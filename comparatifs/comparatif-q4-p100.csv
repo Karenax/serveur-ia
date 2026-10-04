@@ -1,0 +1,17 @@
+﻿mode,test,elapsed_seconds,prompt_tokens,output_tokens,prompt_tps,generation_tps,draft_tokens,draft_accepted,draft_acceptance,finish_reason,source
+cafe-sans-mtp,1.0,25.3829026,40.0,256.0,7.04688362142168,13.06599856202281,,,,length,D:\Serveur IA\comparatifs\2026-10-02-cafe-q4-p100\resultats-sans-mtp.csv
+cafe-sans-mtp,2.0,30.5691859,46.0,256.0,19.08117505194435,9.09472303839931,,,,length,D:\Serveur IA\comparatifs\2026-10-02-cafe-q4-p100\resultats-sans-mtp.csv
+cafe-mtp,1.0,23.5327651,40.0,256.0,7.108659413464512,14.364022753287994,200.0,155.0,0.775,length,D:\Serveur IA\comparatifs\2026-10-02-cafe-q4-p100\resultats-mtp.csv
+cafe-mtp,2.0,29.5421934,46.0,256.0,18.221473293261937,9.488281358574543,182.0,164.0,0.9010989010989011,length,D:\Serveur IA\comparatifs\2026-10-02-cafe-q4-p100\resultats-mtp.csv
+strata-mtp-hybride,1.0,30.1028128,40.0,256.0,30.6,8.907260112871688,206.0,116.0,0.5631067961165048,length,D:\Serveur IA\comparatifs\2026-10-02-strata-q4-p100\essai-hybride-staging16\resultats-strata-mtp.csv
+strata-mtp-hybride,2.0,24.1852548,46.0,256.0,33.7,11.226445295198502,191.0,153.0,0.8010471204188482,length,D:\Serveur IA\comparatifs\2026-10-02-strata-q4-p100\essai-hybride-staging16\resultats-strata-mtp.csv
+strata-mtp-gpu-seul,1.0,30.6800349,40.0,256.0,30.6,8.725914261075264,207.0,118.0,0.5700483091787439,length,D:\Serveur IA\comparatifs\2026-10-02-strata-q4-p100\resultats-strata-mtp.csv
+strata-mtp-gpu-seul,2.0,24.7473749,46.0,256.0,33.9,10.96007706304185,183.0,158.0,0.8633879781420765,length,D:\Serveur IA\comparatifs\2026-10-02-strata-q4-p100\resultats-strata-mtp.csv
+strata-mtp-cpu16-pcie1,2,24.775834700001724,46,256,34.0,10.952059117770013,183.0,158.0,0.8633879781420765,length,D:\Serveur IA\comparatifs\2026-10-02-strata-hybride-p100\essai-20261002-194111\resultats.csv
+strata-mtp-cpu16-pcie1,1,30.695652999998856,40,256,30.75,8.71879544405705,206.5,117.5,0.5690047371136437,length,D:\Serveur IA\comparatifs\2026-10-02-strata-hybride-p100\essai-20261002-194111\resultats.csv
+strata-mtp-cpu16-pcie0.5,2,15.892580050000106,46,256,34.0,17.618416811552144,190.0,154.0,0.8105263157894737,length,D:\Serveur IA\comparatifs\2026-10-02-strata-hybride-p100\essai-20261002-194111\resultats.csv
+strata-mtp-cpu16-pcie0.5,1,18.76786070000162,40,256,30.9,14.653476751259891,201.0,115.5,0.5746590093323761,length,D:\Serveur IA\comparatifs\2026-10-02-strata-hybride-p100\essai-20261002-194111\resultats.csv
+strata-mtp-cpu16-pcie0.25,2,10.946018500000719,46,256,34.0,26.73084856603071,189.0,154.0,0.8148148148148148,length,D:\Serveur IA\comparatifs\2026-10-02-strata-hybride-p100\essai-20261002-194111\resultats.csv
+strata-mtp-cpu16-pcie0.25,1,12.695485049998751,40,256,30.9,22.462477417781596,195.0,118.0,0.6051178203240059,length,D:\Serveur IA\comparatifs\2026-10-02-strata-hybride-p100\essai-20261002-194111\resultats.csv
+strata-mtp-cpu16-pcie0,2,8.640354449998995,46,256,34.0,35.16107004601431,188.0,153.0,0.8138297872340425,length,D:\Serveur IA\comparatifs\2026-10-02-strata-hybride-p100\essai-20261002-194111\resultats.csv
+strata-mtp-cpu16-pcie0,1,10.217975399998977,40,256,30.9,28.70058753791308,187.0,113.0,0.6042780748663101,length,D:\Serveur IA\comparatifs\2026-10-02-strata-hybride-p100\essai-20261002-194111\resultats.csv

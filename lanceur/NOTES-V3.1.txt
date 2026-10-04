@@ -1,0 +1,16 @@
+Qwen 3.1 — accès par EXE personnel et interfaces par fonction
+4 octobre 2026
+
+Cette version remplace le fonctionnement de connexion décrit dans NOTES-V3.txt : aucun compte ni mot de passe n'est désormais requis. Chaque client reçoit un EXE unique, avec ses clés WireGuard et son jeton propres. Cet accès est suspendu, limité ou révoqué dans Clients & accès.
+
+Console : navigation par Pilotage, Clients et Maintenance. Les rubriques Clients & accès, Accès distant, API locale, Mises à jour, Sauvegardes, Démarrage et Journaux sont séparées. Les commandes de sauvegarde des réglages du modèle apparaissent uniquement dans les rubriques concernées.
+
+Client : barre latérale avec conversations et recherche, espace de chat, accès personnel, connexion serveur, mises à jour et API locale. Les réglages n'encombrent plus la conversation. La connexion est automatique ; les adresses de secours locales ou publiques sont essayées sans login. L'historique chiffré et l'EXE personnel sont conservés par les mises à jour signées.
+
+Code : Python pour l'application Windows et le proxy local ; HTML, CSS et JavaScript pour l'interface ; pywebview/WebView2 pour la fenêtre native ; Go pour le tunnel WireGuard. Les données du modèle restent sur le serveur.
+
+Référence d'interface étudiée : https://github.com/CopilotKit/OpenDots (MIT, React/TypeScript). La disposition en espace de travail et navigation latérale a servi de référence. Notre interface est propre au projet ; aucun code OpenDots ni service de ses agents n'est incorporé.
+
+Validation : 34 tests réussis, accès sans session et révocation sur un tunnel WireGuard réel, conversation en streaming via l'interface avec un modèle simulé isolé, interface Windows compilée vérifiée, console 3.1 déployée et modèle de production toujours chargé.
+
+Migration : remplacer une première fois le client 3.0 (qui affichait le login) par l'EXE personnel 3.1 téléchargé depuis Clients & accès. Les nouvelles versions ultérieures se lancent depuis le bouton Mettre à jour du client.

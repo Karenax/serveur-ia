@@ -1,0 +1,34 @@
+[
+  {
+    "path": "D:\\Serveur IA\\lanceur\\session.json",
+    "sha256": "00ec1a702f5a3b2fa77bc7b117aea797c4d959df5b0b4e7c0f0ccae5d49cc281"
+  },
+  {
+    "path": "D:\\Serveur IA\\lanceur\\reglages.json",
+    "sha256": "5beb1ffcf8de48735588dc76ae17421a94a6b2ed2ca4d1a0e5729d758e8957bb"
+  },
+  {
+    "path": "D:\\Serveur IA\\lanceur\\reglages-par-defaut.json",
+    "sha256": "5114c1b2ed9a0da6a40756e9b99c98de98b70573aefb93e87c3b29f6c2b9ba5a"
+  },
+  {
+    "path": "D:\\Serveur IA\\lanceur\\base-strata.json",
+    "sha256": "e4410573aad540c2def0cab886af7e211e0ebf7d791767d9d848c5142661a16b"
+  },
+  {
+    "path": "D:\\Serveur IA\\lanceur\\exploitation.json",
+    "sha256": "2a56a8b1a5612be6e1fd6d4e5e9f098302abeeb22ad7fb0a2f91de249c448e1b"
+  },
+  {
+    "path": "D:\\Serveur IA\\lanceur\\sessions\\20261003-211939-259117\\strata.json",
+    "sha256": "9c8c6624f1841689308f14d45f470e8e3c7257736056fff6ea06d92abd63ab5b"
+  },
+  {
+    "path": "D:\\Serveur IA\\lanceur\\sessions\\20261003-211939-259117\\state.json",
+    "sha256": "c148b30b7a336712ffd8f9d2cc19e5900c971e0c19bfbf268257339680f68e2d"
+  },
+  {
+    "path": "D:/Serveur IA/strata-build-p100/strata.exe",
+    "sha256": "9b07c8c1e2367d217e17199f137f6c8d33f5832ab02df594b68652ba5c9488d0"
+  }
+]

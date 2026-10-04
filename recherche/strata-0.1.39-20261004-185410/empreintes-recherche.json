@@ -1,0 +1,17 @@
+[
+  {
+    "Algorithm": "SHA256",
+    "Hash": "BA5843A23CF9CBF3B11153B110011B835AA0F092ECB09972385CBB8C5E5D8706",
+    "Path": "D:\\Serveur IA\\recherche\\strata-0.1.39-20261004-185410\\build-officiel\\strata.exe"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "AD160C3651D7B43BBBF43F9887AFEE82825A80BE0A3E50775D5032FE61AF5793",
+    "Path": "D:\\Serveur IA\\recherche\\strata-0.1.39-20261004-185410\\build-adapte\\strata.exe"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "4293F62B0D4D700805785B4F5116083C994D2CABA7CAC79D0471154E8D2CBE9C",
+    "Path": "D:\\Serveur IA\\recherche\\strata-0.1.39-20261004-185410\\adaptations-v0.1.39.patch"
+  }
+]

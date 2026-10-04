@@ -1,0 +1,96 @@
+[
+  {
+    "test": 1,
+    "elapsed_seconds": 30.710700499999803,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 40,
+      "prompt_ms": 1304.2,
+      "prompt_per_token_ms": 32.605,
+      "prompt_per_second": 30.7,
+      "predicted_n": 256,
+      "predicted_ms": 29348.1,
+      "predicted_per_token_ms": 114.641,
+      "predicted_per_second": 8.7,
+      "draft_n": 208,
+      "draft_n_accepted": 118
+    },
+    "nvml": {
+      "1": {
+        "rx_integrated_GB": 176.13284502495333,
+        "rx_mean_GB_s": 5.735227206066318,
+        "rx_peak_GB_s": 18.228224,
+        "mean_gpu_util": 51.67391304347826,
+        "mean_memory_util": 5.318840579710145,
+        "sm_min": 1189,
+        "sm_max": 1328,
+        "max_power_w": 90.616,
+        "max_temp_c": 48,
+        "throttle_values": [
+          0
+        ]
+      },
+      "2": {
+        "rx_integrated_GB": 144.37381394034048,
+        "rx_mean_GB_s": 4.701091528027549,
+        "rx_peak_GB_s": 16.76288,
+        "mean_gpu_util": 49.731884057971016,
+        "mean_memory_util": 5.905797101449275,
+        "sm_min": 1189,
+        "sm_max": 1328,
+        "max_power_w": 94.54,
+        "max_temp_c": 51,
+        "throttle_values": [
+          0
+        ]
+      }
+    }
+  },
+  {
+    "test": 2,
+    "elapsed_seconds": 24.86357230000067,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 46,
+      "prompt_ms": 1353.3,
+      "prompt_per_token_ms": 29.42,
+      "prompt_per_second": 34.0,
+      "predicted_n": 256,
+      "predicted_ms": 23359.3,
+      "predicted_per_token_ms": 91.247,
+      "predicted_per_second": 11.0,
+      "draft_n": 183,
+      "draft_n_accepted": 158
+    },
+    "nvml": {
+      "1": {
+        "rx_integrated_GB": 130.01767224880228,
+        "rx_mean_GB_s": 5.229243436141266,
+        "rx_peak_GB_s": 19.400704,
+        "mean_gpu_util": 54.786407766990294,
+        "mean_memory_util": 5.359223300970874,
+        "sm_min": 1328,
+        "sm_max": 1328,
+        "max_power_w": 93.027,
+        "max_temp_c": 49,
+        "throttle_values": [
+          0
+        ]
+      },
+      "2": {
+        "rx_integrated_GB": 99.58704560730907,
+        "rx_mean_GB_s": 4.005339393941649,
+        "rx_peak_GB_s": 18.036736,
+        "mean_gpu_util": 51.349514563106794,
+        "mean_memory_util": 5.747572815533981,
+        "sm_min": 1328,
+        "sm_max": 1328,
+        "max_power_w": 99.285,
+        "max_temp_c": 52,
+        "throttle_values": [
+          0
+        ]
+      }
+    }
+  }
+]

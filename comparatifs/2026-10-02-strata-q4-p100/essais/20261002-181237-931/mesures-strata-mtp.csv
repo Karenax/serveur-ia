@@ -1,0 +1,1 @@
+time,gpu_index,gpu_util_pct,vram_mib,power_w,server_cpu_seconds,server_ram_bytes,io_read_bytes_per_sec,disk_d_read_bytes_per_sec

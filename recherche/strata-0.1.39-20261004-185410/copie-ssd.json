@@ -1,0 +1,25 @@
+{
+  "status": "verifie",
+  "files": [
+    {
+      "name": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+      "expected_bytes": 44766155936,
+      "present_bytes": 44766155936,
+      "no_active_writer": true
+    },
+    {
+      "name": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+      "expected_bytes": 44735995008,
+      "present_bytes": 44735995008,
+      "no_active_writer": true
+    },
+    {
+      "name": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+      "expected_bytes": 7971004256,
+      "present_bytes": 7971004256,
+      "no_active_writer": true
+    }
+  ],
+  "elapsed_seconds": 855,
+  "verification": "Exact sizes, no open writer, and equal 256 KiB samples at beginning/middle/end of all shards"
+}

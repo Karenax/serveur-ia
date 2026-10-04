@@ -1,0 +1,3 @@
+"mode","test","elapsed_seconds","prompt_tokens","output_tokens","prompt_tps","generation_tps","draft_tokens","draft_accepted","draft_acceptance","finish_reason"
+"mtp","1","23,5327651","40","256","7,108659413464512","14,364022753287994","200","155","0,775","length"
+"mtp","2","29,5421934","46","256","18,221473293261937","9,488281358574543","182","164","0,9010989010989011","length"

@@ -1,0 +1,57 @@
+{
+  "request": {
+    "model": "qwen3.8-flash-next-iq3-s",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Écris une fonction Python fibonacci(n) qui retourne les n premiers nombres de Fibonacci, puis donne un exemple pour n=8. Réponds en français."
+      }
+    ],
+    "max_tokens": 256,
+    "temperature": 0,
+    "seed": 42,
+    "cache_prompt": false,
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    }
+  },
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "length",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Voici une implémentation simple et efficace de la fonction `fibonacci(n)` en Python, suivie d'un exemple d'utilisation pour `n=8`.\n\n```python\ndef fibonacci(n):\n    \"\"\"\n    Retourne une liste contenant les n premiers nombres de Fibonacci.\n    \"\"\"\n    if n <= 0:\n        return []\n    elif n == 1:\n        return [0]\n    \n    fib_sequence = [0, 1]\n    for i in range(2, n):\n        next_value = fib_sequence[-1] + fib_sequence[-2]\n        fib_sequence.append(next_value)\n    \n    return fib_sequence\n\n# Exemple pour n=8\nn = 8\nresult = fibonacci(n)\nprint(f\"Les {n} premiers nombres de Fibonacci sont : {result}\")\n```\n\n**Sortie attendue :**\n```\nLes 8 premiers nombres de Fibonacci sont : [0, 1, 1, 2, 3, 5, 8, 13]\n```\n\n### Explication :\n- La suite de Fibonacci commence généralement par `0` et `1`.\n- Chaque nombre suivant est la somme des deux précéd"
+        }
+      }
+    ],
+    "created": 1791046891,
+    "model": "qwen3.8-flash-next-iq3-s",
+    "system_fingerprint": "b1-0ae77ef",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 256,
+      "prompt_tokens": 46,
+      "total_tokens": 302,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "id": "chatcmpl-EHfF6jqFvZgFeZ0A8rqWRF9EDBMGb7so",
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 46,
+      "prompt_ms": 1386.767,
+      "prompt_per_token_ms": 30.147108695652175,
+      "prompt_per_second": 33.170676833238744,
+      "predicted_n": 256,
+      "predicted_ms": 12989.537,
+      "predicted_per_token_ms": 50.93936078431373,
+      "predicted_per_second": 19.631184698884958,
+      "draft_n": 174,
+      "draft_n_accepted": 167
+    }
+  },
+  "elapsed_seconds": 14.39100000000326
+}

@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-d11e211e10f1494e961ba7a0",
+  "object": "chat.completion",
+  "created": 1790962872,
+  "model": "qwen3.8-flash-next",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Pour comprendre les couleurs du ciel, il faut d'abord regarder la lumière du soleil. Bien qu'elle nous paraisse blanche, elle est en réalité composée de toutes les couleurs de l'arc-en-ciel (rouge, orange, jaune, vert, bleu, indigo, violet). Chaque couleur voyage sous forme d'ondes de longueurs différentes : le rouge a des ondes longues, tandis que le bleu et le violet ont des ondes courtes.\n\nLorsque cette lumière entre dans l'atmosphère terrestre, elle rencontre des milliards de molécules de gaz (principalement de l'azote et de l'oxygène). C'est ici qu'intervient un phénomène physique appelé la **diffusion de Rayleigh**.\n\n### Pourquoi le ciel est bleu en journée ?\n\nLes molécules de l'atmosphère sont beaucoup plus petites que la longueur d'onde de la lumière visible. Elles interagissent beaucoup plus facilement avec les ondes courtes (bleu et violet) qu'avec les ondes longues (rouge et jaune).\n\n1.  **La diffusion préférentielle** : La lumière bleue est diffusée (dispersée) dans toutes les directions par les molécules de l'air"
+      },
+      "finish_reason": "length"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 40,
+    "completion_tokens": 256,
+    "total_tokens": 296,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 40,
+    "prompt_ms": 1306.9,
+    "prompt_per_token_ms": 32.672,
+    "prompt_per_second": 30.6,
+    "predicted_n": 256,
+    "predicted_ms": 29398.6,
+    "predicted_per_token_ms": 114.838,
+    "predicted_per_second": 8.7,
+    "draft_n": 207,
+    "draft_n_accepted": 118
+  }
+}

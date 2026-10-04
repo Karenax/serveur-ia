@@ -1,0 +1,122 @@
+[
+  {
+    "archive": "D:\\Serveur IA\\comparatifs\\huihui-confirmation-mtp-2-tensor-20261003-202134",
+    "mode": "confirmation-mtp-2-tensor",
+    "ram_gib": 17.900836944580078,
+    "ciel": {
+      "median": 31.815907528673115,
+      "min": 31.73612272694688,
+      "max": 31.895692330399346
+    },
+    "fibonacci": {
+      "median": 34.739773871244324,
+      "min": 34.52833415411472,
+      "max": 34.95121358837394
+    }
+  },
+  {
+    "archive": "D:\\Serveur IA\\comparatifs\\huihui-mtp-2-layer-fa-off-20261003-201021",
+    "mode": "mtp-2-layer-fa-off",
+    "ram_gib": 17.928325653076172,
+    "ciel": {
+      "median": 19.775869153458945,
+      "min": 18.678250795730108,
+      "max": 20.873487511187783
+    },
+    "fibonacci": {
+      "median": 22.279866004498242,
+      "min": 22.129722873385703,
+      "max": 22.43000913561078
+    }
+  },
+  {
+    "archive": "D:\\Serveur IA\\comparatifs\\huihui-mtp-2-layer-fa-on-20261003-200729",
+    "mode": "mtp-2-layer-fa-on",
+    "ram_gib": 17.898197174072266,
+    "ciel": {
+      "median": 20.41814391190561,
+      "min": 20.284232207208444,
+      "max": 20.552055616602775
+    },
+    "fibonacci": {
+      "median": 22.495486841594037,
+      "min": 22.491177504871104,
+      "max": 22.499796178316974
+    }
+  },
+  {
+    "archive": "D:\\Serveur IA\\comparatifs\\huihui-mtp-2-tensor-fa-on-20261003-201735",
+    "mode": "mtp-2-tensor-fa-on",
+    "ram_gib": 17.89968490600586,
+    "ciel": {
+      "median": 27.15850681153093,
+      "min": 22.51916712286378,
+      "max": 31.79784650019808
+    },
+    "fibonacci": {
+      "median": 31.180307407849632,
+      "min": 29.678245915575047,
+      "max": 32.68236890012422
+    }
+  },
+  {
+    "archive": "D:\\Serveur IA\\comparatifs\\huihui-mtp-4-layer-fa-on-20261003-201231",
+    "mode": "mtp-4-layer-fa-on",
+    "ram_gib": 17.900341033935547,
+    "ciel": {
+      "median": 16.04375288172427,
+      "min": 14.4496101013541,
+      "max": 17.63789566209444
+    },
+    "fibonacci": {
+      "median": 19.840195143944324,
+      "min": 19.046662979830256,
+      "max": 20.633727308058393
+    }
+  },
+  {
+    "archive": "D:\\Serveur IA\\comparatifs\\huihui-mtp-4-tensor-fa-on-20261003-201928",
+    "mode": "mtp-4-tensor-fa-on",
+    "ram_gib": 17.906890869140625,
+    "ciel": {
+      "median": 21.697048993296093,
+      "min": 17.836726799751965,
+      "max": 25.55737118684022
+    },
+    "fibonacci": {
+      "median": 24.63081199433826,
+      "min": 22.44539497513622,
+      "max": 26.8162290135403
+    }
+  },
+  {
+    "archive": "D:\\Serveur IA\\comparatifs\\huihui-mtp-6-layer-fa-on-20261003-201414",
+    "mode": "mtp-6-layer-fa-on",
+    "ram_gib": 17.90259552001953,
+    "ciel": {
+      "median": 11.684856466052825,
+      "min": 11.440708193296821,
+      "max": 11.929004738808827
+    },
+    "fibonacci": {
+      "median": 16.06289695193021,
+      "min": 15.116372952576203,
+      "max": 17.009420951284216
+    }
+  },
+  {
+    "archive": "D:\\Serveur IA\\comparatifs\\huihui-sans-mtp-layer-fa-on-20261003-200259",
+    "mode": "sans-mtp-layer-fa-on",
+    "ram_gib": 16.54174041748047,
+    "ciel": {
+      "median": 12.125610941816017,
+      "min": 12.122600854096655,
+      "max": 12.12862102953538
+    },
+    "fibonacci": {
+      "median": 12.125015660279933,
+      "min": 12.122610074963369,
+      "max": 12.127421245596498
+    }
+  }
+]

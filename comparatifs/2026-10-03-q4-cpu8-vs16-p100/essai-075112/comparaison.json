@@ -1,0 +1,161 @@
+[
+  {
+    "test": "ciel",
+    "prompt": "Ciel bleu",
+    "mode": "16 physiques",
+    "median_tps": 28.260303926589398,
+    "loss_percent": 0.0,
+    "gain_16_over_mode_percent": 0.0,
+    "output_tokens": [
+      256,
+      256
+    ],
+    "min_tps": 28.235190311800324,
+    "max_tps": 28.28541754137847,
+    "median_mtp_acceptance": 0.5842105263157895,
+    "average_cpu_cores": 14.075388245112986,
+    "same_text_as_16": true
+  },
+  {
+    "test": "ciel",
+    "prompt": "Ciel bleu",
+    "mode": "8 regroupés",
+    "median_tps": 21.354347602148252,
+    "loss_percent": 24.436949943569108,
+    "gain_16_over_mode_percent": 32.33981413577067,
+    "output_tokens": [
+      256,
+      256
+    ],
+    "min_tps": 21.07793897277982,
+    "max_tps": 21.63075623151669,
+    "median_mtp_acceptance": 0.5968758795384181,
+    "average_cpu_cores": 7.306198134044672,
+    "same_text_as_16": true
+  },
+  {
+    "test": "ciel",
+    "prompt": "Ciel bleu",
+    "mode": "8 répartis",
+    "median_tps": 25.496940768651882,
+    "loss_percent": 9.77824996191049,
+    "gain_16_over_mode_percent": 10.838018501949186,
+    "output_tokens": [
+      256,
+      256,
+      256,
+      256
+    ],
+    "min_tps": 21.212598294705966,
+    "max_tps": 25.73355716166906,
+    "median_mtp_acceptance": 0.601080836374954,
+    "average_cpu_cores": 6.995049270983677,
+    "same_text_as_16": true
+  },
+  {
+    "test": "fibonacci",
+    "prompt": "Fibonacci Python",
+    "mode": "16 physiques",
+    "median_tps": 33.314680187895924,
+    "loss_percent": 0.0,
+    "gain_16_over_mode_percent": 0.0,
+    "output_tokens": [
+      256,
+      256
+    ],
+    "min_tps": 32.33139681737813,
+    "max_tps": 34.29796355841372,
+    "median_mtp_acceptance": 0.8017050704146484,
+    "average_cpu_cores": 12.909931044051739,
+    "same_text_as_16": true
+  },
+  {
+    "test": "fibonacci",
+    "prompt": "Fibonacci Python",
+    "mode": "8 regroupés",
+    "median_tps": 25.61983822520743,
+    "loss_percent": 23.097451091498776,
+    "gain_16_over_mode_percent": 30.03470160524868,
+    "output_tokens": [
+      256,
+      256
+    ],
+    "min_tps": 25.507153959587104,
+    "max_tps": 25.732522490827762,
+    "median_mtp_acceptance": 0.8138297872340425,
+    "average_cpu_cores": 7.075289940545272,
+    "same_text_as_16": true
+  },
+  {
+    "test": "fibonacci",
+    "prompt": "Fibonacci Python",
+    "mode": "8 répartis",
+    "median_tps": 30.332125277487236,
+    "loss_percent": 8.95267459746567,
+    "gain_16_over_mode_percent": 9.832990214577443,
+    "output_tokens": [
+      256,
+      256,
+      256,
+      256
+    ],
+    "min_tps": 27.52244261678224,
+    "max_tps": 31.80045216267919,
+    "median_mtp_acceptance": 0.8138297872340425,
+    "average_cpu_cores": 6.9622702511138534,
+    "same_text_as_16": true
+  },
+  {
+    "test": "fourmis",
+    "prompt": "Poésie sur les fourmis",
+    "mode": "16 physiques",
+    "median_tps": 27.585364378387496,
+    "loss_percent": 0.0,
+    "gain_16_over_mode_percent": 0.0,
+    "output_tokens": [
+      426,
+      426
+    ],
+    "min_tps": 27.431838963514366,
+    "max_tps": 27.738889793260622,
+    "median_mtp_acceptance": 0.6541353383458647,
+    "average_cpu_cores": 14.916360436078953,
+    "same_text_as_16": true
+  },
+  {
+    "test": "fourmis",
+    "prompt": "Poésie sur les fourmis",
+    "mode": "8 regroupés",
+    "median_tps": 20.709896173226188,
+    "loss_percent": 24.924333464842974,
+    "gain_16_over_mode_percent": 33.19895062559479,
+    "output_tokens": [
+      426,
+      426
+    ],
+    "min_tps": 20.634336310619418,
+    "max_tps": 20.785456035832958,
+    "median_mtp_acceptance": 0.6578473413379073,
+    "average_cpu_cores": 7.652292789320468,
+    "same_text_as_16": true
+  },
+  {
+    "test": "fourmis",
+    "prompt": "Poésie sur les fourmis",
+    "mode": "8 répartis",
+    "median_tps": 25.07286291979948,
+    "loss_percent": 9.108095960322004,
+    "gain_16_over_mode_percent": 10.020800044353727,
+    "output_tokens": [
+      426,
+      426,
+      426,
+      426
+    ],
+    "min_tps": 19.755880388810567,
+    "max_tps": 25.56685191631357,
+    "median_mtp_acceptance": 0.6566037735849056,
+    "average_cpu_cores": 7.548182967183292,
+    "same_text_as_16": true
+  }
+]

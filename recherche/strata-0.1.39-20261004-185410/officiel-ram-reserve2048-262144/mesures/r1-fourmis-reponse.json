@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-514470705a8648f89f35b666",
+  "object": "chat.completion",
+  "created": 1791138500,
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Sous le soleil ardent, dans l’ombre des racines,\nUn peuple minuscule, aux forces divines,\nS’agite sans relâche, silencieux et fier,\nPortant le poids du monde sur son dos léger.\n\nElles marchent en file, noires comme l’encre,\nSur les chemins de terre, aux sentiers de l’ombre.\nChacune est un soldat, une ouvrière dévouée,\nPour la gloire du nid, pour la reine adorée.\n\nLeurs antennes se touchent, langage des ténèbres,\nUn code secret, pur, sans aucune ombre.\nElles transportent des graines, des miettes de pain,\nDes trésors inestimables aux yeux du destin.\n\nPas de repos, pas de trêve, pas de sommeil,\nSeule la mission compte, seule la communauté.\nElles soulèvent des fardeaux cent fois plus lourds,\nDéfiant la gravité, défiant le jour.\n\nQuand la pluie menace, elles se rassemblent,\nEn ponts vivants, en chaînes, elles s’assemblent.\nSolidarité parfaite, instinct ancestral,\nUn ballet chorégraphié, majestuel et brutal.\n\nNous les ignorons, ces géantes invisibles,\nPourtant, elles bâtissent des cités invincibles.\nDans leur humilité, réside la grandeur,\nDans leur silence, bat le cœur de la terre.\n\nApprenons d’elles la patience et l’effort,\nLa force du groupe, bien plus que le sort.\nCar dans la petitesse, réside la puissance,\nEt dans l’union, la seule vraie alliance.\n\nAinsi vivent les fourmis, reines de l’ombre,\nGardant les secrets, les lois, les nombres.\nRespectons ces créatures, humbles et fières,\nMaîtresses absolues de leurs propres frontières."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 26,
+    "completion_tokens": 431,
+    "total_tokens": 457,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 26,
+    "prompt_ms": 506.3,
+    "prompt_per_token_ms": 19.473,
+    "prompt_per_second": 51.4,
+    "predicted_n": 431,
+    "predicted_ms": 16002.4,
+    "predicted_per_token_ms": 37.129,
+    "predicted_per_second": 26.9,
+    "draft_n": 496,
+    "draft_n_accepted": 183
+  }
+}

@@ -1,0 +1,40 @@
+Récapitulatif des essais — 3 octobre 2026
+Vitesses en tokens générés/s : ciel / Fibonacci. RAM en Gio (working set du processus).
+Les répétitions d'une configuration sont regroupées. Chargement exclu du débit.
+
+Q4_K_XL (fichiers 103,69 Gio)
+Café sans MTP : 13,07 / 9,09 ; pic RAM 100,33.
+Café avec MTP : 14,36 / 9,49 ; pic RAM 100,90.
+Strata GPU seul : 8,72 / 10,95 ; pic RAM 84,12.
+Strata hybride staging initial : 8,91 / 11,23 ; pic RAM 84,10.
+Strata 50% des absents sur CPU : 14,65 / 17,62 ; pic RAM 84,12.
+Strata 75% des absents sur CPU : 22,46 / 26,73 ; pic RAM 84,12.
+Strata tous les absents sur CPU : 28,70 / 35,16 ; pic RAM 84,12.
+Strata comparaison Q4/IQ4, 16 cœurs : 28,26 / 33,31 ; pic RAM 83,49.
+Strata 8 cœurs regroupés : 21,35 / 25,62 ; RAM non relevée séparément.
+Strata 8 cœurs répartis : 25,50 / 30,33 ; RAM non relevée séparément.
+Poésie : 27,59 / 20,71 / 25,07 pour 16 / 8 regroupés / 8 répartis.
+
+IQ4_XS (fichiers environ 90,78 Gio)
+Strata hybride 16 cœurs : 29,82 / 36,75 ; pic RAM 70,07 ; poésie 27,99.
+
+IQ3_S (fichiers environ 77,88 Gio)
+Strata initial : 29,1 / 34,7.
+Strata référence répétée : environ 29,4–29,5 / 35,5–35,6.
+Strata MTP seuil 0,7 : 29,3 / 36,75 (confirmations).
+Strata MTP seuil 0,3 : 27,7 / 35,4.
+Strata 12,5% des absents transférés au GPU : 28,9 / 35,8.
+Strata 25% des absents transférés au GPU : 25,8 / 30,6.
+RAM processus Strata IQ3 : pic non archivé. Allocations connues : experts 29,08 + PLE 26,82 = 55,90 Gio, auxquels s'ajoutent les autres allocations. Ce total n'est pas un pic RAM mesuré.
+Café GPU seul sans MTP, caches 8 Gio/carte : 17,16 / 13,84 ; RAM observée environ 75,5.
+Café GPU seul avec MTP, caches 8 Gio/carte : 23,24 / 16,81 ; RAM observée environ 75,6.
+Café GPU seul avec MTP, cache auto : 26,01 / 19,22 ; RAM non relevée séparément.
+Café vrai hybride, 100% des absents CPU, 15 travailleurs/GPU : 22,57 / 22,10 ; RAM observée à la relance 76,10.
+Café vrai hybride, 25% des absents CPU, 8 travailleurs/GPU : 22,31 / 19,17 ; RAM non relevée séparément.
+VRAM vrai hybride : 14,88 / 14,81 Gio sur les deux P100.
+Le premier essai IQ3 intitulé hybride (archive 185106) était GPU seul : ancien binaire sans calcul expert CPU. Les résultats ci-dessus utilisent le mode effectif corrigé.
+
+Anciens essais avec protocole différent : Q4 CPU seul 1,765 t/s (64 tokens), premier placement GPU 10,09 / 9,02 (96 tokens). RAM non relevée : comparaison directe exclue.
+MTP = génération spéculative. Strata et Café emploient des brouillons différents.
+Sources : comparatifs/ressources-q4-p100.json, comparatif-q4-p100.csv ; comparatifs/2026-10-02-q4-iq4-xs-p100/essai-20261002-210119/RAPPORT.txt ; comparatifs/2026-10-03-q4-cpu8-vs16-p100/essai-075112/comparaison.json ; archives IQ3, audits et Café du 3 octobre.
+Confirmation finale Café vrai hybride : 22,54 / 22,13 tok/s. RAM observée en inférence 76,10 Gio. Serveur laissé actif.

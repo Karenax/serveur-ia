@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-eb7a0e24e1c840dab793e54f",
+  "object": "chat.completion",
+  "created": 1791139106,
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Sous le soleil de midi, quand l’air tremble de chaleur,\nUn peuple minuscule s’agite avec ferveur.\nLoin des regards humains, loin du bruit des cités,\nLes fourmis bâtissent leur empire, leur vérité.\n\nNoires comme l’encre, petites comme le vent,\nElles marchent en file indienne, silencieuses et prudentes.\nChacune porte un fardeau, lourd pour ses frêles pattes,\nUne miette de pain, une graine, un éclat de terre.\n\nElles ne connaissent ni repos, ni paresse, ni doute,\nGuidées par des phéromones, un langage sans route.\nLeur reine trône au cœur du labyrinthe souterrain,\nMère de milliers d’âmes, source du destin.\n\nLes ouvrières s’activent, les soldats veillent aux portes,\nPrêtes à défendre le nid contre les bêtes fortes.\nIl n’y a pas d’individu, seulement le collectif,\nUn seul corps, une seule âme, un instinct primitif.\n\nQuand la pluie menace, elles déménagent leurs trésors,\nAvec une précision qui force le respect des morts.\nElles ignorent le temps, les saisons, les années,\nVivant dans l’instant présent, par la nature dictées.\n\nNous les voyons passer, insignifiantes et rapides,\nMais elles sont les architectes de mondes solides.\nDans leur humilité, elles nous enseignent la force,\nLa puissance du nombre, la beauté de la course.\n\nNe les écrasez pas, ces guerrières de l’ombre,\nCar dans leur petit monde, elles sont les plus grandes ombres.\nRespectez leur travail, leur ordre, leur silence,\nCar la vie est partout, même dans l’immense immensité du commencement."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 26,
+    "completion_tokens": 413,
+    "total_tokens": 439,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 26,
+    "prompt_ms": 982.3,
+    "prompt_per_token_ms": 37.781,
+    "prompt_per_second": 26.5,
+    "predicted_n": 413,
+    "predicted_ms": 15540.0,
+    "predicted_per_token_ms": 37.627,
+    "predicted_per_second": 26.6,
+    "draft_n": 279,
+    "draft_n_accepted": 156
+  }
+}

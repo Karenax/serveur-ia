@@ -1,0 +1,7 @@
+{
+  "status": "interrompue",
+  "read_gib": 27.099609375,
+  "total_gib": 60.9375,
+  "elapsed_seconds": 436.39613029999964,
+  "reason": "Arrêt pour laisser le chargeur Strata terminer seul; aucun benchmark exécuté pendant cette lecture."
+}

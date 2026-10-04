@@ -1,0 +1,549 @@
+{
+  "created": "2026-10-02T18:37:36.2264548+02:00",
+  "engine": "Strata",
+  "commit": "d9ab8435f654c368c586340d490915f6addf56a3",
+  "engine_pid": 33648,
+  "engine_creation": "2026-10-02T18:17:04.0065340+02:00",
+  "engine_binary_sha256": "F795EB68F0640E640DA1E3373BEDE1609D0B742A65CD603BB68E8FFAA7943609",
+  "cpu_expert_jobs": 0,
+  "ple_ram_gib": 26.82,
+  "expert_ram_gib": 55.71,
+  "staging_blobs": 64,
+  "model_files": [
+    {
+      "path": "D:\\modèle\\qwen3.8FlashNext\\mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf",
+      "bytes": 2786568256,
+      "mtime_utc": "2026-09-28T18:55:03.6445138Z"
+    },
+    {
+      "path": "D:\\modèle\\qwen3.8FlashNext\\Qwen3.8-Flash-Next-UD-Q4_K_XL-00001-of-00004.gguf",
+      "bytes": 10946752,
+      "mtime_utc": "2026-10-01T10:26:10.0000000Z"
+    },
+    {
+      "path": "D:\\modèle\\qwen3.8FlashNext\\Qwen3.8-Flash-Next-UD-Q4_K_XL-00002-of-00004.gguf",
+      "bytes": 49859583296,
+      "mtime_utc": "2026-10-01T12:18:42.0000000Z"
+    },
+    {
+      "path": "D:\\modèle\\qwen3.8FlashNext\\Qwen3.8-Flash-Next-UD-Q4_K_XL-00003-of-00004.gguf",
+      "bytes": 49376141664,
+      "mtime_utc": "2026-10-01T12:18:58.0000000Z"
+    },
+    {
+      "path": "D:\\modèle\\qwen3.8FlashNext\\Qwen3.8-Flash-Next-UD-Q4_K_XL-00004-of-00004.gguf",
+      "bytes": 12087983680,
+      "mtime_utc": "2026-10-01T10:41:32.0000000Z"
+    }
+  ],
+  "model_file_identity_note": "Fichiers GGUF originaux conservés ; tailles et dates contrôlées. Pas de relecture des 111 Go pour calculer une empreinte intégrale.",
+  "main_model_compatibility": "Projections natives Q4/Q5/Q8 préservées ; petits tenseurs compatibles BF16 décrits dans conversions.json.",
+  "mtp_compatibility": "Draft Q8_0 converti en Q2_0 pour Strata ; Café utilisait le draft Q8_0 original.",
+  "files": [
+    {
+      "path": "adaptations-strata.patch",
+      "bytes": 22877,
+      "sha256": "28E3CA9E2E8157F2C5FF555648B5E4464F0C4ED8C5F8C153585A44164CCB6C51"
+    },
+    {
+      "path": "Analyser-Comparatifs.py",
+      "bytes": 3380,
+      "sha256": "6AC3B045D908C8A4DCED995867F0FE2F9438E6C86C61769E77A3A78DC24EC0E5"
+    },
+    {
+      "path": "Build-Strata-P100.cmd",
+      "bytes": 1294,
+      "sha256": "0C0398306C2B020154A8FBEF68C65893111EA60E6ECB4ED5E41E06E33F6C0777"
+    },
+    {
+      "path": "chargement-premiere-version.log",
+      "bytes": 10950,
+      "sha256": "3AC76F8DEAFEE77DEA267D0E4E5F6C6CD43BA988F161F1AF09C89C7C9FFE7C74"
+    },
+    {
+      "path": "Check-Strata-Build-Dependencies.cmd",
+      "bytes": 666,
+      "sha256": "CA56802997F3E0174986BBDB485EEC6E59511FB7B01DAD004071CED8DE74E073"
+    },
+    {
+      "path": "Check-Strata-P100.cmd",
+      "bytes": 693,
+      "sha256": "3269A380C72F1BAFE4E6ED0A8A2412A3869677F85017CCAFFD7D4244274F2385"
+    },
+    {
+      "path": "comparatif-q4-p100.csv",
+      "bytes": 1600,
+      "sha256": "CAA768296651FBD55163109A2F4BF58D0C7CAF77FAE0426920557335558D2BAF"
+    },
+    {
+      "path": "COMPARATIF-Q4-STRATA.txt",
+      "bytes": 6739,
+      "sha256": "03B0A3DFD5DD6DB500850314173DBE7998805FB5B34D746E8103571B9C602C1B"
+    },
+    {
+      "path": "compat-bf16.json",
+      "bytes": 22045,
+      "sha256": "0332813ED1913A68FA6A0611C2D19D0841B4044A8DDD38A5F8BB86E0BDEC6DDE"
+    },
+    {
+      "path": "configuration-tests.json",
+      "bytes": 2069,
+      "sha256": "7691D91669FE76AC24D45F5B843789B3A993C7351DC177EDC10C29E1580140B6"
+    },
+    {
+      "path": "Conserver-Comparatif-Strata.ps1",
+      "bytes": 4131,
+      "sha256": "E7592BDDA0946C7CAD0FCCB7046502DA1DEC1E034C3848C5814D3B7E0CD7FF42"
+    },
+    {
+      "path": "conversion-local.json",
+      "bytes": 901,
+      "sha256": "933E41CBEBC9C7C366007B8EDC1D4A20DD9EE0C09EB1688C74F2D44C83DDA72B"
+    },
+    {
+      "path": "conversions.json",
+      "bytes": 172496,
+      "sha256": "AB3B99914786E10B8B559DFEFC345B6C05507911AECFBE7A69D4DD4C73DFACB8"
+    },
+    {
+      "path": "Convert-MTP-Strata.py",
+      "bytes": 5137,
+      "sha256": "EB48C928A606E261A2FF9060D7E1EC3C7727C830C3E1606FD7B16B7995A457B1"
+    },
+    {
+      "path": "demarrage.json",
+      "bytes": 172,
+      "sha256": "967A70E7C1B00436A9A2FE9284EC4BBB50D51A12E29AB077BB5807FAE029C84E"
+    },
+    {
+      "path": "engine-strata-mtp-test-1.log",
+      "bytes": 5192,
+      "sha256": "FB48F5885358C2C6ECC1940D60EF59EFCB56613BA2E788126495976BEEBE166F"
+    },
+    {
+      "path": "engine-strata-mtp-test-2.log",
+      "bytes": 3530,
+      "sha256": "3DF2B791B53F45E128ABB1D91F12CCD5D2E6183C7918BBBA2D318853103FE9B2"
+    },
+    {
+      "path": "ETAT-DES-ARCHIVES.txt",
+      "bytes": 1443,
+      "sha256": "6AB82982ABF2D415A9315AF1CD7F5FF723A411A3443033B0C826123C3D507447"
+    },
+    {
+      "path": "Fix-Strata-Build-Dependencies.ps1",
+      "bytes": 2248,
+      "sha256": "0857A68D49C9094ECA3D3D681474113B6F6E2BE8868105EA431EF2C4A2DFE9B3"
+    },
+    {
+      "path": "FP16-echec-initial.txt",
+      "bytes": 96,
+      "sha256": "872A85F11D459DE22E9BEB3C8D5AB2D0A8097886C4EDCEE1FCD218B0717B9A3B"
+    },
+    {
+      "path": "Generer-CompteRendu-Strata.py",
+      "bytes": 9542,
+      "sha256": "E1333BB7F86099B345A30056D0D4DD3A9B4D80EE6DF449B5D72AA7B915364A70"
+    },
+    {
+      "path": "gpu-strata-mtp-test-1.json",
+      "bytes": 1888,
+      "sha256": "10F3FCEB9C46933FA27644AB92FE8A6E811CADD3AE3C6C8E0424247A6BDB37E9"
+    },
+    {
+      "path": "gpu-strata-mtp-test-2.json",
+      "bytes": 1701,
+      "sha256": "4A78B50EECFA25C58AFC8663872DE9D8D6060D7B7F29B8933C4000A607EAD50E"
+    },
+    {
+      "path": "inference-echec-1.log",
+      "bytes": 18218,
+      "sha256": "86EE5104B4839F7D9BAB1307E6BA2A0486E81586BEFC2F5F60B7AFE9D05780B7"
+    },
+    {
+      "path": "LISEZ-MOI.txt",
+      "bytes": 2662,
+      "sha256": "864066EE3D25ACC216EDF84F6F6211187F154A33951C3857AB5783BB308FCB77"
+    },
+    {
+      "path": "manifest-pre-tests.json",
+      "bytes": 2815,
+      "sha256": "5727D84FF102CB46C69F798A6305D12640D93A8EF5A1807D6595AB0FA7FF55A8"
+    },
+    {
+      "path": "mesures-inference-echec-1.csv",
+      "bytes": 376,
+      "sha256": "3436A76D6EDD09105911F05B80FD0896812FFF7673567E0A8D1E4B9755B5FA71"
+    },
+    {
+      "path": "mesures-strata-mtp.csv",
+      "bytes": 4257,
+      "sha256": "469B6BE0927571F6B8844E48E9244F1933FB22EB3FE5EB00929CD12666B8680E"
+    },
+    {
+      "path": "metrics-strata-mtp.json",
+      "bytes": 11692,
+      "sha256": "4D99E1FC45265CD152BCA61EA43C2417545F78B8373088F22E265C8F970C70C5"
+    },
+    {
+      "path": "metrics-strata-mtp.txt",
+      "bytes": 133,
+      "sha256": "9309EEB48B74A7FB602B061F08EA38C03543164AD849FA75C33B3CB0D0C8194C"
+    },
+    {
+      "path": "MMQ-Q5K-echec-initial.txt",
+      "bytes": 273,
+      "sha256": "004344A982D749C43B3460E9E46B069AAFA4BEDEC8E045BABF337DEA7C108C0E"
+    },
+    {
+      "path": "prefill_p100_test.cpp",
+      "bytes": 5627,
+      "sha256": "B6D7B8EBCD072FC10081D2A26C76E84F9020D8300C02CFD15C2BEEA48413767E"
+    },
+    {
+      "path": "protocole-comparatif-q4.json",
+      "bytes": 726,
+      "sha256": "A8C54ECB1BB01B988414A1E1F9443854579668E6DF347ED6A7CC2FFDDE728AE0"
+    },
+    {
+      "path": "protocole.json",
+      "bytes": 726,
+      "sha256": "A8C54ECB1BB01B988414A1E1F9443854579668E6DF347ED6A7CC2FFDDE728AE0"
+    },
+    {
+      "path": "python-packages.txt",
+      "bytes": 933,
+      "sha256": "BF776322110B1487887A5345D2AD20C780A5C6A497AA08A699C9F678E28BA5D6"
+    },
+    {
+      "path": "reponse-diagnostic-2.json",
+      "bytes": 808,
+      "sha256": "982542DC5F825825F438EE25260D78A3BBC8B8E7CC2FCA5E3BC4471E1FB2F85D"
+    },
+    {
+      "path": "requete-diagnostic-2.json",
+      "bytes": 414,
+      "sha256": "5B07B63C4F96250868D3E5C72C0DBE0B49AF1A26DAEFD9AFD769EAECBD7D11CA"
+    },
+    {
+      "path": "requete-strata-mtp-test-1.json",
+      "bytes": 416,
+      "sha256": "BF9CBA10E7FEDCCCECE8B633905910ED21060398626B4B7D0A950EB143AC8391"
+    },
+    {
+      "path": "requete-strata-mtp-test-2.json",
+      "bytes": 413,
+      "sha256": "5FDED2B937556204C94EB19C65F446796F15D1F8302256385E7E2CB72D0B86AA"
+    },
+    {
+      "path": "ressources-q4-p100.json",
+      "bytes": 1679,
+      "sha256": "29496176B639F92D63B1FAE4FA041F7278D19CDED9704F8F5E1FE8D444083426"
+    },
+    {
+      "path": "resultats-strata-mtp.csv",
+      "bytes": 408,
+      "sha256": "864E3CB1C6645A3954ACAB1DEFAC0F7A6572CE92EA6C49F558A39B216BF56498"
+    },
+    {
+      "path": "Start-Strata-P100.ps1",
+      "bytes": 1639,
+      "sha256": "185842C6908C76250F86727C2852177E65FAD50AA198B657C7872996EC39C4FC"
+    },
+    {
+      "path": "Stop-Strata-P100.ps1",
+      "bytes": 1880,
+      "sha256": "76BA571D6F57F8F7A54D1D48F52455065357ED5C1BBDA180143018DB734DE75E"
+    },
+    {
+      "path": "strata-build-8.log",
+      "bytes": 1000,
+      "sha256": "91571D396D37D9867062B7395E1F940A64D331D57B18EAD6D3D8F0C666E136BE"
+    },
+    {
+      "path": "strata-build-debug-sync.log",
+      "bytes": 45365,
+      "sha256": "A1F02AE8C1D5F8B193BD7F80A4550A71A2FC51FEA266F04C80F7A379B153DE23"
+    },
+    {
+      "path": "strata-build-dependencies-fixed.log",
+      "bytes": 84415,
+      "sha256": "D793034AFF33700A314EC32560524B13E70B5148F7EC9DB741DB0FA80DEBFFB2"
+    },
+    {
+      "path": "strata-build-final.log",
+      "bytes": 3284,
+      "sha256": "86BFDDB2EA118498FBE120ECF389899F61D5012F0ABC19D772FE3DE2C21A380E"
+    },
+    {
+      "path": "strata-build-staging64.log",
+      "bytes": 118101,
+      "sha256": "F77FBDDDB6DA4C949387987234A4312022A19A363E80BA314406075FD7FE1725"
+    },
+    {
+      "path": "strata-check-build-dependencies.log",
+      "bytes": 2407,
+      "sha256": "59896BECC368423334FB668C9B3881A54A735DDDA283AB43CEAA860DC850289C"
+    },
+    {
+      "path": "strata-engine-p100.log",
+      "bytes": 76977,
+      "sha256": "C410738A7C6AB92B01B5E893C7A88D10773E658F530E3FE61156DBBE98A77991"
+    },
+    {
+      "path": "strata-f16-valide-second.txt",
+      "bytes": 600,
+      "sha256": "B9FF741F03EF78773E252B91763C5D51D2A67AFE73609B506254C5A8C79F6F29"
+    },
+    {
+      "path": "strata-f16-valide.txt",
+      "bytes": 600,
+      "sha256": "B9FF741F03EF78773E252B91763C5D51D2A67AFE73609B506254C5A8C79F6F29"
+    },
+    {
+      "path": "strata-mapped-valide-second.txt",
+      "bytes": 644,
+      "sha256": "CA18DFAF024479A3722C73A975D0D838D8C2125166857D462BEDECDB74E8AA25"
+    },
+    {
+      "path": "strata-mapped-valide.txt",
+      "bytes": 644,
+      "sha256": "CA18DFAF024479A3722C73A975D0D838D8C2125166857D462BEDECDB74E8AA25"
+    },
+    {
+      "path": "strata-mmq-valide-second.txt",
+      "bytes": 1650,
+      "sha256": "57283F1EABD24FC7D341010EB417A6CFAAB692211AA59EA18A2659C3986739F4"
+    },
+    {
+      "path": "strata-mmq-valide.txt",
+      "bytes": 1650,
+      "sha256": "57283F1EABD24FC7D341010EB417A6CFAAB692211AA59EA18A2659C3986739F4"
+    },
+    {
+      "path": "strata-p100-gpu-seul.exe",
+      "bytes": 24015360,
+      "sha256": "F795EB68F0640E640DA1E3373BEDE1609D0B742A65CD603BB68E8FFAA7943609"
+    },
+    {
+      "path": "strata-p100-staging64.exe",
+      "bytes": 24015360,
+      "sha256": "214502B35FFE0D8E594E64563B581C96427A5660BEEF773BA797CE291685DEC8"
+    },
+    {
+      "path": "strata-parity-p100-second.txt",
+      "bytes": 1937,
+      "sha256": "8C5DEE83001733D4C5A4EBE2B30BAA2C8ECB0827048DF03138EA0B9BD94019FA"
+    },
+    {
+      "path": "strata-parity-p100.txt",
+      "bytes": 1937,
+      "sha256": "05AC5FF1089C455A28BE34734429BB94EFC2460B67E761E37FF6EF05B5F80732"
+    },
+    {
+      "path": "strata-prefill-parity-p100-2.txt",
+      "bytes": 241,
+      "sha256": "83C12F41A8927B7746AB8E4655293D26E01C6CC04E90D5582E7824AFF7B6FD78"
+    },
+    {
+      "path": "strata-prefill-parity-p100-4.txt",
+      "bytes": 301,
+      "sha256": "94C099A1AB5C7B04D3195882FC7B151A0EB43ED073B7C06ECA57AAE6AF41CDAE"
+    },
+    {
+      "path": "strata-q4-p100.json",
+      "bytes": 1567,
+      "sha256": "2394068138364D1EF71B358C94031FDFEB773BCCA47A9D2C45951174A9624230"
+    },
+    {
+      "path": "strata-server.stderr.log",
+      "bytes": 0,
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "strata-server.stdout.log",
+      "bytes": 6475,
+      "sha256": "F1D4457BF253490A6E74239E9D55547DE667B19C556E72A9B366958E72A7700E"
+    },
+    {
+      "path": "strata-warmup-response.json",
+      "bytes": 808,
+      "sha256": "11FE03169438089D10323B3309E1E12A0C68596B48A7C5C4AE2ED6290E4C3CDC"
+    },
+    {
+      "path": "strata-warmup.stderr.log",
+      "bytes": 0,
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "strata-warmup.stdout.log",
+      "bytes": 106,
+      "sha256": "49231166362B9FBFC11548D28A2E463813F7CC4A7812A508652F022712EA4D14"
+    },
+    {
+      "path": "Test-Qwen-GPU.ps1",
+      "bytes": 3032,
+      "sha256": "7342437BDBAF6863D162ED2DC3BC22E95BCA8E0BFC3A6E1583F1CD3D4CD4AE9C"
+    },
+    {
+      "path": "Test-Strata-P100.ps1",
+      "bytes": 5666,
+      "sha256": "9BECFF133979186A3B07310DFD8061B0FE9678D67A13E81A93F1D0EC7E8536B3"
+    },
+    {
+      "path": "Warmup-Strata-P100.ps1",
+      "bytes": 1757,
+      "sha256": "01060315ADF6E50C1AC2769B22AEFF16F3BA6A461B3B48E140E78A429DA7F7D7"
+    },
+    {
+      "path": "essai-hybride-staging16\\adaptations-strata.patch",
+      "bytes": 19669,
+      "sha256": "B6C7E9FF0AB3B41317F6CD555B6B237AEAD0274ECFDE87991F7E81B3AC45BC3C"
+    },
+    {
+      "path": "essai-hybride-staging16\\configuration-tests.json",
+      "bytes": 1561,
+      "sha256": "6BE92AD57D94BBD4D1E4243F6ABB1D5F754999841E2B8145A7F5EE8FB5AD52CB"
+    },
+    {
+      "path": "essai-hybride-staging16\\gpu-strata-mtp-test-1.json",
+      "bytes": 1887,
+      "sha256": "A5A9BFB2D856EFA221C2BA372C0F590FB82EF86D4BA7E8780384A5D6B243D797"
+    },
+    {
+      "path": "essai-hybride-staging16\\gpu-strata-mtp-test-2.json",
+      "bytes": 1689,
+      "sha256": "E5F52895B3AD7C78FBE6706E400F86DC8F193F52D0AE71091B7522ACA2D559EF"
+    },
+    {
+      "path": "essai-hybride-staging16\\mesures-strata-mtp.csv",
+      "bytes": 4785,
+      "sha256": "04BED8B88EF7ED32091CE1F8213585E0CAF5DC29B658832C54B896E24CED8D89"
+    },
+    {
+      "path": "essai-hybride-staging16\\metrics-strata-mtp.json",
+      "bytes": 11988,
+      "sha256": "DA767D961F4C5F389D152631B8B6A6026D3AE61AB8F5269FFBDAF962878970EF"
+    },
+    {
+      "path": "essai-hybride-staging16\\requete-strata-mtp-test-1.json",
+      "bytes": 416,
+      "sha256": "4B2176AC5A97C7D339F51E303DC41A639954369F08BE7A92E325A885B4797A32"
+    },
+    {
+      "path": "essai-hybride-staging16\\requete-strata-mtp-test-2.json",
+      "bytes": 413,
+      "sha256": "E75E28540353EE88EB0A15A4788C32C369A09DE8969968D3FECA51E77778F009"
+    },
+    {
+      "path": "essai-hybride-staging16\\resultats-strata-mtp.csv",
+      "bytes": 409,
+      "sha256": "04457E61A738CA6BC6DA106F446B95C01B1C4C30AA8798152FE78085FF14E505"
+    },
+    {
+      "path": "essai-hybride-staging16\\strata-engine.log",
+      "bytes": 49539,
+      "sha256": "621EBE856DBB3A84795FCFCC4CBF25C0DD49E6F306E42A22DC61A05BF4C558F3"
+    },
+    {
+      "path": "essai-hybride-staging16\\strata-q4-p100.json",
+      "bytes": 1567,
+      "sha256": "2394068138364D1EF71B358C94031FDFEB773BCCA47A9D2C45951174A9624230"
+    },
+    {
+      "path": "essai-hybride-staging16\\strata.exe",
+      "bytes": 24014848,
+      "sha256": "FAC0D4CFEC27511CFC1BE43AB9828F1A9FE3249EDB8F7A9B22342F3A650D2D15"
+    },
+    {
+      "path": "essais\\20261002-181237-931\\configuration-tests.json",
+      "bytes": 2069,
+      "sha256": "1805332A78254B0E39B746709CDFE569FEF5D483CE91B9E4E0327220F287F1D6"
+    },
+    {
+      "path": "essais\\20261002-181237-931\\engine.log",
+      "bytes": 58695,
+      "sha256": "F1A2668866B3E3A814D021AF2669CDE260EE91BB68947921FC815944307F20D9"
+    },
+    {
+      "path": "essais\\20261002-181237-931\\erreur-strata-mtp-test-1.json",
+      "bytes": 422,
+      "sha256": "80B282A3D3B88E849FB88AACF98A1F31E5E8DE434FED66226D1B7BDE052A3999"
+    },
+    {
+      "path": "essais\\20261002-181237-931\\etat.txt",
+      "bytes": 924,
+      "sha256": "599BEFC755CADBB7C8AE8D6AD0A3C4452D134FCC64B9BA2F2C17E94CA507F90D"
+    },
+    {
+      "path": "essais\\20261002-181237-931\\mesures-strata-mtp.csv",
+      "bytes": 130,
+      "sha256": "45C79911C0B128A87B81254D52B65CDBB6511CC3BD7EF7ECCB05386BC33B6EB0"
+    },
+    {
+      "path": "essais\\20261002-181237-931\\requete-strata-mtp-test-1.json",
+      "bytes": 416,
+      "sha256": "01C001DA6B5ADEAFB6822A3528FFDA1EE1909B28C09A473C89C7C711DC92C84C"
+    },
+    {
+      "path": "essais\\20261002-181237-931\\server.stdout.log",
+      "bytes": 3295,
+      "sha256": "FF499062E52BD5142889A307D59A0845BB329F59584A0350DF6ED6E6D931435A"
+    },
+    {
+      "path": "essais\\20261002-183213-661\\configuration-tests.json",
+      "bytes": 2069,
+      "sha256": "7691D91669FE76AC24D45F5B843789B3A993C7351DC177EDC10C29E1580140B6"
+    },
+    {
+      "path": "essais\\20261002-183213-661\\engine-strata-mtp-test-1.log",
+      "bytes": 5192,
+      "sha256": "FB48F5885358C2C6ECC1940D60EF59EFCB56613BA2E788126495976BEEBE166F"
+    },
+    {
+      "path": "essais\\20261002-183213-661\\engine-strata-mtp-test-2.log",
+      "bytes": 3530,
+      "sha256": "3DF2B791B53F45E128ABB1D91F12CCD5D2E6183C7918BBBA2D318853103FE9B2"
+    },
+    {
+      "path": "essais\\20261002-183213-661\\gpu-strata-mtp-test-1.json",
+      "bytes": 1888,
+      "sha256": "10F3FCEB9C46933FA27644AB92FE8A6E811CADD3AE3C6C8E0424247A6BDB37E9"
+    },
+    {
+      "path": "essais\\20261002-183213-661\\gpu-strata-mtp-test-2.json",
+      "bytes": 1701,
+      "sha256": "4A78B50EECFA25C58AFC8663872DE9D8D6060D7B7F29B8933C4000A607EAD50E"
+    },
+    {
+      "path": "essais\\20261002-183213-661\\mesures-strata-mtp.csv",
+      "bytes": 4257,
+      "sha256": "469B6BE0927571F6B8844E48E9244F1933FB22EB3FE5EB00929CD12666B8680E"
+    },
+    {
+      "path": "essais\\20261002-183213-661\\metrics-strata-mtp.json",
+      "bytes": 11692,
+      "sha256": "4D99E1FC45265CD152BCA61EA43C2417545F78B8373088F22E265C8F970C70C5"
+    },
+    {
+      "path": "essais\\20261002-183213-661\\protocole.json",
+      "bytes": 726,
+      "sha256": "A8C54ECB1BB01B988414A1E1F9443854579668E6DF347ED6A7CC2FFDDE728AE0"
+    },
+    {
+      "path": "essais\\20261002-183213-661\\requete-strata-mtp-test-1.json",
+      "bytes": 416,
+      "sha256": "BF9CBA10E7FEDCCCECE8B633905910ED21060398626B4B7D0A950EB143AC8391"
+    },
+    {
+      "path": "essais\\20261002-183213-661\\requete-strata-mtp-test-2.json",
+      "bytes": 413,
+      "sha256": "5FDED2B937556204C94EB19C65F446796F15D1F8302256385E7E2CB72D0B86AA"
+    },
+    {
+      "path": "essais\\20261002-183213-661\\resultats-strata-mtp.csv",
+      "bytes": 408,
+      "sha256": "864E3CB1C6645A3954ACAB1DEFAC0F7A6572CE92EA6C49F558A39B216BF56498"
+    }
+  ]
+}

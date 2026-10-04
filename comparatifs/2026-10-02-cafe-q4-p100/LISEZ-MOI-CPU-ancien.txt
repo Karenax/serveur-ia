@@ -1,0 +1,62 @@
+Qwen3.8 Flash Next — serveur local — 2 octobre 2026
+
+Adresse : http://127.0.0.1:8080
+API compatible OpenAI : http://127.0.0.1:8080/v1
+Identifiant : qwen3.8-flash-next
+Démarrage : powershell -ExecutionPolicy Bypass -File "D:\Serveur IA\Start-Qwen.ps1"
+Arrêt : powershell -ExecutionPolicy Bypass -File "D:\Serveur IA\Stop-Qwen.ps1"
+Le serveur est démarré pour cette session ; aucun démarrage automatique Windows n'a été installé.
+
+Configuration validée : llama.cpp b11344, CPU AVX2, 16 threads, contexte 4096,
+un utilisateur à la fois, batch 256 / microbatch 128, Flash Attention désactivée.
+Le fichier MTP n'est pas activé. Aucun projecteur vision de ce modèle n'est présent.
+
+Matériel : Threadripper PRO 3955WX, 16 cœurs / 32 threads ; environ 128 Gio RAM ;
+deux Tesla P100 PCIe de 16 Gio (compute capability 6.0), Quadro P2200 5 Gio (6.1).
+Pilote NVIDIA 528.89. Stockage D: sur disque mécanique ST5000DM000 de 5 To.
+C: n'a qu'environ 6 Go libres ; éviter d'y installer de volumineux outils.
+
+Modèle : D:\modèle\qwen3.8FlashNext (accent dans le chemin).
+Architecture GGUF qwen4exp : 48 couches, 512 experts, 10 experts activés/token.
+Les quatre fichiers UD-Q4_K_XL totalisent 111334655392 octets, environ 103.69 Gio.
+La première partie contient zéro tenseur : ses 10 Mo sont normaux.
+Les métadonnées locales indiquent Unsloth et une modification Huihui.ai.
+Les versions Q2 et Q3 sont incomplètes : seules leurs premières parties sont présentes.
+
+Validation : /health retourne status=ok ; génération API réelle réussie : Bonjour.
+Chargement CPU : environ 3 min 19 s. Première mesure courte : 1.02 token/s de génération,
+1.30 token/s de traitement du prompt ; cette mesure de deux tokens est indicative.
+Consommation mémoire observée après chargement : environ 89 Gio, puis environ 25 Gio
+de RAM système libre après la première génération. Voir benchmark-response.json
+pour une mesure plus longue et test-response.json pour le premier test.
+
+CUDA : binaires officiels b11344 CUDA 12.4 et leurs bibliothèques installés dans
+llama-b11344. Les P100 sont détectées, mais l'inférence échoue avec
+"invalid device function", cudaFuncGetAttributes, ggml_cuda_kernel_can_use_pdl.
+Ne pas considérer cette configuration GPU comme fonctionnelle.
+Le lancement CPU utilise un exécutable séparé sans backend CUDA.
+
+Piste d'optimisation prioritaire : compiler llama.cpp avec CUDA 12 et architecture
+CUDA explicitement 60 pour les P100, puis tester le même modèle et comparer.
+Le toolkit CUDA, CMake et le compilateur C++ ne sont pas actuellement disponibles.
+La compatibilité sm_60 existe dans les sources, mais le fonctionnement d'une
+compilation spécifique sur ce pilote et ce modèle reste à valider.
+Exemple de configuration de compilation (dans un environnement C++/CUDA préparé) :
+cmake -S . -B build-p100 -DGGML_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=60 -DGGML_NATIVE=OFF
+cmake --build build-p100 --config Release --target llama-server -j 16
+Pour le futur test GPU : sélectionner les deux P100, split-mode layer, fit on,
+marge 1536 Mio/carte, contexte 4096 ; laisser fit choisir la répartition.
+Conserver les embeddings N-gram en RAM. La répartition optimale des experts
+et le bénéfice de MTP doivent être mesurés après stabilisation du backend GPU.
+
+Un SSD avec assez de place accélérerait surtout le démarrage et limiterait
+les lenteurs en cas de défauts de pages ; aucun achat n'est requis pour utiliser
+la configuration CPU actuelle.
+
+Sources :
+https://github.com/QwenLM/Qwen3.8-Flash-Next
+https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF
+https://github.com/ggml-org/llama.cpp/releases/tag/b11344
+https://github.com/ggml-org/llama.cpp/blob/master/ggml/src/ggml-cuda/CMakeLists.txt
+
+Mesure finale sur 64 tokens : génération 1.765 tokens/s (35.70 s), prompt 2.324 tokens/s (25 tokens en 10.76 s). Sortie interrompue volontairement à la limite de 64 tokens.

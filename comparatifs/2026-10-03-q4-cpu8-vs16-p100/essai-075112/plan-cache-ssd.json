@@ -1,0 +1,37 @@
+{
+  "bytes": 77017907200,
+  "gib": 71.728515625,
+  "layers": 48,
+  "experts_per_layer": 512,
+  "target": "C:\\Strata-cache\\q4-experts-contigus",
+  "source": {
+    "schema": 1,
+    "shards": [
+      {
+        "name": "Qwen3.8-Flash-Next-UD-Q4_K_XL-00001-of-00004.gguf",
+        "size": 10946752
+      },
+      {
+        "name": "Qwen3.8-Flash-Next-UD-Q4_K_XL-00002-of-00004.gguf",
+        "size": 49859583296
+      },
+      {
+        "name": "Qwen3.8-Flash-Next-UD-Q4_K_XL-00003-of-00004.gguf",
+        "size": 49376141664
+      },
+      {
+        "name": "Qwen3.8-Flash-Next-UD-Q4_K_XL-00004-of-00004.gguf",
+        "size": 12087983680
+      }
+    ],
+    "native_experts_sha256": "33bf4dbaeb00b75edefd18083e47214d71852db6fa38ae8efd4ecbdcc0b7c5ed",
+    "bytes": 77017907200
+  },
+  "source_mtime_ns": {
+    "Qwen3.8-Flash-Next-UD-Q4_K_XL-00001-of-00004.gguf": 1790850370000000000,
+    "Qwen3.8-Flash-Next-UD-Q4_K_XL-00002-of-00004.gguf": 1790857122000000000,
+    "Qwen3.8-Flash-Next-UD-Q4_K_XL-00003-of-00004.gguf": 1790857138000000000,
+    "Qwen3.8-Flash-Next-UD-Q4_K_XL-00004-of-00004.gguf": 1790851292000000000
+  },
+  "note": "Native gate/up/down bytes are copied unchanged. No requantization. One preparation pass, separate from inference benchmarks. Startup gain remains to be measured."
+}

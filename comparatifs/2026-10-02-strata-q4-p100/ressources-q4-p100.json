@@ -1,0 +1,66 @@
+{
+  "cafe-sans-mtp": {
+    "samples_gpu": 46,
+    "vram_peak_mib": {
+      "1": 11196.0,
+      "2": 11640.0
+    },
+    "gpu_mean_util_pct": {
+      "1": 48.130434782608695,
+      "2": 50.78260869565217
+    },
+    "ram_peak_gib": 100.32567977905273,
+    "cpu_equivalent_cores": 0.5204123717464886,
+    "process_io_read_peak_bytes_s": 0,
+    "disk_d_read_peak_bytes_s": null,
+    "telemetry_seconds": 53.863535
+  },
+  "cafe-mtp": {
+    "samples_gpu": 38,
+    "vram_peak_mib": {
+      "1": 11316.0,
+      "2": 14088.0
+    },
+    "gpu_mean_util_pct": {
+      "1": 54.26315789473684,
+      "2": 37.21052631578947
+    },
+    "ram_peak_gib": 100.90352249145508,
+    "cpu_equivalent_cores": 0.5098480338258583,
+    "process_io_read_peak_bytes_s": 0,
+    "disk_d_read_peak_bytes_s": null,
+    "telemetry_seconds": 44.222736
+  },
+  "strata-mtp-hybride": {
+    "samples_gpu": 40,
+    "vram_peak_mib": {
+      "1": 14779.0,
+      "2": 14992.0
+    },
+    "gpu_mean_util_pct": {
+      "1": 39.35,
+      "2": 57.4
+    },
+    "ram_peak_gib": 84.09716796875,
+    "cpu_equivalent_cores": 3.1279603910844194,
+    "process_io_read_peak_bytes_s": 0,
+    "disk_d_read_peak_bytes_s": 16241.0,
+    "telemetry_seconds": 52.03071
+  },
+  "strata-mtp-gpu-seul": {
+    "samples_gpu": 36,
+    "vram_peak_mib": {
+      "1": 15046.0,
+      "2": 15260.0
+    },
+    "gpu_mean_util_pct": {
+      "1": 44.0,
+      "2": 52.94444444444444
+    },
+    "ram_peak_gib": 84.1126480102539,
+    "cpu_equivalent_cores": 0.9980620909401074,
+    "process_io_read_peak_bytes_s": 0,
+    "disk_d_read_peak_bytes_s": 64006.0,
+    "telemetry_seconds": 46.371113
+  }
+}

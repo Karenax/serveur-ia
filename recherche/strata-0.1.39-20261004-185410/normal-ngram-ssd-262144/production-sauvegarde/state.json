@@ -1,0 +1,21 @@
+{
+  "status": "pret",
+  "started": "2026-10-04T20:54:57.849166+02:00",
+  "started_epoch": 1791140097.8491662,
+  "supervisor": {
+    "pid": 49324,
+    "created": 1791140097.7050536
+  },
+  "config_path": "D:\\Serveur IA\\lanceur\\sessions\\20261003-211939-259117\\strata.json",
+  "host": "127.0.0.1",
+  "port": 8080,
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "min_free_ram_gib": 6.0,
+  "server": {
+    "pid": 41040,
+    "created": 1791140098.0816345
+  },
+  "available_ram_gib": 34.45,
+  "loaded_seconds": 900.8,
+  "ready_seconds": 903.0
+}

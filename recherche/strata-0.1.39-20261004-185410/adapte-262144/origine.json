@@ -1,0 +1,9 @@
+{
+  "tag": "v0.1.39",
+  "revision": "6f32ec070f23ced9f50e704d854d775da52591ab",
+  "source_status": "M  CMakeLists.txt\nA  bench/results/2026-10-02-p100-resident-hybrid/README.md\nA  bench/results/2026-10-02-p100-resident-hybrid/config.example.json\nA  bench/results/2026-10-02-p100-resident-hybrid/native-parity.txt\nA  bench/results/2026-10-02-p100-resident-hybrid/protocol.json\nA  bench/results/2026-10-02-p100-resident-hybrid/run.py\nA  bench/results/2026-10-02-p100-resident-hybrid/runs.json\nA  bench/results/2026-10-02-p100-resident-hybrid/startup-validation.json\nA  bench/results/2026-10-02-p100-resident-hybrid/summary.json\nA  bench/results/2026-10-02-p100-resident-hybrid/validation.txt\nM  include/strata/core/verify.hpp\nM  include/strata/prefill/gemm.hpp\nM  include/strata/prefill/kernels.hpp\nM  src/core/expert_source.cpp\nM  src/core/native_dense.cpp\nM  src/core/verify.cpp\nM  src/kernels/ngram.cpp\nM  src/prefill/gemm.cu\nM  src/prefill/kernels.cu\nM  src/prefill/prefill.cpp\nM  src/program/generate.cpp\nM  tests/core/native_dense_ple_key_test.cpp\nM  tests/cuda/prefill_mmq_kquant_test.cpp\nA  tests/cuda/prefill_p100_test.cpp\nA  tools/mtp_q8_runtime.py\n",
+  "adaptations": true,
+  "context": 262144,
+  "prompt_cache": 0,
+  "difference": "Local P100 resident hybrid adaptations"
+}

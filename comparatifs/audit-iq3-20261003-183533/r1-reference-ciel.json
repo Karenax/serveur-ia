@@ -1,0 +1,61 @@
+{
+  "setting": "r1-reference",
+  "case": "ciel",
+  "request": {
+    "model": "qwen3.8-flash-next-iq3-s",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Explique en français pourquoi le ciel est bleu, puis pourquoi il devient rouge au coucher du soleil. Donne une explication précise et accessible."
+      }
+    ],
+    "max_tokens": 256,
+    "temperature": 0,
+    "seed": 42,
+    "cache_prompt": false,
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    },
+    "strata_tune": {
+      "pcie_frac": 0,
+      "spec_min_p": 0.5
+    }
+  },
+  "response": {
+    "id": "chatcmpl-b4292f3636ad4722956d7317",
+    "object": "chat.completion",
+    "created": 1791045351,
+    "model": "qwen3.8-flash-next-iq3-s",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Pour comprendre les couleurs du ciel, il faut d'abord regarder la lumière du soleil. Bien qu'elle nous paraisse blanche, elle est en réalité composée de toutes les couleurs de l'arc-en-ciel (rouge, orange, jaune, vert, bleu, indigo, violet). Chaque couleur correspond à une longueur d'onde différente : le rouge a des ondes longues, tandis que le bleu et le violet ont des ondes courtes.\n\nLorsque cette lumière traverse l'atmosphère terrestre, elle rencontre des molécules de gaz (principalement l'azote et l'oxygène). Ces molécules sont beaucoup plus petites que la longueur d'onde de la lumière visible. C'est ici qu'intervient un phénomène physique appelé la **diffusion de Rayleigh**.\n\n### Pourquoi le ciel est bleu en journée ?\n\nLa diffusion de Rayleigh explique que les molécules de l'atmosphère diffusent beaucoup plus efficacement les courtes longueurs d'onde (le bleu et le violet) que les longues (le rouge et l'orange).\n\n1.  **La diffusion préférentielle du bleu** : Quand la lumière du soleil entre dans l'atmosphère, les ondes bleues sont"
+        },
+        "finish_reason": "length"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 40,
+      "completion_tokens": 256,
+      "total_tokens": 296,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 40,
+      "prompt_ms": 1229.4,
+      "prompt_per_token_ms": 30.735,
+      "prompt_per_second": 32.5,
+      "predicted_n": 256,
+      "predicted_ms": 8796.2,
+      "predicted_per_token_ms": 34.36,
+      "predicted_per_second": 29.1,
+      "draft_n": 192,
+      "draft_n_accepted": 125
+    }
+  }
+}

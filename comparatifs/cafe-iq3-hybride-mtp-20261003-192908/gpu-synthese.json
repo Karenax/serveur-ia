@@ -1,0 +1,14 @@
+[
+  {
+    "gpu_index": "1",
+    "samples": 293,
+    "max_vram_mib": 15236.0,
+    "max_utilization_pct": 99.0
+  },
+  {
+    "gpu_index": "2",
+    "samples": 293,
+    "max_vram_mib": 15170.0,
+    "max_utilization_pct": 100.0
+  }
+]

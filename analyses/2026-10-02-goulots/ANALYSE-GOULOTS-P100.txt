@@ -1,0 +1,261 @@
+Analyse des goulots d'étranglement — 2 octobre 2026
+Machine : Threadripper PRO 3955WX, 128 Gio DDR4-3200, 2 Tesla P100 PCIe 16 Gio.
+Modèle : Qwen3.8-Flash-Next-UD-Q4_K_XL local, même quantification Q4 que les comparatifs précédents.
+
+Conclusion de référence
+-----------------------
+Le principal frein probable du mode où tous les experts sont calculés sur GPU est la quantité de poids
+transférée de la RAM vers la VRAM, à travers les liens PCIe 3.0 x16. Les deux cartes disposent de puissance
+de calcul et de mémoire locale rapide, mais la plupart des experts ne tiennent pas dans leur cache VRAM.
+Leur découpage par couches limite aussi le parallélisme pour une seule réponse.
+Le CPU peut être utile en calculant directement une partie des experts conservés en RAM : cela évite
+de déplacer leurs poids, même si les kernels CPU sont individuellement moins rapides que les kernels GPU.
+La série d'inférence hybride autorisée ensuite confirme le gain : 28,70 et 35,16 tokens/s en médiane,
+contre 8,72 et 10,95 sur GPU seul. Le meilleur des quatre réglages testés calcule tous les experts absents
+de la VRAM sur CPU. Les couches denses et les experts en cache continuent à être calculés sur les deux P100.
+
+Ce qui est effectivement mesuré
+-------------------------------
+Les débits ci-dessous utilisent Go = 10^9 octets. Les capacités en Gio utilisent 2^30 octets.
+Chaque microtest possède trois mesures ; les chiffres cités sont des médianes.
+
+Lecture CPU de la RAM :
+  Test initial AVX2/OpenMP, tampon de 512 Mio : 23,9 Go/s avec un thread ; 79,5 Go/s au meilleur nombre de threads.
+  Contrôle avec huit accumulateurs AVX2, affinité explicite, un thread par cœur physique :
+    16 cœurs : 80,4 Go/s en lecture ; 90,2 Go/s pour une triade lecture/lecture/écriture non temporelle.
+    32 threads SMT : 78,4 Go/s en lecture ; 89,4 Go/s pour la triade. Aucun avantage démontré du SMT ici.
+  Affinité : 4 cœurs regroupés donnent 41,5 Go/s ; 4 cœurs répartis donnent 69,6 Go/s en lecture.
+    À 8 cœurs : 42,2 Go/s regroupés et 79,4 Go/s répartis.
+  Ces tests mesurent le chemin d'accès des cœurs, pas le débit maximal absolu des huit contrôleurs mémoire.
+
+RAM épinglée vers VRAM, CUDA :
+  Copies de 3 Mio : environ 12,85 Go/s par P100.
+  Copies de 64 Mio : environ 13,07 Go/s par P100.
+  Copies simultanées vers les deux P100 : 26,09 Go/s cumulés.
+  La machine permet donc deux flux PCIe simultanés ; il n'y a pas de plafond matériel global à 13 Go/s.
+
+Copie des experts comme dans Strata :
+  Reproduction du kernel de copie de Strata, experts de 3 072 000 octets, groupes de 6, 12 ou 20 experts.
+  Kernel : 12,68 à 12,78 Go/s ; copies CUDA DMA : environ 12,86 Go/s.
+  La vérification des octets copiés réussit pour chaque essai.
+  Le remplacement du kernel par DMA n'offre qu'environ 1 % de gain brut de débit dans ce microtest.
+  Son intérêt éventuel est le chevauchement avec le calcul des experts déjà en VRAM.
+
+Mémoire locale des P100 :
+  Copie device-to-device de 64 Mio : environ 514 Go/s par carte, lecture + écriture comptées.
+  Ce chiffre est une mesure de copie mémoire ; il ne mesure ni les TFLOPS ni l'efficacité des kernels d'experts.
+
+Deux requêtes d'inférence de référence :
+  Ciel : 8,723 tokens/s ; 84 635 chargements d'experts RAM vers GPU ; 256 tokens générés.
+  Fibonacci : 10,959 tokens/s ; 68 454 chargements ; 256 tokens générés.
+  Zéro travail d'expert CPU et zéro lecture de blob d'expert dans les fichiers pendant ces deux requêtes.
+  MTP : 118/208 drafts acceptés pour le ciel (56,7 %) ; 158/183 pour Fibonacci (86,3 %).
+  P100 : températures maximales 48–52 °C, puissances maximales 90–99 W, fréquences jusqu'à 1328 MHz.
+  Aucun motif de limitation de fréquence relevé par NVML pendant ces requêtes.
+
+Les 204,8 Go/s de la RAM huit canaux
+-----------------------------------
+Le calcul théorique est correct : 3200 millions de transferts/s × 8 octets × 8 canaux = 204,8 Go/s.
+Les huit modules de 16 Gio sont configurés à 3200 MT/s. Ce débit est celui de l'ensemble des canaux,
+avant les limites du demandeur, du chemin interne du processeur, des accès et des surcoûts.
+Il n'implique pas qu'une boucle exécutée par le 3955WX obtienne 204,8 Go/s.
+
+Les tests contrôlés montrent environ 80 Go/s accessibles en lecture par les cœurs et un effet fort de
+leur placement. Cela est compatible avec une limitation du chemin interne entre cœurs et contrôleurs.
+Ce n'est pas une preuve que les DIMM sont défectueux, que seulement quatre canaux fonctionnent,
+ou que le BIOS est mal réglé. La fréquence réelle de l'Infinity Fabric n'a pas été mesurée.
+Le DMA vers les GPU ne suit pas nécessairement le même chemin que les lectures des cœurs.
+Il faudrait des compteurs des contrôleurs mémoire pour identifier précisément la limite interne.
+
+Pourquoi les transferts d'experts dominent probablement
+------------------------------------------------------
+Les poids des experts du modèle occupent 71,73 Gio. Les caches VRAM conservent environ 16,02 Gio
+(5491 experts sur 24576), et leur complément de 55,71 Gio est en RAM épinglée.
+La table PLE/ngram occupe encore 26,82 Gio de RAM verrouillée. La VRAM restante sert aux projections
+denses, aux états d'attention, au draft MTP et aux buffers. Les 32 Gio des deux cartes ne peuvent donc
+pas servir intégralement au cache des experts.
+
+Un expert occupe entre 3 072 000 et 3 993 600 octets, avec une moyenne par couche de 3 133 867 octets.
+Les compteurs logiciels donnent 330,6 copies par token final pour le ciel, contre 267,4 pour Fibonacci.
+En utilisant la taille minimale, cela représente 1,016 Go et 0,821 Go de poids logiquement copiés par
+token final. Les brouillons vérifiés puis rejetés et les passages supplémentaires de MTP sont inclus.
+
+Au débit de copie isolé d'environ 12,75 Go/s, ces volumes correspondent à environ 80 ms et 64 ms
+par token, à comparer aux 115 ms et 91 ms mesurées pour la génération complète.
+L'ordre de grandeur est donc environ 70 % du temps. Il s'agit d'une estimation de coût de copie,
+pas d'un profilage CUDA démontrant que 70 % du temps réel appartient exactement à cette phase.
+La taille pondérée des experts effectivement choisis par couche et les chevauchements ne sont pas tracés.
+
+Les deux requêtes traitent presque le même nombre de copies par seconde : 2884 et 2930.
+Fibonacci génère plus vite avec moins de copies par token et davantage de drafts acceptés.
+Ces observations, les copies isolées et l'inspection du code concordent avec un frein PCIe important.
+
+Limite des compteurs PCIe NVML
+------------------------------
+Les traces brutes ont été conservées. Certains échantillons donnent des pointes supérieures à ce qu'un
+lien PCIe 3.0 x16 peut physiquement transporter. Ces compteurs et leur échantillonnage ne sont donc
+pas utilisés comme mesures exactes du nombre d'octets transférés ou de la saturation instantanée.
+L'estimation précédente utilise les compteurs logiciels d'experts et les microtests contrôlés.
+
+Calcul GPU, utilisation et coordination des deux cartes
+-------------------------------------------------------
+Les P100 ne montrent pas de bridage thermique ou de puissance pendant les réponses mesurées.
+Cela ne prouve pas que chaque kernel est optimal : les petits produits matrice-vecteur, la déquantification,
+les lancements et les synchronisations ont un coût. Les P100 n'ont pas les Tensor Cores des RTX récentes.
+Augmenter la limite de puissance n'est cependant pas justifié par les mesures actuelles.
+
+Le modèle traverse les couches 0–23 sur une carte, puis 24–47 sur l'autre. Une seule réponse impose
+des dépendances entre ces étapes. La seconde carte ne peut pas calculer ses couches avant d'avoir
+les activations de la première. La structure actuelle exploite peu la capacité matérielle mesurée de
+26 Go/s de transfert simultané vers les deux cartes.
+
+L'utilisation GPU affichée mesure le temps pendant lequel des kernels sont actifs. Strata utilise aussi
+des kernels qui attendent des indicateurs de synchronisation. 100 % d'utilisation peut inclure de l'attente ;
+ce n'est pas 100 % des unités de calcul utilisées efficacement. Il ne faut donc pas additionner les deux
+pourcentages pour en déduire une saturation de calcul ou exiger 200 % pour considérer le système efficace.
+Dans le ciel, première répétition : somme des utilisations GPU moyennes 97,6 % sur GPU seul,
+contre 97,3 % dans le mode hybride sans transfert d'experts. Pourtant la génération passe de 8,71 à
+28,66 tokens/s. Les puissances moyennes cumulées montent d'environ 117 à 152 W : davantage de travail
+utile par seconde peut donc apparaître sans augmentation du pourcentage d'utilisation affiché.
+
+Les activations échangées entre cartes sont beaucoup plus petites que les poids d'experts chargés de RAM.
+Le volume de cet échange paraît secondaire, mais sa latence et les dépendances peuvent être importantes.
+La topologie PCIe/P2P détaillée et le coût de ces échanges n'ont pas été mesurés.
+
+Ce que le CPU peut apporter
+---------------------------
+Le microtest CPU appelle les véritables fonctions natives Strata AVX2, avec la géométrie des experts locaux,
+sur une banque de 128 experts dépassant le cache L3. Les poids sont synthétiques, quantifiés aux mêmes
+formats ; les nombres suivants ne sont pas des tokens/s de modèle complet.
+
+Format majoritaire Q4_K gate/up + Q5_1 down, un token par expert :
+  1 thread : environ 4296 experts/s.
+  4 threads : environ 12607 experts/s, 38,7 Go/s de poids logiques.
+  8 threads : environ 24166 experts/s, 74,2 Go/s.
+  16 threads : environ 21663 experts/s.
+Pour deux tokens partageant un expert : environ 16903 travaux d'expert/s avec 8 threads et 17000 avec 16.
+Les autres formats présents dans le modèle ont également été mesurés et sont dans les CSV.
+
+Contrôle avec le véritable ExpertPool de Strata, lots de 4, 8 ou 16 experts Q4_K/Q5_1, affinité native :
+  15 travailleurs + le thread hôte : environ 21 700–22 100 experts/s pour un token par expert,
+    soit 66,7–68,0 Go/s de poids logiques ; 17 700–19 700 travaux/s lorsque deux tokens partagent l'expert.
+  7 travailleurs + le thread hôte : environ 11 700–12 300 experts/s pour un token.
+  Cette différence confirme qu'ici il faut couvrir les cœurs répartis sur le processeur : les huit premiers
+  cœurs physiques ne reproduisent pas le placement des huit threads libres du premier microtest OpenMP.
+  Pour ce contrôle plus fidèle, utiliser les 16 cœurs physiques est donc préférable aux huit premiers.
+  Les poids restent synthétiques et le test ne contient pas les attentes entre CPU et GPU du modèle complet.
+
+À 12,85 Go/s, déplacer seul un expert de 3,072 Mo permet environ 4180 experts/s, avant son calcul GPU.
+Le CPU a donc une capacité utile pour éviter ces copies : il lit et calcule les poids dans la RAM, puis
+publie uniquement les résultats, environ 10 Ko par expert et par token. Il travaille en parallèle du GPU.
+Le gain réel dépend toutefois de petits lots par couche, du partage des lignes entre travailleurs,
+de leur réveil, du coût des barrières, des accès mémoire simultanés et du taux d'acceptation de MTP.
+
+Résultats du test hybride : même binaire, mêmes caches, mêmes prompts, 256 tokens, deux répétitions.
+  Part des absents transférée/calculée sur GPU 1,00 : ciel 8,719 ; Fibonacci 10,952 tokens/s.
+  Part 0,50 : ciel 14,653 ; Fibonacci 17,618 tokens/s.
+  Part 0,25 : ciel 22,462 ; Fibonacci 26,731 tokens/s.
+  Part 0,00 : ciel 28,701 ; Fibonacci 35,161 tokens/s.
+Le mode 0,00 gagne 229 % et 221 % par rapport à la référence GPU du même binaire.
+Il effectue 82 878 et 72 350 travaux d'experts CPU, et zéro chargement RAM vers GPU pendant la génération.
+Les compteurs sont identiques pour les deux répétitions à ce réglage ; les textes aussi.
+Tous les essais confirment zéro blob d'expert lu dans les fichiers pendant les réponses.
+La RAM du processus reste à environ 84,12 Gio ; elle n'augmente pas pour exploiter le CPU.
+Le temps CPU cumulé représente environ 14,05 et 13,64 cœurs actifs en moyenne, calcul et attentes actives inclus.
+Les P100 montent jusqu'à 63 °C au fil de la série, probablement avec davantage de chaleur du CPU dans le boîtier.
+La répétition GPU de fin retrouve 8,73 et 10,95 tokens/s : aucun ralentissement thermique notable du comparatif.
+
+Ces essais font passer la capacité isolée du CPU à un gain de génération démontré.
+La capacité maximale du CPU et du GPU ne s'additionne pas simplement en TFLOPS.
+Le précédent essai hybride accidentel avec 4 travailleurs et seulement 16 buffers de staging gagnait
+environ 2 %, mais il ne constituait pas une optimisation du partage et ne fixe pas le potentiel maximal.
+
+Pistes à prioriser
+------------------
+1. Retenir le partage intentionnel CPU+GPU validé sur les mêmes prompts. Les experts résidents restent calculés
+   sur GPU ; --pcie-frac est uniquement la fraction des experts absents du cache envoyée au GPU.
+   Une valeur de 0,25 signifie que 75 % de ces absents sont calculés sur CPU, pas 75 % du modèle entier.
+   Le mode local hybride conserve la RAM épinglée, la PLE en RAM, les caches fixes et l'absence d'I/O d'experts.
+   15 travailleurs + le thread hôte couvrent les 16 cœurs physiques ; le SMT n'est pas un objectif en soi.
+   --pcie-frac 0 est le meilleur des réglages testés, mais pas un optimum prouvé pour tous les contextes et usages.
+
+   Après suppression des transferts de poids d'experts, les pistes suivantes concernent les kernels denses GPU,
+   le travail CPU des experts en RAM, les barrières entre phases et l'efficacité du draft MTP. La vitesse
+   RAM→GPU n'est plus le frein direct des experts absents au réglage retenu. Le calcul CPU et la mémoire
+   qu'il atteint peuvent devenir des limites ; il faut maintenant profiler ce mode avant de proposer du matériel.
+
+   Validation après rechargement, sans strata_tune dans les requêtes :
+     ciel 28,73 tokens/s ; Fibonacci 35,60 tokens/s ; mêmes textes que le réglage retenu du comparatif.
+     environ 84,10 Gio de RAM ; VRAM 15052 Mio et 15264 Mio ; zéro blob d'expert lu dans les fichiers.
+   Le CPU+GPU est donc le défaut réel du serveur laissé actif sur http://127.0.0.1:8080/.
+
+   Les chronomètres hôte, déjà présents dans Strata, indiquent pour le mode retenu :
+     ciel : 61,45 ms par fenêtre, dont 24,76 ms dans l'appel de calcul CPU des experts,
+       3,39 ms pour le draft, 1,08 ms de commit/émission ; 1,77 token final par fenêtre.
+     Fibonacci : 69,81 ms par fenêtre, dont 29,78 ms dans l'appel CPU,
+       3,78 ms pour le draft, 1,17 ms de commit/émission ; 2,49 tokens finaux par fenêtre.
+   Le calcul CPU et son chemin mémoire représentent donc des intervalles importants, environ 40–43 %
+   de la durée totale des fenêtres. Ces intervalles peuvent chevaucher du travail GPU : ne pas additionner
+   ces pourcentages comme des phases disjointes. Les compteurs wait/pool du vérificateur principal
+   couvrent seulement la première carte, tandis que le compteur de calcul CPU est partagé par les deux étapes.
+   On ne peut pas soustraire ces sous-totaux pour en tirer un temps GPU exact pour les deux cartes.
+   Les autres coûts importants restent les projections denses GPU, la coordination et les fenêtres de MTP.
+   Le draft représente environ 5,4–5,5 % du temps par fenêtre, mais ses rejets augmentent également
+   le travail de vérification ; le seul temps du drafter ne mesure pas l'ensemble du coût de MTP.
+
+2. Optimiser le choix des experts conservés en VRAM à partir d'un corpus représentatif en français et en code.
+   Avec --pcie-frac 0, le compteur de cache couvre aussi les absents calculés sur CPU : le ciel rapporte
+   38183 hits sur 158880 entrées routées, soit 24,0 %. C'est seulement un peu plus que la proportion
+   d'experts stockés en VRAM (22,3 %). Le profil générique n'offre donc pas un fort avantage sur ce prompt.
+   En mode GPU seul, le « 100 % » affiché exclut les absents traités par PCIe ; il ne signifie pas que
+   tous les experts demandés étaient déjà en VRAM.
+   Deux prompts ne suffisent pas à établir un profil général. Une stratégie adaptée peut réduire les transferts
+   sans ajouter de VRAM. Les échanges dynamiques demandent une adaptation de notre résidence stricte :
+   les experts écartés de la VRAM doivent pouvoir rester en RAM sans relecture du disque.
+
+3. Régler MTP sur les mêmes prompts : seuil de confiance puis comparaison sans MTP.
+   Le draft Q2 utilisé par Strata accepte moins de propositions sur le ciel que le draft Q8 de Café.
+   Une proposition rejetée coûte des vérifications et des lectures d'experts. Un draft plus gros peut mieux
+   proposer mais consomme de la VRAM et réduit le cache ; il faut mesurer le bilan complet.
+
+4. Tester le mode DMA pour son chevauchement, après profilage. Le gain de débit de copie brut est très faible.
+   Le kernel de copie est le mode actuel ; il occupe le GPU et ne se chevauche pas comme un moteur DMA.
+
+5. Un SSD raccourcirait surtout les démarrages. Les experts et la table PLE sont déjà en mémoire pendant
+   l'inférence mesurée. Un SSD ne supprime donc pas son frein principal.
+   Ajouter de la RAM n'est pas prioritaire tant que le complément et la PLE sont résidents sans pagination.
+   Davantage de VRAM réduit directement les poids à déplacer ; un lien PCIe plus rapide réduit leur coût.
+   Les P100 restent limitées au PCIe 3.0 même si la plateforme CPU sait faire du PCIe 4.0.
+
+Mise à jour Strata du 2 octobre
+-------------------------------
+Version mesurée : 0.1.35, commit d9ab8435f654c368c586340d490915f6addf56a3, avec adaptations locales P100.
+Vérification distante : 0.1.36, commit 36fa455, publiée le 2 octobre ; références distantes récupérées sans
+changer les sources exécutées pendant le comparatif CPU/GPU.
+
+Les accélérations de prompt utilisent des Tensor Cores int8 sur RTX 30 et plus récentes ; celles du décodage
+utilisent des clusters de blocs sm_90+. Notre Q4_K/Q5_1/Q8_0 sur P100 sm_60 n'est pas la configuration ciblée.
+La sauvegarde --expert-profile-save est intéressante pour conserver l'apprentissage du cache.
+Mais elle classe les experts déjà résidents avant les autres : avec notre cache fixe et l'adaptation désactivée,
+l'activer seul ne garantit pas un meilleur cache au redémarrage. Une collecte puis un classement hors ligne,
+ou une adaptation de la gestion RAM/VRAM, serait nécessaire pour exploiter ce mécanisme ici.
+Le binaire Windows officiel CUDA 13 ne contient pas sm_60 ; conserver une compilation CUDA 12 pour les P100.
+
+Protocole et limites du comparatif
+----------------------------------
+Deux prompts exactement repris du fichier protocole-comparatif-q4.json : explication du ciel et Fibonacci.
+256 tokens maximum, température 0, graine 42, raisonnement désactivé, cache de prompt désactivé, contexte 4096.
+Le prompt de poésie reste une suggestion pour une prochaine série commune, pas un remplacement de ces deux tests.
+Les résultats sont une mesure de vitesse à contexte court, pas une évaluation générale de qualité ou de long contexte.
+Les calculs CPU et GPU arrondissent différemment : les textes peuvent diverger malgré les mêmes paramètres.
+Les anciens Café et Strata sont conservés ; Q8 MTP Café et Q2 MTP Strata limitent leur comparaison directe.
+
+Sources primaires
+------------------
+https://www.amd.com/en/support/downloads/drivers.html/processors/ryzen-threadripper-pro/ryzen-threadripper-pro-3000wx-series/amd-ryzen-threadripper-pro-3955wx.html
+https://images.nvidia.com/content/pdf/tesla/NV-tesla-p100-pcie-PB-08248-001-v01.pdf
+https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html
+https://docs.nvidia.com/deploy/nvml-api/latest/api/group__nvmlDeviceStructs.html
+https://github.com/Niko1221/Strata/releases/tag/v0.1.36
+https://github.com/Niko1221/Strata/blob/36fa455/docs/DETAILS.md
+L'inspection du code local épinglé et les mesures brutes sont les sources des détails de cette installation.

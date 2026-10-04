@@ -1,0 +1,36 @@
+{
+  "choices": [
+    {
+      "finish_reason": "length",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Pour comprendre les couleurs du ciel, il faut d'abord savoir que la lumière du soleil, bien qu'elle paraisse blanche, est en réalité composée de toutes les couleurs de l'arc-en-ciel. Chaque couleur voyage sous forme d'ondes de différentes longueurs : le bleu et le violet ont des ondes courtes, tandis que le rouge et l'orange ont des ondes longues.\n\nLorsque cette lumière entre dans l'atmosphère terrestre,"
+      }
+    }
+  ],
+  "created": 1790945489,
+  "model": "qwen3.8-flash-next",
+  "system_fingerprint": "b1-0ae77ef",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 96,
+    "prompt_tokens": 40,
+    "total_tokens": 136,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-PfCQLpnlkxsLveVPuv8achtmFNvldKco",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 40,
+    "prompt_ms": 4795.072,
+    "prompt_per_token_ms": 119.8768,
+    "prompt_per_second": 8.341897681619797,
+    "predicted_n": 96,
+    "predicted_ms": 9414.963,
+    "predicted_per_token_ms": 99.10487368421052,
+    "predicted_per_second": 10.090321119690008
+  }
+}

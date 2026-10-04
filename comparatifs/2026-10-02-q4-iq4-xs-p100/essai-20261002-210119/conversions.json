@@ -1,0 +1,4611 @@
+{
+ "schema": 1,
+ "tool": "tools/iq_pack.py",
+ "compat_bf16": true,
+ "source_shards": [
+  {
+   "name": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "size": 44766155936
+  },
+  {
+   "name": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "size": 44735995008
+  },
+  {
+   "name": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "size": 7971004256
+  }
+ ],
+ "tensors": [
+  {
+   "name": "output_hc_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.003265380859375,
+   "source_sha256": "09f75925a9d393a28c33f38f131afda1d2e59aa3b8187d705cc9b194f9e9f9d9"
+  },
+  {
+   "name": "output_hc_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00921630859375,
+   "source_sha256": "a665080f1742f1043104c847656828f5b4bdc9c3b671c1eabd730611ce80e632"
+  },
+  {
+   "name": "blk.0.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "c367d894cf8ce1f3681d71f4b6fbb4c419cbae8c41fb2593232b40bd49bd7455"
+  },
+  {
+   "name": "blk.0.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "ba7149360e4a67d47eeaaf89846e7f6313568a91aa169b8e7bde36f2934d04ab"
+  },
+  {
+   "name": "blk.0.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.001903533935546875,
+   "source_sha256": "75810e386f881cb25ea70db5adbac989e3ad463b0e9e6504510f840a7b8fd47c"
+  },
+  {
+   "name": "blk.0.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000476837158203125,
+   "source_sha256": "d0a5a958fbd15844c1e00d97fa9cbe2e5b0302336a077dc5dddf975892fccd00"
+  },
+  {
+   "name": "blk.0.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00775146484375,
+   "source_sha256": "050c3043ca6d088be097b4ba63ea82bdafe8562bd049e157195f990bcce96852"
+  },
+  {
+   "name": "blk.0.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0076446533203125,
+   "source_sha256": "d050e8cc1da559754bd64c8b02267c710dd97af0742bfd5d8e0f02b34b6f587c"
+  },
+  {
+   "name": "blk.0.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00092315673828125,
+   "source_sha256": "f7eeeb5f54dc0cb3a561d0515649be57205518a0b21e3d495e368f684013a735"
+  },
+  {
+   "name": "blk.0.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.015472412109375,
+   "source_sha256": "6f9f26217936c8b69f0aabcea82d14f665465bb56fc3b6c04763280cb55c7eb3"
+  },
+  {
+   "name": "blk.0.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0004634857177734375,
+   "source_sha256": "0b0fb7adbea7af7d3b96e2261e523eafb2bee50065c799ec8f3b55c56aca036f"
+  },
+  {
+   "name": "blk.0.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00024318695068359375,
+   "source_sha256": "ddd627e9654e9b789d2f2ac0f4268841de84dbc38b18cf9afa5f45ca32f0740f"
+  },
+  {
+   "name": "blk.1.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "8a9a3697015e8f9158539be07d9d250c9c54c70a0d3b943bfb93bd157208781d"
+  },
+  {
+   "name": "blk.1.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "6d89a6fdddd7e2e0b5754cd2c30c6500ec5eca45603e2ad3edde3c5643065392"
+  },
+  {
+   "name": "blk.1.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00376129150390625,
+   "source_sha256": "95d596eb84a5857af45f60b8b2ea8b0153203a8a543e4ce6d76cb02527e0bd7c"
+  },
+  {
+   "name": "blk.1.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0009021759033203125,
+   "source_sha256": "fe2cca5241cf1fd40669500ecaaa346183f5117f46af580ed9bc512647b57e17"
+  },
+  {
+   "name": "blk.1.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0055084228515625,
+   "source_sha256": "a777144cad56ea339f15ac7729e7de1c22bdc1474cbbf677667806b851f5e9ae"
+  },
+  {
+   "name": "blk.1.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00389862060546875,
+   "source_sha256": "59435682b29973ef597e3e14295c4f41309a4c2905233fd6ae3325fffd4656ba"
+  },
+  {
+   "name": "blk.1.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0005884170532226562,
+   "source_sha256": "870788d03ad2a9cc01be3846b9f9e82a2d08ae520613a4a3798a6b6fa2062987"
+  },
+  {
+   "name": "blk.1.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.01556396484375,
+   "source_sha256": "a2a156df37003ba1a79ab127bb4c4014941a3f8660ed7c316d5cd8aac480ea72"
+  },
+  {
+   "name": "blk.1.ple_value.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00043892860412597656,
+   "source_sha256": "16d3b56bdd02549dfcd5059813efbd73581c0a0a6dd01bb481a8de6995c1e80c"
+  },
+  {
+   "name": "blk.1.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0009455084800720215,
+   "source_sha256": "25c1c2a19d6f4dd875833010579a9aef2d6267cd1433c232c6fc42fbbb53b699"
+  },
+  {
+   "name": "blk.1.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.001911163330078125,
+   "source_sha256": "aab38308afe4852ce1dc8914b69992302fc2b4963c11fde6f619fa772db88e00"
+  },
+  {
+   "name": "blk.2.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "328a0ad6a00c2519e8c4aa20175a41208d8a64844cae4c8658112514721ce773"
+  },
+  {
+   "name": "blk.2.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "120c7c51cbc0b4911b3b24881fd1a2f0588768afaf51e75e724ccbb158d57d7d"
+  },
+  {
+   "name": "blk.2.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00380706787109375,
+   "source_sha256": "9e38360f7c05ab915357a4f40ca737aab2e2393713e1feca52d58ce568c1ae42"
+  },
+  {
+   "name": "blk.2.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000766754150390625,
+   "source_sha256": "640f162d83bf18b13b0543958d3eaba0e0c8f6ab5becbcec97f4fb78c69749a9"
+  },
+  {
+   "name": "blk.2.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0087890625,
+   "source_sha256": "98842aea4a1067c1b075f7adddafaea96a8eed69d15a52cf2983ef0518766ed3"
+  },
+  {
+   "name": "blk.2.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0038604736328125,
+   "source_sha256": "7846d6070720dbd9bb4fc525879921cfa338a2c033ee8147a3d75ac5386a5a1d"
+  },
+  {
+   "name": "blk.2.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0008029937744140625,
+   "source_sha256": "37c642d231092cc994c5d8263db92be7c64dc0b30e68dc6caa51bb33576a11eb"
+  },
+  {
+   "name": "blk.2.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.015472412109375,
+   "source_sha256": "771bbe5184b842a9d1144d8d6d7cc7380eb0432ed39f3cefbe5ef0e1e5f911f2"
+  },
+  {
+   "name": "blk.2.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000972747802734375,
+   "source_sha256": "a45724b632060c9c51f5041b88084221207a1273a717afcd65b18b4099ff9b1c"
+  },
+  {
+   "name": "blk.2.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000885009765625,
+   "source_sha256": "ca0235430e6282f4bc965468add9ca58e6c62b02aafce74b93c73f9a2ef6f47a"
+  },
+  {
+   "name": "blk.3.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "880c73a68a24fa98a5628552e8c3dd558ab21b58635ae24c48cfde7be11ae0cb"
+  },
+  {
+   "name": "blk.3.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "f08977ab1ace5bcb930937da4f44d68ee6b7416d8e6cb889d5c5986818fb3c16"
+  },
+  {
+   "name": "blk.3.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00337982177734375,
+   "source_sha256": "4d397366d111431b36c7cae07bc3e12fa9e1a73a5e317aab457da9a00d4cf6d7"
+  },
+  {
+   "name": "blk.3.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0004782676696777344,
+   "source_sha256": "11c7babefe8ea8a22d65d22caf8eaa844db6a3b42285db17e9f51bb304f061f8"
+  },
+  {
+   "name": "blk.3.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.007049560546875,
+   "source_sha256": "3ad1ad190d1023d0e33c8ca9b783539062ce22398dd3f824b0692b37107edde4"
+  },
+  {
+   "name": "blk.3.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.002593994140625,
+   "source_sha256": "d1e7051fe72beac3f57b859c9d85b5495900e2f11309a0b9705e2ad217c9d6af"
+  },
+  {
+   "name": "blk.3.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0004647374153137207,
+   "source_sha256": "6c416762c3120db191329a9dba308efd4b228b1608d2628098283ff34fd9decc"
+  },
+  {
+   "name": "blk.3.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.01556396484375,
+   "source_sha256": "855899505460345cb52c0585bfa7288c7b3747a4618d561bca72a85f05769df0"
+  },
+  {
+   "name": "blk.4.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "967c080ede08952579636fe925b024b93bd808478eeecea558cea087ace7792c"
+  },
+  {
+   "name": "blk.4.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "4f849640958a68921c05101a152661ff0cfa55fc4db3ab73c189573aaed19e89"
+  },
+  {
+   "name": "blk.4.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00385284423828125,
+   "source_sha256": "c8f0dc934dfcc00256a73ca545cf279e8a4a8c1c230e3eef71628204fb7fdaa6"
+  },
+  {
+   "name": "blk.4.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0018463134765625,
+   "source_sha256": "53ff194a9d989955ef115f232946eb924609170b1431a7e137edf245eadb72bc"
+  },
+  {
+   "name": "blk.4.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0062103271484375,
+   "source_sha256": "2bc634ac5dec8a5d167018908b3a7dadd25557758693faaa7c593e1785b8577b"
+  },
+  {
+   "name": "blk.4.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00362396240234375,
+   "source_sha256": "e6048485c862453bafa303e530b2dea44cd7372807dca8dd052ea9d56e58d613"
+  },
+  {
+   "name": "blk.4.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000560760498046875,
+   "source_sha256": "74d40a4158d6066238e9ec13c0e9fdb0055ca817383de1fa9cb939c6c954f527"
+  },
+  {
+   "name": "blk.4.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.01318359375,
+   "source_sha256": "c89a8067b112a99140cd4f3bb40bae54752079576a94af3b57c7698a03ea2eb0"
+  },
+  {
+   "name": "blk.4.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0008335113525390625,
+   "source_sha256": "4c12de205ec439d6f03575edd600d3722ac6365fa8df781d6b443d13707babf7"
+  },
+  {
+   "name": "blk.4.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00089263916015625,
+   "source_sha256": "a3c491607a71b52a35e1a4eda864187523256fee35e07b62cbc789e2559c495f"
+  },
+  {
+   "name": "blk.5.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "dab49e8b36d29fb1e4415d611ba79264dcfa8edc468ce642d3e613a9e7f077f1"
+  },
+  {
+   "name": "blk.5.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "2acf19f73f5a12ee7608018f615ce70051e3ba36ccd8d49dddc19dcabc0c1425"
+  },
+  {
+   "name": "blk.5.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0038909912109375,
+   "source_sha256": "f24c652d2531a684fc6154d6ba0bf68fdfcb774013c1f0360b13e5043a3c357d"
+  },
+  {
+   "name": "blk.5.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0005645751953125,
+   "source_sha256": "0eec2f2adf629f89d54d6e9159f9e7c445b17f2696201cfec6421d9b6474cbea"
+  },
+  {
+   "name": "blk.5.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0077056884765625,
+   "source_sha256": "0b3278b205435d265d41863f575aa1119d7cc67e0aee11f3ce5cc22cd4b24fe6"
+  },
+  {
+   "name": "blk.5.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.003814697265625,
+   "source_sha256": "164f037e7406f29a960f651b17ca7026affb2d911b123030f877892f9b3a60a2"
+  },
+  {
+   "name": "blk.5.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0004115104675292969,
+   "source_sha256": "41b4118fbf87af325e927fcd788f8b2e5d82e0e62016addcafce72abe067214a"
+  },
+  {
+   "name": "blk.5.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0076446533203125,
+   "source_sha256": "255832fbf9dcb3ddddb9b569a8c1aece95b584abcc41859f60942ea1a50aeff3"
+  },
+  {
+   "name": "blk.5.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0005283355712890625,
+   "source_sha256": "d2793ab0ff19eaa8022fb9d6ebd5389a2e1bf2b4c7eb15e314ad5cc3b4b8565a"
+  },
+  {
+   "name": "blk.5.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00093841552734375,
+   "source_sha256": "9a0c86a2ffbdec681283e6bf9cf4f8ed52ce924fe6493f200787df2a98ca1acc"
+  },
+  {
+   "name": "blk.6.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "0c6b90fe5c130d66e44249c2a8e224a0932869d1174f177ffcf15abe615c0971"
+  },
+  {
+   "name": "blk.6.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "f4ed3abc5478def5364acf3c620fa1df17af3352bce911cd1e2d6c288bcc9101"
+  },
+  {
+   "name": "blk.6.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00305938720703125,
+   "source_sha256": "70c07394b79e21681b80d154dd5bff9abe1a5e3a15ac0814cb8dff418e0da286"
+  },
+  {
+   "name": "blk.6.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0009238719940185547,
+   "source_sha256": "7b8a91e333ab51b358c89c848b006de6497b3f56787305ed2262733f59be1ef6"
+  },
+  {
+   "name": "blk.6.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.007171630859375,
+   "source_sha256": "b01524de92bb0006df8fa8f451e25d5a2b928d8f13038d842b99c71a590d460c"
+  },
+  {
+   "name": "blk.6.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0035247802734375,
+   "source_sha256": "5cfa91134cc719f6b318833be0fc06b4ed201e0eee38804b8f9c62e4694dea27"
+  },
+  {
+   "name": "blk.6.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000621795654296875,
+   "source_sha256": "70b9404d0d43a383f1a57b0862c66df32182f12edb4cf698379c5c498656f009"
+  },
+  {
+   "name": "blk.6.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.014312744140625,
+   "source_sha256": "4b9e413437e79d24345fc1dc2ec0bb417cfe3b4dc3946daaf73acd22181e8264"
+  },
+  {
+   "name": "blk.6.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0008563995361328125,
+   "source_sha256": "dd979375666b9ec1f8a87909e8f68cfbeff65fa07419596e2e0c4375504efa1f"
+  },
+  {
+   "name": "blk.6.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0004940032958984375,
+   "source_sha256": "e1a97da0138915fa1329009b33b3d059cbd7d1afe5b9f1b9836579ec5e820772"
+  },
+  {
+   "name": "blk.7.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "7c00e53df09bb569ccd5b6b24474ffc5b45cbcfa2944ead1833b6065ecfe70c7"
+  },
+  {
+   "name": "blk.7.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "99133adeca1b136abcdb70a040f050135643af33564dbd75d9416cba69975700"
+  },
+  {
+   "name": "blk.7.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.003509521484375,
+   "source_sha256": "8c32687e9e94ccb06d8da171af1a05512ea1d847b14acc07ec4dfa8e8af0de61"
+  },
+  {
+   "name": "blk.7.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0008335113525390625,
+   "source_sha256": "6837c1c8a60f338edcadfd4446c5c104d90190db0d707a409c8f4cbf4ced82cd"
+  },
+  {
+   "name": "blk.7.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0069122314453125,
+   "source_sha256": "9272abc913134d140ba52992929d21f3581d9c2be5e8ba847434d396118303f8"
+  },
+  {
+   "name": "blk.7.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0037841796875,
+   "source_sha256": "211e0d7b9a5bbd1e81638a98cf803cdc41086428016e652b1f7d7f791c7ef0fb"
+  },
+  {
+   "name": "blk.7.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000583648681640625,
+   "source_sha256": "04e6ff772d4cd4ac4135f68708df97cdb99c98e034827f9fded52d4a13619d8c"
+  },
+  {
+   "name": "blk.7.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.007171630859375,
+   "source_sha256": "ac6ba4dfc920ff005cf6c5774f623b12b3a4881e5572435b4d58de2c7f27a160"
+  },
+  {
+   "name": "blk.8.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "89fb654d54b48e15775205a83a0376758be1f3d74dba4f430aae1c08323679c4"
+  },
+  {
+   "name": "blk.8.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "86c8e24cc18a8b8e8ee36d1f1746fbba2d866eed00a8febd6ae27a0c7944bec9"
+  },
+  {
+   "name": "blk.8.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0020751953125,
+   "source_sha256": "3c5fa83cdaaa7becbe25600da024f145f6f304bff2a1b8912cf47db7b459c215"
+  },
+  {
+   "name": "blk.8.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0004825592041015625,
+   "source_sha256": "df0a4f8a7008ca5486b51443e601df131123cbe4bd09dd57623f8cd14a2629c1"
+  },
+  {
+   "name": "blk.8.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0058135986328125,
+   "source_sha256": "9d175f81210dd514cd0ba0f8596bcfe19e2255136a96110df7276daa88899be0"
+  },
+  {
+   "name": "blk.8.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00194549560546875,
+   "source_sha256": "b586079c03760ae84910376311e6489e5883532a09712ffb190e1bdda7eb2dd2"
+  },
+  {
+   "name": "blk.8.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0007152557373046875,
+   "source_sha256": "6bd6dcb553d27e6d084f55ef26fe02f829b229baa92066d76dddbe6bfabbb2ff"
+  },
+  {
+   "name": "blk.8.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0077056884765625,
+   "source_sha256": "5893971d5a37d997fdd1940b1b1b6e361f045242505dc0ca645dc4e22f09ce5f"
+  },
+  {
+   "name": "blk.8.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000911712646484375,
+   "source_sha256": "62c110538bf9b90c5d3640a6464fdf0ba9e0dec1b2ebf4a587cddd90b3fed83c"
+  },
+  {
+   "name": "blk.8.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00087738037109375,
+   "source_sha256": "5f436c2cc737ce5a983c1ac9996ceec5e6cd9b622727e6455f8b6b7a8a470a4e"
+  },
+  {
+   "name": "blk.9.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "aae1df9912ca2d567b1da8fcb9ac4a28768b6b2d82c1fd83bc41be23f7a43557"
+  },
+  {
+   "name": "blk.9.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "25a455f965e31dbf4bef31308d3fa112109ba5afb532d8e685ed2f498cd9aca0"
+  },
+  {
+   "name": "blk.9.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0026702880859375,
+   "source_sha256": "924040c95021c0b3d8a81b20101baf5f8664bdfb27926c0ba1869362ea372d44"
+  },
+  {
+   "name": "blk.9.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000881195068359375,
+   "source_sha256": "bbd94c78f0540645ca9ce2bf4827be23ceb595df1340fa524e5137f694234d30"
+  },
+  {
+   "name": "blk.9.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0070343017578125,
+   "source_sha256": "96aa4ec1b389b499d2634faa9d17a69417ed9847d589109ac70e00ff63380584"
+  },
+  {
+   "name": "blk.9.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00193023681640625,
+   "source_sha256": "23a735f1390e54f310deba9e95aafd24cdfe7e80e7f0b6ed2c58458f0ce48776"
+  },
+  {
+   "name": "blk.9.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0008945465087890625,
+   "source_sha256": "66fc434977356de14bf3d6fc666c9a9ce0f9a3e47d6dd596d7a33abf45f85b31"
+  },
+  {
+   "name": "blk.9.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.010498046875,
+   "source_sha256": "3114eb901bb66678d0ffd67b46e4100370ead7aed6fb37e7bfd7c64d2e46d105"
+  },
+  {
+   "name": "blk.9.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0007266998291015625,
+   "source_sha256": "459145dcb8e987818844d9d50dc9c22bbd7a67c18ac92c5edd4ea2cbc4456074"
+  },
+  {
+   "name": "blk.9.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000576019287109375,
+   "source_sha256": "0d414cf9ac1c44b6f8d551cbedf113cb86b8d9308514323660b40f7875f357c5"
+  },
+  {
+   "name": "blk.10.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "54d25f01e50dab4f9ee9443c7e4f72e70561d5ef3273a5ba8d9c0e27ba8eb824"
+  },
+  {
+   "name": "blk.10.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "13fe97fbf28bd8f180731998263d3dbb652762fe4ee08c61e00c4333e68dc1f0"
+  },
+  {
+   "name": "blk.10.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00344085693359375,
+   "source_sha256": "17c9591f2e4fea1f287353c108d7bbc2d13a821f14eb2d5971ef072d0eb5292c"
+  },
+  {
+   "name": "blk.10.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00048828125,
+   "source_sha256": "ebb23468d0ac4636c35e1559bb43cd537a57b1ea059db1f0e474f59b37135233"
+  },
+  {
+   "name": "blk.10.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0074005126953125,
+   "source_sha256": "b97f773d25f4b9de58809cb4e6f64f5346e6f3296c855e315d9a4853626df064"
+  },
+  {
+   "name": "blk.10.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0030975341796875,
+   "source_sha256": "efe8eeca40bacb2bf1ef3ce62e3d1dc7ec25b6d2aeb7d6a7dae5aaabe4e5a87a"
+  },
+  {
+   "name": "blk.10.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000896453857421875,
+   "source_sha256": "ec44160c5fabac60719926c5b23037797647faf59d8253b92243bedb421c7462"
+  },
+  {
+   "name": "blk.10.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.007781982421875,
+   "source_sha256": "2bbc23d8b166ae10bd3f293bf8d50ff3c51d1297e011c859191895ec6165ca9a"
+  },
+  {
+   "name": "blk.10.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.001323699951171875,
+   "source_sha256": "98c44f93269f666ffc3e981eb866ed1c3c6734a4f57a68bdc99f4c86bdc61bfe"
+  },
+  {
+   "name": "blk.10.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0009593963623046875,
+   "source_sha256": "fc88a0598a6a0046f13840eb3f8cd0d0fa3dcc8e510c0e200770ca9527169e6d"
+  },
+  {
+   "name": "blk.11.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "3109af1ffb739f1232cf7cd129966f2b48050a4eaddca47525dd029e4ebabf79"
+  },
+  {
+   "name": "blk.11.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "73fa6859aaf64ccdb46481635c3801bd2d2a271bcffd0c66c8e3181b127da3cd"
+  },
+  {
+   "name": "blk.11.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00270843505859375,
+   "source_sha256": "1d5b111ecb2e24a7b0fa9c7f799d929d5543c43f745b93d5e921e66e242fcc85"
+  },
+  {
+   "name": "blk.11.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00089263916015625,
+   "source_sha256": "d0698b326af52f320a7dfc93f011d035abc4cd446e30511635ce38f9fc5e2a2b"
+  },
+  {
+   "name": "blk.11.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0074920654296875,
+   "source_sha256": "b4091fc51ae7972b92e8b36b0f53f7eeb659c47b12166ef71d65650a6c29e49c"
+  },
+  {
+   "name": "blk.11.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00382232666015625,
+   "source_sha256": "cb81f41dcb38a3a5cbc0e02a869223c95a3f3003dc93d0701c0574c1e421bfaa"
+  },
+  {
+   "name": "blk.11.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0009555816650390625,
+   "source_sha256": "648bb75648d7c1ea4606530259d2e6e2633b75e56a6e262d080b0b17e397c029"
+  },
+  {
+   "name": "blk.11.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0076751708984375,
+   "source_sha256": "c8ca7d331a4f2f6a6dfb5dd986c76118d42b8924c3ecd8009d2a79155e7e8980"
+  },
+  {
+   "name": "blk.12.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "07420ccb970584be352fb60ca9464df0e6d60162fe9e18b47bade68ab4778dd9"
+  },
+  {
+   "name": "blk.12.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "50db07e633dd8ea6d33f64128c26ae7a59513e3d8398b91b67697f9189f0e171"
+  },
+  {
+   "name": "blk.12.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00383758544921875,
+   "source_sha256": "86a72a55a8f1af89c0882c8cce142f5e904aed96203c3178bd37943f857cb5d1"
+  },
+  {
+   "name": "blk.12.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000959932804107666,
+   "source_sha256": "c3175da42a0afec4291363f9928d3f9e208c14bdbe308ca18e1cf1deab29f3b2"
+  },
+  {
+   "name": "blk.12.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.01275634765625,
+   "source_sha256": "a87489fc71f20d9ba17cccf5fb1abaf84ba39da5e3bc8ca0c921ab27a1296a71"
+  },
+  {
+   "name": "blk.12.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.001880645751953125,
+   "source_sha256": "bf5ef26766cc593e084d3b3d39e9ff4eff79690d5bcf2eb889e84d423771e7c4"
+  },
+  {
+   "name": "blk.12.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00081634521484375,
+   "source_sha256": "81e72d117f891ef53d268069b257ce78d52c5811283626614423f8c5a53cdabd"
+  },
+  {
+   "name": "blk.12.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00750732421875,
+   "source_sha256": "8c3f32aa7e5cc06e81cc11a144afa42eee4dee3e4ecca3ba11247b04ffbb3fcd"
+  },
+  {
+   "name": "blk.12.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000476837158203125,
+   "source_sha256": "f21c627884c4b949a5302f40c907cca36e0ec3d3d29a30f803fd8a96708becac"
+  },
+  {
+   "name": "blk.12.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0006809234619140625,
+   "source_sha256": "12696b744a23c93aa701e949c785ec7692f742f9032ba221f3f00b60bc290ad1"
+  },
+  {
+   "name": "blk.13.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "3318fe2bb45892fb1d7666b56ee17b878ddf5cd5cf2cda1e33b0b3f8f489d9e3"
+  },
+  {
+   "name": "blk.13.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "396bedc87a395161d75c949b5f340dff7f4f629c20c705f7ae8c5b84da00abe0"
+  },
+  {
+   "name": "blk.13.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0038909912109375,
+   "source_sha256": "7a09141ed31fa62b6131ee2210bbef7fb596ae00c509c708fe95402ca84b0d31"
+  },
+  {
+   "name": "blk.13.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000945746898651123,
+   "source_sha256": "fe26e7613364479ae2c58c4b7f49a3bca5023567e0cc1b1e771fce1089a2b9cf"
+  },
+  {
+   "name": "blk.13.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00384521484375,
+   "source_sha256": "5185ee7f843dd79ad9c1f1456b3a86d2d9ac45abefd73ae33e8646c1afa35118"
+  },
+  {
+   "name": "blk.13.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00194549560546875,
+   "source_sha256": "5fa9cefbef161df0f2457164d5e42d959ca7547f5818146a696c88e604db7976"
+  },
+  {
+   "name": "blk.13.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0004787445068359375,
+   "source_sha256": "e771718233f7451426247cdd45ab7f3ad3bb862d6df624aad38991e47d7075b7"
+  },
+  {
+   "name": "blk.13.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.006805419921875,
+   "source_sha256": "675c08a5e232d7fecb776bdcd1e52824c271c02dc0e3b1c89c58edfc70bf753f"
+  },
+  {
+   "name": "blk.13.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000621795654296875,
+   "source_sha256": "b92493649f4e546f9dc974d483af0bbc3f858c5e0e5d0e57a4f61263c8052b61"
+  },
+  {
+   "name": "blk.13.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000476837158203125,
+   "source_sha256": "dd62acd3c277c97002089ec51153a37225405b5278702549fb5668514116d520"
+  },
+  {
+   "name": "blk.14.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "deaa130f8595b72ddbb80a97b238eb49b9a08b812b325fbf88699e1a8837c2d2"
+  },
+  {
+   "name": "blk.14.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "c85dde82b78c9b9e1aae1da65ddcccd71e1c95144912fb22b86346f169736fe3"
+  },
+  {
+   "name": "blk.14.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00310516357421875,
+   "source_sha256": "6a1e96ac16f75672ff3180724914a24205c1cddfb1c6f9d62fd093f6b5004ff5"
+  },
+  {
+   "name": "blk.14.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000461578369140625,
+   "source_sha256": "7ea6063e583b3ac6181a08789b38d5f5dc9df744b4c80a479c8fc63484fa931b"
+  },
+  {
+   "name": "blk.14.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.007781982421875,
+   "source_sha256": "56aa009fffcb7e5a1601c7c42b565489b529c9ff1e006958b48e2bf13868e3aa"
+  },
+  {
+   "name": "blk.14.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0019404888153076172,
+   "source_sha256": "c8d6e06135785fefbb0ba117e1be59d2a33a34f2ae5983dc98b3b541cea87a34"
+  },
+  {
+   "name": "blk.14.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000476837158203125,
+   "source_sha256": "bcc4df1082706491ccfd6ce3b06ec044a19ed1d9f4f54aefda901e58567c5027"
+  },
+  {
+   "name": "blk.14.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00927734375,
+   "source_sha256": "338f0b23a1e5ac0941c85f0cb8a018d400598b8859343a075cdd037befaf87a3"
+  },
+  {
+   "name": "blk.14.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0004825592041015625,
+   "source_sha256": "060717acbfd5da8b75d0f209eec1300cd510799686e4e95a1a4e4111673f0349"
+  },
+  {
+   "name": "blk.14.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0007572174072265625,
+   "source_sha256": "d7ba53f94423115c334bc7492afd860443ecd2e0d87ccdca6c102fef43ea3e9a"
+  },
+  {
+   "name": "blk.15.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "edc5f198f82a38b1637a4ffaf070e8c500283cf09d9776ab5610f195667a676d"
+  },
+  {
+   "name": "blk.15.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "03fc18e692a41666f3b0cd76b6c2509e28f500ea24bb5fc5b3707491bda1f052"
+  },
+  {
+   "name": "blk.15.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00191497802734375,
+   "source_sha256": "9d9a6c4f94db7aa69d7a23f99cb7bbd3dfc0328334602741446e6ae32b32d876"
+  },
+  {
+   "name": "blk.15.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000759124755859375,
+   "source_sha256": "7d1e395658ebdb7de2d935baf0d47a33467c2a3e1ffef21cf44d8919ec180f31"
+  },
+  {
+   "name": "blk.15.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.006591796875,
+   "source_sha256": "702cfbb2b30bd1010f0617eb83a2e14c1a2fd7e4168f0f16720ec12b8ecc6da5"
+  },
+  {
+   "name": "blk.15.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.001941680908203125,
+   "source_sha256": "a952e99238b93c35c99a3b68774f03e72474d30ca2f2935d735531e53c2e0f8c"
+  },
+  {
+   "name": "blk.15.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0009174346923828125,
+   "source_sha256": "7892e8bc095fc697096a4cbddc45f8653d797285062e85b1fd590afd5e0fec9c"
+  },
+  {
+   "name": "blk.15.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.01513671875,
+   "source_sha256": "b7c80d8b422563a11f3d344b81e080ae51262f65d69041cc30e1380413007676"
+  },
+  {
+   "name": "blk.16.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "c2fbf232fa97ea0cf23ed42c086bcccbb7a93c353ecc5c18fdcd041aa52b0717"
+  },
+  {
+   "name": "blk.16.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "2f88f43e8e35c8456ac51d9a7f8f640252b76974e455e152aebe819888393459"
+  },
+  {
+   "name": "blk.16.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00191497802734375,
+   "source_sha256": "32fd317a9f630d417aa90e67d3befa3e56f5accafdd5da1f92e71d2221e100ca"
+  },
+  {
+   "name": "blk.16.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000965118408203125,
+   "source_sha256": "490311be51c6e21aa0f941e88769e41c2d330f26feae6c441297ebf4dee324ae"
+  },
+  {
+   "name": "blk.16.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00384521484375,
+   "source_sha256": "7cf95ac153a231cdf18919c1de0c785f353cc0377bce8ede18b1f2488e294db9"
+  },
+  {
+   "name": "blk.16.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0018768310546875,
+   "source_sha256": "4da6da8053f4545e890d300e53ab8edf614a72811dde72e455e0d264b5244b10"
+  },
+  {
+   "name": "blk.16.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00048828125,
+   "source_sha256": "da60c5b2a9d75490353be21c1369b1667fe0cf1499090a5af03b32b3b63d4a18"
+  },
+  {
+   "name": "blk.16.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0189208984375,
+   "source_sha256": "1f5dbf9213fa06f8bef6c7515acef67055bb6719146880f9c99fd7f75733c89c"
+  },
+  {
+   "name": "blk.16.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0009250640869140625,
+   "source_sha256": "f7bdd5788147e64c0b6dc1243c14c0ece86b7abbed8c6a861d2f843841cce2c1"
+  },
+  {
+   "name": "blk.16.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0007724761962890625,
+   "source_sha256": "2b997caee232d073b8c263665c4a1668d95b6fdcc5fbe32d94c96379749bdd2f"
+  },
+  {
+   "name": "blk.17.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "3cc2c69b95c4272493855fe5a72b67714c6d4e7e3319cb65efe6bf036a1a222c"
+  },
+  {
+   "name": "blk.17.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "3153f6a2c1029f9acdac6d2daaaecd20177c21ed92e09cd2617119ef5132cf0e"
+  },
+  {
+   "name": "blk.17.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00319671630859375,
+   "source_sha256": "0a0d06917476cf6cd94501f8f4394d10e25201e7583d9b2ee72e8d996f6a86e2"
+  },
+  {
+   "name": "blk.17.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000858306884765625,
+   "source_sha256": "f91f5f528c622fb4e083b34bffd96725370d7f0a0feb46fe0b37e4a9984c691c"
+  },
+  {
+   "name": "blk.17.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0074615478515625,
+   "source_sha256": "f6206cd63f0234ccc39c29fd63db37c02358e6d38916f69516eb68c54b5de2f8"
+  },
+  {
+   "name": "blk.17.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00188446044921875,
+   "source_sha256": "9bf373c8ead382a5c18088316314f9a666ac42db46be280f7883b739aaf771a6"
+  },
+  {
+   "name": "blk.17.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000797271728515625,
+   "source_sha256": "418fd2a12d9e098f32eea15ee83e491805988672b35f24c788789651d7d44b9f"
+  },
+  {
+   "name": "blk.17.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.007720947265625,
+   "source_sha256": "58e09772f1c21193f50f08cf5d59087719a8dd5a1fc44bc6e1392c2003c205f7"
+  },
+  {
+   "name": "blk.17.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000629425048828125,
+   "source_sha256": "7c7f6ac5d2d9dab456b92ac45d99088598eb3d106d515ddbb5a531d39efecece"
+  },
+  {
+   "name": "blk.17.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000957489013671875,
+   "source_sha256": "8541db4f07212db03b93d26b2d63650605686b09748f943a4547a30c11247549"
+  },
+  {
+   "name": "blk.18.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "8205da910e2b49109516c6cfcbd33e541f7a44256cdb020b7751d3f5f2f81d7b"
+  },
+  {
+   "name": "blk.18.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "445552436483b9110e37f298ed86e3faa67f60bf54836e6db8957b1ad81d353f"
+  },
+  {
+   "name": "blk.18.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0018463134765625,
+   "source_sha256": "5ebbffd8c3150c8964e28c9f69cb914de8bd9558d562e0983535880961b0aed3"
+  },
+  {
+   "name": "blk.18.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0008983612060546875,
+   "source_sha256": "c2bbc0afd313057ecf734dab5f8a92374158c64e63f7820c17e2c06fe869db87"
+  },
+  {
+   "name": "blk.18.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0052490234375,
+   "source_sha256": "7e8faff6725d518a4757d4b528191d7586b070c25d83e07e845545661ab29873"
+  },
+  {
+   "name": "blk.18.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.001941680908203125,
+   "source_sha256": "0f6ef6be981cc5606eaa9010cfda5e70817a045c24abefd3929f41fe955731a1"
+  },
+  {
+   "name": "blk.18.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00048661231994628906,
+   "source_sha256": "15e5fcb95baf31b666cfeecc24bd628f023a210c10415953ee69053c47a6b6fb"
+  },
+  {
+   "name": "blk.18.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0077362060546875,
+   "source_sha256": "86e65835fba1b8167b0a625417f561551486d3fa29cee01ae2804a04a1b748e6"
+  },
+  {
+   "name": "blk.18.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0004692673683166504,
+   "source_sha256": "d5e5075717179bb45974db495b12980470de1da8c018a2827120a0554d4c5087"
+  },
+  {
+   "name": "blk.18.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00093841552734375,
+   "source_sha256": "1bbe1dddd038e537a12b0c9868d0dc076f1e8505bb9efcfe0ce75ec2f4608390"
+  },
+  {
+   "name": "blk.19.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "3baee2f57cbc7258bed5aff9f45ac171f2ae40d17ea1fca01d8b9c004682fc46"
+  },
+  {
+   "name": "blk.19.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "c150301bdf2bba65501177d43a1479b77bed4fcc13e46cbe1785cab3731c8001"
+  },
+  {
+   "name": "blk.19.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.003326416015625,
+   "source_sha256": "1c6ccf4cd43af23422b454c6b8eb3ef08e522f287b4693d3a5587915af08c8bb"
+  },
+  {
+   "name": "blk.19.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0008640289306640625,
+   "source_sha256": "400a23c290340b531f6a1a734c6d3d904c40df32c4f0dd195b201acdae75b311"
+  },
+  {
+   "name": "blk.19.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00762939453125,
+   "source_sha256": "281676db720073d37ad7844ea8e28dbc1ed6e110f0dafa776886330977eea3d3"
+  },
+  {
+   "name": "blk.19.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.003173828125,
+   "source_sha256": "81105e1e4b9e536fd5500186ae705775b48f8f160538dbb50c8f8e7b89155d7a"
+  },
+  {
+   "name": "blk.19.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000614166259765625,
+   "source_sha256": "97117386ce31245c56936446a6003931cfc1fb3ab76fccce9bd8641fa0f6fc04"
+  },
+  {
+   "name": "blk.19.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0072021484375,
+   "source_sha256": "e80148ec09826931d2b234862db9c7019b9f37f66db5c926f90cc46921ea2f3b"
+  },
+  {
+   "name": "blk.20.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "7866e7247ccd27084c273a906c502dd2ac5a6b449ea758798d636e45f9343e52"
+  },
+  {
+   "name": "blk.20.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "1a615ec226a76718ccf4f7e6b849470aa61f679ea744719ddeca02daa2a5b428"
+  },
+  {
+   "name": "blk.20.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.003509521484375,
+   "source_sha256": "91540d86efd935eec5a40792d89cad6ea6568a9dd4b0f9dfc2b6d3dacb2b0eac"
+  },
+  {
+   "name": "blk.20.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0004767179489135742,
+   "source_sha256": "3378464eb8f700943b6b7a477a4d31927d2cddc3b65532091918f34ef140ed8b"
+  },
+  {
+   "name": "blk.20.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0056915283203125,
+   "source_sha256": "964f2a67b4a6101880aa6c1329b672971264daa5aaab0c8cfb73138f6c62e14a"
+  },
+  {
+   "name": "blk.20.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.001918792724609375,
+   "source_sha256": "55cda8e995f00f4781fea43a22be35128fc044d0f864db116b4936c91644e9e5"
+  },
+  {
+   "name": "blk.20.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000476837158203125,
+   "source_sha256": "208975e049cfe5f95caed1af845bd71606f13996df2f8e9e4c832b7a38ba0d6e"
+  },
+  {
+   "name": "blk.20.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.013885498046875,
+   "source_sha256": "d0a136ea5e84ef3af4f39f2bd1991b36195dfdd7222301709fe610859cdb7c44"
+  },
+  {
+   "name": "blk.20.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00048351287841796875,
+   "source_sha256": "1b5b873e254d715f857b40854592deab1eb60c4b1c163fdb3a8ce8d6d3eccc43"
+  },
+  {
+   "name": "blk.20.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00093841552734375,
+   "source_sha256": "87063c73a0e3f221ef9ff8304ec5fa75834d08cab8e6f8390a4cded252d6e5a3"
+  },
+  {
+   "name": "blk.21.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "f627d357faffb16f7acfa000f2d4b2f9c03bf1395f7f48567d636a31b7cfe12d"
+  },
+  {
+   "name": "blk.21.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "faca04a1246edc1c0aedc13fab0455bea4ecae54f934e1739da984b4bf9f1c8e"
+  },
+  {
+   "name": "blk.21.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.001934051513671875,
+   "source_sha256": "82d5bfef17fa6bb5a8474ef2485fa72c7abbfe787fc09134c9872075aca53425"
+  },
+  {
+   "name": "blk.21.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0006694793701171875,
+   "source_sha256": "11a3ca529caa26f9006e2bb184a1643e5ca88da2a4c4a528285357e83cb0ed22"
+  },
+  {
+   "name": "blk.21.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00385284423828125,
+   "source_sha256": "225776bb1474dd2edb65a17250ffe8328213ec432c5c4b7056956b9c8bc026b9"
+  },
+  {
+   "name": "blk.21.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.003814697265625,
+   "source_sha256": "455b6e0612c5d48f09dd3056f720d07e97ab05ce716c5b037bd411b71ed45c0d"
+  },
+  {
+   "name": "blk.21.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000606536865234375,
+   "source_sha256": "54e2485b7d4769074021b98ce0314981e63a405ac9f6d53eb90eef9c9e203e09"
+  },
+  {
+   "name": "blk.21.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0064849853515625,
+   "source_sha256": "ce7abdda6e853c39b29992a97836d4ef48135ad0aaa01fcb93a09d2f02c35a58"
+  },
+  {
+   "name": "blk.21.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000934600830078125,
+   "source_sha256": "5c6a291ec09effdf57f42ece382d7eb007cf31af29ca4bc414c34a6734e6857b"
+  },
+  {
+   "name": "blk.21.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000934600830078125,
+   "source_sha256": "e42e50ccb7df5c87e4686dda76d004f103cb764468610c4c4c235d0f43984eef"
+  },
+  {
+   "name": "blk.22.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "29c953059493e5fbd3a6cfe5dccf915aa54156dce065426d63ae5ce4546c71da"
+  },
+  {
+   "name": "blk.22.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "6e77b7916c4a915a28da82a9235608315ca48662927845a4c6c8ca6d2730ea50"
+  },
+  {
+   "name": "blk.22.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00366973876953125,
+   "source_sha256": "c179f8d1f42897550cce46707abc2f37bb1c6e095881387e0379d82ddfbdbcb9"
+  },
+  {
+   "name": "blk.22.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0004533529281616211,
+   "source_sha256": "1ba293bfbbc323ce90262d0708c390a6f8ccb3e672063e99021825615925f07e"
+  },
+  {
+   "name": "blk.22.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0038909912109375,
+   "source_sha256": "002c4d9b78fe4e1cb6ba881bceceaa8eef1be799fc5adcc044a05fb115bc908f"
+  },
+  {
+   "name": "blk.22.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.001926422119140625,
+   "source_sha256": "2bc42b38034f033503048cee0a0c3776f82e05128238970de034034b0c6e8373"
+  },
+  {
+   "name": "blk.22.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0004634857177734375,
+   "source_sha256": "6ee1485235acfef53fbc8cf16af8b206e36d4cf4cca5e54769f2d711a5b3fd61"
+  },
+  {
+   "name": "blk.22.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.006988525390625,
+   "source_sha256": "3ed4de9c5bcc61768234815b27181a9ad76ba6085545bd4aee9fb7fba10237a9"
+  },
+  {
+   "name": "blk.22.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000652313232421875,
+   "source_sha256": "8fc36d42b44c618ba0479bf670aa0a1022e8dec05db20dcd028b0348ceec6126"
+  },
+  {
+   "name": "blk.22.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.001873016357421875,
+   "source_sha256": "0bf40be420bafab3ccda0cb5ab6380eb2e256580c1a90fc84e18866205719f7d"
+  },
+  {
+   "name": "blk.23.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "ca6bba0e86872e947fafc7511eff7fa965dfd5bf7899edc0255b7c2e542ec337"
+  },
+  {
+   "name": "blk.23.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "53d664b3b439842ebd72bf01ab0f0dfa59ce34ac22e931a5299a9f2f3e22eb7b"
+  },
+  {
+   "name": "blk.23.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00189971923828125,
+   "source_sha256": "9a6553b455c2cbd80c23d42d38517f755a6ded59ec9a00f931866b214a4b3140"
+  },
+  {
+   "name": "blk.23.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000457763671875,
+   "source_sha256": "bbdc4fccc882e579cbb5cd407c42d513ef48a9e111c889a14e7689bd7e037ea4"
+  },
+  {
+   "name": "blk.23.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0057525634765625,
+   "source_sha256": "ad2c53070b9d9b9a5ff43946315898022b8a9be58b04a4e167197dae8283ec55"
+  },
+  {
+   "name": "blk.23.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0019073486328125,
+   "source_sha256": "ac32b6d5680cda144e3743035e2e44dc8205f5eb16e8f158f14dfaf1dc8d1fc9"
+  },
+  {
+   "name": "blk.23.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00070953369140625,
+   "source_sha256": "606627595fd908f767376f15cfe8c59ebc47da2b73764030b36cc20eb35f8d11"
+  },
+  {
+   "name": "blk.23.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.007293701171875,
+   "source_sha256": "7c5494d091bb14a65485356a44a3391a611ff03035ddcc45fc015018f798d761"
+  },
+  {
+   "name": "blk.24.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "11d6f121b5440343ee5fc3566628305006486971699290d213507fcc88a35eb8"
+  },
+  {
+   "name": "blk.24.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "034a42b34cdd2edf2e12c95f483ecb45401755285591da4488b7621403cb2834"
+  },
+  {
+   "name": "blk.24.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00264739990234375,
+   "source_sha256": "1eb52dfde18ef23ee76af08f48f2ccb349eb86002f0ba863569e0a5a89d774fe"
+  },
+  {
+   "name": "blk.24.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000560760498046875,
+   "source_sha256": "089aee4828d6b4c58c4f1f4a855f6bf1098fbcd48705de31ebaa77c9e3a036bc"
+  },
+  {
+   "name": "blk.24.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0062713623046875,
+   "source_sha256": "6cf4167a845caa3086d55cccc09cd42eb6fa201cd6c459947761155ca49df7b2"
+  },
+  {
+   "name": "blk.24.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00194549560546875,
+   "source_sha256": "edc31228eeddd2dc44e33362deec6b11a30ab188baa9eab04d09e4975220e655"
+  },
+  {
+   "name": "blk.24.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0004863739013671875,
+   "source_sha256": "83007d4a300a885010c116fecf0a8ed8e18b2f81af818b478e3a0f0b2f195b71"
+  },
+  {
+   "name": "blk.24.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00897216796875,
+   "source_sha256": "0ec22a31c2e50b11155c76573d3e95264c721035b025ece60324954104356fbb"
+  },
+  {
+   "name": "blk.24.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000942230224609375,
+   "source_sha256": "f06e004ff971dfdcdf543d4f7856fb6754c5a3717766363dac608ce9d91e4a40"
+  },
+  {
+   "name": "blk.24.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0009212493896484375,
+   "source_sha256": "37345cfc149c9814f8143214d51af986e0f385612e48155bad68bb6877b8b82f"
+  },
+  {
+   "name": "blk.25.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "bb6c2fa232774323ace584c9808e8d785f33b2fc5ae85410cdb67a89f3619428"
+  },
+  {
+   "name": "blk.25.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "c73b8e940049876d5d446917a930698cfa787e9be039bc43b6b38ea3d2e7c4f4"
+  },
+  {
+   "name": "blk.25.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00278472900390625,
+   "source_sha256": "28d094c39d9e1e05b4585b9983863bfe5d138e89f642911c33716e95594e9926"
+  },
+  {
+   "name": "blk.25.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00048482418060302734,
+   "source_sha256": "3b270874a626b604636d8670d1679787ee50023c76732fa9cd1d0b3cf7bdf74c"
+  },
+  {
+   "name": "blk.25.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0066680908203125,
+   "source_sha256": "8ca730c709d7174c1bc761c62939fcbc47e7313664233fe04468279235343611"
+  },
+  {
+   "name": "blk.25.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00191497802734375,
+   "source_sha256": "845e8d50c7b6c37016c36f5522bcc62df1d905682faa24eb2055cbe9ca33f760"
+  },
+  {
+   "name": "blk.25.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0006656646728515625,
+   "source_sha256": "ba8a24ea7d7c43b2d5471d7602726cc96a01615036157421dfc8bb4674c9b8b4"
+  },
+  {
+   "name": "blk.25.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.01177978515625,
+   "source_sha256": "43c47d21220ab7f104d77c940521cc2b346040901d97ba33cf19210fff994906"
+  },
+  {
+   "name": "blk.25.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00083160400390625,
+   "source_sha256": "57b212c500751b253cfe4781e40a9146e56bb51bad475a5bd763f2059de68589"
+  },
+  {
+   "name": "blk.25.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0007648468017578125,
+   "source_sha256": "adbc91421de424adcbd9caba4998b483c42add8947dcbbeb6c4dcec828b1244b"
+  },
+  {
+   "name": "blk.26.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "f7446624811b28156c1f4ddbd8c9588955e3817c96fc278c3eced096e54e69c4"
+  },
+  {
+   "name": "blk.26.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "595651b2916fbde5b0e927e98403f1e0da4602554c3c93730af182549a502fe3"
+  },
+  {
+   "name": "blk.26.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00380706787109375,
+   "source_sha256": "5aa52aa20626662a49a75a6a97e02ab61390d1c3eff2827982312557f4bbe7d5"
+  },
+  {
+   "name": "blk.26.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0005931854248046875,
+   "source_sha256": "88ae73ceef41f33056a4bafaa6aafc622ba4141144c8c447472587f423baf981"
+  },
+  {
+   "name": "blk.26.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00386810302734375,
+   "source_sha256": "ee77e768e8a8122734401fbb7188f91ffe0b51212b5b8e5dced6708753ca2de9"
+  },
+  {
+   "name": "blk.26.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00354766845703125,
+   "source_sha256": "72bec2cef13caa0189366cac49115198ef14c79470fb24794cae70d40a535456"
+  },
+  {
+   "name": "blk.26.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0008296966552734375,
+   "source_sha256": "e67052f7d6f4d22da0d6967ce58d706e07ebb2641e166fb3e6cf69e91207058a"
+  },
+  {
+   "name": "blk.26.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0069122314453125,
+   "source_sha256": "3e964d301bc20d27973079433a2745a22671262308d6c0f8fed67080f47a6ef0"
+  },
+  {
+   "name": "blk.26.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0008983612060546875,
+   "source_sha256": "4869786dce04cda6e2acaf955f0445b3f95948da1c9f6f50105cd84c493d8ad9"
+  },
+  {
+   "name": "blk.26.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000812530517578125,
+   "source_sha256": "dda6d8f88e33f30dbb4f667ca1a0533b5c3107cf6746f1e12bb0d1a375a61003"
+  },
+  {
+   "name": "blk.27.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "eabc0ea858ee7d48a8705a93ddeb6881a252c73a7f7a0c4178c8cb8337926def"
+  },
+  {
+   "name": "blk.27.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "c7bd95715823d4c0d670bca93b4c3ad8542ed2b9b280cca795b0d36ad931d37f"
+  },
+  {
+   "name": "blk.27.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.002777099609375,
+   "source_sha256": "fef5f3e076bd0adf9fda63d4a76fa46c9190787d28517a00b64d0c0ab2ff7839"
+  },
+  {
+   "name": "blk.27.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00079345703125,
+   "source_sha256": "d69d162e67667cfb44e7168b01435271c24b47762a48f307a2814b24275a2cb4"
+  },
+  {
+   "name": "blk.27.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.007659912109375,
+   "source_sha256": "d6de553938733dd9e676490c70e98af2d6bff75b1a3e612f7b39d2e67d8c574f"
+  },
+  {
+   "name": "blk.27.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.003204345703125,
+   "source_sha256": "fc0637f78403a2b7b0151dafdce0bab17c4d77c5b0e1e43896072864454fa25a"
+  },
+  {
+   "name": "blk.27.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0006771087646484375,
+   "source_sha256": "cf3c310d16779cd1edf894c553e8678bbcf5c556c8ee88ac79a3b25ee39c5757"
+  },
+  {
+   "name": "blk.27.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0077362060546875,
+   "source_sha256": "289bd750b3b7cbbf3bcbd05536b55dac74eb6bfc701a3e219089edc0cf614355"
+  },
+  {
+   "name": "blk.28.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "2ccde72d6959b9bbca76f7e0dbb7ef201be0fb63356148ad8d1a4253a06a303f"
+  },
+  {
+   "name": "blk.28.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "d7f71a69170b943d44fed8f9388d31c52be289412fda2e848602723462b9fb6a"
+  },
+  {
+   "name": "blk.28.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0019054412841796875,
+   "source_sha256": "d2f5d8d96768a574f34f260ea317f5e23e9861c1acb633815b10acf9747ae761"
+  },
+  {
+   "name": "blk.28.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0009441375732421875,
+   "source_sha256": "aa61b1ee15ca2432f5233535294165dba09f4c7ab8678bf7d80fa59f3802f320"
+  },
+  {
+   "name": "blk.28.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.009735107421875,
+   "source_sha256": "b456b04285bc8dc61af5ff0b6f314bbae5051e469b1846972b5209566be82e15"
+  },
+  {
+   "name": "blk.28.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00194549560546875,
+   "source_sha256": "8c92f69ba01203e73fd880fd0742d9b3691e9c4e62f3454f97ac84aea40a5300"
+  },
+  {
+   "name": "blk.28.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000911712646484375,
+   "source_sha256": "cac6102d407b7a3a54b087d89cab0ee1823f87050db3f04816b76fb90a3ccfff"
+  },
+  {
+   "name": "blk.28.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.011138916015625,
+   "source_sha256": "a5d8c656d280a48afe6a2254eafaabb409cc220258cb4048baa4c2479004387a"
+  },
+  {
+   "name": "blk.28.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0009250640869140625,
+   "source_sha256": "90cffa895f919306c1fa458f557064153e8182c38b9516446f825a1d3cf913df"
+  },
+  {
+   "name": "blk.28.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000736236572265625,
+   "source_sha256": "b46dfb526c15e7021c2c0712454c1e07f21dda49848386f4cd9c34a78c585770"
+  },
+  {
+   "name": "blk.29.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "9c8bb9e21b311d4c3bb4ca3e9083eca659237e6823cc53fcf40332b888dacad4"
+  },
+  {
+   "name": "blk.29.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "fc7d31ecca7c51d316ad25271479823e43af04bb0b22c3757b2434163bfe67c3"
+  },
+  {
+   "name": "blk.29.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00194549560546875,
+   "source_sha256": "0189c1fe96fb18d8164711ad623c8ff3f57d2e10bc8d42cf4e9eba203faccb7e"
+  },
+  {
+   "name": "blk.29.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0009746551513671875,
+   "source_sha256": "582b58ebfab71b6e8e1b7606c17ef4bf0120cdb976be09ff4990e0ba3640cd62"
+  },
+  {
+   "name": "blk.29.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00762939453125,
+   "source_sha256": "7a59f90f18f144bbb2b084759c6d849e5ee5145db06b95206a42005d5edd6130"
+  },
+  {
+   "name": "blk.29.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0019426345825195312,
+   "source_sha256": "4eb19fd60f5163dab55229a0b2b20647154bccb2f8aa7b8026d72e0ed4ef25ad"
+  },
+  {
+   "name": "blk.29.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0009365081787109375,
+   "source_sha256": "4bc82e3ed6acf0ec99ec723d5948d6f6523f91423cdf7fad27a1b1119ec083c4"
+  },
+  {
+   "name": "blk.29.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.009429931640625,
+   "source_sha256": "d0f0aa8b8d3d3023719925d832e4f7912e32067fe05e9ac8660ce62ad518ad6d"
+  },
+  {
+   "name": "blk.29.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000560760498046875,
+   "source_sha256": "e7bed3be02d05b0ed40cdc978ec809940584efa72f8761065ad240c5baf772de"
+  },
+  {
+   "name": "blk.29.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0008754730224609375,
+   "source_sha256": "720b0af233bd7de0ef0bc9443e03307495f9bfbae8d7d5e5a9aedd282c2b2ee0"
+  },
+  {
+   "name": "blk.30.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "19170ad4bb2d0ba78cfa3c3664eacab25f8aa3288d8d1c36a4014bf4a7c3b0cf"
+  },
+  {
+   "name": "blk.30.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "e41521a323cd859da59b53623e6e6590ac119135194dbfee9f9dfabc15940ee8"
+  },
+  {
+   "name": "blk.30.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00322723388671875,
+   "source_sha256": "2bc38cdb8f303c7a1fef701adb2b30d0fcf7fbd91cccc6d5fb4649cea7260088"
+  },
+  {
+   "name": "blk.30.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0008831024169921875,
+   "source_sha256": "f51d8504995602b37a67061381998c3d83926a5f2029a68b007fd97b16737f3c"
+  },
+  {
+   "name": "blk.30.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.007354736328125,
+   "source_sha256": "af8b3d4ee818488aaca0aecb1ea8f7e75c8cfebcb5579c6b9d18e48f690d4669"
+  },
+  {
+   "name": "blk.30.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.001949310302734375,
+   "source_sha256": "1709d533c9bacb2252491f66ad25d913455a3c7f46d75108d060d4db816b9730"
+  },
+  {
+   "name": "blk.30.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0009059906005859375,
+   "source_sha256": "ae4f4126dcfacfc9594cd0ca929345d361e010bda0490f814a09a2aeb40b7093"
+  },
+  {
+   "name": "blk.30.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.012420654296875,
+   "source_sha256": "560621dfc9d9f85a2e94f08d621679a81be3bc0e964a037bd11801d8995efca5"
+  },
+  {
+   "name": "blk.30.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000545501708984375,
+   "source_sha256": "f2198fc4ce3992abbeff5365d299d0f0731fa0d0e8578fc61bb26c1f370363f0"
+  },
+  {
+   "name": "blk.30.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0007114410400390625,
+   "source_sha256": "b03b191bd06e8447fc90abead6f6092ddea204d4b8c447f0cdee5080257f6ca8"
+  },
+  {
+   "name": "blk.31.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "6f2c6ef01102b0d1b454303d764763fff9d7a4059e715270b50665e65bae8693"
+  },
+  {
+   "name": "blk.31.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "be41b9a987c46e050e246ce782639afcf628453cb5164e33fa704a2b167fb78b"
+  },
+  {
+   "name": "blk.31.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00186920166015625,
+   "source_sha256": "65310818bfd2f5b7c1995fc128c24fb61046772841ea6877f3e4645fc7bb8637"
+  },
+  {
+   "name": "blk.31.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000942230224609375,
+   "source_sha256": "b3068f49cb1c20bc90052b508513d72fc195bf172f94ea0853c8c049c2a7a163"
+  },
+  {
+   "name": "blk.31.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0063629150390625,
+   "source_sha256": "0e84f08bfc1df78a4f1db38ed4fd6b87a385276f0a1ece93ac176d5dea33f9ce"
+  },
+  {
+   "name": "blk.31.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0018157958984375,
+   "source_sha256": "fa8c8510bfe35d6a4c8f3d98ce53a372b892886ec719933b77b159f448bec9ff"
+  },
+  {
+   "name": "blk.31.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00092315673828125,
+   "source_sha256": "470d923a6c72a0e086955afca9811c2b48c42b0a6af744e7e68c6a429dac947b"
+  },
+  {
+   "name": "blk.31.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.02227783203125,
+   "source_sha256": "be368ecccd8b68cc94052157b96cd8ba652df16e2987425724a7a92fa0a71d63"
+  },
+  {
+   "name": "blk.32.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "315f83c46ab2d985c284a16096af9685c878a3a8883eb52f2291fff02105181b"
+  },
+  {
+   "name": "blk.32.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "ed9fa0395b55580fb5ed22f818d7216367fba4132419678982c2b3e345a5406b"
+  },
+  {
+   "name": "blk.32.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00333404541015625,
+   "source_sha256": "8193f97cadc40728177b0d885449f682decfbeb2d33b578765a4971af46d9c7a"
+  },
+  {
+   "name": "blk.32.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00048828125,
+   "source_sha256": "720dc9932d391cb1dbed1c6f09552a1587250ba1cb351b933d2622eb2138a6c5"
+  },
+  {
+   "name": "blk.32.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00389862060546875,
+   "source_sha256": "19275c28958c6ac99fa583a5c0057193b4826f3ed2ace7ef1b280d74d9c3e146"
+  },
+  {
+   "name": "blk.32.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.001941680908203125,
+   "source_sha256": "00e87254a054179dd5767fdaff26af010dfda87ca568f49af0b2ffc2e7f39bfd"
+  },
+  {
+   "name": "blk.32.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0007781982421875,
+   "source_sha256": "70fc438012b4308cdcd9ac64ec0ac2741d2b5b21e6f357814ee2d0e99bbe1bdb"
+  },
+  {
+   "name": "blk.32.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.014862060546875,
+   "source_sha256": "a063eda945ff23fb4c935f20c3e710a1c6733a1d41f5d35078d23edd746899ee"
+  },
+  {
+   "name": "blk.32.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000965118408203125,
+   "source_sha256": "7bbb3601640c12711634b1c20b3d81b63f6fc2de65314a7c9177c98b39d46596"
+  },
+  {
+   "name": "blk.32.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000843048095703125,
+   "source_sha256": "c54a6d134b3eda0f70770b0a34cfc6504772e61782e2b2d946f57e4ac40f76af"
+  },
+  {
+   "name": "blk.33.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "870b9a3d349215b4ec842a2e75a34068b239efa4614d5a67fcf34946f14f2a0f"
+  },
+  {
+   "name": "blk.33.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "1440558fcf786f61d41eac9ee6d30ac5d5248199f1ec74b215c8bdb5591f29b8"
+  },
+  {
+   "name": "blk.33.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0018988847732543945,
+   "source_sha256": "ca569caa2dbe5e4cf2dc12e335981fdc83ade5c4d317d1419780c0304d19085f"
+  },
+  {
+   "name": "blk.33.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0009685754776000977,
+   "source_sha256": "4401ddce0758836a1c283f69da41e229c386900e165d9fe0f01684eaf91ed601"
+  },
+  {
+   "name": "blk.33.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0052642822265625,
+   "source_sha256": "dcf41998dfe0b4d50dd1abd5e7640e6ca2c801e335fa8ef5911cfa47f8fb763a"
+  },
+  {
+   "name": "blk.33.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.001857757568359375,
+   "source_sha256": "1bfa4f5fc4a45e2bf678c196add220b0960faf0e389fa024211f3a00b07b1464"
+  },
+  {
+   "name": "blk.33.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000736236572265625,
+   "source_sha256": "9cfa2dc886fb8221d58564018a642ee55ffb7b23b31822eb924e7f301cca7ed9"
+  },
+  {
+   "name": "blk.33.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.007080078125,
+   "source_sha256": "ba7fc5580680dc74efe9bf40247402ae8237458cd067f356d74f61c62e42d0d2"
+  },
+  {
+   "name": "blk.33.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0009250640869140625,
+   "source_sha256": "b075933747005f76c50b9ce8693511cb0f2e543d1d9b8f5f50ebcff886141d8d"
+  },
+  {
+   "name": "blk.33.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000873565673828125,
+   "source_sha256": "593a6cd041192ad2f2153d0e763c5f1e1fa0f12eed6f3f0a40de0cf2b6fb41ad"
+  },
+  {
+   "name": "blk.34.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "9b8980e4cf70a10c249b9b1c17c28ce7415e0bb1343fc8a2fdcfc909df04219b"
+  },
+  {
+   "name": "blk.34.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "be8e0eeb5eaf803042f7ee8806bffcf64f184ed4b2cbc3e924ffbf7cc00e75ff"
+  },
+  {
+   "name": "blk.34.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0019073486328125,
+   "source_sha256": "250cbe8ea806f2a837c0720362a3c41eb04a2a087d11415a5634787071c5c478"
+  },
+  {
+   "name": "blk.34.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00079345703125,
+   "source_sha256": "810846bbada45530b22d0dff41a380e41899704d6e03d15d8895a05435762d4d"
+  },
+  {
+   "name": "blk.34.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0075836181640625,
+   "source_sha256": "3bb1855faddee515a5b98b2cc5fa52671938f752b233fae468f4f3298794c9a9"
+  },
+  {
+   "name": "blk.34.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0027313232421875,
+   "source_sha256": "88921a79a9c5c7f565b620de4d87599c790234220ef078f008609b3c790c23a3"
+  },
+  {
+   "name": "blk.34.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0009695291519165039,
+   "source_sha256": "a867157903b2ed8f40b76edb3d35f8832cea4369c6039962326cda078023e4b8"
+  },
+  {
+   "name": "blk.34.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.01019287109375,
+   "source_sha256": "6883fd4def61456559303eaa1a0af9f9113b669340cca148a95b86f09188fdc3"
+  },
+  {
+   "name": "blk.34.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0008487701416015625,
+   "source_sha256": "3898cbca92410ca64cb9747803243ad0a16db1fe316ed53847dc4f7aec9d6623"
+  },
+  {
+   "name": "blk.34.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0009002685546875,
+   "source_sha256": "eeb7a48ca90817bf849958cd69e38933333a56cdf672126b03196fc86889b853"
+  },
+  {
+   "name": "blk.35.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "f0501f22b8a80105d48d423715b60ef1af8f9d60e3f7f58765c7725364b02ec4"
+  },
+  {
+   "name": "blk.35.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "d46bb890c81b2ade98fbbd98e5d36269a62e7f124d597cf6e205f08046f95fb3"
+  },
+  {
+   "name": "blk.35.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0034332275390625,
+   "source_sha256": "42298cb5b36fbf545697c9a6fc5a3b9d5c667926d269aa0bf577a8fdbd08b45c"
+  },
+  {
+   "name": "blk.35.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0009670257568359375,
+   "source_sha256": "2621114358b323ad78fa87c9b9c6c9a57a5c24ff7f48e93a138d2fdcddf55073"
+  },
+  {
+   "name": "blk.35.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.006988525390625,
+   "source_sha256": "aca3d2e3ac2eb6cc31589c55f95abe5f89042d1655c6a543d62fe9197e50bd64"
+  },
+  {
+   "name": "blk.35.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00302886962890625,
+   "source_sha256": "695bed7b15ee89500c1476f1d2768c4f3a5613610b644b1f7c6998e8b337f7ee"
+  },
+  {
+   "name": "blk.35.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0008525848388671875,
+   "source_sha256": "945d7a9ef95a32191716325d9de6a5d3d8a45e0fa0d0964122873b2ad8bbb93b"
+  },
+  {
+   "name": "blk.35.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0068511962890625,
+   "source_sha256": "d2243b55488a2733dda2f8385f789a3ea1c9505d20424d280dbab13e36b63f9a"
+  },
+  {
+   "name": "blk.36.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "8d09fd32489aeabe98674fa0531da75b223d8caaf9d5da56658cf133119726ae"
+  },
+  {
+   "name": "blk.36.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "fb1b6c0d7a2b21d6b64f824ee254be6896a19c22b26c540281415ae71edc721e"
+  },
+  {
+   "name": "blk.36.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.001922607421875,
+   "source_sha256": "6d9db818af03bb279263f51bced262104ff163b77eab718de68acadb61ec373a"
+  },
+  {
+   "name": "blk.36.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00089263916015625,
+   "source_sha256": "8e30e18834f184f31c83f9e91715142df0d17f1f84d2f39285c6d5a6f183fa9b"
+  },
+  {
+   "name": "blk.36.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.006591796875,
+   "source_sha256": "416fbf424b4c23e99e7147638b571ae6fb2128b3a59acb3472b7121967184faa"
+  },
+  {
+   "name": "blk.36.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00194549560546875,
+   "source_sha256": "b09f86a3688b7bb835e203e8ecca8ffd6e19d88935d729fa7f4ffa24c8dec8dc"
+  },
+  {
+   "name": "blk.36.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0018157958984375,
+   "source_sha256": "649dc08d9951091f7dfc384a898267e25f39506d25baf143b5512e925ad7a472"
+  },
+  {
+   "name": "blk.36.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.01116943359375,
+   "source_sha256": "086a4b9900693d634550c266350680a19e7d4d0637c0546fa8f191ebc6b0ecb2"
+  },
+  {
+   "name": "blk.36.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000957489013671875,
+   "source_sha256": "d0da52c8596dd0d0f1e34e5a4a73ac980d34f809e21af85dffd0d7cf7ed4bf99"
+  },
+  {
+   "name": "blk.36.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00090789794921875,
+   "source_sha256": "99900a9af1124a77e9109fa667a04adcde3ec4ef30793ec10eba1777e1da4d23"
+  },
+  {
+   "name": "blk.37.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "f389d67631ee333924b449b88b0637adfd20b513c84e25e7a25ff823eec4f861"
+  },
+  {
+   "name": "blk.37.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "4c71d2a74ee2ec9664e0b89a96d75c68f58c7262b965441302abaf0dc0892ccc"
+  },
+  {
+   "name": "blk.37.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0035247802734375,
+   "source_sha256": "acfdc0652a2a0204d8405d3a702adeab794dc76834aaebf0700b48a09bdf767b"
+  },
+  {
+   "name": "blk.37.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000835418701171875,
+   "source_sha256": "1c1101ecebe00f9f4f06dcfa23340b2a6993a4dc926806f73e6f3af3562e6294"
+  },
+  {
+   "name": "blk.37.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00762939453125,
+   "source_sha256": "fbac01950ea0ed6b9eb9c22851f642d4f3f9cd7cd2b028ebc73975a15f9d873d"
+  },
+  {
+   "name": "blk.37.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.001911163330078125,
+   "source_sha256": "cde56c4bc4cf4461bf2574c8aaefe1c100f37945fd8dfb0f7572425933d29b3c"
+  },
+  {
+   "name": "blk.37.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0013580322265625,
+   "source_sha256": "d22571061d2b2dd0fdcfbdc4d2a88e351971acce57f5fc7761cc1130f5529921"
+  },
+  {
+   "name": "blk.37.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0071258544921875,
+   "source_sha256": "270c42d7f41ca97b4409bd94c70cd1f40a5f94d3515937ae9e6f8b255196ca39"
+  },
+  {
+   "name": "blk.37.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00109100341796875,
+   "source_sha256": "2dc5ed60184a102ca791adb4893149e6855f6df8862d2a6bd73fdfdc827ae233"
+  },
+  {
+   "name": "blk.37.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.001026153564453125,
+   "source_sha256": "3cf1501c9532af2f95eff1b71f9c3bdce393714b407f0425dab8e664639c4ebe"
+  },
+  {
+   "name": "blk.38.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "73fae9404d3306a32fb2ec9918547de872000f305965ea3e623873170fe53480"
+  },
+  {
+   "name": "blk.38.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "e2b970b875d6b35c9a9c2c0cea586cd176c52c1e4e7c88089ad0170293344d04"
+  },
+  {
+   "name": "blk.38.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00278472900390625,
+   "source_sha256": "a471df3c5829ee9760f501e3f826eed26a936ed4d91a26c2a5f4e9a3b33aeb65"
+  },
+  {
+   "name": "blk.38.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0008563995361328125,
+   "source_sha256": "cd0e9200d34609fdf9e1ad209b069605ed8e7527c94ea5b54f66c2899da418ba"
+  },
+  {
+   "name": "blk.38.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.005126953125,
+   "source_sha256": "57b21840a1a64a3bc763f4f9ae5d37f5d8736e8545a148f1844fe5c1474bdc9e"
+  },
+  {
+   "name": "blk.38.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.001934051513671875,
+   "source_sha256": "d355920ecf622aa584c2e687cf5bc004c5336553ce170a9fc4d80fb14416aed1"
+  },
+  {
+   "name": "blk.38.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0005340576171875,
+   "source_sha256": "6bce0680d9c59a62c870beb060094381f9c84c612c388820b3d26ccea811521b"
+  },
+  {
+   "name": "blk.38.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.007476806640625,
+   "source_sha256": "f9930d12ee6fbca1b549008bcb77b717a8f6eefbbcff71d739533ac9ff6459fd"
+  },
+  {
+   "name": "blk.38.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0009737610816955566,
+   "source_sha256": "1624c90a75a93ed7570db10a40a0a9e0b8bf24f6ed51df540820b9d67d803b3b"
+  },
+  {
+   "name": "blk.38.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000972747802734375,
+   "source_sha256": "4ac31d131d7cf3ac8e6083a641f4f6f978553dde30e00fd255814efa23e3fb8a"
+  },
+  {
+   "name": "blk.39.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "389bd10f8b685d8673478fe95648d62391498aedd68e197d71e454087fa82e64"
+  },
+  {
+   "name": "blk.39.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "674a0579a8fd5793db47f07645cf64a695baeb034f6bb5989c6cd44d8d78e7ce"
+  },
+  {
+   "name": "blk.39.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0019383430480957031,
+   "source_sha256": "93e84412ee8decf8e87f551d64f158bdc0d97dd8ac2f5b5a03ca7e0f5a47cd7c"
+  },
+  {
+   "name": "blk.39.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000461578369140625,
+   "source_sha256": "e37e295ad92702dabccfe6ff1fa8072e18360d2cfda899164a430fcb47ddd1a3"
+  },
+  {
+   "name": "blk.39.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00382232666015625,
+   "source_sha256": "da8133045c3fe902a3108a5dd5432c514b1bc6793f08630ec2eecf3bbf031d2a"
+  },
+  {
+   "name": "blk.39.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0027313232421875,
+   "source_sha256": "58dc4a4fbacccaa5901c02ccf72b27b79fee083e1a42f06593fe97bf781540fe"
+  },
+  {
+   "name": "blk.39.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0007724761962890625,
+   "source_sha256": "50aeec8b7e825f4cb936f613debf62a85252a0915e59b0a4dcc84aa015223563"
+  },
+  {
+   "name": "blk.39.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0063323974609375,
+   "source_sha256": "c2123249fca8d47c74a84a1ca915011e4876ded55be38e3de3df6dddbe1b9b3d"
+  },
+  {
+   "name": "blk.40.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "8a253cdb2bcd4b9ba26bc92397857b925a532949dcf276b5f726b684e41a5e26"
+  },
+  {
+   "name": "blk.40.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "86af0864bf82acc282b50bd1099767f3e54c32378b42f006e5741369818c4955"
+  },
+  {
+   "name": "blk.40.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00260162353515625,
+   "source_sha256": "3b5ce455ef641b42b16f7ac977cfd81062fcfbd84606ebf5ed56152b6a88dbcc"
+  },
+  {
+   "name": "blk.40.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00048828125,
+   "source_sha256": "b3a07a19973916df0c23199a87c6408d037eefc23820866df7fe88cdd3fbf414"
+  },
+  {
+   "name": "blk.40.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0043182373046875,
+   "source_sha256": "9bbf74db9780ae58ef5fb1fc1336eb587176af119452ef1ea204fc38034ee869"
+  },
+  {
+   "name": "blk.40.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.002410888671875,
+   "source_sha256": "af0e393b5aaf9c6c93532ba0c213a4abc94be7bdcd0cbeaacce4a14c1493871b"
+  },
+  {
+   "name": "blk.40.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0008945465087890625,
+   "source_sha256": "afa3265ee83197ae9e7f04a4c20333011cb5e35dd8d2096ae8d71c5e4f030b23"
+  },
+  {
+   "name": "blk.40.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0073699951171875,
+   "source_sha256": "f0abea8efbc6c269b3611ad768a32fe9582d5d01f8fefc12a3eba72f9a8a4520"
+  },
+  {
+   "name": "blk.40.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0009613037109375,
+   "source_sha256": "ca0a694f444a852889e0d9f996ec377242942f211cc9a786fdbcce44bbda3fa3"
+  },
+  {
+   "name": "blk.40.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0009288787841796875,
+   "source_sha256": "b5bbc56f76c6b0a3a03576e3e506ecec03eb12390ad0e11c5ac2bf18b5b97995"
+  },
+  {
+   "name": "blk.41.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "28a66e4c454dcd68c319779f85bc4f7cf9f100134d5b2616cb85a33d9438c7b4"
+  },
+  {
+   "name": "blk.41.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "b673baa1fd30224e410275ae4fef9a7f208555757e81bf3e8256009604eb5d7c"
+  },
+  {
+   "name": "blk.41.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0035653114318847656,
+   "source_sha256": "ca045dacc8770f75a10dd5f7364768eef19f99653294bca3e9b4a3b9bc620860"
+  },
+  {
+   "name": "blk.41.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0004837512969970703,
+   "source_sha256": "983d42a8eec2db5ae95dca7388899d8b4a60aa530108bc5a2e880bbf5f282865"
+  },
+  {
+   "name": "blk.41.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0068817138671875,
+   "source_sha256": "0a4f8eb5947be56432070198391f90ec2b4c66c8e730546cf91fdc470f699a9a"
+  },
+  {
+   "name": "blk.41.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0036468505859375,
+   "source_sha256": "b9cfe1a048c776bfea1942891123c2aad36405c54289697cc0a6dfd532656028"
+  },
+  {
+   "name": "blk.41.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0004857778549194336,
+   "source_sha256": "dd413029b1f3281a9194a2c71f89956f3bc7a76ab4eebabfe73b1596704e1796"
+  },
+  {
+   "name": "blk.41.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0076751708984375,
+   "source_sha256": "95d84f4110172552c078b7a0394cb6663a4b672b4f9bd33bbccf16030bbf2efe"
+  },
+  {
+   "name": "blk.41.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00092315673828125,
+   "source_sha256": "7a15c91465da3641d571bebec40dbd926f5961d28b005880b479fe6517f7f2c2"
+  },
+  {
+   "name": "blk.41.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0005779266357421875,
+   "source_sha256": "ffc95cb0587ab2d955d31345f458a3636238747385986ad1fd90be2893fd5afc"
+  },
+  {
+   "name": "blk.42.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "9863d053c3550b1c2d67958654e28e5d84defb0ed9b5108b923323416f30e8c5"
+  },
+  {
+   "name": "blk.42.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "267ca40021d88232ea196de48e2194bf4ea7999c39c99139a9488a8d13437379"
+  },
+  {
+   "name": "blk.42.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0033721923828125,
+   "source_sha256": "29931aa390939d5a4455bb89b671e62b0cd611fb327c7836d9ca790571aa0dd7"
+  },
+  {
+   "name": "blk.42.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0004863739013671875,
+   "source_sha256": "7320ac8564c200c0ce9d3f6a8346b499b549fd695a58cf58f6a554983a29d8e3"
+  },
+  {
+   "name": "blk.42.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00738525390625,
+   "source_sha256": "adb419d38000a5239f4170d19197fbd03f829b521de78f2327bd59d19ec5dda2"
+  },
+  {
+   "name": "blk.42.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.001827239990234375,
+   "source_sha256": "ca639dfb4e183b4ef94b470f7e64aff3b7a61fdd1499aa6eef05c2ec18e98c09"
+  },
+  {
+   "name": "blk.42.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00048065185546875,
+   "source_sha256": "350fa9b827975cd8ba373a3ac50556a54c40ccf904961561af80ae7682bfd9ae"
+  },
+  {
+   "name": "blk.42.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.010894775390625,
+   "source_sha256": "9cde17c4bfa293ff6bb367a34467ad71d77070d926305862407f2eefc0c5a216"
+  },
+  {
+   "name": "blk.42.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0008449554443359375,
+   "source_sha256": "50ab7602fa95bbd006dbaeb69c1416189d79f5269edc3eecb6c183136f23f524"
+  },
+  {
+   "name": "blk.42.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0007190704345703125,
+   "source_sha256": "f95d5de63810a8f87b3a3b2e2570bc7b6338ceb7fb679ce347c968e9fde2061c"
+  },
+  {
+   "name": "blk.43.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "52333fbc1174f2deeb2ed764c264c16aeb2961f72346cdaedfe4a252ed7f42a0"
+  },
+  {
+   "name": "blk.43.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "ef51b4785be4051e196b6809963a8808f004037fd13aec66d26a47bc1777aafe"
+  },
+  {
+   "name": "blk.43.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.003814697265625,
+   "source_sha256": "d543b1fdefd394f855d4a4ee7b87a6ed915d08ac0bdda49d2823c991c239e6ee"
+  },
+  {
+   "name": "blk.43.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0009670257568359375,
+   "source_sha256": "7167759951124cd02167aa2af2d20222073419adf7acfe3dbeac64ee5e32e40c"
+  },
+  {
+   "name": "blk.43.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0074005126953125,
+   "source_sha256": "1de857a5f7730678a772573deee593bf0adc3471a23754ff58fc344e984fe3a3"
+  },
+  {
+   "name": "blk.43.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0019164085388183594,
+   "source_sha256": "6fc67398b9e5b01a7fc68bc72f48fc1f07736b5127fdd4ce9f76eeb8e1a4f90d"
+  },
+  {
+   "name": "blk.43.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0009517669677734375,
+   "source_sha256": "21215a1eb57bcd105a33eb608acb6a985a9b0546cfb22042eee5477b080ad91b"
+  },
+  {
+   "name": "blk.43.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0075225830078125,
+   "source_sha256": "b0b2e4b244ecd756b2875eecb093445dd9840d75c06ffee5775470e01ccad67a"
+  },
+  {
+   "name": "blk.44.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "05e6e0281f4e82523ae1c9303d196651ef9685c449681c8264faca6ac3dbab27"
+  },
+  {
+   "name": "blk.44.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "65fd59ba4f3ba03200f7b6c01ba877442e1a417bf9b1fcfa72cd8f18ba4ac46e"
+  },
+  {
+   "name": "blk.44.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.003570556640625,
+   "source_sha256": "67c5b08bf7dbbdd18cc791a2891d06b5030e5053fde14178075ca0b803695103"
+  },
+  {
+   "name": "blk.44.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0004691481590270996,
+   "source_sha256": "abedc38386bfc374a2f28a29bbaed56be3730896f46695d23f25f90013080b55"
+  },
+  {
+   "name": "blk.44.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0073394775390625,
+   "source_sha256": "b3b1145e17049a2122d66ff8701d2e123b99cd06e7ae2671e92ae24d5b2420b6"
+  },
+  {
+   "name": "blk.44.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00362396240234375,
+   "source_sha256": "8fb3c893f85d127fdfe9da2b6b5342eb85db516bfcea5a2ee72d52f4d5272d68"
+  },
+  {
+   "name": "blk.44.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00093841552734375,
+   "source_sha256": "b605be591daf9d4047e9d5312588e9494a985348c1c70c3f9a281805ef2c7288"
+  },
+  {
+   "name": "blk.44.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0077667236328125,
+   "source_sha256": "a24f5c2e3856164f250b21e7031db25a8236998020d500bd5bcced102e285bf7"
+  },
+  {
+   "name": "blk.44.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000934600830078125,
+   "source_sha256": "1ea1c4ef59a820c78fba0e888f3b04824955d04c4d57f9e3355e7ec842dab348"
+  },
+  {
+   "name": "blk.44.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0008831024169921875,
+   "source_sha256": "2e4e3efae8cc6242b504a04236e6775be106f87b0fcee97f01cfba21cb213373"
+  },
+  {
+   "name": "blk.45.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "716e86907b98006efcd8f5fe429a1a534486a2805233f0ed0898a2fe21443e12"
+  },
+  {
+   "name": "blk.45.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "e97868f76058d3d1896c0191cf5789ab16b0fad7ff4252ad00872444d9933e7a"
+  },
+  {
+   "name": "blk.45.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00345611572265625,
+   "source_sha256": "231a8ef04a85352fef31414faf42f53b032ed3945e061c02571452ca71671619"
+  },
+  {
+   "name": "blk.45.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0007915496826171875,
+   "source_sha256": "aa10d9a1be4b2cbfb8fe0ee2bd7356312f38cfd1e739642b21367eee3aa78f61"
+  },
+  {
+   "name": "blk.45.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.004791259765625,
+   "source_sha256": "dcd466cb579cc2a375a737ca27f9e9e3f14ba9c5ca0bf1119b835b6c2942b483"
+  },
+  {
+   "name": "blk.45.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00160980224609375,
+   "source_sha256": "599e4ffe4afa5e2704eda0586225cde71a841e07c3891d9840d51e0a55aeff0e"
+  },
+  {
+   "name": "blk.45.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00133514404296875,
+   "source_sha256": "a5c2d1e730da3239ffdf4362b40fdc567bb7eb31b06161cd9031af5d59146df1"
+  },
+  {
+   "name": "blk.45.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.014801025390625,
+   "source_sha256": "4a21fc96bd03c842e17d7e2bc8b0ed8bb9d6515b0ac1dabef0e8fead12c91327"
+  },
+  {
+   "name": "blk.45.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0009021759033203125,
+   "source_sha256": "d1b4213e4a6cd1f322717784ab55ae3e7b210141e8e8399d7124430892092e6f"
+  },
+  {
+   "name": "blk.45.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00193023681640625,
+   "source_sha256": "fff0d4d312f0aa9227f30dc32b8b39a9effa687f1eb550dc4cca4aaf40b6fdd9"
+  },
+  {
+   "name": "blk.46.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "6647c66ac7ade9cd0b2997660c35a70c1f7de9ff94060e5686ca9c4decb2064e"
+  },
+  {
+   "name": "blk.46.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "aa649ff658521daa1478f1141bb2f57f9cb0f2b4d0f099dc2c61aa834ee161c3"
+  },
+  {
+   "name": "blk.46.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00193023681640625,
+   "source_sha256": "854ae9f9622a0f2982fa46e5264174be5e623e22e5465e93a54d2cba48fe90cb"
+  },
+  {
+   "name": "blk.46.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0009593963623046875,
+   "source_sha256": "3266dfa15be0414caf9e3efa976cc771fed8c659c4b2e6d1c07714764b49acce"
+  },
+  {
+   "name": "blk.46.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0070953369140625,
+   "source_sha256": "5c228aced20a486f8162df336d1cbf601c2fad65241429ddd7be8cf28b21c714"
+  },
+  {
+   "name": "blk.46.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00193023681640625,
+   "source_sha256": "5704a6bb09557fbbac9dc5e47fd09dd7f3f4ed250082b9cb27990c797a2d8af8"
+  },
+  {
+   "name": "blk.46.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0009314417839050293,
+   "source_sha256": "5d545f6935980ffc90cbb36a9eeffe0dc0d1ac7963222adba8e06b8cfb8c299b"
+  },
+  {
+   "name": "blk.46.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0074310302734375,
+   "source_sha256": "82b73b326a469b2b015dddd43a0aefc5213893f3ff101a24884abe78f06493d1"
+  },
+  {
+   "name": "blk.46.ssm_alpha.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000934600830078125,
+   "source_sha256": "d3daac7a590efa423bb074c5d05f3e5d485ac392005de3363c6f82c3c440536a"
+  },
+  {
+   "name": "blk.46.ssm_beta.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000965118408203125,
+   "source_sha256": "59ae9bedbb3df6be795a1fdcc7b335e42c740ec874d3f0a44a0b79cbb99548cf"
+  },
+  {
+   "name": "blk.47.ffn_gate_inp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "418104d20e8c36a0ad9f0ac27f922b663e3bedc4c998fe4471547734e8e0d454"
+  },
+  {
+   "name": "blk.47.ffn_gate_inp_shexp.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "F32",
+   "dst_type": "BF16",
+   "method": "f32->bf16: the values are BF16's (low 16 bits zero)",
+   "exact": true,
+   "max_abs_err": 0.0,
+   "source_sha256": "59159ff58823cccd76fc9a148d9e6248e163dac5be09d38f64be4d2b832602eb"
+  },
+  {
+   "name": "blk.47.hc_attn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.00247955322265625,
+   "source_sha256": "cd52a22ea3545662f92c2bd980f4214991505598612c9a3dff21ae312808e1fc"
+  },
+  {
+   "name": "blk.47.hc_attn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.000576019287109375,
+   "source_sha256": "16a5fe7f2a71b800a51db518a40f70ddb3f5d0e963ea193a7f8555971006ea49"
+  },
+  {
+   "name": "blk.47.hc_attn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0058135986328125,
+   "source_sha256": "779cd1568f8677dca316aa10d0cda1518052adf1594558a49bfc6e374868ac8f"
+  },
+  {
+   "name": "blk.47.hc_ffn_down.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.001941680908203125,
+   "source_sha256": "a62cbd0505b1e5cb39c53dbe8037dc5caedb8a407273328d928d57388322d44a"
+  },
+  {
+   "name": "blk.47.hc_ffn_inject.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_XS",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0009388923645019531,
+   "source_sha256": "348992ae2e1e31c99062d55d1891ec1670680a14203ee1f95ee8e6f2327a85e2"
+  },
+  {
+   "name": "blk.47.hc_ffn_up.weight",
+   "shard": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+   "src_type": "IQ4_NL",
+   "dst_type": "BF16",
+   "method": "dequantize->bf16 round-to-nearest-even (--compat-bf16)",
+   "exact": false,
+   "max_abs_err": 0.0070343017578125,
+   "source_sha256": "b5f74f0e2b2dc5bc03d275a4eac7f6c690690f0a227957ffaa17c9c3d623aeee"
+  }
+ ]
+}

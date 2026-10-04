@@ -1,0 +1,30 @@
+{
+  "source": "D:\\mod\u00e8le\\qwen3.8FlashNext\\mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf",
+  "target_unchanged": true,
+  "expert_conversion": "Q8_0 -> Q2_0 (Strata MSE quantizer)",
+  "norms": "copied, GGUF Gemma +1 already applied",
+  "expert_error": [
+    0.4204113483428955,
+    0.41877755522727966,
+    0.42820248007774353,
+    0.4427911639213562,
+    0.4225793480873108,
+    0.43340012431144714,
+    0.4228215217590332,
+    0.4289187788963318
+  ],
+  "files": {
+    "dense.bin": {
+      "bytes": 114357248,
+      "sha256": "ac2000b46559a509eacfbb08a5bafcd22ddd15150460d176c307517127ab5029"
+    },
+    "dense.txt": {
+      "bytes": 1688,
+      "sha256": "82da467949373c583c13d1e2ef56dd2fc7948d5e095ec9894234d45590e9f4bd"
+    },
+    "experts.bin": {
+      "bytes": 707788800,
+      "sha256": "01e9bc84a746832782d80135e3e53b3560f48177656ab655e90e36d91aca59e0"
+    }
+  }
+}

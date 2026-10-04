@@ -1,0 +1,1160 @@
+{
+  "created": "2026-10-03T08:38:12.626206+00:00",
+  "files": [
+    {
+      "path": "affinite-8-compacts.json",
+      "bytes": 6994,
+      "sha256": "7eca0b7f94196930489cfd834c71441330438eb0baef5c67a354752c22f6508c"
+    },
+    {
+      "path": "affinite-8-repartis.json",
+      "bytes": 22822,
+      "sha256": "8a6571399e707d5cf4fe98dcfdbe6bfff1c3ab8546e1f83b13c001b61c9063e8"
+    },
+    {
+      "path": "affinite-apres-compact.json",
+      "bytes": 12554,
+      "sha256": "934d254d9fea9cb269497669fab182b74990f1ab944463b033b951ef9f07461a"
+    },
+    {
+      "path": "affinite-apres-spread-confirmation.json",
+      "bytes": 5893,
+      "sha256": "6fdfa47dbb394fa2edfa915dc2ae8d2bf48f8dcdb8eaf0498c8b148d34bf841a"
+    },
+    {
+      "path": "affinite-apres-spread.json",
+      "bytes": 12776,
+      "sha256": "81d7d1daff48c9a42541bcfd974d0637f8859959fa38e58ed01112adfaa454ab"
+    },
+    {
+      "path": "affinite-avant-compact.json",
+      "bytes": 12554,
+      "sha256": "cc87f74ce3183ff9f6429e1eff05d9dffdb02386fa7a45234ffa0769ed51a35e"
+    },
+    {
+      "path": "affinite-avant-spread-confirmation.json",
+      "bytes": 5893,
+      "sha256": "5d2c113825c4706ae5b1c442345f8dae76b067fb7eae8ab88851d7a3d0272a1c"
+    },
+    {
+      "path": "affinite-avant-spread.json",
+      "bytes": 12776,
+      "sha256": "9a8a868e7d0a9f2221de7b3fa2ee8836b86ee4bc3e32917a9aae9e1f13947ab1"
+    },
+    {
+      "path": "affinite-diagnostic.json",
+      "bytes": 4207,
+      "sha256": "529f6e8a2692500ebbc78a523f6c7e47020b1d4b082eb3a108ea6f66318a67f9"
+    },
+    {
+      "path": "affinite-finale.json",
+      "bytes": 9302,
+      "sha256": "77bd4d2060503a0cc8d69f0b8c8130e6c3dc4e0a4d56b532a8a00fed3d021483"
+    },
+    {
+      "path": "affinite-repartition.stdout.log",
+      "bytes": 14835,
+      "sha256": "4e93b6bd1f567ad9ff54c20b28a7e794cece56d1aae6d687e47492b2b2bb5b02"
+    },
+    {
+      "path": "affinite.py",
+      "bytes": 7877,
+      "sha256": "78b03c035a18ce1963c7d6f098105965e31bafd9c31745c709c7630dc4e98263"
+    },
+    {
+      "path": "benchmark.py",
+      "bytes": 9634,
+      "sha256": "27e6c73928715658a26097e7acb64a47df9ce02f266bdcc0eba0a43793738513"
+    },
+    {
+      "path": "benchmark.stdout.log",
+      "bytes": 8238,
+      "sha256": "5a33d57be7cde184c5439187185bc0f48393dee9841573865c1e46057950e582"
+    },
+    {
+      "path": "BILAN-CHARGEMENT.txt",
+      "bytes": 1133,
+      "sha256": "0d0ff043daa37a8c793b3c9026d9f13b2ce37cca35648f7cff58e8b28ce92f21"
+    },
+    {
+      "path": "cache-ssd-reprise.pid",
+      "bytes": 6,
+      "sha256": "6c749439ca0fbeb7d5f5fe9322b2461a64fd62cf3fd15ee463123813eee09602"
+    },
+    {
+      "path": "comparaison.csv",
+      "bytes": 1775,
+      "sha256": "2596b50bba5ec3ed25746c2cdf7ce74a773fb2d6b14c2eec8c3bbbe0df27ff32"
+    },
+    {
+      "path": "comparaison.json",
+      "bytes": 4320,
+      "sha256": "ef76dd58fe91c45514fca581e46221b38528965d19f6cd0a29719a0756d0dc0c"
+    },
+    {
+      "path": "configuration-q4-16-reference.json",
+      "bytes": 1634,
+      "sha256": "bb1b0baf4410d1820b85a4c1ac001cd5a980d8e30f4659601623c4c39556843e"
+    },
+    {
+      "path": "configuration-q4-8.json",
+      "bytes": 1680,
+      "sha256": "e7977af34c0572f3c4104dc167885efab5e1f92c581c039868898b37abb3946f"
+    },
+    {
+      "path": "engine-cache-ssd-fin-comparatif.log",
+      "bytes": 41203,
+      "sha256": "db8a92373380e385938231f8cdbcc9b9a945009f6017b3498568bbd0c617b809"
+    },
+    {
+      "path": "engine-q4-8-fin-comparatif.log",
+      "bytes": 78886,
+      "sha256": "2b1fed206bc3194bb96ff3528db9ba1041aabe2c49766dba64fdcc938dc7ab1d"
+    },
+    {
+      "path": "engine-q4-8.log",
+      "bytes": 78886,
+      "sha256": "2b1fed206bc3194bb96ff3528db9ba1041aabe2c49766dba64fdcc938dc7ab1d"
+    },
+    {
+      "path": "estimation-contexte.json",
+      "bytes": 761,
+      "sha256": "1fcbf8ca449a60e47d43ea355aa0c240ff774426a040612267615ee7f9adc943"
+    },
+    {
+      "path": "etat-cache-ssd.json",
+      "bytes": 107,
+      "sha256": "bf444d05ffcd57b8fe76632494c28db7bd7ef727158f8e52f142cf44ea6b7c55"
+    },
+    {
+      "path": "etat-prelecture-q4.json",
+      "bytes": 483,
+      "sha256": "4368ba98aa447e86ec074cc040f6ac25684da2b1a6eabda0aa6635946f8d71f6"
+    },
+    {
+      "path": "etat-prelecture-ram-couches.json",
+      "bytes": 598,
+      "sha256": "c26b8551a147fbe84a65b67452e8f1f8442d9555d4bcc034f32cc951ac828264"
+    },
+    {
+      "path": "etat-prelecture-ram-directe.json",
+      "bytes": 503,
+      "sha256": "c16082d40ccd6917c99eebd87d3542394bbaccbe2467582e7bc4a1ea3efdb301"
+    },
+    {
+      "path": "etat-prelecture-ram-ordre-fichier.json",
+      "bytes": 552,
+      "sha256": "4eec4a43d90efe1632f959ad79a11ce49c89f133ddab100443fd0fa1b4a51dc3"
+    },
+    {
+      "path": "etat-prelecture-ram.json",
+      "bytes": 593,
+      "sha256": "6b1718960daecfc46a2a65417f4f26875850cf9d26ab4443771e409d4cd97e2a"
+    },
+    {
+      "path": "etat-retablissement-ssd.json",
+      "bytes": 104,
+      "sha256": "41a9e65eec377a50c354280887e6aff86c990e8d1a24a97e470bc7ce03565899"
+    },
+    {
+      "path": "experts-cache-ssd.src.json",
+      "bytes": 599,
+      "sha256": "411c513281eca7954e1c3df422ba441ab58337477fd8a245bf6f0a99f9c904b8"
+    },
+    {
+      "path": "generer-rapport.py",
+      "bytes": 8092,
+      "sha256": "9a8c1777326d56fccbb3276847a51ec52a897fb0ba80086249c3f63642a39f44"
+    },
+    {
+      "path": "health-final.json",
+      "bytes": 166,
+      "sha256": "58fe129e0d75f8369f86298778342b34908b375dcb7f981de0d94a3769fa208f"
+    },
+    {
+      "path": "liberation-cache.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "liberation-cache.stdout.log",
+      "bytes": 50,
+      "sha256": "aee3163584b6f7eda296aa4e4ad2cca6d877bd2309bb47fc8776dea16894278c"
+    },
+    {
+      "path": "Liberer-Cache-Prelecture.ps1",
+      "bytes": 1122,
+      "sha256": "d7605a7f04587f561891d99b9ca38fb36831a72847352a33156130e7576b4f82"
+    },
+    {
+      "path": "pilote-benchmark.py",
+      "bytes": 3153,
+      "sha256": "3bfb75439483263013110177c12c54376744f59bfbb66cc2f36002ba4a261c8f"
+    },
+    {
+      "path": "plan-cache-contigu.json",
+      "bytes": 1342,
+      "sha256": "3646d0fb43430d583efdfc23adb15bf99e3532e193420966656d882d907ea650"
+    },
+    {
+      "path": "plan-cache-ssd.json",
+      "bytes": 1331,
+      "sha256": "1ed047070a66b46fc515576c24f4f30fc8ca929c3ebf6984a25eb7047fb96365"
+    },
+    {
+      "path": "prelecture-ordre-natif.py",
+      "bytes": 5926,
+      "sha256": "4f03ef5b507dd0e17fee33aaf28dc6e3f847334644eba2a8a2fc209a4d8398f1"
+    },
+    {
+      "path": "prelecture-ram-couches.stdout.log",
+      "bytes": 57554,
+      "sha256": "680d80513ed1f67f0fc748fbeb307982c3ca1e852b72c1008b5b90ae381d4d39"
+    },
+    {
+      "path": "prelecture-ram-directe.stdout.log",
+      "bytes": 6548,
+      "sha256": "efe5ed71c170b298b9033c66fee342c0fc5f8598076f8b062f23c0ae7824e1f9"
+    },
+    {
+      "path": "prelecture-ram-ordre-natif.stdout.log",
+      "bytes": 4591,
+      "sha256": "7ce08bae3b1f908b0bb24ad69afae9376a67e21b34d507f8145712e2bcc656d0"
+    },
+    {
+      "path": "prelecture-ram.stdout.log",
+      "bytes": 1536,
+      "sha256": "b307f1d39e1f63c78f503562ac96db6d9c8e6b57e4fdf1f71b1528a65dcc2c32"
+    },
+    {
+      "path": "prelecture.py",
+      "bytes": 5118,
+      "sha256": "2a0c96a3342975773cf653fea74172be3b86ae4bd8d15bcec5ddfa16738569c9"
+    },
+    {
+      "path": "preparation-cache-ssd-reprise.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "preparation-cache-ssd-reprise.stdout.log",
+      "bytes": 3329,
+      "sha256": "0a6f5d8eb0fdb06623dd087643fc116d6194b9709edc3b9a61bcacacabda22cc"
+    },
+    {
+      "path": "preparation-cache-ssd.log",
+      "bytes": 1784,
+      "sha256": "753f9497afda492dd6877820edb20000d8654a4bf0722c72c6cd2db6e8f51b1c"
+    },
+    {
+      "path": "protocole-historique.json",
+      "bytes": 726,
+      "sha256": "a8c54ecb1bb01b988414a1e1f9443854579668e6df347ed6a7cc2ffdde728ae0"
+    },
+    {
+      "path": "q4-8-compacts\\configuration.json",
+      "bytes": 2091,
+      "sha256": "5b89646db1bb703afcfade6095bd303fa137755c02cfb5e1a0195753c7637b99"
+    },
+    {
+      "path": "q4-8-compacts\\metrics.json",
+      "bytes": 14159,
+      "sha256": "59008c7049aec2c5cc3e4bf2eb3a0d8aa69272ab4a55d9d0bda9ac5b9155c968"
+    },
+    {
+      "path": "q4-8-compacts\\protocole.json",
+      "bytes": 910,
+      "sha256": "3c3e7ee2c1f2cddd8d5677350b5728abd4f72cdea1e43c710946edb1ac36e547"
+    },
+    {
+      "path": "q4-8-compacts\\r1-ciel-engine.log",
+      "bytes": 5829,
+      "sha256": "8bba36e59007556863c1a5a3cfbd6df234eb09e21cc685827c5d8e0954220af6"
+    },
+    {
+      "path": "q4-8-compacts\\r1-ciel-reponse.json",
+      "bytes": 1927,
+      "sha256": "1b3a99c8a5d81930aac5cf8255c04555cfe95e548736a04ac20f881d8f29e44e"
+    },
+    {
+      "path": "q4-8-compacts\\r1-ciel-requete.json",
+      "bytes": 416,
+      "sha256": "914ccb2297d20a122db1afddf4b2e2c095d40714bffb730bb480105d945f7a16"
+    },
+    {
+      "path": "q4-8-compacts\\r1-ciel-telemetrie.csv",
+      "bytes": 10044,
+      "sha256": "d3e6680f3c35ba676b496377d18f306052906f08f7abcb7e2d7277c45d0a7815"
+    },
+    {
+      "path": "q4-8-compacts\\r1-ciel-texte.txt",
+      "bytes": 1111,
+      "sha256": "6dabb2fbc615d659689a004ad05bf0ece2c07c837d48f7eeebfc50be59395934"
+    },
+    {
+      "path": "q4-8-compacts\\r1-fibonacci-engine.log",
+      "bytes": 4096,
+      "sha256": "56955628e2485bfd4e9925d437afe6a011d689fc87b802e9a4ad31cd1f52f705"
+    },
+    {
+      "path": "q4-8-compacts\\r1-fibonacci-reponse.json",
+      "bytes": 1688,
+      "sha256": "d040d0045eb881519ce7448998d1d5b4d1be33fef503b381658f966830f34909"
+    },
+    {
+      "path": "q4-8-compacts\\r1-fibonacci-requete.json",
+      "bytes": 413,
+      "sha256": "8a43178c218e2d34de97c608b89eab747cb670236b49a0985ad1bddbc0b0ad71"
+    },
+    {
+      "path": "q4-8-compacts\\r1-fibonacci-telemetrie.csv",
+      "bytes": 8581,
+      "sha256": "ab38f27e3c8ec666b3a360eaa8d89c731ae5a04bf254f67157f5a6ea947c1281"
+    },
+    {
+      "path": "q4-8-compacts\\r1-fibonacci-texte.txt",
+      "bytes": 864,
+      "sha256": "ffdeead1400f68719391421220ad405e71c5c36e760f36f654293d6a4799b553"
+    },
+    {
+      "path": "q4-8-compacts\\r1-fourmis-engine.log",
+      "bytes": 8491,
+      "sha256": "a46e196a0d8cfafe1ffca5695dcd6270e506e6a05e34148dbfb8a793665a5148"
+    },
+    {
+      "path": "q4-8-compacts\\r1-fourmis-reponse.json",
+      "bytes": 2339,
+      "sha256": "ed73d3102a52413e222151fc78050df19d3743648430978650685c9ff8e3ba0f"
+    },
+    {
+      "path": "q4-8-compacts\\r1-fourmis-requete.json",
+      "bytes": 314,
+      "sha256": "472d9197278aebea959d60d8af1733661fd66790a1827a3abf94a0f80b280596"
+    },
+    {
+      "path": "q4-8-compacts\\r1-fourmis-telemetrie.csv",
+      "bytes": 15763,
+      "sha256": "e9f88302761007c531c785d9ef1141128fdd564d6d0c71d21b2f6cee6d8cca23"
+    },
+    {
+      "path": "q4-8-compacts\\r1-fourmis-texte.txt",
+      "bytes": 1524,
+      "sha256": "70a39fab8168ae4c7f31d67528d482c3bfef1665108791f45fe4fc4dec5aaa1a"
+    },
+    {
+      "path": "q4-8-compacts\\r2-ciel-engine.log",
+      "bytes": 5268,
+      "sha256": "3ec02dc3eb520ecb80988c833d17fa2c7d0c9591bef1486f212ff6d26e109f80"
+    },
+    {
+      "path": "q4-8-compacts\\r2-ciel-reponse.json",
+      "bytes": 1927,
+      "sha256": "c653f25c7412f9d3cad1482c625504d1aaf71066c6e0a586af5f6386c8956903"
+    },
+    {
+      "path": "q4-8-compacts\\r2-ciel-requete.json",
+      "bytes": 416,
+      "sha256": "914ccb2297d20a122db1afddf4b2e2c095d40714bffb730bb480105d945f7a16"
+    },
+    {
+      "path": "q4-8-compacts\\r2-ciel-telemetrie.csv",
+      "bytes": 9510,
+      "sha256": "d98d3fe9b97a90a57f0665301592c2d0974f8206bf38ffe051c7029e5d094489"
+    },
+    {
+      "path": "q4-8-compacts\\r2-ciel-texte.txt",
+      "bytes": 1111,
+      "sha256": "6dabb2fbc615d659689a004ad05bf0ece2c07c837d48f7eeebfc50be59395934"
+    },
+    {
+      "path": "q4-8-compacts\\r2-fibonacci-engine.log",
+      "bytes": 4097,
+      "sha256": "e400afbb37dbe1358c7d50a160e1493b0a559a53a6bb662af2ed66ade7f892e9"
+    },
+    {
+      "path": "q4-8-compacts\\r2-fibonacci-reponse.json",
+      "bytes": 1689,
+      "sha256": "5ff9b417c9dbf0c6d4a48f22941a9e5067a1472b9741b328adf4774df83bac39"
+    },
+    {
+      "path": "q4-8-compacts\\r2-fibonacci-requete.json",
+      "bytes": 413,
+      "sha256": "8a43178c218e2d34de97c608b89eab747cb670236b49a0985ad1bddbc0b0ad71"
+    },
+    {
+      "path": "q4-8-compacts\\r2-fibonacci-telemetrie.csv",
+      "bytes": 8341,
+      "sha256": "66815acafd8553ca577ba28bbbec6ff260fe734aa2971993c6cc2260e9443756"
+    },
+    {
+      "path": "q4-8-compacts\\r2-fibonacci-texte.txt",
+      "bytes": 864,
+      "sha256": "ffdeead1400f68719391421220ad405e71c5c36e760f36f654293d6a4799b553"
+    },
+    {
+      "path": "q4-8-compacts\\r2-fourmis-engine.log",
+      "bytes": 8426,
+      "sha256": "7024340a439b9052fcb673e26aebf2460000889b66569ca5595f24abd6134fae"
+    },
+    {
+      "path": "q4-8-compacts\\r2-fourmis-reponse.json",
+      "bytes": 2339,
+      "sha256": "7246fb3174ab039cdba7c753bb00150975d36f82c9639b77ad95cb6f67529131"
+    },
+    {
+      "path": "q4-8-compacts\\r2-fourmis-requete.json",
+      "bytes": 314,
+      "sha256": "472d9197278aebea959d60d8af1733661fd66790a1827a3abf94a0f80b280596"
+    },
+    {
+      "path": "q4-8-compacts\\r2-fourmis-telemetrie.csv",
+      "bytes": 15818,
+      "sha256": "48bd4c1f18646591f7047fc2a92a57dfb2a0b7e362abbc45c97a07faeaf76dce"
+    },
+    {
+      "path": "q4-8-compacts\\r2-fourmis-texte.txt",
+      "bytes": 1524,
+      "sha256": "70a39fab8168ae4c7f31d67528d482c3bfef1665108791f45fe4fc4dec5aaa1a"
+    },
+    {
+      "path": "q4-8-compacts\\resultats.csv",
+      "bytes": 1875,
+      "sha256": "e4b423f892c7ca216e7f81173d2817939dd7e6e3e06ae5b1b5988c08e69707bf"
+    },
+    {
+      "path": "q4-8-compacts\\resultats.json",
+      "bytes": 4479,
+      "sha256": "1368a54a1f9d2de59fe4b3ffda02d9fb2128a6ed2d41038757bf4d6dff800871"
+    },
+    {
+      "path": "q4-8-compacts\\synthese.json",
+      "bytes": 498,
+      "sha256": "71abf242cfa12c6d72e0e235ce8cd82c50ae38a1d0e85949bd3e92de6281c711"
+    },
+    {
+      "path": "q4-8-repartis\\configuration.json",
+      "bytes": 2090,
+      "sha256": "a6d76cdb46ad82b40f0ea2b44fceca8e38cf174624185270277184604605900d"
+    },
+    {
+      "path": "q4-8-repartis\\metrics.json",
+      "bytes": 16619,
+      "sha256": "e7a5c1ca0fcf71749f9ae351f20de2047180a6993b16d71cd8fdad38d6a4721d"
+    },
+    {
+      "path": "q4-8-repartis\\protocole.json",
+      "bytes": 910,
+      "sha256": "3c3e7ee2c1f2cddd8d5677350b5728abd4f72cdea1e43c710946edb1ac36e547"
+    },
+    {
+      "path": "q4-8-repartis\\r1-ciel-engine.log",
+      "bytes": 5268,
+      "sha256": "740ba261d3a4c429b355971091ffe92115656dcd30ff2904cee13ea5d3512590"
+    },
+    {
+      "path": "q4-8-repartis\\r1-ciel-reponse.json",
+      "bytes": 1927,
+      "sha256": "07a0ddab35ba93338a7a7ad5606c3121af2e04db7b711f078ff5005f8e18960d"
+    },
+    {
+      "path": "q4-8-repartis\\r1-ciel-requete.json",
+      "bytes": 416,
+      "sha256": "914ccb2297d20a122db1afddf4b2e2c095d40714bffb730bb480105d945f7a16"
+    },
+    {
+      "path": "q4-8-repartis\\r1-ciel-telemetrie.csv",
+      "bytes": 8718,
+      "sha256": "3cf7446dcd3232afa8f04e93f25edfb632306e4bc472eff6ce49970b75262b4e"
+    },
+    {
+      "path": "q4-8-repartis\\r1-ciel-texte.txt",
+      "bytes": 1111,
+      "sha256": "6dabb2fbc615d659689a004ad05bf0ece2c07c837d48f7eeebfc50be59395934"
+    },
+    {
+      "path": "q4-8-repartis\\r1-fibonacci-engine.log",
+      "bytes": 4190,
+      "sha256": "66c543754c06c9b428144e5c19b0c840792b517c9e3100a67550a08b8d8f173e"
+    },
+    {
+      "path": "q4-8-repartis\\r1-fibonacci-reponse.json",
+      "bytes": 1688,
+      "sha256": "6247c28fd2b18d7297592039610e0cecc7955c92741c8c31a986126e0d955608"
+    },
+    {
+      "path": "q4-8-repartis\\r1-fibonacci-requete.json",
+      "bytes": 413,
+      "sha256": "8a43178c218e2d34de97c608b89eab747cb670236b49a0985ad1bddbc0b0ad71"
+    },
+    {
+      "path": "q4-8-repartis\\r1-fibonacci-telemetrie.csv",
+      "bytes": 7702,
+      "sha256": "bc686fc19dac1aa89a14e9f3b5ffeda52ea5babe39fcb7380c5345557d01c1fe"
+    },
+    {
+      "path": "q4-8-repartis\\r1-fibonacci-texte.txt",
+      "bytes": 864,
+      "sha256": "ffdeead1400f68719391421220ad405e71c5c36e760f36f654293d6a4799b553"
+    },
+    {
+      "path": "q4-8-repartis\\r1-fourmis-engine.log",
+      "bytes": 8491,
+      "sha256": "42d369e6e422a92b75ada42a61f83bfe16925c5b48c0fcf5bae6bd9de3aa58e7"
+    },
+    {
+      "path": "q4-8-repartis\\r1-fourmis-reponse.json",
+      "bytes": 2339,
+      "sha256": "cd04680b3ff77efe31b637e04ddd3101a604333edd005aeb476440d2ef076cbe"
+    },
+    {
+      "path": "q4-8-repartis\\r1-fourmis-requete.json",
+      "bytes": 314,
+      "sha256": "472d9197278aebea959d60d8af1733661fd66790a1827a3abf94a0f80b280596"
+    },
+    {
+      "path": "q4-8-repartis\\r1-fourmis-telemetrie.csv",
+      "bytes": 16569,
+      "sha256": "8ca71549eeaddf060d459a22646270236485cf7fbe070200f86b62157ca18eb0"
+    },
+    {
+      "path": "q4-8-repartis\\r1-fourmis-texte.txt",
+      "bytes": 1524,
+      "sha256": "70a39fab8168ae4c7f31d67528d482c3bfef1665108791f45fe4fc4dec5aaa1a"
+    },
+    {
+      "path": "q4-8-repartis\\r2-ciel-engine.log",
+      "bytes": 5268,
+      "sha256": "484f340d15a2a1f976fdeeee717d0d155ac06ccb4ade6f01ea321b0c4544e534"
+    },
+    {
+      "path": "q4-8-repartis\\r2-ciel-reponse.json",
+      "bytes": 1926,
+      "sha256": "c6353f7e110b37212ad70920dc4189e068543f791eb2d294c89c4a8fa56649db"
+    },
+    {
+      "path": "q4-8-repartis\\r2-ciel-requete.json",
+      "bytes": 416,
+      "sha256": "914ccb2297d20a122db1afddf4b2e2c095d40714bffb730bb480105d945f7a16"
+    },
+    {
+      "path": "q4-8-repartis\\r2-ciel-telemetrie.csv",
+      "bytes": 8445,
+      "sha256": "e9f7af783f46add24b7866c6ba370cc00c1af57b8252732bb5e5d15d047addf4"
+    },
+    {
+      "path": "q4-8-repartis\\r2-ciel-texte.txt",
+      "bytes": 1111,
+      "sha256": "6dabb2fbc615d659689a004ad05bf0ece2c07c837d48f7eeebfc50be59395934"
+    },
+    {
+      "path": "q4-8-repartis\\r2-fibonacci-engine.log",
+      "bytes": 4097,
+      "sha256": "17307cdfdb1ea311e0e2b4723482e8b9dbd2b2e99c905af7a4339d62dd6345cb"
+    },
+    {
+      "path": "q4-8-repartis\\r2-fibonacci-reponse.json",
+      "bytes": 1688,
+      "sha256": "ddc32ef7981df269fe42239779e66f007d47d149d6189783b9b24adbbdfc7681"
+    },
+    {
+      "path": "q4-8-repartis\\r2-fibonacci-requete.json",
+      "bytes": 413,
+      "sha256": "8a43178c218e2d34de97c608b89eab747cb670236b49a0985ad1bddbc0b0ad71"
+    },
+    {
+      "path": "q4-8-repartis\\r2-fibonacci-telemetrie.csv",
+      "bytes": 7156,
+      "sha256": "36aecec92c1d36cd7fc4cdd4979135038a736729282abd24fb5b1029fbd63aed"
+    },
+    {
+      "path": "q4-8-repartis\\r2-fibonacci-texte.txt",
+      "bytes": 864,
+      "sha256": "ffdeead1400f68719391421220ad405e71c5c36e760f36f654293d6a4799b553"
+    },
+    {
+      "path": "q4-8-repartis\\r2-fourmis-engine.log",
+      "bytes": 8492,
+      "sha256": "d350b929a5735b527433d9e6b56f2f47f10b31a147fd1d928f93f912150a952f"
+    },
+    {
+      "path": "q4-8-repartis\\r2-fourmis-reponse.json",
+      "bytes": 2339,
+      "sha256": "b8a9bb9e53c12545f5c031314dc02ea4b12c8b0f7cfaaa4554b4ece7d8bbb72b"
+    },
+    {
+      "path": "q4-8-repartis\\r2-fourmis-requete.json",
+      "bytes": 314,
+      "sha256": "472d9197278aebea959d60d8af1733661fd66790a1827a3abf94a0f80b280596"
+    },
+    {
+      "path": "q4-8-repartis\\r2-fourmis-telemetrie.csv",
+      "bytes": 13326,
+      "sha256": "38c96293bc8fe1cac1d177dbe71737a3c870e4d4c5f50ca389930b2af085d0ac"
+    },
+    {
+      "path": "q4-8-repartis\\r2-fourmis-texte.txt",
+      "bytes": 1524,
+      "sha256": "70a39fab8168ae4c7f31d67528d482c3bfef1665108791f45fe4fc4dec5aaa1a"
+    },
+    {
+      "path": "q4-8-repartis\\resultats.csv",
+      "bytes": 1872,
+      "sha256": "440c3e184a9560177f4ea3a96a425329469dc90659fccf67e1fd6568d687539f"
+    },
+    {
+      "path": "q4-8-repartis\\resultats.json",
+      "bytes": 4476,
+      "sha256": "ba344c7983397f2f507501a946a56aadea31ce9f44d8e94a56b76b341482d924"
+    },
+    {
+      "path": "q4-8-repartis\\synthese.json",
+      "bytes": 497,
+      "sha256": "22d0a00a2fc7d9385dd95ce608d4539121703d61a1933aeacc9b1095e4650cc7"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\configuration.json",
+      "bytes": 2068,
+      "sha256": "d7333b984fae4e23111c0432f55ee46c872e12f5202bc61e8c640f738cef9c7a"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\metrics.json",
+      "bytes": 14097,
+      "sha256": "51e08dad9252cedd4d3d107a24745cf80d617aa976409434acb19494230cfbdc"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\protocole.json",
+      "bytes": 910,
+      "sha256": "3c3e7ee2c1f2cddd8d5677350b5728abd4f72cdea1e43c710946edb1ac36e547"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\r1-ciel-engine.log",
+      "bytes": 5653,
+      "sha256": "4b98a7dc173658234f83a040b403719f48d8d3ead3a1a9d95c9a84ac59e98597"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\r1-ciel-reponse.json",
+      "bytes": 1928,
+      "sha256": "6a1e88b79827b131760a2a83d09528057033379d62a4823add986cf2f62a26e4"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\r1-ciel-requete.json",
+      "bytes": 416,
+      "sha256": "914ccb2297d20a122db1afddf4b2e2c095d40714bffb730bb480105d945f7a16"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\r1-ciel-telemetrie.csv",
+      "bytes": 9917,
+      "sha256": "642ca7b1cd4fb036852ac996b0d3f21300f1b729b613ce9fefa555c1bf5ac870"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\r1-ciel-texte.txt",
+      "bytes": 1111,
+      "sha256": "6dabb2fbc615d659689a004ad05bf0ece2c07c837d48f7eeebfc50be59395934"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\r1-fibonacci-engine.log",
+      "bytes": 4076,
+      "sha256": "035dad652c23dd0138f88ff774e522fe63f3a3aa3b0dca3afd72ba7183fa2e4b"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\r1-fibonacci-reponse.json",
+      "bytes": 1688,
+      "sha256": "c1cfe2092eb4b6f4ae2b9a6aeb5412e25b741008581e1a6834bcd6349d66d4b4"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\r1-fibonacci-requete.json",
+      "bytes": 413,
+      "sha256": "8a43178c218e2d34de97c608b89eab747cb670236b49a0985ad1bddbc0b0ad71"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\r1-fibonacci-telemetrie.csv",
+      "bytes": 7441,
+      "sha256": "dba285d3c0949056915b47f9d557dc9a687587fa606a732eaf81ea9edad3881d"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\r1-fibonacci-texte.txt",
+      "bytes": 864,
+      "sha256": "ffdeead1400f68719391421220ad405e71c5c36e760f36f654293d6a4799b553"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\r1-fourmis-engine.log",
+      "bytes": 8471,
+      "sha256": "2626856db100a3174b7006edda790ac9923cabc82b76122442eff2d7df4024d0"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\r1-fourmis-reponse.json",
+      "bytes": 2339,
+      "sha256": "0214a3f43a68dc466e16d9b9abccec42f8e7f371ae05c039d2d2a77b591fbdb2"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\r1-fourmis-requete.json",
+      "bytes": 314,
+      "sha256": "472d9197278aebea959d60d8af1733661fd66790a1827a3abf94a0f80b280596"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\r1-fourmis-telemetrie.csv",
+      "bytes": 13322,
+      "sha256": "0f4d6442c8e738d94e9711d20c06a40dbe57fc09867afbe30b02d08e1992eadf"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\r1-fourmis-texte.txt",
+      "bytes": 1524,
+      "sha256": "70a39fab8168ae4c7f31d67528d482c3bfef1665108791f45fe4fc4dec5aaa1a"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\r2-ciel-engine.log",
+      "bytes": 5469,
+      "sha256": "3acbfeec5da3f5781bac270a385aa695198b89fb819fc922d35ef4a4345fa88d"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\r2-ciel-reponse.json",
+      "bytes": 1926,
+      "sha256": "98efa2cd5467d6ff190c63fea6b77e13746db0c2833bcb01e5af44bc3adc06f5"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\r2-ciel-requete.json",
+      "bytes": 416,
+      "sha256": "914ccb2297d20a122db1afddf4b2e2c095d40714bffb730bb480105d945f7a16"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\r2-ciel-telemetrie.csv",
+      "bytes": 8572,
+      "sha256": "4ee5b6e4f698a201114baefa6ca25c633ad9cf8a62b33ad37fbcfb5043d88c19"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\r2-ciel-texte.txt",
+      "bytes": 1111,
+      "sha256": "6dabb2fbc615d659689a004ad05bf0ece2c07c837d48f7eeebfc50be59395934"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\r2-fibonacci-engine.log",
+      "bytes": 4076,
+      "sha256": "bdc50cd999f969ae712a35fec44b1aecedf1a599114fc1b0bd37d3b219e29fb7"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\r2-fibonacci-reponse.json",
+      "bytes": 1688,
+      "sha256": "5349348acc75291f3981c1937c9c8a72eca7b4110de20aaa51870013ad0a8347"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\r2-fibonacci-requete.json",
+      "bytes": 413,
+      "sha256": "8a43178c218e2d34de97c608b89eab747cb670236b49a0985ad1bddbc0b0ad71"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\r2-fibonacci-telemetrie.csv",
+      "bytes": 7148,
+      "sha256": "8235a963bdca7a1c3b3f9074f82426d645cb409e7085aec1b380c4b14d4c3660"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\r2-fibonacci-texte.txt",
+      "bytes": 864,
+      "sha256": "ffdeead1400f68719391421220ad405e71c5c36e760f36f654293d6a4799b553"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\r2-fourmis-engine.log",
+      "bytes": 8406,
+      "sha256": "31d8f1c6ce57fb6b278394fc739ce7c8942fe5cfca2991221576d7a37114cf52"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\r2-fourmis-reponse.json",
+      "bytes": 2339,
+      "sha256": "9c4e1febe370eae1c3722fd47c271855201fb1b6a2d87a70703d1ba8effbb2da"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\r2-fourmis-requete.json",
+      "bytes": 314,
+      "sha256": "472d9197278aebea959d60d8af1733661fd66790a1827a3abf94a0f80b280596"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\r2-fourmis-telemetrie.csv",
+      "bytes": 13109,
+      "sha256": "8a659e3a6d4607b84660a64a45af0a0ce241c6361d539e6b84654f2113f3ee17"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\r2-fourmis-texte.txt",
+      "bytes": 1524,
+      "sha256": "70a39fab8168ae4c7f31d67528d482c3bfef1665108791f45fe4fc4dec5aaa1a"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\resultats.csv",
+      "bytes": 1970,
+      "sha256": "d5471d114598f88d2cc521c0411f4fa8649809dc74909d7841c4e33955c0f79d"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\resultats.json",
+      "bytes": 4574,
+      "sha256": "5c0ece9ff8b1272933c77a313c77f96dd8dd2487a3b43b50f0b7e0cee18deded"
+    },
+    {
+      "path": "q4-8-repartis-confirmation\\synthese.json",
+      "bytes": 497,
+      "sha256": "dacfd54252f9b38fe33b2ba1ae79536c0f5db6842f347f6e7047891439ae509f"
+    },
+    {
+      "path": "rapport-final.stdout.log",
+      "bytes": 4311,
+      "sha256": "f71d066eff62c6bad04ee7a8eefae4d6911a7bafa0634c7a919a04d68373d64d"
+    },
+    {
+      "path": "rapport-provisoire.stdout.log",
+      "bytes": 4241,
+      "sha256": "a5e2163a68f075ec31223cd9b12ea6de6fb7d721a26d241f10c59715eb722b9e"
+    },
+    {
+      "path": "rapport.stdout.log",
+      "bytes": 4241,
+      "sha256": "a5e2163a68f075ec31223cd9b12ea6de6fb7d721a26d241f10c59715eb722b9e"
+    },
+    {
+      "path": "RAPPORT.txt",
+      "bytes": 4882,
+      "sha256": "24f3a860ec9506f67c7188026516c8cd85c82fe6e083baf7f145f6d821e2512b"
+    },
+    {
+      "path": "reference-16-coeurs\\configuration.json",
+      "bytes": 2043,
+      "sha256": "033d2d106d473fb6c353e34ae5721b1e820b90683375cb14f3b5bab03ca2ded0"
+    },
+    {
+      "path": "reference-16-coeurs\\metrics.json",
+      "bytes": 15599,
+      "sha256": "812e6aab6e38274a15013049900ee02f2e3ed0bd5d61b9560c13ba978b8958b7"
+    },
+    {
+      "path": "reference-16-coeurs\\protocole.json",
+      "bytes": 910,
+      "sha256": "3c3e7ee2c1f2cddd8d5677350b5728abd4f72cdea1e43c710946edb1ac36e547"
+    },
+    {
+      "path": "reference-16-coeurs\\r1-ciel-engine.log",
+      "bytes": 5392,
+      "sha256": "050460507b567594cf58a65c547417e8b4b9798818adcb148d0937146e91af47"
+    },
+    {
+      "path": "reference-16-coeurs\\r1-ciel-reponse.json",
+      "bytes": 1927,
+      "sha256": "de5457be234c8c84789c032c22e9797e25e68f323abd89fe397e5e392e5ec5e8"
+    },
+    {
+      "path": "reference-16-coeurs\\r1-ciel-requete.json",
+      "bytes": 416,
+      "sha256": "914ccb2297d20a122db1afddf4b2e2c095d40714bffb730bb480105d945f7a16"
+    },
+    {
+      "path": "reference-16-coeurs\\r1-ciel-telemetrie.csv",
+      "bytes": 7570,
+      "sha256": "6ee7ca50db13c098996139eae295d7942c59582e90bce8a893e559563bfb6552"
+    },
+    {
+      "path": "reference-16-coeurs\\r1-ciel-texte.txt",
+      "bytes": 1111,
+      "sha256": "6dabb2fbc615d659689a004ad05bf0ece2c07c837d48f7eeebfc50be59395934"
+    },
+    {
+      "path": "reference-16-coeurs\\r1-fibonacci-engine.log",
+      "bytes": 4221,
+      "sha256": "db72f2e8d6cac2cea0d5bd40e9925e359f74ba563125bef5111c93744f4d7012"
+    },
+    {
+      "path": "reference-16-coeurs\\r1-fibonacci-reponse.json",
+      "bytes": 1688,
+      "sha256": "571272e4d7a04c40ef078969d25052c15e3983973bc250463c70f8a2f59cbe56"
+    },
+    {
+      "path": "reference-16-coeurs\\r1-fibonacci-requete.json",
+      "bytes": 413,
+      "sha256": "8a43178c218e2d34de97c608b89eab747cb670236b49a0985ad1bddbc0b0ad71"
+    },
+    {
+      "path": "reference-16-coeurs\\r1-fibonacci-telemetrie.csv",
+      "bytes": 6867,
+      "sha256": "f8502ff369f95c6dafda067cc2a02312dc9649c5cfc9f4a41891a7d7d4f583dd"
+    },
+    {
+      "path": "reference-16-coeurs\\r1-fibonacci-texte.txt",
+      "bytes": 864,
+      "sha256": "ffdeead1400f68719391421220ad405e71c5c36e760f36f654293d6a4799b553"
+    },
+    {
+      "path": "reference-16-coeurs\\r1-fourmis-engine.log",
+      "bytes": 8492,
+      "sha256": "01ff04d4c3b5f68a233993eaf856e75210d3281ac7ae28540b5704a46d918678"
+    },
+    {
+      "path": "reference-16-coeurs\\r1-fourmis-reponse.json",
+      "bytes": 2339,
+      "sha256": "3a95556bd02c40521520e63c9df69c0fea18dcb66f3a62e20f9eb5a6d549f923"
+    },
+    {
+      "path": "reference-16-coeurs\\r1-fourmis-requete.json",
+      "bytes": 314,
+      "sha256": "472d9197278aebea959d60d8af1733661fd66790a1827a3abf94a0f80b280596"
+    },
+    {
+      "path": "reference-16-coeurs\\r1-fourmis-telemetrie.csv",
+      "bytes": 12179,
+      "sha256": "99f4476dabe8542436aefac8c67ea2d2475e19909a3d56d2d7e309af27816039"
+    },
+    {
+      "path": "reference-16-coeurs\\r1-fourmis-texte.txt",
+      "bytes": 1524,
+      "sha256": "70a39fab8168ae4c7f31d67528d482c3bfef1665108791f45fe4fc4dec5aaa1a"
+    },
+    {
+      "path": "reference-16-coeurs\\r2-ciel-engine.log",
+      "bytes": 5392,
+      "sha256": "db8f178f2c2c8cdc05e3dc7ce92423c1bd889fee16d99e2acd4f5f2cbc6b7dce"
+    },
+    {
+      "path": "reference-16-coeurs\\r2-ciel-reponse.json",
+      "bytes": 1927,
+      "sha256": "e6dfdd734fa2c9a301687038a9eb4f48f7c588c064da92d8ef7a8da5b79f4f96"
+    },
+    {
+      "path": "reference-16-coeurs\\r2-ciel-requete.json",
+      "bytes": 416,
+      "sha256": "914ccb2297d20a122db1afddf4b2e2c095d40714bffb730bb480105d945f7a16"
+    },
+    {
+      "path": "reference-16-coeurs\\r2-ciel-telemetrie.csv",
+      "bytes": 7639,
+      "sha256": "a393a91506f21b875f6e76ead891b82dc954c1af1eefd2291c87c2b9d8e6d44f"
+    },
+    {
+      "path": "reference-16-coeurs\\r2-ciel-texte.txt",
+      "bytes": 1111,
+      "sha256": "6dabb2fbc615d659689a004ad05bf0ece2c07c837d48f7eeebfc50be59395934"
+    },
+    {
+      "path": "reference-16-coeurs\\r2-fibonacci-engine.log",
+      "bytes": 4191,
+      "sha256": "bf54c75022dc582b296603a7931ce7e8009dd9363f887ff7001691a3ecdbafac"
+    },
+    {
+      "path": "reference-16-coeurs\\r2-fibonacci-reponse.json",
+      "bytes": 1687,
+      "sha256": "9e41eef8348402522be18695c7ab2ba3addd2bd6ba14dc2eaae9ea24129cda48"
+    },
+    {
+      "path": "reference-16-coeurs\\r2-fibonacci-requete.json",
+      "bytes": 413,
+      "sha256": "8a43178c218e2d34de97c608b89eab747cb670236b49a0985ad1bddbc0b0ad71"
+    },
+    {
+      "path": "reference-16-coeurs\\r2-fibonacci-telemetrie.csv",
+      "bytes": 6833,
+      "sha256": "affabdbbcd524d382c36f49443c958ca23aed7ae33a75c0cb550780c1e688ca5"
+    },
+    {
+      "path": "reference-16-coeurs\\r2-fibonacci-texte.txt",
+      "bytes": 864,
+      "sha256": "ffdeead1400f68719391421220ad405e71c5c36e760f36f654293d6a4799b553"
+    },
+    {
+      "path": "reference-16-coeurs\\r2-fourmis-engine.log",
+      "bytes": 8492,
+      "sha256": "3d220539f06d14d48c6ad97970c2abd0afff6514b4a8b09cea2d946ae1cfe471"
+    },
+    {
+      "path": "reference-16-coeurs\\r2-fourmis-reponse.json",
+      "bytes": 2338,
+      "sha256": "f610268ba3dd03677ee0ba8dfa547318cabece89d8068c97a774fb79913349b3"
+    },
+    {
+      "path": "reference-16-coeurs\\r2-fourmis-requete.json",
+      "bytes": 314,
+      "sha256": "472d9197278aebea959d60d8af1733661fd66790a1827a3abf94a0f80b280596"
+    },
+    {
+      "path": "reference-16-coeurs\\r2-fourmis-telemetrie.csv",
+      "bytes": 12008,
+      "sha256": "5934bced54544aafb5aa156f5d9783002c7ac7c6fe3176674150fc6716432abc"
+    },
+    {
+      "path": "reference-16-coeurs\\r2-fourmis-texte.txt",
+      "bytes": 1524,
+      "sha256": "70a39fab8168ae4c7f31d67528d482c3bfef1665108791f45fe4fc4dec5aaa1a"
+    },
+    {
+      "path": "reference-16-coeurs\\resultats.csv",
+      "bytes": 1862,
+      "sha256": "1ae60c9fb1b956ecf6f8b4439e9dabbabd135a699b127c91907f1d5cf1f0db23"
+    },
+    {
+      "path": "reference-16-coeurs\\resultats.json",
+      "bytes": 4466,
+      "sha256": "a0c73e3c2de2515d43d0a9d59b4dfd2001005db2d4936a42046c5dc12f2e8e82"
+    },
+    {
+      "path": "reference-16-coeurs\\synthese.json",
+      "bytes": 499,
+      "sha256": "2061a6c02e077fcba4fa5dc7efe7ef6a94f659e8c6854059692f092ed6466733"
+    },
+    {
+      "path": "retablissement-cache-ssd.pid",
+      "bytes": 7,
+      "sha256": "2bdf9aa73109cd2a3d959ae8792e6f4d6f510ec065ea0547c3f7e20cacfc2afb"
+    },
+    {
+      "path": "scripts-finaux\\CHARGEMENT-Q4.txt",
+      "bytes": 3586,
+      "sha256": "24fffb79a2b2a6016a26b7aeca6ba4c130f9bf6ae90c8ced58ceeb0ac92976bf"
+    },
+    {
+      "path": "scripts-finaux\\Comparer-Q4-IQ4.py",
+      "bytes": 9634,
+      "sha256": "27e6c73928715658a26097e7acb64a47df9ce02f266bdcc0eba0a43793738513"
+    },
+    {
+      "path": "scripts-finaux\\Continuer-Cache-Q4.ps1",
+      "bytes": 1015,
+      "sha256": "275c91d5e1888925d684d4bfadafa15af5a4463e517f9db08ad47ebd0dbd96a5"
+    },
+    {
+      "path": "scripts-finaux\\Garder-Strata-Debloque.py",
+      "bytes": 2056,
+      "sha256": "8b4bcdeb1bddb575781c9a4cf01190578ffcd7d37c1d6c374de44fd3a652e3b9"
+    },
+    {
+      "path": "scripts-finaux\\Limiter-Strata-8coeurs.py",
+      "bytes": 7877,
+      "sha256": "78b03c035a18ce1963c7d6f098105965e31bafd9c31745c709c7630dc4e98263"
+    },
+    {
+      "path": "scripts-finaux\\Prelire-Experts-Strata.py",
+      "bytes": 9561,
+      "sha256": "a74e774595bba64b179d85dafa077658364ff46b70cdf0a09ac6a53e10f72eaf"
+    },
+    {
+      "path": "scripts-finaux\\Preparer-Cache-Q4.ps1",
+      "bytes": 598,
+      "sha256": "3bee8150401fc8479d5421e98bb7fac0ff1c776ed8d662430e875a53c2de26e1"
+    },
+    {
+      "path": "scripts-finaux\\Preparer-Cache-Q4.py",
+      "bytes": 7001,
+      "sha256": "0602b5d94555932b6c93ccd9ee0ba56f22d1a8eb8e03304a557e92c2ebcedc2b"
+    },
+    {
+      "path": "scripts-finaux\\Rapport-Strata-8coeurs.py",
+      "bytes": 10302,
+      "sha256": "806d4ee6ff77e3161473edfbb71ead3105adc1fd875f3cc451c6b2d71175dfaf"
+    },
+    {
+      "path": "scripts-finaux\\Retablir-Strata-Cache-Q4.ps1",
+      "bytes": 3845,
+      "sha256": "1f70edb6841e63572af10b6da5fd35b161eac2b8e2d0d93110bb82f705b9f90e"
+    },
+    {
+      "path": "scripts-finaux\\Start-Strata-P100-Persistant.ps1",
+      "bytes": 999,
+      "sha256": "15788990f8bdc968003dab3ee90bc956fefd9b6f68eff2ca1edf42acc750a1b7"
+    },
+    {
+      "path": "scripts-finaux\\Start-Strata-P100.ps1",
+      "bytes": 3697,
+      "sha256": "4a426aae92a988fc56b548cb85da8b999b8a2e7d9fa4f412e722b79857864b8d"
+    },
+    {
+      "path": "scripts-finaux\\Stop-Strata-P100.ps1",
+      "bytes": 2143,
+      "sha256": "5b3e3bad8de1fbbbd1e987cef649861bcfdbda58ad1bcbba61a5c7f12bbf6ea1"
+    },
+    {
+      "path": "scripts-finaux\\strata-q4-p100-8coeurs.json",
+      "bytes": 1680,
+      "sha256": "e7977af34c0572f3c4104dc167885efab5e1f92c581c039868898b37abb3946f"
+    },
+    {
+      "path": "scripts-finaux\\strata-q4-p100-cache-8coeurs.json",
+      "bytes": 1639,
+      "sha256": "891980e1d52c360c100b0193f328facb896dd5984d502279ebcc4501c9ac87fc"
+    },
+    {
+      "path": "scripts-finaux\\strata-q4-p100-cache.json",
+      "bytes": 1640,
+      "sha256": "247a3ae3e74c8ba2ee711ec91b56338a0facb6563dd9f5c6fa93797287fc3d8e"
+    },
+    {
+      "path": "scripts-finaux\\Tester-Strata-8coeurs.py",
+      "bytes": 3153,
+      "sha256": "3bfb75439483263013110177c12c54376744f59bfbb66cc2f36002ba4a261c8f"
+    },
+    {
+      "path": "scripts-finaux\\VARIANTES-QWEN.txt",
+      "bytes": 1861,
+      "sha256": "c840be35fa7d349e42b64fb6f4a18510f5e5d1c43e90e3163b6e11eb3b2c8071"
+    },
+    {
+      "path": "scripts-finaux\\Warmup-Strata-P100.ps1",
+      "bytes": 2892,
+      "sha256": "70580f6f6cbd62bc8780ebecbf260674dc9f93e9ea77052b48b74505c586e6c9"
+    },
+    {
+      "path": "server.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "server.stdout.log",
+      "bytes": 21808,
+      "sha256": "7ed1865df046d264faf00fecb7de3dc914653cacebe858ca882a6e02bd3474fa"
+    },
+    {
+      "path": "topologie-avant.json",
+      "bytes": 3553,
+      "sha256": "9261a6415466040b866f71cdc108651223493746583cd87f7d4f6d67eed0c865"
+    },
+    {
+      "path": "verification-cache-ssd.json",
+      "bytes": 21543,
+      "sha256": "a03dcd83f6a0d94dc4d853f179df33abdb3a57d60c2f8c18be4c7b5cdafe2149"
+    },
+    {
+      "path": "verification-integrale-cache-ssd.json",
+      "bytes": 153,
+      "sha256": "7ed1e1213522e7761431d3ba82a40d1ef925bde39773a7b022eff093bfb45f7d"
+    },
+    {
+      "path": "verification-pack-copie-ssd.json",
+      "bytes": 1513,
+      "sha256": "4487823a127c793d5be5bad2e52420eb7f1f4fc576397110ee3a8c8cfa6f976c"
+    },
+    {
+      "path": "warmup-phase2.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "warmup-phase2.stdout.log",
+      "bytes": 106,
+      "sha256": "1bb8f4bd2984ac58b77c52f335d77db5723dd63d477448bb5376c9a66491e2b5"
+    },
+    {
+      "path": "warmup.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "warmup.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "watchdog.pid",
+      "bytes": 7,
+      "sha256": "4d15ed3e73d3c72e43a895fd7a94488dc8092493236db96aaa332471f3000dfe"
+    },
+    {
+      "path": "watchdog.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "watchdog.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

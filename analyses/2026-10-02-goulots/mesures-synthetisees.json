@@ -1,0 +1,743 @@
+{
+  "units": "GB/s = 10^9 bytes/s; GiB = 2^30 bytes",
+  "caveats": [
+    "La bande passante RAM dépend du test et de l’affinité; elle n’est pas le débit maximal garanti des DIMM.",
+    "La durée des copies est estimée à partir de comptes logiciels et de microtests, sans profilage CUDA des phases.",
+    "Les compteurs PCIe NVML ont des pointes physiquement impossibles: les volumes intégrés ne sont pas retenus comme mesures exactes.",
+    "Le test CPU utilise les vrais kernels Strata mais des poids synthétiques et des lots plus grands que l’inférence."
+  ],
+  "theoretical_DDR4_3200_eight_channels_GB_s": 204.8,
+  "layer_blob_bytes": {
+    "min": 3072000,
+    "mean": 3133866.6666666665,
+    "max": 3993600
+  },
+  "bandwidth": [
+    {
+      "kind": "RAM_read",
+      "device": "-1",
+      "threads": "1",
+      "bytes_per_op": "536870912",
+      "GB_s": 23.89
+    },
+    {
+      "kind": "RAM_read",
+      "device": "-1",
+      "threads": "2",
+      "bytes_per_op": "536870912",
+      "GB_s": 37.797
+    },
+    {
+      "kind": "RAM_read",
+      "device": "-1",
+      "threads": "4",
+      "bytes_per_op": "536870912",
+      "GB_s": 42.743
+    },
+    {
+      "kind": "RAM_read",
+      "device": "-1",
+      "threads": "8",
+      "bytes_per_op": "536870912",
+      "GB_s": 79.482
+    },
+    {
+      "kind": "RAM_read",
+      "device": "-1",
+      "threads": "16",
+      "bytes_per_op": "536870912",
+      "GB_s": 73.882
+    },
+    {
+      "kind": "H2D",
+      "device": "0",
+      "threads": "1",
+      "bytes_per_op": "3145728",
+      "GB_s": 12.852
+    },
+    {
+      "kind": "H2D",
+      "device": "0",
+      "threads": "1",
+      "bytes_per_op": "67108864",
+      "GB_s": 13.071
+    },
+    {
+      "kind": "H2D",
+      "device": "1",
+      "threads": "1",
+      "bytes_per_op": "3145728",
+      "GB_s": 12.844
+    },
+    {
+      "kind": "H2D",
+      "device": "1",
+      "threads": "1",
+      "bytes_per_op": "67108864",
+      "GB_s": 13.066
+    },
+    {
+      "kind": "H2D_both",
+      "device": "-1",
+      "threads": "2",
+      "bytes_per_op": "67108864",
+      "GB_s": 26.09
+    },
+    {
+      "kind": "HBM_copy_read_plus_write",
+      "device": "0",
+      "threads": "1",
+      "bytes_per_op": "67108864",
+      "GB_s": 513.838
+    },
+    {
+      "kind": "HBM_copy_read_plus_write",
+      "device": "1",
+      "threads": "1",
+      "bytes_per_op": "67108864",
+      "GB_s": 513.534
+    }
+  ],
+  "kernel_copies": [
+    {
+      "kind": "Strata_fetch_kernel",
+      "device": "0",
+      "experts": "6",
+      "GB_s": 12.677
+    },
+    {
+      "kind": "DMA_expert_copies",
+      "device": "0",
+      "experts": "6",
+      "GB_s": 12.86
+    },
+    {
+      "kind": "Strata_fetch_kernel",
+      "device": "0",
+      "experts": "12",
+      "GB_s": 12.752
+    },
+    {
+      "kind": "DMA_expert_copies",
+      "device": "0",
+      "experts": "12",
+      "GB_s": 12.86
+    },
+    {
+      "kind": "Strata_fetch_kernel",
+      "device": "0",
+      "experts": "20",
+      "GB_s": 12.777
+    },
+    {
+      "kind": "DMA_expert_copies",
+      "device": "0",
+      "experts": "20",
+      "GB_s": 12.864
+    },
+    {
+      "kind": "Strata_fetch_kernel",
+      "device": "1",
+      "experts": "6",
+      "GB_s": 12.691
+    },
+    {
+      "kind": "DMA_expert_copies",
+      "device": "1",
+      "experts": "6",
+      "GB_s": 12.857
+    },
+    {
+      "kind": "Strata_fetch_kernel",
+      "device": "1",
+      "experts": "12",
+      "GB_s": 12.747
+    },
+    {
+      "kind": "DMA_expert_copies",
+      "device": "1",
+      "experts": "12",
+      "GB_s": 12.858
+    },
+    {
+      "kind": "Strata_fetch_kernel",
+      "device": "1",
+      "experts": "20",
+      "GB_s": 12.775
+    },
+    {
+      "kind": "DMA_expert_copies",
+      "device": "1",
+      "experts": "20",
+      "GB_s": 12.858
+    }
+  ],
+  "cpu_experts": [
+    {
+      "gu_type": "12",
+      "down_type": "7",
+      "tokens_per_expert": "1",
+      "threads": "1",
+      "experts_s": 4296.2,
+      "logical_weight_GB_s": 13.198
+    },
+    {
+      "gu_type": "12",
+      "down_type": "7",
+      "tokens_per_expert": "1",
+      "threads": "4",
+      "experts_s": 12606.8,
+      "logical_weight_GB_s": 38.728
+    },
+    {
+      "gu_type": "12",
+      "down_type": "7",
+      "tokens_per_expert": "1",
+      "threads": "8",
+      "experts_s": 24165.6,
+      "logical_weight_GB_s": 74.237
+    },
+    {
+      "gu_type": "12",
+      "down_type": "7",
+      "tokens_per_expert": "1",
+      "threads": "16",
+      "experts_s": 21663.0,
+      "logical_weight_GB_s": 66.549
+    },
+    {
+      "gu_type": "12",
+      "down_type": "7",
+      "tokens_per_expert": "2",
+      "threads": "1",
+      "experts_s": 2297.5,
+      "logical_weight_GB_s": 7.058
+    },
+    {
+      "gu_type": "12",
+      "down_type": "7",
+      "tokens_per_expert": "2",
+      "threads": "4",
+      "experts_s": 8882.3,
+      "logical_weight_GB_s": 27.286
+    },
+    {
+      "gu_type": "12",
+      "down_type": "7",
+      "tokens_per_expert": "2",
+      "threads": "8",
+      "experts_s": 16902.8,
+      "logical_weight_GB_s": 51.925
+    },
+    {
+      "gu_type": "12",
+      "down_type": "7",
+      "tokens_per_expert": "2",
+      "threads": "16",
+      "experts_s": 17000.3,
+      "logical_weight_GB_s": 52.225
+    },
+    {
+      "gu_type": "12",
+      "down_type": "8",
+      "tokens_per_expert": "1",
+      "threads": "1",
+      "experts_s": 4424.1,
+      "logical_weight_GB_s": 15.856
+    },
+    {
+      "gu_type": "12",
+      "down_type": "8",
+      "tokens_per_expert": "1",
+      "threads": "4",
+      "experts_s": 13576.3,
+      "logical_weight_GB_s": 48.657
+    },
+    {
+      "gu_type": "12",
+      "down_type": "8",
+      "tokens_per_expert": "1",
+      "threads": "8",
+      "experts_s": 20740.0,
+      "logical_weight_GB_s": 74.332
+    },
+    {
+      "gu_type": "12",
+      "down_type": "8",
+      "tokens_per_expert": "1",
+      "threads": "16",
+      "experts_s": 19091.0,
+      "logical_weight_GB_s": 68.422
+    },
+    {
+      "gu_type": "12",
+      "down_type": "8",
+      "tokens_per_expert": "2",
+      "threads": "1",
+      "experts_s": 2695.5,
+      "logical_weight_GB_s": 9.661
+    },
+    {
+      "gu_type": "12",
+      "down_type": "8",
+      "tokens_per_expert": "2",
+      "threads": "4",
+      "experts_s": 8627.3,
+      "logical_weight_GB_s": 30.92
+    },
+    {
+      "gu_type": "12",
+      "down_type": "8",
+      "tokens_per_expert": "2",
+      "threads": "8",
+      "experts_s": 16934.2,
+      "logical_weight_GB_s": 60.692
+    },
+    {
+      "gu_type": "12",
+      "down_type": "8",
+      "tokens_per_expert": "2",
+      "threads": "16",
+      "experts_s": 17237.1,
+      "logical_weight_GB_s": 61.778
+    },
+    {
+      "gu_type": "13",
+      "down_type": "8",
+      "tokens_per_expert": "1",
+      "threads": "1",
+      "experts_s": 3467.0,
+      "logical_weight_GB_s": 13.846
+    },
+    {
+      "gu_type": "13",
+      "down_type": "8",
+      "tokens_per_expert": "1",
+      "threads": "4",
+      "experts_s": 9904.5,
+      "logical_weight_GB_s": 39.555
+    },
+    {
+      "gu_type": "13",
+      "down_type": "8",
+      "tokens_per_expert": "1",
+      "threads": "8",
+      "experts_s": 18577.9,
+      "logical_weight_GB_s": 74.193
+    },
+    {
+      "gu_type": "13",
+      "down_type": "8",
+      "tokens_per_expert": "1",
+      "threads": "16",
+      "experts_s": 16301.3,
+      "logical_weight_GB_s": 65.101
+    },
+    {
+      "gu_type": "13",
+      "down_type": "8",
+      "tokens_per_expert": "2",
+      "threads": "1",
+      "experts_s": 1988.3,
+      "logical_weight_GB_s": 7.94
+    },
+    {
+      "gu_type": "13",
+      "down_type": "8",
+      "tokens_per_expert": "2",
+      "threads": "4",
+      "experts_s": 6496.6,
+      "logical_weight_GB_s": 25.945
+    },
+    {
+      "gu_type": "13",
+      "down_type": "8",
+      "tokens_per_expert": "2",
+      "threads": "8",
+      "experts_s": 13504.0,
+      "logical_weight_GB_s": 53.93
+    },
+    {
+      "gu_type": "13",
+      "down_type": "8",
+      "tokens_per_expert": "2",
+      "threads": "16",
+      "experts_s": 14790.0,
+      "logical_weight_GB_s": 59.065
+    }
+  ],
+  "cpu_pool": [
+    {
+      "threads_including_host": "4",
+      "tokens_per_expert": "1",
+      "jobs_per_batch": "4",
+      "experts_s": 11055.8,
+      "logical_weight_GB_s": 33.963
+    },
+    {
+      "threads_including_host": "4",
+      "tokens_per_expert": "1",
+      "jobs_per_batch": "8",
+      "experts_s": 11131.5,
+      "logical_weight_GB_s": 34.196
+    },
+    {
+      "threads_including_host": "4",
+      "tokens_per_expert": "1",
+      "jobs_per_batch": "16",
+      "experts_s": 12069.2,
+      "logical_weight_GB_s": 37.077
+    },
+    {
+      "threads_including_host": "4",
+      "tokens_per_expert": "2",
+      "jobs_per_batch": "4",
+      "experts_s": 8190.4,
+      "logical_weight_GB_s": 25.161
+    },
+    {
+      "threads_including_host": "4",
+      "tokens_per_expert": "2",
+      "jobs_per_batch": "8",
+      "experts_s": 7531.6,
+      "logical_weight_GB_s": 23.137
+    },
+    {
+      "threads_including_host": "4",
+      "tokens_per_expert": "2",
+      "jobs_per_batch": "16",
+      "experts_s": 7471.2,
+      "logical_weight_GB_s": 22.952
+    },
+    {
+      "threads_including_host": "8",
+      "tokens_per_expert": "1",
+      "jobs_per_batch": "4",
+      "experts_s": 11692.0,
+      "logical_weight_GB_s": 35.918
+    },
+    {
+      "threads_including_host": "8",
+      "tokens_per_expert": "1",
+      "jobs_per_batch": "8",
+      "experts_s": 12181.2,
+      "logical_weight_GB_s": 37.421
+    },
+    {
+      "threads_including_host": "8",
+      "tokens_per_expert": "1",
+      "jobs_per_batch": "16",
+      "experts_s": 12290.0,
+      "logical_weight_GB_s": 37.755
+    },
+    {
+      "threads_including_host": "8",
+      "tokens_per_expert": "2",
+      "jobs_per_batch": "4",
+      "experts_s": 11976.9,
+      "logical_weight_GB_s": 36.793
+    },
+    {
+      "threads_including_host": "8",
+      "tokens_per_expert": "2",
+      "jobs_per_batch": "8",
+      "experts_s": 12407.2,
+      "logical_weight_GB_s": 38.115
+    },
+    {
+      "threads_including_host": "8",
+      "tokens_per_expert": "2",
+      "jobs_per_batch": "16",
+      "experts_s": 11892.7,
+      "logical_weight_GB_s": 36.535
+    },
+    {
+      "threads_including_host": "16",
+      "tokens_per_expert": "1",
+      "jobs_per_batch": "4",
+      "experts_s": 22126.8,
+      "logical_weight_GB_s": 67.973
+    },
+    {
+      "threads_including_host": "16",
+      "tokens_per_expert": "1",
+      "jobs_per_batch": "8",
+      "experts_s": 21702.2,
+      "logical_weight_GB_s": 66.669
+    },
+    {
+      "threads_including_host": "16",
+      "tokens_per_expert": "1",
+      "jobs_per_batch": "16",
+      "experts_s": 22038.7,
+      "logical_weight_GB_s": 67.703
+    },
+    {
+      "threads_including_host": "16",
+      "tokens_per_expert": "2",
+      "jobs_per_batch": "4",
+      "experts_s": 17731.1,
+      "logical_weight_GB_s": 54.47
+    },
+    {
+      "threads_including_host": "16",
+      "tokens_per_expert": "2",
+      "jobs_per_batch": "8",
+      "experts_s": 18399.8,
+      "logical_weight_GB_s": 56.524
+    },
+    {
+      "threads_including_host": "16",
+      "tokens_per_expert": "2",
+      "jobs_per_batch": "16",
+      "experts_s": 19670.9,
+      "logical_weight_GB_s": 60.429
+    }
+  ],
+  "ram_affinity": [
+    {
+      "kind": "read_8_accumulators",
+      "threads": "1",
+      "affinity": "physical-first",
+      "GB_s": 22.422
+    },
+    {
+      "kind": "triad_non_temporal",
+      "threads": "1",
+      "affinity": "physical-first",
+      "GB_s": 36.896
+    },
+    {
+      "kind": "read_8_accumulators",
+      "threads": "4",
+      "affinity": "physical-first",
+      "GB_s": 41.492
+    },
+    {
+      "kind": "triad_non_temporal",
+      "threads": "4",
+      "affinity": "physical-first",
+      "GB_s": 51.811
+    },
+    {
+      "kind": "read_8_accumulators",
+      "threads": "8",
+      "affinity": "physical-first",
+      "GB_s": 42.185
+    },
+    {
+      "kind": "triad_non_temporal",
+      "threads": "8",
+      "affinity": "physical-first",
+      "GB_s": 51.515
+    },
+    {
+      "kind": "read_8_accumulators",
+      "threads": "16",
+      "affinity": "physical-first",
+      "GB_s": 80.443
+    },
+    {
+      "kind": "triad_non_temporal",
+      "threads": "16",
+      "affinity": "physical-first",
+      "GB_s": 90.243
+    },
+    {
+      "kind": "read_8_accumulators",
+      "threads": "32",
+      "affinity": "physical-first",
+      "GB_s": 78.378
+    },
+    {
+      "kind": "triad_non_temporal",
+      "threads": "32",
+      "affinity": "physical-first",
+      "GB_s": 89.379
+    }
+  ],
+  "ram_spread": [
+    {
+      "kind": "read_8_accumulators",
+      "threads": "1",
+      "affinity": "spread-physical-first",
+      "GB_s": 22.106
+    },
+    {
+      "kind": "triad_non_temporal",
+      "threads": "1",
+      "affinity": "spread-physical-first",
+      "GB_s": 36.503
+    },
+    {
+      "kind": "read_8_accumulators",
+      "threads": "4",
+      "affinity": "spread-physical-first",
+      "GB_s": 69.596
+    },
+    {
+      "kind": "triad_non_temporal",
+      "threads": "4",
+      "affinity": "spread-physical-first",
+      "GB_s": 92.518
+    },
+    {
+      "kind": "read_8_accumulators",
+      "threads": "8",
+      "affinity": "spread-physical-first",
+      "GB_s": 79.4
+    },
+    {
+      "kind": "triad_non_temporal",
+      "threads": "8",
+      "affinity": "spread-physical-first",
+      "GB_s": 92.473
+    },
+    {
+      "kind": "read_8_accumulators",
+      "threads": "16",
+      "affinity": "spread-physical-first",
+      "GB_s": 80.335
+    },
+    {
+      "kind": "triad_non_temporal",
+      "threads": "16",
+      "affinity": "spread-physical-first",
+      "GB_s": 90.337
+    },
+    {
+      "kind": "read_8_accumulators",
+      "threads": "32",
+      "affinity": "spread-physical-first",
+      "GB_s": 68.789
+    },
+    {
+      "kind": "triad_non_temporal",
+      "threads": "32",
+      "affinity": "spread-physical-first",
+      "GB_s": 86.852
+    }
+  ],
+  "reference_inference": [
+    {
+      "test": 1,
+      "elapsed_seconds": 30.710700499999803,
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 40,
+        "prompt_ms": 1304.2,
+        "prompt_per_token_ms": 32.605,
+        "prompt_per_second": 30.7,
+        "predicted_n": 256,
+        "predicted_ms": 29348.1,
+        "predicted_per_token_ms": 114.641,
+        "predicted_per_second": 8.7,
+        "draft_n": 208,
+        "draft_n_accepted": 118
+      },
+      "nvml": {
+        "1": {
+          "rx_integrated_GB": 176.13284502495333,
+          "rx_mean_GB_s": 5.735227206066318,
+          "rx_peak_GB_s": 18.228224,
+          "mean_gpu_util": 51.67391304347826,
+          "mean_memory_util": 5.318840579710145,
+          "sm_min": 1189,
+          "sm_max": 1328,
+          "max_power_w": 90.616,
+          "max_temp_c": 48,
+          "throttle_values": [
+            0
+          ]
+        },
+        "2": {
+          "rx_integrated_GB": 144.37381394034048,
+          "rx_mean_GB_s": 4.701091528027549,
+          "rx_peak_GB_s": 16.76288,
+          "mean_gpu_util": 49.731884057971016,
+          "mean_memory_util": 5.905797101449275,
+          "sm_min": 1189,
+          "sm_max": 1328,
+          "max_power_w": 94.54,
+          "max_temp_c": 51,
+          "throttle_values": [
+            0
+          ]
+        }
+      },
+      "cpu_expert_jobs": 0,
+      "ram_gpu_experts": 84635,
+      "generation_tps": 8.722881549401835,
+      "ram_gpu_experts_per_output_token": 330.60546875,
+      "ram_gpu_experts_per_second": 2883.83234349072,
+      "logical_weight_bytes_min": 259998720000,
+      "logical_weight_bytes_mean_estimate": 265234805333.3333,
+      "logical_weight_bytes_max": 337998336000,
+      "logical_weight_GB_per_token_min": 1.01562,
+      "logical_weight_GB_per_token_mean_estimate": 1.0360734583333333,
+      "copy_ms_per_token_min_estimate": 79.65959449390172,
+      "copy_time_fraction_min_estimate": 0.6948612070436873,
+      "draft_acceptance": 0.5673076923076923
+    },
+    {
+      "test": 2,
+      "elapsed_seconds": 24.86357230000067,
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 46,
+        "prompt_ms": 1353.3,
+        "prompt_per_token_ms": 29.42,
+        "prompt_per_second": 34.0,
+        "predicted_n": 256,
+        "predicted_ms": 23359.3,
+        "predicted_per_token_ms": 91.247,
+        "predicted_per_second": 11.0,
+        "draft_n": 183,
+        "draft_n_accepted": 158
+      },
+      "nvml": {
+        "1": {
+          "rx_integrated_GB": 130.01767224880228,
+          "rx_mean_GB_s": 5.229243436141266,
+          "rx_peak_GB_s": 19.400704,
+          "mean_gpu_util": 54.786407766990294,
+          "mean_memory_util": 5.359223300970874,
+          "sm_min": 1328,
+          "sm_max": 1328,
+          "max_power_w": 93.027,
+          "max_temp_c": 49,
+          "throttle_values": [
+            0
+          ]
+        },
+        "2": {
+          "rx_integrated_GB": 99.58704560730907,
+          "rx_mean_GB_s": 4.005339393941649,
+          "rx_peak_GB_s": 18.036736,
+          "mean_gpu_util": 51.349514563106794,
+          "mean_memory_util": 5.747572815533981,
+          "sm_min": 1328,
+          "sm_max": 1328,
+          "max_power_w": 99.285,
+          "max_temp_c": 52,
+          "throttle_values": [
+            0
+          ]
+        }
+      },
+      "cpu_expert_jobs": 0,
+      "ram_gpu_experts": 68454,
+      "generation_tps": 10.959232511248198,
+      "ram_gpu_experts_per_output_token": 267.3984375,
+      "ram_gpu_experts_per_second": 2930.481649706969,
+      "logical_weight_bytes_min": 210290688000,
+      "logical_weight_bytes_mean_estimate": 214525708800.0,
+      "logical_weight_bytes_max": 273377894400,
+      "logical_weight_GB_per_token_min": 0.821448,
+      "logical_weight_GB_per_token_mean_estimate": 0.83799105,
+      "copy_ms_per_token_min_estimate": 64.42982077728537,
+      "copy_time_fraction_min_estimate": 0.7061013865563205,
+      "draft_acceptance": 0.8633879781420765
+    }
+  ]
+}

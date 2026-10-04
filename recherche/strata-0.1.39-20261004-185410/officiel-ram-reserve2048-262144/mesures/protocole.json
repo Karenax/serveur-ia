@@ -1,0 +1,27 @@
+{
+  "id": "strata-0.1.39-p100-recherche-v1",
+  "cases": [
+    {
+      "id": "ciel",
+      "prompt": "Explique en français pourquoi le ciel est bleu, puis pourquoi il devient rouge au coucher du soleil. Donne une explication précise et accessible.",
+      "max_tokens": 256
+    },
+    {
+      "id": "fibonacci",
+      "prompt": "Écris une fonction Python fibonacci(n) qui retourne les n premiers nombres de Fibonacci, puis donne un exemple pour n=8. Réponds en français.",
+      "max_tokens": 256
+    },
+    {
+      "id": "fourmis",
+      "prompt": "creer une poésie sur les fourmis de 200 mots",
+      "max_tokens": 512
+    }
+  ],
+  "temperature": 0,
+  "seed": 42,
+  "cache_prompt": false,
+  "enable_thinking": false,
+  "context": 262144,
+  "warmups": 1,
+  "note": "Two repetitions per prompt; reverse prompt order on repetition 2. Natural EOS is recorded; truncated and complete answers are distinguished."
+}

@@ -1,0 +1,20 @@
+{
+  "created": "2026-10-04T20:01:36.527091+00:00",
+  "reference": "D:\\Serveur IA\\recherche\\strata-0.1.39-20261004-185410\\reference-production-262144",
+  "production_session": "D:\\Serveur IA\\lanceur\\sessions\\20261003-211939-259117",
+  "engine": "D:/Serveur IA/strata-build-p100/strata.exe",
+  "native": "D:\\Serveur IA\\strata-data\\model-q4\\Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+  "context": 262144,
+  "sole_inference_change": {
+    "--ple-io": [
+      "ram",
+      "direct"
+    ],
+    "--ple-gguf": "C:\\Temp\\Strata-ngram-recherche\\iq4-xs-ple-iq4_nl.gguf"
+  },
+  "native_loading_note": "Original model on D; all expert bytes resident in RAM/VRAM before measurement. Prior RAM reference loaded equivalent SSD copies, now absent.",
+  "note": "Identical benchmark settings: prompt history disabled, 2 repetitions after 1 warmup; production files unchanged. Separate PLE GGUF contains exact original tensor bytes.",
+  "table_bytes": 28800138240,
+  "row_cache_capacity": 1048576,
+  "row_cache_bytes": 98697216
+}

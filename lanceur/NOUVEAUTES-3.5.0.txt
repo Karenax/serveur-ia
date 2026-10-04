@@ -1,0 +1,74 @@
+Accès serveur Fred 3.5.0 — 4 octobre 2026
+
+LECTURE ET INTERFACE
+Les réponses affichent les titres, paragraphes, listes, tableaux, citations, liens
+et blocs de code Markdown. Chaque bloc de code possède un bouton Copier.
+Réglages > Mon accès > Apparence : Segoe UI, Arial, Georgia ou Consolas ; tailles
+14, 15, 17 et 19 px ; thèmes clair, sombre et Windows. Le code reste en police fixe.
+Le thème, la police, la taille, la réflexion, la navigation, l’adresse manuelle et
+le brouillon du correcteur sont conservés après fermeture, dans le stockage DPAPI.
+
+CORRECTEUR
+Nouvelle rubrique dans la navigation : saisir ou coller un texte, puis Corriger,
+Reformuler professionnel ou Reformuler amical. La correction porte sur grammaire,
+orthographe, conjugaison, accords et ponctuation. Les reformulations conservent
+les informations. Le résultat est copiable, réutilisable et enregistré dans les
+conversations. La réflexion est désactivée pour ces trois actions.
+
+HISTORIQUES SUR LE SERVEUR
+Toutes les conversations, y compris celles sans projet et celles du correcteur,
+sont enregistrées sur le serveur par identité personnelle. Les anciens historiques
+locaux sont migrés à la première connexion. Une copie locale chiffrée protège les
+changements hors connexion. La synchronisation utilise des révisions et conserve
+les éditions concurrentes en créant une copie lorsqu’elles sont incompatibles.
+Une nouvelle installation récupère l’historique serveur de son identité ; un écran
+initial vide ne remplace pas les données existantes. Le modèle peut être arrêté
+pendant la synchronisation. Les sauvegardes serveur comprennent les historiques ;
+les anciennes sauvegardes restent restaurables après migration contrôlée du schéma.
+Le nombre de conversations et leur stockage sont visibles dans Espaces et fichiers.
+L’administrateur du serveur peut accéder aux données enregistrées sur ce serveur.
+Les exports JSON sont lisibles ; les copies locales sont chiffrées par Windows.
+Limites de stockage existantes : 200 conversations et 9 Mo par historique, inclus
+dans le quota de stockage du client (20 Mo par défaut). Aucun texte n’est tronqué
+silencieusement : un dépassement affiche une erreur et conserve la copie locale.
+
+CONNEXION ET GÉNÉRATION
+Le voyant supérieur ouvre le diagnostic : adresse active, mode de connexion,
+handshake WireGuard, octets reçus/envoyés, dernières réponses HTTP, nouvelles
+connexions, erreurs récentes et étape de génération. Aucun jeton, clé ou texte
+de conversation n’est inclus dans ces événements.
+Une erreur réseau retire immédiatement l’état connecté. Le succès d’une nouvelle
+vérification retire le bandeau réseau périmé. Les vérifications simultanées sont
+regroupées ; les lectures actives empêchent un remplacement prématuré du tunnel.
+Les projets attendent la connexion initiale et réessaient après une coupure.
+Les délais permettent les nouvelles tentatives de handshake Internet : connexion
+TCP 20 s, requêtes de lecture 25 s. Réflexion, rédaction, attente du moteur et flux
+silencieux sont différenciés. Une réflexion sans réponse propose une nouvelle
+tentative sans réflexion. Les réponses partielles interrompues sont conservées.
+Un handshake ancien prouve un échange passé, sans garantir la connexion actuelle.
+
+AUCUN PLAFOND DE TOKENS PAR RÉPONSE
+Les contrôles et politiques de limite par réponse sont retirés. Les anciens champs
+API restent compatibles mais ne limitent plus la sortie : le serveur envoie -1 à
+Strata pour utiliser la place disponible dans le contexte. La capacité finie du
+modèle, le contexte configuré et ses conditions d’arrêt restent applicables.
+
+UN EXE DISTINCT PAR PERSONNE OU PC SIMULTANÉ
+Générer dans Clients & accès > Ajouter un client crée une clé WireGuard, une clé
+prépartagée, un jeton API et une adresse privée distincts. Aucun login nécessaire.
+Copier le même EXE partage toutes ces identités : deux postes peuvent déplacer la
+destination WireGuard des réponses et se couper la connexion. Redistribuer l’EXE
+mis à jour d’une même identité conserve ses clés et son historique.
+L’EXE est une clé d’accès personnelle, suspendable et révocable. Le tunnel chiffre
+et authentifie les échanges ; la mise à jour vérifie la signature Ed25519,
+la taille et le SHA-256. Les clés personnelles sont conservées lors de la mise à jour.
+
+VALIDATION
+Tests automatisés de stockage, révisions, isolation, migration des sauvegardes,
+coupure/reprise, persistance DPAPI, disparition des plafonds, sécurité Markdown et
+tunnel WireGuard UDP réel avec deux identités actives simultanément.
+Contrôles visuels : réponses mises en page, trois modes du correcteur, réglages
+restaurés, coupure WireGuard et reconnexion automatique avec disparition du bandeau.
+Contrôle de la fenêtre Windows compilée et migration native 3.1.0 vers 3.5.0.
+Une validation finale depuis les PC distants reste nécessaire : les tests locaux
+ne reproduisent pas toutes les restrictions du réseau des destinataires.

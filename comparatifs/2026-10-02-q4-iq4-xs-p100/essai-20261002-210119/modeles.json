@@ -1,0 +1,286 @@
+{
+  "q4": {
+    "metadata": {
+      "general.architecture": "qwen4exp",
+      "general.type": "model",
+      "general.sampling.top_k": 20,
+      "general.sampling.top_p": 0.949999988079071,
+      "general.sampling.temp": 1.0,
+      "general.name": "Qwen3.8 Flash Next",
+      "general.description": "A Preview of the Qwen4 Architecture",
+      "general.size_label": "512x56B",
+      "qwen4exp.block_count": 48,
+      "qwen4exp.context_length": 262144,
+      "qwen4exp.embedding_length": 2560,
+      "qwen4exp.attention.head_count": 24,
+      "qwen4exp.attention.head_count_kv": 2,
+      "qwen4exp.rope.freq_base": 10000000.0,
+      "qwen4exp.attention.layer_norm_rms_epsilon": 9.999999974752427e-07,
+      "qwen4exp.expert_count": 512,
+      "qwen4exp.expert_used_count": 10,
+      "qwen4exp.attention.key_length": 256,
+      "qwen4exp.attention.value_length": 256,
+      "qwen4exp.expert_feed_forward_length": 640,
+      "qwen4exp.expert_shared_feed_forward_length": 640,
+      "qwen4exp.ssm.conv_kernel": 4,
+      "qwen4exp.ssm.state_size": 128,
+      "qwen4exp.ssm.group_count": 16,
+      "qwen4exp.ssm.time_step_rank": 48,
+      "qwen4exp.ssm.inner_size": 6144,
+      "qwen4exp.full_attention_interval": 4,
+      "qwen4exp.rope.dimension_count": 64,
+      "qwen4exp.hyper_connection.count": 4,
+      "qwen4exp.hyper_connection.low_rank": 320,
+      "qwen4exp.attention.indexer.head_count": 4,
+      "qwen4exp.attention.indexer.key_length": 128,
+      "qwen4exp.attention.indexer.top_k": 2048,
+      "qwen4exp.ple.ngram_size": 3,
+      "qwen4exp.ple.heads_per_ngram": 8,
+      "qwen4exp.ple.conv_kernel": 4,
+      "qwen4exp.ple.eos_token_id": 248044,
+      "qwen4exp.embedding_length_per_layer_input": 160,
+      "qwen4exp.ple.image_token_id": 248056,
+      "general.quantized_by": "Unsloth",
+      "general.repo_url": "https://huggingface.co/unsloth",
+      "general.quantization_version": 2,
+      "general.file_type": 15,
+      "quantize.imatrix.file": "Qwen3.8-Flash-Next-GGUF/imatrix_unsloth.gguf",
+      "quantize.imatrix.dataset": "unsloth_calibration_Qwen3.8-Flash-Next.txt",
+      "quantize.imatrix.entries_count": 926,
+      "quantize.imatrix.chunks_count": 45,
+      "split.no": 0,
+      "split.tensors.count": 1224,
+      "split.count": 4,
+      "general.abliterated_by": "Huihui.ai",
+      "general.abliterated_url": "https://huggingface.co/huihui-ai"
+    },
+    "shards": [
+      {
+        "name": "Qwen3.8-Flash-Next-UD-Q4_K_XL-00001-of-00004.gguf",
+        "size": 10946752,
+        "header_sha256": "290a31ca20b74ed2c21b257d378a5678d821ad9fdd8feb1fc52c719761668903",
+        "tensor_types": {}
+      },
+      {
+        "name": "Qwen3.8-Flash-Next-UD-Q4_K_XL-00002-of-00004.gguf",
+        "size": 49859583296,
+        "header_sha256": "dbba8bb636aa2e07c578b15e366442ef8c192a8e2df830effbb4aea31a991c17",
+        "tensor_types": {
+          "F32": 135,
+          "Q8_0": 125,
+          "Q4_K": 20,
+          "Q5_1": 10,
+          "BF16": 4,
+          "Q5_K": 2,
+          "IQ4_NL": 1
+        }
+      },
+      {
+        "name": "Qwen3.8-Flash-Next-UD-Q4_K_XL-00003-of-00004.gguf",
+        "size": 49376141664,
+        "header_sha256": "bca812ccc96151b64e3134adb84d0200c076c0a438fe9400ccbd10c6757e39cc",
+        "tensor_types": {
+          "F32": 342,
+          "Q8_0": 306,
+          "Q4_K": 60,
+          "Q5_1": 28,
+          "BF16": 16
+        }
+      },
+      {
+        "name": "Qwen3.8-Flash-Next-UD-Q4_K_XL-00004-of-00004.gguf",
+        "size": 12087983680,
+        "header_sha256": "d6a60ea57c52769d1c5d65c6448277fa4160d8b59f3b8dce58b0f7e755c6688c",
+        "tensor_types": {
+          "F32": 80,
+          "Q8_0": 72,
+          "Q4_K": 14,
+          "Q5_1": 5,
+          "BF16": 4
+        }
+      }
+    ],
+    "total_bytes": 111334655392,
+    "expert_bytes": 77017907200,
+    "expert_types": {
+      "Q5_1": 43,
+      "Q4_K": 94,
+      "Q8_0": 5,
+      "Q5_K": 2
+    },
+    "shape_sha256": "a8685ae27904d25d861b59583a6a76ff29d53e0e5423d63be7991f9df10b0947",
+    "tokenizer_metadata_sha256": "4acd49328b4b0d58a51ebe38143ccb8d0d6ed1712028187ca76baddc43ceb1b6",
+    "important_tensors": {
+      "per_layer_token_embd.weight": {
+        "shape": [
+          160,
+          320001536
+        ],
+        "type": "IQ4_NL",
+        "bytes": 28800138240
+      },
+      "token_embd.weight": {
+        "shape": [
+          2560,
+          248320
+        ],
+        "type": "Q8_0",
+        "bytes": 675430400
+      },
+      "output.weight": {
+        "shape": [
+          2560,
+          248320
+        ],
+        "type": "Q8_0",
+        "bytes": 675430400
+      },
+      "blk.1.ple_key.weight": {
+        "shape": [
+          2560,
+          10240
+        ],
+        "type": "Q8_0",
+        "bytes": 27852800
+      }
+    }
+  },
+  "iq4": {
+    "metadata": {
+      "general.architecture": "qwen4exp",
+      "general.type": "model",
+      "general.sampling.top_k": 20,
+      "general.sampling.top_p": 0.949999988079071,
+      "general.sampling.temp": 1.0,
+      "general.name": "Qwen3.8 Flash Next Abliterated",
+      "general.size_label": "512x56B",
+      "general.license": "apache-2.0",
+      "general.base_model.count": 1,
+      "general.base_model.0.name": "Qwen3.8 Flash Next",
+      "general.base_model.0.organization": "Qwen",
+      "general.base_model.0.repo_url": "https://huggingface.co/Qwen/Qwen3.8-Flash-Next",
+      "qwen4exp.block_count": 48,
+      "qwen4exp.context_length": 262144,
+      "qwen4exp.embedding_length": 2560,
+      "qwen4exp.attention.head_count": 24,
+      "qwen4exp.attention.head_count_kv": 2,
+      "qwen4exp.rope.freq_base": 10000000.0,
+      "qwen4exp.attention.layer_norm_rms_epsilon": 9.999999974752427e-07,
+      "qwen4exp.expert_count": 512,
+      "qwen4exp.expert_used_count": 10,
+      "qwen4exp.attention.key_length": 256,
+      "qwen4exp.attention.value_length": 256,
+      "qwen4exp.expert_feed_forward_length": 640,
+      "qwen4exp.expert_shared_feed_forward_length": 640,
+      "qwen4exp.ssm.conv_kernel": 4,
+      "qwen4exp.ssm.state_size": 128,
+      "qwen4exp.ssm.group_count": 16,
+      "qwen4exp.ssm.time_step_rank": 48,
+      "qwen4exp.ssm.inner_size": 6144,
+      "qwen4exp.full_attention_interval": 4,
+      "qwen4exp.rope.dimension_count": 64,
+      "qwen4exp.hyper_connection.count": 4,
+      "qwen4exp.hyper_connection.low_rank": 320,
+      "qwen4exp.attention.indexer.head_count": 4,
+      "qwen4exp.attention.indexer.key_length": 128,
+      "qwen4exp.attention.indexer.top_k": 2048,
+      "qwen4exp.ple.ngram_size": 3,
+      "qwen4exp.ple.heads_per_ngram": 8,
+      "qwen4exp.ple.conv_kernel": 4,
+      "qwen4exp.ple.eos_token_id": 248044,
+      "qwen4exp.ple.image_token_id": 248056,
+      "qwen4exp.embedding_length_per_layer_input": 160,
+      "general.quantization_version": 2,
+      "general.file_type": 30,
+      "quantize.imatrix.file": "/data/models/Qwen3.8-Flash-Next-abliterated-GGUF/imatrix.gguf",
+      "quantize.imatrix.dataset": "/data/models/calibration.txt",
+      "quantize.imatrix.entries_count": 902,
+      "quantize.imatrix.chunks_count": 200,
+      "split.no": 0,
+      "split.tensors.count": 1224,
+      "split.count": 3
+    },
+    "shards": [
+      {
+        "name": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+        "size": 44766155936,
+        "header_sha256": "ab86479380b6ed7bbe46a19702d5a5bb0c01eed60ca595a84e1904be7e4265df",
+        "tensor_types": {
+          "IQ4_XS": 125,
+          "F32": 86,
+          "IQ4_NL": 44,
+          "Q5_K": 11,
+          "BF16": 4,
+          "Q6_K": 1,
+          "F16": 1
+        }
+      },
+      {
+        "name": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+        "size": 44735995008,
+        "header_sha256": "6584945b49444f4782f12001ffe05b3b87d439a559faa432a8934a9a142d5605",
+        "tensor_types": {
+          "IQ4_XS": 374,
+          "F32": 254,
+          "IQ4_NL": 128,
+          "Q5_K": 32,
+          "BF16": 16
+        }
+      },
+      {
+        "name": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+        "size": 7971004256,
+        "header_sha256": "f381d5b69837c0809a1dd1a6ec8069a749bcd6f6212ccdc128a2fd47b2cf3fc0",
+        "tensor_types": {
+          "IQ4_XS": 69,
+          "F32": 48,
+          "IQ4_NL": 22,
+          "Q5_K": 5,
+          "BF16": 4
+        }
+      }
+    ],
+    "total_bytes": 97473155200,
+    "expert_bytes": 65431142400,
+    "expert_types": {
+      "IQ4_NL": 48,
+      "IQ4_XS": 96
+    },
+    "shape_sha256": "a8685ae27904d25d861b59583a6a76ff29d53e0e5423d63be7991f9df10b0947",
+    "tokenizer_metadata_sha256": "9f53e867c66742e46d898904d7446213b0084e32dde80061c1b3ae2728d2db8e",
+    "important_tensors": {
+      "per_layer_token_embd.weight": {
+        "shape": [
+          160,
+          320001536
+        ],
+        "type": "IQ4_NL",
+        "bytes": 28800138240
+      },
+      "token_embd.weight": {
+        "shape": [
+          2560,
+          248320
+        ],
+        "type": "IQ4_XS",
+        "bytes": 337715200
+      },
+      "output.weight": {
+        "shape": [
+          2560,
+          248320
+        ],
+        "type": "Q6_K",
+        "bytes": 521472000
+      },
+      "blk.1.ple_key.weight": {
+        "shape": [
+          2560,
+          10240
+        ],
+        "type": "IQ4_XS",
+        "bytes": 13926400
+      }
+    }
+  }
+}

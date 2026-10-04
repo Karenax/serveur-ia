@@ -1,0 +1,90 @@
+Audit de la connexion et de l'interface Qwen Client — 3 octobre 2026
+
+Constats et corrections
+
+1. L'ancienne fenêtre ne présentait que trois valeurs de sortie : URL de l'API
+   localhost, modèle et clé API locale. Elles étaient volontairement en lecture
+   seule. L'adresse du serveur WireGuard était intégrée à l'EXE et invisible.
+   Correction : un champ serveur IP-ou-DNS:port modifiable, un bouton Connecter
+   et un bouton Automatique. Le choix personnalisé est conservé avec DPAPI,
+   sans modifier les clés du pair ni la clé de l'API localhost.
+
+2. L'ancienne version ne connaissait que l'adresse publique. Le test signalé
+   était effectué sur un autre PC du même réseau. La nouvelle version inclut
+   les adresses et sous-réseaux locaux du serveur. Elle privilégie l'adresse LAN
+   lorsqu'elle détecte le même sous-réseau, puis essaie l'adresse publique si
+   le serveur ne répond pas. Sur le PC serveur, elle essaie localhost d'abord.
+   La clé publique du serveur reste vérifiée pour chaque adresse. Le tunnel
+   chiffre les échanges, y compris sur le LAN.
+   Le manque de NAT loopback ne doit pas être considéré comme un fait établi :
+   après la configuration de la box, le test vers l'IP publique depuis le PC
+   serveur fonctionne. Cela ne valide pas encore une connexion depuis Internet.
+
+3. Les erreurs de connexion étaient toutes réduites à « serveur inaccessible »,
+   y compris une réponse HTTP indiquant que le modèle n'était pas chargé.
+   Correction : distinguer le tunnel sans réponse authentifiée, l'accès refusé,
+   le serveur joint avec modèle non chargé et le modèle prêt. Un diagnostic
+   indique l'adresse essayée et l'échange WireGuard authentifié, sans révéler
+   les clés privées, la clé prépartagée, le secret du pont ou les clés API.
+   Le démarrage du tunnel est différé pour permettre d'afficher la fenêtre et
+   de corriger une adresse erronée même si son DNS ne se résout pas.
+
+4. La console ne reconnaissait que le profil Q4 et ses propres sessions. Un
+   autre profil Strata du même dossier et du même port pouvait servir un modèle
+   pendant que la console affichait « arrêté ». Le serveur IQ3 sur le port 8080
+   était déjà actif lors de cet audit ; le premier statut « arrêté » était faux.
+   Correction : reconnaître les autres profils Strata du dossier sur ce port.
+   Les serveurs sur d'autres ports ne sont pas ajoutés au contrôle. Le profil
+   Q4 prévu pour le prochain lancement reste inchangé.
+
+5. L'API distante annonçait le nom du modèle de la configuration de repli, qui
+   ne correspondait pas forcément au moteur réellement chargé.
+   Correction : /v1/models et les requêtes de chat utilisent le nom fourni par
+   l'état du moteur actif. Le modèle détecté est qwen3.8-flash-next-iq3-s.
+
+6. Le statut du pare-feu était inconnu parce que le fichier de suivi du bouton
+   d'autorisation n'existait pas. L'absence de ce fichier ne prouvait pas
+   l'absence d'une règle Windows. Une règle UDP existante autorise le programme
+   WireGuard sur le profil Public, qui est le profil de l'Ethernet observé.
+   Cette règle a été vérifiée en lecture dans le registre et consignée dans le
+   statut de la console. Aucune règle Windows n'a été ajoutée ou supprimée.
+
+Redirection SFR
+
+La capture fournie montre une règle Qwen active : port externe 51820 vers
+192.168.1.40, port interne 51820. Le choix « les deux » comprend UDP ; UDP seul
+est suffisant. Réserver l'adresse du PC dans le DHCP de la box.
+
+Fonctionnement du client corrigé
+
+Serveur WireGuard : adresse du PC serveur, modifiable en IP-ou-DNS:port.
+Pour le même LAN : 192.168.1.40:51820, ou le mode Automatique.
+Adresse API : http://127.0.0.1:8081/v1 en général, sur le PC client.
+Modèle et clé API locale : valeurs à copier dans l'application qui utilise
+l'API, avec Authorization: Bearer CLE_API_LOCALE.
+Le bouton Ouvrir le chat utilise la même API localhost.
+Fermer l'ancien EXE avant de lancer la nouvelle version. Chaque PC doit avoir
+son accès personnel pour éviter deux clients concurrents avec le même pair.
+
+Validation
+
+- 19 tests de la suite complète réussis, dont EXE compilé, DPAPI, échange UDP
+  WireGuard réel, streaming, révocation, mauvaise clé, changement d'adresse,
+  adresse locale automatique, repli et modèle non chargé.
+- Deux nouvelles régressions réussies : détection d'un autre profil Strata
+  sans changer les valeurs par défaut ; nom du modèle réel dans l'API/chat.
+  Deux tests concernés existants ont également été relancés avec succès.
+- Syntaxe Python et JavaScript validée ; console vérifiée dans le navigateur.
+- Tests de connexion chiffrée sur le serveur par adresse publique, LAN et
+  localhost. Ces contrôles interrogent uniquement /v1/models.
+- Le serveur Python et le moteur Strata IQ3 sont restés les mêmes processus.
+  Aucun modèle n'a été chargé, déchargé ou quantifié par ces opérations.
+- Aucun prompt réel n'a été lancé. Les générations des tests utilisent un
+  moteur simulé. Le profil Q4 par défaut n'a pas été changé.
+
+Limites de validation
+
+Le résultat sur l'autre PC du LAN et depuis un réseau Internet extérieur reste
+à confirmer par ce client. La fenêtre native a été reconstruite ; aucun
+contrôle visuel automatisé de la fenêtre Windows cliente n'a été effectué.
+Les sources, l'EXE et les résultats détaillés sont conservés localement.

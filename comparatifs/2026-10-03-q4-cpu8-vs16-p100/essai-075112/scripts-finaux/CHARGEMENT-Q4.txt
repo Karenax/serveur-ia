@@ -1,0 +1,60 @@
+Chargements futurs du Q4_K_XL avec Strata sur les deux Tesla P100
+
+Pour éviter un nouveau chargement, conserver le serveur actif : fermer son onglet
+dans le navigateur ne décharge pas le modèle. Les experts CPU sont déjà en RAM
+verrouillée et les experts GPU en VRAM après initialisation.
+
+Préparation facultative d'un fichier d'experts regroupés
+
+Depuis D:\Serveur IA, dans PowerShell :
+  .\Preparer-Cache-Q4.ps1 -Plan
+  .\Preparer-Cache-Q4.ps1
+
+Le premier appel valide les métadonnées sans copier les poids. Le second produit
+C:\Strata-cache\q4-experts-contigus\experts.bin : 77 017 907 200 octets (71,73 Gio),
+plus environ 1,4 Gio de poids denses et les métadonnées du pack. Il faut conserver
+les GGUF d'origine : le moteur continue à y lire les composants non experts.
+L'espace disque libre exigé inclut 10 Gio de marge.
+
+La préparation recopie les octets quantifiés existants, sans nouvelle quantification.
+Elle lit les matrices par blocs avant de regrouper gate/up/down par expert.
+En cas d'interruption, les couches complètes déjà copiées sont comparées octet par
+octet avec les sources avant d'être réutilisées ; la reprise conserve leur contenu.
+Le résultat conserve exactement le format natif attendu par Strata. Des empreintes
+SHA256 et neuf comparaisons d'experts avec les GGUF sont enregistrées. Le fichier
+final n'apparaît qu'après la validation. Le cache est placé dans un dossier distinct
+du pack actuellement utilisé et la conversion ne démarre pas pendant le comparatif CPU.
+
+Quand la conversion sera terminée, arrêter le serveur puis lancer :
+  .\Stop-Strata-P100.ps1
+  .\Start-Strata-P100.ps1 -CacheContigu -CpuCores 8
+Ou utiliser -CpuCores 16 pour les seize cœurs physiques.
+Pour un lancement indépendant du terminal de contrôle, utiliser :
+  .\Start-Strata-P100-Persistant.ps1 -CacheContigu -CpuCores 8
+
+Les deux configurations de cache conservent MTP, les paramètres GPU et le contexte
+4096. Elles changent le dossier du pack et le journal. Le démarrage valide la taille
+et le justificatif de conversion ; il ne relit pas 71,7 Gio pour recalculer une empreinte.
+
+Statut : scripts et configurations préparés ; état final de la conversion dans
+C:\Strata-cache\q4-experts-contigus\verification-cache.json lorsqu'elle sera terminée.
+Le gain de chargement du fichier contigu sur SSD reste à mesurer. Le moteur conserve
+aussi des lectures des GGUF sur D: pour les composants non experts, notamment la
+table PLE chargée en RAM. La vitesse d'inférence est attendue identique,
+puisque les poids et leur placement après chargement restent les mêmes ; cela doit
+être confirmé avec les mêmes prompts.
+
+RAM et SSD
+
+Un RAM-disk de 71,7 Gio en plus des 83–84 Gio de RAM du moteur dépasserait les
+128 Gio installés. Le cache de fichiers Windows peut aider tant que ses pages sont
+conservées ; un redémarrage, la pression mémoire ou la copie en RAM peuvent les évincer.
+Le SSD C: dispose de 95,4 Gio libres après le nettoyage du 3 octobre : le pack natif
+préparé occupera environ 73,2 Gio, laissant environ 22 Gio de marge. L'ensemble des
+GGUF ne tient pas dans cet espace libre ; les originaux sont conservés sur D:.
+
+Contexte maximal : 262 144 tokens selon les métadonnées GGUF, contre 4096 au test.
+Avec le KV FP16 et MTP actuel, estimation d'environ 7 Gio supplémentaires en VRAM.
+Le cache experts GPU automatique serait réduit d'autant, avec davantage d'experts
+résidents en RAM : moteur estimé à 90–92 Gio, hors Windows et pointes de chargement.
+Cette estimation n'est pas un test de contexte maximal.

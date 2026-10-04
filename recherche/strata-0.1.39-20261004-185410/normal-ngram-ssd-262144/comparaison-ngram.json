@@ -1,0 +1,251 @@
+{
+  "created": "2026-10-04T20:31:33.698360+00:00",
+  "context": 262144,
+  "engine": "0.1.35 + hybride P100 de production",
+  "tests": {
+    "ciel": {
+      "ram_tps": 29.074239099632067,
+      "ssd_tps": 29.179458494712154,
+      "relative_percent": 0.3618990499442587,
+      "ram_first_pass_tps": 28.242977868979057,
+      "ssd_first_pass_tps": 28.566327441528298,
+      "ssd_first_pass_read_bytes": 21209322,
+      "ssd_repeat_read_bytes": [
+        6295786,
+        377066
+      ],
+      "ram_output_tokens": [
+        256,
+        256
+      ],
+      "ssd_output_tokens": [
+        256,
+        256
+      ],
+      "ram_prompt_tps": 30.299999999999997,
+      "ssd_prompt_tps": 32.7,
+      "ram_answer_sha256": [
+        "03e37fbe547c90cabb84daabc9cba3d2a9706f9ba33d7b803335e9b82b2cb1fe",
+        "03e37fbe547c90cabb84daabc9cba3d2a9706f9ba33d7b803335e9b82b2cb1fe"
+      ],
+      "ssd_answer_sha256": [
+        "03e37fbe547c90cabb84daabc9cba3d2a9706f9ba33d7b803335e9b82b2cb1fe",
+        "03e37fbe547c90cabb84daabc9cba3d2a9706f9ba33d7b803335e9b82b2cb1fe"
+      ],
+      "ssd_mtp_acceptance": 0.6126621545403271
+    },
+    "fibonacci": {
+      "ram_tps": 34.93476078744591,
+      "ssd_tps": 35.1086521540082,
+      "relative_percent": 0.49776028987373877,
+      "ram_first_pass_tps": 34.93974259236512,
+      "ssd_first_pass_tps": 34.514372000215715,
+      "ssd_first_pass_read_bytes": 17469684,
+      "ssd_repeat_read_bytes": [
+        323828,
+        323828
+      ],
+      "ram_output_tokens": [
+        256,
+        256
+      ],
+      "ssd_output_tokens": [
+        256,
+        256
+      ],
+      "ram_prompt_tps": 36.1,
+      "ssd_prompt_tps": 36.150000000000006,
+      "ram_answer_sha256": [
+        "3c57ecf4b37e34e0962f3c90c8c78b2fe8261ce2992115c4459d0dd314d50a62",
+        "3c57ecf4b37e34e0962f3c90c8c78b2fe8261ce2992115c4459d0dd314d50a62"
+      ],
+      "ssd_answer_sha256": [
+        "3c57ecf4b37e34e0962f3c90c8c78b2fe8261ce2992115c4459d0dd314d50a62",
+        "3c57ecf4b37e34e0962f3c90c8c78b2fe8261ce2992115c4459d0dd314d50a62"
+      ],
+      "ssd_mtp_acceptance": 0.8253968253968254
+    },
+    "fourmis": {
+      "ram_tps": 27.678787171954944,
+      "ssd_tps": 27.779317486165617,
+      "relative_percent": 0.3632034654774685,
+      "ram_first_pass_tps": 27.673119397167728,
+      "ssd_first_pass_tps": 27.335728952772072,
+      "ssd_first_pass_read_bytes": 32653464,
+      "ssd_repeat_read_bytes": [
+        618648,
+        614552
+      ],
+      "ram_output_tokens": [
+        426,
+        426
+      ],
+      "ssd_output_tokens": [
+        426,
+        426
+      ],
+      "ram_prompt_tps": 26.5,
+      "ssd_prompt_tps": 26.5,
+      "ram_answer_sha256": [
+        "9b7fb8e7487216f9b28bb05ef6a828d4a70e537b51b218771d796920747fd2fd",
+        "9b7fb8e7487216f9b28bb05ef6a828d4a70e537b51b218771d796920747fd2fd"
+      ],
+      "ssd_answer_sha256": [
+        "9b7fb8e7487216f9b28bb05ef6a828d4a70e537b51b218771d796920747fd2fd",
+        "9b7fb8e7487216f9b28bb05ef6a828d4a70e537b51b218771d796920747fd2fd"
+      ],
+      "ssd_mtp_acceptance": 0.6452830188679245
+    }
+  },
+  "engine_ram_ram_mode_gib": 77.09029006958008,
+  "engine_ram_ssd_mode_gib": 50.322479248046875,
+  "engine_ram_saved_gib": 26.767810821533203,
+  "system_ram_ram_mode_gib": 93.49842071533203,
+  "system_ram_ssd_mode_gib": 67.44142532348633,
+  "ssd_gpu_vram_gib": {
+    "0": 14.726318359375,
+    "1": 14.87091064453125
+  },
+  "ssd_gpu_temp_max_c": {
+    "0": 53,
+    "1": 59
+  },
+  "ssd_gpu_throttle_masks": {
+    "0": [
+      0
+    ],
+    "1": [
+      0
+    ]
+  },
+  "expert_ram_verified": true,
+  "ssd_proof": {
+    "pid": 48132,
+    "mode": "direct",
+    "table": "C:\\Temp\\Strata-ngram-recherche\\iq4-xs-ple-iq4_nl.gguf",
+    "table_bytes": 28800138240,
+    "full_private_table_copies": [],
+    "large_private_allocations": [
+      {
+        "base": "0x222000000",
+        "bytes": 52586594304
+      }
+    ],
+    "engine_ram_gib": 50.322479248046875,
+    "verified": true,
+    "note": "Absence of the complete private PLE allocation used by our RAM mode; direct I/O bypasses Windows file cache, while the bounded row cache remains enabled."
+  },
+  "table_copy": {
+    "status": "verifie",
+    "source": "D:\\Serveur IA\\strata-data\\model-q4\\Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+    "source_offset": 536060064,
+    "path": "C:\\Temp\\Strata-ngram-recherche\\iq4-xs-ple-iq4_nl.gguf",
+    "tensor": "per_layer_token_embd.weight",
+    "shape": [
+      160,
+      320001536
+    ],
+    "type": "IQ4_NL",
+    "bytes": 28800138240,
+    "copied_bytes": 28800138240,
+    "header_bytes": 224,
+    "note": "Raw tensor bytes, no dequantization or requantization",
+    "elapsed_seconds": 610.3,
+    "source_sha256": "dd55c28902f38cd88134b2a569c51282c5ffce30080487e1a645740115c56cc3",
+    "copied_sha256": "dd55c28902f38cd88134b2a569c51282c5ffce30080487e1a645740115c56cc3",
+    "verified_bytes": 28800138240
+  },
+  "production_file_checks": [
+    {
+      "path": "D:\\Serveur IA\\lanceur\\session.json",
+      "sha256": "00ec1a702f5a3b2fa77bc7b117aea797c4d959df5b0b4e7c0f0ccae5d49cc281",
+      "current_sha256": "00ec1a702f5a3b2fa77bc7b117aea797c4d959df5b0b4e7c0f0ccae5d49cc281",
+      "unchanged": true
+    },
+    {
+      "path": "D:\\Serveur IA\\lanceur\\reglages.json",
+      "sha256": "5beb1ffcf8de48735588dc76ae17421a94a6b2ed2ca4d1a0e5729d758e8957bb",
+      "current_sha256": "5beb1ffcf8de48735588dc76ae17421a94a6b2ed2ca4d1a0e5729d758e8957bb",
+      "unchanged": true
+    },
+    {
+      "path": "D:\\Serveur IA\\lanceur\\reglages-par-defaut.json",
+      "sha256": "5114c1b2ed9a0da6a40756e9b99c98de98b70573aefb93e87c3b29f6c2b9ba5a",
+      "current_sha256": "5114c1b2ed9a0da6a40756e9b99c98de98b70573aefb93e87c3b29f6c2b9ba5a",
+      "unchanged": true
+    },
+    {
+      "path": "D:\\Serveur IA\\lanceur\\base-strata.json",
+      "sha256": "e4410573aad540c2def0cab886af7e211e0ebf7d791767d9d848c5142661a16b",
+      "current_sha256": "e4410573aad540c2def0cab886af7e211e0ebf7d791767d9d848c5142661a16b",
+      "unchanged": true
+    },
+    {
+      "path": "D:\\Serveur IA\\lanceur\\exploitation.json",
+      "sha256": "2a56a8b1a5612be6e1fd6d4e5e9f098302abeeb22ad7fb0a2f91de249c448e1b",
+      "current_sha256": "2a56a8b1a5612be6e1fd6d4e5e9f098302abeeb22ad7fb0a2f91de249c448e1b",
+      "unchanged": true
+    },
+    {
+      "path": "D:\\Serveur IA\\lanceur\\sessions\\20261003-211939-259117\\strata.json",
+      "sha256": "9c8c6624f1841689308f14d45f470e8e3c7257736056fff6ea06d92abd63ab5b",
+      "current_sha256": "9c8c6624f1841689308f14d45f470e8e3c7257736056fff6ea06d92abd63ab5b",
+      "unchanged": true
+    },
+    {
+      "path": "D:/Serveur IA/strata-build-p100/strata.exe",
+      "sha256": "9b07c8c1e2367d217e17199f137f6c8d33f5832ab02df594b68652ba5c9488d0",
+      "current_sha256": "9b07c8c1e2367d217e17199f137f6c8d33f5832ab02df594b68652ba5c9488d0",
+      "unchanged": true
+    }
+  ],
+  "production_restored": {
+    "status": "pret",
+    "health": {
+      "status": "ok",
+      "max_context": 262144,
+      "model": "qwen3.8-flash-next-iq4-xs",
+      "images": false,
+      "api_key": false,
+      "loaded": true,
+      "service": "strata"
+    },
+    "active": {
+      "context": 262144,
+      "workers": 15,
+      "history": 6,
+      "mtp": true,
+      "host": "127.0.0.1",
+      "port": 8080
+    },
+    "managed": true,
+    "engine_exe": "D:/Serveur IA/strata-build-p100/strata.exe",
+    "loading_seconds": 685.3,
+    "ready_seconds": 687.4,
+    "supervisor": {
+      "pid": 920,
+      "created": 1791145120.9398763
+    },
+    "ngram_mode": "ram"
+  },
+  "measured_answers_identical": true,
+  "production_ngram_ram_proof": {
+    "pid": 2072,
+    "engine_exe": "D:\\Serveur IA\\strata-build-p100\\strata.exe",
+    "table_bytes": 28800138240,
+    "allocation_address": "0x248dafe0000",
+    "pages": 7031284,
+    "valid_pages": 7031284,
+    "locked_pages": 7031284,
+    "complete": true,
+    "elapsed_seconds": 9.09
+  },
+  "caveats": [
+    "Two repetitions per prompt: small variations are not conclusive.",
+    "Default 1,048,576-row cache stays enabled (~94.1 MiB with keys); repeated prompts can be almost entirely served by it.",
+    "First pass means first encounter of each prompt in the process; later prompts may share some cached rows.",
+    "RSS is process working set. Total used system RAM includes Windows and other apps.",
+    "Model source is D for this trial: all expert bytes are resident in RAM/VRAM before inference, so source drive affects startup, not expert reads during inference.",
+    "Same context capacity, short prompts of 26-46 tokens. Prompt history disabled for both benchmark modes."
+  ]
+}

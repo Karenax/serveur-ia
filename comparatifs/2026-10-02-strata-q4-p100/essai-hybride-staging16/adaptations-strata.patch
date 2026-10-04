@@ -1,0 +1,370 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 4efc297..04950b1 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -395,6 +395,10 @@ if(STRATA_ENABLE_CUDA OR STRATA_ENABLE_HIP)
+   add_library(strata_prefill STATIC src/prefill/gemm.cu src/prefill/kernels.cu src/prefill/prefill.cpp)
+   target_include_directories(strata_prefill PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include ${_strata_gpu_include_directories})
+   target_link_libraries(strata_prefill PUBLIC strata_engine ${_strata_gpu_blas_target} ${_strata_gpu_runtime_target})
++  if(STRATA_ENABLE_CUDA AND STRATA_BUILD_TESTS)
++    add_executable(prefill_p100_test tests/cuda/prefill_p100_test.cpp)
++    target_link_libraries(prefill_p100_test PRIVATE strata_prefill ggml-base)
++  endif()
+   if(STRATA_ENABLE_HIP AND STRATA_HIPBLASLT_AVAILABLE)
+     target_compile_definitions(strata_prefill PRIVATE STRATA_HIPBLASLT_AVAILABLE=1)
+     target_link_libraries(strata_prefill PRIVATE roc::hipblaslt)
+diff --git a/include/strata/prefill/gemm.hpp b/include/strata/prefill/gemm.hpp
+index c9ddc6f..8738553 100644
+--- a/include/strata/prefill/gemm.hpp
++++ b/include/strata/prefill/gemm.hpp
+@@ -52,6 +52,11 @@ private:
+     void* workspace_ = nullptr;
+     bool external_ = false;
+     void* hipblaslt_state_ = nullptr;
++    bool pascal_checked_ = false;
++    bool pascal_bf16_ = false;
++    uint16_t* pascal_x_ = nullptr;
++    uint16_t* pascal_w_ = nullptr;
++    int64_t pascal_x_cap_ = 0, pascal_w_cap_ = 0;
+ };
+ 
+ 
+diff --git a/include/strata/prefill/kernels.hpp b/include/strata/prefill/kernels.hpp
+index 8f6145b..d3fcd99 100644
+--- a/include/strata/prefill/kernels.hpp
++++ b/include/strata/prefill/kernels.hpp
+@@ -60,6 +60,8 @@ void swiglu_pair(const float* g, const float* u, uint16_t* h16, int64_t n, void*
+ /// dst[i] = src[i] for n int32s, as a kernel: either side may be mapped host memory, and the copy never waits
+ /// behind the copy engine's queue (the prompt path's grouping tables, while the expert stream fills it).
+ void copy_i32(int32_t* dst, const int32_t* src, int64_t n, void* stream);
++// Optional runtime diagnostics; disabled for normal inference and benchmarks.
++void set_debug_sync(bool enabled);
+ /// Gather rows: dst16[i, :] = x16[src[i], :] (n rows of `width` BF16).
+ void gather_rows16(const uint16_t* x16, const int32_t* src, uint16_t* dst16, int64_t n, int64_t width, void* stream);
+ /// bo[t, :] = shared[t, :] * sigmoid(sg[t]) + sum_k w[t, k] * D[slot[t, k], :]
+diff --git a/src/core/expert_source.cpp b/src/core/expert_source.cpp
+index 087854e..5d08833 100644
+--- a/src/core/expert_source.cpp
++++ b/src/core/expert_source.cpp
+@@ -1309,7 +1309,52 @@ bool FileExpertSource::pin_cache_complement(
+                              (long long) done, (long long) n_layers_, (double) copied.load() / 1073741824.0);
+         }
+     };
+-    {
++    const char* sequential_env = std::getenv("STRATA_P100_RAM_SPLIT");
++    const bool sequential_native = !role_ptr_.empty() && sequential_env && std::atoi(sequential_env) == 1;
++    if (sequential_native) {
++        // HDD-friendly local experiment: read a complete projection successively,
++        // then scatter its unchanged bytes into the resident expert blobs.
++        // The usual six-thread gather seeks between three projections per expert.
++        std::vector<uint8_t> role_buffer;
++        std::vector<uint8_t> check;
++        std::fprintf(stderr, "FileExpertSource: sequential native RAM copy (P100 HDD mode)\n");
++        for (int64_t l = 0; l < n_layers_ && !failed.load(); ++l) {
++            uint64_t within = 0;
++            for (int r = 0; r < 3; ++r) {
++                const size_t i = (size_t) (3 * l + r);
++                const uint64_t per = role_bytes_[i];
++                role_buffer.resize((size_t) (per * (uint64_t) n_expert_));
++                std::memcpy(role_buffer.data(), role_ptr_[i], role_buffer.size());
++                for (int64_t e = 0; e < n_expert_; ++e) {
++                    const uint64_t off = offsets[(size_t) (l * n_expert_ + e)];
++                    if (off == kNoComplement) continue;
++                    if (off > bytes || within + per > bytes - off) {
++                        fail("FileExpertSource: sequential copy exceeds resident blob bounds"); break;
++                    }
++                    std::memcpy((uint8_t*) host + (size_t) (off + within),
++                                role_buffer.data() + (size_t) (per * (uint64_t) e), (size_t) per);
++                    copied.fetch_add(per);
++                }
++                within += per;
++#if defined(_WIN32)
++                (void) VirtualUnlock((LPVOID) role_ptr_[i], (SIZE_T) role_buffer.size());
++#endif
++            }
++            // One whole expert per layer checked against the original mapped GGUF.
++            check.resize((size_t) layer_blob_bytes_[(size_t) l]);
++            for (int64_t e = 0; e < n_expert_; ++e) {
++                const uint64_t off = offsets[(size_t) (l * n_expert_ + e)];
++                if (off == kNoComplement) continue;
++                if (!copy_from_files(l, e, check.data()) ||
++                    std::memcmp(check.data(), host + (size_t) off, check.size()) != 0)
++                    fail("FileExpertSource: sequential RAM expert does not match the GGUF");
++                break;
++            }
++            std::fprintf(stderr, "FileExpertSource: sequential copy layer %lld/%lld verified (%.2f GiB)\n",
++                         (long long) (l + 1), (long long) n_layers_, (double) copied.load() / 1073741824.0);
++            std::fflush(stderr);
++        }
++    } else {
+         const int threads = (int) std::max<int64_t>(1, std::min<int64_t>(6, n_layers_));
+         std::vector<std::thread> pool;
+         for (int i = 1; i < threads; ++i) pool.emplace_back(worker);
+diff --git a/src/core/native_dense.cpp b/src/core/native_dense.cpp
+index 4a86d48..e35edb9 100644
+--- a/src/core/native_dense.cpp
++++ b/src/core/native_dense.cpp
+@@ -85,7 +85,10 @@ bool NativeDense::load(const std::vector<std::string>& shards, WeightTable& tabl
+             const auto* count = gguf.get("split.count");
+             const auto* number = gguf.get("split.no");
+             const auto* tensors = gguf.get("split.tensors.count");
+-            if (gguf.get("general.architecture")) {
++            // Local Unsloth shards repeat general.architecture on data shards,
++            // but only shard zero holds the complete architecture parameters.
++            const auto* arch = gguf.get("general.architecture");
++            if (arch && (!have_architecture || gguf.get("qwen4exp.block_count"))) {
+                 err = strata::check_architecture(gguf);
+                 if (!err.empty()) return false;
+                 have_architecture = true;
+@@ -95,7 +98,7 @@ bool NativeDense::load(const std::vector<std::string>& shards, WeightTable& tabl
+                 }
+             } else if (!have_architecture || !split_count || !count || !number || !tensors ||
+                        count->u != split_count || number->u == 0 || number->u >= split_count ||
+-                       tensors->u != split_tensors) {
++                       tensors->u != split_tensors || (arch && arch->s != "qwen4exp")) {
+                 err = "native dense: additional shard must match the architecture-validated first shard's split metadata";
+                 return false;
+             }
+diff --git a/src/kernels/ngram.cpp b/src/kernels/ngram.cpp
+index 1a1552b..ddf2f0d 100644
+--- a/src/kernels/ngram.cpp
++++ b/src/kernels/ngram.cpp
+@@ -148,6 +148,10 @@ struct PleTable::Impl {
+     strata::ngram::PleReader::Ticket ticket;
+     bool pending = false;
+     bool locked = false;
++#if defined(_WIN32)
++    uint8_t* ram_copy = nullptr;
++    uint64_t ram_bytes = 0;
++#endif
+     uint32_t rows[PLE_N_HEADS] = {};
+     uint8_t raw[PLE_N_HEADS * PLE_ROW_BYTES_MAX] = {};
+     bool fp8 = false;                 // F8_E4M3 rows (tools/ple_fp8_pack.py); else IQ4_NL
+@@ -259,7 +263,25 @@ bool PleTable::open(const std::string& gguf_path, std::string& err, const PleIoO
+         impl_->n_rows = n_rows;
+     }
+     if (io.mode == PleIo::Mmap && io.lock && impl_->data != nullptr) {
+-#if !defined(_WIN32)
++#if defined(_WIN32)
++        // Local P100 experiment: a private, locked copy avoids random HDD faults.
++        impl_->ram_copy = (uint8_t*) VirtualAlloc(nullptr, (SIZE_T) need, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
++        if (!impl_->ram_copy) { err = "PLE: cannot allocate the complete RAM table"; close(); return false; }
++        impl_->ram_bytes = need;
++        SIZE_T lo = 0, hi = 0;
++        if (!GetProcessWorkingSetSize(GetCurrentProcess(), &lo, &hi) ||
++            !SetProcessWorkingSetSize(GetCurrentProcess(), lo + (SIZE_T) need + (64u << 20),
++                                      hi + (SIZE_T) need + (64u << 20)) ||
++            !VirtualLock(impl_->ram_copy, (SIZE_T) need)) {
++            err = "PLE: cannot lock the complete RAM table, Windows error " + std::to_string(GetLastError());
++            close(); return false;
++        }
++        std::fprintf(stderr, "strata P100: copying %.2f GiB PLE table to locked RAM\n", (double) need / 1073741824.0);
++        std::fflush(stderr);
++        std::memcpy(impl_->ram_copy, impl_->data, (size_t) need);
++        impl_->data = impl_->ram_copy;
++        impl_->locked = true;
++#else
+         const uint64_t page = 4096;
+         const uintptr_t a0 = (uintptr_t) impl_->data & ~(uintptr_t) (page - 1);
+         const uintptr_t a1 = (uintptr_t) impl_->data + (uintptr_t) need;
+@@ -281,6 +303,14 @@ bool PleTable::open(const std::string& gguf_path, std::string& err, const PleIoO
+ 
+ void PleTable::close() {
+     impl_->reader.close();
++#if defined(_WIN32)
++    if (impl_->ram_copy) {
++        VirtualUnlock(impl_->ram_copy, (SIZE_T) impl_->ram_bytes);
++        VirtualFree(impl_->ram_copy, 0, MEM_RELEASE);
++        impl_->ram_copy = nullptr;
++        impl_->ram_bytes = 0;
++    }
++#endif
+     impl_->pending = false;
+     impl_->locked = false;   // the unmap below releases the lock
+     impl_->mode = PleIo::Mmap;
+diff --git a/src/prefill/gemm.cu b/src/prefill/gemm.cu
+index bb6ef04..9cdc3ef 100644
+--- a/src/prefill/gemm.cu
++++ b/src/prefill/gemm.cu
+@@ -1,6 +1,7 @@
+ // src/prefill/gemm.cu - see include/strata/prefill/gemm.hpp.
+ #include "strata/prefill/gemm.hpp"
+ #include "strata/kernels/dequant_bf16.hpp"
++#include "strata/kernels/f16_bits.hpp"
+ 
+ #include <cublas_v2.h>
+ #include <cuda_runtime.h>
+@@ -35,6 +36,13 @@
+ namespace strata::prefill {
+ namespace {
+ 
++#if !defined(__HIPCC__)
++__global__ void pascal_bf16_to_f16(const uint16_t* src, uint16_t* dst, int64_t n) {
++    const int64_t i = (int64_t) blockIdx.x * blockDim.x + threadIdx.x;
++    if (i < n) dst[i] = strata::kernels::f16_from_f32(__uint_as_float((uint32_t) src[i] << 16));
++}
++#endif
++
+ void ck(cublasStatus_t s, const char* what) {
+     if (s != CUBLAS_STATUS_SUCCESS) {
+         std::fprintf(stderr, "prefill gemm: %s: cuBLAS status %d\n", what, (int) s);
+@@ -294,6 +302,8 @@ bool try_hipblaslt(void* opaque_state, strata::prefill::hipblaslt::InputType typ
+ }  // namespace
+ 
+ Gemm::~Gemm() {
++    if (pascal_x_) cudaFree(pascal_x_);
++    if (pascal_w_) cudaFree(pascal_w_);
+ #if defined(__HIPCC__) && defined(STRATA_HIPBLASLT_AVAILABLE)
+     delete static_cast<HipLtState*>(hipblaslt_state_);
+ #endif
+@@ -375,6 +385,36 @@ bool Gemm::init(void* stream, int64_t scratch_elems, std::string& err) {
+ void Gemm::bf16(const uint16_t* X, const uint16_t* W, float* Y, int64_t T, int64_t N, int64_t K, int64_t ldy,
+                 float beta) {
+     if (T <= 0 || N <= 0) return;
++#if !defined(__HIPCC__)
++    if (!pascal_checked_) {
++        int dev = 0;
++        cudaDeviceProp p{};
++        cudaGetDevice(&dev);
++        cudaGetDeviceProperties(&p, dev);
++        pascal_bf16_ = p.major == 6 && p.minor == 0;
++        pascal_checked_ = true;
++    }
++    if (pascal_bf16_) {
++        // cuBLAS cannot multiply BF16 operands on GP100. Convert on the GPU,
++        // retain the temporary buffers, and accumulate the FP16 GEMM in FP32.
++        auto grow = [](uint16_t*& ptr, int64_t& cap, int64_t need) {
++            if (need <= cap) return;
++            if (ptr) cudaFree(ptr);
++            const cudaError_t e = cudaMalloc((void**) &ptr, (size_t) need * 2);
++            if (e != cudaSuccess) {
++                std::fprintf(stderr, "prefill Pascal conversion buffer: %s\n", cudaGetErrorString(e));
++                std::exit(1);
++            }
++            cap = need;
++        };
++        grow(pascal_x_, pascal_x_cap_, T * K);
++        grow(pascal_w_, pascal_w_cap_, N * K);
++        pascal_bf16_to_f16<<<(unsigned) ((T*K+255)/256),256,0,(cudaStream_t) stream_>>>(X,pascal_x_,T*K);
++        pascal_bf16_to_f16<<<(unsigned) ((N*K+255)/256),256,0,(cudaStream_t) stream_>>>(W,pascal_w_,N*K);
++        f16(pascal_x_,pascal_w_,Y,T,N,K,ldy,beta);
++        return;
++    }
++#endif
+     if (ldy <= 0) ldy = N;
+     const float alpha = 1.0f;
+ #if defined(__HIPCC__) && defined(STRATA_HIPBLASLT_AVAILABLE)
+diff --git a/src/prefill/kernels.cu b/src/prefill/kernels.cu
+index de83344..3fbb82e 100644
+--- a/src/prefill/kernels.cu
++++ b/src/prefill/kernels.cu
+@@ -16,6 +16,7 @@ namespace {
+ 
+ constexpr int N = 2560, HC = 4, D = N * HC, LR = 320;
+ constexpr int S = 128, HK = 16, HV = 48, C = 10240;
++thread_local bool debug_sync = false;
+ 
+ __device__ __forceinline__ float warp_sum(float v) {
+ #pragma unroll
+@@ -56,7 +57,8 @@ __device__ float block_sum(float v, float* sh) {
+     return sh[0];
+ }
+ void check(const char* what) {
+-    const cudaError_t e = cudaGetLastError();
++    const cudaError_t launch = cudaGetLastError();
++    const cudaError_t e = launch == cudaSuccess && debug_sync ? cudaDeviceSynchronize() : launch;
+     if (e != cudaSuccess) { std::fprintf(stderr, "prefill %s: %s\n", what, cudaGetErrorString(e)); std::exit(1); }
+ }
+ unsigned blocks_for(int64_t n, int t = 256) { return (unsigned) ((n + t - 1) / t); }
+@@ -794,6 +796,7 @@ void copy_i32(int32_t* dst, const int32_t* src, int64_t n, void* stream) {
+     copy_i32_kernel<<<(unsigned) (b < 256 ? b : 256), 256, 0, (cudaStream_t) stream>>>(dst, src, n);
+     check("copy_i32");
+ }
++void set_debug_sync(bool enabled) { debug_sync = enabled; }
+ void gather_rows16(const uint16_t* x16, const int32_t* src, uint16_t* dst16, int64_t n, int64_t width, void* stream) {
+     if (n <= 0) return;
+     gather_rows16_kernel<<<blocks_for(n * (width / 8)), 256, 0, (cudaStream_t) stream>>>(x16, src, dst16, n, width);
+diff --git a/src/prefill/prefill.cpp b/src/prefill/prefill.cpp
+index ed47b97..2b69bc5 100644
+--- a/src/prefill/prefill.cpp
++++ b/src/prefill/prefill.cpp
+@@ -995,6 +995,10 @@ bool Prefill::run(const int64_t* tokens, int64_t n, int64_t pos0, std::string& e
+     err.clear();
+     Impl& m = *impl_;
+     const core::OnDevice on_device(m.device);
++    const char* sync_path = std::getenv("STRATA_P100_DIAGNOSTIC_SYNC_FILE");
++    std::FILE* sync_marker = sync_path ? std::fopen(sync_path, "rb") : nullptr;
++    set_debug_sync(sync_marker != nullptr);
++    if (sync_marker) std::fclose(sync_marker);
+     const core::ModelGeometry& g = *m.g;
+     core::SessionState& ss = *m.ss;
+     const auto t_start = Clock::now();
+diff --git a/src/program/generate.cpp b/src/program/generate.cpp
+index 53c38a0..610e965 100644
+--- a/src/program/generate.cpp
++++ b/src/program/generate.cpp
+@@ -1334,7 +1334,19 @@ int main(int argc, char** argv) {
+         o.resident_cpu_experts = o.resident_pin = o.resident_soft = false;
+         o.resident_headroom = 8ull << 30;
+     }
+-    if (o.resident_cpu_experts && (!o.layer_split.empty() || remote_caches)) {
++    // Local P100 experiment: fixed caches + own prefill buffers keep the excluded
++    // experts in VRAM for the whole session. Portable mapped RAM serves both GPUs.
++    const char* ram_split_env = std::getenv("STRATA_P100_RAM_SPLIT");
++    const bool ram_split = ram_split_env && std::atoi(ram_split_env) == 1 &&
++                           o.resident_cpu_experts && !o.layer_split.empty();
++    if (ram_split && (remote_caches || o.resident_soft || o.resident_budget != 0 ||
++                      !o.no_prefill_borrow || o.adapt_every != 0 || o.pcie_frac != 1.0)) {
++        std::fprintf(stderr, "strata generate: P100 RAM split needs full strict residency, --no-prefill-borrow, "
++                             "--adapt-every 0, --pcie-frac 1, and no remote caches\n");
++        return 2;
++    }
++    if (ram_split) o.resident_pin = true;
++    if (o.resident_cpu_experts && ((!o.layer_split.empty() && !ram_split) || remote_caches)) {
+         std::fprintf(stderr, "strata generate: --resident-cpu-experts does not support layer splits or remote expert caches\n");
+         return 2;
+     }
+@@ -1459,7 +1471,7 @@ int main(int argc, char** argv) {
+         return 2;
+     }
+ #if defined(_WIN32)
+-    if (o.ple_io == "ram") {
++    if (o.ple_io == "ram" && !ram_split) {
+         std::fprintf(stderr, "strata generate: --ple-io ram is not available on Windows (no mlock); use --ple-io mmap\n");
+         return 2;
+     }
+@@ -3788,8 +3800,21 @@ int main(int argc, char** argv) {
+             const int64_t k = plan_lend(chunk);
+             if (k > 0) lend_from = xcache.slots() - k;
+         }
+-        bool resident_ok = src.pin_cache_complement(xcache, err, o.resident_pin, {}, lend_from, o.resident_headroom,
++        std::vector<std::pair<int32_t, int32_t>> split_gpu_pairs;
++        if (ram_split) {
++            for (const auto& st : stages)
++                for (int64_t l = st->lb; l < st->le; ++l)
++                    for (int64_t e = 0; e < g.n_expert; ++e)
++                        if (st->cache.slot_of(l, e) >= 0)
++                            split_gpu_pairs.emplace_back((int32_t) l, (int32_t) e);
++        }
++        bool resident_ok = src.pin_cache_complement(xcache, err, o.resident_pin, split_gpu_pairs, lend_from, o.resident_headroom,
+                                                     o.resident_budget, &profile);
++        if (ram_split && (!resident_ok || src.pinned_bytes() != src.resident_bytes())) {
++            std::fprintf(stderr, "strata generate: P100 RAM split requires the whole complement mapped/page-locked: %s\n",
++                         err.c_str());
++            return 1;
++        }
+         std::string whole_err;
+         if (!resident_ok && o.resident_soft) {
+             // #467: the whole complement does not fit - keep what does, the hottest by the profile, through the #403
+diff --git a/tests/cuda/prefill_mmq_kquant_test.cpp b/tests/cuda/prefill_mmq_kquant_test.cpp
+index 01e6eff..5ec5305 100644
+--- a/tests/cuda/prefill_mmq_kquant_test.cpp
++++ b/tests/cuda/prefill_mmq_kquant_test.cpp
+@@ -94,6 +94,7 @@ void product(mmq::Context& ctx, cudaStream_t s, const char* name, ggml_type t, i
+     ck(cudaMemcpy(db.p, bounds.data(), bounds.size() * 4, cudaMemcpyHostToDevice), "bounds");
+     ck(cudaMemcpy(dw.p, w.data(), w.size(), cudaMemcpyHostToDevice), "w");
+     ck(cudaMemset(dy.p, 0xff, (size_t) rows * (size_t) out_rows * 4), "sentinel");
++    ck(cudaDeviceSynchronize(), "uploads ready before the nonblocking test stream");
+     mmq::quantize((const float*) dx.p, (const int32_t*) dsrc.p, dxq.p, (int) t, cols, cols, rows, s);
+     mmq::Product p;
+     p.w = dw.p; p.type = (int) t; p.w_rows = out_rows; p.w_cols = cols; p.expert_bytes = eb; p.n = n;

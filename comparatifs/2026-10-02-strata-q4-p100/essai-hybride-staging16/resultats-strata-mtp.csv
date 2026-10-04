@@ -1,0 +1,3 @@
+"mode","test","elapsed_seconds","prompt_tokens","output_tokens","prompt_tps","generation_tps","reused_tokens","draft_tokens","draft_accepted","draft_acceptance","finish_reason"
+"strata-mtp","1","30,1028128","40","256","30,6","8,907260112871688","0","206","116","0,5631067961165048","length"
+"strata-mtp","2","24,1852548","46","256","33,7","11,226445295198502","0","191","153","0,8010471204188482","length"

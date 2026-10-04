@@ -1,0 +1,7 @@
+{
+  "revision": "5c284bf7bd64230eb93ac9ff5df71aa6cf8c6505",
+  "production_executable": "D:/Serveur IA/strata-build-p100/strata.exe",
+  "context": 262144,
+  "prompt_cache": 0,
+  "note": "Existing production binary, SSD model copy, isolated API/logs; no production settings rewritten"
+}

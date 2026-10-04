@@ -1,0 +1,15 @@
+Essai interrompu : aucun débit à retenir.
+
+La première requête de 256 tokens a été refusée par la garde contre les calculs
+d'experts CPU. Aucun de ces calculs CPU refusés n'a été exécuté.
+
+Le binaire référencé dans configuration-tests.json avait la garde active, mais
+verify.cpp conservait les buffers de 16 emplacements. Le changement à 64 dans
+l'en-tête n'avait pas été suivi par Ninja : préfixe /showIncludes mal encodé avec
+Visual Studio en français. verify.cpp a ensuite été recompilé explicitement ;
+le suivi des dépendances a été corrigé et contrôlé sur native_expert_parity.
+
+Les requêtes, l'erreur API et les journaux sont conservés pour cet essai.
+Le nom de l'ancien binaire strata-p100-staging64.exe ne prouve donc pas que son
+buffer effectif était à 64. Utiliser le binaire final strata-p100-gpu-seul.exe
+et son empreinte dans manifest-final.json pour les essais GPU réussis.

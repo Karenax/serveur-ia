@@ -1,0 +1,1735 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 0121bb0..9c4c053 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -484,6 +484,12 @@ if(STRATA_ENABLE_CUDA OR STRATA_ENABLE_HIP)
+   add_library(strata_prefill STATIC src/prefill/gemm.cu src/prefill/kernels.cu src/prefill/prefill.cpp)
+   target_include_directories(strata_prefill PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include ${_strata_gpu_include_directories})
+   target_link_libraries(strata_prefill PUBLIC strata_engine ${_strata_gpu_blas_target} ${_strata_gpu_runtime_target})
++  if(STRATA_ENABLE_CUDA AND STRATA_BUILD_TESTS)
++    add_executable(prefill_p100_test tests/cuda/prefill_p100_test.cpp)
++    target_link_libraries(prefill_p100_test PRIVATE strata_prefill ggml-base)
++    add_test(NAME prefill_p100_test COMMAND prefill_p100_test)
++    set_tests_properties(prefill_p100_test PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 120)
++  endif()
+   if(STRATA_ENABLE_HIP AND STRATA_HIPBLASLT_AVAILABLE)
+     target_compile_definitions(strata_prefill PRIVATE STRATA_HIPBLASLT_AVAILABLE=1)
+     target_link_libraries(strata_prefill PRIVATE roc::hipblaslt)
+diff --git a/bench/results/2026-10-02-p100-resident-hybrid/README.md b/bench/results/2026-10-02-p100-resident-hybrid/README.md
+new file mode 100644
+index 0000000..5302f74
+--- /dev/null
++++ b/bench/results/2026-10-02-p100-resident-hybrid/README.md
+@@ -0,0 +1,199 @@
++# Dual P100: resident Q4 experts on CPU and GPU
++
++On the measured workstation, computing the RAM-resident expert misses on the CPU increased decode from
++8.72/10.95 to 28.70/35.16 tokens/s on the same two prompts: 3.29x/3.21x. The VRAM cache and dense layers
++continued to run on two P100s. All four configurations used the same binary, packs, caches and worker count.
++
++This is a community experiment on **Strata 0.1.35, base `d9ab8435f654c368c586340d490915f6addf56a3`**.
++It is not a supported release engine or an optimum established for other hardware. The source contribution
++adds an opt-in resident RAM complement for fixed layer-split caches and an sm_60 BF16 prompt fallback.
++
++## Hardware and artifacts
++
++| Component | Measured configuration |
++|---|---|
++| CPU | Threadripper PRO 3955WX, 16 physical cores / 32 threads, AVX2, no AVX-512 |
++| RAM | 128 GiB, eight 16 GiB DDR4-3200 RDIMMs, configured at 3200 MT/s |
++| GPUs | Two Tesla P100 PCIe 16 GiB, sm_60, TCC, driver 528.89; display GPU excluded |
++| Links | PCIe 3.0 x16 per P100, verified under load |
++| OS and toolchain | Windows 10 Pro, CUDA 12.4, MSVC 14.44.35207, CMake 3.31.8, Ninja |
++| Storage | Mechanical HDD; cold model loading takes roughly 15-20 minutes |
++| GGUF | Qwen3.8-Flash-Next UD-Q4_K_XL, four shards, 103.69 GiB |
++| Main expert weights | 71.73 GiB; native Q4_K/Q5_K gate/up, Q5_1/Q8_0 down |
++| Placement | 5,491 expert slots in VRAM (3,004 + 2,487), 16.02 GiB total; 55.71 GiB complement in pinned RAM |
++| PLE | 26.82 GiB table copied to locked host RAM |
++| Working set | About 84.12 GiB process RAM; about 14.70/14.91 GiB total GPU memory used per card |
++| MTP | Q2 draft experts, reduced head; `--spec 3 --spec-min-p 0.5` |
++
++The main expert quantized bytes were preserved. The local pack converted small dense tensors to BF16
++(195 rounded conversions and 264 exactly representable conversions); the PLE convolution is narrowed to F16
++on load. The Q8 PLE key remains native. The MTP draft
++was converted from its original Q8 format to Strata's Q2 representation. Consequently this is not a claim
++of bit-identical inference with an untouched original GGUF or with another backend's Q8 draft.
++
++## Method and results
++
++[`protocol.json`](protocol.json) freezes the exact French sky and Fibonacci prompts. Each request used
++256 output tokens, temperature 0, seed 42, thinking disabled, prompt cache disabled, context 4096, one request
++at a time. Each configuration ran twice; the second pass reversed the fraction order. All responses reached
++the 256-token limit. These are short-context throughput measurements, not a complete answer-quality study.
++
++`pcie_frac` is the fraction of **cache misses** computed on GPU after fetching the expert weights from RAM.
++Cache hits always run on GPU. Fifteen CPU workers plus the host thread were retained for every row.
++
++| PCIe fraction | CPU fraction of misses | Sky decode tok/s | Fibonacci decode tok/s | Average CPU cores, sky / code |
++|---|---|---|---|---|
++| 1.00 | 0% | 8.719 | 10.952 | 0.99 / 0.99 |
++| 0.50 | 50% | 14.653 | 17.618 | 14.91 / 14.69 |
++| 0.25 | 75% | 22.462 | 26.731 | 14.39 / 14.12 |
++| 0.00 | 100% | **28.701** | **35.161** | 14.05 / 13.64 |
++
++Values are two-run medians. [`runs.json`](runs.json) retains all 16 measurements, token counts, MTP counts,
++software expert counters, memory values and output hashes. Process CPU time includes worker spin waits.
++Every request's expert-source log reported zero file blob reads. Tiny process I/O counter increments include
++the engine's stdin protocol and are not evidence of model-file reads.
++
++A restart with `pcie_frac=0` in the startup configuration, with no request-time tuning override, delivered
++28.733/35.603 tok/s. It reported 83,494/72,350 CPU expert jobs and **zero RAM-to-GPU expert-weight fetches**.
++Activation and result transfers still occur. [`startup-validation.json`](startup-validation.json) records
++these two runs. Output hashes matched the corresponding fraction-zero comparative runs.
++
++Both repetitions at fraction zero produced identical text. CPU/GPU rounding can change text between
++fractions; sky outputs also varied within the fraction-0.5 pair. The Fibonacci hashes matched across the
++mixed modes. No general quality or determinism guarantee follows from these two prompts.
++
++Benchmark binary SHA256: `9b07c8c1e2367d217e17199f137f6c8d33f5832ab02df594b68652ba5c9488d0`.
++The contribution subsequently scopes the 64-slot reserve and extra decode log line to the opt-in RAM-split
++mode, registers the prompt test, and adds shard-loader regression cases. The running benchmark binary
++has not been replaced; these review cleanups are not presented as a new throughput run.
++
++## Bottlenecks
++
++| Probe | Result and interpretation |
++|---|---|
++| Nominal RAM bandwidth | Eight DDR4-3200 channels imply 204.8 GB/s of interface bandwidth |
++| CPU streaming reads | 80.44 GB/s with 16 physical cores; 78.38 GB/s with 32 SMT threads |
++| CPU mixed streaming reads/writes | 90.24 GB/s with 16 cores; 89.38 GB/s with 32 SMT threads |
++| Core placement | Eight compact cores: 42.19 GB/s; eight spread cores: 79.40 GB/s |
++| Pinned host to GPU | Approximately 12.85-13.07 GB/s per P100; 26.09 GB/s combined |
++| Strata mapped-host fetch kernel | 12.68-12.78 GB/s; DMA about 12.86 GB/s, only about 1% raw improvement |
++| P100 device copy | About 513 GB/s per card, counting both read and write bytes |
++
++RAM probes used 512 MiB arrays, AVX2/OpenMP, physical-core affinity and three trials. These measure the CPU's
++access path rather than every DIMM's aggregate limit. They do not establish disabled channels or a BIOS fault;
++fabric clock was not measured. SMT did not increase this workload's memory throughput.
++
++The GPU-only reference fetched roughly 331/267 experts per output token. Using the smallest 3.072 MB native
++expert gives at least 1.016/0.821 GB of weight traffic per token. At the measured fetch bandwidth, this accounts
++for an estimated 80/64 ms of the 115/91 ms decode time per token. This is a traffic estimate, not an isolated
++CUDA timing measurement. The measured 3.2-3.3x gain after removing these fetches supports PCIe weight movement
++as the previous bottleneck.
++
++At fraction zero, timed CPU expert calls occupied about 40-43% of decode-window wall time. GPU execution and
++CPU calls can overlap, and some timing fields cover only the primary GPU while CPU counters cover both stages;
++do not add/subtract those fields to derive an exact GPU share. CPU/RAM throughput, dense GPU work and host/GPU
++synchronization now matter. Layer-split stages execute successive layers; the sum of GPU busy percentages
++is not a throughput or compute-occupancy metric. Some NVML PCIe samples exceeded the physical link limit;
++they were rejected as bandwidth evidence in favor of controlled transfers and software byte counts.
++
++The HDD affects cold loading. With the PLE and expert complement locked in RAM, no expert-file reads were
++observed during measured responses. Replacing it with an SSD does not remove the measured decode bottleneck.
++
++## Contribution and constraints
++
++- `STRATA_P100_RAM_SPLIT=1` permits strict pinned residency with a layer split, excludes cache slots on every
++  stage from the RAM complement, and copies native projections sequentially before scattering unchanged blobs.
++- `STRATA_P100_HYBRID=1` permits the CPU share of misses. Without it, the experiment requires `--pcie-frac 1`
++  and refuses accidental CPU fallback. The existing CPU kernels and worker pool perform the calculation.
++- Caches must stay fixed: `--adapt-every 0 --no-prefill-borrow`; partial/soft residency and remote caches are
++  rejected. Evicting an excluded expert would invalidate the complete-RAM assumption.
++- The experimental verifier reserves 64 staging blobs, enough for the measured speculative window; ordinary
++  runs retain 16. A larger speculation window is not validated and must not assume GPU-only coverage.
++- Windows `--ple-io ram` in this mode creates a private `VirtualAlloc`/`VirtualLock` table and fails explicitly
++  if the full table cannot be locked. The mapped source remains open; cold-load transient memory exceeds the
++  steady-state working set. Resident headroom and lock limits must be considered on smaller machines.
++- The sm_60 BF16 prompt GEMM converts operands to FP16 on GPU, retains reusable conversion buffers and uses
++  the existing FP16 cuBLAS path with FP32 accumulation. FP16's smaller dynamic range is a numerical limitation;
++  the synthetic test and short responses do not establish parity for arbitrary long prompts or extreme values.
++- Additional GGUF shards may repeat only `general.architecture` after shard zero's complete metadata is
++  validated; matching split metadata and architecture are still required.
++- `STRATA_P100_DIAGNOSTIC_SYNC_FILE` optionally names a marker file that enables synchronous prompt-kernel
++  diagnostics while it exists. Leave it unset or absent for performance measurements.
++
++Only Windows and this two-P100 Q4 setup have been measured. No HIP, Volta, single-GPU, long-context or concurrent
++request validation is claimed. MTP was on in all four comparative modes; a paired MTP-off series is still needed.
++
++## Reproduction
++
++Use an x64 MSVC developer shell, Ninja and **CUDA 12.x**. The measured toolkit was 12.4; target sm_60 SASS,
++not a current CUDA 13 release engine. The existing `STRATA_EXPERIMENTAL_SM60` build flag is reused.
++
++```powershell
++cmake -S . -B build-p100 -G Ninja -DCMAKE_BUILD_TYPE=Release -DSTRATA_ENABLE_CUDA=ON -DSTRATA_EXPERIMENTAL_SM60=ON -DCMAKE_CUDA_ARCHITECTURES=60-real -DCMAKE_CUDA_RUNTIME_LIBRARY=Shared -DSTRATA_PORTABLE=ON -DSTRATA_NATIVE_EXPERTS=ON -DSTRATA_MMQ_KQUANTS=ON -DSTRATA_BUILD_TESTS=ON
++cmake --build build-p100 --target strata prefill_p100_test native_dense_ple_key_test native_expert_parity -j 8
++$env:CUDA_VISIBLE_DEVICES = '<first P100 UUID>,<second P100 UUID>'
++$env:CUDA_DISABLE_PTX_JIT = '1'
++$env:STRATA_P100_RAM_SPLIT = '1'
++$env:STRATA_P100_HYBRID = '1'
++$env:STRATA_LOOKAHEAD = '0'
++$env:STRATA_TRACE = '1'
++ctest --test-dir build-p100 -R 'prefill_p100_test|native_dense_ple_key_test' --output-on-failure
++```
++
++GGML is pinned by CMake to `3cf03257f219afbe7334045ff7c6a06ac68c627d`. An existing checkout may be supplied
++with `-DSTRATA_GGML_DIR=<llama.cpp checkout>`. Model pack preparation follows
++[`docs/UNSLOTH_Q4.md`](../../../docs/UNSLOTH_Q4.md); use the same compatibility conversions and MTP pack for
++every mode. [`config.example.json`](config.example.json) contains relative placeholder paths to replace with
++your own packs and CUDA 12 library directory. For an existing `blk.48` Q8 draft with the Gemma norm offset
++already included, the tested tensor mapping is available as `tools/mtp_q8_runtime.py`:
++
++```powershell
++python tools/mtp_q8_runtime.py --gguf <Q8 draft GGUF> --out mtp/rt --norms-already-offset
++```
++
++The output directory must be new. Copy `data/draft_vocab.bin` into it after conversion. This adapter writes
++the runtime expert and dense files; it does not convert the main model. Raw-norm drafts must follow the
++standard `mtp_pack.py`/`mtp_rt.py` route instead. The portable adapter keeps the tested arithmetic and mapping;
++its CLI guard/path cleanup has not been used to requantize a new draft in this contribution.
++
++Start the usual server from the repository root on loopback with one concurrent request:
++
++```powershell
++python -m serve.server --engine strata --config bench/results/2026-10-02-p100-resident-hybrid/config.example.json --host 127.0.0.1 --port 8080
++```
++
++```powershell
++python bench/results/2026-10-02-p100-resident-hybrid/run.py --url http://127.0.0.1:8080 --model qwen3.8-flash-next --engine-log <engine log> --out <new results directory>
++```
++
++The portable harness preserves prompt/settings, reverses every second pass, requires decode expert counters,
++and checks that no expert blobs come from files. It does not reproduce the original Windows CPU/NVML monitor;
++CPU/memory measurements in `runs.json` came from the archived workstation harness. Use `--fractions 0
++--startup-only` to check startup settings without `strata_tune`. Stop other inference work during comparisons.
++
++## Validation of the contribution
++
++The review source built successfully in a separate CUDA 12.4 / sm_60 directory with the shared CUDA runtime.
++The four CTest cases `gguf_split_test`, `file_expert_source_test`, `native_dense_ple_key_test` (including the new
++partial-metadata regression cases), and `prefill_p100_test` passed. Native expert parity on synthetic
++`q4_K/q5_1`, `q4_K/q8_0` and `q5_K/q8_0` blobs reported zero failures. The prompt test also checked mapped host
++router/grouping IDs and FP16 dequantization; its maximum relative L2 GEMM error was about 1.6e-4 on these inputs.
++The Python files passed syntax checks. The portable throughput harness has not run a new full-model sweep;
++the measured data above remains the original fixed-binary experiment. The active server was left running.
++
++The earlier generic `prefill_mmq_kquant_test` did not pass its Q8_0 screen on sm_60. It is not included among
++the passing checks; this experiment uses and validates the FP16 prompt route instead. The test's default-stream
++upload synchronization correction is retained, but it does not establish MMQ support on a P100.
++
++## Follow-up
++
++1. Run a larger shared prompt corpus, long-context cases and a paired MTP-on/off comparison before generalizing.
++2. Tune the CPU worker/core placement and profile dense/verification kernels using timing scopes for both GPUs.
++3. Build a frequency profile offline; increasing useful VRAM hits avoids CPU work too. Preserve RAM coverage
++   before enabling dynamic cache changes.
++4. Rebase/revalidate on 0.1.36. Its new fused prompt kernels target newer GPU architectures; its profile-save
++   feature is interesting, but merely saving a profile does not improve these fixed caches during a session.
++
++References: [multi-GPU architecture](../../../docs/MULTI_GPU.md),
++[engine details](../../../docs/DETAILS.md),
++[0.1.36 release](https://github.com/Niko1221/Strata/releases/tag/v0.1.36).
+diff --git a/bench/results/2026-10-02-p100-resident-hybrid/config.example.json b/bench/results/2026-10-02-p100-resident-hybrid/config.example.json
+new file mode 100644
+index 0000000..93b93e0
+--- /dev/null
++++ b/bench/results/2026-10-02-p100-resident-hybrid/config.example.json
+@@ -0,0 +1,61 @@
++{
++  "exe": "./build-p100/strata.exe",
++  "cwd": ".",
++  "args": [
++    "--pack",
++    "./packs/ud-q4_k_xl",
++    "--native",
++    "./models/Qwen3.8-Flash-Next-UD-Q4_K_XL-00001-of-00004.gguf",
++    "--mmap-experts",
++    "--resident-cpu-experts",
++    "--expert-profile",
++    "./data/expert-profile.bin",
++    "--expert-cache",
++    "auto",
++    "--vram-reserve-mib",
++    "2048",
++    "--layer-split",
++    "24",
++    "--split-device",
++    "1",
++    "--no-prefill-borrow",
++    "--adapt-every",
++    "0",
++    "--pcie-frac",
++    "0",
++    "--prefill",
++    "256",
++    "--short-read",
++    "0",
++    "--prompt-cache",
++    "0",
++    "--spec",
++    "3",
++    "--spec-min-p",
++    "0.5",
++    "--mtp",
++    "./mtp/rt",
++    "--ple-io",
++    "ram",
++    "--pool-workers",
++    "15",
++    "--max-context",
++    "4096"
++  ],
++  "env": {
++    "CUDA_DISABLE_PTX_JIT": "1",
++    "STRATA_P100_RAM_SPLIT": "1",
++    "STRATA_LOOKAHEAD": "0",
++    "STRATA_TRACE": "1",
++    "STRATA_P100_HYBRID": "1",
++    "STRATA_DECODE_TIMING": "1"
++  },
++  "lib_dirs": [
++    "<CUDA 12 toolkit>/bin"
++  ],
++  "tokenizer": "./packs/ud-q4_k_xl/tokenizer",
++  "model_name": "qwen3.8-flash-next",
++  "log": "./strata-p100-engine.log",
++  "host": "127.0.0.1",
++  "port": 8080
++}
+diff --git a/bench/results/2026-10-02-p100-resident-hybrid/native-parity.txt b/bench/results/2026-10-02-p100-resident-hybrid/native-parity.txt
+new file mode 100644
+index 0000000..cfaa2f3
+--- /dev/null
++++ b/bench/results/2026-10-02-p100-resident-hybrid/native-parity.txt
+@@ -0,0 +1,18 @@
++          width invariance (1 vs 3 tokens): gate/up 0, down 0 rows differ
++          q4_K gate rows, AVX2 multi-token vs ggml vec_dot: 0 of 36 token-sets differ in any bit; 4 tokens one thread 171 us vs ggml 191 us (1.12x)
++          q5_1 down rows, AVX2 multi-token vs ggml vec_dot: 0 of 36 token-sets differ in any bit; 4 tokens one thread 338 us vs ggml 408 us (1.21x)
++          gpu decode-once vs per-entry kernels: bitwise equal
++          GPU dequant vs ggml to_float: rel 0.00e+00, 0 of 4915200 values differ in any bit; fp16 of it: 0 differ; embedding rows: 0 of 640 differ
++synthetic q4_K    /q5_1    blob  3072000  cpu rel 1.37e-02  gpu rel 1.25e-02  cpu-gpu 1.52e-02  ok
++          width invariance (1 vs 3 tokens): gate/up 0, down 0 rows differ
++          q4_K gate rows, AVX2 multi-token vs ggml vec_dot: 0 of 36 token-sets differ in any bit; 4 tokens one thread 171 us vs ggml 186 us (1.09x)
++          q8_0 down rows, AVX2 multi-token vs ggml vec_dot: 0 of 36 token-sets differ in any bit; 4 tokens one thread 248 us vs ggml 271 us (1.09x)
++          gpu decode-once vs per-entry kernels: bitwise equal
++          GPU dequant vs ggml to_float: rel 0.00e+00, 0 of 4915200 values differ in any bit; fp16 of it: 0 differ; embedding rows: 0 of 640 differ
++synthetic q4_K    /q8_0    blob  3584000  cpu rel 1.39e-02  gpu rel 1.18e-02  cpu-gpu 1.50e-02  ok
++          width invariance (1 vs 3 tokens): gate/up 0, down 0 rows differ
++          q8_0 down rows, AVX2 multi-token vs ggml vec_dot: 0 of 36 token-sets differ in any bit; 4 tokens one thread 249 us vs ggml 272 us (1.09x)
++          gpu decode-once vs per-entry kernels: bitwise equal
++          GPU dequant vs ggml to_float: rel 0.00e+00, 0 of 4915200 values differ in any bit; fp16 of it: 0 differ; embedding rows: 0 of 640 differ
++synthetic q5_K    /q8_0    blob  3993600  cpu rel 1.46e-02  gpu rel 1.30e-02  cpu-gpu 1.64e-02  ok
++native_expert_parity: 0 failures
+diff --git a/bench/results/2026-10-02-p100-resident-hybrid/protocol.json b/bench/results/2026-10-02-p100-resident-hybrid/protocol.json
+new file mode 100644
+index 0000000..26bf4ce
+--- /dev/null
++++ b/bench/results/2026-10-02-p100-resident-hybrid/protocol.json
+@@ -0,0 +1,13 @@
++{
++  "id": "q4-p100-ciel-fibonacci-v1",
++  "prompts": [
++    "Explique en français pourquoi le ciel est bleu, puis pourquoi il devient rouge au coucher du soleil. Donne une explication précise et accessible.",
++    "Écris une fonction Python fibonacci(n) qui retourne les n premiers nombres de Fibonacci, puis donne un exemple pour n=8. Réponds en français."
++  ],
++  "max_tokens": 256,
++  "temperature": 0,
++  "seed": 42,
++  "cache_prompt": false,
++  "enable_thinking": false,
++  "context": 4096
++}
+diff --git a/bench/results/2026-10-02-p100-resident-hybrid/run.py b/bench/results/2026-10-02-p100-resident-hybrid/run.py
+new file mode 100644
+index 0000000..85610a4
+--- /dev/null
++++ b/bench/results/2026-10-02-p100-resident-hybrid/run.py
+@@ -0,0 +1,87 @@
++"""Paired short-context CPU/GPU miss-share experiment; Python standard library only."""
++import argparse
++import datetime as dt
++import hashlib
++import json
++from pathlib import Path
++import re
++import time
++import urllib.request
++
++
++def main():
++    p = argparse.ArgumentParser(description=__doc__)
++    p.add_argument('--url', default='http://127.0.0.1:8080')
++    p.add_argument('--model', default='qwen3.8-flash-next')
++    p.add_argument('--engine-log', required=True, type=Path)
++    p.add_argument('--out', required=True, type=Path)
++    p.add_argument('--fractions', default='1,.5,.25,0')
++    p.add_argument('--repeats', type=int, default=2)
++    p.add_argument('--startup-only', action='store_true')
++    args = p.parse_args()
++    fractions = [float(x) for x in args.fractions.split(',')]
++    if args.repeats < 1 or not fractions or any(not 0 <= x <= 1 for x in fractions):
++        p.error('positive repeats and fractions between zero and one are required')
++    if args.startup_only and len(fractions) != 1:
++        p.error('--startup-only requires one fraction describing the startup configuration')
++    protocol = json.loads(Path(__file__).with_name('protocol.json').read_text(encoding='utf-8'))
++    # Refuse to overwrite an existing experiment, including a partially failed one.
++    args.out.mkdir(parents=True, exist_ok=False)
++
++    def save(name, data):
++        (args.out / name).write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
++
++    save('protocol.json', protocol)
++    save('run-settings.json', dict(created=dt.datetime.now(dt.timezone.utc).isoformat(),
++                                  fractions=fractions, repeats=args.repeats, startup_only=args.startup_only))
++    records = []
++    for repeat in range(1, args.repeats + 1):
++        order = fractions if repeat % 2 else fractions[::-1]
++        for fraction in order:
++            for test, prompt in enumerate(protocol['prompts'], 1):
++                name = f'r{repeat}-pcie{fraction:g}-test{test}'
++                payload = dict(model=args.model, messages=[dict(role='user', content=prompt)],
++                               max_tokens=protocol['max_tokens'], temperature=protocol['temperature'],
++                               seed=protocol['seed'], cache_prompt=False,
++                               chat_template_kwargs=dict(enable_thinking=False))
++                if not args.startup_only:
++                    payload['strata_tune'] = dict(pcie_frac=fraction)
++                save(name + '-request.json', payload)
++                offset = args.engine_log.stat().st_size
++                start = time.perf_counter()
++                request = urllib.request.Request(args.url.rstrip('/') + '/v1/chat/completions',
++                    data=json.dumps(payload, ensure_ascii=False).encode('utf-8'),
++                    headers={'Content-Type': 'application/json; charset=utf-8'})
++                with urllib.request.urlopen(request, timeout=600) as response:
++                    answer = json.load(response)
++                elapsed = time.perf_counter() - start
++                save(name + '-response.json', answer)
++                with args.engine_log.open('rb') as log_file:
++                    log_file.seek(offset)
++                    log = log_file.read().decode('utf-8', errors='replace')
++                (args.out / (name + '-engine.log')).write_text(log, encoding='utf-8')
++                match = re.search(r'decode expert compute: (\d+) CPU jobs, (\d+) RAM-to-GPU experts', log)
++                if not match or '0 blob reads from the file' not in log:
++                    raise RuntimeError('missing expert counters or unconfirmed expert-file residency')
++                cpu_jobs, copies = map(int, match.groups())
++                if fraction == 1 and cpu_jobs != 0:
++                    raise RuntimeError('GPU reference fell back to CPU experts')
++                if fraction == 0 and (copies != 0 or cpu_jobs == 0):
++                    raise RuntimeError('CPU-miss mode was not engaged')
++                timing = answer['timings']
++                if timing['cache_n'] != 0 or timing['predicted_n'] != protocol['max_tokens']:
++                    raise RuntimeError('request reused a cache or did not reach the fixed token limit')
++                content = answer['choices'][0]['message']['content']
++                row = dict(repeat=repeat, pcie_frac=fraction, test=test, elapsed_seconds=elapsed,
++                           generation_tps=timing['predicted_n'] * 1000 / timing['predicted_ms'],
++                           prompt_tps=timing['prompt_per_second'], output_tokens=timing['predicted_n'],
++                           drafts=timing['draft_n'], accepted=timing['draft_n_accepted'],
++                           cpu_expert_jobs=cpu_jobs, ram_gpu_experts=copies,
++                           answer_sha256=hashlib.sha256(content.encode('utf-8')).hexdigest())
++                records.append(row)
++                save('runs.json', records)
++                print(json.dumps(row, ensure_ascii=False), flush=True)
++
++
++if __name__ == '__main__':
++    main()
+diff --git a/bench/results/2026-10-02-p100-resident-hybrid/runs.json b/bench/results/2026-10-02-p100-resident-hybrid/runs.json
+new file mode 100644
+index 0000000..4b11fa4
+--- /dev/null
++++ b/bench/results/2026-10-02-p100-resident-hybrid/runs.json
+@@ -0,0 +1,322 @@
++[
++  {
++    "repeat": 1,
++    "pcie_frac": 1.0,
++    "test": 1,
++    "prompt": "Explique en français pourquoi le ciel est bleu, puis pourquoi il devient rouge au coucher du soleil. Donne une explication précise et accessible.",
++    "elapsed_seconds": 30.762566199999128,
++    "generation_tps": 8.707897654990374,
++    "prompt_tps": 30.6,
++    "output_tokens": 256,
++    "drafts": 207,
++    "accepted": 118,
++    "cpu_expert_jobs": 0,
++    "ram_gpu_experts": 84436,
++    "cpu_average_cores": 0.9853696795945736,
++    "engine_io_read_bytes": 248,
++    "ram_peak_bytes": 90316980224,
++    "gpu_max_temp_c": 50,
++    "gpu_max_power_w": 109.872,
++    "answer_sha256": "fa299e5225c5be64af0d98613ac82fbac3fe682a8831177ba8457fb6471e052b"
++  },
++  {
++    "repeat": 1,
++    "pcie_frac": 1.0,
++    "test": 2,
++    "prompt": "Écris une fonction Python fibonacci(n) qui retourne les n premiers nombres de Fibonacci, puis donne un exemple pour n=8. Réponds en français.",
++    "elapsed_seconds": 24.822182600000815,
++    "generation_tps": 10.951356299810492,
++    "prompt_tps": 34.0,
++    "output_tokens": 256,
++    "drafts": 183,
++    "accepted": 158,
++    "cpu_expert_jobs": 0,
++    "ram_gpu_experts": 68454,
++    "cpu_average_cores": 0.9807256030740504,
++    "engine_io_read_bytes": 258,
++    "ram_peak_bytes": 90318143488,
++    "gpu_max_temp_c": 52,
++    "gpu_max_power_w": 115.623,
++    "answer_sha256": "38bfa32ac6ce388993cfa51fe383e6fb1c47bab46716a3ee510db2858b32db1e"
++  },
++  {
++    "repeat": 1,
++    "pcie_frac": 0.5,
++    "test": 1,
++    "prompt": "Explique en français pourquoi le ciel est bleu, puis pourquoi il devient rouge au coucher du soleil. Donne une explication précise et accessible.",
++    "elapsed_seconds": 18.70317360000263,
++    "generation_tps": 14.708163605338605,
++    "prompt_tps": 30.9,
++    "output_tokens": 256,
++    "drafts": 203,
++    "accepted": 116,
++    "cpu_expert_jobs": 43728,
++    "ram_gpu_experts": 40437,
++    "cpu_average_cores": 14.943152481884717,
++    "engine_io_read_bytes": 248,
++    "ram_peak_bytes": 90319122432,
++    "gpu_max_temp_c": 54,
++    "gpu_max_power_w": 113.709,
++    "answer_sha256": "da8ebca06a73e19cd139120bb43b806c3a206a1c5030d5168a3ef1647cf438fc"
++  },
++  {
++    "repeat": 1,
++    "pcie_frac": 0.5,
++    "test": 2,
++    "prompt": "Écris une fonction Python fibonacci(n) qui retourne les n premiers nombres de Fibonacci, puis donne un exemple pour n=8. Réponds en français.",
++    "elapsed_seconds": 15.886940000000322,
++    "generation_tps": 17.619447465139647,
++    "prompt_tps": 34.0,
++    "output_tokens": 256,
++    "drafts": 190,
++    "accepted": 154,
++    "cpu_expert_jobs": 37351,
++    "ram_gpu_experts": 34880,
++    "cpu_average_cores": 14.695639940730894,
++    "engine_io_read_bytes": 258,
++    "ram_peak_bytes": 90319216640,
++    "gpu_max_temp_c": 55,
++    "gpu_max_power_w": 113.393,
++    "answer_sha256": "12c0386b2dde6aa5333a0b0ce1c540cd2becf61872ebb91341379a8df82626f0"
++  },
++  {
++    "repeat": 1,
++    "pcie_frac": 0.25,
++    "test": 1,
++    "prompt": "Explique en français pourquoi le ciel est bleu, puis pourquoi il devient rouge au coucher du soleil. Donne une explication précise et accessible.",
++    "elapsed_seconds": 12.611653699997987,
++    "generation_tps": 22.62763399802008,
++    "prompt_tps": 30.9,
++    "output_tokens": 256,
++    "drafts": 196,
++    "accepted": 119,
++    "cpu_expert_jobs": 64496,
++    "ram_gpu_experts": 18201,
++    "cpu_average_cores": 14.433575035447497,
++    "engine_io_read_bytes": 249,
++    "ram_peak_bytes": 90319351808,
++    "gpu_max_temp_c": 56,
++    "gpu_max_power_w": 115.161,
++    "answer_sha256": "0d242bd0650167862a17f486a6b114a26586ff42ab987e67e9cde71e5f3475e0"
++  },
++  {
++    "repeat": 1,
++    "pcie_frac": 0.25,
++    "test": 2,
++    "prompt": "Écris une fonction Python fibonacci(n) qui retourne les n premiers nombres de Fibonacci, puis donne un exemple pour n=8. Réponds en français.",
++    "elapsed_seconds": 10.953489400002582,
++    "generation_tps": 26.731546357304705,
++    "prompt_tps": 34.0,
++    "output_tokens": 256,
++    "drafts": 189,
++    "accepted": 154,
++    "cpu_expert_jobs": 55890,
++    "ram_gpu_experts": 16194,
++    "cpu_average_cores": 14.10652070380089,
++    "engine_io_read_bytes": 259,
++    "ram_peak_bytes": 90319446016,
++    "gpu_max_temp_c": 57,
++    "gpu_max_power_w": 120.751,
++    "answer_sha256": "12c0386b2dde6aa5333a0b0ce1c540cd2becf61872ebb91341379a8df82626f0"
++  },
++  {
++    "repeat": 1,
++    "pcie_frac": 0.0,
++    "test": 1,
++    "prompt": "Explique en français pourquoi le ciel est bleu, puis pourquoi il devient rouge au coucher du soleil. Donne une explication précise et accessible.",
++    "elapsed_seconds": 10.232203699997626,
++    "generation_tps": 28.655540257675987,
++    "prompt_tps": 30.9,
++    "output_tokens": 256,
++    "drafts": 187,
++    "accepted": 113,
++    "cpu_expert_jobs": 82878,
++    "ram_gpu_experts": 0,
++    "cpu_average_cores": 14.050309123540352,
++    "engine_io_read_bytes": 248,
++    "ram_peak_bytes": 90319560704,
++    "gpu_max_temp_c": 58,
++    "gpu_max_power_w": 120.992,
++    "answer_sha256": "23f57dd9a585aa8369ebbe834cab4bff5a57be6cda622bb1eaea43ca7e980d09"
++  },
++  {
++    "repeat": 1,
++    "pcie_frac": 0.0,
++    "test": 2,
++    "prompt": "Écris une fonction Python fibonacci(n) qui retourne les n premiers nombres de Fibonacci, puis donne un exemple pour n=8. Réponds en français.",
++    "elapsed_seconds": 8.651327999999921,
++    "generation_tps": 35.10215274921157,
++    "prompt_tps": 34.0,
++    "output_tokens": 256,
++    "drafts": 188,
++    "accepted": 153,
++    "cpu_expert_jobs": 72350,
++    "ram_gpu_experts": 0,
++    "cpu_average_cores": 13.652167043025194,
++    "engine_io_read_bytes": 258,
++    "ram_peak_bytes": 90319638528,
++    "gpu_max_temp_c": 59,
++    "gpu_max_power_w": 132.251,
++    "answer_sha256": "12c0386b2dde6aa5333a0b0ce1c540cd2becf61872ebb91341379a8df82626f0"
++  },
++  {
++    "repeat": 2,
++    "pcie_frac": 0.0,
++    "test": 1,
++    "prompt": "Explique en français pourquoi le ciel est bleu, puis pourquoi il devient rouge au coucher du soleil. Donne une explication précise et accessible.",
++    "elapsed_seconds": 10.203747100000328,
++    "generation_tps": 28.745634818150172,
++    "prompt_tps": 30.9,
++    "output_tokens": 256,
++    "drafts": 187,
++    "accepted": 113,
++    "cpu_expert_jobs": 82878,
++    "ram_gpu_experts": 0,
++    "cpu_average_cores": 14.04202285648528,
++    "engine_io_read_bytes": 248,
++    "ram_peak_bytes": 90319708160,
++    "gpu_max_temp_c": 60,
++    "gpu_max_power_w": 128.149,
++    "answer_sha256": "23f57dd9a585aa8369ebbe834cab4bff5a57be6cda622bb1eaea43ca7e980d09"
++  },
++  {
++    "repeat": 2,
++    "pcie_frac": 0.0,
++    "test": 2,
++    "prompt": "Écris une fonction Python fibonacci(n) qui retourne les n premiers nombres de Fibonacci, puis donne un exemple pour n=8. Réponds en français.",
++    "elapsed_seconds": 8.629380899998068,
++    "generation_tps": 35.21998734281705,
++    "prompt_tps": 34.0,
++    "output_tokens": 256,
++    "drafts": 188,
++    "accepted": 153,
++    "cpu_expert_jobs": 72350,
++    "ram_gpu_experts": 0,
++    "cpu_average_cores": 13.6253256592285,
++    "engine_io_read_bytes": 258,
++    "ram_peak_bytes": 90319777792,
++    "gpu_max_temp_c": 60,
++    "gpu_max_power_w": 138.902,
++    "answer_sha256": "12c0386b2dde6aa5333a0b0ce1c540cd2becf61872ebb91341379a8df82626f0"
++  },
++  {
++    "repeat": 2,
++    "pcie_frac": 0.25,
++    "test": 1,
++    "prompt": "Explique en français pourquoi le ciel est bleu, puis pourquoi il devient rouge au coucher du soleil. Donne une explication précise et accessible.",
++    "elapsed_seconds": 12.779316399999516,
++    "generation_tps": 22.29732083754311,
++    "prompt_tps": 30.9,
++    "output_tokens": 256,
++    "drafts": 194,
++    "accepted": 117,
++    "cpu_expert_jobs": 64724,
++    "ram_gpu_experts": 18221,
++    "cpu_average_cores": 14.337132305449996,
++    "engine_io_read_bytes": 249,
++    "ram_peak_bytes": 90319843328,
++    "gpu_max_temp_c": 61,
++    "gpu_max_power_w": 126.261,
++    "answer_sha256": "0d242bd0650167862a17f486a6b114a26586ff42ab987e67e9cde71e5f3475e0"
++  },
++  {
++    "repeat": 2,
++    "pcie_frac": 0.25,
++    "test": 2,
++    "prompt": "Écris une fonction Python fibonacci(n) qui retourne les n premiers nombres de Fibonacci, puis donne un exemple pour n=8. Réponds en français.",
++    "elapsed_seconds": 10.938547599998856,
++    "generation_tps": 26.730150774756712,
++    "prompt_tps": 34.0,
++    "output_tokens": 256,
++    "drafts": 189,
++    "accepted": 154,
++    "cpu_expert_jobs": 55890,
++    "ram_gpu_experts": 16194,
++    "cpu_average_cores": 14.12721831552995,
++    "engine_io_read_bytes": 259,
++    "ram_peak_bytes": 90319912960,
++    "gpu_max_temp_c": 61,
++    "gpu_max_power_w": 123.974,
++    "answer_sha256": "12c0386b2dde6aa5333a0b0ce1c540cd2becf61872ebb91341379a8df82626f0"
++  },
++  {
++    "repeat": 2,
++    "pcie_frac": 0.5,
++    "test": 1,
++    "prompt": "Explique en français pourquoi le ciel est bleu, puis pourquoi il devient rouge au coucher du soleil. Donne une explication précise et accessible.",
++    "elapsed_seconds": 18.83254780000061,
++    "generation_tps": 14.59878989718118,
++    "prompt_tps": 30.9,
++    "output_tokens": 256,
++    "drafts": 199,
++    "accepted": 115,
++    "cpu_expert_jobs": 43823,
++    "ram_gpu_experts": 40461,
++    "cpu_average_cores": 14.872025175477898,
++    "engine_io_read_bytes": 248,
++    "ram_peak_bytes": 90319982592,
++    "gpu_max_temp_c": 62,
++    "gpu_max_power_w": 117.669,
++    "answer_sha256": "6ddade22e1f25808cba4e3be690dda1ce53099b554f19b32b3f80b1fb1b8f6e4"
++  },
++  {
++    "repeat": 2,
++    "pcie_frac": 0.5,
++    "test": 2,
++    "prompt": "Écris une fonction Python fibonacci(n) qui retourne les n premiers nombres de Fibonacci, puis donne un exemple pour n=8. Réponds en français.",
++    "elapsed_seconds": 15.89822009999989,
++    "generation_tps": 17.617386157964642,
++    "prompt_tps": 34.0,
++    "output_tokens": 256,
++    "drafts": 190,
++    "accepted": 154,
++    "cpu_expert_jobs": 37351,
++    "ram_gpu_experts": 34880,
++    "cpu_average_cores": 14.689144352706604,
++    "engine_io_read_bytes": 258,
++    "ram_peak_bytes": 90320048128,
++    "gpu_max_temp_c": 63,
++    "gpu_max_power_w": 119.05,
++    "answer_sha256": "12c0386b2dde6aa5333a0b0ce1c540cd2becf61872ebb91341379a8df82626f0"
++  },
++  {
++    "repeat": 2,
++    "pcie_frac": 1.0,
++    "test": 1,
++    "prompt": "Explique en français pourquoi le ciel est bleu, puis pourquoi il devient rouge au coucher du soleil. Donne une explication précise et accessible.",
++    "elapsed_seconds": 30.628739799998584,
++    "generation_tps": 8.72969323312373,
++    "prompt_tps": 30.9,
++    "output_tokens": 256,
++    "drafts": 206,
++    "accepted": 117,
++    "cpu_expert_jobs": 0,
++    "ram_gpu_experts": 84410,
++    "cpu_average_cores": 0.9861040707917534,
++    "engine_io_read_bytes": 248,
++    "ram_peak_bytes": 90320117760,
++    "gpu_max_temp_c": 63,
++    "gpu_max_power_w": 107.592,
++    "answer_sha256": "fa299e5225c5be64af0d98613ac82fbac3fe682a8831177ba8457fb6471e052b"
++  },
++  {
++    "repeat": 2,
++    "pcie_frac": 1.0,
++    "test": 2,
++    "prompt": "Écris une fonction Python fibonacci(n) qui retourne les n premiers nombres de Fibonacci, puis donne un exemple pour n=8. Réponds en français.",
++    "elapsed_seconds": 24.729486800002633,
++    "generation_tps": 10.952761935729535,
++    "prompt_tps": 34.0,
++    "output_tokens": 256,
++    "drafts": 183,
++    "accepted": 158,
++    "cpu_expert_jobs": 0,
++    "ram_gpu_experts": 68454,
++    "cpu_average_cores": 0.9989339932439427,
++    "engine_io_read_bytes": 258,
++    "ram_peak_bytes": 90320187392,
++    "gpu_max_temp_c": 63,
++    "gpu_max_power_w": 118.218,
++    "answer_sha256": "38bfa32ac6ce388993cfa51fe383e6fb1c47bab46716a3ee510db2858b32db1e"
++  }
++]
+diff --git a/bench/results/2026-10-02-p100-resident-hybrid/startup-validation.json b/bench/results/2026-10-02-p100-resident-hybrid/startup-validation.json
+new file mode 100644
+index 0000000..e627821
+--- /dev/null
++++ b/bench/results/2026-10-02-p100-resident-hybrid/startup-validation.json
+@@ -0,0 +1,50 @@
++[
++  {
++    "repeat": 1,
++    "pcie_frac": 0.0,
++    "test": 1,
++    "prompt": "Explique en français pourquoi le ciel est bleu, puis pourquoi il devient rouge au coucher du soleil. Donne une explication précise et accessible.",
++    "elapsed_seconds": 10.273061899999448,
++    "generation_tps": 28.732729497064994,
++    "prompt_tps": 30.7,
++    "output_tokens": 256,
++    "drafts": 189,
++    "accepted": 112,
++    "cpu_expert_jobs": 83494,
++    "ram_gpu_experts": 0,
++    "cpu_average_cores": 14.015721544519044,
++    "engine_io_read_bytes": 234,
++    "ram_peak_bytes": 90299097088,
++    "gpu_max_temp_c": 51,
++    "gpu_max_power_w": 123.013,
++    "vram_peak_mib": {
++      "1": 15052.0625,
++      "2": 15264.0625
++    },
++    "answer_sha256": "23f57dd9a585aa8369ebbe834cab4bff5a57be6cda622bb1eaea43ca7e980d09"
++  },
++  {
++    "repeat": 1,
++    "pcie_frac": 0.0,
++    "test": 2,
++    "prompt": "Écris une fonction Python fibonacci(n) qui retourne les n premiers nombres de Fibonacci, puis donne un exemple pour n=8. Réponds en français.",
++    "elapsed_seconds": 8.548876400000154,
++    "generation_tps": 35.60302625723187,
++    "prompt_tps": 34.0,
++    "output_tokens": 256,
++    "drafts": 188,
++    "accepted": 153,
++    "cpu_expert_jobs": 72350,
++    "ram_gpu_experts": 0,
++    "cpu_average_cores": 13.633005034439135,
++    "engine_io_read_bytes": 244,
++    "ram_peak_bytes": 90299977728,
++    "gpu_max_temp_c": 52,
++    "gpu_max_power_w": 127.211,
++    "vram_peak_mib": {
++      "1": 15052.0625,
++      "2": 15264.0625
++    },
++    "answer_sha256": "12c0386b2dde6aa5333a0b0ce1c540cd2becf61872ebb91341379a8df82626f0"
++  }
++]
+diff --git a/bench/results/2026-10-02-p100-resident-hybrid/summary.json b/bench/results/2026-10-02-p100-resident-hybrid/summary.json
+new file mode 100644
+index 0000000..175bd64
+--- /dev/null
++++ b/bench/results/2026-10-02-p100-resident-hybrid/summary.json
+@@ -0,0 +1,149 @@
++{
++  "created": "2026-10-02T20:11:37.071777+02:00",
++  "summary": [
++    {
++      "pcie_frac": 1.0,
++      "test": 2,
++      "repeats": 2,
++      "generation_tps": 10.952059117770013,
++      "prompt_tps": 34.0,
++      "elapsed_seconds": 24.775834700001724,
++      "cpu_average_cores": 0.9898297981589965,
++      "cpu_expert_jobs": 0.0,
++      "ram_gpu_experts": 68454.0,
++      "ram_peak_bytes": 90319165440.0,
++      "generation_tps_min": 10.951356299810492,
++      "generation_tps_max": 10.952761935729535,
++      "draft_acceptance": 0.8633879781420765,
++      "same_answer_across_repeats": true,
++      "gain_vs_same_binary_gpu_percent": 0.0
++    },
++    {
++      "pcie_frac": 1.0,
++      "test": 1,
++      "repeats": 2,
++      "generation_tps": 8.71879544405705,
++      "prompt_tps": 30.75,
++      "elapsed_seconds": 30.695652999998856,
++      "cpu_average_cores": 0.9857368751931634,
++      "cpu_expert_jobs": 0.0,
++      "ram_gpu_experts": 84423.0,
++      "ram_peak_bytes": 90318548992.0,
++      "generation_tps_min": 8.707897654990374,
++      "generation_tps_max": 8.72969323312373,
++      "draft_acceptance": 0.5690047371136437,
++      "same_answer_across_repeats": true,
++      "gain_vs_same_binary_gpu_percent": 0.0
++    },
++    {
++      "pcie_frac": 0.5,
++      "test": 2,
++      "repeats": 2,
++      "generation_tps": 17.618416811552144,
++      "prompt_tps": 34.0,
++      "elapsed_seconds": 15.892580050000106,
++      "cpu_average_cores": 14.692392146718749,
++      "cpu_expert_jobs": 37351.0,
++      "ram_gpu_experts": 34880.0,
++      "ram_peak_bytes": 90319632384.0,
++      "generation_tps_min": 17.617386157964642,
++      "generation_tps_max": 17.619447465139647,
++      "draft_acceptance": 0.8105263157894737,
++      "same_answer_across_repeats": true,
++      "gain_vs_same_binary_gpu_percent": 60.86853277632318
++    },
++    {
++      "pcie_frac": 0.5,
++      "test": 1,
++      "repeats": 2,
++      "generation_tps": 14.653476751259891,
++      "prompt_tps": 30.9,
++      "elapsed_seconds": 18.76786070000162,
++      "cpu_average_cores": 14.907588828681307,
++      "cpu_expert_jobs": 43775.5,
++      "ram_gpu_experts": 40449.0,
++      "ram_peak_bytes": 90319552512.0,
++      "generation_tps_min": 14.59878989718118,
++      "generation_tps_max": 14.708163605338605,
++      "draft_acceptance": 0.5746590093323761,
++      "same_answer_across_repeats": false,
++      "gain_vs_same_binary_gpu_percent": 68.06767454612171
++    },
++    {
++      "pcie_frac": 0.25,
++      "test": 2,
++      "repeats": 2,
++      "generation_tps": 26.73084856603071,
++      "prompt_tps": 34.0,
++      "elapsed_seconds": 10.946018500000719,
++      "cpu_average_cores": 14.11686950966542,
++      "cpu_expert_jobs": 55890.0,
++      "ram_gpu_experts": 16194.0,
++      "ram_peak_bytes": 90319679488.0,
++      "generation_tps_min": 26.730150774756712,
++      "generation_tps_max": 26.731546357304705,
++      "draft_acceptance": 0.8148148148148148,
++      "same_answer_across_repeats": true,
++      "gain_vs_same_binary_gpu_percent": 144.0714415306541
++    },
++    {
++      "pcie_frac": 0.25,
++      "test": 1,
++      "repeats": 2,
++      "generation_tps": 22.462477417781596,
++      "prompt_tps": 30.9,
++      "elapsed_seconds": 12.695485049998751,
++      "cpu_average_cores": 14.385353670448747,
++      "cpu_expert_jobs": 64610.0,
++      "ram_gpu_experts": 18211.0,
++      "ram_peak_bytes": 90319597568.0,
++      "generation_tps_min": 22.29732083754311,
++      "generation_tps_max": 22.62763399802008,
++      "draft_acceptance": 0.6051178203240059,
++      "same_answer_across_repeats": true,
++      "gain_vs_same_binary_gpu_percent": 157.63280675534813
++    },
++    {
++      "pcie_frac": 0.0,
++      "test": 2,
++      "repeats": 2,
++      "generation_tps": 35.16107004601431,
++      "prompt_tps": 34.0,
++      "elapsed_seconds": 8.640354449998995,
++      "cpu_average_cores": 13.638746351126848,
++      "cpu_expert_jobs": 72350.0,
++      "ram_gpu_experts": 0.0,
++      "ram_peak_bytes": 90319708160.0,
++      "generation_tps_min": 35.10215274921157,
++      "generation_tps_max": 35.21998734281705,
++      "draft_acceptance": 0.8138297872340425,
++      "same_answer_across_repeats": true,
++      "gain_vs_same_binary_gpu_percent": 221.0452908253985
++    },
++    {
++      "pcie_frac": 0.0,
++      "test": 1,
++      "repeats": 2,
++      "generation_tps": 28.70058753791308,
++      "prompt_tps": 30.9,
++      "elapsed_seconds": 10.217975399998977,
++      "cpu_average_cores": 14.046165990012817,
++      "cpu_expert_jobs": 82878.0,
++      "ram_gpu_experts": 0.0,
++      "ram_peak_bytes": 90319634432.0,
++      "generation_tps_min": 28.655540257675987,
++      "generation_tps_max": 28.745634818150172,
++      "draft_acceptance": 0.6042780748663101,
++      "same_answer_across_repeats": true,
++      "gain_vs_same_binary_gpu_percent": 229.18065026374853
++    }
++  ],
++  "geometric_mean_tps": {
++    "0.0": 31.76701699534168,
++    "0.25": 24.503899327915228,
++    "0.5": 16.067702422626756,
++    "1.0": 9.7718351981118
++  },
++  "best_fraction_on_two_prompts": 0.0,
++  "caveat": "Deux prompts à contexte court, deux répétitions: choix de cette série, pas optimum universel."
++}
+diff --git a/bench/results/2026-10-02-p100-resident-hybrid/validation.txt b/bench/results/2026-10-02-p100-resident-hybrid/validation.txt
+new file mode 100644
+index 0000000..44b87a2
+--- /dev/null
++++ b/bench/results/2026-10-02-p100-resident-hybrid/validation.txt
+@@ -0,0 +1,14 @@
++Internal ctest changing into directory: <isolated sm_60 build>
++Test project <isolated sm_60 build>
++    Start 2: gguf_split_test
++1/4 Test #2: gguf_split_test ..................   Passed    0.10 sec
++    Start 3: file_expert_source_test
++2/4 Test #3: file_expert_source_test ..........   Passed    0.14 sec
++    Start 5: native_dense_ple_key_test
++3/4 Test #5: native_dense_ple_key_test ........   Passed    0.34 sec
++    Start 7: prefill_p100_test
++4/4 Test #7: prefill_p100_test ................   Passed    1.52 sec
++
++100% tests passed, 0 tests failed out of 4
++
++Total Test time (real) =   2.11 sec
+diff --git a/include/strata/core/verify.hpp b/include/strata/core/verify.hpp
+index e68f7b3..19cea03 100644
+--- a/include/strata/core/verify.hpp
++++ b/include/strata/core/verify.hpp
+@@ -348,7 +348,7 @@ private:
+     int32_t *ids_ = nullptr, *hit_slot_ = nullptr, *hit_dst_ = nullptr, *hit_count_ = nullptr;
+     int32_t* plan_ = nullptr;                                     // device copy of the plan block
+     uint8_t* staging_ = nullptr;                                  // VRAM slots for the PCIe share of the misses
+-    static constexpr int64_t kStagingBlobs = 16;
++    int64_t staging_blobs_ = 16; // experimental RAM split reserves 64, ordinary runs retain 16
+     static constexpr int64_t kPcieGroupRows = 4;                  // the PCIe call's groups side by side (of <= 16)
+     uint8_t* hit_xq_ = nullptr;
+     uint8_t* nat_xq_ = nullptr;   // plan v0.3 P6: q8_1 activations for a native pack's grouped experts
+diff --git a/include/strata/prefill/gemm.hpp b/include/strata/prefill/gemm.hpp
+index 60d1c71..8a5ebbd 100644
+--- a/include/strata/prefill/gemm.hpp
++++ b/include/strata/prefill/gemm.hpp
+@@ -59,6 +59,11 @@ private:
+     int64_t tc_w_elems_ = 0;
+     uint16_t* tc_x_ = nullptr;
+     int64_t tc_x_elems_ = 0;
++    bool pascal_checked_ = false;
++    bool pascal_bf16_ = false;
++    uint16_t* pascal_x_ = nullptr;
++    uint16_t* pascal_w_ = nullptr;
++    int64_t pascal_x_cap_ = 0, pascal_w_cap_ = 0;
+ };
+ 
+ 
+diff --git a/include/strata/prefill/kernels.hpp b/include/strata/prefill/kernels.hpp
+index 3358bea..26eac80 100644
+--- a/include/strata/prefill/kernels.hpp
++++ b/include/strata/prefill/kernels.hpp
+@@ -63,6 +63,8 @@ void copy_i32(int32_t* dst, const int32_t* src, int64_t n, void* stream);
+ /// dst[0, n) = src[0, n) in 16-byte loads (both 16-byte aligned; src may be mapped host memory: read over PCIe by
+ /// the kernel, not queued on a copy engine).
+ void copy_f32_wide(float* dst, const float* src, int64_t n, void* stream);
++// Optional runtime diagnostics; disabled for normal inference and benchmarks.
++void set_debug_sync(bool enabled);
+ /// Gather rows: dst16[i, :] = x16[src[i], :] (n rows of `width` BF16).
+ void gather_rows16(const uint16_t* x16, const int32_t* src, uint16_t* dst16, int64_t n, int64_t width, void* stream);
+ /// bo[t, :] = shared[t, :] * sigmoid(sg[t]) + sum_k w[t, k] * D[slot[t, k], :]
+diff --git a/src/core/expert_source.cpp b/src/core/expert_source.cpp
+index 98e1952..1218b4c 100644
+--- a/src/core/expert_source.cpp
++++ b/src/core/expert_source.cpp
+@@ -1677,7 +1677,52 @@ bool FileExpertSource::pin_cache_complement(
+                              (long long) done, (long long) n_layers_, (double) copied.load() / 1073741824.0);
+         }
+     };
+-    {
++    const char* sequential_env = std::getenv("STRATA_P100_RAM_SPLIT");
++    const bool sequential_native = !role_ptr_.empty() && sequential_env && std::atoi(sequential_env) == 1;
++    if (sequential_native) {
++        // HDD-friendly local experiment: read a complete projection successively,
++        // then scatter its unchanged bytes into the resident expert blobs.
++        // The usual six-thread gather seeks between three projections per expert.
++        std::vector<uint8_t> role_buffer;
++        std::vector<uint8_t> check;
++        std::fprintf(stderr, "FileExpertSource: sequential native RAM copy (P100 HDD mode)\n");
++        for (int64_t l = 0; l < n_layers_ && !failed.load(); ++l) {
++            uint64_t within = 0;
++            for (int r = 0; r < 3; ++r) {
++                const size_t i = (size_t) (3 * l + r);
++                const uint64_t per = role_bytes_[i];
++                role_buffer.resize((size_t) (per * (uint64_t) n_expert_));
++                std::memcpy(role_buffer.data(), role_ptr_[i], role_buffer.size());
++                for (int64_t e = 0; e < n_expert_; ++e) {
++                    const uint64_t off = offsets[(size_t) (l * n_expert_ + e)];
++                    if (off == kNoComplement) continue;
++                    if (off > bytes || within + per > bytes - off) {
++                        fail("FileExpertSource: sequential copy exceeds resident blob bounds"); break;
++                    }
++                    std::memcpy((uint8_t*) host + (size_t) (off + within),
++                                role_buffer.data() + (size_t) (per * (uint64_t) e), (size_t) per);
++                    copied.fetch_add(per);
++                }
++                within += per;
++#if defined(_WIN32)
++                (void) VirtualUnlock((LPVOID) role_ptr_[i], (SIZE_T) role_buffer.size());
++#endif
++            }
++            // One whole expert per layer checked against the original mapped GGUF.
++            check.resize((size_t) layer_blob_bytes_[(size_t) l]);
++            for (int64_t e = 0; e < n_expert_; ++e) {
++                const uint64_t off = offsets[(size_t) (l * n_expert_ + e)];
++                if (off == kNoComplement) continue;
++                if (!copy_from_files(l, e, check.data()) ||
++                    std::memcmp(check.data(), host + (size_t) off, check.size()) != 0)
++                    fail("FileExpertSource: sequential RAM expert does not match the GGUF");
++                break;
++            }
++            std::fprintf(stderr, "FileExpertSource: sequential copy layer %lld/%lld verified (%.2f GiB)\n",
++                         (long long) (l + 1), (long long) n_layers_, (double) copied.load() / 1073741824.0);
++            std::fflush(stderr);
++        }
++    } else {
+         const int threads = (int) std::max<int64_t>(1, std::min<int64_t>(6, n_layers_));
+         std::vector<std::thread> pool;
+         for (int i = 1; i < threads; ++i) pool.emplace_back(worker);
+@@ -2208,6 +2253,20 @@ void expert_pool_dispatch_multi(ExpertDispatch& d, const float* x_f, const int32
+             ++d.multi_entries;
+         }
+     const auto c3 = std::chrono::steady_clock::now();
++    const char* strict_gpu = std::getenv("STRATA_P100_RAM_SPLIT");
++    const char* hybrid_env = std::getenv("STRATA_P100_HYBRID");
++    const bool p100_hybrid = hybrid_env && hybrid_env[0] == '1';
++    if (strict_gpu && strict_gpu[0] == '1' && !p100_hybrid && njobs != 0) {
++        std::fprintf(stderr, "strata P100: refused %d CPU jobs at layer %lld (tokens %lld, PCIe share %d/256, pinned layer %d, plan cap %lld, staging cap %lld)\n",
++                     njobs, (long long) d.layers, (long long) n_tok, d.pcie_num,
++                     (int) d.src->pcie_layer(d.layers), d.plan ? (long long) d.plan->cap : -1,
++                     d.plan ? (long long) d.plan->staging_cap : -1);
++        std::fflush(stderr);
++        d.failed = true;
++        d.fail = "GPU-only P100 mode refuses CPU expert jobs: check the pinned RAM and staging capacity";
++        d.fail_layer = d.layers;
++        return;
++    }
+     pt("run", njobs);
+     if (njobs > 0) {
+         if (native) d.pool->run_split_multi_native(lay.fmt[(size_t) d.layers], d.jobs_multi.data(), njobs);
+diff --git a/src/core/native_dense.cpp b/src/core/native_dense.cpp
+index e0609fd..0920911 100644
+--- a/src/core/native_dense.cpp
++++ b/src/core/native_dense.cpp
+@@ -99,7 +99,10 @@ bool NativeDense::load(const std::vector<std::string>& shards, WeightTable& tabl
+             const auto* count = gguf.get("split.count");
+             const auto* number = gguf.get("split.no");
+             const auto* tensors = gguf.get("split.tensors.count");
+-            if (gguf.get("general.architecture")) {
++            // Local Unsloth shards repeat general.architecture on data shards,
++            // but only shard zero holds the complete architecture parameters.
++            const auto* arch = gguf.get("general.architecture");
++            if (arch && (!have_architecture || gguf.get("qwen4exp.block_count"))) {
+                 err = strata::check_architecture(gguf);
+                 if (!err.empty()) return false;
+                 have_architecture = true;
+@@ -109,7 +112,7 @@ bool NativeDense::load(const std::vector<std::string>& shards, WeightTable& tabl
+                 }
+             } else if (!have_architecture || !split_count || !count || !number || !tensors ||
+                        count->u != split_count || number->u == 0 || number->u >= split_count ||
+-                       tensors->u != split_tensors) {
++                       tensors->u != split_tensors || (arch && arch->s != "qwen4exp")) {
+                 err = "native dense: additional shard must match the architecture-validated first shard's split metadata";
+                 return false;
+             }
+diff --git a/src/core/verify.cpp b/src/core/verify.cpp
+index dd5362b..998b554 100644
+--- a/src/core/verify.cpp
++++ b/src/core/verify.cpp
+@@ -401,6 +401,10 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
+         sink_.ctx = this;
+     }
+ 
++    // Two speculative pipeline groups can each route thirty distinct misses.
++    // Keep the larger reserve opt-in: it costs 48 extra expert blobs per verifier.
++    const char* ram_split = std::getenv("STRATA_P100_RAM_SPLIT");
++    staging_blobs_ = ram_split && std::atoi(ram_split) == 1 ? 64 : 16;
+     // ---- the device arena: the same sequence counted, then carved
+     auto carve = [&](Bump& b) {
+         tok_ = b.take<int32_t>(T); step_ = b.take<int32_t>(T * strata::kernels::kStepCount);
+@@ -425,7 +429,7 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
+         shared_ = b.take<float>(T * N); parts_ = b.take<float>(T * K * N); hit_out_ = b.take<float>(T * K * N);
+         hit_slot_ = b.take<int32_t>(T * K); hit_dst_ = b.take<int32_t>(T * K); hit_count_ = b.take<int32_t>(4);
+         plan_ = b.take<int32_t>(2 * ((uint64_t) plan_i32_ + 16));
+-        staging_ = b.take<uint8_t>((uint64_t) kStagingBlobs * strata::kernels::cpu::expert_layout().max_blob);
++        staging_ = b.take<uint8_t>((uint64_t) staging_blobs_ * strata::kernels::cpu::expert_layout().max_blob);
+         hit_xq_ = b.take<uint8_t>(T * (N / 32) * 34); hit_xs_ = b.take<float>(T * (N / 32));
+         nat_xq_ = b.take<uint8_t>(T * (N / 32) * 36);
+         hit_scratch_ = b.take<uint8_t>(std::max<uint64_t>(
+@@ -471,7 +475,7 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
+     real.base = (uint8_t*) arena_;
+     carve(real);
+     sink_.staging = (unsigned long long) staging_;
+-    sink_.staging_cap = kStagingBlobs;
++    sink_.staging_cap = staging_blobs_;
+     (void) TS;
+     if (cudaStreamCreateWithFlags(&copy_, cudaStreamNonBlocking) != cudaSuccess) {
+         err = "verify: copy stream create failed";
+@@ -1048,7 +1052,7 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
+             if (device_plan_) wait_flag_ge_or(m_flagB_, ring, skip_ + grp, cs);
+             else wait_flag_ge(m_flagB_, ring, cs);                 // the PCIe share is in staging (DMA) or mapped
+             if (sink_.pcie_mode == 2) {                            // stage it with a copy kernel, then point at staging
+-                const int64_t per = G == 2 ? kStagingBlobs / 2 : kStagingBlobs;
++                const int64_t per = G == 2 ? staging_blobs_ / 2 : staging_blobs_;
+                 uint8_t* stage = staging_ + (size_t) (grp * per) * lay.max_blob;
+                 fetch_blobs(p_ptr2, p_counts + 2, stage, (int64_t) lay.blob_bytes(l), (int) per, cs);
+                 rebase_ptrs((unsigned long long*) p_ptr2, p_counts + 2, stage, (int64_t) lay.blob_bytes(l), cs);
+@@ -1594,7 +1598,7 @@ void Verifier::set_plan_slot(int grp) {
+     sink_.ptr2 = sink_.ptr + cap;
+     sink_.start2 = base + ptr_off + 4 * cap;
+     const int G = last_batch_ ? 1 : (groups_[last_t_] > 0 ? groups_[last_t_] : 1);
+-    const int64_t per = G == 2 ? kStagingBlobs / 2 : kStagingBlobs;
++    const int64_t per = G == 2 ? staging_blobs_ / 2 : staging_blobs_;
+     sink_.staging = (unsigned long long) (staging_ + (size_t) (grp * per) * strata::kernels::cpu::expert_layout().max_blob);
+     sink_.staging_cap = per;
+ }
+diff --git a/src/kernels/ngram.cpp b/src/kernels/ngram.cpp
+index 7292dd9..6b06e30 100644
+--- a/src/kernels/ngram.cpp
++++ b/src/kernels/ngram.cpp
+@@ -148,6 +148,10 @@ struct PleTable::Impl {
+     strata::ngram::PleReader::Ticket ticket;
+     bool pending = false;
+     bool locked = false;
++#if defined(_WIN32)
++    uint8_t* ram_copy = nullptr;
++    uint64_t ram_bytes = 0;
++#endif
+     uint32_t rows[PLE_N_HEADS] = {};
+     uint8_t raw[PLE_N_HEADS * PLE_ROW_BYTES_MAX] = {};
+     static constexpr size_t kMaxPrefetch = 16;
+@@ -260,7 +264,25 @@ bool PleTable::open(const std::string& gguf_path, std::string& err, const PleIoO
+         impl_->n_rows = n_rows;
+     }
+     if (io.mode == PleIo::Mmap && io.lock && impl_->data != nullptr) {
+-#if !defined(_WIN32)
++#if defined(_WIN32)
++        // Local P100 experiment: a private, locked copy avoids random HDD faults.
++        impl_->ram_copy = (uint8_t*) VirtualAlloc(nullptr, (SIZE_T) need, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
++        if (!impl_->ram_copy) { err = "PLE: cannot allocate the complete RAM table"; close(); return false; }
++        impl_->ram_bytes = need;
++        SIZE_T lo = 0, hi = 0;
++        if (!GetProcessWorkingSetSize(GetCurrentProcess(), &lo, &hi) ||
++            !SetProcessWorkingSetSize(GetCurrentProcess(), lo + (SIZE_T) need + (64u << 20),
++                                      hi + (SIZE_T) need + (64u << 20)) ||
++            !VirtualLock(impl_->ram_copy, (SIZE_T) need)) {
++            err = "PLE: cannot lock the complete RAM table, Windows error " + std::to_string(GetLastError());
++            close(); return false;
++        }
++        std::fprintf(stderr, "strata P100: copying %.2f GiB PLE table to locked RAM\n", (double) need / 1073741824.0);
++        std::fflush(stderr);
++        std::memcpy(impl_->ram_copy, impl_->data, (size_t) need);
++        impl_->data = impl_->ram_copy;
++        impl_->locked = true;
++#else
+         const uint64_t page = 4096;
+         const uintptr_t a0 = (uintptr_t) impl_->data & ~(uintptr_t) (page - 1);
+         const uintptr_t a1 = (uintptr_t) impl_->data + (uintptr_t) need;
+@@ -315,6 +337,14 @@ void PleTable::prefetch_rows(const uint32_t* rows16) {
+ void PleTable::close() {
+     wait_prefetches();
+     impl_->reader.close();
++#if defined(_WIN32)
++    if (impl_->ram_copy) {
++        VirtualUnlock(impl_->ram_copy, (SIZE_T) impl_->ram_bytes);
++        VirtualFree(impl_->ram_copy, 0, MEM_RELEASE);
++        impl_->ram_copy = nullptr;
++        impl_->ram_bytes = 0;
++    }
++#endif
+     impl_->pending = false;
+     impl_->locked = false;   // the unmap below releases the lock
+     impl_->mode = PleIo::Mmap;
+diff --git a/src/prefill/gemm.cu b/src/prefill/gemm.cu
+index a35daeb..136bc35 100644
+--- a/src/prefill/gemm.cu
++++ b/src/prefill/gemm.cu
+@@ -1,6 +1,7 @@
+ // src/prefill/gemm.cu - see include/strata/prefill/gemm.hpp.
+ #include "strata/prefill/gemm.hpp"
+ #include "strata/kernels/dequant_bf16.hpp"
++#include "strata/kernels/f16_bits.hpp"
+ 
+ #include <cublas_v2.h>
+ #include <cuda_fp16.h>
+@@ -39,6 +40,13 @@
+ namespace strata::prefill {
+ namespace {
+ 
++#if !defined(__HIPCC__)
++__global__ void pascal_bf16_to_f16(const uint16_t* src, uint16_t* dst, int64_t n) {
++    const int64_t i = (int64_t) blockIdx.x * blockDim.x + threadIdx.x;
++    if (i < n) dst[i] = strata::kernels::f16_from_f32(__uint_as_float((uint32_t) src[i] << 16));
++}
++#endif
++
+ void ck(cublasStatus_t s, const char* what) {
+     if (s != CUBLAS_STATUS_SUCCESS) {
+         std::fprintf(stderr, "prefill gemm: %s: cuBLAS status %d\n", what, (int) s);
+@@ -298,6 +306,8 @@ bool try_hipblaslt(void* opaque_state, strata::prefill::hipblaslt::InputType typ
+ }  // namespace
+ 
+ Gemm::~Gemm() {
++    if (pascal_x_) cudaFree(pascal_x_);
++    if (pascal_w_) cudaFree(pascal_w_);
+ #if defined(__HIPCC__) && defined(STRATA_HIPBLASLT_AVAILABLE)
+     delete static_cast<HipLtState*>(hipblaslt_state_);
+ #endif
+@@ -464,6 +474,36 @@ constexpr int64_t kXSliceElems = 16ll << 20;   // 32 MiB of FP16 activations per
+ void Gemm::bf16(const uint16_t* X, const uint16_t* W, float* Y, int64_t T, int64_t N, int64_t K, int64_t ldy,
+                 float beta) {
+     if (T <= 0 || N <= 0) return;
++#if !defined(__HIPCC__)
++    if (!pascal_checked_) {
++        int dev = 0;
++        cudaDeviceProp p{};
++        cudaGetDevice(&dev);
++        cudaGetDeviceProperties(&p, dev);
++        pascal_bf16_ = p.major == 6 && p.minor == 0;
++        pascal_checked_ = true;
++    }
++    if (pascal_bf16_) {
++        // cuBLAS cannot multiply BF16 operands on GP100. Convert on the GPU,
++        // retain the temporary buffers, and accumulate the FP16 GEMM in FP32.
++        auto grow = [](uint16_t*& ptr, int64_t& cap, int64_t need) {
++            if (need <= cap) return;
++            if (ptr) cudaFree(ptr);
++            const cudaError_t e = cudaMalloc((void**) &ptr, (size_t) need * 2);
++            if (e != cudaSuccess) {
++                std::fprintf(stderr, "prefill Pascal conversion buffer: %s\n", cudaGetErrorString(e));
++                std::exit(1);
++            }
++            cap = need;
++        };
++        grow(pascal_x_, pascal_x_cap_, T * K);
++        grow(pascal_w_, pascal_w_cap_, N * K);
++        pascal_bf16_to_f16<<<(unsigned) ((T*K+255)/256),256,0,(cudaStream_t) stream_>>>(X,pascal_x_,T*K);
++        pascal_bf16_to_f16<<<(unsigned) ((N*K+255)/256),256,0,(cudaStream_t) stream_>>>(W,pascal_w_,N*K);
++        f16(pascal_x_,pascal_w_,Y,T,N,K,ldy,beta);
++        return;
++    }
++#endif
+     if (ldy <= 0) ldy = N;
+     const float alpha = 1.0f;
+ #if defined(__HIPCC__) && defined(STRATA_HIPBLASLT_AVAILABLE)
+diff --git a/src/prefill/kernels.cu b/src/prefill/kernels.cu
+index 4ad67b1..359e0da 100644
+--- a/src/prefill/kernels.cu
++++ b/src/prefill/kernels.cu
+@@ -17,6 +17,7 @@ namespace {
+ 
+ constexpr int N = 2560, HC = 4, D = N * HC, LR = 320;
+ constexpr int S = 128, HK = 16, HV = 48, C = 10240;
++thread_local bool debug_sync = false;
+ 
+ __device__ __forceinline__ float warp_sum(float v) {
+ #pragma unroll
+@@ -57,7 +58,8 @@ __device__ float block_sum(float v, float* sh) {
+     return sh[0];
+ }
+ void check(const char* what) {
+-    const cudaError_t e = cudaGetLastError();
++    const cudaError_t launch = cudaGetLastError();
++    const cudaError_t e = launch == cudaSuccess && debug_sync ? cudaDeviceSynchronize() : launch;
+     if (e != cudaSuccess) { std::fprintf(stderr, "prefill %s: %s\n", what, cudaGetErrorString(e)); std::exit(1); }
+ }
+ unsigned blocks_for(int64_t n, int t = 256) { return (unsigned) ((n + t - 1) / t); }
+@@ -976,6 +978,7 @@ void copy_i32(int32_t* dst, const int32_t* src, int64_t n, void* stream) {
+     copy_i32_kernel<<<(unsigned) (b < 256 ? b : 256), 256, 0, (cudaStream_t) stream>>>(dst, src, n);
+     check("copy_i32");
+ }
++void set_debug_sync(bool enabled) { debug_sync = enabled; }
+ void gather_rows16(const uint16_t* x16, const int32_t* src, uint16_t* dst16, int64_t n, int64_t width, void* stream) {
+     if (n <= 0) return;
+     gather_rows16_kernel<<<blocks_for(n * (width / 8)), 256, 0, (cudaStream_t) stream>>>(x16, src, dst16, n, width);
+diff --git a/src/prefill/prefill.cpp b/src/prefill/prefill.cpp
+index e76fb6d..8fdd5ae 100644
+--- a/src/prefill/prefill.cpp
++++ b/src/prefill/prefill.cpp
+@@ -1546,6 +1546,10 @@ bool Prefill::run_impl(const int64_t* tokens, int64_t n, int64_t pos0, std::stri
+     err.clear();
+     Impl& m = *impl_;
+     const core::OnDevice on_device(m.device);
++    const char* sync_path = std::getenv("STRATA_P100_DIAGNOSTIC_SYNC_FILE");
++    std::FILE* sync_marker = sync_path ? std::fopen(sync_path, "rb") : nullptr;
++    set_debug_sync(sync_marker != nullptr);
++    if (sync_marker) std::fclose(sync_marker);
+     const core::ModelGeometry& g = *m.g;
+     core::SessionState& ss = *m.ss;
+     const auto t_start = Clock::now();
+diff --git a/src/program/generate.cpp b/src/program/generate.cpp
+index 085c3d8..09a323a 100644
+--- a/src/program/generate.cpp
++++ b/src/program/generate.cpp
+@@ -1618,7 +1618,23 @@ int main(int argc, char** argv) {
+         o.resident_cpu_experts = o.resident_pin = o.resident_soft = false;
+         o.resident_headroom = 8ull << 30;
+     }
+-    if (o.resident_cpu_experts && (!o.layer_split.empty() || remote_caches)) {
++    // Local P100 experiment: fixed caches + own prefill buffers keep the excluded
++    // experts in VRAM for the whole session. Portable mapped RAM serves both GPUs.
++    const char* ram_split_env = std::getenv("STRATA_P100_RAM_SPLIT");
++    const bool ram_split = ram_split_env && std::atoi(ram_split_env) == 1 &&
++                           o.resident_cpu_experts && !o.layer_split.empty();
++    const char* hybrid_env = std::getenv("STRATA_P100_HYBRID");
++    const bool p100_hybrid = ram_split && hybrid_env && hybrid_env[0] == '1';
++    if (ram_split && (remote_caches || o.resident_soft || o.resident_budget != 0 ||
++                      !o.no_prefill_borrow || o.adapt_every != 0 || (!p100_hybrid && o.pcie_frac != 1.0))) {
++        std::fprintf(stderr, "strata generate: P100 RAM split needs full strict residency, --no-prefill-borrow, "
++                             "--adapt-every 0, no remote caches, and --pcie-frac 1 unless STRATA_P100_HYBRID=1\n");
++        return 2;
++    }
++    if (p100_hybrid)
++        std::fprintf(stderr, "strata P100: hybrid CPU+GPU enabled; pinned RAM residency and fixed VRAM caches preserved\n");
++    if (ram_split) o.resident_pin = true;
++    if (o.resident_cpu_experts && ((!o.layer_split.empty() && !ram_split) || remote_caches)) {
+         std::fprintf(stderr, "strata generate: --resident-cpu-experts does not support layer splits or remote expert caches\n");
+         return 2;
+     }
+@@ -1743,7 +1759,7 @@ int main(int argc, char** argv) {
+         return 2;
+     }
+ #if defined(_WIN32)
+-    if (o.ple_io == "ram") {
++    if (o.ple_io == "ram" && !ram_split) {
+         std::fprintf(stderr, "strata generate: --ple-io ram is not available on Windows (no mlock); use --ple-io mmap\n");
+         return 2;
+     }
+@@ -4544,8 +4560,21 @@ int main(int argc, char** argv) {
+             const int64_t k = plan_lend(chunk);
+             if (k > 0) lend_from = xcache.slots() - k;
+         }
+-        bool resident_ok = src.pin_cache_complement(xcache, err, o.resident_pin, {}, lend_from, o.resident_headroom,
++        std::vector<std::pair<int32_t, int32_t>> split_gpu_pairs;
++        if (ram_split) {
++            for (const auto& st : stages)
++                for (int64_t l = st->lb; l < st->le; ++l)
++                    for (int64_t e = 0; e < g.n_expert; ++e)
++                        if (st->cache.slot_of(l, e) >= 0)
++                            split_gpu_pairs.emplace_back((int32_t) l, (int32_t) e);
++        }
++        bool resident_ok = src.pin_cache_complement(xcache, err, o.resident_pin, split_gpu_pairs, lend_from, o.resident_headroom,
+                                                     o.resident_budget, &profile);
++        if (ram_split && (!resident_ok || src.pinned_bytes() != src.resident_bytes())) {
++            std::fprintf(stderr, "strata generate: P100 RAM split requires the whole complement mapped/page-locked: %s\n",
++                         err.c_str());
++            return 1;
++        }
+         std::string whole_err;
+         if (!resident_ok && o.resident_soft) {
+             // #467: the whole complement does not fit - keep what does, the hottest by the profile, through the #403
+@@ -7078,6 +7107,8 @@ int main(int argc, char** argv) {
+             double dt_run = 0, dt_commit = 0, dt_draft = 0;
+             int64_t dec_windows = 0, dec_T = 0;
+             const int64_t decode_hits0 = drive.d.cache_hits;
++            const int64_t decode_cpu_jobs0 = drive.d.multi_misses;
++            const int64_t decode_pcie0 = drive.d.pcie_experts;
+             // CS-T: the RAM and file tiers of this request (the mmap source; 0 with the arena)
+             const int64_t ram0 = src.ram_reads(), files0 = src.file_reads();
+             const uint64_t file_bytes0 = src.file_read_bytes();
+@@ -7329,6 +7360,9 @@ int main(int argc, char** argv) {
+                              (unsigned long long) h_pool_full, ss.ple_prev[0], ss.ple_prev[1]);
+             }
+             const int64_t req_hits = drive.d.cache_hits - decode_hits0;
++            if (ram_split) std::fprintf(stderr, "strata P100: decode expert compute: %lld CPU jobs, %lld RAM-to-GPU experts\n",
++                         (long long) (drive.d.multi_misses - decode_cpu_jobs0),
++                         (long long) (drive.d.pcie_experts - decode_pcie0));
+             const int64_t req_look = (drive.d.cache_hits + drive.d.cache_admitted + drive.d.cache_refused) - decode_look0;
+             const int64_t req_offload = drive.d.offload_entries - offload0;
+             // #471: the prompt tokens this request read - all the fresh ones, or as far as the prompt pass got when a
+diff --git a/tests/core/native_dense_ple_key_test.cpp b/tests/core/native_dense_ple_key_test.cpp
+index e69d838..9d153fb 100644
+--- a/tests/core/native_dense_ple_key_test.cpp
++++ b/tests/core/native_dense_ple_key_test.cpp
+@@ -164,6 +164,42 @@ int main() {
+               "no key in the skip set: the index is not read");
+     }
+ 
++    std::printf("4. data shards repeat only general.architecture\n");
++    {
++        const fs::path pack = tmp.path / "split";
++        write_pack(pack, false);
++        const std::string first = (tmp.path / "split-1.gguf").string();
++        const std::string second = (tmp.path / "split-2.gguf").string();
++        auto meta = arch_keys();
++        const auto split = fixture::split_keys(0, 2, 2);
++        meta.insert(meta.end(), split.begin(), split.end());
++        fixture::write(first, meta, {});
++        auto data_meta = fixture::split_keys(1, 2, 2);
++        data_meta.push_back(fixture::str("general.architecture", "qwen4exp"));
++        auto attempt = [&](const std::vector<fixture::Kv>& keys) {
++            fixture::write(second, keys, {{QKV, {NE0, NE1}, 8, 1}, {KEY, {NE0, NE1}, 8, 2}});
++            Loaded l;
++            std::string err;
++            const std::vector<std::string> shards{first, second};
++            uint64_t pool = 0;
++            if (!NativeDense::served_names(shards, true, l.skip, err) ||
++                !WeightTable::pool_bytes(pack.string(), pool, err, &l.skip)) return false;
++            if (cudaMalloc(&l.arena, pool ? pool : 256) != cudaSuccess) return false;
++            if (!l.wt.load(pack.string(), l.arena, pool ? pool : 256, err, &l.skip)) return false;
++            return l.dense.load(shards, l.wt, err, true);
++        };
++        check(attempt(data_meta), "architecture-only data shard loads after a validated metadata shard");
++        auto wrong_arch = data_meta;
++        wrong_arch.back() = fixture::str("general.architecture", "llama");
++        check(!attempt(wrong_arch), "a different architecture in a data shard is refused");
++        auto wrong_split = fixture::split_keys(1, 3, 2);
++        wrong_split.push_back(fixture::str("general.architecture", "qwen4exp"));
++        check(!attempt(wrong_split), "mismatched split.count is still refused");
++        auto wrong_count = fixture::split_keys(1, 2, 3);
++        wrong_count.push_back(fixture::str("general.architecture", "qwen4exp"));
++        check(!attempt(wrong_count), "mismatched split.tensors.count is still refused");
++    }
++
+     std::printf(g_fail ? "native_dense_ple_key_test: %d FAILED\n" : "native_dense_ple_key_test: all passed\n", g_fail);
+     return g_fail ? 1 : 0;
+ }
+diff --git a/tests/cuda/prefill_mmq_kquant_test.cpp b/tests/cuda/prefill_mmq_kquant_test.cpp
+index 01e6eff..5ec5305 100644
+--- a/tests/cuda/prefill_mmq_kquant_test.cpp
++++ b/tests/cuda/prefill_mmq_kquant_test.cpp
+@@ -94,6 +94,7 @@ void product(mmq::Context& ctx, cudaStream_t s, const char* name, ggml_type t, i
+     ck(cudaMemcpy(db.p, bounds.data(), bounds.size() * 4, cudaMemcpyHostToDevice), "bounds");
+     ck(cudaMemcpy(dw.p, w.data(), w.size(), cudaMemcpyHostToDevice), "w");
+     ck(cudaMemset(dy.p, 0xff, (size_t) rows * (size_t) out_rows * 4), "sentinel");
++    ck(cudaDeviceSynchronize(), "uploads ready before the nonblocking test stream");
+     mmq::quantize((const float*) dx.p, (const int32_t*) dsrc.p, dxq.p, (int) t, cols, cols, rows, s);
+     mmq::Product p;
+     p.w = dw.p; p.type = (int) t; p.w_rows = out_rows; p.w_cols = cols; p.expert_bytes = eb; p.n = n;
+diff --git a/tests/cuda/prefill_p100_test.cpp b/tests/cuda/prefill_p100_test.cpp
+new file mode 100644
+index 0000000..acb5694
+--- /dev/null
++++ b/tests/cuda/prefill_p100_test.cpp
+@@ -0,0 +1,122 @@
++// Numerical screen of the actual FP16 prompt route on GP100, including the
++// BF16 -> FP16 conversion and native Q4_K / Q5_K / Q5_1 / Q8_0 weights.
++#include "strata/prefill/gemm.hpp"
++#include "strata/prefill/kernels.hpp"
++#include "ggml.h"
++#include <cuda_runtime.h>
++#include <cmath>
++#include <cstdio>
++#include <stdexcept>
++#include <vector>
++
++void ck(cudaError_t e) { if(e!=cudaSuccess) throw std::runtime_error(cudaGetErrorString(e)); }
++struct Dev {
++    void* p=nullptr;
++    Dev(size_t bytes) { ck(cudaMalloc(&p,bytes)); }
++    ~Dev() { cudaFree(p); }
++};
++void check(strata::prefill::Gemm& gemm, cudaStream_t stream, ggml_type type, int N, int K) {
++    const int T=7;
++    std::vector<float> x(T*K), w(N*K);
++    std::vector<uint16_t> xb(T*K);
++    for(int i=0;i<T*K;++i) {
++        float f = i >= (T-1)*K ? 0.0f : 0.35f*std::sin(i*.009f)+.17f*std::cos(i*.021f);
++        if(type==GGML_TYPE_BF16) {
++            auto b=ggml_fp32_to_bf16(f); xb[i]=b.bits;
++            x[i]=ggml_fp16_to_fp32(ggml_fp32_to_fp16(ggml_bf16_to_fp32(b)));
++        } else { xb[i]=ggml_fp32_to_fp16(f); x[i]=ggml_fp16_to_fp32(xb[i]); }
++    }
++    for(int i=0;i<N*K;++i) w[i]=.025f*std::sin(i*.013f)+.0015f*((i*37)%101-50);
++    std::vector<uint8_t> raw;
++    if(type==GGML_TYPE_BF16) {
++        raw.resize(w.size()*2);
++        auto* b=(ggml_bf16_t*)raw.data();
++        for(size_t i=0;i<w.size();++i) {
++            b[i]=ggml_fp32_to_bf16(w[i]);
++            w[i]=ggml_fp16_to_fp32(ggml_fp32_to_fp16(ggml_bf16_to_fp32(b[i])));
++        }
++    } else {
++        const auto* tr=ggml_get_type_traits(type);
++        size_t row=ggml_row_size(type,K);
++        raw.resize(N*row);
++        for(int r=0;r<N;++r) {
++            tr->from_float_ref(w.data()+r*K,raw.data()+r*row,K);
++            tr->to_float(raw.data()+r*row,w.data()+r*K,K);
++        }
++    }
++    Dev dx(xb.size()*2), dw(raw.size()), dy(T*N*4);
++    ck(cudaMemcpy(dx.p,xb.data(),xb.size()*2,cudaMemcpyHostToDevice));
++    ck(cudaMemcpy(dw.p,raw.data(),raw.size(),cudaMemcpyHostToDevice));
++    ck(cudaMemset(dy.p,0xff,T*N*4));
++    ck(cudaDeviceSynchronize()); // default-stream copies before the nonblocking compute stream
++    if(type==GGML_TYPE_BF16)
++        gemm.bf16((uint16_t*)dx.p,(uint16_t*)dw.p,(float*)dy.p,T,N,K);
++    else gemm.native((uint16_t*)dx.p,(int)type,dw.p,(float*)dy.p,T,N,K);
++    ck(cudaStreamSynchronize(stream));
++    if(type!=GGML_TYPE_BF16) {
++        std::vector<uint16_t> dq(N*K);
++        ck(cudaMemcpy(dq.data(),gemm.scratch(),dq.size()*2,cudaMemcpyDeviceToHost));
++        size_t diff=0;
++        double de=0, dr=0, dm=0;
++        for(size_t i=0;i<dq.size();++i) {
++            auto expected=ggml_fp32_to_fp16(w[i]);
++            diff+=dq[i]!=expected;
++            double ref=ggml_fp16_to_fp32(expected), got=ggml_fp16_to_fp32(dq[i]);
++            double d=got-ref; de+=d*d; dr+=ref*ref; dm=std::fmax(dm,std::fabs(d));
++        }
++        std::printf("%s GPU dequant FP16: %zu / %zu bits differ, rel_l2 %.6g max %.6g\n",ggml_type_name(type),diff,dq.size(),std::sqrt(de/dr),dm);
++        if(std::sqrt(de/dr)>.001 || !std::isfinite(de)) throw std::runtime_error("GPU FP16 dequant outside rounding tolerance");
++    }
++    std::vector<float> got(T*N);
++    ck(cudaMemcpy(got.data(),dy.p,T*N*4,cudaMemcpyDeviceToHost));
++    double err2=0, ref2=0, maxerr=0, zero=0;
++    for(int t=0;t<T;++t) for(int n=0;n<N;++n) {
++        double ref=0;
++        for(int k=0;k<K;++k) ref+=(double)x[t*K+k]*w[n*K+k];
++        double v=got[t*N+n];
++        if(!std::isfinite(v)) throw std::runtime_error("non-finite or unwritten FP16 output");
++        double d=v-ref; err2+=d*d; ref2+=ref*ref;
++        maxerr=std::fmax(maxerr,std::fabs(d));
++        if(t==T-1) zero=std::fmax(zero,std::fabs(v));
++    }
++    double rel=std::sqrt(err2/ref2), rms=std::sqrt(ref2/(T*N));
++    std::printf("%s %dx%d: rel_l2 %.6g max/rms %.6g zero %.6g\n",ggml_type_name(type),N,K,rel,maxerr/rms,zero);
++    if(rel>.003 || maxerr/rms>.02 || zero!=0) throw std::runtime_error("FP16 GPU numerical screen failed");
++}
++int main() {
++    int device = 0;
++    cudaDeviceProp prop{};
++    if (cudaGetDevice(&device) != cudaSuccess || cudaGetDeviceProperties(&prop, device) != cudaSuccess ||
++        prop.major != 6 || prop.minor != 0) {
++        std::printf("prefill_p100_test: requires a GP100 (sm_60), skipped\n");
++        return 77;
++    }
++    try {
++        cudaStream_t stream; ck(cudaStreamCreateWithFlags(&stream,cudaStreamNonBlocking));
++        {
++            int32_t *host=nullptr; void* alias=nullptr;
++            ck(cudaHostAlloc((void**)&host,8192*sizeof(int32_t),cudaHostAllocMapped));
++            ck(cudaHostGetDevicePointer(&alias,host,0));
++            Dev ids(8192*sizeof(int32_t)), logits(40*512*sizeof(float)), weights(40*10*sizeof(float));
++            ck(cudaMemsetAsync(logits.p,0,40*512*sizeof(float),stream));
++            strata::prefill::route((float*)logits.p,(int32_t*)ids.p,(float*)weights.p,40,512,stream);
++            ck(cudaStreamSynchronize(stream));
++            strata::prefill::copy_i32((int32_t*)alias,(int32_t*)ids.p,400,stream);
++            ck(cudaStreamSynchronize(stream));
++            for(int i=0;i<400;++i) if(host[i]!=i%10) throw std::runtime_error("mapped router ids differ");
++            ck(cudaFreeHost(host));
++            std::printf("P100 mapped host grouping and route passed\n");
++        }
++        {
++            strata::prefill::Gemm gemm; std::string err;
++            if(!gemm.init(stream,1280*2560,err)) throw std::runtime_error(err);
++            check(gemm,stream,GGML_TYPE_Q4_K,1280,2560);
++            check(gemm,stream,GGML_TYPE_Q5_K,1280,2560);
++            check(gemm,stream,GGML_TYPE_Q5_1,2560,640);
++            check(gemm,stream,GGML_TYPE_Q8_0,2560,640);
++            check(gemm,stream,GGML_TYPE_BF16,320,10240);
++        }
++        ck(cudaStreamDestroy(stream));
++        std::printf("P100 FP16 prompt route passed\n"); return 0;
++    } catch(const std::exception& e) { std::fprintf(stderr,"FAIL: %s\n",e.what()); return 1; }
++}
+diff --git a/tools/mtp_q8_runtime.py b/tools/mtp_q8_runtime.py
+new file mode 100644
+index 0000000..cfa1ab5
+--- /dev/null
++++ b/tools/mtp_q8_runtime.py
+@@ -0,0 +1,107 @@
++"""Adapt the existing shared Q8 GGUF draft head to Strata's Q2 runtime.
++
++Target-model weights are never changed. This adapter only accepts a blk.48 Q8 draft whose norms already include
++the Gemma +1 offset. It preserves those norms; it does not add the offset.
++"""
++import argparse
++import hashlib
++import json
++from pathlib import Path
++import numpy as np
++
++from _paths import add_gguf_py
++add_gguf_py()
++import gguf
++from mtp_pack import q2_0, dequant
++from mtp_rt import blob_of, H, FF, NE
++
++def bf16(x):
++    bits = np.asarray(x, dtype=np.float32).view(np.uint32)
++    return ((bits + 0x7fff + ((bits >> 16) & 1)) >> 16).astype(np.uint16)
++
++def main():
++    ap = argparse.ArgumentParser()
++    ap.add_argument('--gguf', required=True)
++    ap.add_argument('--out', required=True)
++    ap.add_argument('--norms-already-offset', action='store_true',
++                    help='Confirm that this GGUF already includes the Gemma +1 norm offset')
++    a = ap.parse_args()
++    if not a.norms_already_offset:
++        ap.error('This adapter requires --norms-already-offset; use mtp_rt.py for raw-norm drafts')
++    out = Path(a.out)
++    out.mkdir(parents=True, exist_ok=False)
++    reader = gguf.GGUFReader(a.gguf)
++    ts = {t.name.removeprefix('blk.48.'): t for t in reader.tensors}
++    for name in ('ffn_gate_exps.weight', 'ffn_up_exps.weight', 'ffn_down_exps.weight'):
++        if name not in ts or int(ts[name].tensor_type) != 8:
++            raise ValueError('Expected blk.48 Q8_0 expert tensors: ' + name)
++    report = {'source_name': Path(a.gguf).name, 'target_unchanged': True,
++              'expert_conversion': 'Q8_0 -> Q2_0 (Strata MSE quantizer)',
++              'norms': 'copied, GGUF Gemma +1 already applied', 'expert_error': []}
++    with (out / 'experts.bin').open('wb') as f:
++        for e in range(NE):
++            floats = [gguf.dequantize(np.asarray(ts[n].data[e]), ts[n].tensor_type)
++                      for n in ('ffn_gate_exps.weight', 'ffn_up_exps.weight', 'ffn_down_exps.weight')]
++            gu = q2_0(np.concatenate(floats[:2])).reshape(2*FF, H//64*18)
++            dn = q2_0(floats[2]).reshape(H, FF//64*18)
++            f.write(blob_of(gu, dn))
++            if e < 8:
++                ref = np.concatenate([x.reshape(-1) for x in floats])
++                got = np.concatenate([dequant('q2_0', gu, 2*FF*H), dequant('q2_0', dn, FF*H)])
++                report['expert_error'].append(float(np.sqrt(np.mean((ref-got)**2))/np.sqrt(np.mean(ref**2))))
++            if e % 32 == 0:
++                print(f'Expert {e}/{NE}', flush=True)
++    mapping = {
++        'attn_q.weight': 'self_attn.q_proj.weight', 'attn_k.weight': 'self_attn.k_proj.weight',
++        'attn_v.weight': 'self_attn.v_proj.weight', 'attn_output.weight': 'self_attn.o_proj.weight',
++        'attn_q_norm.weight': 'self_attn.q_norm.weight', 'attn_k_norm.weight': 'self_attn.k_norm.weight',
++        'ffn_down_shexp.weight': 'mlp.shared_expert.down_proj.weight',
++        'ffn_gate_shexp.weight': 'mlp.shared_expert.gate_proj.weight',
++        'ffn_up_shexp.weight': 'mlp.shared_expert.up_proj.weight',
++        'ffn_gate_inp.weight': 'mlp.gate.weight', 'ffn_gate_inp_shexp.weight': 'mlp.shared_expert_gate.weight',
++        'nextn.enorm.weight': 'pre_fc_norm_embedding.weight',
++        'nextn.hnorm.weight': 'pre_fc_norm_hidden.weight',
++    }
++    for gg, rt in [('hc_attn', 'attn_hyper_connection'), ('hc_ffn', 'mlp_hyper_connection'),
++                   ('nextn.hc_head', 'hyper_connection_mixer')]:
++        for suffix, name in [('down','input_mix_weight_down'), ('up','input_mix_weight_up'),
++                             ('norm','hc_norm')]:
++            mapping[f'{gg}_{suffix}.weight'] = f'{rt}.{name}.weight'
++        if not gg.startswith('nextn'):
++            mapping[f'{gg}_inject.weight'] = f'{rt}.block_inject_weight.weight'
++    entries = []
++    for src, dest in mapping.items():
++        t = ts[src]
++        shape = tuple(int(x) for x in t.shape[::-1])
++        rows, cols = (1, shape[0]) if len(shape)==1 else shape
++        if int(t.tensor_type)==8 and ('self_attn.' in dest or 'mlp.shared_expert.' in dest):
++            raw, kind = np.asarray(t.data).tobytes(), 'q8_0'
++        else:
++            x = gguf.dequantize(np.asarray(t.data), t.tensor_type)
++            if 'norm' in dest:
++                raw, kind = x.astype(np.float32).tobytes(), 'f32'
++            else:
++                raw, kind = bf16(x).tobytes(), 'bf16'
++        entries.append((dest, kind, rows, cols, raw))
++    # The GGUF combiner fuses [W_embedding | W_hidden] along columns.
++    t = ts['nextn.eh_proj.weight']
++    assert int(t.tensor_type)==8 and tuple(t.shape)==(2*H,H)
++    fused = np.asarray(t.data).reshape(H,2,H//32*34)
++    for i, name in enumerate(('fc_embedding.weight','fc_hidden.weight')):
++        entries.append((name,'q8_0',H,H,np.ascontiguousarray(fused[:,i,:]).tobytes()))
++    off, lines = 0, []
++    with (out/'dense.bin').open('wb') as f:
++        for name, kind, rows, cols, raw in entries:
++            pad = (-off)%256
++            f.write(b'\0'*pad)
++            off += pad
++            lines.append(f'{name} {kind} {rows} {cols} {off} {len(raw)}')
++            f.write(raw)
++            off += len(raw)
++    (out/'dense.txt').write_text('\n'.join(lines)+'\n',encoding='utf-8')
++    report['files'] = {p.name: {'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()}
++                       for p in out.iterdir() if p.is_file()}
++    (out/'conversion-local.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
++    print(f'Done: {len(entries)} dense tensors, {NE} experts, {off} dense bytes',flush=True)
++
++if __name__=='__main__': main()

@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-7a6264994e4b4e4a9f301221",
+  "object": "chat.completion",
+  "created": 1791137802,
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Sous le soleil ardent, dans l’ombre des racines,\nUn peuple minuscule, aux forces divines,\nS’agite sans relâche, silencieux et fier,\nPortant le poids du monde sur son dos léger.\n\nElles marchent en file, noires comme l’encre,\nSur les chemins de terre, aux sentiers de pierre.\nChacune est un soldat, une ouvrière fidèle,\nAu service du tout, de la reine éternelle.\n\nLeurs antennes se touchent, langage des secrets,\nUn code olfactif, précis et parfait.\nElles transportent des graines, des feuilles, des trésors,\nBâtissant des cathédrales sous le ciel d’or.\n\nPas de repos, pas de trêve, pas de sommeil,\nSeulement le devoir, le travail, le soleil.\nElles soulèvent des fardeaux cent fois plus lourds,\nDéfiant la gravité, défiant le cours.\n\nDans la fourmilière, le cœur bat fort,\nUn organisme unique, un seul corps.\nChaque membre compte, chaque geste est vital,\nPour la survie du groupe, pour l’idéal.\n\nNous les regardons passer, indifférents parfois,\nSans voir la grandeur de leurs exploits.\nPourtant, dans leur humilité, dans leur labeur,\nSe cache une sagesse, une force, une fleur.\n\nApprenons d’elles l’union, la patience,\nLa force tranquille de la persévérance.\nCar même le plus petit, uni à ses frères,\nPeut déplacer les montagnes, briser les barrières.\n\nRespectons ces géants de l’ombre et du sol,\nMaîtres du temps, gardiens du rôle.\nDans leur silence, une leçon résonne,\nL’unité est la clé, la force qui étonne."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 26,
+    "completion_tokens": 426,
+    "total_tokens": 452,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 26,
+    "prompt_ms": 490.1,
+    "prompt_per_token_ms": 18.85,
+    "prompt_per_second": 53.1,
+    "predicted_n": 426,
+    "predicted_ms": 15062.5,
+    "predicted_per_token_ms": 35.358,
+    "predicted_per_second": 28.3,
+    "draft_n": 472,
+    "draft_n_accepted": 191
+  }
+}

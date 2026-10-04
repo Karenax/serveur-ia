@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-5f0b8b5b52234230b3f619e1",
+  "object": "chat.completion",
+  "created": 1791144941,
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Sous le soleil de midi, quand l’air tremble de chaleur,\nUn peuple minuscule s’agite avec ferveur.\nLoin des regards humains, loin des bruits de la ville,\nIls bâtissent leur empire, humble et fragile.\n\nNoires comme l’encre, agiles comme l’éclair,\nElles suivent le chemin tracé par l’air.\nUn fil invisible, parfumé de mystère,\nGuide leurs pas sûrs vers la lumière.\n\nChacune porte sa charge, fardeau trop lourd pour elle,\nMais ensemble, elles soulèvent le monde, sans querelle.\nUne miette de pain, une graine dorée,\nDevient trésor sacré, précieuse et adorée.\n\nLeurs antennes se touchent, langage silencieux,\nUn échange d’idées, un lien précieux.\nPas de chef qui commande, pas de roi qui trône,\nMais une intelligence collective, unique et personne.\n\nElles creusent la terre, tissent des galeries,\nProtègent le nid, gardiennes de la vie.\nQuand l’orage gronde et que le ciel se voile,\nElles rentrent en hâte, sans perdre la boussole.\n\nPetites ouvrières du grand théâtre du monde,\nElles nous enseignent l’ordre, la force profonde.\nDans leur labeur constant, dans leur union parfaite,\nSe cache une sagesse que l’homme a faite.\n\nRespectons ces géantes, si petites aux yeux,\nCar dans leur humilité, réside le mieux.\nElles nous rappellent que la force est dans le groupe,\nQue le travail partagé est le plus beau coup.\n\nAinsi, quand vous verrez une file noire passer,\nNe les écrasez pas, laissez-les avancer.\nCar dans leur petit corps bat un cœur immense,\nCelui de la nature, dans sa pure essence."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 26,
+    "completion_tokens": 426,
+    "total_tokens": 452,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 26,
+    "prompt_ms": 982.6,
+    "prompt_per_token_ms": 37.792,
+    "prompt_per_second": 26.5,
+    "predicted_n": 426,
+    "predicted_ms": 15335.7,
+    "predicted_per_token_ms": 35.999,
+    "predicted_per_second": 27.8,
+    "draft_n": 265,
+    "draft_n_accepted": 171
+  }
+}

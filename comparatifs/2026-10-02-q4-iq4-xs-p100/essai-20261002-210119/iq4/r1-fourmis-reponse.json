@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-94e23d2f67134917a3b0ef51",
+  "object": "chat.completion",
+  "created": 1790972204,
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Sous le soleil ardent, dans l’ombre des racines,\nUn peuple minuscule, aux forces divines,\nS’agite sans relâche, silencieux et fier,\nPortant sur ses épaules le poids de l’univers.\n\nElles marchent en file, noires comme l’encre,\nSur les chemins de terre, aux bords des haies sombres.\nChacune est un soldat, une ouvrière, une reine,\nUnies par un instinct, une loi souveraine.\n\nElles soulèvent des grains plus lourds qu’elles-mêmes,\nDépassant les obstacles, franchissant les systèmes.\nPas de repos, pas de trêve, pas de plainte au vent,\nSeulement le labeur, constant et dévorant.\n\nLeurs antennes se touchent, langage des ténèbres,\nÉchangeant des secrets, des ordres, des ténèbres.\nElles construisent des cathédrales de terre,\nDes labyrinthes profonds, mystérieux et fiers.\n\nL’homme les regarde, géant indifférent,\nSans voir la grandeur de ce monde vivant.\nIl piétine parfois, sans le vouloir vraiment,\nCe peuple dévoué, humble et pourtant puissant.\n\nMais quand la pluie tombe, quand le ciel se voile,\nElles rentrent chez elles, sans perdre la parole.\nElles stockent la nourriture, préparent l’avenir,\nDans la nuit profonde, prêtes à souffrir.\n\nCar la fourmi sait que la vie est courte,\nQue chaque seconde compte, que chaque effort porte.\nElle ne rêve pas de gloire ni de couronne,\nMais de survie pure, de force qui résonne.\n\nAinsi va le monde, petit et immense,\nOù la patience seule est la vraie puissance.\nRespectez ces créatures, gardiennes du sol,\nCar dans leur humilité, réside le contrôle."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 26,
+    "completion_tokens": 440,
+    "total_tokens": 466,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 26,
+    "prompt_ms": 857.5,
+    "prompt_per_token_ms": 32.981,
+    "prompt_per_second": 30.3,
+    "predicted_n": 440,
+    "predicted_ms": 15812.3,
+    "predicted_per_token_ms": 35.937,
+    "predicted_per_second": 27.8,
+    "draft_n": 311,
+    "draft_n_accepted": 171
+  }
+}

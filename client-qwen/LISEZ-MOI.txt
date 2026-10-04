@@ -1,0 +1,86 @@
+Accès serveur Fred — version 3.5.1
+
+WireGuard utilise un emplacement permanent dans %LOCALAPPDATA%\AccesServeurFred\WireGuard.
+Windows conserve ainsi l'autorisation entre les lancements. Une première autorisation
+peut être nécessaire pour cet emplacement ou si le moteur WireGuard change.
+
+Lancez l’EXE personnel remis par le serveur. Il contient les clés du destinataire
+et se connecte automatiquement par WireGuard. Aucun compte ni mot de passe à saisir.
+Chaque destinataire possède un accès distinct, révocable depuis la console serveur.
+
+La fenêtre est organisée par fonction :
+- Conversations : chatbot intégré, recherche, renommage, suppression avec annulation,
+  copie des messages, import/export, réflexion, arrêt et nouvelle tentative.
+- Projets : discussions publiées, consignes, documents éditables, fichiers et mémoire choisie.
+- Assistants : Général, Rédaction, Code, Analyse et Recherche, configurables sur le serveur.
+- Correcteur : texte français, correction grammaticale et orthographique, reformulations
+  professionnelle ou amicale, copie et conservation des résultats.
+- Tâches : travail serveur client fermé, résultats, pause, annulation et planification.
+- Réglages : accès personnel, connexion, mises à jour et API locale pour les autres applications.
+
+Dans le chat, choisissez un projet et un assistant. Les passages utiles des documents
+du projet alimentent la réponse et s'affichent avec leurs références. Toutes les conversations sont enregistrées automatiquement
+sur le serveur, même sans projet. Enregistrer au projet ajoute une discussion au
+projet choisi. Une copie locale chiffrée conserve les modifications hors connexion
+et se synchronise à la reconnexion, sans écraser les changements d'un autre poste.
+
+Projets accepte TXT, Markdown, DOCX et PDF texte, jusqu'à 2 Mo. Les PDF scannés
+demandent un OCR préalable. Les notes s'enregistrent automatiquement avec contrôle
+de révision ; les brouillons sont chiffrés localement. Comparez avec le serveur en
+cas de conflit. Une révision proposée par l'IA doit être acceptée avant de remplacer
+le document. Les fichiers et projets du serveur sont accessibles à son administrateur.
+
+Les tâches restent disponibles client fermé. Les tâches interrompues par une panne
+attendent une relance explicite. La recherche web nécessite une autorisation serveur ;
+avec une URL HTTPS publique, aucune clé de recherche n'est nécessaire. La recherche
+par sujet utilise une clé Brave configurée sur le serveur. Les exports sont en texte
+ou Markdown. Voir ../lanceur/ESPACES-FRED.txt pour les limites et réglages.
+
+Automatique privilégie le réseau local quand il est utilisable, puis l’adresse Internet.
+Sur le serveur lui-même, il essaie localhost. La clé publique du serveur reste vérifiée
+après un changement d’adresse. Les modèles sont annoncés par le serveur.
+Le diagnostic distingue modèle arrêté, tunnel indisponible, accès révoqué ou expiré.
+
+Toutes les conversations sont synchronisées sur le serveur par accès personnel.
+Les copies locales et les réglages sont chiffrés par Windows DPAPI pour votre compte Windows.
+Le thème, la police, la taille, la réflexion, la navigation et le brouillon du correcteur
+sont conservés après fermeture. Les historiques sont inclus dans les sauvegardes du serveur.
+Le dossier LOCALAPPDATA/QwenClient est conservé pour la compatibilité.
+Un historique illisible n’est jamais remplacé silencieusement : l’action de récupération
+conserve le fichier chiffré original. Deux fenêtres ne peuvent pas écraser la même
+révision ; en cas de conflit, exportez votre travail puis rechargez l’application.
+L’export JSON est lisible, sans chiffrement. Maximum : 200 conversations et 9 Mo.
+La fermeture normale attend l’enregistrement complet de l’historique.
+
+Dans Réglages > Mises à jour, cliquez Vérifier puis Mettre à jour le client si une version est
+proposée. Signature Ed25519, taille et SHA-256 sont vérifiés avant installation.
+Les clés personnelles sont conservées. L’ancienne version reste archivée et est
+restaurée si la nouvelle fenêtre ne confirme pas son démarrage. Une mise à jour
+ou un changement d’adresse attend la fin des requêtes de génération.
+Une mise à jour conserve le chemin de votre EXE existant. Les nouveaux téléchargements
+portent le nom « Accès serveur Fred - identifiant.exe ».
+
+Gardez l’application ouverte pour son API locale, généralement
+http://127.0.0.1:8081/v1. Un port libre jusqu’à 8090 est choisi si nécessaire.
+Utilisez la clé locale affichée dans API locale. Elle diffère de la clé distante intégrée.
+Fermer l’application ferme le tunnel et l’API locale.
+
+Votre EXE est votre clé d’accès. Remettez-le uniquement à son destinataire.
+La base dist/Accès serveur Fred.exe ne contient aucun profil et sert à la compilation.
+Distribuez exclusivement les EXE personnels générés dans la console serveur.
+
+Technologies : Python 3.12, HTML/CSS/JavaScript dans pywebview/WebView2 et WireGuard Go
+avec pile réseau en mémoire. Aucun pilote VPN ni droit administrateur côté client.
+Microsoft Edge WebView2 Runtime doit être présent.
+Sources applicatives MIT : LICENSE.txt ; dépendances : THIRD-PARTY.txt.
+Compilation Windows x64 : Build-WireGuard.ps1 puis Build-Client.ps1.
+Audit et vérifications : ../lanceur/AUDIT-FRED.txt.
+
+Interface 3.5.0 : mise en page Markdown, choix de police et taille du texte,
+correcteur et diagnostic de connexion dans le voyant supérieur. Navigation compacte, thèmes clair/sombre/Windows, menus contextuels,
+projets par onglets et filtres de tâches. Voir ../lanceur/REFONTE-INTERFACE.txt.
+
+Un EXE distinct par personne ou PC utilisé simultanément. Copier le même EXE
+partage la même identité WireGuard et peut détourner les réponses vers l’autre poste.
+Aucun plafond de tokens par réponse : la capacité de contexte du modèle reste finie.
+Voir ../lanceur/NOUVEAUTES-3.5.0.txt.

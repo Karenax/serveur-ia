@@ -1,0 +1,20 @@
+[
+  {
+    "mode": "cache-auto-mtp",
+    "case": "ciel",
+    "median_tps": 26.00845255434392,
+    "output_tokens": [
+      256,
+      256
+    ]
+  },
+  {
+    "mode": "cache-auto-mtp",
+    "case": "fibonacci",
+    "median_tps": 19.222444920600893,
+    "output_tokens": [
+      256,
+      256
+    ]
+  }
+]

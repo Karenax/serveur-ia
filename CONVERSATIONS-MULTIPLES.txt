@@ -1,0 +1,62 @@
+Diagnostic du 3 octobre 2026 — serveur Strata sur les deux Tesla P100
+
+Constat mesuré sur le serveur actif http://127.0.0.1:8080 :
+Deux requêtes HTTP ont été envoyées simultanément, chacune avec son propre
+historique et un mot de réponse distinct. Pendant le test, /status indiquait
+busy=true, queued=1. Les réponses VIOLET et ORANGE sont arrivées respectivement
+après 1,27 et 2,47 secondes, sans mélange des réponses.
+L'API accepte donc plusieurs demandes, mais le moteur les traite successivement.
+Le verrou Service.fifo dans Strata-src/serve/server.py protège le moteur partagé.
+
+Le chat Web avait en plus un seul historique local, une seule variable busy et
+un bouton nouveau chat bloqué pendant une réponse. Ce blocage est corrigé :
+- menu Conversations pour retrouver chaque historique ;
+- nouveau chat disponible pendant une réponse ;
+- une demande indépendante par conversation, poursuivie en arrière-plan ;
+- arrêt limité à la conversation sélectionnée ;
+- sauvegarde des conversations et migration de l'ancien historique ;
+- conservation des conversations sauvegardées depuis d'autres onglets.
+Les brouillons restent disponibles pendant les changements de chat dans la page.
+Les pièces jointes ne sont pas conservées intégralement après rechargement,
+comme dans l'interface précédente. Un rechargement coupe les demandes en cours.
+Les historiques du chat Web sont locaux au navigateur, pas synchronisés entre appareils.
+
+Utilisation actuelle : recharger le chat Strata, puis utiliser Nouveau chat et
+le menu Conversations. Les fichiers Web sont servis directement : aucun
+redémarrage du modèle n'est nécessaire. Les demandes attendent toujours leur tour.
+
+Pour deux réponses progressant réellement en parallèle :
+Le moteur Café/llama.cpp déjà compilé accepte --parallel et --cont-batching.
+Ses lanceurs imposaient -np 1. Ils acceptent désormais -Parallel et -Context.
+Après arrêt volontaire de Strata, la commande suivante prépare deux séquences
+avec un contexte TOTAL de 8192 tokens (environ 4096 par séquence) :
+
+  .\Start-Qwen.ps1 -SansMTP -Parallel 2 -Context 8192
+
+Le lancement avec MTP reste disponible en omettant -SansMTP. Les valeurs par
+défaut restent une séquence et un contexte total de 4096 pour Café.
+Ce mode n'a PAS été chargé ni mesuré sur les P100 pendant ce diagnostic :
+le serveur Strata actif est conservé. La mémoire et le débit à deux séquences
+restent à vérifier. Le contexte 262144 actuel de Strata n'est pas conservé
+par cet exemple Café. Les performances Café à une séquence étaient plus faibles
+dans les comparatifs précédents ; cela ne mesure pas son débit à deux séquences.
+
+Pour conserver Strata et obtenir une génération entrelacée, il faut développer
+un ordonnanceur avec état KV/récurrent/MTP indépendant pour chaque séquence,
+et gérer équitablement prefill, decode et annulation. Son cache de conversations
+ne fournit pas à lui seul cette concurrence. Retirer le verrou ne suffit pas.
+Lancer plusieurs moteurs Strata dupliquerait les ressources ; ce n'est pas
+validé avec l'occupation RAM/VRAM actuelle.
+
+Validation effectuée :
+- test réel de deux requêtes concurrentes sur Strata actif ;
+- node Strata-src/serve/test_chat_conversations.cjs : migration, deux flux SSE
+  différés, isolation, changement de chat pendant une réponse, sauvegarde,
+  brouillon, rechargement, conservation d'un autre onglet et arrêt ;
+- tests Python StatusHandover et ClientHangUp : trois tests réussis ;
+- Test-Qwen-Parallel.ps1 : arguments à deux séquences et défauts vérifiés,
+  sans lancement de modèle ni modification de fichier PID ;
+- aide du binaire Café : --parallel et --cont-batching confirmés ;
+- syntaxe JavaScript et PowerShell, git diff --check vérifiés.
+Le contrôle visuel du chat Windows n'a pas pu être réalisé : le navigateur
+automatisé disponible rejoint un autre service localhost (llama-ui).

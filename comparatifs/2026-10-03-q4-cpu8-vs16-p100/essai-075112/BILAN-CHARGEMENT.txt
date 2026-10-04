@@ -1,0 +1,10 @@
+﻿Cache natif contigu sur C: : 71,73 Gio de poids experts, quantification conservée.
+Fichier relu intégralement : SHA256 81c269e6cc30e29e048ea2b15fe4c4641c851437d2e8de6a44dfd9d51304afab.
+Poids denses, métadonnées et tokenizer : les dix fichiers recopiés sont identiques aux originaux.
+La table n-gram reste lue depuis les GGUF sur D: au démarrage, puis verrouillée en RAM.
+Ce redémarrage : lancement 09:55:17, initialisation CUDA et affinités validées à 10:15:56, environ 20 min 39 s.
+Le précédent chargement HDD a duré environ 69 minutes avec plusieurs aides de prélecture.
+Ces durées sont indicatives : caches Windows différents, aucune purge pour un test à froid contrôlé.
+Serveur final : Q4_K_XL, contexte 4096, MTP activé, sept travailleurs experts et thread principal sur huit cœurs répartis.
+Qualité : aucun expert retiré, aucune nouvelle quantification ; les trois réponses de benchmark sont identiques à la référence.
+Contexte maximal 262144 : estimation de +7 Gio de VRAM pour les buffers/KV actuels, cache GPU experts réduit, RAM moteur estimée 90–92 Gio hors OS ; pas mesuré.

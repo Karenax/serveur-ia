@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-f809fb21ba2f4688b479b846",
+  "object": "chat.completion",
+  "created": 1791136915,
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Sous le soleil ardent, dans l’ombre des racines,\nUn peuple minuscule, aux forces divines,\nS’agite sans relâche, silencieux et fier,\nPortant le poids du monde sur son dos léger.\n\nElles marchent en file, noires comme l’encre,\nSur les sentiers de terre, aux bords de l’enceinte.\nChacune a sa tâche, chacune a son rôle,\nDans ce vaste empire, nul n’est seul, nul ne s’envole.\n\nLa reine trône au fond, mère de la légion,\nTissant les fils du destin, de la première à la fin.\nLes ouvrières infatigables, aux mandibules d’acier,\nTransportent les graines, les feuilles, le blé.\n\nElles construisent des cathédrales sous la terre,\nDes galeries complexes, un labyrinthe mystère.\nAucun architecte ne dessine leurs plans,\nPourtant, chaque pierre est posée avec élan.\n\nQuand la pluie menace, elles barricadent l’entrée,\nProtégeant le trésor, la vie, la vérité.\nSolidarité parfaite, instinct ancestral,\nUn seul cœur bat pour eux, un seul idéal.\n\nNous les regardons passer, indifférents parfois,\nSans voir la grandeur de leurs exploits.\nPourtant, dans leur humilité, dans leur labeur constant,\nElles nous enseignent la force du temps.\n\nPetites créatures, géantes par l’esprit,\nElles nous rappellent que la vie est un écrit.\nChaque pas compte, chaque grain est un don,\nDans le grand théâtre de la création.\n\nRespectons ces reines, ces guerrières, ces sœurs,\nQui portent le monde avec tant de douceur.\nCar dans la fourmilière, comme dans notre cœur,\nC’est l’union qui fait la vraie grandeur."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 26,
+    "completion_tokens": 432,
+    "total_tokens": 458,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 26,
+    "prompt_ms": 2219.6,
+    "prompt_per_token_ms": 85.369,
+    "prompt_per_second": 11.7,
+    "predicted_n": 432,
+    "predicted_ms": 28573.9,
+    "predicted_per_token_ms": 66.143,
+    "predicted_per_second": 15.1,
+    "draft_n": 480,
+    "draft_n_accepted": 191
+  }
+}

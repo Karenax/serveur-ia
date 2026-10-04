@@ -1,0 +1,48 @@
+{
+  "label": "normal-ngram-ssd-0.1.35+hybride-ctx262144",
+  "repeat": 1,
+  "test": "fibonacci",
+  "elapsed_seconds": 8.717849800013937,
+  "generation_tps": 34.514372000215715,
+  "prompt_tps": 35.8,
+  "prompt_tokens": 46,
+  "output_tokens": 256,
+  "max_tokens": 256,
+  "finish_reason": "length",
+  "drafts": 189,
+  "accepted": 156,
+  "mtp_acceptance": 0.8253968253968254,
+  "cpu_expert_jobs": 74753,
+  "ram_gpu_experts": 0,
+  "cpu_average_cores": 13.755900566193315,
+  "engine_io_read_bytes": 17469684,
+  "ram_peak_gib": 50.3011474609375,
+  "vram_peak_gib": {
+    "0": 14.726318359375,
+    "1": 14.87091064453125
+  },
+  "answer_sha256": "3c57ecf4b37e34e0962f3c90c8c78b2fe8261ce2992115c4459d0dd314d50a62",
+  "warmup": true,
+  "system_ram_peak_gib": 67.42161178588867,
+  "ngram_helper_peak_gib": 0.0,
+  "gpu_observations": {
+    "0": {
+      "temperature_max_c": 47,
+      "sm_min_busy_mhz": 1328,
+      "sm_max_mhz": 1328,
+      "power_max_w": 102.823,
+      "throttle_masks": [
+        0
+      ]
+    },
+    "1": {
+      "temperature_max_c": 51,
+      "sm_min_busy_mhz": 1328,
+      "sm_max_mhz": 1328,
+      "power_max_w": 121.653,
+      "throttle_masks": [
+        0
+      ]
+    }
+  }
+}

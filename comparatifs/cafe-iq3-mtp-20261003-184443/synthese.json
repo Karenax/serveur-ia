@@ -1,0 +1,20 @@
+[
+  {
+    "mode": "mtp",
+    "case": "ciel",
+    "median_tps": 23.235505173925443,
+    "output_tokens": [
+      256,
+      256
+    ]
+  },
+  {
+    "mode": "mtp",
+    "case": "fibonacci",
+    "median_tps": 16.811724806645977,
+    "output_tokens": [
+      256,
+      256
+    ]
+  }
+]

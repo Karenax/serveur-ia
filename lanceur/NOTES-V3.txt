@@ -1,0 +1,60 @@
+Qwen serveur et client — version 3.0.0
+4 octobre 2026
+
+UTILISATION
+
+1. Dans la console serveur, onglet accès distant, créer ou sélectionner un client.
+2. Renseigner son identifiant et son mot de passe (12 à 256 caractères), puis enregistrer son compte.
+3. Télécharger son EXE personnel et le remettre au destinataire. Les anciens accès conservent leurs clés WireGuard.
+4. Le destinataire ouvre l'application et se connecte. Le chat s'affiche directement dans la fenêtre Windows.
+5. Les versions suivantes sont détectées après connexion, puis toutes les dix minutes. « Mettre à jour le client » télécharge, vérifie et installe la version publiée par ce serveur.
+
+La migration depuis le client 2.0 nécessite une première redistribution de l'EXE : cet ancien client ne possède ni connexion par compte ni système de mise à jour. Aucun mot de passe n'est inventé ou inséré dans les EXE existants ; l'administrateur le choisit dans la console.
+
+COMPTES
+
+Un compte est associé à un accès client personnel. Identifiant unique, hash scrypt avec sel aléatoire, sessions de douze heures conservées en mémoire, cinq tentatives infructueuses sur cinq minutes. Un changement de mot de passe ou la désactivation du compte invalide les sessions et annule les demandes de cet accès. Le redémarrage de la console nécessite une reconnexion.
+
+Le jeton personnel et le tunnel restent nécessaires, mais ne suffisent plus à utiliser le modèle. Les routes de connexion sont les seules accessibles sans session. La clé API locale pour les autres applications est affichée dans les réglages du client ; ces applications bénéficient de la session ouverte dans le client.
+
+MISES À JOUR
+
+Le script Build-Client.ps1 compile le binaire de base et produit un manifeste signé Ed25519. La clé privée est protégée par DPAPI sur le serveur ; sa clé publique est intégrée au profil personnel. Le déploiement vérifie le manifeste existant, sans recalculer une nouvelle référence de confiance.
+
+Le téléchargement nécessite une connexion client. Le client contrôle la signature, la version, la taille et SHA-256, conserve son profil, quitte et laisse un assistant séparé remplacer l'EXE. L'assistant contrôle de nouveau le fichier et lance son autotest avant remplacement. Une copie .previous-VERSION.exe reste disponible. Une erreur de remplacement ou de lancement rétablit le fichier précédent. Une erreur de l'autotest laisse l'ancien EXE intact. Les chemins d'installation doivent rester inscriptibles pour le compte Windows qui utilise le client.
+
+L'historique est enregistré séparément, chiffré avec DPAPI, et conservé après mise à jour. Aucune sauvegarde du mot de passe ou de la session n'est créée. WebView2 Runtime est nécessaire à la fenêtre native ; Windows et Edge le fournissent souvent déjà. Le client indique son absence explicitement.
+
+CORRECTIONS DE L'AUDIT
+
+- Écriture JSON atomique avec fichiers temporaires uniques, pour les accès concurrents.
+- Restauration sous verrou, validation avant écriture et retour automatique à l'état précédent en cas d'erreur.
+- Sauvegarde des comptes, des options d'exploitation, de la clé de signature et des profils restaurés même en l'absence d'EXE.
+- Préparation des clients transactionnelle ; archives immuables identifiées par version et empreinte, retour contrôlé par SHA-256.
+- Annulation ciblée par identifiant de demande ; une annulation tardive ne touche pas la génération suivante.
+- Réponses bloquées annulées après 120 secondes sans données, avec limite totale de quinze minutes ; le watchdog peut ensuite relancer un moteur malade.
+- Budget de relances enregistré sur disque, et derniers réglages validés conservés après un chargement réussi.
+- Inventaire des processus moins coûteux et cache de cinq secondes pour la consultation ; décisions de démarrage et d'arrêt fondées sur un inventaire frais.
+- Empreintes de versions mises en cache selon l'identité du fichier ; modification du fichier invalide le cache.
+- Historique enregistré avec temporisation, conversation sélectionnée persistante et messages partiels conservés après annulation.
+- Messages distincts pour accès expiré, suspendu, révoqué, session expirée et modèle non chargé ; compteurs séparés de succès, échecs et annulations.
+
+PROJETS ÉTUDIÉS
+
+pywebview : https://github.com/r0x0r/pywebview
+Licence BSD 3 clauses. Retenu pour intégrer notre interface HTML existante dans une fenêtre native Python avec WebView2. Aucun serveur de chat supplémentaire n'est nécessaire.
+Installation : https://pywebview.flowrl.com/guide/installation.html
+Sécurité : https://pywebview.flowrl.com/guide/security.html
+
+Chatbox : https://github.com/ChatboxAI/chatbox
+Projet de chat Electron sous GPLv3. Consulté comme référence ; son code n'a pas été incorporé, afin de conserver notre client Python et notre protocole WireGuard.
+
+Les licences des composants distribués se trouvent dans client-qwen/THIRD-PARTY.txt. Les versions de dépendances sont fixées dans requirements-build.txt.
+
+VALIDATION
+
+Tests isolés de comptes, sessions, révocation, suspension, file, streaming et vrai tunnel WireGuard ; restauration avec panne injectée ; signature et corruption ; remplacement d'un véritable EXE compilé avec conservation du profil et de l'ancienne version ; contrôle de la fenêtre native WebView2 compilée. Aucun test ne sollicite l'inférence du modèle de production.
+
+Le démarrage automatique reste lié à l'ouverture de la session Windows qui détient les secrets DPAPI du serveur. Le déploiement de cette version redémarre la console uniquement et préserve le modèle chargé.
+
+Résultats du déploiement : 34 tests réussis, fenêtre WebView2 et mise à jour réelle vérifiées, modèle toujours chargé, état serveur mesuré à 0,062–0,063 seconde, manifeste signé vérifié et clés du client existant conservées. Le nettoyage automatique des deux dossiers de tests natifs et du fichier .chat-syntax.js a été refusé par la politique du système ; ils restent des artefacts de test isolés.

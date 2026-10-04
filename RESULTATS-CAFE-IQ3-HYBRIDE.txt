@@ -1,0 +1,50 @@
+Cafe hybride IQ3_S - 3 octobre 2026
+
+Outils de compilation portables sur D :
+  D:\Serveur IA\toolchain\msvc (MSVC 19.44.35229, SDK 10.0.22621.0)
+  D:\Serveur IA\toolchain\ninja-1.12.1
+  D:\Serveur IA\toolchain\Build-Environment.cmd
+Fichiers temporaires de compilation : D:\Temp\cafe-build.
+Aucune installation de Visual Studio sur C.
+Les paquets proviennent des manifestes Microsoft et leurs SHA256 sont verifies.
+
+Nouveau module CUDA : cafe-build-p100-hybride\bin\ggml-cuda.dll.
+moe-direct.cu est recompile sans GGML_CUDA_MOE_DIRECT_GPU_ONLY, puis relie
+aux 154 autres objets CUDA existants. Le lien ajoute ggml.lib pour l'acces
+au registre des peripheriques CPU. Le binaire GPU seul reste disponible.
+Build-Cafe-Hybride-P100.cmd permet de reproduire cette reconstruction.
+build-hybride.json conserve l'empreinte du module; le lanceur la verifie.
+
+Lancer le mode retenu : .\Start-Cafe-IQ3-Hybride-P100.ps1
+Arreter : .\Stop-Cafe-IQ3-P100.ps1
+Interface/API : http://127.0.0.1:8080
+
+Modele principal : les deux fichiers GSQ-RCO-IQ3_S dans C:\Temp.
+MTP Q8_0 active, contexte 4096, une conversation.
+Cache GPU automatique, 1024 Mio de reserve par carte.
+Les experts en cache sont calcules sur GPU; tous les experts absents sont
+calcules sur CPU, avec 15 travailleurs par GPU (deux pools).
+
+Premiere validation, medianes de deux repetitions apres chauffe, 256 tokens,
+temperature 0, seed 42, cache de prompt et thinking desactives :
+  CPU 100% des absents, 15 travailleurs/GPU : ciel 22.57, Fibonacci 22.10 tok/s.
+  CPU 25% des absents, 8 travailleurs/GPU   : ciel 22.31, Fibonacci 19.17 tok/s.
+Le premier partage est retenu pour sa meilleure vitesse sur ces deux essais.
+
+CPU confirme dans les logs par md_cpu_create pour les deux GPU.
+Temps CPU moyen pendant les requetes (attentes actives incluses) :
+  premier partage : environ 9.3-10.6 coeurs equivalents pour ciel,
+                    12.8-13.0 pour Fibonacci.
+  second partage : environ 5.6-5.9 et 7.0 coeurs equivalents.
+VRAM observee : 15236 et 15170 Mio. La trace du second partage montre des
+pointes de charge GPU de 99 et 100%; ce ne sont pas des moyennes continues.
+
+Archives :
+comparatifs\cafe-iq3-hybride-mtp-20261003-191852 (CPU 100%, 15 travailleurs)
+comparatifs\cafe-iq3-hybride-mtp-20261003-192908 (CPU 25%, 8 travailleurs)
+
+Le mode hybride ne gagne pas sur tous les textes : Cafe GPU seul avec MTP
+et cache auto avait donne 26.01 / 19.22 tok/s. Le mode hybride retenu est
+plus rapide sur Fibonacci et plus lent sur ciel. Strata hybride IQ3 etait
+a environ 29.4 / 35.6 tok/s, avec un draft MTP converti different.
+Confirmation finale : ciel 22,54 / Fibonacci 22,13 tok/s. Serveur hybride actif, PID 46148. Archive cafe-iq3-hybride-mtp-20261003-193704.

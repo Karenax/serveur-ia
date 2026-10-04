@@ -1,0 +1,7 @@
+Pour comprendre pourquoi le ciel change de couleur, il faut d'abord savoir que la lumière du soleil, bien qu'elle paraisse blanche, est en réalité composée de toutes les couleurs de l'arc-en-ciel. Chaque couleur correspond à une longueur d'onde différente : le violet et le bleu ont des longueurs d'onde courtes, tandis que le rouge et l'orange ont des longueurs d'onde longues.
+
+Lorsque cette lumière traverse l'atmosphère terrestre, elle entre en collision avec les molécules de gaz (principalement l'azote et l'oxygène) et les petites particules en suspension. Ce phénomène s'appelle la **diffusion de Rayleigh**. La règle physique est simple : plus la longueur d'onde est courte, plus la lumière est diffusée (dispersée) dans toutes les directions par les molécules de l'air.
+
+### Pourquoi le ciel est bleu en journée
+
+Pendant la journée, le soleil est haut dans le ciel. La lumière traverse une couche relativement fine d'atmosphère. Les couleurs à longueurs d'onde courtes, comme le **bleu** et le violet, sont beaucoup plus diffusées que les couleurs à longueurs d'onde

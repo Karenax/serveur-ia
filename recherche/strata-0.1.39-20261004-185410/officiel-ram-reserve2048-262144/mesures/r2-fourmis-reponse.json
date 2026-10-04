@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-1cc2ac0b1be3469582379723",
+  "object": "chat.completion",
+  "created": 1791138516,
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Sous le soleil de midi, quand l’air tremble de chaleur,\nUn peuple minuscule s’agite avec ferveur.\nLoin des regards humains, loin des bruits de la ville,\nIls bâtissent leur empire, humble et fragile.\n\nNoires comme l’encre, agiles comme l’éclair,\nElles suivent le chemin tracé par leurs pères.\nChacune porte un fardeau bien plus lourd qu’elle-même,\nUn grain de sable, une feuille, un trésor suprême.\n\nPas de repos, pas de trêve, pas de plainte au vent,\nSeule la loi du groupe guide leur mouvement.\nAntenne contre antenne, elles se parlent sans mots,\nUn langage silencieux, ancien et beau.\n\nElles ignorent la peur, elles ignorent le doute,\nMarchant d’un pas certain, sans jamais se dégoûter.\nSi l’une tombe à terre, mille mains la relèvent,\nCar dans cette fourmilière, nul ne se soulève.\n\nLeur palais de terre s’élève sous nos pieds,\nUn labyrinthe secret, mystérieux et lié.\nElles stockent l’avenir, elles préparent l’hiver,\nDans l’ombre des racines, loin de l’univers.\n\nNous les voyons passer, indifférents et pressés,\nSans voir la grandeur de ces êtres minuscules et sacrés.\nCar dans leur ordre parfait, dans leur travail constant,\nRéside une leçon d’humilité et de temps.\n\nQuand la pluie viendra laver la poussière du sol,\nElles reprendront leur course, fidèles à leur rôle.\nPetites ouvrières du monde, gardiennes du sol,\nVous êtes la mémoire vive, le cœur du monde qui s’envole."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 26,
+    "completion_tokens": 406,
+    "total_tokens": 432,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 26,
+    "prompt_ms": 497.9,
+    "prompt_per_token_ms": 19.15,
+    "prompt_per_second": 52.2,
+    "predicted_n": 406,
+    "predicted_ms": 14933.4,
+    "predicted_per_token_ms": 36.782,
+    "predicted_per_second": 27.2,
+    "draft_n": 470,
+    "draft_n_accepted": 170
+  }
+}

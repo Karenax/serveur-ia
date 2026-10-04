@@ -1,0 +1,11 @@
+{
+  "actual_mode": "cache-auto-mtp",
+  "effective_cpu_fraction": 0,
+  "vram_mib": [
+    14212,
+    14146
+  ],
+  "requested_cpu_fraction": 1,
+  "reason": "GGML_CUDA_MOE_DIRECT_GPU_ONLY=ON in CMakeCache and compile_commands: CPU expert compute is compiled out. The larger cache, not CPU compute, explains this run.",
+  "gpu_only_build": true
+}

@@ -1,0 +1,486 @@
+{
+  "chargement-iq4.csv": {
+    "bytes": 177,
+    "sha256": "3f859229d895264a4dff1a10b7757e9a1a5bcde4899a420054cebab153900ac4"
+  },
+  "chat_template-commun.jinja": {
+    "bytes": 9993,
+    "sha256": "12827f24b742ea4e80cdc12dbcf9622227056b9f797252a3149263d4f9aaadce"
+  },
+  "chat_template-iq4-original.jinja": {
+    "bytes": 8952,
+    "sha256": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041"
+  },
+  "Comparer-Q4-IQ4.py": {
+    "bytes": 9634,
+    "sha256": "27e6c73928715658a26097e7acb64a47df9ce02f266bdcc0eba0a43793738513"
+  },
+  "configuration-iq4.json": {
+    "bytes": 1756,
+    "sha256": "a7aeeb54ea35137148af816a7b3e8ed37c02e6ea79584999d2a2fb3914b0cbd7"
+  },
+  "configuration-q4.json": {
+    "bytes": 1634,
+    "sha256": "bb1b0baf4410d1820b85a4c1ac001cd5a980d8e30f4659601623c4c39556843e"
+  },
+  "conversions.json": {
+    "bytes": 179720,
+    "sha256": "bfaab33e8326239dedce1e9d4e93acc6b91c2e1757e4ee6aacb28dd07bdde0f0"
+  },
+  "dechargement-q4.json": {
+    "bytes": 30,
+    "sha256": "6803392e88858c2107450d01d9ba72f3b21315d4a5cdfec6b2a9ce7deba0a3bc"
+  },
+  "engine-iq4-snapshot.log": {
+    "bytes": 44158,
+    "sha256": "b367fdfe2b7478b06f032cd73e5a851913dfddf6abcbecc078b779a51a171cea"
+  },
+  "engine-q4-reference.log": {
+    "bytes": 299327,
+    "sha256": "2a91d23716fefe63e03a6124bb260ddbb1ce55079c63776798cdb37cb6ab20b5"
+  },
+  "etat-prelecture-complement-rapide.json": {
+    "bytes": 487,
+    "sha256": "a51b361e62bcd2d46dd5ae55096908151d89bbf81068bea09235c3bcf37ed2f0"
+  },
+  "etat-prelecture-complement.json": {
+    "bytes": 468,
+    "sha256": "622f553dc81228eadcd492f102ff1eb0905b18aae8ffd499eb6d56cb190b9298"
+  },
+  "etat-prelecture-gpu2.json": {
+    "bytes": 388,
+    "sha256": "a8b8bea6428483db564137a38111cbf27d271eb4faadcecd26cb07945d234abe"
+  },
+  "etat-prelecture.json": {
+    "bytes": 248,
+    "sha256": "fca8c995d9f0e7f793fc09d455a57080a87e714012755a4056ee62d62c828f98"
+  },
+  "Executer-Comparatif-IQ4-suite.py": {
+    "bytes": 2406,
+    "sha256": "2009c84c1dcdfcd33f843404ff2a4a617b012f085d94268e300c6442893bd571"
+  },
+  "Executer-Comparatif-IQ4.py": {
+    "bytes": 2406,
+    "sha256": "4b97655ee8fce98404dd7acfa298a829608cbbf5eddcda7c30a71383901eed55"
+  },
+  "expert-profile.bin": {
+    "bytes": 196632,
+    "sha256": "8f59b4aa8873209dff11c11e37bcda9529a1335b724a1afeea37bf6388975baf"
+  },
+  "health-iq4.json": {
+    "bytes": 173,
+    "sha256": "56818152c054ed1193a5c0108f42fcf290bd6731a592fbece0fa2867543a9489"
+  },
+  "index.txt": {
+    "bytes": 93566,
+    "sha256": "546e458bb387e9f5c53a9c7bc386a9f5e5fe7c743b771b5215b50ff2d4d9e18a"
+  },
+  "Inspect-Comparatif-IQ4.py": {
+    "bytes": 2944,
+    "sha256": "da4c033121dcc117a27e57d26d555370dab1bec30be58747dca927432b3d10bc"
+  },
+  "iq4/configuration.json": {
+    "bytes": 2161,
+    "sha256": "ab13bf6d3daf9e52a58b7703972141d669a24c76395784d246b792a5694ed51e"
+  },
+  "iq4/metrics.json": {
+    "bytes": 14098,
+    "sha256": "28ea194a0565f9c70f1ef3b6193991dfe3c1b2de5c39c29af870fb2718bd22c4"
+  },
+  "iq4/protocole.json": {
+    "bytes": 910,
+    "sha256": "3c3e7ee2c1f2cddd8d5677350b5728abd4f72cdea1e43c710946edb1ac36e547"
+  },
+  "iq4/r1-ciel-engine.log": {
+    "bytes": 5489,
+    "sha256": "100ee9b4846191f8217dfee56a3b34af21236a792d21509aa9677d468d4550f6"
+  },
+  "iq4/r1-ciel-reponse.json": {
+    "bytes": 1929,
+    "sha256": "41edb46812708bbcb507de3b150579b302e395c10b6980fac00ac58fa6e2a74b"
+  },
+  "iq4/r1-ciel-requete.json": {
+    "bytes": 423,
+    "sha256": "734a99216394fbbbcfb0e60cdd54a0140f4d3ad59fce33b0989a45fcca1e9856"
+  },
+  "iq4/r1-ciel-telemetrie.csv": {
+    "bytes": 7003,
+    "sha256": "aefba180d029634407fdf3810380f3ff453956c6dfca9ab5b293516400baeadc"
+  },
+  "iq4/r1-ciel-texte.txt": {
+    "bytes": 1106,
+    "sha256": "4e358d6a193da3fafd6492a6e63e340b8135b9b98fd0b55e37fa57af6c8772a9"
+  },
+  "iq4/r1-fibonacci-engine.log": {
+    "bytes": 4067,
+    "sha256": "c02813748c78c69c8183e31c253c8cb25cc258ba0e0d02fba2d54c2c02c6436a"
+  },
+  "iq4/r1-fibonacci-reponse.json": {
+    "bytes": 1711,
+    "sha256": "091c73e1892a91a3693c34fe3f1bc0df9f013dee0ebed415d34bd76ba2625845"
+  },
+  "iq4/r1-fibonacci-requete.json": {
+    "bytes": 420,
+    "sha256": "dbf8bdce75f6656e9f02b8a3d74035fc94b18099e96109052b8774c2eb18cb7e"
+  },
+  "iq4/r1-fibonacci-telemetrie.csv": {
+    "bytes": 6953,
+    "sha256": "718b16b95a40f0631a32d09b167aa0640520977757b840a477a308c558fbd629"
+  },
+  "iq4/r1-fibonacci-texte.txt": {
+    "bytes": 880,
+    "sha256": "6adcbb43817e98b8562aedcb9e258826d9d2db53aad5d3fb2da1bdb0138d8299"
+  },
+  "iq4/r1-fourmis-engine.log": {
+    "bytes": 8952,
+    "sha256": "30cbf9127d0ca428cc66e3d1caa206ad7e94185d0eba07e6d67b011f70842e83"
+  },
+  "iq4/r1-fourmis-reponse.json": {
+    "bytes": 2393,
+    "sha256": "a750668079f1dbbd846f988d1b0a8d19619c78a5e8e786a8a9279990ecedc143"
+  },
+  "iq4/r1-fourmis-requete.json": {
+    "bytes": 321,
+    "sha256": "0e4a3635fc1bc6230e155c6b8ccac78acf21a070f8968d3f3f18b674d82bd833"
+  },
+  "iq4/r1-fourmis-telemetrie.csv": {
+    "bytes": 11994,
+    "sha256": "3c4245c91db8fa0de71b6d36a4cd21bb703d903a4995ba79e3970444565ceb59"
+  },
+  "iq4/r1-fourmis-texte.txt": {
+    "bytes": 1572,
+    "sha256": "602c1f3e4e64376ebd475972a81ba05f068b0830d816b994d4e0a89266674f1b"
+  },
+  "iq4/r2-ciel-engine.log": {
+    "bytes": 5101,
+    "sha256": "5d73858e95f882ac11e14ee9111a75407bc6d4b5aa56c23394f03cc613e5c978"
+  },
+  "iq4/r2-ciel-reponse.json": {
+    "bytes": 1958,
+    "sha256": "7114217106881eb4a6122dcfc69d5845a9f0675869af6ee9991dc93ab308ccc5"
+  },
+  "iq4/r2-ciel-requete.json": {
+    "bytes": 423,
+    "sha256": "734a99216394fbbbcfb0e60cdd54a0140f4d3ad59fce33b0989a45fcca1e9856"
+  },
+  "iq4/r2-ciel-telemetrie.csv": {
+    "bytes": 7082,
+    "sha256": "a69c58bb1a38f276cdc29a5f8c2b723a5db34b5c65b5060480458b7842869e82"
+  },
+  "iq4/r2-ciel-texte.txt": {
+    "bytes": 1135,
+    "sha256": "922a50a775bef1caed70e5eee2900d8c908b5863faefb5776bd2a8af8f4e22b2"
+  },
+  "iq4/r2-fibonacci-engine.log": {
+    "bytes": 4067,
+    "sha256": "ae1a8089e6cc4b67580bfe884e5a6b7bba56f6edeebba2906670f46971a495fe"
+  },
+  "iq4/r2-fibonacci-reponse.json": {
+    "bytes": 1711,
+    "sha256": "18f05cdaebe3a97c5be9d5205318caa098c1f7efe0a8d16f15ba7e046dc6a4d3"
+  },
+  "iq4/r2-fibonacci-requete.json": {
+    "bytes": 420,
+    "sha256": "dbf8bdce75f6656e9f02b8a3d74035fc94b18099e96109052b8774c2eb18cb7e"
+  },
+  "iq4/r2-fibonacci-telemetrie.csv": {
+    "bytes": 5921,
+    "sha256": "04d83887761a09557df75ca131aae6dc10a9aa6dab5c398909cc99f5a04ddb0a"
+  },
+  "iq4/r2-fibonacci-texte.txt": {
+    "bytes": 880,
+    "sha256": "6adcbb43817e98b8562aedcb9e258826d9d2db53aad5d3fb2da1bdb0138d8299"
+  },
+  "iq4/r2-fourmis-engine.log": {
+    "bytes": 8517,
+    "sha256": "405a2ec9d0650c2f0a6e7fb836e632e9a11806f37427f5ff955efac29099929d"
+  },
+  "iq4/r2-fourmis-reponse.json": {
+    "bytes": 2259,
+    "sha256": "7a4023ec0f077255abb789d5e8ccc843e8157690684b14361f3909b3c020d11d"
+  },
+  "iq4/r2-fourmis-requete.json": {
+    "bytes": 321,
+    "sha256": "0e4a3635fc1bc6230e155c6b8ccac78acf21a070f8968d3f3f18b674d82bd833"
+  },
+  "iq4/r2-fourmis-telemetrie.csv": {
+    "bytes": 11384,
+    "sha256": "e6980735829c92e5dc19dd188adc5977bc6020ed356e6521c7c6521c72ec22c5"
+  },
+  "iq4/r2-fourmis-texte.txt": {
+    "bytes": 1438,
+    "sha256": "2a14136d2d45cc7132117577410190110f62963744d0b4d4d28ebf2c5447412f"
+  },
+  "iq4/resultats.csv": {
+    "bytes": 1808,
+    "sha256": "c7d2d0f77ef507ff34447b2727929e32670af80bf20680d082dea9ff6740aede"
+  },
+  "iq4/resultats.json": {
+    "bytes": 4412,
+    "sha256": "25e03312632bf86d0cae8c7f109c3c7a96c1f58a8d3014ec68de5dd33de76323"
+  },
+  "iq4/synthese.json": {
+    "bytes": 486,
+    "sha256": "514e66a2ee91f9175ead08a621b280f3dc1b678312ffb71746d6994af4a2af2b"
+  },
+  "modeles.json": {
+    "bytes": 9544,
+    "sha256": "b975f3c4689ff4fb51625e80df3213f71780052de7fadd3c46d31a2c50eb2cb5"
+  },
+  "native_experts.txt": {
+    "bytes": 5625,
+    "sha256": "f956487fc1699b229bdcf9dd0e7d164d2e61b9718a4fe698ce8727f19be52949"
+  },
+  "parite-experts-iq4.txt": {
+    "bytes": 1660,
+    "sha256": "d8d5fcfef7cb4033ccfde2c8cfaa7ffe07018947233137f951095e7d12d2a958"
+  },
+  "prelecture-complement-rapide.log": {
+    "bytes": 41057,
+    "sha256": "21871d3713e9c016753db9b91578448e76ec0074c3b34eebbed6cdaf954fc1b7"
+  },
+  "prelecture-complement.log": {
+    "bytes": 8192,
+    "sha256": "ba598bee631ce402d735b0de1df511b7462545ad7925a2bb15ada9b658b760ff"
+  },
+  "prelecture-experts.log": {
+    "bytes": 10483,
+    "sha256": "4a1bb3aaa2647e6773af15e9533087b0fcd0cd780c1e7c1a134d0294ed2ac31e"
+  },
+  "prelecture-gpu2.log": {
+    "bytes": 22022,
+    "sha256": "177085a704ce98b3ba90cba8abb2bfee76684737ef678164ca8fc3f51a28a3dc"
+  },
+  "Prelire-Complement-IQ4-rapide.py": {
+    "bytes": 5006,
+    "sha256": "7c580140c4e6080f16efd10f87f721173619f78fa32d37435e806f388480a9ba"
+  },
+  "Prelire-Complement-IQ4.py": {
+    "bytes": 3882,
+    "sha256": "ee699238fa789e654e7290c9bbb90151fe3532c0a75539a863b8dccfa0511e0f"
+  },
+  "Prelire-Experts-IQ4.py": {
+    "bytes": 2304,
+    "sha256": "f75f8cd20bf71fe5ba125ee67dd51791a33e5b01e99910c32faf75b835cca7e4"
+  },
+  "Prelire-GPU2-IQ4.py": {
+    "bytes": 3257,
+    "sha256": "9672e9ed104bf64e261bef5ce47bfb6394c9f13105b6d62713b509a5d4eb1b1b"
+  },
+  "preparation-iq4.log": {
+    "bytes": 742,
+    "sha256": "ab2f6006247e277c82c18fba257c984d54d63e276ece12294e740870f33d3eef"
+  },
+  "Preparer-IQ4-Strata.py": {
+    "bytes": 552,
+    "sha256": "37d8def3c11591d68f26b93cb19a48137bc520738af707b51a19dd933c3e1e84"
+  },
+  "protocole-historique.json": {
+    "bytes": 726,
+    "sha256": "a8c54ecb1bb01b988414a1e1f9443854579668e6df347ed6a7cc2ffdde728ae0"
+  },
+  "q4/configuration.json": {
+    "bytes": 2043,
+    "sha256": "033d2d106d473fb6c353e34ae5721b1e820b90683375cb14f3b5bab03ca2ded0"
+  },
+  "q4/metrics.json": {
+    "bytes": 15599,
+    "sha256": "812e6aab6e38274a15013049900ee02f2e3ed0bd5d61b9560c13ba978b8958b7"
+  },
+  "q4/protocole.json": {
+    "bytes": 910,
+    "sha256": "3c3e7ee2c1f2cddd8d5677350b5728abd4f72cdea1e43c710946edb1ac36e547"
+  },
+  "q4/r1-ciel-engine.log": {
+    "bytes": 5392,
+    "sha256": "050460507b567594cf58a65c547417e8b4b9798818adcb148d0937146e91af47"
+  },
+  "q4/r1-ciel-reponse.json": {
+    "bytes": 1927,
+    "sha256": "de5457be234c8c84789c032c22e9797e25e68f323abd89fe397e5e392e5ec5e8"
+  },
+  "q4/r1-ciel-requete.json": {
+    "bytes": 416,
+    "sha256": "914ccb2297d20a122db1afddf4b2e2c095d40714bffb730bb480105d945f7a16"
+  },
+  "q4/r1-ciel-telemetrie.csv": {
+    "bytes": 7570,
+    "sha256": "6ee7ca50db13c098996139eae295d7942c59582e90bce8a893e559563bfb6552"
+  },
+  "q4/r1-ciel-texte.txt": {
+    "bytes": 1111,
+    "sha256": "6dabb2fbc615d659689a004ad05bf0ece2c07c837d48f7eeebfc50be59395934"
+  },
+  "q4/r1-fibonacci-engine.log": {
+    "bytes": 4221,
+    "sha256": "db72f2e8d6cac2cea0d5bd40e9925e359f74ba563125bef5111c93744f4d7012"
+  },
+  "q4/r1-fibonacci-reponse.json": {
+    "bytes": 1688,
+    "sha256": "571272e4d7a04c40ef078969d25052c15e3983973bc250463c70f8a2f59cbe56"
+  },
+  "q4/r1-fibonacci-requete.json": {
+    "bytes": 413,
+    "sha256": "8a43178c218e2d34de97c608b89eab747cb670236b49a0985ad1bddbc0b0ad71"
+  },
+  "q4/r1-fibonacci-telemetrie.csv": {
+    "bytes": 6867,
+    "sha256": "f8502ff369f95c6dafda067cc2a02312dc9649c5cfc9f4a41891a7d7d4f583dd"
+  },
+  "q4/r1-fibonacci-texte.txt": {
+    "bytes": 864,
+    "sha256": "ffdeead1400f68719391421220ad405e71c5c36e760f36f654293d6a4799b553"
+  },
+  "q4/r1-fourmis-engine.log": {
+    "bytes": 8492,
+    "sha256": "01ff04d4c3b5f68a233993eaf856e75210d3281ac7ae28540b5704a46d918678"
+  },
+  "q4/r1-fourmis-reponse.json": {
+    "bytes": 2339,
+    "sha256": "3a95556bd02c40521520e63c9df69c0fea18dcb66f3a62e20f9eb5a6d549f923"
+  },
+  "q4/r1-fourmis-requete.json": {
+    "bytes": 314,
+    "sha256": "472d9197278aebea959d60d8af1733661fd66790a1827a3abf94a0f80b280596"
+  },
+  "q4/r1-fourmis-telemetrie.csv": {
+    "bytes": 12179,
+    "sha256": "99f4476dabe8542436aefac8c67ea2d2475e19909a3d56d2d7e309af27816039"
+  },
+  "q4/r1-fourmis-texte.txt": {
+    "bytes": 1524,
+    "sha256": "70a39fab8168ae4c7f31d67528d482c3bfef1665108791f45fe4fc4dec5aaa1a"
+  },
+  "q4/r2-ciel-engine.log": {
+    "bytes": 5392,
+    "sha256": "db8f178f2c2c8cdc05e3dc7ce92423c1bd889fee16d99e2acd4f5f2cbc6b7dce"
+  },
+  "q4/r2-ciel-reponse.json": {
+    "bytes": 1927,
+    "sha256": "e6dfdd734fa2c9a301687038a9eb4f48f7c588c064da92d8ef7a8da5b79f4f96"
+  },
+  "q4/r2-ciel-requete.json": {
+    "bytes": 416,
+    "sha256": "914ccb2297d20a122db1afddf4b2e2c095d40714bffb730bb480105d945f7a16"
+  },
+  "q4/r2-ciel-telemetrie.csv": {
+    "bytes": 7639,
+    "sha256": "a393a91506f21b875f6e76ead891b82dc954c1af1eefd2291c87c2b9d8e6d44f"
+  },
+  "q4/r2-ciel-texte.txt": {
+    "bytes": 1111,
+    "sha256": "6dabb2fbc615d659689a004ad05bf0ece2c07c837d48f7eeebfc50be59395934"
+  },
+  "q4/r2-fibonacci-engine.log": {
+    "bytes": 4191,
+    "sha256": "bf54c75022dc582b296603a7931ce7e8009dd9363f887ff7001691a3ecdbafac"
+  },
+  "q4/r2-fibonacci-reponse.json": {
+    "bytes": 1687,
+    "sha256": "9e41eef8348402522be18695c7ab2ba3addd2bd6ba14dc2eaae9ea24129cda48"
+  },
+  "q4/r2-fibonacci-requete.json": {
+    "bytes": 413,
+    "sha256": "8a43178c218e2d34de97c608b89eab747cb670236b49a0985ad1bddbc0b0ad71"
+  },
+  "q4/r2-fibonacci-telemetrie.csv": {
+    "bytes": 6833,
+    "sha256": "affabdbbcd524d382c36f49443c958ca23aed7ae33a75c0cb550780c1e688ca5"
+  },
+  "q4/r2-fibonacci-texte.txt": {
+    "bytes": 864,
+    "sha256": "ffdeead1400f68719391421220ad405e71c5c36e760f36f654293d6a4799b553"
+  },
+  "q4/r2-fourmis-engine.log": {
+    "bytes": 8492,
+    "sha256": "3d220539f06d14d48c6ad97970c2abd0afff6514b4a8b09cea2d946ae1cfe471"
+  },
+  "q4/r2-fourmis-reponse.json": {
+    "bytes": 2338,
+    "sha256": "f610268ba3dd03677ee0ba8dfa547318cabece89d8068c97a774fb79913349b3"
+  },
+  "q4/r2-fourmis-requete.json": {
+    "bytes": 314,
+    "sha256": "472d9197278aebea959d60d8af1733661fd66790a1827a3abf94a0f80b280596"
+  },
+  "q4/r2-fourmis-telemetrie.csv": {
+    "bytes": 12008,
+    "sha256": "5934bced54544aafb5aa156f5d9783002c7ac7c6fe3176674150fc6716432abc"
+  },
+  "q4/r2-fourmis-texte.txt": {
+    "bytes": 1524,
+    "sha256": "70a39fab8168ae4c7f31d67528d482c3bfef1665108791f45fe4fc4dec5aaa1a"
+  },
+  "q4/resultats.csv": {
+    "bytes": 1862,
+    "sha256": "1ae60c9fb1b956ecf6f8b4439e9dabbabd135a699b127c91907f1d5cf1f0db23"
+  },
+  "q4/resultats.json": {
+    "bytes": 4466,
+    "sha256": "a0c73e3c2de2515d43d0a9d59b4dfd2001005db2d4936a42046c5dc12f2e8e82"
+  },
+  "q4/synthese.json": {
+    "bytes": 499,
+    "sha256": "2061a6c02e077fcba4fa5dc7efe7ef6a94f659e8c6854059692f092ed6466733"
+  },
+  "RAPPORT.txt": {
+    "bytes": 6570,
+    "sha256": "f56249b589fea2def17cf7338521b5bbfca278c0e5cef744e1a8d5567373f36c"
+  },
+  "relance-attente-iq4.json": {
+    "bytes": 165,
+    "sha256": "1210428a318b2f09edbdd4d6039710c9145a038337f9f0b8259392658b6a6c19"
+  },
+  "serveur-iq4.pid": {
+    "bytes": 6,
+    "sha256": "add23a97fd19a8cbed9903e68bd1a84db506521df887ce9157744163c62a565a"
+  },
+  "Start-Strata-IQ4-P100.ps1": {
+    "bytes": 1483,
+    "sha256": "12b7e21df8ebc1c16e3a14e70f76c0630a9fcfe2c1e710dd5b12c5d4cce878d5"
+  },
+  "Stop-Strata-IQ4-P100.ps1": {
+    "bytes": 1507,
+    "sha256": "15b4002807fb379548f98f8ccfc50d10db98449bc6727e6de8ec81435b5c8177"
+  },
+  "strata-iq4-p100-hybride.json": {
+    "bytes": 1660,
+    "sha256": "a2a21044f5c62e9d43861929f82d0fcc8fce129b97d989124670b5f08caeb21c"
+  },
+  "synthese.csv": {
+    "bytes": 230,
+    "sha256": "d3200a0c2c98e5b6bbfe93978ed846b7cf0451853b53047e86c8cd002d13e966"
+  },
+  "synthese.json": {
+    "bytes": 2888,
+    "sha256": "d8393f7ad4166645dd8c62a479b4c8eb15a31dd135c194983f782a0bce8ae813"
+  },
+  "Synthetiser-Comparatif-IQ4.py": {
+    "bytes": 15001,
+    "sha256": "44349478d93fe712a62be4ed78f48a801e586b319630d07f49db904ae333ade9"
+  },
+  "tokenizer-commun/chat_template.jinja": {
+    "bytes": 9993,
+    "sha256": "12827f24b742ea4e80cdc12dbcf9622227056b9f797252a3149263d4f9aaadce"
+  },
+  "tokenizer-commun/merges.txt": {
+    "bytes": 3600844,
+    "sha256": "080cf95432173729d160346b7882bd2a644b07f7a3813a3eb73f4e66787bfde9"
+  },
+  "tokenizer-commun/token_type.json": {
+    "bytes": 744960,
+    "sha256": "5088c8c298fc06af8382ddb3b76c888703ac2634e82263b97eedcc2ad202738b"
+  },
+  "tokenizer-commun/tokenizer.json": {
+    "bytes": 554,
+    "sha256": "87be2ac47d8bc7393b7435df6ccd276740019a393941a2585d5edce59f450c54"
+  },
+  "tokenizer-commun/vocab.json": {
+    "bytes": 5737005,
+    "sha256": "4ba64f0332abcfb0b600b7df1537d1e836e68009d5fb7cdb77339738dc6365c4"
+  },
+  "warmup-iq4.json": {
+    "bytes": 814,
+    "sha256": "affd6c6df66c39735f47771ebd0c2f08d0cf13c0f4db3ad5ad6810045027519a"
+  }
+}

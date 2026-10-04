@@ -1,0 +1,59 @@
+{
+  "request": {
+    "model": "qwen3.8-flash-next-iq3-s",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Explique en français pourquoi le ciel est bleu, puis pourquoi il devient rouge au coucher du soleil. Donne une explication précise et accessible."
+      }
+    ],
+    "max_tokens": 256,
+    "temperature": 0,
+    "seed": 42,
+    "cache_prompt": false,
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    }
+  },
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "length",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Pour comprendre les couleurs du ciel, il faut d'abord regarder la lumière du soleil. Bien qu'elle nous paraisse blanche, elle est en réalité composée de toutes les couleurs de l'arc-en-ciel (rouge, orange, jaune, vert, bleu, indigo, violet). Ces couleurs voyagent sous forme d'ondes, et chaque couleur a une longueur d'onde différente : le rouge a des ondes longues, tandis que le bleu et le violet ont des ondes courtes.\n\n### Pourquoi le ciel est bleu en journée ?\n\nLorsque la lumière du soleil traverse l'atmosphère terrestre, elle rencontre des milliards de petites molécules de gaz (principalement de l'azote et de l'oxygène). Ce phénomène s'appelle la **diffusion de Rayleigh**.\n\nVoici ce qui se passe :\n1. Les ondes courtes (comme le **bleu** et le violet) sont beaucoup plus faciles à diffuser par les petites molécules de l'atmosphère que les ondes longues (comme le rouge).\n2. La lumière bleue est donc envoyée dans toutes les directions par ces molécules, ce qui fait que le bleu nous parvient de partout dans le ciel"
+        }
+      }
+    ],
+    "created": 1791048918,
+    "model": "qwen3.8-flash-next-iq3-s",
+    "system_fingerprint": "b1-0ae77ef",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 256,
+      "prompt_tokens": 40,
+      "total_tokens": 296,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "id": "chatcmpl-W2xK437flK84x59Lsk3h2Hka0KwqRj8B",
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 40,
+      "prompt_ms": 1038.121,
+      "prompt_per_token_ms": 25.953025000000004,
+      "prompt_per_second": 38.53115388283254,
+      "predicted_n": 256,
+      "predicted_ms": 11586.162,
+      "predicted_per_token_ms": 45.435929411764704,
+      "predicted_per_second": 22.009013856357264,
+      "draft_n": 205,
+      "draft_n_accepted": 152
+    }
+  },
+  "elapsed_seconds": 12.625,
+  "cpu_seconds": 74.3125,
+  "average_cpu_cores": 5.8861386138613865
+}

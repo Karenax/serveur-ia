@@ -1,0 +1,33 @@
+Voici une implémentation simple et efficace de la fonction `fibonacci(n)` en Python, suivie de l'exemple demandé pour `n=8`.
+
+```python
+def fibonacci(n):
+    """
+    Retourne une liste contenant les n premiers nombres de Fibonacci.
+    """
+    if n <= 0:
+        return []
+    elif n == 1:
+        return [0]
+    
+    fib_sequence = [0, 1]
+    for i in range(2, n):
+        next_value = fib_sequence[-1] + fib_sequence[-2]
+        fib_sequence.append(next_value)
+    
+    return fib_sequence
+
+# Exemple pour n=8
+result = fibonacci(8)
+print(f"Les 8 premiers nombres de Fibonacci sont : {result}")
+```
+
+**Sortie attendue :**
+```
+Les 8 premiers nombres de Fibonacci sont : [0, 1, 1, 2, 3, 5, 8, 13]
+```
+
+### Explication :
+- La suite de Fibonacci commence généralement par `0` et `1`.
+- Chaque nombre suivant est la somme des deux précédents.
+- Pour

@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-166777896d2647ecbfc11ba7",
+  "object": "chat.completion",
+  "created": 1791137818,
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Sous le soleil ardent, dans l’ombre des racines,\nUn peuple minuscule, aux forces divines,\nS’agite sans relâche, silencieux et fier,\nPortant le poids du monde sur son dos léger.\n\nElles marchent en file, noires comme l’encre,\nSur les sentiers de terre, aux bords de l’enceinte.\nChacune est un rouage, un maillon essentiel,\nDans cette cité souterraine, immense et réel.\n\nPas de roi pour régner, pas de trône doré,\nSeule la Reine-Mère, par le destin guidée,\nDonne la vie à tous, par millions de fois,\nAssurant l’avenir, la force et la loi.\n\nLes ouvrières infatigables, au cœur de fer,\nTransportent des miettes, des graines, des éclats de verre.\nElles construisent des cathédrales de boue,\nDes galeries profondes, des tunnels à genoux.\n\nLa communication passe par les antennes,\nUn langage chimique, subtil et sans gêne.\nUn parfum d’alarme, un signal de danger,\nEt toute la colonie se met à danser.\n\nElles ne dorment jamais, ou si peu, si peu,\nToujours en mouvement, toujours au milieu.\nDe la pluie qui tombe, du vent qui s’élève,\nElles protègent le nid, ce trésor qui s’achève.\n\nNous les regardons passer, indifférents parfois,\nSans voir l’ordre parfait, la discipline et la foi.\nPourtant, dans leur humilité, dans leur travail constant,\nElles nous enseignent la force du temps.\n\nCar la grandeur n’est pas dans la taille du corps,\nMais dans l’union sacrée, dans l’effort sans effort.\nLes fourmis nous rappellent, dans leur danse éternelle,\nQue la vie est un don, une flamme nouvelle."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 26,
+    "completion_tokens": 445,
+    "total_tokens": 471,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 26,
+    "prompt_ms": 483.7,
+    "prompt_per_token_ms": 18.604,
+    "prompt_per_second": 53.8,
+    "predicted_n": 445,
+    "predicted_ms": 15387.0,
+    "predicted_per_token_ms": 34.578,
+    "predicted_per_second": 28.9,
+    "draft_n": 492,
+    "draft_n_accepted": 198
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "status": "interrupted",
+  "read_gib": 7.568359375,
+  "total_gib": 71.728515625,
+  "block_mib": 4,
+  "rate_limit_mib_s": 128,
+  "layers": [
+    0,
+    47
+  ],
+  "cache_aware": true,
+  "order": "native-copy",
+  "reader": "file",
+  "skipped_verified_gib": 6.298828125,
+  "hot_read_gib": 3.353515625,
+  "elapsed_seconds": 427.05586120000225,
+  "note": "Read-only startup aid. No inference benchmarks run while this helper is active.",
+  "last_tensor": "blk.8.ffn_down_exps.weight"
+}

@@ -1,0 +1,20 @@
+[
+  {
+    "mode": "mtp-4-tensor-fa-on",
+    "case": "ciel",
+    "median_tps": 21.697048993296093,
+    "output_tokens": [
+      256,
+      256
+    ]
+  },
+  {
+    "mode": "mtp-4-tensor-fa-on",
+    "case": "fibonacci",
+    "median_tps": 24.63081199433826,
+    "output_tokens": [
+      256,
+      256
+    ]
+  }
+]

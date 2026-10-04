@@ -1,0 +1,26 @@
+Organisation des résultats Strata
+
+Les copies à la racine sont l'index du dernier essai GPU réussi, si
+resultats-strata-mtp.csv est présent. Vérifier configuration-tests.json,
+engine-strata-mtp-test-1.log et engine-strata-mtp-test-2.log ainsi que le
+manifest-final.json pour connaître les paramètres et le binaire utilisés.
+
+essais/date-heure conserve chaque nouvelle exécution sans écraser les précédentes.
+Un dossier avec erreur-*.json décrit un essai interrompu, pas un débit à comparer.
+
+essai-hybride-staging16 conserve l'essai achevé avant suppression du calcul CPU.
+Ses résultats ne constituent pas une mesure d'inférence GPU seule.
+
+strata-p100-staging64.exe est une ancienne reconstruction : verify.cpp n'avait
+pas suivi le changement d'en-tête, son buffer effectif restait à 16. Le binaire
+final nommé strata-p100-gpu-seul.exe est la reconstruction corrigée.
+
+manifest-pre-tests.json et demarrage.json décrivent des états de préparation
+anciens. Les fichiers *echec* et reponse-diagnostic-* sont conservés pour diagnostic.
+
+metrics-strata-mtp.txt est un ancien export PowerShell non structuré, impropre
+à l'analyse. metrics-strata-mtp.json contient l'export JSON de l'API de métriques.
+
+Les résultats Café/llama.cpp originaux sont dans le dossier voisin
+2026-10-02-cafe-q4-p100. Le tableau comparatif consolidé est
+comparatifs/comparatif-q4-p100.csv, avec les modes hybrides identifiés séparément.

@@ -1,0 +1,15 @@
+{
+  "status": "interrupted",
+  "read_gib": 11.865234375,
+  "total_gib": 60.9375,
+  "block_mib": 4,
+  "rate_limit_mib_s": 64,
+  "layers": [
+    0,
+    47
+  ],
+  "elapsed_seconds": 189.84377790000144,
+  "note": "Read-only startup aid. No inference benchmarks run while this helper is active.",
+  "last_tensor": "blk.9.ffn_down_exps.weight",
+  "reason": "Remplacé par la prélecture qui saute les couches vérifiées et ne bride pas les pages chaudes."
+}

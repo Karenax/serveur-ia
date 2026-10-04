@@ -1,0 +1,149 @@
+[
+  {
+    "test": "ciel",
+    "prompt": "Explique en français pourquoi le ciel est bleu, puis pourquoi il devient rouge au coucher du soleil. Donne une explication précise et accessible.",
+    "q4_tps": 28.260303926589398,
+    "iq4_tps": 29.815831567452122,
+    "iq4_change_pct": 5.50428489694752,
+    "mtp_acceptance": {
+      "q4": 0.5842105263157895,
+      "iq4": 0.6097208121827411
+    },
+    "ram_peak_gib": {
+      "q4": 83.49295425415039,
+      "iq4": 70.07210540771484
+    },
+    "output_tokens": {
+      "q4": [
+        256,
+        256
+      ],
+      "iq4": [
+        256,
+        256
+      ]
+    },
+    "output_words": {
+      "q4": [
+        162,
+        162
+      ],
+      "iq4": [
+        165,
+        169
+      ]
+    },
+    "deterministic_output": {
+      "q4": true,
+      "iq4": false
+    },
+    "complete_answers": {
+      "q4": [
+        false,
+        false
+      ],
+      "iq4": [
+        false,
+        false
+      ]
+    }
+  },
+  {
+    "test": "fibonacci",
+    "prompt": "Écris une fonction Python fibonacci(n) qui retourne les n premiers nombres de Fibonacci, puis donne un exemple pour n=8. Réponds en français.",
+    "q4_tps": 33.314680187895924,
+    "iq4_tps": 36.75013440913189,
+    "iq4_change_pct": 10.312133275360559,
+    "mtp_acceptance": {
+      "q4": 0.8017050704146484,
+      "iq4": 0.8125
+    },
+    "ram_peak_gib": {
+      "q4": 83.492919921875,
+      "iq4": 70.07203674316406
+    },
+    "output_tokens": {
+      "q4": [
+        256,
+        256
+      ],
+      "iq4": [
+        256,
+        256
+      ]
+    },
+    "output_words": {
+      "q4": [
+        105,
+        105
+      ],
+      "iq4": [
+        102,
+        102
+      ]
+    },
+    "deterministic_output": {
+      "q4": true,
+      "iq4": true
+    },
+    "complete_answers": {
+      "q4": [
+        false,
+        false
+      ],
+      "iq4": [
+        false,
+        false
+      ]
+    }
+  },
+  {
+    "test": "fourmis",
+    "prompt": "creer une poésie sur les fourmis de 200 mots",
+    "q4_tps": 27.585364378387496,
+    "iq4_tps": 27.990379681242217,
+    "iq4_change_pct": 1.4682253143338597,
+    "mtp_acceptance": {
+      "q4": 0.6541353383458647,
+      "iq4": 0.5673071574005051
+    },
+    "ram_peak_gib": {
+      "q4": 83.49288558959961,
+      "iq4": 70.0719985961914
+    },
+    "output_tokens": {
+      "q4": [
+        426,
+        426
+      ],
+      "iq4": [
+        440,
+        421
+      ]
+    },
+    "output_words": {
+      "q4": [
+        222,
+        222
+      ],
+      "iq4": [
+        236,
+        218
+      ]
+    },
+    "deterministic_output": {
+      "q4": true,
+      "iq4": false
+    },
+    "complete_answers": {
+      "q4": [
+        true,
+        true
+      ],
+      "iq4": [
+        true,
+        true
+      ]
+    }
+  }
+]

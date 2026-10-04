@@ -1,0 +1,48 @@
+Qwen Serveur / Client — version 2.0.0
+
+Nouvel onglet Exploitation : démarrage à la connexion Windows, chargement
+automatique facultatif, surveillance et relance (trois essais maximum par
+heure), profils de contexte, diagnostic exportable, sauvegardes et mises à jour.
+La console affiche les températures GPU et l'état de la file distante.
+Le débit utilise les tokens annoncés par le moteur et la durée totale de la
+demande, traitement du prompt compris. Aucun gain de performance n'est présumé.
+
+File FIFO : une demande par client, une génération distante active, seize
+demandes maximum, attente limitée à quinze minutes. Les positions passent
+dans des commentaires SSE ignorés par les clients API standard.
+Annuler ferme la connexion amont. Les demandes directement soumises au moteur
+ne passent pas par cette file. GET /v1/status affiche uniquement les demandes
+du client connecté ; POST /v1/cancel annule ses demandes.
+
+Accès : suspension, expiration en jours (0 = illimité), plafond de tokens par
+réponse, dernière activité et journal local borné à mille événements.
+Le journal n'enregistre ni messages ni clés. Expiration/suspension bloquent
+l'API ; la révocation retire également le pair du tunnel.
+
+Client : conversations séparées et nommées, recherche, import/export JSON,
+réponses partielles sauvegardées et nouvelle tentative. L'historique reste
+dans le navigateur. Des ports localhost distincts ont des stockages distincts.
+
+Mises à jour : compiler avec Build-WireGuard.ps1 puis Build-Client.ps1.
+La compilation crée dist/release.json. L'onglet Exploitation vérifie l'empreinte
+SHA-256 du binaire local avant de préparer les EXE personnels ; les accès sont
+conservés. Les anciens EXE sont conservés dans lanceur/clients-retour.
+Retour arrière depuis le même onglet. Redistribuer les EXE personnellement.
+Il s'agit d'intégrité locale, pas d'une signature Authenticode ni d'un service
+de téléchargement automatique.
+
+Sauvegarde .qwenbackup : phrase d'au moins douze caractères, Fernet,
+PBKDF2-SHA256, sel aléatoire, 600 000 tours. Contient réglages, accès, clés
+WireGuard et profils des EXE présents. Les poids et conversations restent
+séparés. La restauration exige modèle arrêté et WireGuard désactivé et crée
+une sauvegarde de retour. Les clés sont rechiffrées par DPAPI sur le PC cible.
+Préparer les EXE reconstruit les clients restaurés. Vérifier les chemins du
+modèle et l'adresse réseau après changement de PC.
+
+Diagnostic : ressources, état, DNS, file et WireGuard, sans clés ni conversations.
+La joignabilité UDP publique et le CGNAT exigent un test depuis un autre réseau.
+
+Limite du démarrage : nécessite la connexion du compte Windows. L'exécution
+avant connexion comme véritable service Windows n'est pas installée.
+Profils : contextes 8 192 / 32 768 / 262 144 tokens, appliqués au prochain
+lancement. Ils ne redémarrent pas le moteur et n'ont pas été benchmarkés.

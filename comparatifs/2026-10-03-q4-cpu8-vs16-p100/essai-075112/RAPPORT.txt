@@ -1,0 +1,54 @@
+﻿Q4_K_XL — comparaison de 8 et 16 cœurs physiques
+Mesures : référence à 16 cœurs du 2 octobre 2026 ; essais à 8 cœurs du 3 octobre 2026.
+
+Threadripper PRO 3955WX, 128 Gio DDR4-3200 sur 8 canaux, deux Tesla P100 16 Gio.
+Même modèle Qwen3.8-Flash-Next-UD-Q4_K_XL, même binaire Strata et mêmes caches experts GPU.
+MTP Q2 activé, spec=3, spec-min-p=0.5 ; thinking et cache des prompts désactivés.
+Deux répétitions à 16 cœurs et à 8 regroupés ; quatre à 8 répartis.
+Température 0, seed 42, contexte 4096 ; ordre inversé à la seconde répétition de chaque série.
+Ciel et Fibonacci : limite commune de 256 tokens. Poésie : limite de 512 tokens et arrêt naturel enregistré.
+Débit de génération hors traitement du prompt, médiane des mesures du même réglage.
+
+Prompt ; 16 cœurs ; 8 regroupés ; 8 répartis ; perte de 8 répartis par rapport à 16
+Ciel bleu ; 28.26 ; 21.35 ; 25.50 tokens/s ; 9.8 %
+Fibonacci Python ; 33.31 ; 25.62 ; 30.33 tokens/s ; 9.0 %
+Poésie sur les fourmis ; 27.59 ; 20.71 ; 25.07 tokens/s ; 9.1 %
+
+Le passage à 8 cœurs utilise 7 travailleurs experts plus le thread principal, contre 15+1 à 16 cœurs.
+Affinité effective du moteur : 8 cœurs physiques. Les frères SMT de ces mêmes cœurs restent disponibles
+pour les threads auxiliaires CUDA ; chaque travailleur expert est fixé à un seul processeur logique.
+8 regroupés : experts sur les processeurs logiques 0,2,4,6,8,10,12,14 ; masque processus 0x0000ffff.
+8 répartis : experts sur 0,16,2,18,4,20,6,22 ; masque processus 0x00ff00ff.
+Les masques de tous les threads sont vérifiés avant et après chaque série ; le principal est sur 0.
+Le nombre de cœurs disponibles pour les autres logiciels et le BIOS restent inchangés.
+
+Les séries ont des requêtes JSON identiques ; mêmes options de calcul, sauf le nombre de travailleurs.
+La confirmation utilise le pack contigu sur SSD : octets natifs conservés, dossier et journal différents.
+Experts absents du cache GPU calculés sur CPU depuis la RAM ; 0 transfert RAM→GPU de poids experts.
+Tous les journaux de requêtes confirment 0 lecture de blobs experts depuis les fichiers.
+La prélecture des fichiers est terminée avant les benchmarks. Chargement et génération sont distingués.
+Le débit CPU moyen inclut les attentes actives : il ne représente pas uniquement des calculs utiles.
+
+Texte et longueur des réponses :
+Ciel bleu / 16 physiques : [256, 256] tokens, 28.24–28.29 tokens/s, MTP accepté 58.4 %, texte identique à la référence : True.
+Ciel bleu / 8 regroupés : [256, 256] tokens, 21.08–21.63 tokens/s, MTP accepté 59.7 %, texte identique à la référence : True.
+Ciel bleu / 8 répartis : [256, 256, 256, 256] tokens, 21.21–25.73 tokens/s, MTP accepté 60.1 %, texte identique à la référence : True.
+Fibonacci Python / 16 physiques : [256, 256] tokens, 32.33–34.30 tokens/s, MTP accepté 80.2 %, texte identique à la référence : True.
+Fibonacci Python / 8 regroupés : [256, 256] tokens, 25.51–25.73 tokens/s, MTP accepté 81.4 %, texte identique à la référence : True.
+Fibonacci Python / 8 répartis : [256, 256, 256, 256] tokens, 27.52–31.80 tokens/s, MTP accepté 81.4 %, texte identique à la référence : True.
+Poésie sur les fourmis / 16 physiques : [426, 426] tokens, 27.43–27.74 tokens/s, MTP accepté 65.4 %, texte identique à la référence : True.
+Poésie sur les fourmis / 8 regroupés : [426, 426] tokens, 20.63–20.79 tokens/s, MTP accepté 65.8 %, texte identique à la référence : True.
+Poésie sur les fourmis / 8 répartis : [426, 426, 426, 426] tokens, 19.76–25.57 tokens/s, MTP accepté 65.7 %, texte identique à la référence : True.
+
+Limites : seulement trois prompts courts et peu de répétitions. La référence 16 cœurs provient de la veille,
+elle ne forme pas une série alternée 8/16/8. Les caches GPU fixes et le binaire ont été conservés.
+Ces résultats mesurent cette machine et ce moteur, sans isoler complètement calcul, accès RAM et synchronisations.
+Ils ne permettent pas d’extrapoler linéairement vers un processeur 32 cœurs ou une autre architecture.
+Le premier essai à 8 répartis a montré une variation de 19,76 à 25,12 tokens/s pour la poésie.
+Une série supplémentaire a été effectuée après la copie du cache SSD et le redémarrage, sans copie concurrente.
+
+État final après confirmation : Q4_K_XL actif sur http://127.0.0.1:8080, huit cœurs répartis et MTP activé.
+Redémarrer le même réglage : .\Start-Strata-P100-Persistant.ps1 -CacheContigu -CpuCores 8
+Revenir à 16 cœurs : arrêter le serveur, puis .\Start-Strata-P100-Persistant.ps1 -CacheContigu -CpuCores 16
+Binaire SHA256 : 9b07c8c1e2367d217e17199f137f6c8d33f5832ab02df594b68652ba5c9488d0
+Archive : D:\Serveur IA\comparatifs\2026-10-03-q4-cpu8-vs16-p100\essai-075112

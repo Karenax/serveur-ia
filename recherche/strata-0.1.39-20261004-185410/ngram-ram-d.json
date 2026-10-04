@@ -1,0 +1,15 @@
+{
+  "status": "libere",
+  "pid": 41296,
+  "path": "D:\\Serveur IA\\strata-data\\model-q4\\Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+  "tensor": "per_layer_token_embd.weight",
+  "offset": 536060064,
+  "bytes": 28800138240,
+  "gib": 26.822218894958496,
+  "locked_bytes": 28800138400,
+  "verified_locked_pages": 7031284,
+  "elapsed_seconds": 282.6,
+  "available_ram_gib": 73.59,
+  "note": "Read-only shared file pages held physically in RAM by an external process. Official Strata must use --ple-io mmap; its code is unchanged.",
+  "released_after_seconds": 1476.2
+}

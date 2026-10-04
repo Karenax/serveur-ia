@@ -1,0 +1,77 @@
+Comparatif Q4_K_XL / IQ4_XS — deux P100, Strata expérimental
+Deux répétitions par prompt, mêmes requêtes, même binaire, même MTP Q2 (spec 3, seuil 0.5).
+Température 0, seed 42, reasoning désactivé, cache de prompt désactivé, contexte 4096.
+Ciel/Fibonacci : limite 256 tokens ; poésie : limite 512 pour permettre une réponse complète.
+15 travailleurs CPU + thread principal ; tous les experts absents de la VRAM calculés sur CPU.
+Cache VRAM auto, réserve 2048 Mio, partage par couches 24/24, caches fixes, adaptation désactivée.
+Experts en RAM épinglée, table ngram en RAM verrouillée ; aucune lecture de blob d’expert pendant les réponses.
+Le profil d’experts et le tokenizer commun sont copiés dans cette archive pour les comparatifs ultérieurs.
+
+Résultats : médianes des deux répétitions, en tokens générés par seconde.
+ciel: Q4 28.26 t/s ; IQ4 29.82 t/s ; écart +5.5 %.
+  MTP accepté : q4 58.4 %, iq4 61.0 %
+  Tokens produits : q4 [256, 256], iq4 [256, 256]
+fibonacci: Q4 33.31 t/s ; IQ4 36.75 t/s ; écart +10.3 %.
+  MTP accepté : q4 80.2 %, iq4 81.2 %
+  Tokens produits : q4 [256, 256], iq4 [256, 256]
+fourmis: Q4 27.59 t/s ; IQ4 27.99 t/s ; écart +1.5 %.
+  MTP accepté : q4 65.4 %, iq4 56.7 %
+  Tokens produits : q4 [426, 426], iq4 [440, 421]
+
+Interprétation :
+Le gain sur la poésie est faible (+1.5 % sur ces deux répétitions) : les débits sont pratiquement équivalents.
+L’acceptation MTP sur la poésie baisse de 65.4 % en Q4 à 56.7 % en IQ4, ce qui peut réduire le gain apporté par les caches.
+Sur ciel et Fibonacci, les médianes IQ4 augmentent respectivement de 5.5 % et 10.3 %.
+À température 0 et seed 42, les deux sorties IQ4 diffèrent sur ciel et poésie ; Fibonacci reste identique.
+Le protocole identique ne garantit donc pas un texte identique ni une comparaison à parcours de calcul strictement identique.
+Les poèmes sont complets et compréhensibles, mais les deux modèles dépassent les 200 mots demandés.
+Le code Fibonacci IQ4 donne bien [0, 1, 1, 2, 3, 5, 8, 13] pour n=8 ; son commentaire final est tronqué par la limite commune.
+Les explications du ciel sont également tronquées par la limite commune de 256 tokens.
+Ce petit ensemble permet de comparer vitesse et placement ; il ne prouve pas une qualité globale supérieure.
+
+Placement et portée de la comparaison :
+Experts natifs : Q4 71.73 Gio ; IQ4 60.94 Gio.
+Table PLE/ngram : même format IQ4_NL et même taille de 26.82 Gio pour les deux artefacts.
+Le vocabulaire, les merges et les IDs spéciaux sont identiques. Les templates fournis diffèrent.
+Le serveur IQ4 utilise volontairement le tokenizer/template Q4 pour produire les mêmes tokens d’entrée.
+Le template original IQ4 est conservé dans chat_template-iq4-original.jinja.
+Les noms/provenances et les calibrations des deux artefacts diffèrent : ce test compare ces fichiers locaux,
+pas uniquement deux quantifications d’un checkpoint dont l’identité des poids aurait été prouvée.
+Les petits tenseurs nécessaires à Strata sont convertis en BF16 ; les experts gardent leurs octets natifs.
+Le wrapper Preparer-IQ4-Strata.py conserve aussi la clé PLE native IQ4_XS, déjà supportée par le moteur.
+Le brouillon MTP Q2 reste strictement le même ; son taux d’acceptation peut donc varier selon le modèle cible.
+Les réponses ciel/Fibonacci limitées à 256 tokens ne constituent pas une étude complète de qualité.
+Les réponses, télémétries et traces de chaque essai sont conservées dans q4/ et iq4/.
+L’utilisation CPU inclut les attentes actives des travailleurs ; elle ne mesure pas uniquement du calcul utile.
+Les hash des GGUF portent seulement sur leurs en-têtes ; aucun hash intégral des poids n’est revendiqué.
+
+Binaire commun SHA256 : 9b07c8c1e2367d217e17199f137f6c8d33f5832ab02df594b68652ba5c9488d0
+
+Placement mesuré au terme des essais :
+q4: 5491 experts en VRAM (3004 sur la première P100, 2487 sur la seconde), 16.02 Gio de cache expert.
+  Complément expert en RAM : 55.71 Gio ; pic RAM du processus : 83.49 Gio.
+  VRAM occupée, toutes allocations comprises : P100 1 14.87 Gio, P100 2 15.09 Gio
+iq4: 7628 experts en VRAM (4089 sur la première P100, 3539 sur la seconde), 18.91 Gio de cache expert.
+  Complément expert en RAM : 42.02 Gio ; pic RAM du processus : 70.07 Gio.
+  VRAM occupée, toutes allocations comprises : P100 1 14.66 Gio, P100 2 14.80 Gio
+  Poésie, nombre de mots selon le même compteur : q4 [222, 222], iq4 [236, 218]
+Le pic RAM est le working set du processus ; il peut aussi inclure des pages des GGUF mises en cache.
+Il doit être distingué du complément expert épinglé et de la table PLE verrouillée, dont les tailles sont explicites.
+Les mesures GPU ci-dessus proviennent de NVML, avec les UUID des deux P100 explicitement sélectionnés.
+Le panneau matériel de /metrics identifie la Quadro P2200 : ses graphiques GPU ne sont pas utilisés ici.
+
+Chargement initial :
+Une prélecture séquentielle supplémentaire a été essayée, puis arrêtée avant les requêtes mesurées.
+État archivé : interrompue; 27.10 Gio lus par cet auxiliaire.
+Les lectures dispersées du profil rendent le démarrage depuis le HDD très lent.
+Ce temps de démarrage ne fait pas partie des débits d’inférence présentés.
+Une seconde prélecture, limitée aux couches 24-47, a lu 30.47 Gio en 813.4 s ; blocs de 4 Mio, plafond de 48 Mio/s.
+Cette aide au démarrage se termine avant le warmup et les six réponses mesurées.
+Aide à la copie RAM (etat-prelecture-complement.json) : état interrupted, 11.87 Gio lus en 189.8 s, 0.00 Gio ignorés car déjà copiés/vérifiés par Strata.
+Aide à la copie RAM (etat-prelecture-complement-rapide.json) : état complete, 44.43 Gio lus en 755.4 s, 16.50 Gio ignorés car déjà copiés/vérifiés par Strata.
+La dernière aide bride les blocs lents et parcourt immédiatement les blocs déjà chauds.
+Le seuil temporel utilisé pour reconnaître les blocs chauds est une heuristique, pas une mesure matérielle de cache.
+Le code du moteur copiant les projections natives utilise memcpy sur les vues des GGUF sans PrefetchVirtualMemory.
+Le démarrage Q4/IQ4 ne fait pas l’objet d’un ratio comparable : les états du cache fichier diffèrent.
+Ces étapes copient les octets natifs ; le temps d’attente ne démontre pas un coût de calcul IQ4 en inférence.
+Serveur IQ4 observé prêt après environ 69.6 minutes (horodatages des fichiers, interrogation toutes les dix secondes).

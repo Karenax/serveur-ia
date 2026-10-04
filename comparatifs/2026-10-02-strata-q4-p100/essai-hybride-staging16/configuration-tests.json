@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-02",
+  "engine": "Strata 0.1.35",
+  "source_commit": "d9ab8435f654c368c586340d490915f6addf56a3",
+  "engine_pid": 5912,
+  "engine_start": "2026-10-02T17:23:46+02:00",
+  "engine_binary_sha256": "FAC0D4CFEC27511CFC1BE43AB9828F1A9FE3249EDB8F7A9B22342F3A650D2D15",
+  "mode": "hybride : repli CPU possible malgré pcie-frac=1, capacité de staging 16 experts",
+  "gpu": "2 Tesla P100 16 Gio sm60",
+  "driver": "528.89",
+  "context": 4096,
+  "main_model": "UD-Q4_K_XL local, adaptations BF16",
+  "mtp": "experts Q2_0 dérivés du MTP Q8 local",
+  "model_files": [
+    {
+      "FullName": "D:\\modèle\\qwen3.8FlashNext\\Qwen3.8-Flash-Next-UD-Q4_K_XL-00001-of-00004.gguf",
+      "Length": 10946752,
+      "LastWriteTimeUtc": "2026-10-01T10:26:10Z"
+    },
+    {
+      "FullName": "D:\\modèle\\qwen3.8FlashNext\\Qwen3.8-Flash-Next-UD-Q4_K_XL-00002-of-00004.gguf",
+      "Length": 49859583296,
+      "LastWriteTimeUtc": "2026-10-01T12:18:42Z"
+    },
+    {
+      "FullName": "D:\\modèle\\qwen3.8FlashNext\\Qwen3.8-Flash-Next-UD-Q4_K_XL-00003-of-00004.gguf",
+      "Length": 49376141664,
+      "LastWriteTimeUtc": "2026-10-01T12:18:58Z"
+    },
+    {
+      "FullName": "D:\\modèle\\qwen3.8FlashNext\\Qwen3.8-Flash-Next-UD-Q4_K_XL-00004-of-00004.gguf",
+      "Length": 12087983680,
+      "LastWriteTimeUtc": "2026-10-01T10:41:32Z"
+    }
+  ],
+  "diagnostic_sync_during_benchmark": false,
+  "trace": true,
+  "max_output_tokens": 256,
+  "temperature": 0,
+  "seed": 42,
+  "thinking": false,
+  "prompt_cache": 0
+}

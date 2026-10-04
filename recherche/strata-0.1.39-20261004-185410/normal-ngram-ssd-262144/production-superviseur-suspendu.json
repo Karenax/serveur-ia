@@ -1,0 +1,14 @@
+{
+  "pid": 49324,
+  "created": 1791140097.7050536,
+  "status": "remplace",
+  "config_path": "D:\\Serveur IA\\lanceur\\sessions\\20261003-211939-259117\\strata.json",
+  "server_pids": [
+    41040,
+    47624
+  ],
+  "replacement": {
+    "pid": 920,
+    "created": 1791145120.9398763
+  }
+}

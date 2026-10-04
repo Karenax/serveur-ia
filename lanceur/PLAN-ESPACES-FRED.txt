@@ -1,0 +1,158 @@
+ESPACES DE TRAVAIL — ACCÈS SERVEUR FRED
+Étude et proposition : 4 octobre 2026
+État : plan initial ; les lots retenus sont intégrés dans la version 3.3.1.
+Guide de la version livrée : ESPACES-FRED.txt ; vérifications : AUDIT-ESPACES-FRED.txt.
+Base examinée : version 3.2.1, client personnel sans compte ni mot de passe.
+
+OBJECTIF
+
+Faire évoluer le chatbot vers un espace de travail : un projet regroupe ses
+discussions, instructions, documents et résultats. L'utilisateur peut choisir un
+assistant, produire un document et retrouver le travail effectué sur le serveur.
+Conserver l'EXE personnel, WireGuard, les mises à jour signées et le moteur Qwen.
+
+CE QUE L'ÉTUDE OPENDOTS APPORTE
+
+OpenDots fournit des espaces, des pages éditables, des assistants configurables,
+une mémoire choisie par l'utilisateur et des travaux planifiés. C'est un modèle
+encore en développement, prévu initialement pour un propriétaire unique.
+Les pièces jointes et le partage entre utilisateurs ne sont pas inclus actuellement.
+Les pages sont stockées localement ; ses conversations utilisent Intelligence.
+Son architecture complète ajoute React, Node et les services CopilotKit.
+
+Source : https://github.com/CopilotKit/OpenDots/blob/main/README.md
+Configuration : https://github.com/CopilotKit/OpenDots/blob/main/docs/SETUP.md
+Ordinateurs d'agents : https://github.com/CopilotKit/OpenDots/blob/main/docs/COMPUTERS.md
+Licence : https://github.com/CopilotKit/OpenDots/blob/main/LICENSE
+
+La licence du code OpenDots est MIT. Toute reprise substantielle doit conserver
+ses mentions de copyright et de licence ; contrôler séparément les dépendances.
+L'inspiration fonctionnelle ne nécessite pas d'importer tout son environnement.
+
+ORGANISATION PROPOSÉE
+
+Client : Discussions / Projets / Assistants / Tâches / Réglages.
+- Discussions : chat actuel, avec choix d'un projet et d'un assistant.
+- Projets : dossiers, instructions, documents, notes et résultats enregistrés.
+- Assistants : profils disponibles, rôle et capacités clairement présentés.
+- Tâches : travaux en cours, résultats, échecs, annulation et relance.
+- Réglages : connexion, accès personnel, mises à jour et API locale existants.
+
+Dans un projet : navigation à gauche, discussion au centre, panneau de document
+ou résultat à droite. Réduire le panneau secondaire sur une petite fenêtre.
+Les documents restent dans leur projet pour éviter de multiplier les rubriques.
+
+Console serveur : conserver les sujets actuels et ajouter :
+- Espaces et fichiers : capacité utilisée, limites par accès, sauvegardes.
+- Assistants et outils : profils, instructions, droits et services autorisés.
+- Tâches : file d'attente, activité, erreurs et arrêt d'un travail.
+Dans Clients, afficher les droits et limites de chaque EXE personnel.
+
+LOT 1 — PROJETS, ASSISTANTS ET DOCUMENTS ÉDITABLES
+
+1. Créer, renommer, archiver et rechercher un projet ; rattacher des discussions.
+2. Définir des instructions et notes de contexte propres au projet.
+3. Fournir quatre profils : Général, Rédaction, Code et Analyse.
+   Un profil change les instructions et droits ; tous utilisent le même Qwen.
+   Il ne charge pas un modèle supplémentaire et ne crée pas de parallélisme GPU.
+4. Transformer une réponse en document ; édition simple, export Markdown ou texte.
+   Prévisualiser une révision proposée par l'IA avant de l'accepter.
+5. Sauvegarde avec numéro de révision et conservation du brouillon sur erreur.
+
+Critères de fin : deux accès distincts ne peuvent lire ni modifier les projets de
+l'autre, même avec un identifiant deviné. Révocation effective. Une modification
+concurrente ne remplace pas silencieusement un document. Les fonctions 3.2.1 restent
+utilisables, y compris historique local, arrêt de génération et mise à jour signée.
+
+LOT 2 — FICHIERS ET QUESTIONS SUR LES DOCUMENTS
+
+Importer les fichiers choisis par l'utilisateur : TXT, Markdown, DOCX et PDF texte.
+Afficher l'état d'import, les limites, les erreurs et un bouton de suppression.
+Découper et indexer le texte, puis sélectionner les extraits utiles à une question.
+Retourner le fichier source, la page quand elle existe et l'extrait justificatif.
+Commencer par une recherche textuelle ; évaluer ensuite un index sémantique sur
+un corpus représentatif. Prévoir l'OCR des PDF scannés dans une étape distincte.
+Les pièces jointes et cette recherche sont nos extensions, pas des fonctions
+déjà disponibles dans le modèle OpenDots examiné.
+
+Critères de fin : imports bornés, type et contenu validés, fichiers hors projet
+inaccessibles, suppression de l'index avec le fichier, citations vérifiables.
+Un document est une source à consulter, pas une autorisation d'exécuter ses consignes.
+
+LOT 3 — TÂCHES PERSISTANTES ET MÉMOIRE EXPLICITE
+
+Lancer une synthèse ou une analyse longue et retrouver son résultat après fermeture
+du client. Enregistrer état, résultat, erreur et échéance dans une base persistante.
+Ajouter annulation, relance manuelle et notification dans le client à la reconnexion.
+Les discussions interactives passent avant les tâches en attente. Une tâche déjà
+en cours reste arrêtée ou terminée proprement ; pas de promesse de préemption GPU.
+Après stabilisation, permettre une exécution à date donnée puis des récurrences.
+
+Mémoire : l'utilisateur choisit les préférences et faits à retenir dans son projet,
+peut les consulter, modifier et supprimer. Pas d'enregistrement automatique de
+toutes ses conversations comme mémoire partagée.
+
+Critères de fin : redémarrage serveur sans perte des tâches, pas de double action
+après relance, annulation et limites par client, accès révoqué privé de nouvelles
+exécutions. Résultats accessibles uniquement au propriétaire autorisé.
+
+LOT 4 — RECHERCHE WEB ET OUTILS CONTRÔLÉS
+
+Recherche web avec liens et extraits sourcés. Le fournisseur externe est configuré
+par l'administrateur ; indiquer les informations qui lui sont transmises.
+Les documents d'un projet ne sont pas envoyés automatiquement au fournisseur.
+Autoriser ensuite des outils précis par assistant, projet et accès personnel.
+Présenter une validation dans le chat avant une action sensible et journaliser
+l'action sans copier les secrets ou tout le contenu des documents.
+
+Strata sait déjà traiter des appels d'outils et dispose d'un composant MCP.
+Notre relais distant désactive actuellement l'exécution MCP du serveur. Cette
+protection ne doit pas être simplement retirée : construire un service d'outils
+avec contrôle du propriétaire, des capacités et des ressources à chaque appel.
+
+L'exécution de code et le navigateur piloté viennent après ce contrôle. OpenDots
+utilise des services OpenBot et des conteneurs Docker ; ces services demandent
+une préparation dédiée. Un conteneur standard ne garantit pas une isolation
+complète. Les outils ne doivent pas retomber sur le terminal Windows du serveur.
+
+ULTÉRIEUREMENT
+
+- Dictée et lecture vocale, après évaluation de la latence et des ressources.
+- Espaces partagés, avec invitations, rôles et contrôle d'accès explicites.
+- Connecteurs mail ou messagerie uniquement selon les usages demandés.
+- Coordination de plusieurs assistants après mesure du coût sur la file Qwen.
+Ces fonctions ne sont pas prioritaires pour le premier lot.
+
+INTÉGRATION TECHNIQUE PROPOSÉE
+
+Garder le client Python/pywebview/WebView2 et ses écrans HTML/CSS/JavaScript.
+Ajouter un service Python et une base SQLite pour projets, pages, profils et tâches,
+avec fichiers et index rattachés au propriétaire. Sauvegarder base et fichiers
+ensemble et vérifier leur restauration. Les données du serveur restent accessibles
+à son administrateur ; ne pas promettre un chiffrement de bout en bout.
+
+L'identité provient du jeton de l'EXE vérifié côté serveur, jamais d'un owner_id
+fourni librement par le client. Les copies du même EXE partagent la même identité.
+Une séparation par destinataire exige donc un EXE distinct pour chacun.
+
+Étendre explicitement les routes autorisées des passerelles Go côté client et
+serveur. Conserver l'API de chat actuelle et versionner les nouvelles capacités
+pour qu'un ancien client reste utilisable pendant une mise à jour progressive.
+L'historique local DPAPI actuel reste local ; tout transfert vers un projet serveur
+est une action explicite de l'utilisateur.
+
+La file actuelle est bornée et en mémoire ; elle n'est pas un moteur de tâches
+durables. Ajouter la persistance et les priorités avant de promettre un travail
+qui continue client fermé. Limiter stockage, import et tâches par accès personnel.
+
+Choix recommandé : reprendre l'organisation et les mécanismes utiles d'OpenDots,
+puis intégrer progressivement dans notre application. Une adoption complète exige
+de tester Qwen/Strata avec son runtime et d'adapter les identités, la persistance
+des conversations et les services externes. Ce n'est pas une intégration déjà validée.
+
+PROCHAINE ÉTAPE CONCRÈTE
+
+Implémenter le lot 1, avec les contrôles d'accès et sauvegardes dès le départ.
+Le résultat visible sera : créer un projet, choisir Rédaction, discuter avec Qwen,
+enregistrer la réponse comme document, la corriger et la retrouver au prochain
+lancement. Les imports et tâches s'ajoutent ensuite sur cette même base.

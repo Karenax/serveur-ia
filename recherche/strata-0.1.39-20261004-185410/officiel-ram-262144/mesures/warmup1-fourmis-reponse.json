@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-a6b45eea8d5c43a8b304f232",
+  "object": "chat.completion",
+  "created": 1791137767,
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Sous le soleil ardent, dans l’ombre des racines,\nUn peuple minuscule, aux forces divines,\nS’agite sans relâche, silencieux et fier,\nPortant le poids du monde sur son dos léger.\n\nElles marchent en file, noires comme l’encre,\nSur les sentiers de terre, aux bords de l’enceinte.\nChacune a sa tâche, chacune a son rôle,\nDans ce vaste empire, nul n’est seul, nul ne s’envole.\n\nLa fourmi ouvrière, au pas mesuré,\nTransporte une miette, un trésor doré.\nElle grimpe la colline, franchit le ruisseau,\nGuidée par l’instinct, par le fil du temps.\n\nLa soldate veille, antennes dressées,\nPrête à défendre les portes sacrées.\nContre le scarabée, contre le vent froid,\nElle offre sa vie, elle offre sa foi.\n\nLa reine, au centre, cœur battant du nid,\nTisse l’avenir, tisse l’esprit.\nElle ne voit pas le ciel ni les étoiles,\nMais elle sent la vie qui coule dans ses voiles.\n\nPas de roi couronné, pas de trône d’or,\nJuste l’union, plus forte que la mort.\nChaque grain de sable est une victoire,\nChaque pas un hymne, chaque souffle une gloire.\n\nIls construisent des cathédrales de poussière,\nSans jamais douter, sans jamais se taire.\nLeur sagesse est simple, leur force est immense,\nDans l’ordre parfait, dans la pure essence.\n\nQuand la nuit tombe, ils dorment ensemble,\nDans le calme profond, où l’âme se rassemble.\nPetites créatures, géants de l’effort,\nVous enseignez au monde le sens du sort.\n\nNe méprisez pas le plus petit des êtres,\nCar dans leur travail, il y a des mystères.\nLa fourmi nous dit, par son humble chemin,\nQue la grandeur naît du plus petit destin."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 26,
+    "completion_tokens": 478,
+    "total_tokens": 504,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 26,
+    "prompt_ms": 486.1,
+    "prompt_per_token_ms": 18.696,
+    "prompt_per_second": 53.5,
+    "predicted_n": 478,
+    "predicted_ms": 17000.0,
+    "predicted_per_token_ms": 35.565,
+    "predicted_per_second": 28.1,
+    "draft_n": 536,
+    "draft_n_accepted": 209
+  }
+}

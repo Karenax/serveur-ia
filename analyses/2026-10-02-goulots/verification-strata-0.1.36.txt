@@ -1,0 +1,35 @@
+Vérification du dépôt Strata après le comparatif CPU/GPU
+Dernière vérification distante : 2026-10-02, 19:49 Europe/Paris.
+Commande : git fetch origin main ; aucun merge ni remplacement des sources actives.
+
+Version exécutée et testée : 0.1.35
+Commit de base : d9ab8435f654c368c586340d490915f6addf56a3
+Adaptations locales : compilation sm_60/CUDA 12.4, compatibilité P100, PLE en RAM,
+complément strict en RAM épinglée pour deux GPU, staging 64, option explicite hybride CPU/GPU.
+
+Dernière version du dépôt : 0.1.36
+Commit main/tag : 36fa455e579b23a9c909c2c6fe1bddd9e51cb8ca
+Dernier commit daté : 2026-10-02 18:24:22 +02:00
+Publication de la release : 2 octobre.
+Source primaire : https://github.com/Niko1221/Strata/releases/tag/v0.1.36
+
+Nouveautés pertinentes :
+- Kernels de prompt fusionnés int8 sur Tensor Cores, Q2_0 et certains IQ.
+  Dépendance matérielle RTX 30 et plus récentes ; notre P100 sm_60 et les experts locaux
+  Q4_K/Q5_1/Q8_0 ne sont pas la combinaison visée.
+- Clusters de blocs pour la sélection QSA et argmax en décodage, sm_90+.
+  Les P100 conservent les kernels précédents.
+- --expert-profile-save : sauvegarde périodique et à l'arrêt des experts résidents puis
+  de la fréquence de routage, utilisable au démarrage suivant.
+  Intéressant pour l'apprentissage du cache, mais pas un gain automatique avec notre
+  cache fixe : le classement privilégie les résidents avant la chaleur des autres experts.
+  Il faut une adaptation sûre de RAM/VRAM, ou un classement hors ligne représentatif.
+- UPDATE.bat/update.sh, meilleures indications de taille du draft head et mesures des
+  prompts interrompus : commodité et diagnostics, sans gain attendu sur notre décodage P100.
+
+Le ZIP Windows officiel utilise CUDA 13 et les architectures sm_75, sm_86, sm_89, sm_120,
+avec un pilote NVIDIA 580+. Il ne remplace pas notre binaire P100 sm_60 compilé sous CUDA 12.
+Une migration ultérieure des sources devra conserver les adaptations locales et être recompilée.
+La version 0.1.36 n'a pas été installée pendant cette série : le facteur CPU/GPU reste isolé.
+
+Fichiers locaux associés : commits-strata-0.1.36.txt et mise-a-jour-strata.diff.

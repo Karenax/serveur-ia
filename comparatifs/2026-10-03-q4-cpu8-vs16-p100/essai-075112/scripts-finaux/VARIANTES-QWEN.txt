@@ -1,0 +1,30 @@
+Variantes de Qwen3.8-Flash-Next — qualité prioritaire, aucune suppression d'experts
+Vérification des sources : 3 octobre 2026
+
+Référence conservée : Unsloth UD-Q4_K_XL, actuellement installé (111,33 GB sur disque).
+Le cache contigu sur SSD est une réorganisation des octets existants : aucune
+nouvelle quantification et aucun expert retiré. Il vise le chargement, pas une
+hausse du débit de calcul à poids et placement identiques.
+
+Seul candidat à envisager pour une comparaison ultérieure :
+ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF, variante IQ3_S.
+https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF
+
+Les 512 experts de chacune des 48 couches sont conservés. Les auteurs allouent
+une précision différente aux tenseurs suivant leur sensibilité. Taille publiée :
+83,6 GB (54,8 GB de poids + 28,8 GB de table n-gram), hors vision et MTP.
+Ces tailles de fichiers ne représentent pas directement la RAM ou la VRAM utilisée.
+Nos 128 Gio de RAM permettraient de conserver aussi la table n-gram en RAM.
+La taille moindre pourrait augmenter la part des experts en VRAM ; le gain réel
+sur les P100 et le 3955WX n'est pas mesuré.
+
+Qualité publiée par les auteurs : AIME25 100,00 contre 100,00 en BF16 ;
+GPQA-Diamond 92,93 contre 91,92 ; LiveCodeBench v6 86,86 contre 87,43.
+Les auteurs attribuent les petits dépassements au bruit des benchmarks. Ces
+résultats ne prouvent pas l'absence de dégradation sur nos usages, ni l'équivalence
+avec notre Q4_K_XL. Une évaluation sur tâches réelles serait nécessaire avant un
+remplacement. Aucune autre version n'a été téléchargée ou activée pour ce conseil.
+
+Les variantes supprimant des experts sont exclues conformément à la préférence
+de l'utilisateur. La qualité prime aussi sur les gains de vitesse des quants
+plus agressives. Le Q4_K_XL reste le modèle retenu.

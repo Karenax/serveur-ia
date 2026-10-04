@@ -1,0 +1,11 @@
+{
+  "pid": 56864,
+  "engine_exe": "D:\\Serveur IA\\strata-build-p100\\strata.exe",
+  "table_bytes": 28800138240,
+  "allocation_address": "0x1fc0b170000",
+  "pages": 7031284,
+  "valid_pages": 7031284,
+  "locked_pages": 7031284,
+  "complete": true,
+  "elapsed_seconds": 9.27
+}

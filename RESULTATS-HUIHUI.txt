@@ -1,0 +1,24 @@
+Huihui Qwen3.8 27B abliterated Q4_K_M - essais du 3 octobre 2026
+Model: D:\modèle\huihui-ai\Huihui-Qwen3.8-27B-abliterated-GGUF\Huihui-Qwen3.8-27B-abliterated-UD-DW-Q4_K_M.gguf
+Deux P100 16 Gio, contexte 4096, une conversation, température 0, seed 42, thinking/cache prompt désactivés, 256 tokens.
+Les débits excluent le chargement et le traitement du prompt. Médianes de deux réponses après chauffe.
+RAM = working set observé, incluant des pages du GGUF. Ce ne sont pas tous des pics mesurés.
+Les dernières séries chaudes ont un ralentissement thermique confirmé à environ 79 C. Leur classement mélange configuration et température.
+La confirmation finale attend <=68 C avant chaque réponse mesurée : débit maximal avec pauses de refroidissement, pas débit continu garanti.
+Le mode row échoue (split buffers non pris en charge). Le binaire llama-b11344 échoue en mode layer (invalid device function sur P100).
+Le mode tensor Café fonctionne avec le repli meta-backend butterfly; sampler sur CPU.
+Le fichier IQ3 voisin indique une provenance GSQ-RCO différente et n’a pas été substitué au Huihui abliterated.
+
+Mode | ciel tok/s | Fibonacci tok/s | RAM Gio observée
+confirmation-mtp-2-tensor | 31.82 (31.74-31.90) | 34.74 (34.53-34.95) | 17.900836944580078
+mtp-2-layer-fa-off | 19.78 (18.68-20.87) | 22.28 (22.13-22.43) | 17.928325653076172
+mtp-2-layer-fa-on | 20.42 (20.28-20.55) | 22.50 (22.49-22.50) | 17.898197174072266
+mtp-2-tensor-fa-on | 27.16 (22.52-31.80) | 31.18 (29.68-32.68) | 17.89968490600586
+mtp-4-layer-fa-on | 16.04 (14.45-17.64) | 19.84 (19.05-20.63) | 17.900341033935547
+mtp-4-tensor-fa-on | 21.70 (17.84-25.56) | 24.63 (22.45-26.82) | 17.906890869140625
+mtp-6-layer-fa-on | 11.68 (11.44-11.93) | 16.06 (15.12-17.01) | 17.90259552001953
+sans-mtp-layer-fa-on | 12.13 (12.12-12.13) | 12.13 (12.12-12.13) | 16.54174041748047
+
+Lancer : Start-Huihui-Rapide-P100.ps1. Arrêter : Stop-Huihui-P100.ps1.
+Interface : http://127.0.0.1:8080. Télémétrie thermique : huihui-gpu-thermique.csv.
+Archives détaillées et paramètres effectifs : voir RESULTATS-HUIHUI.json.

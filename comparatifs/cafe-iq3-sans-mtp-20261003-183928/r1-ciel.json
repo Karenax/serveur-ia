@@ -1,0 +1,55 @@
+{
+  "request": {
+    "model": "qwen3.8-flash-next-iq3-s",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Explique en français pourquoi le ciel est bleu, puis pourquoi il devient rouge au coucher du soleil. Donne une explication précise et accessible."
+      }
+    ],
+    "max_tokens": 256,
+    "temperature": 0,
+    "seed": 42,
+    "cache_prompt": false,
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    }
+  },
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "length",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Pour comprendre les couleurs du ciel, il faut d'abord regarder la lumière du soleil. Bien qu'elle nous paraisse blanche, elle est en réalité composée de toutes les couleurs de l'arc-en-ciel (rouge, orange, jaune, vert, bleu, indigo, violet). Ces couleurs voyagent sous forme d'ondes, et chaque couleur a une longueur d'onde différente : le rouge a des ondes longues, tandis que le bleu et le violet ont des ondes courtes.\n\n### Pourquoi le ciel est bleu en journée ?\n\nLorsque la lumière du soleil traverse l'atmosphère terrestre, elle rencontre des milliards de petites molécules de gaz (principalement de l'azote et de l'oxygène). Ce phénomène s'appelle la **diffusion de Rayleigh**.\n\nVoici ce qui se passe :\n1. Les ondes courtes (comme le **bleu** et le violet) sont beaucoup plus faciles à diffuser par les petites molécules de l'atmosphère que les ondes longues (comme le rouge).\n2. La lumière bleue est donc renvoyée dans toutes les directions par l'atmosphère.\n3. Quand vous regardez le ciel, vos"
+        }
+      }
+    ],
+    "created": 1791045789,
+    "model": "qwen3.8-flash-next-iq3-s",
+    "system_fingerprint": "b1-0ae77ef",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 256,
+      "prompt_tokens": 40,
+      "total_tokens": 296,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "id": "chatcmpl-wkdM54xsMncKAIUj3Ziafq5SocCl70Io",
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 40,
+      "prompt_ms": 1005.09,
+      "prompt_per_token_ms": 25.12725,
+      "prompt_per_second": 39.79743107582405,
+      "predicted_n": 256,
+      "predicted_ms": 14773.057,
+      "predicted_per_token_ms": 57.9335568627451,
+      "predicted_per_second": 17.261153192599203
+    }
+  },
+  "elapsed_seconds": 15.889999999999418
+}

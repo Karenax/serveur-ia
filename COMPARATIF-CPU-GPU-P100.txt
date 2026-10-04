@@ -1,0 +1,33 @@
+Comparatif Strata Q4 P100 — CPU et GPU — 2026-10-02T20:11:37.071777+02:00
+Même binaire et mêmes caches pour les quatre répartitions ; 15 travailleurs + le thread hôte.
+Mêmes prompts ciel/Fibonacci, 256 tokens, température 0, seed 42, cache désactivé, thinking désactivé.
+Chaque prompt est testé deux fois ; les valeurs ci-dessous sont les médianes.
+pcie_frac désigne la part des experts absents du cache VRAM calculée sur GPU.
+Les experts déjà résidents et les couches denses restent sur les deux P100.
+
+Part PCIe des absents | Ciel tok/s | Fibonacci tok/s | CPU moyen ciel/fib (équivalents de cœurs)
+---------------------|------------|-----------------|-------------------------------------------
+1.00                 | 8.719      | 10.952           | 0.99 / 0.99
+0.50                 | 14.653      | 17.618           | 14.91 / 14.69
+0.25                 | 22.462      | 26.731           | 14.39 / 14.12
+0.00                 | 28.701      | 35.161           | 14.05 / 13.64
+
+Meilleur partage de cette série : pcie_frac=0.
+Les journaux de toutes les requêtes confirment la résidence RAM et zéro blob lu dans les fichiers.
+L’utilisation CPU moyenne inclut les périodes où les GPU travaillent ; elle ne représente pas un taux d’occupation permanent des 16 cœurs.
+Deux threads SMT partagent un cœur : 100 % dans un affichage sur 32 processeurs logiques n’est pas un objectif de performance.
+Les textes peuvent varier entre chemins CPU/GPU à cause des arrondis ; les réponses intégrales et leurs empreintes sont conservées.
+Cette série conserve MTP et ne teste pas encore ses différents seuils ni son arrêt.
+
+Résultats antérieurs sur les mêmes prompts :
+Café sans MTP : ciel 13.066 ; Fibonacci 9.095 tok/s.
+Café MTP Q8 : ciel 14.364 ; Fibonacci 9.488 tok/s.
+Strata GPU MTP Q2, avant la série : ciel 8.726 ; Fibonacci 10.960 tok/s.
+Café et Strata utilisent des drafts différents : leur écart ne mesure pas uniquement le backend.
+
+Dossier brut : D:\Serveur IA\comparatifs\2026-10-02-strata-hybride-p100\essai-20261002-194111
+
+Validation du réglage par défaut après redémarrage, sans strata_tune :
+Test 1 : 28.733 tokens/s, 83494 travaux CPU, 0 chargements d'experts vers GPU.
+Test 2 : 35.603 tokens/s, 72350 travaux CPU, 0 chargements d'experts vers GPU.
+Résultats : D:\Serveur IA\comparatifs\2026-10-02-strata-hybride-p100\validation-20261002-200515

@@ -1,0 +1,16 @@
+{
+  "pid": 48132,
+  "mode": "direct",
+  "table": "C:\\Temp\\Strata-ngram-recherche\\iq4-xs-ple-iq4_nl.gguf",
+  "table_bytes": 28800138240,
+  "full_private_table_copies": [],
+  "large_private_allocations": [
+    {
+      "base": "0x222000000",
+      "bytes": 52586594304
+    }
+  ],
+  "engine_ram_gib": 50.322479248046875,
+  "verified": true,
+  "note": "Absence of the complete private PLE allocation used by our RAM mode; direct I/O bypasses Windows file cache, while the bounded row cache remains enabled."
+}

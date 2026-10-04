@@ -1,0 +1,61 @@
+{
+  "setting": "gpu-12pc",
+  "case": "fibonacci",
+  "request": {
+    "model": "qwen3.8-flash-next-iq3-s",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Écris une fonction Python fibonacci(n) qui retourne les n premiers nombres de Fibonacci, puis donne un exemple pour n=8. Réponds en français."
+      }
+    ],
+    "max_tokens": 256,
+    "temperature": 0,
+    "seed": 42,
+    "cache_prompt": false,
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    },
+    "strata_tune": {
+      "pcie_frac": 0.125,
+      "spec_min_p": 0.5
+    }
+  },
+  "response": {
+    "id": "chatcmpl-54644c01acfa4e57a6a26415",
+    "object": "chat.completion",
+    "created": 1791045204,
+    "model": "qwen3.8-flash-next-iq3-s",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Voici une implémentation simple et efficace de la fonction `fibonacci(n)` en Python, suivie d'un exemple d'utilisation pour `n=8`.\n\n```python\ndef fibonacci(n):\n    \"\"\"\n    Retourne une liste contenant les n premiers nombres de Fibonacci.\n    \"\"\"\n    if n <= 0:\n        return []\n    elif n == 1:\n        return [0]\n    \n    fib_sequence = [0, 1]\n    for i in range(2, n):\n        next_value = fib_sequence[-1] + fib_sequence[-2]\n        fib_sequence.append(next_value)\n    \n    return fib_sequence\n\n# Exemple pour n=8\nn = 8\nresult = fibonacci(n)\nprint(f\"Les {n} premiers nombres de Fibonacci sont : {result}\")\n```\n\n**Sortie attendue :**\n```\nLes 8 premiers nombres de Fibonacci sont : [0, 1, 1, 2, 3, 5, 8, 13]\n```\n\n### Explication :\n- La suite de Fibonacci commence généralement par `0` et `1`.\n- Chaque nombre suivant est la somme des deux précéd"
+        },
+        "finish_reason": "length"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 46,
+      "completion_tokens": 256,
+      "total_tokens": 302,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 46,
+      "prompt_ms": 1296.2,
+      "prompt_per_token_ms": 28.178,
+      "prompt_per_second": 35.5,
+      "predicted_n": 256,
+      "predicted_ms": 7158.9,
+      "predicted_per_token_ms": 27.964,
+      "predicted_per_second": 35.8,
+      "draft_n": 181,
+      "draft_n_accepted": 157
+    }
+  }
+}

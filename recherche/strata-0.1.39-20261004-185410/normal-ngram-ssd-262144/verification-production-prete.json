@@ -1,0 +1,29 @@
+{
+  "status": "pret",
+  "health": {
+    "status": "ok",
+    "max_context": 262144,
+    "model": "qwen3.8-flash-next-iq4-xs",
+    "images": false,
+    "api_key": false,
+    "loaded": true,
+    "service": "strata"
+  },
+  "active": {
+    "context": 262144,
+    "workers": 15,
+    "history": 6,
+    "mtp": true,
+    "host": "127.0.0.1",
+    "port": 8080
+  },
+  "managed": true,
+  "engine_exe": "D:/Serveur IA/strata-build-p100/strata.exe",
+  "loading_seconds": 685.3,
+  "ready_seconds": 687.4,
+  "supervisor": {
+    "pid": 920,
+    "created": 1791145120.9398763
+  },
+  "ngram_mode": "ram"
+}

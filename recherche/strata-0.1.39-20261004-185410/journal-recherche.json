@@ -1,0 +1,386 @@
+{
+  "ssd_policy": "Only user copies GGUF files to C:/Temp; all research scripts/builds/logs remain on D",
+  "production_policy": "No production source, executable, defaults or settings changed by this research task",
+  "official_git_revision": "6f32ec070f23ced9f50e704d854d775da52591ab",
+  "second_attempt": {
+    "path": "officiel-262144/mesures-echec-disque",
+    "result": "Stock default direct PLE on HDD was interrupted at user requirement that PLE be in RAM; not a final performance result"
+  },
+  "context": 262144,
+  "official_git_tag": "v0.1.39",
+  "official_cpu_gpu_parity": "Both Tesla P100: native_expert_parity --synthetic iq4_xs/iq4_nl: 0 failures",
+  "date": "2026-10-04T19:37:02.8005809+02:00",
+  "ple_ram": {
+    "windows_reference": "https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtuallock",
+    "verified_locked_pages": 7031284,
+    "code": "Official: --ple-io mmap, external read-only locked pages of the same SSD shard; adapted/reference: complete private VirtualLock RAM copy.",
+    "bytes": 28800138240
+  },
+  "first_attempt": {
+    "path": "officiel-262144/mesures-echec-froid",
+    "result": "First cold batched prompt hit stock 300-second engine silence limit; 503 response, no benchmark result"
+  },
+  "date_fin": "2026-10-04T21:12:51.476746+02:00",
+  "ssd_copy": {
+    "status": "verifie",
+    "files": [
+      {
+        "name": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+        "expected_bytes": 44766155936,
+        "present_bytes": 44766155936,
+        "no_active_writer": true
+      },
+      {
+        "name": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00002-of-00003.gguf",
+        "expected_bytes": 44735995008,
+        "present_bytes": 44735995008,
+        "no_active_writer": true
+      },
+      {
+        "name": "Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00003-of-00003.gguf",
+        "expected_bytes": 7971004256,
+        "present_bytes": 7971004256,
+        "no_active_writer": true
+      }
+    ],
+    "elapsed_seconds": 855,
+    "verification": "Exact sizes, no open writer, and equal 256 KiB samples at beginning/middle/end of all shards"
+  },
+  "completed_benchmarks": {
+    "date": "2026-10-04T21:12:51.382459+02:00",
+    "context": 262144,
+    "input_tokens": [
+      26,
+      40,
+      46
+    ],
+    "repeats": 2,
+    "warmups": 1,
+    "modes": [
+      {
+        "mode": "reference-production",
+        "label": "0.1.35 + notre hybride",
+        "path": "D:\\Serveur IA\\recherche\\strata-0.1.39-20261004-185410\\reference-production-262144",
+        "tests": {
+          "ciel": {
+            "median_tps": 29.074239099632067,
+            "median_prompt_tps": 30.299999999999997,
+            "output_tokens": [
+              256,
+              256
+            ]
+          },
+          "fibonacci": {
+            "median_tps": 34.93476078744591,
+            "median_prompt_tps": 36.1,
+            "output_tokens": [
+              256,
+              256
+            ]
+          },
+          "fourmis": {
+            "median_tps": 27.678787171954944,
+            "median_prompt_tps": 26.5,
+            "output_tokens": [
+              426,
+              426
+            ]
+          }
+        },
+        "engine_rss_peak_gib": 77.09029006958008,
+        "ngram_external_rss_peak_gib": 0.0,
+        "system_ram_peak_gib": 93.49842071533203,
+        "vram_peak_gib": {
+          "0": 14.726318359375,
+          "1": 14.87091064453125
+        },
+        "temperature_max_c": {
+          "0": 54,
+          "1": 60
+        },
+        "throttle_masks": {
+          "0": [
+            0
+          ],
+          "1": [
+            0
+          ]
+        },
+        "ram_cpu_mode_verified": true
+      },
+      {
+        "mode": "officiel",
+        "label": "0.1.39 Git, experts mmap",
+        "path": "D:\\Serveur IA\\recherche\\strata-0.1.39-20261004-185410\\officiel-262144",
+        "tests": {
+          "ciel": {
+            "median_tps": 12.533626581435257,
+            "median_prompt_tps": 12.0,
+            "output_tokens": [
+              256,
+              256
+            ]
+          },
+          "fibonacci": {
+            "median_tps": 9.14524099600112,
+            "median_prompt_tps": 10.45,
+            "output_tokens": [
+              256,
+              256
+            ]
+          },
+          "fourmis": {
+            "median_tps": 17.08978854902307,
+            "median_prompt_tps": 12.1,
+            "output_tokens": [
+              432,
+              416
+            ]
+          }
+        },
+        "engine_rss_peak_gib": 55.922874450683594,
+        "ngram_external_rss_peak_gib": 26.894302368164062,
+        "system_ram_peak_gib": 98.92772674560547,
+        "vram_peak_gib": {
+          "0": 15.7852783203125,
+          "1": 15.92218017578125
+        },
+        "temperature_max_c": {
+          "0": 54,
+          "1": 59
+        },
+        "throttle_masks": {
+          "0": [
+            0
+          ],
+          "1": [
+            0
+          ]
+        },
+        "ram_cpu_mode_verified": null
+      },
+      {
+        "mode": "officiel-ram-reserve2048",
+        "label": "0.1.39 Git, tous les experts RAM, reserve 2 Go",
+        "path": "D:\\Serveur IA\\recherche\\strata-0.1.39-20261004-185410\\officiel-ram-reserve2048-262144",
+        "tests": {
+          "ciel": {
+            "median_tps": 29.906168093364833,
+            "median_prompt_tps": 51.2,
+            "output_tokens": [
+              256,
+              256
+            ]
+          },
+          "fibonacci": {
+            "median_tps": 34.72389717608943,
+            "median_prompt_tps": 49.1,
+            "output_tokens": [
+              256,
+              256
+            ]
+          },
+          "fourmis": {
+            "median_tps": 27.060419304388418,
+            "median_prompt_tps": 51.8,
+            "output_tokens": [
+              431,
+              406
+            ]
+          }
+        },
+        "engine_rss_peak_gib": 63.435794830322266,
+        "ngram_external_rss_peak_gib": 26.833301544189453,
+        "system_ram_peak_gib": 105.43671417236328,
+        "vram_peak_gib": {
+          "0": 14.47344970703125,
+          "1": 14.6103515625
+        },
+        "temperature_max_c": {
+          "0": 57,
+          "1": 64
+        },
+        "throttle_masks": {
+          "0": [
+            0
+          ],
+          "1": [
+            0
+          ]
+        },
+        "ram_cpu_mode_verified": null
+      },
+      {
+        "mode": "adapte",
+        "label": "0.1.39 + notre hybride",
+        "path": "D:\\Serveur IA\\recherche\\strata-0.1.39-20261004-185410\\adapte-262144",
+        "tests": {
+          "ciel": {
+            "median_tps": 29.571303362215744,
+            "median_prompt_tps": 32.8,
+            "output_tokens": [
+              256,
+              256
+            ]
+          },
+          "fibonacci": {
+            "median_tps": 35.32061547941452,
+            "median_prompt_tps": 36.2,
+            "output_tokens": [
+              256,
+              256
+            ]
+          },
+          "fourmis": {
+            "median_tps": 26.597645443115105,
+            "median_prompt_tps": 26.5,
+            "output_tokens": [
+              413,
+              413
+            ]
+          }
+        },
+        "engine_rss_peak_gib": 77.08740997314453,
+        "ngram_external_rss_peak_gib": 0.0,
+        "system_ram_peak_gib": 93.55436325073242,
+        "vram_peak_gib": {
+          "0": 14.714599609375,
+          "1": 14.85723876953125
+        },
+        "temperature_max_c": {
+          "0": 55,
+          "1": 60
+        },
+        "throttle_masks": {
+          "0": [
+            0
+          ],
+          "1": [
+            0
+          ]
+        },
+        "ram_cpu_mode_verified": true
+      }
+    ],
+    "incomplete_official_default": {
+      "path": "D:\\Serveur IA\\recherche\\strata-0.1.39-20261004-185410\\officiel-ram-262144\\mesures",
+      "reason": "Last request failed: verify: instantiate: out of memory. Default 700 MiB GPU reserve; complete retest uses official --vram-reserve-mib 2048."
+    },
+    "memory_note": "RSS values are process working sets, not unique physical pages. External PLE lock maps the same file as the official engine; their RSS values partly overlap. Machine used RAM is independently sampled and includes Windows/other apps."
+  },
+  "production_restored": {
+    "status": "pret",
+    "health": {
+      "status": "ok",
+      "max_context": 262144,
+      "model": "qwen3.8-flash-next-iq4-xs",
+      "images": false,
+      "api_key": false,
+      "loaded": true,
+      "service": "strata"
+    },
+    "active": {
+      "context": 262144,
+      "workers": 15,
+      "history": 6,
+      "mtp": true,
+      "host": "127.0.0.1",
+      "port": 8080
+    },
+    "managed": true,
+    "engine_exe": "D:/Serveur IA/strata-build-p100/strata.exe",
+    "loading_seconds": 900.8,
+    "ready_seconds": 903.0,
+    "supervisor": {
+      "pid": 49324,
+      "created": 1791140097.7050536
+    }
+  },
+  "production_hash_checks": [
+    {
+      "path": "D:\\Serveur IA\\lanceur\\base-strata.json",
+      "unchanged": true,
+      "current_sha256": "E4410573AAD540C2DEF0CAB886AF7E211E0EBF7D791767D9D848C5142661A16B"
+    },
+    {
+      "path": "D:\\Serveur IA\\lanceur\\reglages.json",
+      "unchanged": true,
+      "current_sha256": "5BEB1FFCF8DE48735588DC76AE17421A94A6B2ED2CA4D1A0E5729D758E8957BB"
+    },
+    {
+      "path": "D:\\Serveur IA\\lanceur\\reglages-par-defaut.json",
+      "unchanged": true,
+      "current_sha256": "5114C1B2ED9A0DA6A40756E9B99C98DE98B70573AEFB93E87C3B29F6C2B9BA5A"
+    },
+    {
+      "path": "D:\\Serveur IA\\strata-iq4-p100-hybride.json",
+      "unchanged": true,
+      "current_sha256": "E4410573AAD540C2DEF0CAB886AF7E211E0EBF7D791767D9D848C5142661A16B"
+    },
+    {
+      "path": "D:\\Serveur IA\\strata-build-p100\\strata.exe",
+      "unchanged": true,
+      "current_sha256": "9B07C8C1E2367D217E17199F137F6C8D33F5832AB02DF594B68652BA5C9488D0"
+    },
+    {
+      "path": "D:\\Serveur IA\\lanceur\\core.py",
+      "unchanged": false,
+      "current_sha256": "C3FB49DE3475CCE615404BDDD662BD80195A97B2FEB5A02AAD641F215BD401AF"
+    },
+    {
+      "path": "D:\\Serveur IA\\lanceur\\app.py",
+      "unchanged": false,
+      "current_sha256": "2D529123B96DDDD2008C8FD37517AB206A1AF5BACECC80C8D17466DFB85DB741"
+    },
+    {
+      "path": "D:\\Serveur IA\\Strata-src\\serve\\web\\app.js",
+      "unchanged": true,
+      "current_sha256": "0D4D97B17AC02608C4250BFD63ED7243DA7DDF898FE623DC0671F45CB155D7C1"
+    },
+    {
+      "path": "D:\\Serveur IA\\Strata-src\\serve\\web\\app.css",
+      "unchanged": true,
+      "current_sha256": "0675E1C62A9647067E76CAE7185BC24EEC19E7E280D259C7698B35BECF8E4393"
+    },
+    {
+      "path": "D:\\Serveur IA\\Strata-src\\serve\\web\\index.html",
+      "unchanged": true,
+      "current_sha256": "A90A390C0B04A47FF1F03B06285F276E7D94AE38FE9D58BED8ED22D7E0B8447D"
+    }
+  ],
+  "production_external_edits_note": "app.py and core.py changed during the research session outside this work; they were not edited or restored by the research task. Production engine/config/settings hashes are unchanged.",
+  "adapted_cpu_gpu_parity": "Both Tesla P100: native_expert_parity iq4_xs/iq4_nl and prefill_p100_test passed",
+  "adapted_ngram_ram_check": {
+    "pid": 48448,
+    "engine_exe": "D:\\Serveur IA\\recherche\\strata-0.1.39-20261004-185410\\build-adapte\\strata.exe",
+    "table_bytes": 28800138240,
+    "allocation_address": "0x269c12c0000",
+    "pages": 7031284,
+    "valid_pages": 7031284,
+    "locked_pages": 7031284,
+    "complete": true,
+    "elapsed_seconds": 9.34
+  },
+  "reference_ngram_ram_check": {
+    "pid": 29780,
+    "engine_exe": "D:\\Serveur IA\\strata-build-p100\\strata.exe",
+    "table_bytes": 28800138240,
+    "allocation_address": "0x27c1e640000",
+    "pages": 7031284,
+    "valid_pages": 7031284,
+    "locked_pages": 7031284,
+    "complete": true,
+    "elapsed_seconds": 9.38
+  },
+  "production_ngram_ram_check": {
+    "pid": 56864,
+    "engine_exe": "D:\\Serveur IA\\strata-build-p100\\strata.exe",
+    "table_bytes": 28800138240,
+    "allocation_address": "0x1fc0b170000",
+    "pages": 7031284,
+    "valid_pages": 7031284,
+    "locked_pages": 7031284,
+    "complete": true,
+    "elapsed_seconds": 9.27
+  }
+}

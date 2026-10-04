@@ -1,0 +1,18 @@
+{
+  "status": "interrupted",
+  "read_gib": 2.05078125,
+  "total_gib": 71.728515625,
+  "block_mib": 4,
+  "rate_limit_mib_s": 128,
+  "layers": [
+    0,
+    47
+  ],
+  "cache_aware": true,
+  "skipped_verified_gib": 0.0,
+  "hot_read_gib": 0.10546875,
+  "elapsed_seconds": 147.98588209999434,
+  "note": "Read-only startup aid. No inference benchmarks run while this helper is active.",
+  "last_tensor": "blk.1.ffn_down_exps.weight",
+  "reason": "Remplacée par une prélecture dans le même ordre gate/up/down que la copie RAM du moteur"
+}

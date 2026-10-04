@@ -1,0 +1,36 @@
+Qwen3.8 Flash Next Q4 — GPU P100 — 2 octobre 2026
+
+Serveur validé sur les deux P100 avec poids en VRAM + RAM épinglée.
+Adresse : http://127.0.0.1:8080 ; API : http://127.0.0.1:8080/v1
+Alias API : qwen3.8-flash-next.
+Le compte rendu détaillé et les limites des mesures figurent dans RESULTATS-GPU.txt.
+
+Démarrer (GPU avec MTP par défaut) :
+powershell -ExecutionPolicy Bypass -File "D:\Serveur IA\Start-Qwen.ps1"
+Démarrer sans MTP : même commande suivie de -SansMTP
+Arrêter avant de changer de mode :
+powershell -ExecutionPolicy Bypass -File "D:\Serveur IA\Stop-Qwen.ps1"
+
+Tests de 256 tokens, température 0 :
+Texte scientifique : 13,07 tokens/s sans MTP ; 14,36 avec MTP (+9,9 %).
+Code Python : 9,09 tokens/s sans MTP ; 9,49 avec MTP (+4,3 %).
+Les sorties sont identiques entre les deux modes sur ces deux tests.
+MTP : 77,5 % puis 90,1 % des propositions acceptées.
+Le serveur est laissé actif avec MTP. Le choix par défaut repose sur ce petit comparatif.
+
+Occupation maximale avec MTP : 11316 et 14088 Mio de VRAM, environ 101 Gio de RAM.
+Les matrices et experts sont calculés sur GPU. Le CPU prépare les requêtes et lit
+les tables n-gram ; les experts hors cache VRAM sont lus en RAM par les GPU via PCIe.
+Aucune lecture disque du modèle mesurée pendant les réponses.
+Le Q4 fait 103,69 Gio et ne tient pas entièrement dans les 32 Gio de VRAM des P100.
+Chargement complet observé : environ 15 à 17 minutes sur le disque mécanique.
+Contexte : 4096, une requête à la fois. Aucun démarrage automatique Windows installé.
+
+Moteur compilé localement : cafe-build-p100\bin\llama-server.exe, CUDA 12.4, sm_60.
+Scripts avancés : Start-Qwen-GPU.ps1 [-MTP], Stop-Qwen-GPU.ps1.
+Tests : Test-Qwen-GPU.ps1 -Mode sans-mtp ou -Mode mtp, selon le serveur démarré.
+Ancienne configuration CPU conservée dans les scripts *-CPU-ancien.ps1 et
+LISEZ-MOI-CPU-ancien.txt ; le lanceur normal utilise désormais les GPU.
+
+Strata : sources présentes dans Strata-src, mode P100 expérimental identifié,
+inférence Strata pas encore testée.

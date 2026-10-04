@@ -1,0 +1,16 @@
+{
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "messages": [
+    {
+      "role": "user",
+      "content": "creer une poésie sur les fourmis de 200 mots"
+    }
+  ],
+  "max_tokens": 512,
+  "temperature": 0,
+  "seed": 42,
+  "cache_prompt": false,
+  "chat_template_kwargs": {
+    "enable_thinking": false
+  }
+}

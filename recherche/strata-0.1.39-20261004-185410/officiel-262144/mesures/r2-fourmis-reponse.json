@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-0e8acdc96f02465099c45b9a",
+  "object": "chat.completion",
+  "created": 1791136945,
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Sous le soleil ardent, dans l’ombre des racines,\nUn peuple minuscule, aux forces divines,\nS’agite avec ferveur, sans bruit ni vacarme,\nPortant sur son dos le poids de l’alarme.\n\nPetites ouvrières aux pattes de velours,\nElles suivent le chemin, fidèles à leur tour,\nUn fil invisible, parfumé de mystère,\nLes guide vers la terre, vers la lumière.\n\nChacune est un rouage, un maillon essentiel,\nDans ce vaste empire, silencieux et réel.\nElles soulèvent des fardeaux mille fois plus lourds,\nDéfiants la gravité, défiant le lourd.\n\nPas de roi pour régner, pas de trône doré,\nSeule la reine vit, dans l’ombre adorée,\nDonnant la vie, tissant le futur,\nDans le calme profond, obscur et pur.\n\nElles construisent des cathédrales de terre,\nDes labyrinthes profonds, des cités solitaires,\nOù chaque grain de sable est une pierre précieuse,\nPour la gloire du groupe, la cause généreuse.\n\nQuand la pluie menace, quand le vent se lève,\nElles rentrent en hâte, dans leur monde bref.\nSolidarité parfaite, instinct ancestral,\nUn ballet chorégraphié, jamais banal.\n\nNous les ignorons, marchant sans les voir,\nPourtant elles bâtissent, avec un grand savoir,\nUn monde d’entraide, de labeur et de foi,\nSous nos pas distraits, sous notre froid.\n\nRespectons ces géantes, si petites pourtant,\nMaîtres de la patience, gardiens du temps.\nCar dans leur humilité, dans leur travail constant,\nRéside la leçon, la plus belle, la plus grand."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 26,
+    "completion_tokens": 416,
+    "total_tokens": 442,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 26,
+    "prompt_ms": 2083.4,
+    "prompt_per_token_ms": 80.131,
+    "prompt_per_second": 12.5,
+    "predicted_n": 416,
+    "predicted_ms": 21824.8,
+    "predicted_per_token_ms": 52.463,
+    "predicted_per_second": 19.1,
+    "draft_n": 484,
+    "draft_n_accepted": 175
+  }
+}

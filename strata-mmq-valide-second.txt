@@ -1,0 +1,17 @@
+Q4_K gate/up-0         rows  7 experts 3  ref_rms 1.553  rel_l2 0.00259  max/rms 0.0068  zero row 0
+Q5_K gate/up-0         rows  7 experts 3  ref_rms 1.565  rel_l2 0.00225  max/rms 0.0055  zero row 0
+Q5_1 down-0            rows  7 experts 3  ref_rms 1.774  rel_l2 0.00221  max/rms 0.0099  zero row 0
+Q8_0 down-0            rows  7 experts 3  ref_rms 1.835  rel_l2 0.00053  max/rms 0.0018  zero row 0
+Q4_K gate/up-1         rows  7 experts 3  ref_rms 1.556  rel_l2 0.00225  max/rms 0.0065  zero row 0
+Q5_K gate/up-1         rows  7 experts 3  ref_rms 1.568  rel_l2 0.00278  max/rms 0.0071  zero row 0
+Q5_1 down-1            rows  7 experts 3  ref_rms 1.792  rel_l2 0.00260  max/rms 0.0115  zero row 0
+Q8_0 down-1            rows  7 experts 3  ref_rms 1.847  rel_l2 0.00045  max/rms 0.0015  zero row 0
+Q4_K gate/up-2         rows  5 experts 2  ref_rms 1.489  rel_l2 0.00252  max/rms 0.0077  zero row 0
+Q5_K gate/up-2         rows  5 experts 2  ref_rms 1.482  rel_l2 0.00297  max/rms 0.0083  zero row 0
+Q5_1 down-2            rows  5 experts 2  ref_rms 1.706  rel_l2 0.00225  max/rms 0.0102  zero row 0
+Q8_0 down-2            rows  5 experts 2  ref_rms 1.776  rel_l2 0.00045  max/rms 0.0015  zero row 0
+Q4_K gate/up-3         rows 17 experts 1  ref_rms 1.816  rel_l2 0.00167  max/rms 0.0068  zero row 0
+Q5_K gate/up-3         rows 17 experts 1  ref_rms 1.815  rel_l2 0.00219  max/rms 0.0063  zero row 0
+Q5_1 down-3            rows 17 experts 1  ref_rms 1.93  rel_l2 0.00230  max/rms 0.0106  zero row 0
+Q8_0 down-3            rows 17 experts 1  ref_rms 1.943  rel_l2 0.00053  max/rms 0.0017  zero row 0
+prefill MMQ K-quant screen passed

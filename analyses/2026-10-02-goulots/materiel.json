@@ -1,0 +1,75 @@
+{
+  "date": "2026-10-02T19:28:08.9706644+02:00",
+  "cpu": {
+    "Name": "AMD Ryzen Threadripper PRO 3955WX 16-Cores     ",
+    "NumberOfCores": 16,
+    "NumberOfLogicalProcessors": 32
+  },
+  "memory": [
+    {
+      "DeviceLocator": "DIMM5",
+      "BankLabel": "BANK4",
+      "Capacity": 17179869184,
+      "ConfiguredClockSpeed": 3200,
+      "PartNumber": "HMA82GR7CJR8N-XN    "
+    },
+    {
+      "DeviceLocator": "DIMM6",
+      "BankLabel": "BANK5",
+      "Capacity": 17179869184,
+      "ConfiguredClockSpeed": 3200,
+      "PartNumber": "HMA82GR7CJR8N-XN    "
+    },
+    {
+      "DeviceLocator": "DIMM7",
+      "BankLabel": "BANK6",
+      "Capacity": 17179869184,
+      "ConfiguredClockSpeed": 3200,
+      "PartNumber": "HMA82GR7CJR8N-XN    "
+    },
+    {
+      "DeviceLocator": "DIMM8",
+      "BankLabel": "BANK7",
+      "Capacity": 17179869184,
+      "ConfiguredClockSpeed": 3200,
+      "PartNumber": "HMA82GR7CJR8N-XN    "
+    },
+    {
+      "DeviceLocator": "DIMM4",
+      "BankLabel": "BANK3",
+      "Capacity": 17179869184,
+      "ConfiguredClockSpeed": 3200,
+      "PartNumber": "HMA82GR7CJR8N-XN    "
+    },
+    {
+      "DeviceLocator": "DIMM3",
+      "BankLabel": "BANK2",
+      "Capacity": 17179869184,
+      "ConfiguredClockSpeed": 3200,
+      "PartNumber": "HMA82GR7CJR8N-XN    "
+    },
+    {
+      "DeviceLocator": "DIMM2",
+      "BankLabel": "BANK1",
+      "Capacity": 17179869184,
+      "ConfiguredClockSpeed": 3200,
+      "PartNumber": "HMA82GR7CJR8N-XN    "
+    },
+    {
+      "DeviceLocator": "DIMM1",
+      "BankLabel": "BANK0",
+      "Capacity": 17179869184,
+      "ConfiguredClockSpeed": 3200,
+      "PartNumber": "HMA82GR7CJR8N-XN    "
+    }
+  ],
+  "board": {
+    "Manufacturer": "LENOVO",
+    "Product": "1046"
+  },
+  "os": {
+    "Caption": "Microsoft Windows 10 Professionnel",
+    "TotalVisibleMemorySize": 134067260,
+    "FreePhysicalMemory": 58517472
+  }
+}

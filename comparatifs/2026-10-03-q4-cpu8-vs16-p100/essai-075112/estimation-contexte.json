@@ -1,0 +1,19 @@
+{
+  "model_max_context_tokens": 262144,
+  "tested_context_tokens": 4096,
+  "kv_format": "fp16",
+  "mtp_active": true,
+  "full_attention_layers": 12,
+  "kv_heads": 2,
+  "head_dim": 256,
+  "kv_bytes_per_token_main": 24576,
+  "kv_bytes_per_token_draft": 2048,
+  "main_kv_delta_gib": 5.90625,
+  "draft_kv_delta_gib": 0.4921875,
+  "estimated_total_vram_delta_gib": 7,
+  "estimated_engine_ram_at_max_gib": [
+    90,
+    92
+  ],
+  "note": "Estimate from GGUF metadata and local Strata source. Includes approximate indexer/rope/buffer overhead. The current auto VRAM expert cache would shrink and its RAM complement would grow. Not a maximum-context measurement; OS memory and cold-load transient peaks excluded. No context settings were changed."
+}

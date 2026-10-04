@@ -1,0 +1,19 @@
+{
+  "status": "interrupted",
+  "read_gib": 5.712890625,
+  "total_gib": 71.728515625,
+  "block_mib": 4,
+  "rate_limit_mib_s": 128,
+  "layers": [
+    0,
+    47
+  ],
+  "cache_aware": true,
+  "order": "native-copy",
+  "skipped_verified_gib": 1.46484375,
+  "hot_read_gib": 1.033203125,
+  "elapsed_seconds": 297.1170168999961,
+  "note": "Read-only startup aid. No inference benchmarks run while this helper is active.",
+  "last_tensor": "blk.4.ffn_up_exps.weight",
+  "reason": "Comparaison du chargement avec des lectures de fichiers par blocs au lieu de PrefetchVirtualMemory"
+}

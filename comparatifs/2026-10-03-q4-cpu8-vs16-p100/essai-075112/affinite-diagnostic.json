@@ -1,0 +1,273 @@
+{
+  "pid": 29604,
+  "executable": "D:\\Serveur IA\\strata-build-p100\\strata.exe",
+  "created": "2026-10-03T06:00:05.039587+00:00",
+  "physical_topology": [
+    {
+      "logical": [
+        0,
+        1
+      ],
+      "primary": 0,
+      "mask": 3
+    },
+    {
+      "logical": [
+        2,
+        3
+      ],
+      "primary": 2,
+      "mask": 12
+    },
+    {
+      "logical": [
+        4,
+        5
+      ],
+      "primary": 4,
+      "mask": 48
+    },
+    {
+      "logical": [
+        6,
+        7
+      ],
+      "primary": 6,
+      "mask": 192
+    },
+    {
+      "logical": [
+        8,
+        9
+      ],
+      "primary": 8,
+      "mask": 768
+    },
+    {
+      "logical": [
+        10,
+        11
+      ],
+      "primary": 10,
+      "mask": 3072
+    },
+    {
+      "logical": [
+        12,
+        13
+      ],
+      "primary": 12,
+      "mask": 12288
+    },
+    {
+      "logical": [
+        14,
+        15
+      ],
+      "primary": 14,
+      "mask": 49152
+    },
+    {
+      "logical": [
+        16,
+        17
+      ],
+      "primary": 16,
+      "mask": 196608
+    },
+    {
+      "logical": [
+        18,
+        19
+      ],
+      "primary": 18,
+      "mask": 786432
+    },
+    {
+      "logical": [
+        20,
+        21
+      ],
+      "primary": 20,
+      "mask": 3145728
+    },
+    {
+      "logical": [
+        22,
+        23
+      ],
+      "primary": 22,
+      "mask": 12582912
+    },
+    {
+      "logical": [
+        24,
+        25
+      ],
+      "primary": 24,
+      "mask": 50331648
+    },
+    {
+      "logical": [
+        26,
+        27
+      ],
+      "primary": 26,
+      "mask": 201326592
+    },
+    {
+      "logical": [
+        28,
+        29
+      ],
+      "primary": 28,
+      "mask": 805306368
+    },
+    {
+      "logical": [
+        30,
+        31
+      ],
+      "primary": 30,
+      "mask": 3221225472
+    }
+  ],
+  "placement": "spread",
+  "selected_physical_cores": [
+    {
+      "logical": [
+        0,
+        1
+      ],
+      "primary": 0,
+      "mask": 3
+    },
+    {
+      "logical": [
+        16,
+        17
+      ],
+      "primary": 16,
+      "mask": 196608
+    },
+    {
+      "logical": [
+        2,
+        3
+      ],
+      "primary": 2,
+      "mask": 12
+    },
+    {
+      "logical": [
+        18,
+        19
+      ],
+      "primary": 18,
+      "mask": 786432
+    },
+    {
+      "logical": [
+        4,
+        5
+      ],
+      "primary": 4,
+      "mask": 48
+    },
+    {
+      "logical": [
+        20,
+        21
+      ],
+      "primary": 20,
+      "mask": 3145728
+    },
+    {
+      "logical": [
+        6,
+        7
+      ],
+      "primary": 6,
+      "mask": 192
+    },
+    {
+      "logical": [
+        22,
+        23
+      ],
+      "primary": 22,
+      "mask": 12582912
+    }
+  ],
+  "selected_process_mask": 16711935,
+  "process_mask_before": 65535,
+  "threads_before": [
+    {
+      "tid": 17596,
+      "mask": 65535,
+      "group": 0
+    },
+    {
+      "tid": 15776,
+      "mask": 65535,
+      "group": 0
+    },
+    {
+      "tid": 31984,
+      "mask": 65535,
+      "group": 0
+    },
+    {
+      "tid": 31880,
+      "mask": 65535,
+      "group": 0
+    },
+    {
+      "tid": 12776,
+      "mask": 65535,
+      "group": 0
+    },
+    {
+      "tid": 4976,
+      "mask": 65535,
+      "group": 0
+    },
+    {
+      "tid": 11936,
+      "mask": 65535,
+      "group": 0
+    },
+    {
+      "tid": 6564,
+      "mask": 65535,
+      "group": 0
+    },
+    {
+      "tid": 29508,
+      "mask": 65535,
+      "group": 0
+    },
+    {
+      "tid": 13952,
+      "mask": 65535,
+      "group": 0
+    },
+    {
+      "tid": 17560,
+      "mask": 65535,
+      "group": 0
+    },
+    {
+      "tid": 1656,
+      "mask": 65535,
+      "group": 0
+    },
+    {
+      "tid": 14080,
+      "mask": 65535,
+      "group": 0
+    }
+  ],
+  "applied": false,
+  "note": "Seven expert workers plus the host on eight physical cores. SMT siblings remain allowed for auxiliary GPU/runtime threads; expert workers use one logical CPU per core."
+}

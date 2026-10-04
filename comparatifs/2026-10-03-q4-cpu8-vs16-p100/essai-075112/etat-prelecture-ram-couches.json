@@ -1,0 +1,22 @@
+{
+  "status": "complete",
+  "read_gib": 57.861328125,
+  "total_gib": 71.728515625,
+  "paused_loader_pid": 29604,
+  "paused_loader_tid": 17596,
+  "block_mib": 4,
+  "rate_limit_mib_s": 128,
+  "layers": [
+    0,
+    47
+  ],
+  "cache_aware": true,
+  "order": "native-copy",
+  "reader": "file",
+  "skipped_verified_gib": 13.8671875,
+  "hot_read_gib": 2.78125,
+  "elapsed_seconds": 1430.3815547999984,
+  "note": "Read-only startup aid. No inference benchmarks run while this helper is active.",
+  "last_tensor": "blk.47.ffn_down_exps.weight",
+  "checksum_u64": 783936138147746751
+}

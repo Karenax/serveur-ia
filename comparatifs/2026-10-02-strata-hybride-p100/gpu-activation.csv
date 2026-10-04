@@ -1,0 +1,4 @@
+index, name, pci.bus_id, pcie.link.gen.current, pcie.link.width.current, memory.used [MiB], temperature.gpu, clocks.current.sm [MHz], power.draw [W]
+0, Quadro P2200, 00000000:41:00.0, 3, 16, 977 MiB, 36, 139 MHz, 5.66 W
+1, Tesla P100-PCIE-16GB, 00000000:42:00.0, 3, 16, 14962 MiB, 46, 1189 MHz, 33.54 W
+2, Tesla P100-PCIE-16GB, 00000000:61:00.0, 3, 16, 15174 MiB, 48, 1189 MHz, 34.56 W

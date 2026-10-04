@@ -1,0 +1,52 @@
+[
+  {
+    "path": "D:\\Serveur IA\\lanceur\\base-strata.json",
+    "unchanged": true,
+    "current_sha256": "E4410573AAD540C2DEF0CAB886AF7E211E0EBF7D791767D9D848C5142661A16B"
+  },
+  {
+    "path": "D:\\Serveur IA\\lanceur\\reglages.json",
+    "unchanged": true,
+    "current_sha256": "5BEB1FFCF8DE48735588DC76AE17421A94A6B2ED2CA4D1A0E5729D758E8957BB"
+  },
+  {
+    "path": "D:\\Serveur IA\\lanceur\\reglages-par-defaut.json",
+    "unchanged": true,
+    "current_sha256": "5114C1B2ED9A0DA6A40756E9B99C98DE98B70573AEFB93E87C3B29F6C2B9BA5A"
+  },
+  {
+    "path": "D:\\Serveur IA\\strata-iq4-p100-hybride.json",
+    "unchanged": true,
+    "current_sha256": "E4410573AAD540C2DEF0CAB886AF7E211E0EBF7D791767D9D848C5142661A16B"
+  },
+  {
+    "path": "D:\\Serveur IA\\strata-build-p100\\strata.exe",
+    "unchanged": true,
+    "current_sha256": "9B07C8C1E2367D217E17199F137F6C8D33F5832AB02DF594B68652BA5C9488D0"
+  },
+  {
+    "path": "D:\\Serveur IA\\lanceur\\core.py",
+    "unchanged": false,
+    "current_sha256": "C3FB49DE3475CCE615404BDDD662BD80195A97B2FEB5A02AAD641F215BD401AF"
+  },
+  {
+    "path": "D:\\Serveur IA\\lanceur\\app.py",
+    "unchanged": false,
+    "current_sha256": "2D529123B96DDDD2008C8FD37517AB206A1AF5BACECC80C8D17466DFB85DB741"
+  },
+  {
+    "path": "D:\\Serveur IA\\Strata-src\\serve\\web\\app.js",
+    "unchanged": true,
+    "current_sha256": "0D4D97B17AC02608C4250BFD63ED7243DA7DDF898FE623DC0671F45CB155D7C1"
+  },
+  {
+    "path": "D:\\Serveur IA\\Strata-src\\serve\\web\\app.css",
+    "unchanged": true,
+    "current_sha256": "0675E1C62A9647067E76CAE7185BC24EEC19E7E280D259C7698B35BECF8E4393"
+  },
+  {
+    "path": "D:\\Serveur IA\\Strata-src\\serve\\web\\index.html",
+    "unchanged": true,
+    "current_sha256": "A90A390C0B04A47FF1F03B06285F276E7D94AE38FE9D58BED8ED22D7E0B8447D"
+  }
+]

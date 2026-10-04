@@ -1,0 +1,13 @@
+ CMakeLists.txt                         |  4 +++
+ include/strata/core/verify.hpp         |  4 ++-
+ include/strata/prefill/gemm.hpp        |  5 +++
+ include/strata/prefill/kernels.hpp     |  2 ++
+ src/core/expert_source.cpp             | 61 +++++++++++++++++++++++++++++++++-
+ src/core/native_dense.cpp              |  7 ++--
+ src/kernels/ngram.cpp                  | 32 +++++++++++++++++-
+ src/prefill/gemm.cu                    | 40 ++++++++++++++++++++++
+ src/prefill/kernels.cu                 |  5 ++-
+ src/prefill/prefill.cpp                |  4 +++
+ src/program/generate.cpp               | 40 ++++++++++++++++++++--
+ tests/cuda/prefill_mmq_kquant_test.cpp |  1 +
+ 12 files changed, 196 insertions(+), 9 deletions(-)

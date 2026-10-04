@@ -1,0 +1,14 @@
+{
+  "chat_template_kwargs": {
+    "enable_thinking": false
+  },
+  "max_tokens": 16,
+  "messages": [
+    {
+      "content": "Réponds uniquement par le mot Bonjour.",
+      "role": "user"
+    }
+  ],
+  "temperature": 0,
+  "model": "qwen3.8-flash-next"
+}

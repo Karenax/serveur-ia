@@ -1,0 +1,18 @@
+{
+  "status": "complete",
+  "read_gib": 71.728515625,
+  "total_gib": 71.728515625,
+  "block_mib": 4,
+  "rate_limit_mib_s": 128,
+  "layers": [
+    0,
+    47
+  ],
+  "cache_aware": true,
+  "skipped_verified_gib": 0.0,
+  "hot_read_gib": 0.0078125,
+  "elapsed_seconds": 1229.6850073999958,
+  "note": "Read-only startup aid. No inference benchmarks run while this helper is active.",
+  "last_tensor": "blk.47.ffn_up_exps.weight",
+  "checksum_u64": 16699949505271274232
+}

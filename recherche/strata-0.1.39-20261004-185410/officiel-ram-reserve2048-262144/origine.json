@@ -1,0 +1,9 @@
+{
+  "tag": "v0.1.39",
+  "revision": "6f32ec070f23ced9f50e704d854d775da52591ab",
+  "source_status": "",
+  "adaptations": false,
+  "context": 262144,
+  "prompt_cache": 0,
+  "difference": "Official code and stock automatic tuning. The standard --ple-io mmap option plus an external read-only lock keeps the entire PLE table physically in RAM on Windows. No local STRATA environment switches."
+}

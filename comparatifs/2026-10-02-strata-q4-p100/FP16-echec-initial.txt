@@ -1,0 +1,2 @@
+q4_K 1280x2560: rel_l2 0.307832 max/rms 3.29116 zero 0
+FAIL: FP16 GPU numerical screen failed

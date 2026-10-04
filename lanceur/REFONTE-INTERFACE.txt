@@ -1,0 +1,56 @@
+ACCÈS SERVEUR FRED 3.4.0 — REFONTE DE L’INTERFACE
+4 octobre 2026
+
+Le client
+- Navigation compacte : Conversations, Projets, Assistants et Tâches. Réglages
+  reste accessible au bas de la barre latérale ; les discussions récentes sont
+  regroupées sous la navigation. Ctrl+B replie la barre, hors des champs de texte.
+- Thème clair par défaut ; thèmes sombre et Windows dans Réglages > Mon accès.
+  Le choix est mémorisé localement. Aucun service ou police externe n’est chargé.
+- Chat centré, zone de saisie dégagée et suggestions courtes. Projet et assistant
+  se choisissent dans la saisie. Le menu « … » regroupe le document de référence,
+  Enregistrer au projet et Voir le document. Options contient réflexion, longueur
+  de réponse et nouvelle tentative. Sources ouvre le panneau à la demande.
+- Actions de conversation et de document regroupées dans des menus. L’annulation
+  d’une suppression reste visible en haut, même après suppression du dernier chat.
+- Projets : Documents / Discussions / Mémoire / Consignes. Éditeur consacré au
+  texte, sauvegarde automatique et état d’enregistrement visibles. Les imports et
+  propositions de révision conservent leurs protections et leurs contrôles.
+- Assistants : rôles présentés en cartes, capacités lisibles et consignes détaillées
+  accessibles à la demande. Le même modèle et les mêmes droits restent utilisés.
+- Tâches : création repliable, recherche et planification à la demande, filtres
+  Toutes / En cours / Terminées / À reprendre. Un point signale les nouveaux résultats.
+- Fenêtres compactes : navigation en tiroir, fermeture après sélection et avec
+  Échap ; navigation cachée exclue du parcours au clavier.
+
+La console serveur
+- Barre latérale persistante, en-tête compact et contenu centré. Le thème et
+  Ctrl+B suivent les mêmes principes que le client. Petit écran : navigation en tiroir.
+- Fonctions regroupées par pilotage, clients, espaces de travail et maintenance.
+- Ajout d’un client à la demande ; informations explicatives dans une section repliable.
+- Assistants et Recherche web disposent de deux sous-rubriques distinctes.
+- Les limites d’un client et la configuration web en cours de saisie sont conservées
+  pendant les actualisations. Changer explicitement de client recharge ses réglages.
+- Les liens directs ouvrent la rubrique à son début ; état du modèle et actions de
+  lancement demeurent accessibles dans leurs rubriques.
+
+Vérifications et livraison
+La suite Python de 72 tests a réussi après la première compilation de cette refonte.
+Les scripts JavaScript finaux passent la vérification Node. Les essais visuels ont
+couvert les thèmes, l’éditeur, les menus, la sauvegarde, le chat avec références,
+la publication dans un projet, les tâches et l’annulation d’une suppression.
+Le client a été inspecté à 1 200 × 820, 760 × 600 et 390 × 844 dans le navigateur.
+L’environnement d’aperçu utilise uniquement ses données et son modèle de test.
+Les contrôles du binaire final et de sa migration sont consignés dans
+refonte-native-final.log et refonte-native-update.log. Le déploiement et l’accès
+personnel signé sont contrôlés dans refonte-deployment.log et workspace-live-proof.json.
+L’EXE personnel garde ses clés et son accès sans login. L’état du modèle et les
+options de démarrage sont conservés lors du redémarrage de la console.
+
+Sources
+Client : chat.html, workspace.html, ui.css et ui.js dans client-qwen.
+Console : web/interface.css et web/interface.js ; actions dans app.js et workspace.js.
+La refonte s’inspire de la sobriété de Codex et de l’organisation d’OpenDots,
+sans importer leurs services ou reprendre leur code.
+Référence fonctionnelle : https://github.com/CopilotKit/OpenDots
+Guide des fonctions du serveur : ESPACES-FRED.txt.

@@ -1,0 +1,86 @@
+{
+  "date": "2026-10-02T16:30:43.9114213+02:00",
+  "strata_commit": "d9ab8435f654c368c586340d490915f6addf56a3",
+  "ggml_commit": "3cf03257f219afbe7334045ff7c6a06ac68c627d",
+  "cuda": "12.4.131 sm_60 real",
+  "target": "Qwen3.8-Flash-Next-UD-Q4_K_XL local existing 4 shards",
+  "draft": "Existing shared Q8_0 GGUF converted to Strata Q2_0",
+  "baseline": "..\\2026-10-02-cafe-q4-p100",
+  "files": [
+    {
+      "file": "adaptations-strata.patch",
+      "bytes": 10838,
+      "sha256": "DF75E7310CC94BCD70C357FDDCB5A00B5A3C04BA13214803AA721912B432A641"
+    },
+    {
+      "file": "Build-Strata-P100.cmd",
+      "bytes": 1133,
+      "sha256": "98272F7B60991DB91CD6D7FECE7AA817312842EFC7DD365BF015C2837B0D944C"
+    },
+    {
+      "file": "compat-bf16.json",
+      "bytes": 22045,
+      "sha256": "0332813ED1913A68FA6A0611C2D19D0841B4044A8DDD38A5F8BB86E0BDEC6DDE"
+    },
+    {
+      "file": "conversion-local.json",
+      "bytes": 901,
+      "sha256": "933E41CBEBC9C7C366007B8EDC1D4A20DD9EE0C09EB1688C74F2D44C83DDA72B"
+    },
+    {
+      "file": "conversions.json",
+      "bytes": 172496,
+      "sha256": "AB3B99914786E10B8B559DFEFC345B6C05507911AECFBE7A69D4DD4C73DFACB8"
+    },
+    {
+      "file": "Convert-MTP-Strata.py",
+      "bytes": 5137,
+      "sha256": "EB48C928A606E261A2FF9060D7E1EC3C7727C830C3E1606FD7B16B7995A457B1"
+    },
+    {
+      "file": "demarrage.json",
+      "bytes": 172,
+      "sha256": "967A70E7C1B00436A9A2FE9284EC4BBB50D51A12E29AB077BB5807FAE029C84E"
+    },
+    {
+      "file": "python-packages.txt",
+      "bytes": 933,
+      "sha256": "BF776322110B1487887A5345D2AD20C780A5C6A497AA08A699C9F678E28BA5D6"
+    },
+    {
+      "file": "Start-Strata-P100.ps1",
+      "bytes": 885,
+      "sha256": "4D2290C6073BAD4070B8DC16463C0581172EB656D71AF0CCF77163F158FEC7D8"
+    },
+    {
+      "file": "Stop-Strata-P100.ps1",
+      "bytes": 1401,
+      "sha256": "9BAE5BD756534A317F8E25950EF061F7DCA35BA474C189486B3283895146D92C"
+    },
+    {
+      "file": "strata-build-8.log",
+      "bytes": 1000,
+      "sha256": "91571D396D37D9867062B7395E1F940A64D331D57B18EAD6D3D8F0C666E136BE"
+    },
+    {
+      "file": "strata-parity-p100-second.txt",
+      "bytes": 1937,
+      "sha256": "8C5DEE83001733D4C5A4EBE2B30BAA2C8ECB0827048DF03138EA0B9BD94019FA"
+    },
+    {
+      "file": "strata-parity-p100.txt",
+      "bytes": 1937,
+      "sha256": "05AC5FF1089C455A28BE34734429BB94EFC2460B67E761E37FF6EF05B5F80732"
+    },
+    {
+      "file": "strata-q4-p100.json",
+      "bytes": 1276,
+      "sha256": "DB9D2483B543119FC7D8DCA2A7966BA9DB4598AC16C0DCA4D649B79A3D33E18B"
+    },
+    {
+      "file": "Test-Strata-P100.ps1",
+      "bytes": 3593,
+      "sha256": "6B790F35EE9103756583C6530F88E62D78784CECD51FF50ADEF0500C7A3E8D8B"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "status": "verifie",
+  "source": "D:\\Serveur IA\\strata-data\\model-q4\\Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+  "source_offset": 536060064,
+  "path": "C:\\Temp\\Strata-ngram-recherche\\iq4-xs-ple-iq4_nl.gguf",
+  "tensor": "per_layer_token_embd.weight",
+  "shape": [
+    160,
+    320001536
+  ],
+  "type": "IQ4_NL",
+  "bytes": 28800138240,
+  "copied_bytes": 28800138240,
+  "header_bytes": 224,
+  "note": "Raw tensor bytes, no dequantization or requantization",
+  "elapsed_seconds": 610.3,
+  "source_sha256": "dd55c28902f38cd88134b2a569c51282c5ffce30080487e1a645740115c56cc3",
+  "copied_sha256": "dd55c28902f38cd88134b2a569c51282c5ffce30080487e1a645740115c56cc3",
+  "verified_bytes": 28800138240
+}

@@ -1,0 +1,19 @@
+Enable experimental P100 resident layer-split hybrid inference
+
+Permit a strictly pinned expert complement shared by fixed layer-split caches,
+with an opt-in CPU share for cache misses and explicit GPU-only fallback checks.
+Keep the PLE table locked in Windows RAM, copy native expert projections
+sequentially at startup, and reserve the larger staging arena only in this mode.
+
+Convert BF16 prompt GEMM operands to FP16 on sm_60 and accept matching GGUF data
+shards that repeat only the architecture name. Add prompt/shard regression checks,
+a portable existing-Q8 draft adapter, benchmark protocol, raw numeric results,
+example configuration and reproduction harness.
+
+Two paired short prompts improved from 8.72/10.95 to 28.70/35.16 tok/s when CPU
+workers computed RAM misses; do not generalize beyond this measured workstation.
+All measurements kept the same Q4 weights, caches, Q2 MTP and worker count.
+
+Validation: isolated CUDA 12.4 sm_60 build; four targeted CTest cases passed;
+native expert parity q4_K/q5_1, q4_K/q8_0, q5_K/q8_0 passed; Python syntax checks.
+The existing generic MMQ screen is not validated on sm_60 (documented Q8_0 failure).

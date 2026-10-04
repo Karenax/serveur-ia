@@ -1,0 +1,11 @@
+Pour comprendre les couleurs du ciel, il faut d'abord savoir que la lumière du soleil, bien qu'elle paraisse blanche, est en réalité composée de toutes les couleurs de l'arc-en-ciel. Cette lumière voyage sous forme d'ondes.
+
+Le phénomène clé qui explique ces changements de couleur s'appelle la **diffusion de Rayleigh**. L'atmosphère terrestre est remplie de gaz (azote, oxygène) et de petites particules. Lorsque la lumière du soleil traverse cette atmosphère, elle entre en collision avec ces particules et est renvoyée dans toutes les directions.
+
+### Pourquoi le ciel est bleu en journée ?
+
+La lumière bleue a une **longueur d'onde courte** et une fréquence élevée. Les ondes courtes sont beaucoup plus facilement diffusées (dispersées) par les petites molécules de l'atmosphère que les ondes longues (comme le rouge ou l'orange).
+
+*   En journée, le soleil est haut dans le ciel, et la lumière traverse une couche relativement fine d'atmosphère.
+*   La lumière bleue est dispersée dans toutes les directions par l'atmosphère.
+*   Peu importe où vous regardez dans le

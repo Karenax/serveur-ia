@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-bc02c69b764b44a29f3984cc",
+  "object": "chat.completion",
+  "created": 1790972221,
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Sous le soleil ardent, dans l’ombre des racines,\nUn peuple minuscule, aux forces divines,\nS’agite sans relâche, silencieux et fier,\nPortant sur ses épaules le poids de l’univers.\n\nElles marchent en file, noires comme l’encre,\nSur les chemins de terre, aux bords des haies sombres.\nChacune est un soldat, une ouvrière, une reine,\nUnies par un instinct, une loi souveraine.\n\nElles soulèvent des grains plus lourds qu’elles-mêmes,\nTraversent les ruisseaux, défient les vents extrêmes.\nPas de repos, pas de trêve, pas de plainte ni cri,\nSeul le devoir les guide, seul le groupe les unit.\n\nLeurs antennes se touchent, langage des ténèbres,\nÉchangeant des secrets, des ordres, des ténèbres.\nElles construisent des cathédrales de terre,\nDes labyrinthes profonds, mystérieux et austères.\n\nLà-bas, dans le noir, la reine pond sans cesse,\nDonnant vie à la masse, à cette immense presse.\nLes ouvrières nourrissent les larves blanches et tendres,\nPrêtes à tout sacrifier pour que le nid se défende.\n\nQuand l’orage gronde et que le ciel se déchire,\nElles rentrent en hâte, sans jamais se dédire.\nPetites créatures, géantes par l’effort,\nElles nous enseignent l’ordre, le travail, le sort.\n\nNe les méprisez pas, ces ombres sur le sol,\nElles portent en elles la force du monde entier.\nDans leur humilité, dans leur labeur éternel,\nRéside la sagesse d’un peuple immortel."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 26,
+    "completion_tokens": 421,
+    "total_tokens": 447,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 26,
+    "prompt_ms": 857.8,
+    "prompt_per_token_ms": 32.992,
+    "prompt_per_second": 30.3,
+    "predicted_n": 421,
+    "predicted_ms": 14953.3,
+    "predicted_per_token_ms": 35.519,
+    "predicted_per_second": 28.2,
+    "draft_n": 289,
+    "draft_n_accepted": 169
+  }
+}

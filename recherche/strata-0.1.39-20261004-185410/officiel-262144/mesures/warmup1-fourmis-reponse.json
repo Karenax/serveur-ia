@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-3b8b0fd20ef748999a60749d",
+  "object": "chat.completion",
+  "created": 1791136808,
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Sous le soleil ardent, dans l’ombre des racines,\nUn peuple minuscule, aux forces divines,\nS’agite sans relâche, silencieux et fier,\nPortant le poids du monde sur son dos léger.\n\nElles marchent en file, noires comme l’encre,\nSur les sentiers de terre, aux bords de l’enceinte.\nChacune a sa tâche, chacune a son rôle,\nDans ce vaste empire, nul n’est seul, nul ne s’envole.\n\nLa fourmi ouvrière, au cœur de la cité,\nCreuse les galeries avec avidité.\nElle transporte la graine, plus lourde qu’elle-même,\nDéfiante la loi, défiant le système.\n\nLa soldate veille, mandibules ouvertes,\nPrête à repousser les bêtes découvertes.\nLa reine, au centre, tisse le fil de la vie,\nDonnant naissance à l’avenir, à l’envie.\n\nPas de roi couronné, pas de trône doré,\nSeulement l’instinct pur, l’ordre sacré.\nElles ne dorment jamais, ou si peu, dans le noir,\nGuidées par l’odeur, par le souvenir, par l’espoir.\n\nQuand la pluie menace, elles montent la garde,\nBouchant les entrées, chaque porte est bardée.\nSolidarité parfaite, égoïsme banni,\nUn seul corps immense, par mille âmes uni.\n\nNous les regardons passer, indifférents parfois,\nSans voir la grandeur de leurs petits exploits.\nPourtant, dans leur labeur, une leçon se cache :\nLa force du groupe, quand l’individu lâche.\n\nElles bâtissent des cathédrales de sable,\nRésistant au temps, au vent, au diable.\nPetites créatures aux grands cœurs d’acier,\nLes fourmis nous enseignent l’art de persévérer.\n\nDans le silence lourd de la forêt endormie,\nElles sont les gardiennes de la vie qui s’exprime.\nUn ballet invisible, une danse éternelle,\nOù chaque pas compte, où chaque geste est belle."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 26,
+    "completion_tokens": 499,
+    "total_tokens": 525,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 26,
+    "prompt_ms": 3850.5,
+    "prompt_per_token_ms": 148.096,
+    "prompt_per_second": 6.8,
+    "predicted_n": 499,
+    "predicted_ms": 48480.6,
+    "predicted_per_token_ms": 97.156,
+    "predicted_per_second": 10.3,
+    "draft_n": 560,
+    "draft_n_accepted": 218
+  }
+}

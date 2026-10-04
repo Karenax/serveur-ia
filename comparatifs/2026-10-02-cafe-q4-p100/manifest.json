@@ -1,0 +1,171 @@
+{
+  "date": "2026-10-02",
+  "timezone": "Europe/Paris",
+  "engine": "cafe-llama.cpp",
+  "commit": "0ae77ef4914fcd6e78e0b13ab157ff3acccc9edf",
+  "model_files": [
+    {
+      "FullName": "D:\\modèle\\qwen3.8FlashNext\\Qwen3.8-Flash-Next-UD-Q4_K_XL-00001-of-00004.gguf",
+      "Length": 10946752,
+      "LastWriteTimeUtc": "2026-10-01T10:26:10Z"
+    },
+    {
+      "FullName": "D:\\modèle\\qwen3.8FlashNext\\Qwen3.8-Flash-Next-UD-Q4_K_XL-00002-of-00004.gguf",
+      "Length": 49859583296,
+      "LastWriteTimeUtc": "2026-10-01T12:18:42Z"
+    },
+    {
+      "FullName": "D:\\modèle\\qwen3.8FlashNext\\Qwen3.8-Flash-Next-UD-Q4_K_XL-00003-of-00004.gguf",
+      "Length": 49376141664,
+      "LastWriteTimeUtc": "2026-10-01T12:18:58Z"
+    },
+    {
+      "FullName": "D:\\modèle\\qwen3.8FlashNext\\Qwen3.8-Flash-Next-UD-Q4_K_XL-00004-of-00004.gguf",
+      "Length": 12087983680,
+      "LastWriteTimeUtc": "2026-10-01T10:41:32Z"
+    }
+  ],
+  "files": [
+    {
+      "name": "benchmark-response.json",
+      "bytes": 1168,
+      "sha256": "4F9ED43577A5A47B8411F4F99E95F86BE015B9BA40D21495633FAE2CF426D381"
+    },
+    {
+      "name": "build-p100-9.log",
+      "bytes": 21521,
+      "sha256": "27974BAF4F42974B7D261EE0DF4ED05CF32EDFB5CA6C64DF1013766149D30DBE"
+    },
+    {
+      "name": "Build-P100.cmd",
+      "bytes": 1021,
+      "sha256": "5783C7F710D42B0C10D08C9977AA01EE7EEE7D2FA8CC441DB114FB8D95C57445"
+    },
+    {
+      "name": "gpu-mtp-test-1.json",
+      "bytes": 1978,
+      "sha256": "34A3F2F76BA590EE72E2E442361548B6728CF41D1A4143623A7E83A7885B493B"
+    },
+    {
+      "name": "gpu-mtp-test-2.json",
+      "bytes": 1778,
+      "sha256": "535AD4A98A0313653F8235A96DDEF0BC27DE180A1AFC0E99905EA53B7B48D391"
+    },
+    {
+      "name": "gpu-mtp.stderr.log",
+      "bytes": 62528,
+      "sha256": "C33999DF4428ABD7B31D3DD3844D1B7DEB77E706ACDD7248E4FAC3D48A90034E"
+    },
+    {
+      "name": "gpu-mtp.stdout.log",
+      "bytes": 0,
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "name": "gpu-sans-mtp-test-1.json",
+      "bytes": 1926,
+      "sha256": "192425A8192A850E1E74354D6F4A3241A802B7805D65D8FD6AB288D0200A8067"
+    },
+    {
+      "name": "gpu-sans-mtp-test-2.json",
+      "bytes": 1724,
+      "sha256": "FB57C832C66D56B3373DA12285664FBADF6ED90BF497E40AFEF1DA9C7E32ADBA"
+    },
+    {
+      "name": "gpu-sans-mtp.stderr.log",
+      "bytes": 33196,
+      "sha256": "BA5E80F0D5D229854A0DD394968810C6C1AF3CD74AFA929A08554FB72912BD6B"
+    },
+    {
+      "name": "gpu-sans-mtp.stdout.log",
+      "bytes": 0,
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "name": "LISEZ-MOI-CPU-ancien.txt",
+      "bytes": 3931,
+      "sha256": "422DFC551B778B5D94852B4CC55F40F6C3808C83EA650DAA489F256AFA8FC5B4"
+    },
+    {
+      "name": "LISEZ-MOI.txt",
+      "bytes": 2052,
+      "sha256": "B81C1AC77C080DBFB314201B824E9510B5FEA95CA151B5B046F995CFD6318D13"
+    },
+    {
+      "name": "mesures-mtp.csv",
+      "bytes": 4361,
+      "sha256": "56E3F7BF5DD5F217957758637ED07CBE8871C423AE2B9E18D39A8CFDCA45622A"
+    },
+    {
+      "name": "mesures-sans-mtp.csv",
+      "bytes": 5278,
+      "sha256": "37A8110750997029CF77A9314611326D73A6D72B69A45657264636212984A408"
+    },
+    {
+      "name": "metrics-mtp.txt",
+      "bytes": 2904,
+      "sha256": "F26F56B864BEC15E8866223A5A4D5FD7B04292CA7BC7D823C1318D8800403376"
+    },
+    {
+      "name": "metrics-sans-mtp.txt",
+      "bytes": 2586,
+      "sha256": "A19693073FCBFEF80350C4B293D4C009DC1853C01D8E04C87D0CF23DEAB3857D"
+    },
+    {
+      "name": "p100-portability.patch",
+      "bytes": 5279,
+      "sha256": "2EFB4D67BD8BAE3C89C1846FCE22A217C2431902D1ED5A20E06089A99D142DC2"
+    },
+    {
+      "name": "RESULTATS-GPU.txt",
+      "bytes": 6601,
+      "sha256": "9A65A6CEA51ECD3695C00B5AF1D9F724485A65DADDC640968C6211C5363135BC"
+    },
+    {
+      "name": "resultats-mtp.csv",
+      "bytes": 385,
+      "sha256": "CBBF543D3B7BFA6E01D3047C3229250DE7268C6C6B590A3B23DDAF4C4F452CEF"
+    },
+    {
+      "name": "resultats-sans-mtp.csv",
+      "bytes": 287,
+      "sha256": "02FD0DF6E6EA6809207A2FA6D93113D2C2C0141FEEBD9C5A7A0F69DE50AF8D97"
+    },
+    {
+      "name": "Start-Qwen-GPU.ps1",
+      "bytes": 2149,
+      "sha256": "7B9924205D4F088639EAFC0285E150909F25101A4E62994BFA9712458BA3EDCE"
+    },
+    {
+      "name": "Start-Qwen.ps1",
+      "bytes": 189,
+      "sha256": "3EE9EB6BF2B7C8440ACBE8A47CD5BC2CE21BCB295B2ECB62E78E16622E88DEC7"
+    },
+    {
+      "name": "Stop-Qwen-GPU.ps1",
+      "bytes": 435,
+      "sha256": "20FE3C841AB2744D0452FF20207F45B4D03004E877D78528DB76D56944EE97A5"
+    },
+    {
+      "name": "Stop-Qwen.ps1",
+      "bytes": 104,
+      "sha256": "2576CB12973C93881FBA51396A4708DD706A874F954BD81C8BE5FBD0D682275C"
+    },
+    {
+      "name": "Test-Qwen-GPU.ps1",
+      "bytes": 3039,
+      "sha256": "C8E6B0AAA399316A742DDC7300F590FC66009968E30F85F348570E3AA20126DB"
+    },
+    {
+      "name": "test-request.json",
+      "bytes": 266,
+      "sha256": "A6D3A9282A21B1346DC4C48450B8952AE22A28B8970CA632D3C3EF0095516EA0"
+    },
+    {
+      "name": "test-response.json",
+      "bytes": 861,
+      "sha256": "A16FE855F2A91963DDE9BDA5C5E7B49F7A9CD48388557671D339AF94C1FA8A4C"
+    }
+  ],
+  "notes": "Q4 local identique pour le prochain test Strata. Résultats CPU et GPU sans/avec MTP conservés. Le journal peut aussi contenir des requêtes interactives postérieures au benchmark."
+}

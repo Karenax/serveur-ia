@@ -1,0 +1,16 @@
+{
+  "seed": 42,
+  "model": "qwen3.8-flash-next",
+  "chat_template_kwargs": {
+    "enable_thinking": false
+  },
+  "max_tokens": 256,
+  "temperature": 0,
+  "messages": [
+    {
+      "content": "Explique en français pourquoi le ciel est bleu, puis pourquoi il devient rouge au coucher du soleil. Donne une explication précise et accessible.",
+      "role": "user"
+    }
+  ],
+  "cache_prompt": false
+}

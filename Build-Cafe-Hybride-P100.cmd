@@ -1,0 +1,15 @@
+@echo off
+setlocal
+call "D:\Serveur IA\toolchain\msvc\setup_x64.bat"
+set "TEMP=D:\Temp\cafe-build"
+set "TMP=%TEMP%"
+set "PATH=D:\Serveur IA\toolchain\cuda-12.4\bin;%PATH%"
+cd /d "D:\Serveur IA\cafe-build-p100"
+"D:\Serveur IA\toolchain\cuda-12.4\bin\nvcc.exe" -v --use-local-env -forward-unknown-to-host-compiler -DGGML_BACKEND_BUILD -DGGML_BACKEND_SHARED -DGGML_CUDA_FA_BF16_BF16=1 -DGGML_CUDA_FA_BF16_F16=0 -DGGML_CUDA_FA_BF16_Q4_0=0 -DGGML_CUDA_FA_BF16_Q4_1=0 -DGGML_CUDA_FA_BF16_Q5_0=0 -DGGML_CUDA_FA_BF16_Q5_1=0 -DGGML_CUDA_FA_BF16_Q8_0=0 -DGGML_CUDA_FA_F16_BF16=0 -DGGML_CUDA_FA_F16_F16=1 -DGGML_CUDA_FA_F16_Q4_0=0 -DGGML_CUDA_FA_F16_Q4_1=0 -DGGML_CUDA_FA_F16_Q5_0=0 -DGGML_CUDA_FA_F16_Q5_1=0 -DGGML_CUDA_FA_F16_Q8_0=0 -DGGML_CUDA_FA_F16_TURBO2_0=1 -DGGML_CUDA_FA_F16_TURBO3_0=1 -DGGML_CUDA_FA_F16_TURBO4_0=1 -DGGML_CUDA_FA_Q4_0_BF16=0 -DGGML_CUDA_FA_Q4_0_F16=0 -DGGML_CUDA_FA_Q4_0_Q4_0=1 -DGGML_CUDA_FA_Q4_0_Q4_1=0 -DGGML_CUDA_FA_Q4_0_Q5_0=0 -DGGML_CUDA_FA_Q4_0_Q5_1=0 -DGGML_CUDA_FA_Q4_0_Q8_0=0 -DGGML_CUDA_FA_Q4_1_BF16=0 -DGGML_CUDA_FA_Q4_1_F16=0 -DGGML_CUDA_FA_Q4_1_Q4_0=0 -DGGML_CUDA_FA_Q4_1_Q4_1=0 -DGGML_CUDA_FA_Q4_1_Q5_0=0 -DGGML_CUDA_FA_Q4_1_Q5_1=0 -DGGML_CUDA_FA_Q4_1_Q8_0=0 -DGGML_CUDA_FA_Q5_0_BF16=0 -DGGML_CUDA_FA_Q5_0_F16=0 -DGGML_CUDA_FA_Q5_0_Q4_0=0 -DGGML_CUDA_FA_Q5_0_Q4_1=0 -DGGML_CUDA_FA_Q5_0_Q5_0=0 -DGGML_CUDA_FA_Q5_0_Q5_1=0 -DGGML_CUDA_FA_Q5_0_Q8_0=0 -DGGML_CUDA_FA_Q5_1_BF16=0 -DGGML_CUDA_FA_Q5_1_F16=0 -DGGML_CUDA_FA_Q5_1_Q4_0=0 -DGGML_CUDA_FA_Q5_1_Q4_1=0 -DGGML_CUDA_FA_Q5_1_Q5_0=0 -DGGML_CUDA_FA_Q5_1_Q5_1=0 -DGGML_CUDA_FA_Q5_1_Q8_0=0 -DGGML_CUDA_FA_Q8_0_BF16=0 -DGGML_CUDA_FA_Q8_0_F16=0 -DGGML_CUDA_FA_Q8_0_Q4_0=0 -DGGML_CUDA_FA_Q8_0_Q4_1=0 -DGGML_CUDA_FA_Q8_0_Q5_0=0 -DGGML_CUDA_FA_Q8_0_Q5_1=0 -DGGML_CUDA_FA_Q8_0_Q8_0=1 -DGGML_CUDA_FA_QUANTS=\"q4_0-q4_0,q8_0-q8_0,f16-f16,bf16-bf16\" -DGGML_CUDA_FA_TURBO2_0_F16=1 -DGGML_CUDA_FA_TURBO2_0_TURBO2_0=1 -DGGML_CUDA_FA_TURBO3_0_F16=1 -DGGML_CUDA_FA_TURBO3_0_TURBO3_0=1 -DGGML_CUDA_FA_TURBO4_0_F16=1 -DGGML_CUDA_FA_TURBO4_0_TURBO4_0=1 -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -D_CRT_SECURE_NO_WARNINGS -D_XOPEN_SOURCE=600 -Dggml_cuda_EXPORTS -I"D:\Serveur IA\cafe-llama-src\ggml\src\ggml-cuda\.." -I"D:\Serveur IA\cafe-llama-src\ggml\src\..\include" -isystem "D:\Serveur IA\toolchain\cuda-12.4\include" -allow-unsupported-compiler -Xcompiler="-O2 -Ob2" -DNDEBUG -std=c++17 "--generate-code=arch=compute_60,code=[sm_60]" -Xcompiler=-MD -use_fast_math -extended-lambda -Xcompiler /Zc:preprocessor -x cu -c "D:\Serveur IA\cafe-llama-src\ggml\src\ggml-cuda\moe-direct.cu" -o "D:\Serveur IA\cafe-build-p100-hybride\moe-direct.cu.obj" -Xcompiler=-Fdggml\src\ggml-cuda\CMakeFiles\ggml-cuda.dir\,-FS
+if errorlevel 1 exit /b %errorlevel%
+link.exe /nologo @"D:\Serveur IA\cafe-build-p100-hybride\link.rsp" /out:"D:\Serveur IA\cafe-build-p100-hybride\bin\ggml-cuda.dll" /implib:"D:\Serveur IA\cafe-build-p100-hybride\ggml-cuda.lib" /pdb:"D:\Serveur IA\cafe-build-p100-hybride\ggml-cuda.pdb" /dll /version:0.25 /machine:x64 /INCREMENTAL:NO -LIBPATH:"D:\Serveur IA\toolchain\cuda-12.4\lib\x64"
+exit /b %errorlevel%
+
+
+
+

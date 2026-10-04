@@ -1,0 +1,36 @@
+{
+  "choices": [
+    {
+      "finish_reason": "length",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "La lumière du soleil, qui apparaît blanche, est en réalité composée de toutes les couleurs de l'arc-en-ciel. En traversant l'atmosphère, cette lumière entre en collision avec les molécules de gaz, un phénomène appelé diffusion de Rayleigh qui disperse davantage les courtes longueurs d'"
+      }
+    }
+  ],
+  "created": 1790943087,
+  "model": "qwen3.8-flash-next",
+  "system_fingerprint": "b11344-ec7630a64",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 64,
+    "prompt_tokens": 25,
+    "total_tokens": 89,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-jEQ1aoILG6zx4TDgWIDRligEhgAZFwow",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 25,
+    "prompt_ms": 10757.825,
+    "prompt_per_token_ms": 430.31300000000005,
+    "prompt_per_second": 2.3238898197358666,
+    "predicted_n": 64,
+    "predicted_ms": 35696.372,
+    "predicted_per_token_ms": 566.6090793650794,
+    "predicted_per_second": 1.764885238197316
+  }
+}

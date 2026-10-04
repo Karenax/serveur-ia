@@ -1,0 +1,10 @@
+{
+  "pid": 40296,
+  "config_path": "D:\\Serveur IA\\lanceur\\sessions\\20261003-211939-259117\\strata.json",
+  "run_dir": "D:\\Serveur IA\\lanceur\\sessions\\20261003-211939-259117",
+  "exe": "D:/Serveur IA/strata-build-p100/strata.exe",
+  "port": 8080,
+  "context": 262144,
+  "history_slots": 6,
+  "settings_rewritten": false
+}

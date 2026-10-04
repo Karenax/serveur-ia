@@ -1,0 +1,2 @@
+q4_K GPU dequant FP16: 104192 / 3276800 values differ from ggml
+FAIL: GPU FP16 dequant differs from reference

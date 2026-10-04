@@ -1,0 +1,2 @@
+q4_K GPU dequant FP16: 362999 / 3276800 bits differ, rel_l2 0.332857 max 0.103394
+FAIL: GPU FP16 dequant outside rounding tolerance

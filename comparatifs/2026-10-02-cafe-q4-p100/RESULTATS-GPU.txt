@@ -1,0 +1,102 @@
+Qwen3.8 Flash Next UD-Q4_K_XL — mesures GPU P100 — 2 octobre 2026
+Statut : inférence GPU sans MTP et avec MTP validée. Serveur actif avec MTP, PID 19840.
+
+Matériel : Threadripper PRO 3955WX 16 cœurs / 32 threads, environ 128 Gio RAM,
+2 Tesla P100 PCIe 16 Gio sm_60 en TCC, Quadro P2200 pour l'affichage.
+Pilote NVIDIA 528.89. Modèle sur D:, disque dur mécanique de 5 To.
+
+Modèle local : D:\modèle\qwen3.8FlashNext
+4 shards Q4 complets, 111334655392 octets, soit 103,69 Gio.
+Architecture qwen4exp : 48 couches, 512 experts, 10 actifs/token.
+Les métadonnées indiquent une modification Huihui.ai ; les performances/acceptations
+mesurées ici concernent ces fichiers locaux, pas une autre version du checkpoint.
+Tête MTP locale : mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf, 2786568256 octets.
+
+Moteur : cafe-llama.cpp, commit 0ae77ef4914fcd6e78e0b13ab157ff3acccc9edf,
+compilé sous Windows avec MSVC et CUDA 12.4, architecture 60-real.
+Corrections locales de compilation Windows/Pascal et affectation des opérations
+MUL_MAT_ID des experts à la P100 de leur couche. Patch : p100-portability.patch.
+Build : Build-P100.cmd ; sources : cafe-llama-src ; exécutable : cafe-build-p100\bin\llama-server.exe.
+CUDA_DISABLE_PTX_JIT=1 ; CPU_FRAC=0 ; build GPU_ONLY=ON ; graphes CUDA désactivés.
+
+Organisation mémoire :
+- CUDA0 poids fixes : 2077,75 Mio ; CUDA1 : 2528,70 Mio.
+- Experts : 73450 Mio en RAM CUDA_Host_MoE épinglée, lisibles par les GPU.
+- Tables n-gram : 27465,95 Mio en RAM CPU ; autres CUDA_Host : 644,14 Mio.
+- Cache dynamique d'experts plafonné à 8192 Mio par P100, réserve 2048 Mio/carte.
+Les experts hors cache sont lus par le GPU en RAM via PCIe. Le CPU ne calcule pas
+les produits matriciels des experts dans cette compilation. Le CPU prépare les requêtes,
+les tokens et les lectures des tables. Le Q4 complet ne tient pas dans 32 Gio VRAM.
+
+Configuration : contexte 4096, un utilisateur, 4 threads, batch 256, microbatch 128,
+-ngl 99, --host-moe, --split-mode layer, --tensor-split 1,1,
+--fit off, --load-mode none, --lazy-mode off, per_layer_token_embd=CPU,
+Flash Attention désactivée. Aucun streaming des poids depuis le disque à l'inférence.
+Le pipeline parallèle demandé initialement s'était désactivé faute de VRAM ;
+le script le désactive maintenant explicitement.
+
+Protocole : 2 prompts français (couleurs du ciel, fonction Fibonacci et exemple n=8),
+256 tokens de sortie maximum chacun, température 0, seed 42, cache_prompt=false,
+enable_thinking=false. La limite coupe volontairement la fin des textes ; la fonction
+Python et son exemple sont complets et corrects. Il s'agit d'un petit benchmark à
+contexte court, pas d'un test de concurrence ou de contexte long.
+
+Sans MTP, après correction de la répartition :
+Test 1 : génération 13,066 tokens/s ; prompt 7,047 tokens/s ; 256 tokens ; 25,38 s total.
+Test 2 : génération 9,095 tokens/s ; prompt 19,081 tokens/s ; 256 tokens ; 30,57 s total.
+VRAM maximale : 11196 et 11640 Mio sur les P100.
+RAM processus maximale : 100,33 Gio. CPU moyen : 0,52 cœur équivalent pendant les mesures.
+Lectures processus mesurées pendant les réponses : 0 octet/s.
+Charge GPU moyenne échantillonnée : 48,1 % et 50,8 % ; pics à 100 % sur les deux.
+Chargement/réchauffement complet observé : environ 15 min 33 s sur le disque dur.
+Fichiers : gpu-sans-mtp-test-*.json, mesures-sans-mtp.csv, resultats-sans-mtp.csv,
+metrics-sans-mtp.txt, gpu-sans-mtp.stderr.log.
+
+Ancienne configuration GPU (tous les experts sur la première carte) :
+10,09 et 9,02 tokens/s sur 96 tokens. Conservée dans resultats-premiere-config.
+Ancien test CPU : 1,765 tokens/s sur 64 tokens ; protocole différent, comparaison indicative.
+
+MTP validé : tête Q8 partagée, --spec-type draft-mtp --spec-draft-n-max 2.
+Tête chargée dans CUDA1 : 2647,04 Mio ; token_embd.weight et output.weight empruntés
+au modèle principal. Les journaux confirment la présence de draft-mtp et l'acceptation.
+Test 1 : génération 14,364 tokens/s ; prompt 7,109 tokens/s ; 256 tokens ; 23,53 s total.
+155 propositions acceptées sur 200 (77,5 %) ; gain de génération +9,93 %.
+Test 2 : génération 9,488 tokens/s ; prompt 18,221 tokens/s ; 256 tokens ; 29,54 s total.
+164 propositions acceptées sur 182 (90,11 %) ; gain de génération +4,33 %.
+Les textes des deux réponses sont strictement identiques à ceux du mode sans MTP.
+VRAM maximale : 11316 et 14088 Mio ; RAM processus maximale : 100,90 Gio.
+CPU moyen : 0,51 cœur équivalent ; lectures processus mesurées : 0 octet/s.
+Cache expert CUDA0 : 8180 Mio ; CUDA1 : 7669 Mio, limité par la réserve pour le MTP.
+Charge GPU moyenne échantillonnée : 54,3 % et 37,2 %.
+Chargement complet, tête et échauffement compris : environ 17 min.
+Fichiers : gpu-mtp-test-*.json, mesures-mtp.csv, resultats-mtp.csv, metrics-mtp.txt,
+gpu-mtp.stderr.log.
+
+Choix retenu : MTP activé, légèrement plus rapide sur les deux prompts mesurés.
+Ce petit échantillon ne garantit pas un gain identique sur tous les prompts. La mémoire
+RAM/VRAM disponible permet ce réglage sur la machine testée, à contexte 4096.
+Le lanceur habituel Start-Qwen.ps1 démarre désormais le GPU avec MTP ; -SansMTP
+permet de sélectionner l'autre mode. Arrêter le serveur avant de changer de mode.
+Stop-Qwen.ps1 arrête les processus de ce projet. Les anciens scripts CPU sont archivés.
+
+Commandes :
+powershell -ExecutionPolicy Bypass -File "D:\Serveur IA\Start-Qwen-GPU.ps1"
+powershell -ExecutionPolicy Bypass -File "D:\Serveur IA\Start-Qwen-GPU.ps1" -MTP
+powershell -ExecutionPolicy Bypass -File "D:\Serveur IA\Stop-Qwen-GPU.ps1"
+powershell -ExecutionPolicy Bypass -File "D:\Serveur IA\Test-Qwen-GPU.ps1" -Mode sans-mtp
+Pour tester le mode MTP après son démarrage, utiliser la même commande avec -Mode mtp.
+Interface : http://127.0.0.1:8080 ; API : http://127.0.0.1:8080/v1 ; alias : qwen3.8-flash-next.
+
+Strata : sources récupérées dans Strata-src. Le CMake propose STRATA_EXPERIMENTAL_SM60=ON
+avec un toolkit CUDA 12.x pour les P100. Ce support est expérimental ; il faudra compiler
+et valider le modèle local. Aucun résultat Strata mesuré à ce stade.
+
+Sources :
+https://github.com/kozmic-labs/cafe-llama.cpp
+https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF/blob/main/MTP/README.md
+https://github.com/Niko1221/Strata/blob/main/CMakeLists.txt
+https://docs.nvidia.com/cuda/cuda-programming-guide/04-special-topics/unified-memory.html
+Binaire CUDA 12 legacy demandé :
+https://github.com/unslothai/llama.cpp/releases/download/b11160-mix-a6922cc/app-b11160-mix-a6922cc-windows-x64-cuda12-legacy.zip
+
+

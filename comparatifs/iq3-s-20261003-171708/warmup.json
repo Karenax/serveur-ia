@@ -1,0 +1,56 @@
+{
+  "request": {
+    "model": "qwen3.8-flash-next-iq3-s",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Réponds en français : combien font deux plus deux ?"
+      }
+    ],
+    "max_tokens": 1,
+    "temperature": 0,
+    "seed": 42,
+    "cache_prompt": false,
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    }
+  },
+  "response": {
+    "id": "chatcmpl-cf5a06b37b3643c9864ec3dc",
+    "object": "chat.completion",
+    "created": 1791041432,
+    "model": "qwen3.8-flash-next-iq3-s",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "De"
+        },
+        "finish_reason": "length"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 24,
+      "completion_tokens": 1,
+      "total_tokens": 25,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 24,
+      "prompt_ms": 2198.1,
+      "prompt_per_token_ms": 91.587,
+      "prompt_per_second": 10.9,
+      "predicted_n": 1,
+      "predicted_ms": 136.4,
+      "predicted_per_token_ms": 136.4,
+      "predicted_per_second": 7.3,
+      "draft_n": 0,
+      "draft_n_accepted": 0
+    }
+  },
+  "elapsed_seconds": 2.6089999999967404
+}

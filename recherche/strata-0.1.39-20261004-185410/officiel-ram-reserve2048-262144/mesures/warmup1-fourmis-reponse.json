@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-8f739878aea541849b09edd1",
+  "object": "chat.completion",
+  "created": 1791138467,
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Sous le soleil ardent, dans l’ombre des racines,\nUn peuple minuscule, aux forces divines,\nS’agite sans relâche, silencieux et fier,\nPortant le poids du monde sur son dos léger.\n\nElles marchent en file, noires comme l’encre,\nSur les chemins de terre, aux sentiers de l’ombre.\nChacune est un soldat, une ouvrière dévouée,\nPour la gloire du nid, pour la reine adorée.\n\nLeurs antennes se touchent, langage des esprits,\nUn code secret gravé dans la nuit.\nElles transportent des graines, des feuilles, des trésors,\nBâtissant des cathédrales sous les portes du nord.\n\nPas de repos pour elles, pas de trêve, pas de paix,\nSeule la mission compte, seule la tâche est vraie.\nElles soulèvent des fardeaux cent fois plus lourds qu’elles,\nDéfiant la gravité, défiant les mortelles.\n\nQuand la pluie s’abat, quand le vent se déchaîne,\nElles restent unies, formant une chaîne.\nSolidarité parfaite, instinct ancestral,\nUn ballet chorégraphié, un rituel vital.\n\nNous les ignorons, ces géantes invisibles,\nPourtant, elles sont les gardiennes de l’impossible.\nDans leur monde souterrain, complexe et organisé,\nLe chaos se dissout, l’ordre est préservé.\n\nRespectons ces créatures, humbles et puissantes,\nLeur labeur est éternel, leur force est constante.\nCar dans la petitesse réside la grandeur,\nEt dans le silence, bat le cœur du monde, en labeur."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 26,
+    "completion_tokens": 396,
+    "total_tokens": 422,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 26,
+    "prompt_ms": 503.4,
+    "prompt_per_token_ms": 19.362,
+    "prompt_per_second": 51.6,
+    "predicted_n": 396,
+    "predicted_ms": 15083.0,
+    "predicted_per_token_ms": 38.088,
+    "predicted_per_second": 26.3,
+    "draft_n": 466,
+    "draft_n_accepted": 162
+  }
+}

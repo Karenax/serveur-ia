@@ -1,0 +1,38 @@
+{
+  "choices": [
+    {
+      "finish_reason": "length",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Pour comprendre les couleurs du ciel, il faut d'abord savoir que la lumière du soleil, bien qu'elle paraisse blanche, est en réalité composée de toutes les couleurs de l'arc-en-ciel. Chaque couleur voyage sous forme d'ondes de différentes longueurs : le bleu et le violet ont des ondes courtes, tandis que le rouge et l'orange ont des ondes longues.\n\nLorsque cette lumière entre dans l'atmosphère terrestre, elle rencontre des molécules de gaz (comme l'azote et l'oxygène). C'est ici qu'intervient un phénomène physique appelé la **diffusion de Rayleigh**. Les molécules de l'atmosphère sont beaucoup plus petites que les longueurs d'onde de la lumière visible. Elles interagissent plus fortement avec les ondes courtes (bleu et violet) qu'avec les ondes longues (rouge).\n\n### Pourquoi le ciel est bleu ?\n\n1.  **Diffusion préférentielle du bleu** : Les ondes bleues sont dispersées dans toutes les directions par les molécules de l'air. Peu importe où vous regardez dans le ciel (sauf directement vers le soleil), vous voyez cette lumière bleue"
+      }
+    }
+  ],
+  "created": 1790947838,
+  "model": "qwen3.8-flash-next",
+  "system_fingerprint": "b1-0ae77ef",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 256,
+    "prompt_tokens": 40,
+    "total_tokens": 296,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-rHHInOwwzSL2JwnUdp5QCs15D56mJueP",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 40,
+    "prompt_ms": 5626.94,
+    "prompt_per_token_ms": 140.6735,
+    "prompt_per_second": 7.108659413464512,
+    "predicted_n": 256,
+    "predicted_ms": 17752.687,
+    "predicted_per_token_ms": 69.61838039215687,
+    "predicted_per_second": 14.364022753287994,
+    "draft_n": 200,
+    "draft_n_accepted": 155
+  }
+}

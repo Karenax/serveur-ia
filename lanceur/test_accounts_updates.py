@@ -1,0 +1,170 @@
+"""Regression tests use isolated accounts, signed fixtures and fake model endpoints."""
+import base64
+import json
+from pathlib import Path
+import secrets
+import sys
+import tempfile
+import time
+import unittest
+from unittest.mock import patch
+import urllib.error
+from core import HOME,ROOT,read_json,write_json
+from accounts import Accounts
+from signing import sign,public
+from app import Controller
+from scheduler import Scheduler
+import test_remote
+client=test_remote.client
+sys.path.insert(0,str(ROOT/'client-qwen'))
+import updater
+
+class AccountsTests(unittest.TestCase):
+    def test_password_hash_reset_expiry_disabled_and_throttle(self):
+        with tempfile.TemporaryDirectory(dir=HOME) as folder:
+            accounts=Accounts(Path(folder));clients=[{'id':'a','revoked':False},{'id':'b','revoked':False}]
+            values={'id':'a','username':'Alice','password':'test long password 123'}
+            accounts.configure(values,clients)
+            self.assertNotIn(values['password'],accounts.path.read_text())
+            session=accounts.login('a','alice',values['password'])['session']
+            self.assertTrue(accounts.valid('a',session));self.assertFalse(accounts.valid('b',session))
+            with patch('accounts.time.time',return_value=time.time()+13*3600):self.assertFalse(accounts.valid('a',session))
+            accounts.configure({**values,'password':'another long password'},clients)
+            self.assertFalse(accounts.valid('a',session))
+            with self.assertRaises(ValueError):accounts.login('a','alice',values['password'])
+            session=accounts.login('a','alice','another long password')['session']
+            accounts.configure({**values,'password':'','enabled':False},clients)
+            self.assertFalse(accounts.valid('a',session))
+            for _ in range(5):
+                with self.assertRaises(ValueError):accounts.login('a','alice','wrong')
+            with self.assertRaisesRegex(ValueError,'cinq minutes'):accounts.login('a','alice','another long password')
+            with self.assertRaises(ValueError):accounts.configure({**values,'username':12},clients)
+
+    def test_old_cancel_cannot_abort_new_request_and_stall_expires(self):
+        scheduler=Scheduler();old=scheduler.submit('a','a'*32);scheduler.wait(old,lambda:True,lambda _:None);scheduler.finish(old)
+        new=scheduler.submit('a','b'*32);scheduler.wait(new,lambda:True,lambda _:None)
+        scheduler.cancel('a',old['id']);self.assertFalse(new['cancelled'])
+        new['progress']=time.time()-121;calls=[];new['abort']=lambda:calls.append(True)
+        scheduler.expire();self.assertTrue(new['cancelled']);self.assertEqual(calls,[True]);scheduler.finish(new)
+        self.assertEqual(scheduler.snapshot()['cancelled'],1)
+
+    def test_signed_download_rejects_wrong_key_modified_manifest_and_binary(self):
+        with tempfile.TemporaryDirectory(dir=HOME) as folder:
+            home=Path(folder);payload=b'signed executable fixture'
+            import hashlib,io
+            release=sign({'version':'3.0.1','protocol':3,'bytes':len(payload),'sha256':hashlib.sha256(payload).hexdigest()},home)
+            pinned=public(home);updater.verify(release,pinned)
+            with self.assertRaises(ValueError):updater.verify({**release,'version':'9.9.9'},pinned)
+            with self.assertRaises(ValueError):updater.verify(release,base64.b64encode(secrets.token_bytes(32)).decode())
+            class Remote:
+                profile={'update_public_key':pinned}
+                def open(self,path):return io.BytesIO(b'tampered')
+            with self.assertRaisesRegex(ValueError,'altéré'):updater.download(Remote(),release,home)
+            self.assertFalse((home/'QwenClient.base.exe').exists())
+
+    def test_restore_failure_rolls_back_every_file_and_keeps_restored_profiles(self):
+        from wg_crypto import protect
+        from operations import cipher
+        with tempfile.TemporaryDirectory(dir=HOME) as folder:
+            c=Controller(folder,include_legacy=False);password='backup password for regression'
+            c.wireguard.configure({'public_host':'127.0.0.1','listen_port':51820})
+            access=c.remote.issue('Backup');profile=c.wireguard.new_peer(access)
+            saved=c.wireguard.directory/'profils-restaures.dpapi';saved.write_bytes(protect(json.dumps({access['id']:profile}).encode()))
+            c.remote.accounts.configure({'id':access['id'],'username':'backup','password':'long test password'},c.remote.metadata()['clients'])
+            backup=c.operations.backup(password);blob=Path(backup['file']).read_bytes();package=json.loads(cipher(password,blob[11:27]).decrypt(blob[27:]))
+            self.assertEqual(package['files']['profiles'][access['id']],profile)
+            before=c.settings();c.save({**before,'context':8192});changed=c.settings()
+            with patch.object(c,'processes',return_value=[]),patch.object(c,'supervisor',return_value=None),patch.object(c.wireguard,'save_vault',side_effect=OSError('write failed')):
+                with self.assertRaises(OSError):c.operations.restore({'file':backup['file'],'password':password})
+            self.assertEqual(c.settings(),changed)
+            with patch.object(c,'processes',return_value=[]),patch.object(c,'supervisor',return_value=None):c.operations.restore({'file':backup['file'],'password':password})
+            second=c.operations.backup(password);blob=Path(second['file']).read_bytes();second_package=json.loads(cipher(password,blob[11:27]).decrypt(blob[27:]))
+            self.assertEqual(second_package['files']['profiles'][access['id']],profile)
+            self.assertEqual(second_package['files']['comptes.json'][0]['username'],'backup')
+
+    def test_helper_replaces_verified_exe_preserves_profile_and_keeps_previous(self):
+        import shutil,struct,hashlib
+        from types import SimpleNamespace
+        from wg_crypto import keypair,protect
+        source=ROOT/'client-qwen/dist/Accès serveur Fred.exe'
+        if not source.exists():self.skipTest('Compiler le client avant ce test.')
+        with tempfile.TemporaryDirectory(dir=HOME) as folder:
+            home=Path(folder);work=home/'update';work.mkdir()
+            private,key=keypair()
+            profile={'transport':'wireguard','url':'wireguard://10.77.0.1:8766','token':'qwen_0000000000000000_'+'x'*43,'version':'2.9.9','protocol':3,'update_public_key':public(home),'wireguard':{'private_key':private,'server_public_key':key,'preshared_key':key,'address':'10.77.0.2/32','endpoint':'127.0.0.1:1'}}
+            target=home/'QwenClient.exe';shutil.copyfile(source,target)
+            raw=json.dumps(profile).encode()
+            with target.open('ab') as stream:stream.write(raw+struct.pack('<I',len(raw))+b'QWENPROFILE1')
+            old=hashlib.sha256(target.read_bytes()).hexdigest()
+            payload=work/'QwenClient.base.exe';shutil.copyfile(source,payload)
+            release=sign({'version':updater.VERSION,'protocol':3,'bytes':payload.stat().st_size,'sha256':hashlib.sha256(payload.read_bytes()).hexdigest()},home)
+            plan=work/'plan.dpapi';plan.write_bytes(protect(json.dumps({'target':str(target.resolve()),'source':str(payload.resolve()),'profile':profile,'release':release,'pid':99999999,'created':0}).encode()))
+            helper=work/'QwenUpdate.exe'
+            launch=updater.subprocess.Popen;fail_startup=[False];plan_blob=plan.read_bytes();relaunches=[]
+            def test_launch(args,**kwargs):
+                if '--self-test' in args:return launch(args,**kwargs)
+                if len(args)==1:relaunches.append(args[0])
+                if '--update-ack' in args and fail_startup[0]:return SimpleNamespace(pid=0,poll=lambda:1)
+                if '--update-ack' in args:Path(args[-1]).write_text(json.dumps({'version':updater.VERSION,'ready':True}),encoding='utf-8')
+                return SimpleNamespace(pid=0,poll=lambda:None)
+            with patch.object(updater.sys,'executable',str(helper.resolve())),patch.object(updater.subprocess,'Popen',side_effect=test_launch):
+                # A tampered WireGuard identity is rejected even with the correct token and signing pin.
+                changed=json.loads(protect(plan_blob,decrypt=True));changed['profile']['wireguard']['address']='10.77.0.3/32';plan.write_bytes(protect(json.dumps(changed).encode()))
+                with self.assertRaisesRegex(ValueError,'Profil'):updater.apply(plan,protect,lambda:profile)
+                plan.write_bytes(plan_blob)
+                # A failed new-binary self-test leaves the old EXE untouched and relaunches it.
+                with patch.object(updater.subprocess,'run',return_value=SimpleNamespace(returncode=1)):
+                    with self.assertRaises(ValueError):updater.apply(plan,protect,lambda:profile)
+                self.assertEqual(hashlib.sha256(target.read_bytes()).hexdigest(),old)
+                self.assertEqual(relaunches,[str(target.resolve())])
+                fail_startup[0]=True;plan.write_bytes(plan_blob);shutil.copyfile(source,payload)
+                with self.assertRaisesRegex(ValueError,'démarrage'):updater.apply(plan,protect,lambda:profile)
+                self.assertEqual(hashlib.sha256(target.read_bytes()).hexdigest(),old)
+                fail_startup[0]=False;plan.write_bytes(plan_blob);shutil.copyfile(source,payload)
+                updater.apply(plan,protect,lambda:profile)
+            import releases
+            installed=releases.profile(target)
+            self.assertEqual(installed['wireguard'],profile['wireguard']);self.assertEqual(installed['token'],profile['token'])
+            self.assertEqual(installed['version'],updater.VERSION)
+            self.assertEqual(hashlib.sha256((home/'QwenClient.previous-2.9.9.exe').read_bytes()).hexdigest(),old)
+            self.assertFalse(plan.exists());self.assertTrue(read_json(home/'QwenClient-update-result.json')['ok'])
+
+class AuthGatewayTests(unittest.TestCase):
+    # Reuse the fixture, without inheriting and rerunning its full test suite.
+    setUp=test_remote.RemoteTests.setUp
+    tearDown=test_remote.RemoteTests.tearDown
+    request=test_remote.RemoteTests.request
+
+    def test_personal_exe_connects_without_login_and_revocation_crosses_wireguard(self):
+        from wireguard_access import Engine
+        engine=Engine({'role':'server','wireguard':{'private_key':self.wireguard.vault()['private_key']},'listen_port':0,'upstream_port':self.gateway.server_port,'peers':self.wireguard.peers()})
+        remote=client.Remote(self.profile,endpoint=f'127.0.0.1:{engine.port}')
+        try:
+            self.assertFalse(remote.session)
+            with remote.open('/v1/models') as response:self.assertEqual(json.load(response)['data'][0]['id'],'test-model')
+            with remote.open('/v1/auth/login',b'{}') as response:self.fail('Login route must be unavailable')
+        except urllib.error.HTTPError as error:
+            self.assertEqual(error.code,404)
+            self.store.revoke(self.access['id'])
+            with self.assertRaises(urllib.error.HTTPError) as revoked:remote.open('/v1/models')
+            self.assertEqual(revoked.exception.code,401)
+        finally:remote.close();engine.close()
+
+    def test_local_history_encrypted_and_auth_required(self):
+        import threading,urllib.request
+        remote=client.Remote(self.profile,opener=object());key=secrets.token_urlsafe(32)
+        with patch.object(client,'settings_path',return_value=Path(self.temporary.name)/'settings.dpapi'):
+            local=client.serve_local(remote,key,0)
+        threading.Thread(target=local.serve_forever,daemon=True).start()
+        history={'conversations':[{'id':'a','title':'private fixture','messages':[]}],'currentId':'a'}
+        try:
+            with patch.object(client,'settings_path',return_value=Path(self.temporary.name)/'settings.dpapi'):
+                headers={'Authorization':'Bearer '+key,'Content-Type':'application/json'}
+                request=urllib.request.Request(f'http://127.0.0.1:{local.server_port}/client/history',json.dumps({'history':history}).encode(),headers)
+                with urllib.request.urlopen(request) as response:self.assertTrue(json.load(response)['saved'])
+                raw=(Path(self.temporary.name)/'settings.history.dpapi').read_bytes();self.assertNotIn(b'private fixture',raw)
+                with urllib.request.urlopen(urllib.request.Request(request.full_url,headers=headers)) as response:self.assertEqual(json.load(response)['history'],history)
+                with self.assertRaises(urllib.error.HTTPError):urllib.request.urlopen(request.full_url)
+        finally:local.shutdown();local.server_close()
+
+if __name__=='__main__':unittest.main()

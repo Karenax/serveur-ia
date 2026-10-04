@@ -1,0 +1,61 @@
+﻿Qwen3.8 Flash Next Q4 — deux Tesla P100 — 2 octobre 2026
+
+Le serveur actuellement validé et laissé actif est Strata CPU+GPU, adapté pour les P100.
+Interface : http://127.0.0.1:8080/ ; API : http://127.0.0.1:8080/v1
+Alias : qwen3.8-flash-next ; contexte 4096 ; une requête à la fois.
+Analyse complète : ANALYSE-GOULOTS-P100.txt.
+Comparatif CPU+GPU : COMPARATIF-CPU-GPU-P100.txt.
+Comparatif historique GPU : COMPARATIF-Q4-STRATA.txt.
+
+Démarrer Strata :
+powershell -ExecutionPolicy Bypass -File "D:\Serveur IA\Start-Strata-P100.ps1"
+Arrêter Strata :
+powershell -ExecutionPolicy Bypass -File "D:\Serveur IA\Stop-Strata-P100.ps1"
+Chargement complet sur ce disque mécanique : environ 15–20 minutes.
+La validation CUDA initiale se fait automatiquement avant les tests.
+Pour revenir au mode où tous les experts sont calculés sur GPU, ajouter -GPUSeulement au lanceur.
+
+Strata utilise environ 84,1 Gio de RAM moteur, avec 26,82 Gio de table n-gram
+verrouillée en RAM et 55,71 Gio d'experts en RAM épinglée. Pics VRAM observés :
+15052 et 15264 Mio sur les deux P100. Les couches denses et les experts en VRAM
+sont calculés sur GPU. Tous les experts absents du cache sont calculés sur CPU :
+15 travailleurs et le thread hôte utilisent les 16 cœurs physiques.
+Le défaut est --pcie-frac 0, qui évite les transferts de poids d'experts par PCIe.
+Zéro lecture d'expert depuis les fichiers pendant les réponses validées.
+Le Q4 fait 103,69 Gio : il utilise donc ensemble les 32 Gio de VRAM et la RAM.
+
+Comparaison sur les mêmes prompts ciel/Fibonacci, 256 tokens, température 0,
+seed 42, réflexion et cache de prompt désactivés :
+                         Ciel       Fibonacci
+Café sans MTP            13,07       9,09 tokens/s
+Café avec MTP            14,36       9,49 tokens/s
+Strata MTP, experts GPU   8,73      10,96 tokens/s
+Strata MTP, CPU+GPU      28,70      35,16 tokens/s (médianes de deux répétitions)
+Validation du défaut     28,73      35,60 tokens/s (sans réglage dans la requête)
+
+Les paramètres communs sont dans protocole-comparatif-q4.json. La poésie sur
+les fourmis proposée par l'utilisateur est conservée pour une prochaine série
+commune ; elle n'est pas mélangée aux résultats déjà mesurés.
+Limites : Strata utilise un draft MTP Q2 converti, Café le draft Q8 original ;
+certains petits tenseurs de compatibilité Strata sont convertis en BF16.
+Le rapport explique ces différences et conserve les réponses pour comparaison.
+Le mode P100 Strata est expérimental, validé ici sur ces deux requêtes.
+
+Tests du défaut CPU+GPU : Test-Strata-Hybride.ps1.
+Ajouter -Comparatif pour tester les quatre partages 1 / 0,5 / 0,25 / 0, avec deux répétitions.
+Chaque série est conservée dans comparatifs\2026-10-02-strata-hybride-p100.
+Test-Strata-P100.ps1 est réservé au serveur démarré avec -GPUSeulement ; il vérifie zéro travail CPU.
+Les anciennes séries restent dans comparatifs\2026-10-02-strata-q4-p100.
+Archives Café : comparatifs\2026-10-02-cafe-q4-p100.
+Tableau consolidé : comparatifs\comparatif-q4-p100.csv.
+
+Les lanceurs Start-Qwen.ps1 et Stop-Qwen.ps1 utilisent toujours Café/llama.cpp.
+Start-Qwen.ps1 démarre Café avec MTP ; -SansMTP le désactive.
+Arrêter le serveur actif avant de changer de moteur : même port 8080.
+RESULTATS-GPU.txt conserve le compte rendu historique Café.
+Aucun démarrage automatique Windows installé.
+
+Dépôt Strata revérifié le 2 octobre à 20:07 : version 0.1.36 disponible, commit 36fa455.
+La compilation active reste fondée sur 0.1.35 avec les adaptations P100 validées.
+Les nouveaux kernels 0.1.36 visent les RTX récentes ; le profil d'experts persistant
+peut être utile après adaptation de notre résidence RAM/VRAM. Voir l'analyse détaillée.

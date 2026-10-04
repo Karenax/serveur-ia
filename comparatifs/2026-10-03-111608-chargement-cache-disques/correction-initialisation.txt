@@ -1,0 +1,1 @@
+Validation relancee avec PowerShell 7; warmup UTF-8 BOM pour compatibilite Windows PowerShell 5.

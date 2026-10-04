@@ -1,0 +1,4 @@
+Q4_K gate/up-0         rows  7 experts 3  ref_rms 1.553  rel_l2 0.00259  max/rms 0.0068  zero row 0
+Q5_K MMQ disabled on sm_60: prompt uses the FP16 GPU route
+Q5_1 MMQ disabled on sm_60: prompt uses the FP16 GPU route
+prefill MMQ K-quant screen failed: Q8_0 down-0: unwritten or non-finite output

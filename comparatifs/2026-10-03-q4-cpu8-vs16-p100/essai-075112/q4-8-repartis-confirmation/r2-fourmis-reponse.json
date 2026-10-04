@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-732f138156f143e8a03d9540",
+  "object": "chat.completion",
+  "created": 1791015403,
+  "model": "qwen3.8-flash-next",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Dans l’ombre des racines, sous le soleil brûlant,\nUn peuple minuscule, silencieux et grand,\nS’active sans relâche, guidé par l’instinct pur,\nChaque fourmi est un rouage, un soldat, un futur.\n\nElles marchent en file indienne, ligne parfaite,\nPortant sur leurs épaules, une charge secrète.\nUn grain de sable, une feuille, un insecte mort,\nChaque pas est calculé, chaque geste est fort.\n\nLeurs antennes se touchent, langage invisible,\nUn échange chimique, une parole sensible.\nElles parlent de danger, de nourriture trouvée,\nDe la reine au cœur du terrier, toujours adorée.\n\nLa cité souterraine est un labyrinthe d’art,\nDes galeries profondes, un monde à part.\nLà-bas, dans l’obscurité, la vie continue,\nProtégée par la terre, jamais inconnue.\n\nElles ne connaissent ni repos, ni paresse,\nSeule la survie du groupe est leur richesse.\nL’individu s’efface pour le bien commun,\nUn sacrifice silencieux, un destin commun.\n\nQuand la pluie menace, elles déménagent,\nPrévoyantes et sages, elles ne s’engagent\nJamais dans l’imprévu, toujours préparées,\nPar la nature même, elles sont inspirées.\n\nNous les ignorons, écrasées sous nos pas,\nMais elles bâtissent un empire, là-bas.\nPetites ouvrières de la terre nourricière,\nElles nous enseignent la force de la lumière.\n\nDans leur humilité, une leçon immense :\nL’union fait la force, la plus belle défense.\nRespectons ces géantes, minuscules et fières,\nGardiennes du sol, de la vie, de la terre."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 26,
+    "completion_tokens": 426,
+    "total_tokens": 452,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 26,
+    "prompt_ms": 1052.7,
+    "prompt_per_token_ms": 40.488,
+    "prompt_per_second": 24.7,
+    "predicted_n": 426,
+    "predicted_ms": 16662.2,
+    "predicted_per_token_ms": 39.113,
+    "predicted_per_second": 25.6,
+    "draft_n": 264,
+    "draft_n_accepted": 174
+  }
+}

@@ -1,0 +1,68 @@
+AUDIT DES ESPACES — ACCÈS SERVEUR FRED 3.3.1
+4 octobre 2026
+
+Périmètre livré
+Projets, assistants configurables, documents éditables, questions sur les fichiers
+avec passages sourcés, discussions publiées explicitement, mémoire choisie,
+tâches persistantes et planifiées, lecture HTTPS et recherche Brave contrôlées.
+Navigation cliente : Conversations / Projets / Assistants / Tâches / Réglages.
+Console : Espaces et fichiers / Assistants et outils / Tâches.
+L'EXE personnel reste l'identité d'accès, sans écran de compte ou mot de passe.
+
+Première passe : isolation et continuité
+- Contrôle du propriétaire sur les projets, documents, discussions, mémoires
+  et tâches ; aucun owner_id envoyé par le client n'est accepté comme identité.
+- Droits vérifiés par assistant et par accès, limites de stockage et de tâches.
+- Désactivation, suspension et révocation annulent les tâches concernées.
+- Révisions optimistes des documents et discussions ; résultat IA examiné avant
+  remplacement ; historique local et publication serveur distincts.
+- Tâches conservées dans SQLite, résultat disponible après fermeture du client.
+- Une tâche interrompue ou restaurée exige une relance explicite ; une tâche
+  annulée ne publie pas son résultat.
+- Sauvegarde SQLite autonome, intégrée à la sauvegarde chiffrée existante ;
+  validation du schéma, de l'intégrité et des propriétaires avant restauration.
+
+Seconde passe : robustesse et limites
+- Imports TXT/MD/DOCX/PDF isolés dans un processus avec plafond de taille,
+  mémoire et temps ; une importation ne bloque pas le verrou des accès.
+- HTML web dépouillé des scripts, corps et décompression gzip bornés ; résolution
+  d'adresses publiques, IP épinglée pendant TLS, certificats et redirections vérifiés.
+- Clé Brave protégée par DPAPI et absente des réponses API ; web désactivé par
+  défaut, puis activé à la fois globalement et pour l'accès concerné.
+- Un seul worker revendique les tâches ; aucune reprise concurrente silencieuse.
+- Brouillons locaux chiffrés et séparés par fenêtre ; récupération exclusive après
+  arrêt de leur processus. Une autre fenêtre ne peut pas effacer le brouillon actif.
+- Résultat vide signalé comme erreur ; indentation du code conservée.
+- Écriture JSON atomique avec reprise des verrous Windows transitoires.
+- Redémarrage de la console préservant l'état du modèle et les options existantes.
+
+Vérifications
+Résultat final : 72 tests réussis en 187 secondes, contrôle de la fenêtre native
+réussi et migration 3.1.0 vers 3.3.1 réussie avec clés et ancien EXE conservés.
+Console et EXE personnel de production : 3.3.1 ; signature de publication et
+empreinte du binaire téléchargé vérifiées via l'accès WireGuard existant.
+Les journaux workspace-331-tests.log, workspace-331-native-ui.log et
+workspace-331-native-update.log consignent les contrôles de la version finale.
+La suite couvre notamment l'isolation des propriétaires, conflits de révision,
+quotas, imports réels, annulation, récurrence, reprise, sauvegarde chiffrée,
+authentification et mises à jour. Un échange WireGuard UDP réel vérifie qu'une
+tâche termine après déconnexion et que sa révocation refuse le prochain accès.
+Les fenêtres WebView2 et la migration de l'ancien EXE sont contrôlées sur le
+binaire compilé, avec un serveur et un modèle de test isolés.
+Les scripts JavaScript sont vérifiés par Node et les sources Python compilées.
+Une lecture HTTPS publique a été vérifiée avec validation du certificat.
+workspace-live-proof.json contrôle la version de production, l'accès personnel,
+la signature et le hash de téléchargement, ainsi que l'état du modèle.
+
+Limites vérifiées ou non vérifiées
+Le modèle de production était arrêté au début du déploiement et son état est
+conservé. Cette livraison ne revendique pas une génération réelle sur ce modèle.
+Les essais fonctionnels de génération utilisent un modèle de test déterministe.
+La recherche Brave par sujet attend une clé API ; aucun appel réel à ce service
+n'a été réalisé sans clé. La lecture d'une URL publique ne nécessite pas cette clé.
+Le passage depuis un autre réseau Internet n'a pas été vérifié dans cette passe.
+Les documents PDF scannés nécessitent un OCR préalable ; une révision IA complète
+est limitée à 7 500 caractères. Les fichiers de l'espace sont privés par droits
+Windows et par contrôle API, accessibles à l'administrateur du serveur.
+La voix, l'OCR intégré, les espaces partagés, les connecteurs et les conteneurs
+restent les extensions ultérieures du plan initial.

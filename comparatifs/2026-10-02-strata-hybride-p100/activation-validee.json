@@ -1,0 +1,132 @@
+{
+  "checked_at": "2026-10-02T20:11:38.667212+02:00",
+  "engine": "Strata 0.1.35 P100 hybrid",
+  "source_commit": "d9ab8435f654c368c586340d490915f6addf56a3",
+  "binary_sha256": "9b07c8c1e2367d217e17199f137f6c8d33f5832ab02df594b68652ba5c9488d0",
+  "configuration": {
+    "exe": "D:/Serveur IA/strata-build-p100/strata.exe",
+    "cwd": "D:/Serveur IA/Strata-src",
+    "args": [
+      "--pack",
+      "D:/Serveur IA/strata-data/q4-local",
+      "--native",
+      "D:/Serveur IA/strata-data/model-q4/Qwen3.8-Flash-Next-UD-Q4_K_XL-00001-of-00004.gguf",
+      "--mmap-experts",
+      "--resident-cpu-experts",
+      "--expert-profile",
+      "D:/Serveur IA/Strata-src/data/expert-profile.bin",
+      "--expert-cache",
+      "auto",
+      "--vram-reserve-mib",
+      "2048",
+      "--layer-split",
+      "24",
+      "--split-device",
+      "1",
+      "--no-prefill-borrow",
+      "--adapt-every",
+      "0",
+      "--pcie-frac",
+      "0",
+      "--prefill",
+      "256",
+      "--short-read",
+      "0",
+      "--prompt-cache",
+      "0",
+      "--spec",
+      "3",
+      "--spec-min-p",
+      "0.5",
+      "--mtp",
+      "D:/Serveur IA/strata-data/mtp-local-rt",
+      "--ple-io",
+      "ram",
+      "--pool-workers",
+      "15",
+      "--max-context",
+      "4096"
+    ],
+    "env": {
+      "CUDA_VISIBLE_DEVICES": "GPU-a39f1b57-5a26-b53d-e943-44ef8042a438,GPU-486d5352-582e-2880-78bf-3dec4688e142",
+      "CUDA_DISABLE_PTX_JIT": "1",
+      "STRATA_P100_RAM_SPLIT": "1",
+      "STRATA_LOOKAHEAD": "0",
+      "STRATA_P100_DIAGNOSTIC_SYNC_FILE": "D:/Serveur IA/strata-data/cuda-debug.flag",
+      "STRATA_TRACE": "1",
+      "STRATA_P100_HYBRID": "1",
+      "STRATA_DECODE_TIMING": "1"
+    },
+    "lib_dirs": [
+      "D:/Serveur IA/toolchain/cuda-12.4/bin"
+    ],
+    "tokenizer": "D:/Serveur IA/strata-data/q4-local/tokenizer",
+    "model_name": "qwen3.8-flash-next",
+    "log": "D:/Serveur IA/strata-engine-p100.log",
+    "host": "127.0.0.1",
+    "port": 8080
+  },
+  "validation": "D:\\Serveur IA\\comparatifs\\2026-10-02-strata-hybride-p100\\validation-20261002-200515",
+  "results": [
+    {
+      "repeat": 1,
+      "pcie_frac": 0.0,
+      "test": 1,
+      "prompt": "Explique en français pourquoi le ciel est bleu, puis pourquoi il devient rouge au coucher du soleil. Donne une explication précise et accessible.",
+      "elapsed_seconds": 10.273061899999448,
+      "generation_tps": 28.732729497064994,
+      "prompt_tps": 30.7,
+      "output_tokens": 256,
+      "drafts": 189,
+      "accepted": 112,
+      "cpu_expert_jobs": 83494,
+      "ram_gpu_experts": 0,
+      "cpu_average_cores": 14.015721544519044,
+      "engine_io_read_bytes": 234,
+      "ram_peak_bytes": 90299097088,
+      "gpu_max_temp_c": 51,
+      "gpu_max_power_w": 123.013,
+      "vram_peak_mib": {
+        "1": 15052.0625,
+        "2": 15264.0625
+      },
+      "answer_sha256": "23f57dd9a585aa8369ebbe834cab4bff5a57be6cda622bb1eaea43ca7e980d09"
+    },
+    {
+      "repeat": 1,
+      "pcie_frac": 0.0,
+      "test": 2,
+      "prompt": "Écris une fonction Python fibonacci(n) qui retourne les n premiers nombres de Fibonacci, puis donne un exemple pour n=8. Réponds en français.",
+      "elapsed_seconds": 8.548876400000154,
+      "generation_tps": 35.60302625723187,
+      "prompt_tps": 34.0,
+      "output_tokens": 256,
+      "drafts": 188,
+      "accepted": 153,
+      "cpu_expert_jobs": 72350,
+      "ram_gpu_experts": 0,
+      "cpu_average_cores": 13.633005034439135,
+      "engine_io_read_bytes": 244,
+      "ram_peak_bytes": 90299977728,
+      "gpu_max_temp_c": 52,
+      "gpu_max_power_w": 127.211,
+      "vram_peak_mib": {
+        "1": 15052.0625,
+        "2": 15264.0625
+      },
+      "answer_sha256": "12c0386b2dde6aa5333a0b0ce1c540cd2becf61872ebb91341379a8df82626f0"
+    }
+  ],
+  "earlier_archives_verified": [
+    {
+      "archive": "2026-10-02-cafe-q4-p100",
+      "files_verified": 28
+    },
+    {
+      "archive": "2026-10-02-strata-q4-p100",
+      "files_verified": 101
+    }
+  ],
+  "updated_remote_commit": "36fa455e579b23a9c909c2c6fe1bddd9e51cb8ca",
+  "remote_version": "0.1.36 reviewed, not installed"
+}

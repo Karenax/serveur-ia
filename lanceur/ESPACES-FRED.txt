@@ -1,0 +1,87 @@
+ACCÈS SERVEUR FRED 3.4.0 — ESPACES DE TRAVAIL
+
+Fonctions intégrées
+- Projets : création, recherche, consignes, archivage et restauration.
+- Assistants : Général, Rédaction, Code, Analyse et Recherche ; profils modifiables
+  dans la console, utilisant tous le même modèle chargé.
+- Documents : notes éditables et fichiers TXT, MD, DOCX et PDF texte ; import 2 Mo,
+  extraction bornée dans un processus distinct, index textuel et passages sourcés.
+- Révisions par l'IA : préparation dans une tâche, brouillon à examiner, acceptation
+  explicite ; une révision concurrente empêche de remplacer un texte plus récent.
+  La révision complète est limitée à 7 500 caractères ; les documents plus longs
+  se travaillent par passages dans le chat, sans suppression silencieuse du reste.
+- Discussions : choix du projet et du document, publication explicite dans le projet,
+  récupération depuis le serveur. L'historique local DPAPI est conservé séparément.
+- Mémoire : préférences choisies, modifiables et supprimables par projet.
+- Tâches : analyse/rédaction/recherche web, travail serveur client fermé, résultat,
+  pause, annulation, relance, départ différé, récurrence quotidienne ou hebdomadaire.
+- Outils : consultation des documents et de la mémoire selon le profil ; recherche
+  web selon le profil, le droit du client et l'activation globale du serveur.
+- Console : Espaces et fichiers / Assistants et outils / Tâches.
+
+Accès
+Toujours un EXE personnel par destinataire, sans compte ni mot de passe à saisir.
+L'identité est dérivée de la clé vérifiée côté serveur. Chaque requête contrôle
+le propriétaire ; un identifiant de projet seul ne donne pas accès à ses données.
+Les copies du même EXE partagent la même identité. Révoquer ou suspendre un accès
+annule ses tâches et refuse les nouvelles demandes.
+
+Stockage et sauvegardes
+SQLite, fourni avec Python, stocke les données et fichiers dans espaces-prives,
+dossier protégé par les droits Windows du propriétaire du serveur et administrateurs.
+Ce stockage n'est pas chiffré de bout en bout ; l'administrateur du serveur y a accès.
+Par défaut : 20 Mo, 50 projets et 5 tâches actives par accès ; plafond global 128 Mo.
+La console permet de changer les limites. Les brouillons de documents sont chiffrés
+sur le PC client par DPAPI et récupérables après réouverture. Les conflits demandent
+une comparaison avant enregistrement. Les imports PDF scannés demandent un OCR préalable.
+
+Les sauvegardes chiffrées comprennent les espaces, fichiers originaux, conversations
+publiées, index, assistants, tâches et clé de recherche. Le schéma, l'intégrité et les
+propriétaires sont contrôlés avant restauration. Les tâches restaurées et celles
+interrompues en cours d'exécution attendent une relance manuelle, pour éviter un rejeu
+silencieux. Les tâches en attente survivent à un redémarrage ordinaire du serveur.
+
+Recherche web
+Dans Assistants et outils : activer la recherche ; autoriser également le client
+dans Espaces et fichiers. Utiliser un assistant doté du droit web, comme Recherche.
+Dans le client, créer une tâche Recherche web :
+- Avec une URL HTTPS publique : lecture du site, sans clé de fournisseur.
+- Sans URL : recherche Brave Search, nécessitant sa clé API sur le serveur.
+La clé est chiffrée avec Windows DPAPI et n'est jamais retournée dans les états API.
+La recherche par sujet accepte 600 caractères et 75 mots. La question est transmise
+à Brave ; les fichiers et mémoires du projet ne lui sont pas envoyés automatiquement.
+Les résultats présentent des liens et extraits ; une lecture directe est bornée à
+1 Mo. Les adresses privées, ports autres que 443, identifiants dans les URL et
+redirections vers des adresses privées sont refusés. Le certificat HTTPS reste vérifié.
+API de référence : https://api-dashboard.search.brave.com/app/documentation/web-search/codes
+
+Le moteur ne reçoit aucun accès au terminal Windows. Les capacités d'outils sont
+vérifiées par le serveur ; l'exécution MCP de l'hôte reste désactivée sur la passerelle.
+Les PDF et textes constituent des sources ; leurs instructions ne donnent pas de droits.
+
+Exploitation
+Les requêtes interactives passent avant les tâches encore en attente, sans interrompre
+automatiquement une génération déjà commencée. Le modèle doit être chargé pour travailler.
+Une tâche annulée ne publie pas son résultat. Les erreurs restent visibles et relançables.
+Récurrence : la prochaine exécution est créée après une réussite ; une erreur demande
+une relance manuelle. Annuler la prochaine tâche arrête la chaîne de récurrence.
+
+Technologies
+Python et serveur HTTP existant ; SQLite avec recherche FTS5 et schéma versionné.
+Client pywebview/WebView2, HTML/CSS/JavaScript, WireGuard Go et mises à jour Ed25519.
+Pas de MariaDB, Alembic ni FastAPI installés. pypdf et python-docx étaient déjà présents
+dans l'environnement ; leurs versions sont désormais déclarées dans requirements.txt.
+OpenDots a servi de référence fonctionnelle ; aucun de ses services cloud n'est ajouté.
+
+Livraison vérifiée
+Console et EXE personnel : 3.4.0. Les 72 tests passent, ainsi que l'ouverture native
+WebView2 et la mise à jour depuis l'ancien EXE 3.1.0. Les clés sont conservées et
+le téléchargement signé est vérifié. Voir AUDIT-ESPACES-FRED.txt pour les limites
+des essais. Le modèle de production était arrêté ; la livraison conserve cet état.
+
+Périmètre ultérieur du plan
+La voix, l'OCR intégré, les espaces partagés, les connecteurs de messagerie,
+la coordination automatique d'agents et l'exécution de code dans des conteneurs
+restent des extensions futures. Elles n'étaient pas les lots retenus pour cette version.
+
+Interface 3.4.0 : voir REFONTE-INTERFACE.txt pour la nouvelle navigation et ses contrôles.

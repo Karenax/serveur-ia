@@ -1,0 +1,26 @@
+{
+  "ciel": {
+    "median_tps": 25.579316321180947,
+    "output_tokens": [
+      256,
+      256
+    ],
+    "median_mtp_acceptance": 0.6042780748663101
+  },
+  "fibonacci": {
+    "median_tps": 29.49763635633801,
+    "output_tokens": [
+      256,
+      256
+    ],
+    "median_mtp_acceptance": 0.8133320059164866
+  },
+  "fourmis": {
+    "median_tps": 22.43964292436406,
+    "output_tokens": [
+      426,
+      426
+    ],
+    "median_mtp_acceptance": 0.6566037735849056
+  }
+}

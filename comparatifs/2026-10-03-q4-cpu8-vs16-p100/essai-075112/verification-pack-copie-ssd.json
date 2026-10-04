@@ -1,0 +1,52 @@
+[
+  {
+    "path": "compat-bf16.json",
+    "bytes": 22045,
+    "sha256": "0332813ed1913a68fa6a0611c2d19d0841b4044a8ddd38a5f8bb86e0bdec6dde"
+  },
+  {
+    "path": "conversions.json",
+    "bytes": 172496,
+    "sha256": "ab3b99914786e10b8b559dfefc345b6c05507911aecfbe7a69d4dd4c73dfacb8"
+  },
+  {
+    "path": "dense.bin",
+    "bytes": 1485688320,
+    "sha256": "f53174059b262ed342b82e143af62056081948ef5e5f1903a1a70eeb73fa4a23"
+  },
+  {
+    "path": "index.txt",
+    "bytes": 93560,
+    "sha256": "cfc07e91c4d9b8e8c999fd1f70fa364e584748e70fa377b30e0fc85426f52711"
+  },
+  {
+    "path": "native_experts.txt",
+    "bytes": 5795,
+    "sha256": "33bf4dbaeb00b75edefd18083e47214d71852db6fa38ae8efd4ecbdcc0b7c5ed"
+  },
+  {
+    "path": "tokenizer\\chat_template.jinja",
+    "bytes": 9993,
+    "sha256": "12827f24b742ea4e80cdc12dbcf9622227056b9f797252a3149263d4f9aaadce"
+  },
+  {
+    "path": "tokenizer\\merges.txt",
+    "bytes": 3600844,
+    "sha256": "080cf95432173729d160346b7882bd2a644b07f7a3813a3eb73f4e66787bfde9"
+  },
+  {
+    "path": "tokenizer\\token_type.json",
+    "bytes": 744960,
+    "sha256": "5088c8c298fc06af8382ddb3b76c888703ac2634e82263b97eedcc2ad202738b"
+  },
+  {
+    "path": "tokenizer\\tokenizer.json",
+    "bytes": 554,
+    "sha256": "87be2ac47d8bc7393b7435df6ccd276740019a393941a2585d5edce59f450c54"
+  },
+  {
+    "path": "tokenizer\\vocab.json",
+    "bytes": 5737005,
+    "sha256": "4ba64f0332abcfb0b600b7df1537d1e836e68009d5fb7cdb77339738dc6365c4"
+  }
+]

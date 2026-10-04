@@ -1,0 +1,4 @@
+name, uuid, driver_version, memory.total [MiB], memory.used [MiB], temperature.gpu, clocks.current.sm [MHz], clocks.current.memory [MHz], power.draw [W], clocks_throttle_reasons.sw_thermal_slowdown, clocks_throttle_reasons.hw_thermal_slowdown
+Quadro P2200, GPU-97ca6406-8625-b829-b053-191c238ff046, 528.89, 5120 MiB, 1586 MiB, 37, 607 MHz, 405 MHz, 5.47 W, Not Active, Not Active
+Tesla P100-PCIE-16GB, GPU-a39f1b57-5a26-b53d-e943-44ef8042a438, 528.89, 16384 MiB, 14471 MiB, 43, 1189 MHz, 715 MHz, 32.84 W, Not Active, Not Active
+Tesla P100-PCIE-16GB, GPU-486d5352-582e-2880-78bf-3dec4688e142, 528.89, 16384 MiB, 14555 MiB, 45, 1189 MHz, 715 MHz, 33.59 W, Not Active, Not Active

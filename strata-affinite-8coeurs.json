@@ -1,0 +1,514 @@
+{
+  "pid": 28284,
+  "executable": "D:\\Serveur IA\\strata-build-p100\\strata.exe",
+  "created": "2026-10-03T08:15:55.914347+00:00",
+  "physical_topology": [
+    {
+      "logical": [
+        0,
+        1
+      ],
+      "primary": 0,
+      "mask": 3
+    },
+    {
+      "logical": [
+        2,
+        3
+      ],
+      "primary": 2,
+      "mask": 12
+    },
+    {
+      "logical": [
+        4,
+        5
+      ],
+      "primary": 4,
+      "mask": 48
+    },
+    {
+      "logical": [
+        6,
+        7
+      ],
+      "primary": 6,
+      "mask": 192
+    },
+    {
+      "logical": [
+        8,
+        9
+      ],
+      "primary": 8,
+      "mask": 768
+    },
+    {
+      "logical": [
+        10,
+        11
+      ],
+      "primary": 10,
+      "mask": 3072
+    },
+    {
+      "logical": [
+        12,
+        13
+      ],
+      "primary": 12,
+      "mask": 12288
+    },
+    {
+      "logical": [
+        14,
+        15
+      ],
+      "primary": 14,
+      "mask": 49152
+    },
+    {
+      "logical": [
+        16,
+        17
+      ],
+      "primary": 16,
+      "mask": 196608
+    },
+    {
+      "logical": [
+        18,
+        19
+      ],
+      "primary": 18,
+      "mask": 786432
+    },
+    {
+      "logical": [
+        20,
+        21
+      ],
+      "primary": 20,
+      "mask": 3145728
+    },
+    {
+      "logical": [
+        22,
+        23
+      ],
+      "primary": 22,
+      "mask": 12582912
+    },
+    {
+      "logical": [
+        24,
+        25
+      ],
+      "primary": 24,
+      "mask": 50331648
+    },
+    {
+      "logical": [
+        26,
+        27
+      ],
+      "primary": 26,
+      "mask": 201326592
+    },
+    {
+      "logical": [
+        28,
+        29
+      ],
+      "primary": 28,
+      "mask": 805306368
+    },
+    {
+      "logical": [
+        30,
+        31
+      ],
+      "primary": 30,
+      "mask": 3221225472
+    }
+  ],
+  "placement": "spread",
+  "selected_physical_cores": [
+    {
+      "logical": [
+        0,
+        1
+      ],
+      "primary": 0,
+      "mask": 3
+    },
+    {
+      "logical": [
+        16,
+        17
+      ],
+      "primary": 16,
+      "mask": 196608
+    },
+    {
+      "logical": [
+        2,
+        3
+      ],
+      "primary": 2,
+      "mask": 12
+    },
+    {
+      "logical": [
+        18,
+        19
+      ],
+      "primary": 18,
+      "mask": 786432
+    },
+    {
+      "logical": [
+        4,
+        5
+      ],
+      "primary": 4,
+      "mask": 48
+    },
+    {
+      "logical": [
+        20,
+        21
+      ],
+      "primary": 20,
+      "mask": 3145728
+    },
+    {
+      "logical": [
+        6,
+        7
+      ],
+      "primary": 6,
+      "mask": 192
+    },
+    {
+      "logical": [
+        22,
+        23
+      ],
+      "primary": 22,
+      "mask": 12582912
+    }
+  ],
+  "selected_process_mask": 16711935,
+  "process_mask_before": 4294967295,
+  "threads_before": [
+    {
+      "tid": 32132,
+      "mask": 1,
+      "group": 0,
+      "created_ticks": 134354877228781322
+    },
+    {
+      "tid": 7720,
+      "mask": 4294967295,
+      "group": 0,
+      "created_ticks": 134354878157651133
+    },
+    {
+      "tid": 2812,
+      "mask": 4294967295,
+      "group": 0,
+      "created_ticks": 134354878157691077
+    },
+    {
+      "tid": 1104,
+      "mask": 4294967295,
+      "group": 0,
+      "created_ticks": 134354878362219464
+    },
+    {
+      "tid": 20684,
+      "mask": 4294967295,
+      "group": 0,
+      "created_ticks": 134354884199359917
+    },
+    {
+      "tid": 22356,
+      "mask": 4,
+      "group": 0,
+      "created_ticks": 134354884639695746
+    },
+    {
+      "tid": 15728,
+      "mask": 16,
+      "group": 0,
+      "created_ticks": 134354884639696243
+    },
+    {
+      "tid": 21900,
+      "mask": 64,
+      "group": 0,
+      "created_ticks": 134354884639696373
+    },
+    {
+      "tid": 18756,
+      "mask": 256,
+      "group": 0,
+      "created_ticks": 134354884639696583
+    },
+    {
+      "tid": 17820,
+      "mask": 1024,
+      "group": 0,
+      "created_ticks": 134354884639696814
+    },
+    {
+      "tid": 38744,
+      "mask": 4096,
+      "group": 0,
+      "created_ticks": 134354884639697057
+    },
+    {
+      "tid": 10944,
+      "mask": 16384,
+      "group": 0,
+      "created_ticks": 134354884639697284
+    },
+    {
+      "tid": 10164,
+      "mask": 4294967295,
+      "group": 0,
+      "created_ticks": 134354887935335869
+    },
+    {
+      "tid": 37456,
+      "mask": 4294967295,
+      "group": 0,
+      "created_ticks": 134354887937965762
+    },
+    {
+      "tid": 36820,
+      "mask": 4294967295,
+      "group": 0,
+      "created_ticks": 134354887937966051
+    },
+    {
+      "tid": 7944,
+      "mask": 4294967295,
+      "group": 0,
+      "created_ticks": 134354887937966251
+    },
+    {
+      "tid": 14076,
+      "mask": 4294967295,
+      "group": 0,
+      "created_ticks": 134354889003687952
+    },
+    {
+      "tid": 23372,
+      "mask": 4294967295,
+      "group": 0,
+      "created_ticks": 134354889003688324
+    },
+    {
+      "tid": 1032,
+      "mask": 4294967295,
+      "group": 0,
+      "created_ticks": 134354889003688517
+    },
+    {
+      "tid": 28872,
+      "mask": 4294967295,
+      "group": 0,
+      "created_ticks": 134354889003688682
+    },
+    {
+      "tid": 35700,
+      "mask": 4294967295,
+      "group": 0,
+      "created_ticks": 134354889033382212
+    },
+    {
+      "tid": 34028,
+      "mask": 4294967295,
+      "group": 0,
+      "created_ticks": 134354889033386365
+    }
+  ],
+  "applied": true,
+  "note": "Seven expert workers plus the host on eight physical cores. SMT siblings remain allowed for auxiliary GPU/runtime threads; expert workers use one logical CPU per core.",
+  "process_mask_after": 16711935,
+  "host_tid": 32132,
+  "host_mask": 1,
+  "worker_mapping": [
+    {
+      "tid": 22356,
+      "old_mask": 4,
+      "new_mask": 65536
+    },
+    {
+      "tid": 15728,
+      "old_mask": 16,
+      "new_mask": 4
+    },
+    {
+      "tid": 21900,
+      "old_mask": 64,
+      "new_mask": 262144
+    },
+    {
+      "tid": 18756,
+      "old_mask": 256,
+      "new_mask": 16
+    },
+    {
+      "tid": 17820,
+      "old_mask": 1024,
+      "new_mask": 1048576
+    },
+    {
+      "tid": 38744,
+      "old_mask": 4096,
+      "new_mask": 64
+    },
+    {
+      "tid": 10944,
+      "old_mask": 16384,
+      "new_mask": 4194304
+    }
+  ],
+  "threads_after": [
+    {
+      "tid": 32132,
+      "mask": 1,
+      "group": 0,
+      "created_ticks": 134354877228781322
+    },
+    {
+      "tid": 7720,
+      "mask": 16711935,
+      "group": 0,
+      "created_ticks": 134354878157651133
+    },
+    {
+      "tid": 2812,
+      "mask": 16711935,
+      "group": 0,
+      "created_ticks": 134354878157691077
+    },
+    {
+      "tid": 1104,
+      "mask": 16711935,
+      "group": 0,
+      "created_ticks": 134354878362219464
+    },
+    {
+      "tid": 20684,
+      "mask": 16711935,
+      "group": 0,
+      "created_ticks": 134354884199359917
+    },
+    {
+      "tid": 22356,
+      "mask": 65536,
+      "group": 0,
+      "created_ticks": 134354884639695746
+    },
+    {
+      "tid": 15728,
+      "mask": 4,
+      "group": 0,
+      "created_ticks": 134354884639696243
+    },
+    {
+      "tid": 21900,
+      "mask": 262144,
+      "group": 0,
+      "created_ticks": 134354884639696373
+    },
+    {
+      "tid": 18756,
+      "mask": 16,
+      "group": 0,
+      "created_ticks": 134354884639696583
+    },
+    {
+      "tid": 17820,
+      "mask": 1048576,
+      "group": 0,
+      "created_ticks": 134354884639696814
+    },
+    {
+      "tid": 38744,
+      "mask": 64,
+      "group": 0,
+      "created_ticks": 134354884639697057
+    },
+    {
+      "tid": 10944,
+      "mask": 4194304,
+      "group": 0,
+      "created_ticks": 134354884639697284
+    },
+    {
+      "tid": 10164,
+      "mask": 16711935,
+      "group": 0,
+      "created_ticks": 134354887935335869
+    },
+    {
+      "tid": 37456,
+      "mask": 16711935,
+      "group": 0,
+      "created_ticks": 134354887937965762
+    },
+    {
+      "tid": 36820,
+      "mask": 16711935,
+      "group": 0,
+      "created_ticks": 134354887937966051
+    },
+    {
+      "tid": 7944,
+      "mask": 16711935,
+      "group": 0,
+      "created_ticks": 134354887937966251
+    },
+    {
+      "tid": 14076,
+      "mask": 16711935,
+      "group": 0,
+      "created_ticks": 134354889003687952
+    },
+    {
+      "tid": 23372,
+      "mask": 16711935,
+      "group": 0,
+      "created_ticks": 134354889003688324
+    },
+    {
+      "tid": 1032,
+      "mask": 16711935,
+      "group": 0,
+      "created_ticks": 134354889003688517
+    },
+    {
+      "tid": 28872,
+      "mask": 16711935,
+      "group": 0,
+      "created_ticks": 134354889003688682
+    },
+    {
+      "tid": 35700,
+      "mask": 16711935,
+      "group": 0,
+      "created_ticks": 134354889033382212
+    },
+    {
+      "tid": 34028,
+      "mask": 16711935,
+      "group": 0,
+      "created_ticks": 134354889033386365
+    }
+  ]
+}

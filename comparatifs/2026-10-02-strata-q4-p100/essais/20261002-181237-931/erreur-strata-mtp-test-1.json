@@ -1,0 +1,8 @@
+{
+  "date": "2026-10-02T18:12:40.9502060+02:00",
+  "mode": "strata-mtp",
+  "test": 1,
+  "elapsed_seconds": 1.7400366,
+  "error": "Response status code does not indicate success: 400 (Bad Request).",
+  "server_response": "\r\n{\r\n  \"error\": {\r\n    \"type\": \"invalid_request_error\",\r\n    \"message\": \"GPU-only P100 mode refuses CPU expert jobs: check the pinned RAM and staging capacity\"\r\n  }\r\n}"
+}

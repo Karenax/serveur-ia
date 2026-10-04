@@ -1,0 +1,20 @@
+[
+  {
+    "mode": "hybride-mtp",
+    "case": "ciel",
+    "median_tps": 22.535150762362143,
+    "output_tokens": [
+      256,
+      256
+    ]
+  },
+  {
+    "mode": "hybride-mtp",
+    "case": "fibonacci",
+    "median_tps": 22.134215488185554,
+    "output_tokens": [
+      256,
+      256
+    ]
+  }
+]

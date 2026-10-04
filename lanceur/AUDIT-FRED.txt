@@ -1,0 +1,110 @@
+AUDIT EN DEUX PASSES — ACCÈS SERVEUR FRED 3.2.1
+Date : 4 octobre 2026
+
+Périmètre : console, client, API locale, passerelle distante, identités WireGuard,
+file d’inférence, mises à jour, sauvegardes, exploitation, compilation et sources.
+Les poids et les composants internes du moteur Strata sont distincts de cet audit.
+Décision conservée : un EXE personnel par destinataire, sans compte ni login client.
+
+PREMIÈRE PASSE — 3.2.0
+
+1. Identité du produit : Accès serveur Fred dans la fenêtre et l’interface, les
+   propriétés Windows, le binaire compilé et le téléchargement UTF-8 du serveur.
+
+2. Historique : un fichier illisible était assimilé à un fichier absent et pouvait
+   être remplacé. Il est maintenant conservé avec une erreur explicite. Validation
+   des conversations, écritures atomiques/fsync, révisions et refus des conflits.
+   L’échec de sauvegarde reste visible et bloque la mise à jour demandée dans l’UI.
+
+3. Streaming : la fin de connexion pouvait sembler une fin normale de réponse.
+   Contrôle du marqueur SSE [DONE] dans le relais local et dans le chatbot ; erreur
+   explicite et conservation de la réponse partielle avec son état interrompu.
+
+4. Génération : une autre application pouvait utiliser l’API pendant un changement
+   d’adresse ou une mise à jour. Compteur des requêtes actives et verrou d’activité,
+   refus pendant une génération et pause du scan périodique pendant le chat.
+
+5. Ressources : API locale limitée à 24 workers, surcharge refusée en 503 et délai
+   de lecture. Passerelle serveur limitée à 32 workers et file FIFO bornée.
+
+6. Métadonnées : contraintes supplémentaires avant vérification Ed25519 : version
+   canonique à trois nombres, protocole entier, SHA-256 minuscule à 64 caractères,
+   taille bornée et refus des signatures altérées ou provenant d’une autre clé.
+
+Validation : 39 tests examinés ; 37 passent au premier lancement. Deux attentes
+adaptées au nouveau titre et à la lecture UTF-8 sont rejouées avec succès.
+EXE 3.2.0 compilé et propriétés Windows vérifiées.
+Preuves : audit-pass1-tests.log et audit-pass1-recheck.log.
+
+SECONDE PASSE — 3.2.1
+
+7. Concurrence : le premier verrou était limité à un processus. Mutex Windows par
+   fichier entre processus et contrôle de révision sous verrou. Test simultané :
+   un enregistrement et un conflit refusé. Réglages et clé locale protégés aussi.
+
+8. Fermeture : elle attend maintenant la sauvegarde complète de l’historique natif,
+   sans dépendre du keepalive navigateur limité à 64 Ko. En cas d’erreur, la fenêtre
+   peut rester ouverte pour exporter. Récupération explicite d’un historique illisible
+   avec conservation d’une copie chiffrée du fichier original.
+
+9. Identités : avant distribution ou restauration, recoupement identifiant, hash
+   du jeton, clé publique dérivée de la clé privée, adresse WireGuard, clé serveur
+   et clé partagée du coffre. Registre, coffre et clé de signature d’une sauvegarde
+   contrôlés avant mutation. Les profils mélangés sont refusés sans modifier les fichiers.
+
+10. Retour arrière serveur : il pouvait rester partiel après une erreur disque.
+    Préparation de tous les fichiers, copies précédentes, restauration des fichiers
+    et métadonnées sur erreur. Métadonnées des nouveaux clients conservées et EXE
+    révoqués exclus. Erreur injectée sur le deuxième remplacement et récupération vérifiée.
+
+11. Mise à jour cliente : profil complet recoupé avec l’ancien EXE ; clés conservées.
+    Attente des identités du processus et de son parent PyInstaller si nécessaire,
+    nouvelles tentatives pour un fichier momentanément verrouillé par Windows.
+    Relance de l’ancienne application si le contrôle de démarrage échoue.
+    Arrêt des seuls processus lancés par le helper avant restauration atomique.
+
+12. Publication : version signée obligatoire avant création d’accès ; copie vérifiée,
+    profil ajouté dans un fichier temporaire et publication par remplacement atomique.
+    La simple vérification ne crée plus une nouvelle clé de signature si elle manque.
+
+13. Ergonomie : adresse saisie préservée pendant les rafraîchissements, imports
+    bornés au total à 200 conversations/9 Mo, suppression avec annulation, copie
+    des messages et disposition adaptée aux fenêtres étroites ou de faible hauteur.
+
+14. Livraison : archive de sources complétée avec signature, mise à jour, historique,
+    mutex, validation d’identités, métadonnées Windows et tests. Guides actualisés
+    pour la fenêtre native sans login. Aucune configuration privée, clé, EXE personnel
+    ou poids de modèle dans l’archive de sources.
+
+VÉRIFICATIONS FINALES
+
+- 46 tests Python passent : audit-pass2-tests.log.
+- Python compilable et syntaxe JavaScript client/console vérifiée avec Node.
+- WireGuard Go : modules vérifiés, go vet sans diagnostic et go test compilable.
+  Le module Go n’a pas de tests unitaires ; le protocole est exercé par les tests
+  Python de bout en bout utilisant le véritable moteur et des ports UDP isolés.
+- Véritable fenêtre du nouvel EXE, tunnel WireGuard isolé et modèle simulé :
+  native-ui-fred.json.
+- Migration réelle depuis le helper EXE 3.1 vers 3.2.1 : signature, fenêtre native
+  confirmée, clés conservées, ancienne version archivée : native-update-fred.json.
+- Pannes simulées : archives, signature et téléchargement altérés, disque en erreur,
+  démarrage refusé, identités mélangées, historique corrompu et écritures concurrentes.
+- Interface : conversation simulée conservée après rechargement, suppression et
+  annulation, adresse saisie conservée, aucune erreur JavaScript observée.
+- Console et EXE personnel existant en 3.2.1 ; mêmes clés, connexion réelle sans
+  login, mise à jour signée vérifiée et téléchargement intègre : verification-fred.json.
+- Modèle toujours chargé et identités de ses processus existants conservées.
+- Archive de sources contrôlée : 53 fichiers, intégrité ZIP correcte et aucun
+  EXE, fichier DPAPI, JSON de configuration ou sauvegarde privée.
+
+LIMITES PRATIQUES
+
+Le tunnel est testé réellement en UDP sur ce PC. L’accès depuis un autre réseau
+Internet reste à tester pour confirmer redirection UDP, pare-feu et DNS publics.
+Les retours arrière couvrent les erreurs détectées et les remplacements atomiques.
+Une panne électrique au milieu d’une opération portant sur plusieurs fichiers n’a
+pas été simulée ; archives et sauvegardes permettent une récupération manuelle.
+La signature serveur Ed25519 est distincte de la signature Authenticode reconnue
+par Windows pour un éditeur ; Authenticode n’est pas configurée ici.
+Le démarrage automatique se fait à la connexion du compte Windows pour conserver
+l’identité DPAPI. Il ne constitue pas un service avant la connexion utilisateur.

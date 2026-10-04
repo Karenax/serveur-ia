@@ -1,0 +1,7 @@
+{
+  "configuration": "Q4_K_XL cache C, 8 coeurs physiques repartis, MTP actif",
+  "started": "2026-10-03T11:17:39.321448+02:00",
+  "status": "interrompu_saturation_ram",
+  "launch_time": "2026-10-03T11:18:10.968421+02:00",
+  "motif": "Chargement interrompu; retour utilisateur demande configuration originale 16 coeurs sans cache C"
+}

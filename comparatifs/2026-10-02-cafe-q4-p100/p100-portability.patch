@@ -1,0 +1,126 @@
+diff --git a/common/common.cpp b/common/common.cpp
+index ffe764d..de7c22c 100644
+--- a/common/common.cpp
++++ b/common/common.cpp
+@@ -1722,7 +1722,7 @@ struct llama_context_params common_context_params_to_llama(const common_params &
+             char hex[32];
+             snprintf(hex, sizeof(hex), "%016llx", (unsigned long long)hash);
+             const_cast<common_params &>(params).moe_cache_profile_path =
+-                fs_get_cache_file(string_format("moe-experts-%s.v1", hex));
++                fs_get_cache_file(string_format("moe-experts-%s.v1", hex)).u8string();
+         }
+         if (!params.moe_cache_profile_path.empty()) {
+             cparams.moe_cache_profile_path = params.moe_cache_profile_path.c_str();
+diff --git a/ggml/src/ggml-cuda/CMakeLists.txt b/ggml/src/ggml-cuda/CMakeLists.txt
+index a71ec70..0c9d2c5 100644
+--- a/ggml/src/ggml-cuda/CMakeLists.txt
++++ b/ggml/src/ggml-cuda/CMakeLists.txt
+@@ -1,5 +1,10 @@
+ cmake_minimum_required(VERSION 3.18)  # for CMAKE_CUDA_ARCHITECTURES
+ 
++option(GGML_CUDA_MOE_DIRECT_GPU_ONLY "Disable host expert compute in the CUDA backend" OFF)
++if (GGML_CUDA_MOE_DIRECT_GPU_ONLY)
++    set_source_files_properties(moe-direct.cu PROPERTIES COMPILE_DEFINITIONS GGML_CUDA_MOE_DIRECT_GPU_ONLY)
++endif()
++
+ # ARM64EC uses the x64 ABI, so it needs the x64 import libraries. The arm64 ones
+ # hold native ARM64 symbols and cannot satisfy EC references at link time.
+ # FindCUDAToolkit picks the library dir from the host arch, not the target, so
+diff --git a/ggml/src/ggml-cuda/moe-direct.cu b/ggml/src/ggml-cuda/moe-direct.cu
+index 1fd4c45..392b04b 100644
+--- a/ggml/src/ggml-cuda/moe-direct.cu
++++ b/ggml/src/ggml-cuda/moe-direct.cu
+@@ -22,6 +22,7 @@
+ 
+ #ifdef _WIN32
+ #include <direct.h>
++#include <intrin.h>
+ #else
+ #include <sys/stat.h>
+ #endif
+@@ -718,7 +719,9 @@ struct md_cpu {
+ };
+ 
+ static inline void md_cpu_pause() {
+-#if defined(__x86_64__) || defined(_M_X64)
++#if defined(_MSC_VER) && defined(_M_X64)
++    _mm_pause();
++#elif defined(__x86_64__)
+     __builtin_ia32_pause();
+ #endif
+ }
+@@ -832,6 +835,9 @@ static void md_cpu_worker(md_cpu * c, int id) {
+ }
+ 
+ static md_cpu * md_cpu_create() {
++#if defined(GGML_CUDA_MOE_DIRECT_GPU_ONLY)
++    return nullptr;
++#else
+     if (md_cfg().cpu_frac <= 0.0f) {
+         return nullptr;
+     }
+@@ -857,6 +863,7 @@ static md_cpu * md_cpu_create() {
+     GGML_LOG_INFO("%s: %d CPU threads compute %.0f%% of the experts missing from VRAM\n", __func__,
+         md_cfg().cpu_threads, 100.0f*md_cfg().cpu_frac);
+     return c;
++#endif
+ }
+ 
+ static void md_cpu_free(md_cpu * c) {
+@@ -949,7 +956,9 @@ static __global__ void md_cpu_merge_kernel(const md_mailbox * __restrict__ mb, c
+     if (threadIdx.x == 0) {
+         const uint32_t seq = st->seq;
+         while ((int32_t) (mb->done - seq) < 0) {
++#if __CUDA_ARCH__ >= GGML_CUDA_CC_VOLTA
+             __nanosleep(256);
++#endif
+         }
+     }
+     __syncthreads();
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 5b107cc..d5bf21b 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -72,6 +72,9 @@ target_compile_features   (llama PRIVATE cxx_std_17) # don't bump
+ target_link_libraries(llama PUBLIC ggml)
+ 
+ if (BUILD_SHARED_LIBS)
++    if (WIN32)
++        set_target_properties(llama PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
++    endif()
+     set_target_properties(llama PROPERTIES POSITION_INDEPENDENT_CODE ON)
+     target_compile_definitions(llama PRIVATE LLAMA_BUILD)
+     target_compile_definitions(llama PUBLIC  LLAMA_SHARED)
+diff --git a/src/llama-context.cpp b/src/llama-context.cpp
+index 2671ed9..edfddd0 100644
+--- a/src/llama-context.cpp
++++ b/src/llama-context.cpp
+@@ -3141,8 +3141,13 @@ llm_graph_cb llama_context::graph_get_cb() const {
+         // - force the last op of the layer on the specified backend to avoid running it on the backend of the next layer due to scheduling
+         // FIXME: fix in ggml_backend_sched
+         const bool full_offload = model.n_gpu_layers() > model.hparams.n_layer_all;
++        // Pinned expert weights are readable by every CUDA device. Keep their
++        // matmuls on the device assigned to the layer instead of the first GPU
++        // selected by the scheduler for a shared host buffer.
++        const bool host_moe_matmul = cur->op == GGML_OP_MUL_MAT_ID && cur->src[0] && cur->src[0]->buffer &&
++            strcmp(ggml_backend_buffer_name(cur->src[0]->buffer), "CUDA_Host_MoE") == 0;
+         if (ubatch.n_tokens < 32 || full_offload) {
+-            if (il != -1 && (strcmp(name, "norm") == 0 || strcmp(name, "l_last") == 0)) {
++            if (il != -1 && (strcmp(name, "norm") == 0 || strcmp(name, "l_last") == 0 || host_moe_matmul)) {
+                 const auto & dev_layer = model.dev_layer(il);
+                 for (const auto & backend : backends) {
+                     if (ggml_backend_get_device(backend.get()) == dev_layer) {
+diff --git a/src/llama-ssd.cpp b/src/llama-ssd.cpp
+index 1867137..2d4e44c 100644
+--- a/src/llama-ssd.cpp
++++ b/src/llama-ssd.cpp
+@@ -17,6 +17,9 @@
+ #include <cstring>
+ 
+ #if defined(_WIN32)
++#ifndef NOMINMAX
++#define NOMINMAX
++#endif
+ #include <windows.h>
+ #include <io.h>
+ #else

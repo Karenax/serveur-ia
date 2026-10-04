@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-7384a3f044b3410a8e59f7fb",
+  "object": "chat.completion",
+  "created": 1790963066,
+  "model": "qwen3.8-flash-next",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Voici une implémentation simple et efficace de la fonction `fibonacci(n)` en Python. Cette fonction génère une liste contenant les `n` premiers nombres de la suite de Fibonacci.\n\n```python\ndef fibonacci(n):\n    \"\"\"\n    Retourne une liste contenant les n premiers nombres de Fibonacci.\n    \"\"\"\n    if n <= 0:\n        return []\n    elif n == 1:\n        return [0]\n    \n    fib_sequence = [0, 1]\n    for i in range(2, n):\n        next_value = fib_sequence[i-1] + fib_sequence[i-2]\n        fib_sequence.append(next_value)\n        \n    return fib_sequence\n\n# Exemple pour n=8\nn = 8\nresult = fibonacci(n)\nprint(f\"Les {n} premiers nombres de Fibonacci sont : {result}\")\n```\n\n**Sortie pour `n=8` :**\n```\nLes 8 premiers nombres de Fibonacci sont : [0, 1, 1, 2, 3, 5, 8, 13]\n```\n\n### Explication :\n1. **Cas de base** : Si `n` est inférieur"
+      },
+      "finish_reason": "length"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 46,
+    "completion_tokens": 256,
+    "total_tokens": 302,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 46,
+    "prompt_ms": 1353.7,
+    "prompt_per_token_ms": 29.428,
+    "prompt_per_second": 34.0,
+    "predicted_n": 256,
+    "predicted_ms": 14531.1,
+    "predicted_per_token_ms": 56.762,
+    "predicted_per_second": 17.6,
+    "draft_n": 190,
+    "draft_n_accepted": 154
+  }
+}

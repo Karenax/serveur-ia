@@ -1,0 +1,20 @@
+[
+  {
+    "mode": "confirmation-mtp-2-tensor",
+    "case": "ciel",
+    "median_tps": 31.815907528673115,
+    "output_tokens": [
+      256,
+      256
+    ]
+  },
+  {
+    "mode": "confirmation-mtp-2-tensor",
+    "case": "fibonacci",
+    "median_tps": 34.739773871244324,
+    "output_tokens": [
+      256,
+      256
+    ]
+  }
+]

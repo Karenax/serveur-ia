@@ -1,0 +1,390 @@
+{
+  "results": [
+    {
+      "test": 1.0,
+      "elapsed_seconds": 25.3829026,
+      "prompt_tokens": 40.0,
+      "output_tokens": 256.0,
+      "prompt_tps": 7.04688362142168,
+      "generation_tps": 13.06599856202281,
+      "draft_tokens": null,
+      "draft_accepted": null,
+      "draft_acceptance": null,
+      "mode": "cafe-sans-mtp",
+      "source": "D:\\Serveur IA\\comparatifs\\2026-10-02-cafe-q4-p100\\resultats-sans-mtp.csv",
+      "finish_reason": "length"
+    },
+    {
+      "test": 2.0,
+      "elapsed_seconds": 30.5691859,
+      "prompt_tokens": 46.0,
+      "output_tokens": 256.0,
+      "prompt_tps": 19.08117505194435,
+      "generation_tps": 9.09472303839931,
+      "draft_tokens": null,
+      "draft_accepted": null,
+      "draft_acceptance": null,
+      "mode": "cafe-sans-mtp",
+      "source": "D:\\Serveur IA\\comparatifs\\2026-10-02-cafe-q4-p100\\resultats-sans-mtp.csv",
+      "finish_reason": "length"
+    },
+    {
+      "test": 1.0,
+      "elapsed_seconds": 23.5327651,
+      "prompt_tokens": 40.0,
+      "output_tokens": 256.0,
+      "prompt_tps": 7.108659413464512,
+      "generation_tps": 14.364022753287994,
+      "draft_tokens": 200.0,
+      "draft_accepted": 155.0,
+      "draft_acceptance": 0.775,
+      "mode": "cafe-mtp",
+      "source": "D:\\Serveur IA\\comparatifs\\2026-10-02-cafe-q4-p100\\resultats-mtp.csv",
+      "finish_reason": "length"
+    },
+    {
+      "test": 2.0,
+      "elapsed_seconds": 29.5421934,
+      "prompt_tokens": 46.0,
+      "output_tokens": 256.0,
+      "prompt_tps": 18.221473293261937,
+      "generation_tps": 9.488281358574543,
+      "draft_tokens": 182.0,
+      "draft_accepted": 164.0,
+      "draft_acceptance": 0.9010989010989011,
+      "mode": "cafe-mtp",
+      "source": "D:\\Serveur IA\\comparatifs\\2026-10-02-cafe-q4-p100\\resultats-mtp.csv",
+      "finish_reason": "length"
+    },
+    {
+      "test": 1.0,
+      "elapsed_seconds": 30.1028128,
+      "prompt_tokens": 40.0,
+      "output_tokens": 256.0,
+      "prompt_tps": 30.6,
+      "generation_tps": 8.907260112871688,
+      "draft_tokens": 206.0,
+      "draft_accepted": 116.0,
+      "draft_acceptance": 0.5631067961165048,
+      "mode": "strata-mtp-hybride",
+      "source": "D:\\Serveur IA\\comparatifs\\2026-10-02-strata-q4-p100\\essai-hybride-staging16\\resultats-strata-mtp.csv",
+      "finish_reason": "length"
+    },
+    {
+      "test": 2.0,
+      "elapsed_seconds": 24.1852548,
+      "prompt_tokens": 46.0,
+      "output_tokens": 256.0,
+      "prompt_tps": 33.7,
+      "generation_tps": 11.226445295198502,
+      "draft_tokens": 191.0,
+      "draft_accepted": 153.0,
+      "draft_acceptance": 0.8010471204188482,
+      "mode": "strata-mtp-hybride",
+      "source": "D:\\Serveur IA\\comparatifs\\2026-10-02-strata-q4-p100\\essai-hybride-staging16\\resultats-strata-mtp.csv",
+      "finish_reason": "length"
+    },
+    {
+      "test": 1.0,
+      "elapsed_seconds": 30.6800349,
+      "prompt_tokens": 40.0,
+      "output_tokens": 256.0,
+      "prompt_tps": 30.6,
+      "generation_tps": 8.725914261075264,
+      "draft_tokens": 207.0,
+      "draft_accepted": 118.0,
+      "draft_acceptance": 0.5700483091787439,
+      "mode": "strata-mtp-gpu-seul",
+      "source": "D:\\Serveur IA\\comparatifs\\2026-10-02-strata-q4-p100\\resultats-strata-mtp.csv",
+      "finish_reason": "length"
+    },
+    {
+      "test": 2.0,
+      "elapsed_seconds": 24.7473749,
+      "prompt_tokens": 46.0,
+      "output_tokens": 256.0,
+      "prompt_tps": 33.9,
+      "generation_tps": 10.96007706304185,
+      "draft_tokens": 183.0,
+      "draft_accepted": 158.0,
+      "draft_acceptance": 0.8633879781420765,
+      "mode": "strata-mtp-gpu-seul",
+      "source": "D:\\Serveur IA\\comparatifs\\2026-10-02-strata-q4-p100\\resultats-strata-mtp.csv",
+      "finish_reason": "length"
+    },
+    {
+      "mode": "strata-mtp-cpu16-pcie1",
+      "test": 2,
+      "elapsed_seconds": 24.775834700001724,
+      "prompt_tokens": 46,
+      "output_tokens": 256,
+      "prompt_tps": 34.0,
+      "generation_tps": 10.952059117770013,
+      "draft_tokens": 183.0,
+      "draft_accepted": 158.0,
+      "draft_acceptance": 0.8633879781420765,
+      "finish_reason": "length",
+      "source": "D:\\Serveur IA\\comparatifs\\2026-10-02-strata-hybride-p100\\essai-20261002-194111\\resultats.csv"
+    },
+    {
+      "mode": "strata-mtp-cpu16-pcie1",
+      "test": 1,
+      "elapsed_seconds": 30.695652999998856,
+      "prompt_tokens": 40,
+      "output_tokens": 256,
+      "prompt_tps": 30.75,
+      "generation_tps": 8.71879544405705,
+      "draft_tokens": 206.5,
+      "draft_accepted": 117.5,
+      "draft_acceptance": 0.5690047371136437,
+      "finish_reason": "length",
+      "source": "D:\\Serveur IA\\comparatifs\\2026-10-02-strata-hybride-p100\\essai-20261002-194111\\resultats.csv"
+    },
+    {
+      "mode": "strata-mtp-cpu16-pcie0.5",
+      "test": 2,
+      "elapsed_seconds": 15.892580050000106,
+      "prompt_tokens": 46,
+      "output_tokens": 256,
+      "prompt_tps": 34.0,
+      "generation_tps": 17.618416811552144,
+      "draft_tokens": 190.0,
+      "draft_accepted": 154.0,
+      "draft_acceptance": 0.8105263157894737,
+      "finish_reason": "length",
+      "source": "D:\\Serveur IA\\comparatifs\\2026-10-02-strata-hybride-p100\\essai-20261002-194111\\resultats.csv"
+    },
+    {
+      "mode": "strata-mtp-cpu16-pcie0.5",
+      "test": 1,
+      "elapsed_seconds": 18.76786070000162,
+      "prompt_tokens": 40,
+      "output_tokens": 256,
+      "prompt_tps": 30.9,
+      "generation_tps": 14.653476751259891,
+      "draft_tokens": 201.0,
+      "draft_accepted": 115.5,
+      "draft_acceptance": 0.5746590093323761,
+      "finish_reason": "length",
+      "source": "D:\\Serveur IA\\comparatifs\\2026-10-02-strata-hybride-p100\\essai-20261002-194111\\resultats.csv"
+    },
+    {
+      "mode": "strata-mtp-cpu16-pcie0.25",
+      "test": 2,
+      "elapsed_seconds": 10.946018500000719,
+      "prompt_tokens": 46,
+      "output_tokens": 256,
+      "prompt_tps": 34.0,
+      "generation_tps": 26.73084856603071,
+      "draft_tokens": 189.0,
+      "draft_accepted": 154.0,
+      "draft_acceptance": 0.8148148148148148,
+      "finish_reason": "length",
+      "source": "D:\\Serveur IA\\comparatifs\\2026-10-02-strata-hybride-p100\\essai-20261002-194111\\resultats.csv"
+    },
+    {
+      "mode": "strata-mtp-cpu16-pcie0.25",
+      "test": 1,
+      "elapsed_seconds": 12.695485049998751,
+      "prompt_tokens": 40,
+      "output_tokens": 256,
+      "prompt_tps": 30.9,
+      "generation_tps": 22.462477417781596,
+      "draft_tokens": 195.0,
+      "draft_accepted": 118.0,
+      "draft_acceptance": 0.6051178203240059,
+      "finish_reason": "length",
+      "source": "D:\\Serveur IA\\comparatifs\\2026-10-02-strata-hybride-p100\\essai-20261002-194111\\resultats.csv"
+    },
+    {
+      "mode": "strata-mtp-cpu16-pcie0",
+      "test": 2,
+      "elapsed_seconds": 8.640354449998995,
+      "prompt_tokens": 46,
+      "output_tokens": 256,
+      "prompt_tps": 34.0,
+      "generation_tps": 35.16107004601431,
+      "draft_tokens": 188.0,
+      "draft_accepted": 153.0,
+      "draft_acceptance": 0.8138297872340425,
+      "finish_reason": "length",
+      "source": "D:\\Serveur IA\\comparatifs\\2026-10-02-strata-hybride-p100\\essai-20261002-194111\\resultats.csv"
+    },
+    {
+      "mode": "strata-mtp-cpu16-pcie0",
+      "test": 1,
+      "elapsed_seconds": 10.217975399998977,
+      "prompt_tokens": 40,
+      "output_tokens": 256,
+      "prompt_tps": 30.9,
+      "generation_tps": 28.70058753791308,
+      "draft_tokens": 187.0,
+      "draft_accepted": 113.0,
+      "draft_acceptance": 0.6042780748663101,
+      "finish_reason": "length",
+      "source": "D:\\Serveur IA\\comparatifs\\2026-10-02-strata-hybride-p100\\essai-20261002-194111\\resultats.csv"
+    }
+  ],
+  "resources": {
+    "cafe-sans-mtp": {
+      "samples_gpu": 46,
+      "vram_peak_mib": {
+        "1": 11196.0,
+        "2": 11640.0
+      },
+      "gpu_mean_util_pct": {
+        "1": 48.130434782608695,
+        "2": 50.78260869565217
+      },
+      "ram_peak_gib": 100.32567977905273,
+      "cpu_equivalent_cores": 0.5204123717464886,
+      "process_io_read_peak_bytes_s": 0,
+      "disk_d_read_peak_bytes_s": null,
+      "telemetry_seconds": 53.863535
+    },
+    "cafe-mtp": {
+      "samples_gpu": 38,
+      "vram_peak_mib": {
+        "1": 11316.0,
+        "2": 14088.0
+      },
+      "gpu_mean_util_pct": {
+        "1": 54.26315789473684,
+        "2": 37.21052631578947
+      },
+      "ram_peak_gib": 100.90352249145508,
+      "cpu_equivalent_cores": 0.5098480338258583,
+      "process_io_read_peak_bytes_s": 0,
+      "disk_d_read_peak_bytes_s": null,
+      "telemetry_seconds": 44.222736
+    },
+    "strata-mtp-hybride": {
+      "samples_gpu": 40,
+      "vram_peak_mib": {
+        "1": 14779.0,
+        "2": 14992.0
+      },
+      "gpu_mean_util_pct": {
+        "1": 39.35,
+        "2": 57.4
+      },
+      "ram_peak_gib": 84.09716796875,
+      "cpu_equivalent_cores": 3.1279603910844194,
+      "process_io_read_peak_bytes_s": 0,
+      "disk_d_read_peak_bytes_s": 16241.0,
+      "telemetry_seconds": 52.03071
+    },
+    "strata-mtp-gpu-seul": {
+      "samples_gpu": 36,
+      "vram_peak_mib": {
+        "1": 15046.0,
+        "2": 15260.0
+      },
+      "gpu_mean_util_pct": {
+        "1": 44.0,
+        "2": 52.94444444444444
+      },
+      "ram_peak_gib": 84.1126480102539,
+      "cpu_equivalent_cores": 0.9980620909401074,
+      "process_io_read_peak_bytes_s": 0,
+      "disk_d_read_peak_bytes_s": 64006.0,
+      "telemetry_seconds": 46.371113
+    },
+    "strata-mtp-cpu16-pcie1": {
+      "pcie_frac": 1.0,
+      "pool_workers": 15,
+      "host_worker": true,
+      "repeats": 2,
+      "aggregation": "median per prompt",
+      "tests": {
+        "2": {
+          "ram_peak_gib": 84.11627769470215,
+          "cpu_equivalent_cores": 0.9898297981589965,
+          "cpu_expert_jobs": 0.0,
+          "ram_gpu_experts": 68454.0,
+          "expert_file_reads": 0
+        },
+        "1": {
+          "ram_peak_gib": 84.11570358276367,
+          "cpu_equivalent_cores": 0.9857368751931634,
+          "cpu_expert_jobs": 0.0,
+          "ram_gpu_experts": 84423.0,
+          "expert_file_reads": 0
+        }
+      },
+      "vram_note": "Même allocation de caches pour les quatre réglages; VRAM non échantillonnée pendant cette série."
+    },
+    "strata-mtp-cpu16-pcie0.5": {
+      "pcie_frac": 0.5,
+      "pool_workers": 15,
+      "host_worker": true,
+      "repeats": 2,
+      "aggregation": "median per prompt",
+      "tests": {
+        "2": {
+          "ram_peak_gib": 84.11671257019043,
+          "cpu_equivalent_cores": 14.692392146718749,
+          "cpu_expert_jobs": 37351.0,
+          "ram_gpu_experts": 34880.0,
+          "expert_file_reads": 0
+        },
+        "1": {
+          "ram_peak_gib": 84.11663818359375,
+          "cpu_equivalent_cores": 14.907588828681307,
+          "cpu_expert_jobs": 43775.5,
+          "ram_gpu_experts": 40449.0,
+          "expert_file_reads": 0
+        }
+      },
+      "vram_note": "Même allocation de caches pour les quatre réglages; VRAM non échantillonnée pendant cette série."
+    },
+    "strata-mtp-cpu16-pcie0.25": {
+      "pcie_frac": 0.25,
+      "pool_workers": 15,
+      "host_worker": true,
+      "repeats": 2,
+      "aggregation": "median per prompt",
+      "tests": {
+        "2": {
+          "ram_peak_gib": 84.11675643920898,
+          "cpu_equivalent_cores": 14.11686950966542,
+          "cpu_expert_jobs": 55890.0,
+          "ram_gpu_experts": 16194.0,
+          "expert_file_reads": 0
+        },
+        "1": {
+          "ram_peak_gib": 84.11668014526367,
+          "cpu_equivalent_cores": 14.385353670448747,
+          "cpu_expert_jobs": 64610.0,
+          "ram_gpu_experts": 18211.0,
+          "expert_file_reads": 0
+        }
+      },
+      "vram_note": "Même allocation de caches pour les quatre réglages; VRAM non échantillonnée pendant cette série."
+    },
+    "strata-mtp-cpu16-pcie0": {
+      "pcie_frac": 0.0,
+      "pool_workers": 15,
+      "host_worker": true,
+      "repeats": 2,
+      "aggregation": "median per prompt",
+      "tests": {
+        "2": {
+          "ram_peak_gib": 84.11678314208984,
+          "cpu_equivalent_cores": 13.638746351126848,
+          "cpu_expert_jobs": 72350.0,
+          "ram_gpu_experts": 0.0,
+          "expert_file_reads": 0
+        },
+        "1": {
+          "ram_peak_gib": 84.11671447753906,
+          "cpu_equivalent_cores": 14.046165990012817,
+          "cpu_expert_jobs": 82878.0,
+          "ram_gpu_experts": 0.0,
+          "expert_file_reads": 0
+        }
+      },
+      "vram_note": "Même allocation de caches pour les quatre réglages; VRAM non échantillonnée pendant cette série."
+    }
+  }
+}

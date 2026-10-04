@@ -1,0 +1,10 @@
+q4_K GPU dequant FP16: 0 / 3276800 bits differ, rel_l2 0 max 0
+q4_K 1280x2560: rel_l2 0.000158013 max/rms 0.000618544 zero 0
+q5_K GPU dequant FP16: 0 / 3276800 bits differ, rel_l2 0 max 0
+q5_K 1280x2560: rel_l2 0.000129813 max/rms 0.000551732 zero 0
+q5_1 GPU dequant FP16: 0 / 1638400 bits differ, rel_l2 0 max 0
+q5_1 2560x640: rel_l2 4.82097e-05 max/rms 0.000192339 zero 0
+q8_0 GPU dequant FP16: 0 / 1638400 bits differ, rel_l2 0 max 0
+q8_0 2560x640: rel_l2 4.24015e-05 max/rms 0.000174577 zero 0
+bf16 320x10240: rel_l2 2.61918e-07 max/rms 1.18197e-06 zero 0
+P100 FP16 prompt route passed

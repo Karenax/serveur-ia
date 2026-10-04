@@ -1,0 +1,64 @@
+[
+  {
+    "directory": "Strata-src",
+    "remote": "https://github.com/Niko1221/Strata.git",
+    "branch": "community/p100-resident-hybrid-q4",
+    "head": "5c284bf7bd64230eb93ac9ff5df71aa6cf8c6505",
+    "patch_base": "d9ab8435f654c368c586340d490915f6addf56a3",
+    "patch": "Strata-src.patch",
+    "additional_directory": "Strata-src-nouveaux",
+    "additional_files": [
+      "serve/test_chat_conversations.cjs"
+    ]
+  },
+  {
+    "directory": "cafe-llama-src",
+    "remote": "https://github.com/kozmic-labs/cafe-llama.cpp.git",
+    "branch": "master",
+    "head": "0ae77ef4914fcd6e78e0b13ab157ff3acccc9edf",
+    "patch_base": "0ae77ef4914fcd6e78e0b13ab157ff3acccc9edf",
+    "patch": "cafe-llama-src.patch",
+    "additional_directory": null,
+    "additional_files": []
+  },
+  {
+    "directory": "llama-p100-src",
+    "remote": "https://github.com/danielhanchen/llama.cpp.git",
+    "branch": "qwen4exp/mtp",
+    "head": "6fcaa16f4b360649933a54d1f91ad40ed35c0e11",
+    "patch_base": "6fcaa16f4b360649933a54d1f91ad40ed35c0e11",
+    "patch": null,
+    "additional_directory": null,
+    "additional_files": []
+  },
+  {
+    "directory": "ik-llama-src",
+    "remote": "https://github.com/ikawrakow/ik_llama.cpp.git",
+    "branch": "main",
+    "head": "5bf8f0fe4db98e9560de0f495232f8d3a733c678",
+    "patch_base": "5bf8f0fe4db98e9560de0f495232f8d3a733c678",
+    "patch": null,
+    "additional_directory": null,
+    "additional_files": []
+  },
+  {
+    "directory": "recherche/strata-0.1.39-20261004-185410/source-adaptee",
+    "remote": "https://github.com/Niko1221/Strata.git",
+    "branch": "",
+    "head": "6f32ec070f23ced9f50e704d854d775da52591ab",
+    "patch_base": "6f32ec070f23ced9f50e704d854d775da52591ab",
+    "patch": "recherche__strata-0.1.39-20261004-185410__source-adaptee.patch",
+    "additional_directory": null,
+    "additional_files": []
+  },
+  {
+    "directory": "recherche/strata-0.1.39-20261004-185410/source-officielle",
+    "remote": "https://github.com/Niko1221/Strata.git",
+    "branch": "",
+    "head": "6f32ec070f23ced9f50e704d854d775da52591ab",
+    "patch_base": "6f32ec070f23ced9f50e704d854d775da52591ab",
+    "patch": null,
+    "additional_directory": null,
+    "additional_files": []
+  }
+]

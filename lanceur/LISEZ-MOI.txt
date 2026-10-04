@@ -1,0 +1,153 @@
+Console Qwen / Strata pour les deux Tesla P100
+
+Ouvrir « Serveur Qwen.cmd » dans D:\Serveur IA.
+L'interface se trouve sur http://127.0.0.1:8765.
+Elle reconnaît le serveur existant. Dans Exploitation, le chargement au démarrage
+et la relance automatique sont configurables ; ils sont activés sur ce PC.
+Fermer le navigateur laisse l'interface et le modèle fonctionner.
+
+Espaces de travail — version 3.5.0
+La console regroupe désormais Espaces et fichiers, Assistants et outils, et Tâches.
+Chaque EXE personnel possède ses projets, documents, mémoire et travaux planifiés.
+Les quotas et le droit de recherche web se règlent dans Espaces et fichiers ;
+les profils d'assistants et la clé Brave dans Assistants et outils.
+Guide détaillé : ESPACES-FRED.txt. Contrôles : AUDIT-ESPACES-FRED.txt.
+Cette mise à jour conserve l'état du modèle et les options de démarrage existantes.
+
+Profil initial par défaut :
+- Qwen3.8-Flash-Next Uncensored IQ4_XS complet, pack iq4-xs-local et GGUF sur D: ;
+- deux P100, séparation des couches à 24, réserve GPU de 2048 Mo ;
+- 15 travailleurs CPU et le thread principal (16 cœurs), sans changement SMT ;
+- contexte 262144 tokens, blocs de prompt de 256 tokens ;
+- MTP actif, fenêtres de 3 tokens et seuil 0,5 ;
+- réutilisation de l'historique activée, 6 points de sauvegarde, tous les 16384 tokens ;
+- écoute 127.0.0.1, port 8080 ;
+- table n-gram et complément CPU en RAM verrouillée, caches GPU fixes.
+
+« Enregistrer » conserve les réglages pour le prochain lancement, sans modifier
+le serveur actif. « Définir par défaut » conserve également le profil de restauration.
+Le profil du lanceur est indépendant des anciens scripts de test.
+Le bouton Lancer refuse de charger un deuxième modèle si Qwen est déjà actif.
+Pour appliquer les réglages, arrêter le serveur puis cliquer sur Lancer.
+
+Le lancement crée un dossier dans lanceur\sessions : configuration réellement
+utilisée, journal moteur, sorties serveur et état du chargement.
+Un superviseur valide l'initialisation CUDA avec une seule requête d'un token,
+comme l'ancien lanceur. Le contrôle ne déclenche aucun benchmark automatique.
+Pendant un nouveau chargement, moins de 6 Go de RAM disponibles pendant 8 secondes
+déclenche par défaut l'arrêt du modèle. Le seuil est réglable de 2 à 32 Go.
+La protection ne s'applique pas rétroactivement au serveur déjà en cours.
+
+Réseau : choisir « Réseau local », générer une clé API et enregistrer.
+Au prochain lancement, le serveur écoutera sur 0.0.0.0 et le port choisi.
+Utiliser depuis les autres appareils http://ADRESSE_IPV4_DU_PC:PORT/v1,
+le nom du modèle affiché et la clé API (Authorization: Bearer CLE).
+L'API Anthropic est également disponible sous /v1/messages.
+La console d'administration reste locale, sur le port 8765.
+Les clés sont stockées dans les JSON locaux : ne pas partager ces fichiers.
+L'interface ne change pas le pare-feu, le routeur ou les règles de ports.
+Si nécessaire, autoriser Python dans le pare-feu Windows sur les réseaux privés.
+Pour un accès Internet chiffré, utiliser WireGuard dans Accès distant.
+Les origines CORS concernent les clients web ; les origines de confiance permettent
+au chat Strata situé derrière un proxy d'utiliser ses fonctions d'administration.
+
+Accès Internet autonome avec WireGuard
+
+Le moteur officiel WireGuard Go est intégré dans le serveur et dans les EXE
+clients, avec une pile réseau en mémoire. Aucun compte externe, relais SaaS,
+certificat HTTPS public, service Tailscale ou installation VPN n'est nécessaire.
+Le client fonctionne sans droits administrateur et sans modifier le routage
+Windows, le DNS, les interfaces réseau ou la connexion Internet du destinataire.
+Le serveur protège la liaison par WireGuard et demande aussi une clé API propre
+à chaque client. Les fichiers et la console de gestion restent locaux.
+
+Sur le serveur, dans Accès distant :
+1. Indiquer l'IP publique fixe ou le nom DNS et le port UDP (51820 par défaut).
+2. Enregistrer le réseau.
+3. Autoriser dans Windows : accepter la validation administrateur afin de créer
+   la règle UDP du pare-feu pour le moteur WireGuard uniquement.
+4. Dans la box, rediriger UDP 51820 vers l'adresse LAN du PC, port UDP 51820.
+   Réserver cette adresse au PC dans le DHCP de la box.
+5. Activer WireGuard, donner un nom au destinataire et générer son client Windows.
+
+Le serveur WireGuard reste actif quand la fenêtre du navigateur est fermée.
+Si la console est relancée, elle réactive WireGuard lorsqu'il était activé.
+Le PC et la console serveur doivent fonctionner pour accepter les clients.
+Une adresse publique joignable est nécessaire. Une box derrière CGNAT demande
+une adresse publique de l'opérateur ou une autre infrastructure que vous gérez.
+Le programme ne crée pas de redirection sur la box automatiquement.
+
+Côté client : lancer l'EXE personnel, garder sa fenêtre ouverte et attendre
+Connecté. Le chatbot est intégré dans la fenêtre native « Accès serveur Fred ».
+La rubrique API locale affiche l’adresse et la clé pour vos autres applications.
+Aucun réglage de tunnel, import de profil ou installation WireGuard à effectuer.
+Le client choisit l'adresse locale sur le même sous-réseau, puis l'adresse
+Internet. La rubrique Connexion au serveur accepte une adresse IP-ou-DNS:port pour
+dépanner. Les paramètres de la rubrique API locale sont des valeurs à copier.
+L'adresse API habituelle est http://127.0.0.1:8081/v1. Un port libre entre 8082
+et 8090 est choisi si 8081 est occupé. Les applications utilisent une API
+compatible OpenAI et Authorization: Bearer CLE_API_LOCALE.
+GET /v1/models et POST /v1/chat/completions sont disponibles avec streaming.
+Les appels d'outils côté application sont acceptés ; les outils du PC serveur
+ne sont pas accessibles par cette passerelle.
+
+Le chat conserve tous les historiques sur le serveur avec une copie locale chiffrée,
+permet de régler la police, la taille du texte et la réflexion,
+transmet la conversation complète et affiche les réponses progressivement.
+Fermer l'EXE ferme le tunnel et l'API localhost. La reconnexion est automatique
+si le serveur devient temporairement indisponible.
+
+Les EXE préparés contiennent la clé privée WireGuard, une clé prépartagée et
+l'accès API du destinataire. Toute personne possédant cet EXE possède cet accès.
+Distribuer chaque EXE à son destinataire uniquement et ne pas le publier.
+Les clés privées du serveur sont chiffrées par Windows DPAPI et les dossiers
+privés sont limités au compte courant, aux administrateurs et à Local System.
+Le serveur stocke un hash de chaque clé API distante ; les clés privées clientes
+sont intégrées aux EXE. Révoquer retire l'accès API et le pair WireGuard, sans
+changer les autres pairs. Désactiver l'accès distant ne décharge pas Qwen.
+
+La base client-qwen/dist/Accès serveur Fred.exe ne contient pas de profil destinataire.
+Distribuer les fichiers produits par Générer le client Windows dans l'interface.
+Ils sont conservés dans lanceur/clients. La liaison utilise la clé publique du
+serveur intégrée à chaque EXE, avec les mécanismes du protocole WireGuard.
+Aucune connexion HTTP non chiffrée ne traverse Internet : HTTP reste sur
+localhost ou dans la pile réseau privée transportée par WireGuard.
+
+Le code applicatif est sous licence MIT (LICENSE.txt dans chaque dossier).
+Les licences des dépendances restent applicables (client-qwen/THIRD-PARTY.txt).
+La source du moteur et les versions exactes sont dans client-qwen/wireguard-bridge
+avec go.mod et go.sum. Build-WireGuard.ps1 puis Build-Client.ps1 reconstruisent
+le client. Python 3.12 avec Tk et PyInstaller est nécessaire à la compilation ;
+le serveur utilise aussi psutil et cryptography. Le modèle Strata et ses poids
+restent des composants distincts, soumis à leurs propres licences.
+Après une nouvelle compilation, Mettre-A-Jour-Clients.py remplace les EXE
+personnels existants en conservant leurs accès et leurs clés. Les clients signés
+3.0 et suivants peuvent installer la version publiée depuis leur bouton de mise à jour.
+Sources officielles :
+https://git.zx2c4.com/wireguard-go/tree/tun/netstack/examples/http_client.go
+https://www.wireguard.com/quickstart/
+
+Les chemins modifiables doivent désigner des packs Strata déjà compatibles.
+L'interface n'effectue aucune conversion ou quantification du modèle.
+Le contexte maximal et les blocs de prompt occupent de la VRAM qui serait sinon
+disponible pour les experts. Ajouter des threads CPU ne garantit pas un gain SMT.
+
+Fichiers du lanceur :
+- base-strata.json : copie de la configuration validée, options préservées ;
+- reglages-par-defaut.json : valeurs du profil par défaut ;
+- reglages.json : derniers réglages enregistrés ;
+- session.json : dossier de la dernière session lancée depuis l'interface ;
+- interface.pid.json : identité du processus de la console locale.
+
+Version 2.0.0 : consulter CHANGEMENTS-V2.txt. Le nouvel onglet Exploitation regroupe démarrage Windows, surveillance, sauvegarde, diagnostic et mises à jour. Le démarrage à la connexion Windows, le chargement automatique et la relance sont maintenant activés ; ces options restent modifiables dans la console.
+
+Version actuelle : Accès serveur Fred 3.2.1. Aucun compte ni login client.
+Clients & accès sert à générer, télécharger, suspendre et révoquer les EXE personnels.
+Voir client-qwen/LISEZ-MOI.txt et lanceur/AUDIT-FRED.txt pour les fonctions actuelles.
+
+Interface entièrement revue : REFONTE-INTERFACE.txt. Thèmes et navigation commune
+à la console et au client. Les actions réseau, modèle et accès sont conservées.
+
+Version 3.5.0 : correcteur français, mise en page Markdown, réglages persistants,
+historiques serveur, diagnostic WireGuard/génération et suppression des plafonds
+de tokens par réponse. Voir NOUVEAUTES-3.5.0.txt.

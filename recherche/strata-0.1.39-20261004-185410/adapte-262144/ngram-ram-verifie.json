@@ -1,0 +1,11 @@
+{
+  "pid": 48448,
+  "engine_exe": "D:\\Serveur IA\\recherche\\strata-0.1.39-20261004-185410\\build-adapte\\strata.exe",
+  "table_bytes": 28800138240,
+  "allocation_address": "0x269c12c0000",
+  "pages": 7031284,
+  "valid_pages": 7031284,
+  "locked_pages": 7031284,
+  "complete": true,
+  "elapsed_seconds": 9.34
+}

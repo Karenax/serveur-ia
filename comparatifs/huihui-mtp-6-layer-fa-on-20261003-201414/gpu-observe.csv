@@ -1,0 +1,4 @@
+uuid, name, memory.used [MiB], utilization.gpu [%]
+GPU-97ca6406-8625-b829-b053-191c238ff046, Quadro P2200, 1260 MiB, 4 %
+GPU-a39f1b57-5a26-b53d-e943-44ef8042a438, Tesla P100-PCIE-16GB, 8306 MiB, 42 %
+GPU-486d5352-582e-2880-78bf-3dec4688e142, Tesla P100-PCIE-16GB, 11190 MiB, 54 %

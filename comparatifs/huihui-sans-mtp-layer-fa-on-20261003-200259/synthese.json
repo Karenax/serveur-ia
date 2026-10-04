@@ -1,0 +1,20 @@
+[
+  {
+    "mode": "sans-mtp-layer-fa-on",
+    "case": "ciel",
+    "median_tps": 12.125610941816017,
+    "output_tokens": [
+      256,
+      256
+    ]
+  },
+  {
+    "mode": "sans-mtp-layer-fa-on",
+    "case": "fibonacci",
+    "median_tps": 12.125015660279933,
+    "output_tokens": [
+      256,
+      256
+    ]
+  }
+]

@@ -1,0 +1,36 @@
+IQ3_S avec Cafe/llama.cpp adapte aux Tesla P100 - 3 octobre 2026
+
+Modele principal : les deux shards GSQ-RCO-IQ3_S dans C:\Temp.
+Deux P100, contexte 4096, une requete a la fois, temperature 0, seed 42,
+thinking et reutilisation du prompt desactives. Deux repetitions mesurees
+par prompt, apres un passage de chauffe complet sur chaque prompt.
+Chaque reponse mesuree produit 256 tokens; les textes sont tronques a cette limite.
+
+Medianes de generation (tokens/s) :
+                              Ciel       Fibonacci
+Cafe sans MTP, cache 8 Gio     17.16      13.84
+Cafe MTP Q8, cache 8 Gio       23.24      16.81
+Cafe MTP Q8, cache auto        26.01      19.22
+Strata hybride IQ3, reference  29.4       35.6
+
+Le cache automatique garde 2048 Mio libres par GPU. Occupation observee a
+chaud : 14212 et 14146 Mio, contre environ 11 Gio pour le cache plafonne.
+Les 2.3/2.6 Gio observes pendant le chargement ne comprennent pas encore
+le cache d'experts, alloue pendant l'initialisation et les premieres requetes.
+
+Limite importante : le binaire Cafe actif est compile avec
+GGML_CUDA_MOE_DIRECT_GPU_ONLY=ON. La fraction CPU demandee a 1 pour le
+dernier essai est donc sans effet; ce dernier essai est GPU seul avec MTP
+et cache agrandi, pas hybride. Le lanceur bloque desormais ce faux mode.
+Strata utilise un draft converti different du Q8_0 de Cafe; la comparaison
+ne mesure pas seulement le backend. Les caches d'experts different aussi.
+
+Archives :
+comparatifs\cafe-iq3-sans-mtp-20261003-183928
+comparatifs\cafe-iq3-mtp-20261003-184443
+comparatifs\cafe-iq3-hybride-mtp-20261003-185106
+Le dernier dossier conserve son nom initial et contient correction-mode.json.
+
+Serveur laisse actif : Cafe MTP, cache auto, http://127.0.0.1:8080.
+Relancer : .\Start-Cafe-IQ3-P100.ps1 -MTP
+Arreter : .\Stop-Cafe-IQ3-P100.ps1
