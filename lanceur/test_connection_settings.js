@@ -1,0 +1,12 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const source=fs.readFileSync(path.join(__dirname,'../client-qwen/ui.js'),'utf8');
+const code=source.slice(source.indexOf('function uiReadConnectionParameters(text){'),source.indexOf('function uiUseConnectionParameters(text){'));
+const context=vm.createContext({});vm.runInContext(code,context);
+const parse=context.uiReadConnectionParameters;
+const params={format:'acces-serveur-fred-connection',version:1,protocol:'UDP',endpoint:'serveur.example:51820'};
+assert.equal(parse(JSON.stringify(params,null,2)),params.endpoint);
+assert.equal(parse(' serveur.example:51820 / UDP '),params.endpoint);
+assert.equal(parse('[2001:db8::1]:51820'),'[2001:db8::1]:51820');
+for(const text of ['','{',JSON.stringify({...params,protocol:'TCP'}),JSON.stringify({...params,token:'private'}),JSON.stringify({...params,endpoint:[]}),JSON.stringify({...params,version:true}),'x'.repeat(2049)])assert.throws(()=>parse(text));
+console.log('Connection clipboard parsing OK');

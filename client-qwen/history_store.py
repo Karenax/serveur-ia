@@ -24,8 +24,10 @@ def validate(value):
         raise HistoryError('Conserver entre 1 et 200 conversations.')
     ids = set()
     for row in rows:
-        if not isinstance(row, dict) or set(row) - {'id', 'title', 'messages','project_id','assistant_id','document_id','server_revision'}:
+        if not isinstance(row, dict) or set(row) - {'id', 'title', 'messages','project_id','assistant_id','document_id','server_revision','archived'}:
             raise HistoryError('Conversation invalide.')
+        if 'archived' in row and type(row['archived']) is not bool:
+            raise HistoryError('Archivage de conversation invalide.')
         identity, title, messages = row.get('id'), row.get('title'), row.get('messages')
         if not isinstance(identity, str) or not 1 <= len(identity) <= 80 or identity in ids:
             raise HistoryError('Identifiant de conversation invalide ou dupliqué.')

@@ -1,0 +1,2 @@
+conversation_snapshot_test: two-device A/B/A exercised in four K/V formats
+conversation_snapshot_test: 1957 checks passed

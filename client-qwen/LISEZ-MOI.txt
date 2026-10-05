@@ -11,6 +11,10 @@ Chaque destinataire possède un accès distinct, révocable depuis la console se
 La fenêtre est organisée par fonction :
 - Conversations : chatbot intégré, recherche, renommage, suppression avec annulation,
   copie des messages, import/export, réflexion, arrêt et nouvelle tentative.
+  Glissez une discussion sur un projet dans la barre latérale ou dans Projets pour
+  la déplacer. Le clic droit propose Déplacer, Archiver, Restaurer et Supprimer.
+  Le filtre Archivées retrouve les discussions conservées. Annuler la suppression
+  restaure aussi leur publication dans le projet, pendant la session courante.
 - Projets : discussions publiées, consignes, documents éditables, fichiers et mémoire choisie.
 - Assistants : Général, Rédaction, Code, Analyse et Recherche, configurables sur le serveur.
 - Correcteur : texte français, correction grammaticale et orthographique, reformulations
@@ -37,6 +41,20 @@ par sujet utilise une clé Brave configurée sur le serveur. Les exports sont en
 ou Markdown. Voir ../lanceur/ESPACES-FRED.txt pour les limites et réglages.
 
 Automatique privilégie le réseau local quand il est utilisable, puis l’adresse Internet.
+Dans la console serveur, Accès distant > Copier les paramètres pour le client distant
+copie l’adresse et le port UDP. Dans le client, Réglages > Connexion > Coller les
+paramètres prépare l’adresse ; Appliquer l’adresse la valide et se reconnecte.
+Le collage manuel avec Ctrl+V fonctionne également dans l’adresse ou dans la zone
+des paramètres. L’accès personnel intégré à l’EXE reste nécessaire.
+Le nom annoncé par le modèle chargé reste visible dans l’en-tête de toutes les vues.
+Dans Réglages > API locale, Ajouter à OpenCode 2 et Ajouter à Hermes détectent
+les applications installées sur ce PC et ajoutent le fournisseur Serveur Fred.
+Choisissez ensuite ce fournisseur et le modèle dans l’application concernée.
+Gardez le client Fred ouvert ; relancez l’application si la liste n’est pas actualisée.
+Le modèle par défaut et les autres fournisseurs restent conservés. Une sauvegarde
+.fred-backup est créée à côté de la configuration avant chaque modification.
+Seule la clé API locale est transmise à ces applications, avec l’adresse locale
+et le nom du modèle. Le tunnel WireGuard reste géré par le client Fred.
 Sur le serveur lui-même, il essaie localhost. La clé publique du serveur reste vérifiée
 après un changement d’adresse. Les modèles sont annoncés par le serveur.
 Le diagnostic distingue modèle arrêté, tunnel indisponible, accès révoqué ou expiré.

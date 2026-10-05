@@ -135,6 +135,68 @@ class AuthGatewayTests(unittest.TestCase):
     tearDown=test_remote.RemoteTests.tearDown
     request=test_remote.RemoteTests.request
 
+    def test_integration_buttons_require_auth_and_only_use_verified_local_settings(self):
+        import threading,urllib.request,yaml
+        remote=client.Remote(self.profile,opener=object());key=secrets.token_urlsafe(32)
+        home=Path(self.temporary.name)
+        apps={name:{'installed':True,'config_path':str(home/(name+suffix))} for name,suffix in [('opencode','.json'),('hermes','.yaml')]}
+        state={'connected':True,'model':'test-model','models':['test-model']}
+        with patch.object(client,'settings_path',return_value=home/'settings.dpapi'):
+            local=client.serve_local(remote,key,0)
+        threading.Thread(target=local.serve_forever,daemon=True).start()
+        base=f'http://127.0.0.1:{local.server_port}'
+        headers={'Authorization':'Bearer '+key,'Content-Type':'application/json'}
+        def post(value):return urllib.request.urlopen(urllib.request.Request(base+'/client/integrations/apply',json.dumps(value).encode(),headers))
+        try:
+            with patch.object(client.app_integrations,'detect',return_value=apps),patch.object(remote,'check',return_value=state) as checked:
+                with self.assertRaises(urllib.error.HTTPError) as denied:urllib.request.urlopen(base+'/client/integrations')
+                self.assertEqual(denied.exception.code,401)
+                with urllib.request.urlopen(urllib.request.Request(base+'/client/integrations',headers=headers)) as response:self.assertEqual(json.load(response)['apps'],apps)
+                foreign=urllib.request.Request(base+'/client/integrations',headers={**headers,'Origin':'https://example.test'})
+                with self.assertRaises(urllib.error.HTTPError) as denied:urllib.request.urlopen(foreign)
+                self.assertEqual(denied.exception.code,403)
+                for app in apps:
+                    with post({'app':app,'model':'test-model'}) as response:self.assertEqual(json.load(response)['model'],'test-model')
+                config=json.loads(Path(apps['opencode']['config_path']).read_text())['providers']['serveur-fred']
+                self.assertEqual(config['settings'],{'baseURL':base+'/v1','apiKey':key})
+                hermes=yaml.safe_load(Path(apps['hermes']['config_path']).read_text())['providers']['serveur-fred']
+                self.assertEqual(hermes['api'],base+'/v1');self.assertEqual(hermes['api_key'],key)
+                snapshots={app:Path(info['config_path']).read_bytes() for app,info in apps.items()}
+                for values in [{'app':'opencode','model':'invented'},{'app':'unknown'},{'app':'opencode','config_path':str(home/'injected.json')},{'app':'hermes','key':'injected'}]:
+                    with self.assertRaises(urllib.error.HTTPError) as refused:post(values)
+                    self.assertEqual(refused.exception.code,400)
+                state['connected']=False
+                with self.assertRaises(urllib.error.HTTPError) as refused:post({'app':'opencode'})
+                self.assertEqual(refused.exception.code,400)
+                self.assertGreaterEqual(checked.call_count,3)
+                for app,info in apps.items():self.assertEqual(Path(info['config_path']).read_bytes(),snapshots[app])
+                self.assertFalse(list(home.glob('*.fred-backup-*')))
+        finally:local.shutdown();local.server_close()
+
+    def test_pasted_connection_parameters_are_validated_before_switching(self):
+        import threading,urllib.request
+        from connection_settings import export
+        remote=client.Remote(self.profile,opener=object());key=secrets.token_urlsafe(32)
+        with patch.object(client,'settings_path',return_value=Path(self.temporary.name)/'settings.dpapi'):
+            local=client.serve_local(remote,key,0)
+        threading.Thread(target=local.serve_forever,daemon=True).start()
+        headers={'Authorization':'Bearer '+key,'Content-Type':'application/json'}
+        url=f'http://127.0.0.1:{local.server_port}/client/endpoint'
+        def post(value):return urllib.request.urlopen(urllib.request.Request(url,json.dumps(value).encode(),headers))
+        try:
+            with patch.object(client,'save_endpoint') as saved:
+                with post({'endpoint':json.dumps(export('server.example:51820'),indent=2)}) as response:
+                    self.assertEqual(json.load(response)['endpoint'],'server.example:51820')
+                saved.assert_called_once_with(remote.profile,'server.example:51820')
+                saved.reset_mock()
+                with self.assertRaises(urllib.error.HTTPError) as invalid:post({'endpoint':'https://invalid.example/v1'})
+                self.assertEqual(invalid.exception.code,400);saved.assert_not_called()
+                self.assertEqual(remote.endpoint,'server.example:51820')
+                remote.active_requests=1
+                with self.assertRaises(urllib.error.HTTPError):post({'endpoint':'new.example:51820'})
+                saved.assert_not_called();self.assertEqual(remote.endpoint,'server.example:51820')
+        finally:local.shutdown();local.server_close()
+
     def test_personal_exe_connects_without_login_and_revocation_crosses_wireguard(self):
         from wireguard_access import Engine
         engine=Engine({'role':'server','wireguard':{'private_key':self.wireguard.vault()['private_key']},'listen_port':0,'upstream_port':self.gateway.server_port,'peers':self.wireguard.peers()})

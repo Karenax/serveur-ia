@@ -26,6 +26,8 @@ from product import APP_NAME
 import history_store
 from urllib.parse import urlsplit
 from wg_bridge import Bridge,validate_profile,validate_endpoint,connection_candidates
+from connection_settings import parse as parse_connection_settings
+import app_integrations
 
 class Blob(ctypes.Structure):
     _fields_ = [('cbData', wintypes.DWORD), ('pbData', ctypes.POINTER(ctypes.c_ubyte))]
@@ -312,6 +314,9 @@ def serve_local(remote, key, port=8081):
         def do_GET(self):
             if self.path in ('/', '/chat'):
                 return self.chat()
+            if self.path == '/client/integrations':
+                if not self.authorized():return
+                return self.reply(200,{'apps':app_integrations.detect()})
             if self.path == '/client/state':
                 if not self.authorized():return
                 histories.schedule()
@@ -340,7 +345,7 @@ def serve_local(remote, key, port=8081):
             self.forward()
 
         def do_POST(self):
-            if self.path not in ('/v1/chat/completions', '/v1/cancel','/v1/workspace/action','/client/draft','/client/endpoint','/client/preferences','/client/update/check','/client/update/apply','/client/history','/client/history/sync','/client/history/flush','/client/history/recover'):
+            if self.path not in ('/v1/chat/completions', '/v1/cancel','/v1/workspace/action','/client/draft','/client/endpoint','/client/preferences','/client/update/check','/client/update/apply','/client/history','/client/history/sync','/client/history/flush','/client/history/recover','/client/integrations/apply'):
                 return self.reply(404, {'error': {'message': 'Route non disponible.'}})
             if not self.authorized():
                 return
@@ -358,9 +363,16 @@ def serve_local(remote, key, port=8081):
                 try:
                     values=json.loads(body)
                     if not isinstance(values,dict):raise ValueError('Paramètres invalides.')
-                    if self.path=='/client/endpoint':
+                    if self.path=='/client/integrations/apply':
+                        if set(values)-{'app','model'}:raise ValueError('Paramètres d’intégration invalides.')
+                        state=remote.check()
+                        if not state['connected']:raise ValueError('Connectez le client au serveur et chargez un modèle avant de l’ajouter.')
+                        model=values.get('model') or state['model']
+                        if model not in state['models']:raise ValueError('Ce modèle n’est plus disponible sur le serveur. Actualisez la liste.')
+                        result=app_integrations.install(values.get('app'),f'http://127.0.0.1:{self.server.server_port}/v1',key,model)
+                    elif self.path=='/client/endpoint':
                         endpoint=values.get('endpoint') or None
-                        if endpoint:endpoint=validate_endpoint(endpoint)
+                        if endpoint:endpoint=parse_connection_settings(endpoint)
                         with remote.activity_lock:
                             if remote.active_requests or remote.applying_update:raise ValueError('Attendre la fin des requêtes API avant de changer d’adresse.')
                             save_endpoint(remote.profile,endpoint);remote.set_endpoint(endpoint);result={'endpoint':remote.endpoint}

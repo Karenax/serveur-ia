@@ -982,6 +982,60 @@ index 0000000..44b87a2
 +100% tests passed, 0 tests failed out of 4
 +
 +Total Test time (real) =   2.11 sec
+diff --git a/include/strata/core/conversation_cache.hpp b/include/strata/core/conversation_cache.hpp
+index 0a190c7..6b3babf 100644
+--- a/include/strata/core/conversation_cache.hpp
++++ b/include/strata/core/conversation_cache.hpp
+@@ -26,7 +26,7 @@ struct ConversationCheckpoint {
+     std::vector<uint8_t> gdn, ple, tails, dead, block_pos;
+     uint64_t used = 0; // upstream root-pinned/LRU checkpoint retention
+     // Ordinary layer-split checkpoints retain each device's running state.
+-    // Whole-session parking is currently single-GPU and rejects these parts.
++    // Split snapshots retain these parts together with every device's K/V.
+     std::vector<ConversationCheckpoint> stage_parts;
+ 
+     size_t bytes() const {
+@@ -69,10 +69,11 @@ struct SavedConversation {
+     std::vector<ConversationCheckpoint> checkpoints;
+     std::vector<ConversationKv> kv; // main layers followed by the draft layer
+     bool cvec = true;
++    std::vector<std::array<int64_t, 2>> stage_ranges;
+ 
+     size_t bytes() const {
+         size_t n = live.bytes() + checkpoints.capacity() * sizeof(ConversationCheckpoint) +
+-                   kv.capacity() * sizeof(ConversationKv);
++                   kv.capacity() * sizeof(ConversationKv) + stage_ranges.capacity() * sizeof(stage_ranges[0]);
+         for (const auto& c : checkpoints) n += c.bytes();
+         for (const auto& k : kv) n += k.bytes();
+         return n;
+diff --git a/include/strata/core/conversation_snapshot.hpp b/include/strata/core/conversation_snapshot.hpp
+index a840bf2..0f87d11 100644
+--- a/include/strata/core/conversation_snapshot.hpp
++++ b/include/strata/core/conversation_snapshot.hpp
+@@ -70,6 +70,23 @@ bool conversation_snapshot_save(SavedConversation& image, const ConversationView
+ bool conversation_snapshot_validate(const SavedConversation& image, const SessionState& session,
+                                     const ModelGeometry& g, const QsaState& draft, std::string& error);
+ enum class ConversationRestore { restored, invalid, transfer_failed };
++struct ConversationStage {
++    SessionState* session;
++    int device;
++};
++// Full captures on a split: all stages are validated before any device is touched.
++// K/V is stored in stage order, followed by the draft on draft_device.
++bool conversation_split_snapshot_bytes(const ConversationView& view, const std::vector<ConversationStage>& stages,
++                                      const ModelGeometry& g, const QsaState& draft, size_t& bytes, std::string& error);
++bool conversation_split_snapshot_save(SavedConversation& image, const ConversationView& view,
++                                     const std::vector<ConversationStage>& stages, const ModelGeometry& g,
++                                     const QsaState& draft, int draft_device, std::string& error);
++bool conversation_split_snapshot_validate(const SavedConversation& image, const std::vector<ConversationStage>& stages,
++                                         const ModelGeometry& g, const QsaState& draft, std::string& error);
++ConversationRestore conversation_split_snapshot_restore(const SavedConversation& image,
++                                                        const std::vector<ConversationStage>& stages,
++                                                        const ModelGeometry& g, const QsaState& draft,
++                                                        int draft_device, std::string& error);
+ // Invalid images are rejected before any CUDA call/write. Transfer failure may
+ // leave partial state: caller MUST NOT continue inference from that session.
+ ConversationRestore conversation_snapshot_restore(const SavedConversation& image, SessionState& session,
 diff --git a/include/strata/core/verify.hpp b/include/strata/core/verify.hpp
 index 5717eb4..067c1cd 100644
 --- a/include/strata/core/verify.hpp
@@ -1244,6 +1298,324 @@ index d858d2f..719ae97 100644
      <div class="chat-scroll" id="chat-scroll">
        <div class="chat" id="chat">
          <div class="chat-empty" id="chat-empty">
+diff --git a/src/core/conversation_snapshot_test.cpp b/src/core/conversation_snapshot_test.cpp
+index da95113..0d9c6af 100644
+--- a/src/core/conversation_snapshot_test.cpp
++++ b/src/core/conversation_snapshot_test.cpp
+@@ -1,5 +1,6 @@
+ #include "strata/core/conversation_snapshot.hpp"
+ #include "strata/kernels/kv_q4.hpp"
++#include "strata/core/on_device.hpp"
+ #include <cuda_runtime.h>
+ 
+ #include <array>
+@@ -21,6 +22,7 @@ void cuda_check(cudaError_t e) {
+     if (e != cudaSuccess) { std::fprintf(stderr, "CUDA: %s\n", cudaGetErrorString(e)); std::exit(1); }
+ }
+ struct Fixture {
++    int device_id = 0;
+     ModelGeometry g;
+     QsaState state;
+     std::vector<void*> device, host;
+@@ -41,6 +43,7 @@ struct Fixture {
+         }
+     }
+     Fixture(int fmt, int mode) {
++        cuda_check(cudaGetDevice(&device_id));
+         auto& st = state;
+         st.kv_mode = mode; st.kv_int8 = fmt==kKvInt8; st.kv_q4 = fmt==kKvQ4; st.kv_hybrid = fmt==3;
+         st.n_pages = 24; st.n_slots = mode ? 4 : st.n_pages;
+@@ -98,7 +101,7 @@ struct Fixture {
+                 cuda_check(cudaMemset(static_cast<uint8_t*>(sources[i])+offset, salt, sizes[i]-offset));
+         }
+     }
+-    ~Fixture() { for (void* p:device) cudaFree(p); for (void* p:host) cudaFreeHost(p); }
++    ~Fixture() { const OnDevice on(device_id); for (void* p:device) cudaFree(p); for (void* p:host) cudaFreeHost(p); }
+ };
+ bool equal(const ConversationKv& a,const ConversationKv& b) {
+     return a.k==b.k && a.v==b.v && a.k_scale==b.k_scale && a.v_scale==b.v_scale && a.pooled==b.pooled;
+@@ -193,6 +196,84 @@ void full_session(int fmt, int mode, int experts) {
+     check(spare==a.checkpoints[0].dead,"checkpoint rebuilds spare row over a later completed block");
+     check(ss.ple_prev[0]==2 && ss.ple_prev[1]==3,"checkpoint PLE token window");
+ }
++
++void split_session(int fmt) {
++    cuda_check(cudaSetDevice(0));
++    Fixture first(fmt, 0);
++    cuda_check(cudaSetDevice(1));
++    Fixture second(fmt, 0), draft(fmt == 3 ? kKvInt8 : fmt, 2);
++    cuda_check(cudaSetDevice(0));
++    auto g = first.g;
++    g.n_layers = 8; g.ssm_state_size = 2; g.ssm_v_heads = 2; g.ssm_conv_channels = 8;
++    std::array<SessionState, 2> sessions;
++    std::array<QsaState, 2> qsa{first.state, second.state};
++    std::array<ConversationStateSizes, 2> sizes;
++    std::string error;
++    for (int i = 0; i < 2; ++i) {
++        const OnDevice on(i);
++        auto& ss = sessions[i]; auto& f = i ? second : first;
++        ss.layer_lo = i * 4; ss.layer_hi = i * 4 + 4;
++        ss.max_cells = 96; ss.gdn_alloc = 3; ss.qsa_ord0 = i; ss.qsa_alloc = 1;
++        ss.qsa_states = qsa.data();
++        check(conversation_session_sizes(g, ss, sizes[i], error), "split owned state sizing");
++        f.alloc(ss.gdn_state, sizes[i].gdn); f.alloc(ss.ple_hist, sizes[i].ple);
++        f.alloc(qsa[i].idx_tail, sizes[i].tail); f.alloc(qsa[i].idx_dead, sizes[i].dead);
++        f.alloc(qsa[i].idx_block_pos, sizes[i].block_pos);
++    }
++    std::vector<int32_t> ids(65);
++    for (size_t i = 0; i < ids.size(); ++i) ids[i] = int32_t(i + 1);
++    std::vector<ConversationImageKey> images;
++    std::vector<ConversationCheckpoint> checkpoint_chain;
++    const std::vector<ConversationStage> stages{{&sessions[0], 0}, {&sessions[1], 1}};
++    const ConversationView view{ids, images, checkpoint_chain, true};
++    auto fill = [&](uint8_t salt) {
++        for (int i = 0; i < 2; ++i) {
++            const OnDevice on(i); auto& ss = sessions[i];
++            (i ? second : first).fill(uint8_t(salt + i));
++            for (const auto& [p, n] : std::vector<std::pair<void*, size_t>>{
++                    {ss.gdn_state, sizes[i].gdn}, {ss.ple_hist, sizes[i].ple},
++                    {qsa[i].idx_tail, sizes[i].tail}, {qsa[i].idx_dead, sizes[i].dead},
++                    {qsa[i].idx_block_pos, sizes[i].block_pos}})
++                cuda_check(cudaMemset(p, salt + i, n));
++            cuda_check(cudaMemcpy(qsa[i].idx_pooled + (ids.size() / 4) * g.idx_key_dim,
++                                  qsa[i].idx_dead, sizes[i].dead, cudaMemcpyDeviceToDevice));
++        }
++        const OnDevice on(1); draft.fill(uint8_t(salt + 2));
++    };
++    fill(13);
++    SavedConversation a, b, restored;
++    check(conversation_split_snapshot_save(a, view, stages, g, draft.state, 1, error), "capture split A");
++    checkpoint_chain.push_back(a.live); checkpoint_chain.back().used = 17;
++    size_t estimate = 0;
++    check(conversation_split_snapshot_bytes(view, stages, g, draft.state, estimate, error), "estimate split capture");
++    check(conversation_split_snapshot_save(a, view, stages, g, draft.state, 1, error), "capture split checkpoint chain");
++    check(a.bytes() <= estimate, "split allocation stays within admitted byte budget");
++    check(a.checkpoints[0].used == 17 && a.checkpoints[0].stage_parts.size() == 1,
++          "split checkpoint history survives capture");
++    fill(177);
++    check(conversation_split_snapshot_save(b, view, stages, g, draft.state, 1, error), "capture split B");
++    auto bad = a; bad.kv.back().k.pop_back();
++    check(conversation_split_snapshot_restore(bad, stages, g, draft.state, 1, error) == ConversationRestore::invalid,
++          "invalid draft rejects split before first device write");
++    check(conversation_split_snapshot_save(restored, view, stages, g, draft.state, 1, error), "capture after rejected split");
++    check(restored.live.gdn == b.live.gdn && restored.live.stage_parts[0].gdn == b.live.stage_parts[0].gdn &&
++          equal(restored.kv[0], b.kv[0]) && equal(restored.kv[1], b.kv[1]), "rejected restore preserves both GPUs");
++    bad = a; bad.live.stage_parts[0].gdn.pop_back();
++    check(!conversation_split_snapshot_validate(bad, stages, g, draft.state, error), "reject corrupt secondary recurrence");
++    bad = a; bad.stage_ranges[1][0]++;
++    check(!conversation_split_snapshot_validate(bad, stages, g, draft.state, error), "reject another split layout");
++    check(conversation_split_snapshot_restore(a, stages, g, draft.state, 1, error) == ConversationRestore::restored,
++          "restore split A after B");
++    check(conversation_split_snapshot_save(restored, view, stages, g, draft.state, 1, error), "capture restored split A");
++    auto equal_running = [](const ConversationCheckpoint& x, const ConversationCheckpoint& y) {
++        return x.ids == y.ids && x.gdn == y.gdn && x.ple == y.ple && x.tails == y.tails &&
++               x.dead == y.dead && x.block_pos == y.block_pos;
++    };
++    check(equal_running(restored.live, a.live) &&
++          equal_running(restored.live.stage_parts[0], a.live.stage_parts[0]) && equal(restored.kv[0], a.kv[0]) &&
++          equal(restored.kv[1], a.kv[1]) && equal(restored.kv[2], a.kv[2]), "two-device A/B/A exactness");
++    check(sessions[0].ple_prev[1] == 65 && sessions[1].ple_prev[1] == 65, "PLE reconstructed on both devices");
++}
+ }
+ 
+ int main() {
+@@ -279,5 +360,9 @@ int main() {
+     for (int fmt : {kKvF16,kKvInt8,kKvQ4}) for (int mode : {0,1}) for (int experts : {256,512})
+         full_session(fmt,mode,experts);
+     for (int experts : {256,512}) full_session(3,0,experts);
++    if (devices >= 2) {
++        for (int fmt : std::array<int, 4>{kKvF16, kKvInt8, kKvQ4, 3}) split_session(fmt);
++        std::puts("conversation_snapshot_test: two-device A/B/A exercised in four K/V formats");
++    }
+     std::printf("conversation_snapshot_test: %d checks passed\n",checks);
+ }
+diff --git a/src/core/conversation_state.cpp b/src/core/conversation_state.cpp
+index 3e97827..ad19888 100644
+--- a/src/core/conversation_state.cpp
++++ b/src/core/conversation_state.cpp
+@@ -1,5 +1,6 @@
+ #include "strata/core/conversation_snapshot.hpp"
+ #include "conversation_checked.hpp"
++#include "strata/core/on_device.hpp"
+ 
+ #include <algorithm>
+ #include <array>
+@@ -71,14 +72,14 @@ bool checkpoint_targets(const SessionState& ss, const ModelGeometry& g, size_t t
+ }
+ 
+ bool view_validate(const ConversationView& view, const SessionState& ss,
+-                   const ModelGeometry& g, std::string& error) {
++                   const ModelGeometry& g, std::string& error, bool split = false) {
+     ConversationStateSizes z;
+     if (!checkpoint_targets(ss, g, view.ids.size(), z, error)) return false;
+     if (view.ids.empty() || !image_keys(view.images, view.ids.size()) ||
+         std::any_of(view.ids.begin(), view.ids.end(), [](int32_t id) { return id < 0; }))
+         return fail(error, "invalid live token/image metadata");
+     for (const auto& c : view.checkpoints) {
+-        if (!c.stage_parts.empty() || c.ids.empty() || c.ids.size() > view.ids.size() ||
++        if ((!split && !c.stage_parts.empty()) || c.ids.empty() || c.ids.size() > view.ids.size() ||
+             !std::equal(c.ids.begin(), c.ids.end(), view.ids.begin()))
+             return fail(error, "checkpoint is not a live token prefix");
+         if (!conversation_checkpoint_validate(c, ss, g, error)) return false;
+@@ -275,7 +276,7 @@ bool conversation_snapshot_save(SavedConversation& image, const ConversationView
+ 
+ bool conversation_snapshot_validate(const SavedConversation& image, const SessionState& ss,
+                                     const ModelGeometry& g, const QsaState& draft, std::string& error) {
+-    if (!image.live.stage_parts.empty()) return fail(error, "layer-split parking is not supported");
++    if (!image.live.stage_parts.empty() || !image.stage_ranges.empty()) return fail(error, "split image requires split restore");
+     if (image.geometry != geometry_key(g)) return fail(error, "incompatible runtime geometry");
+     // an image holds exactly one carve's running state and K/V: same layer range or nothing
+     if (image.layer_lo != ss.layer_lo || image.layer_hi != ss.layer_hi)
+@@ -302,4 +303,149 @@ ConversationRestore conversation_snapshot_restore(const SavedConversation& image
+         !conversation_checkpoint_restore(image.live, ss, g, error)) return ConversationRestore::transfer_failed;
+     return ConversationRestore::restored;
+ }
++namespace {
++bool split_stages(const std::vector<ConversationStage>& stages, const ModelGeometry& g, std::string& error) {
++    if (stages.size() < 2) return fail(error, "split requires at least two stages");
++    int64_t next = 0;
++    for (const auto& stage : stages) {
++        if (!stage.session || stage.device < 0 || stage.session->layer_lo != next ||
++            stage.session->layer_hi <= next || stage.session->layer_hi > g.n_layers)
++            return fail(error, "invalid split layer ranges");
++        next = stage.session->layer_hi;
++    }
++    return next == g.n_layers || fail(error, "incomplete split layer ranges");
++}
++bool split_checkpoint(const ConversationCheckpoint& c, const std::vector<ConversationStage>& stages,
++                      const ModelGeometry& g, std::string& error) {
++    if (c.stage_parts.size() != stages.size() - 1 ||
++        !conversation_checkpoint_validate(c, *stages[0].session, g, error))
++        return fail(error, "invalid split checkpoint");
++    for (size_t i = 1; i < stages.size(); ++i) {
++        const auto& part = c.stage_parts[i - 1];
++        if (!part.stage_parts.empty() || part.ids != c.ids || !part.imgs.empty() ||
++            !conversation_checkpoint_validate(part, *stages[i].session, g, error))
++            return fail(error, "invalid secondary checkpoint");
++    }
++    return true;
++}
++bool split_view(const ConversationView& view, const std::vector<ConversationStage>& stages,
++                const ModelGeometry& g, std::string& error) {
++    if (!split_stages(stages, g, error)) return false;
++    // Image position tables need their own snapshot; this text-only extension
++    // must not silently advertise support for images.
++    if (!view.images.empty()) return fail(error, "split parking currently requires text-only requests");
++    if (!view_validate(view, *stages[0].session, g, error, true)) return false;
++    for (size_t i = 1; i < stages.size(); ++i) {
++        ConversationStateSizes z;
++        if (!checkpoint_targets(*stages[i].session, g, view.ids.size(), z, error)) return false;
++    }
++    for (const auto& c : view.checkpoints)
++        if (!split_checkpoint(c, stages, g, error)) return false;
++    return true;
++}
++}
++
++bool conversation_split_snapshot_bytes(const ConversationView& view, const std::vector<ConversationStage>& stages,
++                                      const ModelGeometry& g, const QsaState& draft, size_t& bytes, std::string& error) {
++    bytes = 0;
++    if (!split_view(view, stages, g, error)) return false;
++    if (!add(bytes, stages.size() * sizeof(std::array<int64_t, 2>)) ||
++        !add(bytes, (stages.size() - 1) * sizeof(ConversationCheckpoint)) ||
++        !add(bytes, view.checkpoints.size() * sizeof(ConversationCheckpoint))) return fail(error, "split metadata overflow");
++    for (const auto& c : view.checkpoints)
++        if (!add(bytes, c.bytes())) return fail(error, "split checkpoint size overflow");
++    const int64_t upto = int64_t(view.ids.size());
++    for (const auto& stage : stages) {
++        const auto& ss = *stage.session;
++        ConversationStateSizes z;
++        if (!conversation_session_sizes(g, ss, z, error)) return false;
++        for (size_t n : {view.ids.size() * sizeof(int32_t), z.gdn, ss.ple_hist ? z.ple : 0,
++                         owned_qsa(ss) * (z.tail + z.dead + z.block_pos)})
++            if (!add(bytes, n)) return fail(error, "split running-state size overflow");
++        for (size_t j = 0; j < owned_qsa(ss); ++j) {
++            const size_t n = conversation_kv_bytes(owned(ss, j), g, upto, true);
++            if (!n || !add(bytes, sizeof(ConversationKv)) || !add(bytes, n))
++                return fail(error, "invalid split K/V estimate");
++        }
++    }
++    const size_t n = conversation_kv_bytes(draft, g, upto, false);
++    return (n && add(bytes, sizeof(ConversationKv)) && add(bytes, n)) || fail(error, "invalid split draft estimate");
++}
++
++bool conversation_split_snapshot_save(SavedConversation& image, const ConversationView& view,
++                                     const std::vector<ConversationStage>& stages, const ModelGeometry& g,
++                                     const QsaState& draft, int draft_device, std::string& error) {
++    size_t bytes = 0;
++    if (!conversation_split_snapshot_bytes(view, stages, g, draft, bytes, error)) return false;
++    SavedConversation saved;
++    saved.geometry = geometry_key(g); saved.layer_lo = 0; saved.layer_hi = g.n_layers;
++    saved.cvec = view.cvec; saved.checkpoints = view.checkpoints;
++    saved.stage_ranges.resize(stages.size()); saved.live.stage_parts.resize(stages.size() - 1);
++    size_t layers = 0;
++    for (const auto& stage : stages) layers += owned_qsa(*stage.session);
++    saved.kv.resize(layers + 1);
++    size_t at = 0;
++    for (size_t i = 0; i < stages.size(); ++i) {
++        const auto& stage = stages[i]; const auto& ss = *stage.session;
++        const OnDevice device(stage.device);
++        if (!sync(error)) return false;
++        saved.stage_ranges[i] = {ss.layer_lo, ss.layer_hi};
++        auto& live = i == 0 ? saved.live : saved.live.stage_parts[i - 1];
++        live.ids = view.ids;
++        if (!conversation_checkpoint_save(live, ss, g, error)) return false;
++        for (size_t j = 0; j < owned_qsa(ss); ++j)
++            if (!conversation_kv_save(saved.kv[at++], owned(ss, j), g, int64_t(view.ids.size()), true, error)) return false;
++    }
++    {
++        const OnDevice device(draft_device);
++        if (!sync(error) || !conversation_kv_save(saved.kv.back(), draft, g, int64_t(view.ids.size()), false, error)) return false;
++    }
++    image = std::move(saved);
++    return true;
++}
++
++bool conversation_split_snapshot_validate(const SavedConversation& image, const std::vector<ConversationStage>& stages,
++                                         const ModelGeometry& g, const QsaState& draft, std::string& error) {
++    if (image.geometry != geometry_key(g) || image.layer_lo != 0 || image.layer_hi != g.n_layers ||
++        image.stage_ranges.size() != stages.size()) return fail(error, "incompatible split snapshot");
++    const ConversationView view{image.live.ids, image.live.imgs, image.checkpoints, image.cvec};
++    if (!split_view(view, stages, g, error) || !split_checkpoint(image.live, stages, g, error)) return false;
++    size_t count = 1;
++    for (size_t i = 0; i < stages.size(); ++i) {
++        const auto& ss = *stages[i].session;
++        if (image.stage_ranges[i] != std::array<int64_t, 2>{ss.layer_lo, ss.layer_hi})
++            return fail(error, "snapshot from another split layout");
++        count += owned_qsa(ss);
++    }
++    if (image.kv.size() != count) return fail(error, "invalid split K/V layer count");
++    size_t at = 0;
++    const int64_t upto = int64_t(image.live.ids.size());
++    for (const auto& stage : stages)
++        for (size_t j = 0; j < owned_qsa(*stage.session); ++j)
++            if (!conversation_kv_validate(image.kv[at++], owned(*stage.session, j), g, upto, true, error)) return false;
++    return conversation_kv_validate(image.kv.back(), draft, g, upto, false, error);
++}
++
++ConversationRestore conversation_split_snapshot_restore(const SavedConversation& image,
++                                                        const std::vector<ConversationStage>& stages,
++                                                        const ModelGeometry& g, const QsaState& draft,
++                                                        int draft_device, std::string& error) {
++    if (!conversation_split_snapshot_validate(image, stages, g, draft, error)) return ConversationRestore::invalid;
++    size_t at = 0;
++    const int64_t upto = int64_t(image.live.ids.size());
++    for (size_t i = 0; i < stages.size(); ++i) {
++        const auto& stage = stages[i];
++        const OnDevice device(stage.device);
++        if (!sync(error)) return ConversationRestore::transfer_failed;
++        for (size_t j = 0; j < owned_qsa(*stage.session); ++j)
++            if (!conversation_kv_restore(image.kv[at++], owned(*stage.session, j), g, upto, true, error))
++                return ConversationRestore::transfer_failed;
++        const auto& live = i == 0 ? image.live : image.live.stage_parts[i - 1];
++        if (!conversation_checkpoint_restore(live, *stage.session, g, error)) return ConversationRestore::transfer_failed;
++    }
++    const OnDevice device(draft_device);
++    if (!sync(error) || !conversation_kv_restore(image.kv.back(), draft, g, upto, false, error) || !sync(error))
++        return ConversationRestore::transfer_failed;
++    return ConversationRestore::restored;
++}
+ } // namespace strata::core
 diff --git a/src/core/expert_source.cpp b/src/core/expert_source.cpp
 index 087854e..7725027 100644
 --- a/src/core/expert_source.cpp
@@ -1574,10 +1946,21 @@ index ed47b97..2b69bc5 100644
      core::SessionState& ss = *m.ss;
      const auto t_start = Clock::now();
 diff --git a/src/program/generate.cpp b/src/program/generate.cpp
-index 53c38a0..c1fc33d 100644
+index 53c38a0..2bcbfe4 100644
 --- a/src/program/generate.cpp
 +++ b/src/program/generate.cpp
-@@ -1334,7 +1334,23 @@ int main(int argc, char** argv) {
+@@ -1257,10 +1257,6 @@ int main(int argc, char** argv) {
+     if (o.serve && o.conversation_cache_mib > 0 && (o.prompt_cache == 0 || o.conversation_cache_slots == 0))
+         std::fprintf(stderr, "strata serve: warning: conversation caching is disabled by %s\n",
+                      o.prompt_cache == 0 ? "--prompt-cache 0" : "--conversation-cache-slots 0");
+-    if (o.conversation_cache_mib > 0 && o.conversation_cache_slots > 0 && o.prompt_cache > 0 && !o.layer_split.empty()) {
+-        std::fprintf(stderr, "strata serve: conversation parking does not yet support --layer-split; disable parking with --conversation-cache-mib 0\n");
+-        return 2;
+-    }
+     // Layer split (multi-GPU): the later stages run layers [K_i, K_i+1) on their own GPUs (--split-device, default
+     // the next visible ones); "auto" places the K from each GPU's free VRAM once the weights are in (below).  Across
+     // GPUs, not yet: KV streaming, images, control vectors, the helper caches (--expert-cache-remote), and lending
+@@ -1334,7 +1330,23 @@ int main(int argc, char** argv) {
          o.resident_cpu_experts = o.resident_pin = o.resident_soft = false;
          o.resident_headroom = 8ull << 30;
      }
@@ -1602,7 +1985,7 @@ index 53c38a0..c1fc33d 100644
          std::fprintf(stderr, "strata generate: --resident-cpu-experts does not support layer splits or remote expert caches\n");
          return 2;
      }
-@@ -1459,7 +1475,7 @@ int main(int argc, char** argv) {
+@@ -1459,7 +1471,7 @@ int main(int argc, char** argv) {
          return 2;
      }
  #if defined(_WIN32)
@@ -1611,7 +1994,7 @@ index 53c38a0..c1fc33d 100644
          std::fprintf(stderr, "strata generate: --ple-io ram is not available on Windows (no mlock); use --ple-io mmap\n");
          return 2;
      }
-@@ -3788,8 +3804,21 @@ int main(int argc, char** argv) {
+@@ -3788,8 +3800,21 @@ int main(int argc, char** argv) {
              const int64_t k = plan_lend(chunk);
              if (k > 0) lend_from = xcache.slots() - k;
          }
@@ -1634,7 +2017,90 @@ index 53c38a0..c1fc33d 100644
          std::string whole_err;
          if (!resident_ok && o.resident_soft) {
              // #467: the whole complement does not fit - keep what does, the hottest by the profile, through the #403
-@@ -5380,6 +5409,8 @@ int main(int argc, char** argv) {
+@@ -4306,14 +4331,32 @@ int main(int argc, char** argv) {
+         strata::core::ConversationCache conversations(
+             o.prompt_cache > 0 ? (size_t) o.conversation_cache_mib * 1024 * 1024 : 0,
+             (size_t) o.conversation_cache_slots);
++        std::vector<strata::core::ConversationStage> cache_stages;
++        cache_stages.push_back({&ss, 0});
++        for (auto& stage : stages) cache_stages.push_back({&stage->ss, stage->dev});
++        const bool split_parking = cache_stages.size() > 1;
++        auto snapshot_validate = [&](const strata::core::SavedConversation& image) {
++            return split_parking
++                ? strata::core::conversation_split_snapshot_validate(image, cache_stages, g, mtp.kv_state(), err)
++                : strata::core::conversation_snapshot_validate(image, ss, g, mtp.kv_state(), err);
++        };
++        auto snapshot_restore = [&](const strata::core::SavedConversation& image) {
++            return split_parking
++                ? strata::core::conversation_split_snapshot_restore(image, cache_stages, g, mtp.kv_state(), hist_dev, err)
++                : strata::core::conversation_snapshot_restore(image, ss, g, mtp.kv_state(), err);
++        };
+         // Save only on a switch/rewind, not on each continuing request. No graph
+         // addresses change: all parked images live in ordinary host vectors.
+         auto park_current = [&](size_t held) -> bool {
+             if (!conversations.enabled() || !live_ok || live.empty()) return true;
+             const strata::core::ConversationView view{live, live_imgs, checks, cvec_cached};
+             auto reuse = conversations.take_reuse();
++            if (split_parking) reuse = {}; // split captures account for all devices; no single-device retained buffers
+             size_t estimate = 0;
+-            if (!strata::core::conversation_snapshot_bytes(view, ss, g, mtp.kv_state(), estimate, err)) {
++            const bool estimated = split_parking
++                ? strata::core::conversation_split_snapshot_bytes(view, cache_stages, g, mtp.kv_state(), estimate, err)
++                : strata::core::conversation_snapshot_bytes(view, ss, g, mtp.kv_state(), estimate, err);
++            if (!estimated) {
+                 std::fprintf(stderr, "strata serve: conversation cache: skip parking (%s)\n", err.c_str());
+                 err.clear(); // A recoverable miss must not poison the batched draft prefill's error channel.
+                 return true;
+@@ -4353,8 +4396,11 @@ int main(int argc, char** argv) {
+                 }
+                 strata::core::SavedConversation image;
+                 size_t reused_bytes = 0;
+-                if (!strata::core::conversation_snapshot_save(image, view, ss, g, mtp.kv_state(), err,
+-                        std::move(reuse), &reused_bytes)) return false;
++                const bool saved = split_parking
++                    ? strata::core::conversation_split_snapshot_save(image, view, cache_stages, g, mtp.kv_state(), hist_dev, err)
++                    : strata::core::conversation_snapshot_save(image, view, ss, g, mtp.kv_state(), err,
++                                                               std::move(reuse), &reused_bytes);
++                if (!saved) return false;
+                 if (!strata::core::conversation_memory_admit(strata::core::conversation_available_memory(), 0, floor)) {
+                     std::fprintf(stderr, "strata serve: conversation cache: skip parking (physical RAM floor after capture, or telemetry unavailable)\n");
+                     return true;
+@@ -4953,7 +4999,7 @@ int main(int argc, char** argv) {
+             if (parked.tokens > resume) incoming.emplace(conversations.take(parked.index));
+             // Reject the entire image before parking/overwriting the outgoing
+             // state. Invalid entries can safely fall back to its existing prefix.
+-            if (incoming && !strata::core::conversation_snapshot_validate(*incoming, ss, g, mtp.kv_state(), err)) {
++            if (incoming && !snapshot_validate(*incoming)) {
+                 std::fprintf(stderr, "strata serve: conversation cache: discard invalid snapshot (%s)\n", err.c_str());
+                 incoming.reset();
+                 err.clear();
+@@ -4966,7 +5012,7 @@ int main(int argc, char** argv) {
+             }
+             if (incoming) {
+                 const auto t0 = Clock::now();
+-                if (strata::core::conversation_snapshot_restore(*incoming, ss, g, mtp.kv_state(), err) !=
++                if (snapshot_restore(*incoming) !=
+                     strata::core::ConversationRestore::restored) {
+                     // Already prevalidated above: a failure here is fatal, never
+                     // permission to decode from a partially restored session.
+@@ -4974,6 +5020,7 @@ int main(int argc, char** argv) {
+                     return 1;
+                 }
+                 if (std::getenv("STRATA_SNAPSHOT_VERIFY") != nullptr) {
++                    const strata::core::OnDevice draft_device(hist_dev);
+                     uint64_t draft_hash = 0;
+                     if (!strata::core::conversation_kv_verify(incoming->kv.back(), mtp.kv_state(), g,
+                             int64_t(incoming->live.ids.size()), false, draft_hash, err)) {
+@@ -4991,7 +5038,7 @@ int main(int argc, char** argv) {
+                 cvec_cached = incoming->cvec;
+                 resume = parked.tokens;
+                 from_live = parked.live;
+-                if (std::getenv("STRATA_SNAPSHOT_FULL_CAPTURE") == nullptr)
++                if (!split_parking && std::getenv("STRATA_SNAPSHOT_FULL_CAPTURE") == nullptr)
+                     conversations.retain(std::move(incoming->kv), int64_t(live.size()));
+                 incoming.reset(); // Running-state/checkpoint copies are no longer needed.
+                 std::fprintf(stderr, "strata serve: conversation cache: restored %lld tokens (%s) in %.1f ms; parked=%zu bytes=%zu\n",
+@@ -5380,6 +5427,8 @@ int main(int argc, char** argv) {
              double dt_run = 0, dt_commit = 0, dt_draft = 0;
              int64_t dec_windows = 0, dec_T = 0;
              const int64_t decode_hits0 = drive.d.cache_hits;
@@ -1643,7 +2109,7 @@ index 53c38a0..c1fc33d 100644
              // CS-T: the RAM and file tiers of this request (the mmap source; 0 with the arena)
              const int64_t ram0 = src.ram_reads(), files0 = src.file_reads();
              const uint64_t file_bytes0 = src.file_read_bytes();
-@@ -5627,6 +5658,9 @@ int main(int argc, char** argv) {
+@@ -5627,6 +5676,9 @@ int main(int argc, char** argv) {
                               (unsigned long long) h_pool_full, ss.ple_prev[0], ss.ple_prev[1]);
              }
              const int64_t req_hits = drive.d.cache_hits - decode_hits0;

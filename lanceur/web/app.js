@@ -160,6 +160,7 @@ async function remoteRefresh(force=false){
     $('remote-save').disabled=false;
     if(!remoteDirty){$('remote-host').value=value.connection.public_host;$('remote-port').value=value.connection.listen_port;}
     $('remote-url').value=value.connection.public_host?value.connection.public_host+':'+value.connection.listen_port+' / UDP':'';
+    $('remote-copy-connection').disabled=remoteDirty||!value.connection.public_host;
     $('remote-route').textContent='Box : rediriger UDP '+value.connection.listen_port+' vers '+(liveState.lan_ips?.[0]||'l’adresse locale du PC serveur')+', port UDP '+value.connection.listen_port+'.';
     $('remote-firewall-state').textContent=value.connection.firewall?.message||'Autorisation Windows : utiliser « Autoriser dans Windows ».';
     $('remote-activate').disabled=remoteDirty||!value.connection.public_host||!value.connection.compiled||!value.gateway_available;
@@ -207,3 +208,11 @@ $('ops-diagnostic').onclick=()=>action(async()=>{const d=await request('/api/dia
 request('/api/releases').then(r=>{document.getElementById('release-status').textContent='Serveur '+r.server_version+' · client '+(r.release.version||'à compiler')+' · '+(r.verified?'empreinte vérifiée':'binaire non vérifié');});
 $('release-prepare').onclick=()=>action(async()=>{toast((await request('/api/releases/prepare',{})).message);});
 $('release-rollback').onclick=()=>action(async()=>{toast((await request('/api/releases/rollback',{})).message);});
+$('remote-copy-connection').onclick=()=>action(async()=>{
+  if(remoteDirty)throw new Error('Enregistrez les paramètres d’accès distant avant de les copier.');
+  const endpoint=$('remote-url').value.replace(/\s*\/\s*UDP\s*$/i,'').trim();
+  if(!endpoint)throw new Error('Enregistrez une adresse publique et un port UDP.');
+  const settings=JSON.stringify({format:'acces-serveur-fred-connection',version:1,protocol:'UDP',endpoint},null,2);
+  try{await navigator.clipboard.writeText(settings);$('remote-copy-status').textContent='Paramètres copiés. Dans le client : Réglages → Connexion → Coller les paramètres.';}
+  catch{$('remote-url').focus();$('remote-url').select();$('remote-copy-status').textContent='Adresse sélectionnée. Copiez avec Ctrl+C et collez-la dans le client distant.';}
+});

@@ -189,6 +189,8 @@ class Workspace:
         self.extract_slots=threading.BoundedSemaphore(2)
         with self.db() as db:
             db.executescript(SCHEMA)
+            if 'archived' not in {r['name'] for r in db.execute('PRAGMA table_info(conversations)')}:
+                db.execute('ALTER TABLE conversations ADD COLUMN archived INTEGER NOT NULL DEFAULT 0')
             for id,name,prompt,tools in DEFAULT_ASSISTANTS:db.execute('INSERT OR IGNORE INTO assistants VALUES(?,?,?,?,1)',(id,name,prompt,tools))
             # Never replay a running action silently after a process interruption.
             lease=db.execute("SELECT value FROM settings WHERE key='worker'").fetchone()
@@ -234,7 +236,7 @@ class Workspace:
             for p in projects:
                 p['documents']=[dict(r) for r in db.execute('SELECT id,title,kind,revision,updated FROM documents WHERE owner=? AND project=? ORDER BY updated DESC',(owner,p['id']))]
                 p['memories']=[dict(r) for r in db.execute('SELECT id,text FROM memories WHERE owner=? AND project=? ORDER BY updated',(owner,p['id']))]
-                p['conversations']=[dict(r) for r in db.execute('SELECT id,title,revision,updated FROM conversations WHERE owner=? AND project=? ORDER BY updated DESC',(owner,p['id']))]
+                p['conversations']=[dict(r) for r in db.execute('SELECT id,title,revision,updated,archived FROM conversations WHERE owner=? AND project=? ORDER BY updated DESC',(owner,p['id']))]
             return {'projects':projects,'assistants':[dict(r) for r in db.execute('SELECT * FROM assistants WHERE enabled=1')],
                     'jobs':[dict(r) for r in db.execute('SELECT id,project,title,state,error,created,due,repeat_hours,parent FROM jobs WHERE owner=? ORDER BY created DESC LIMIT 100',(owner,))],
                     'limits':self.policy(db,owner),'used_bytes':self.usage(db,owner),'capabilities':['projects','documents','assistants','jobs','memory','web']}
@@ -390,7 +392,20 @@ class Workspace:
                 if not r and db.execute('SELECT COUNT(*) FROM conversations WHERE owner=?',(owner,)).fetchone()[0]>=200:raise ValueError('Maximum 200 conversations serveur.')
                 self.quota(db,owner,max(0,len(encoded.encode())-(len(r['messages'].encode()) if r else 0)))
                 revision=r['revision']+1 if r else 1
-                db.execute('INSERT OR REPLACE INTO conversations VALUES(?,?,?,?,?,?,?)',(id,owner,p['id'],title,encoded,revision,now));result={'revision':revision}
+                archived=v.get('archived',bool(r['archived']) if r else False)
+                if type(archived) is not bool:raise ValueError('Archivage invalide.')
+                db.execute('INSERT OR REPLACE INTO conversations(id,owner,project,title,messages,revision,updated,archived) VALUES(?,?,?,?,?,?,?,?)',(id,owner,p['id'],title,encoded,revision,now,int(archived)));result={'revision':revision}
+            elif action in ('conversation_move','conversation_archive'):
+                r=self.own(db,'conversations',v.get('id'),owner)
+                if v.get('revision')!=r['revision']:raise Conflict('Conversation modifiée ailleurs. Rechargez avant de réessayer.')
+                if action=='conversation_move':
+                    p=self.own(db,'projects',v.get('project'),owner)
+                    if p['archived']:raise ValueError('Projet archivé : restaurez-le avant de déplacer une discussion.')
+                    db.execute('UPDATE conversations SET project=?,revision=revision+1,updated=? WHERE id=?',(p['id'],now,r['id']))
+                else:
+                    if type(v.get('archived')) is not bool:raise ValueError('Archivage invalide.')
+                    db.execute('UPDATE conversations SET archived=?,revision=revision+1,updated=? WHERE id=?',(int(v['archived']),now,r['id']))
+                result={'revision':r['revision']+1}
             elif action=='conversation_get':
                 r=self.own(db,'conversations',v.get('id'),owner);r['messages']=json.loads(r['messages']);return r
             elif action=='conversation_delete':
@@ -620,9 +635,16 @@ class Workspace:
             restored=memory.execute("SELECT type,name,sql FROM sqlite_master WHERE name NOT LIKE 'sqlite_%' ORDER BY name").fetchall()
             if [tuple(r) for r in installed]!=restored:
                 # Upgrade only our known previous schema, without executing any restored SQL.
-                previous=[tuple(r) for r in installed if r['name']!='client_histories']
-                if previous!=restored:raise ValueError('Schéma des espaces incompatible.')
-                memory.execute(HISTORY_SCHEMA);raw=memory.serialize()
+                legacy=sqlite3.connect(':memory:')
+                try:
+                    legacy.executescript(SCHEMA)
+                    previous=legacy.execute("SELECT type,name,sql FROM sqlite_master WHERE name NOT LIKE 'sqlite_%' ORDER BY name").fetchall()
+                finally:legacy.close()
+                if restored not in (previous,[r for r in previous if r[1]!='client_histories'],[tuple(r) for r in installed if r['name']!='client_histories']):raise ValueError('Schéma des espaces incompatible.')
+                memory.execute(HISTORY_SCHEMA)
+                if 'archived' not in {r[1] for r in memory.execute('PRAGMA table_info(conversations)')}:
+                    memory.execute('ALTER TABLE conversations ADD COLUMN archived INTEGER NOT NULL DEFAULT 0')
+                raw=memory.serialize()
             if memory.execute('PRAGMA user_version').fetchone()[0]!=1:raise ValueError('Version des espaces incompatible.')
             for table in ('projects','documents','chunks','memories','conversations','jobs','client_histories'):
                 if any(r[0] not in owners for r in memory.execute('SELECT DISTINCT owner FROM '+table)):raise ValueError('Espaces sans accès personnel correspondant.')

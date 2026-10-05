@@ -70,6 +70,51 @@ class WorkspaceTests(unittest.TestCase):
         with self.assertRaises(Denied):self.w.action('b',{'action':'conversation_get','id':id})
         self.assertEqual(self.act('conversation_get',id=id)['messages'],messages)
 
+    def test_move_archive_restore_and_delete_published_conversation(self):
+        identity=secrets.token_hex(16);messages=[{'role':'user','content':'À conserver'}]
+        target=self.act('project_create',title='Projet B')['id']
+        self.act('conversation_save',project=self.p,id=identity,title='Discussion',messages=messages)
+        self.assertEqual(self.act('conversation_move',id=identity,project=target,revision=1)['revision'],2)
+        projects={p['id']:p for p in self.w.snapshot('a')['projects']}
+        self.assertEqual(projects[self.p]['conversations'],[])
+        self.assertEqual(projects[target]['conversations'][0]['id'],identity)
+        with self.assertRaises(Conflict):self.act('conversation_archive',id=identity,archived=True,revision=1)
+        self.act('conversation_archive',id=identity,archived=True,revision=2)
+        reloaded=Workspace(self.home);stored=reloaded.action('a',{'action':'conversation_get','id':identity})
+        self.assertEqual(stored['messages'],messages);self.assertEqual(stored['archived'],1)
+        # Publishing an edited message must preserve the archive state.
+        self.act('conversation_save',id=identity,project=target,title='Renommée',messages=messages,revision=3)
+        self.assertEqual(self.act('conversation_get',id=identity)['archived'],1)
+        self.act('conversation_archive',id=identity,archived=False,revision=4)
+        self.act('conversation_delete',id=identity,revision=5)
+        with self.assertRaises(Denied):self.act('conversation_get',id=identity)
+
+    def test_conversation_actions_reject_other_owner_and_archived_destination(self):
+        identity=secrets.token_hex(16);self.act('conversation_save',id=identity,project=self.p,title='Privée',messages=[])
+        other=self.w.action('b',{'action':'project_create','title':'Autre accès'})['id']
+        with self.assertRaises(Denied):self.act('conversation_move',id=identity,project=other,revision=1)
+        for action,values in [('conversation_move',{'project':other}),('conversation_archive',{'archived':True}),('conversation_delete',{})]:
+            with self.subTest(action=action),self.assertRaises(Denied):self.w.action('b',{'action':action,'id':identity,'revision':1,**values})
+        target=self.act('project_create',title='Archivé')['id']
+        self.act('project_save',id=target,title='Archivé',instructions='',archived=True,revision=1)
+        with self.assertRaises(ValueError):self.act('conversation_move',id=identity,project=target,revision=1)
+        with self.assertRaises(ValueError):self.act('conversation_archive',id=identity,archived=1,revision=1)
+        self.assertEqual(self.act('conversation_get',id=identity)['revision'],1)
+
+    def test_legacy_conversation_database_and_backup_upgrade_preserve_content(self):
+        from workspace import SCHEMA
+        legacy=sqlite3.connect(':memory:');legacy.executescript(SCHEMA)
+        identity=secrets.token_hex(16)
+        legacy.execute('INSERT INTO projects VALUES(?,?,?,?,0,1,?)',(self.p,'a','Ancien projet','',time.time()))
+        legacy.execute('INSERT INTO conversations VALUES(?,?,?,?,?,?,?)',(identity,'a',self.p,'Ancienne discussion','[]',1,time.time()))
+        raw=legacy.serialize();legacy.close()
+        validated=self.w.validate_backup(base64.b64encode(raw).decode(),{'a'})
+        self.w.restore(validated)
+        self.assertEqual(self.act('conversation_get',id=identity)['archived'],0)
+        self.act('conversation_archive',id=identity,archived=True,revision=1)
+        reloaded=Workspace(self.home)
+        self.assertEqual(reloaded.action('a',{'action':'conversation_get','id':identity})['archived'],1)
+
     def test_storage_and_project_quotas(self):
         self.w.admin_action({'action':'policy','owner':'a','limits':{**DEFAULT_LIMITS,'projects':1,'storage_mb':1}},{'a'})
         with self.assertRaises(ValueError):self.act('project_create',title='Débordement')

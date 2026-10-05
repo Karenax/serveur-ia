@@ -54,6 +54,18 @@ class HistoryTests(unittest.TestCase):
         self.remote.connected=True;self.assertTrue(sync.synchronize()['server_synced'])
         self.assertEqual(self.remote.value['history'],changed)
 
+    def test_archive_survives_offline_sync_and_reopening(self):
+        from history_store import validate,HistoryError
+        sync=self.sync();initial=sync.synchronize(history());self.remote.connected=False
+        archived=history();archived['conversations'][0]['archived']=True
+        sync.write(archived,initial['revision'])
+        self.remote.connected=True;sync.synchronize()
+        placeholder=history('',identity='placeholder');placeholder['conversations'][0]['messages']=[]
+        reopened=self.sync('second').synchronize(placeholder)
+        self.assertTrue(reopened['history']['conversations'][0]['archived'])
+        invalid=copy.deepcopy(archived);invalid['conversations'][0]['archived']=1
+        with self.assertRaises(HistoryError):validate(invalid)
+
     def test_concurrent_edits_preserve_both_texts(self):
         one=self.sync();a=one.synchronize(history());two=self.sync('second');b=two.synchronize(history(''))
         self.remote.connected=False
