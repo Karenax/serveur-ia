@@ -20,6 +20,34 @@ sys.path.insert(0,str(ROOT/'client-qwen'))
 import updater
 
 class AccountsTests(unittest.TestCase):
+    def test_update_starts_with_active_api_requests_and_closes_after_preparation(self):
+        import threading
+        from unittest.mock import Mock
+        remote=client.Remote.__new__(client.Remote)
+        remote.activity_lock=threading.Lock();remote.update_lock=threading.Lock()
+        remote.active_requests=3;remote.applying_update=False
+        remote.window=Mock();remote.update_state={}
+        entered=threading.Event();release=threading.Event()
+        def prepare(*args):
+            entered.set()
+            if not release.wait(5):raise TimeoutError('Test update preparation timed out')
+        with patch.object(updater,'prepare',side_effect=prepare) as prepared:
+            try:
+                self.assertTrue(remote.update(True)['busy'])
+                self.assertTrue(entered.wait(2))
+                self.assertTrue(remote.applying_update)
+                remote.window.destroy.assert_not_called()
+                with self.assertRaisesRegex(ValueError,'Installation en cours'):remote.update(True)
+            finally:
+                release.set()
+            self.assertTrue(remote.update_lock.acquire(timeout=2))
+            remote.update_lock.release()
+        prepared.assert_called_once_with(remote,client.protect)
+        remote.window.destroy.assert_called_once()
+        self.assertEqual(remote.active_requests,3)
+        self.assertFalse(remote.update_state['busy'])
+        self.assertNotIn('error',remote.update_state)
+
     def test_password_hash_reset_expiry_disabled_and_throttle(self):
         with tempfile.TemporaryDirectory(dir=HOME) as folder:
             accounts=Accounts(Path(folder));clients=[{'id':'a','revoked':False},{'id':'b','revoked':False}]
@@ -92,12 +120,13 @@ class AccountsTests(unittest.TestCase):
             home=Path(folder);work=home/'update';work.mkdir()
             private,key=keypair()
             profile={'transport':'wireguard','url':'wireguard://10.77.0.1:8766','token':'qwen_0000000000000000_'+'x'*43,'version':'2.9.9','protocol':3,'update_public_key':public(home),'wireguard':{'private_key':private,'server_public_key':key,'preshared_key':key,'address':'10.77.0.2/32','endpoint':'127.0.0.1:1'}}
-            target=home/'QwenClient.exe';shutil.copyfile(source,target)
+            target=home/'Accès serveur Fred.exe';shutil.copyfile(source,target)
             raw=json.dumps(profile).encode()
             with target.open('ab') as stream:stream.write(raw+struct.pack('<I',len(raw))+b'QWENPROFILE1')
             old=hashlib.sha256(target.read_bytes()).hexdigest()
             payload=work/'QwenClient.base.exe';shutil.copyfile(source,payload)
             release=sign({'version':updater.VERSION,'protocol':3,'bytes':payload.stat().st_size,'sha256':hashlib.sha256(payload.read_bytes()).hexdigest()},home)
+            release['client_name']='Fred'
             plan=work/'plan.dpapi';plan.write_bytes(protect(json.dumps({'target':str(target.resolve()),'source':str(payload.resolve()),'profile':profile,'release':release,'pid':99999999,'created':0}).encode()))
             helper=work/'QwenUpdate.exe'
             launch=updater.subprocess.Popen;fail_startup=[False];plan_blob=plan.read_bytes();relaunches=[]
@@ -105,7 +134,7 @@ class AccountsTests(unittest.TestCase):
                 if '--self-test' in args:return launch(args,**kwargs)
                 if len(args)==1:relaunches.append(args[0])
                 if '--update-ack' in args and fail_startup[0]:return SimpleNamespace(pid=0,poll=lambda:1)
-                if '--update-ack' in args:Path(args[-1]).write_text(json.dumps({'version':updater.VERSION,'ready':True}),encoding='utf-8')
+                if '--update-ack' in args:Path(args[-1]).write_text(json.dumps({'version':updater.personal_profile(Path(args[0]))['version'],'ready':True}),encoding='utf-8')
                 return SimpleNamespace(pid=0,poll=lambda:None)
             with patch.object(updater.sys,'executable',str(helper.resolve())),patch.object(updater.subprocess,'Popen',side_effect=test_launch):
                 # A tampered WireGuard identity is rejected even with the correct token and signing pin.
@@ -123,11 +152,27 @@ class AccountsTests(unittest.TestCase):
                 fail_startup[0]=False;plan.write_bytes(plan_blob);shutil.copyfile(source,payload)
                 updater.apply(plan,protect,lambda:profile)
             import releases
-            installed=releases.profile(target)
+            renamed=target
+            self.assertTrue(target.exists())
+            installed=releases.profile(renamed)
             self.assertEqual(installed['wireguard'],profile['wireguard']);self.assertEqual(installed['token'],profile['token'])
             self.assertEqual(installed['version'],updater.VERSION)
-            self.assertEqual(hashlib.sha256((home/'QwenClient.previous-2.9.9.exe').read_bytes()).hexdigest(),old)
+            self.assertEqual(installed['client_name'],'Fred')
+            backups=list((home/'Sauvegardes client Fred').rglob('*.exe'))
+            self.assertEqual([p.name for p in backups],[target.name])
+            self.assertEqual(hashlib.sha256(backups[0].read_bytes()).hexdigest(),old)
             self.assertFalse(plan.exists());self.assertTrue(read_json(home/'QwenClient-update-result.json')['ok'])
+            # A second update preserves the filename and archives the current version.
+            next_version='.'.join(map(str,(*updater.version(updater.VERSION)[:2],updater.version(updater.VERSION)[2]+1)))
+            shutil.copyfile(source,payload)
+            next_release=sign({'version':next_version,'protocol':3,'bytes':payload.stat().st_size,'sha256':hashlib.sha256(payload.read_bytes()).hexdigest()},home)
+            next_release['client_name']='Fred'
+            plan.write_bytes(protect(json.dumps({'target':str(renamed.resolve()),'source':str(payload.resolve()),'profile':installed,'release':next_release,'pid':99999999,'created':0}).encode()))
+            with patch.object(updater.sys,'executable',str(helper.resolve())),patch.object(updater.subprocess,'Popen',side_effect=test_launch),patch.object(updater.subprocess,'run',return_value=SimpleNamespace(returncode=0)):
+                updater.apply(plan,protect,lambda:installed)
+            self.assertTrue(renamed.exists())
+            self.assertEqual([p.name for p in home.glob('*.exe')],[target.name])
+            self.assertEqual(sorted(p.name for p in (home/'Sauvegardes client Fred').rglob('*.exe')),[target.name,target.name])
 
 class AuthGatewayTests(unittest.TestCase):
     # Reuse the fixture, without inheriting and rerunning its full test suite.

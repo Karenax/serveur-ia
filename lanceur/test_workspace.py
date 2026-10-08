@@ -15,7 +15,7 @@ import urllib.request
 import urllib.error
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 sys.path.insert(0,str(Path(__file__).resolve().parent.parent/'client-qwen'))
-from workspace import Workspace,Denied,Conflict,extract,public_url,DEFAULT_LIMITS
+from workspace import Workspace,Denied,Conflict,extract,public_url,DEFAULT_LIMITS,HISTORY_RESET_ID
 from scheduler import Scheduler
 
 class WorkspaceTests(unittest.TestCase):
@@ -23,7 +23,7 @@ class WorkspaceTests(unittest.TestCase):
         self.tmp=tempfile.TemporaryDirectory(prefix='fred-workspace-');self.home=Path(self.tmp.name);self.w=Workspace(self.home)
         self.p=self.act('project_create',title='Projet A')['id']
     def tearDown(self):self.w.stop.set();self.tmp.cleanup()
-    def act(self,action,**values):return self.w.action('a',{'action':action,**values})
+    def act(self,action,**values):return self.w.action('a',{'action':action,'reset_id':HISTORY_RESET_ID,**values})
     def document(self,content='Le budget approuvé est de 2500 euros.'):
         return self.act('document_create',project=self.p,title='Budget',text=content)['id']
     def job(self,**kwargs):return self.act('job_create',project=self.p,prompt='Résume le budget',request_key=secrets.token_hex(16),**kwargs)['id']
@@ -49,12 +49,10 @@ class WorkspaceTests(unittest.TestCase):
 
     def test_explicit_memory_and_permissions(self):
         self.document();m=self.act('memory_create',project=self.p,text='Utiliser les euros')['id']
-        context,sources=self.w.context('a',[{'role':'user','content':'Quel budget ?'}],self.p,'analysis')
+        context,sources=self.w.context('a',[{'role':'user','content':'Quel budget ?'}],self.p)
         self.assertIn('Utiliser les euros',context[0]['content']);self.assertTrue(sources)
-        self.w.admin_action({'action':'assistant_save','id':'restricted','name':'Limité','instructions':'Réponds','enabled':True,'tools':[]},{'a'})
-        context,sources=self.w.context('a',[{'role':'user','content':'Quel budget ?'}],self.p,'restricted')
-        self.assertNotIn('Utiliser les euros',context[0]['content']);self.assertEqual(sources,[])
-        with self.assertRaises(Denied):self.act('search',project=self.p,query='budget',assistant='restricted')
+        self.assertNotIn('assistants',self.w.snapshot('a'))
+        self.assertNotIn('assistants',self.w.snapshot('a')['capabilities'])
         self.act('memory_save',id=m,text='Utiliser les dollars');self.act('memory_delete',id=m)
         self.assertFalse(self.w.snapshot('a')['projects'][0]['memories'])
 
@@ -101,19 +99,32 @@ class WorkspaceTests(unittest.TestCase):
         with self.assertRaises(ValueError):self.act('conversation_archive',id=identity,archived=1,revision=1)
         self.assertEqual(self.act('conversation_get',id=identity)['revision'],1)
 
-    def test_legacy_conversation_database_and_backup_upgrade_preserve_content(self):
-        from workspace import SCHEMA
-        legacy=sqlite3.connect(':memory:');legacy.executescript(SCHEMA)
+    def test_legacy_profiles_and_histories_are_removed_while_documents_survive(self):
+        from workspace import LEGACY_SCHEMA
+        legacy=sqlite3.connect(':memory:');legacy.executescript(LEGACY_SCHEMA)
         identity=secrets.token_hex(16)
         legacy.execute('INSERT INTO projects VALUES(?,?,?,?,0,1,?)',(self.p,'a','Ancien projet','',time.time()))
         legacy.execute('INSERT INTO conversations VALUES(?,?,?,?,?,?,?)',(identity,'a',self.p,'Ancienne discussion','[]',1,time.time()))
+        legacy.execute("INSERT INTO assistants VALUES('code','Code','Anciennes consignes','documents',1)")
+        legacy.execute('INSERT INTO documents VALUES(?,?,?,?,?,?,?,1,?)',(identity,'a',self.p,'Note','Texte conservé',None,'note',time.time()))
+        old={'currentId':identity,'conversations':[{'id':identity,'title':'Ancienne discussion','messages':[{'role':'user','content':'Ancien texte'}]}]}
+        legacy.execute('INSERT INTO client_histories VALUES(?,?,1,?)',('a',json.dumps(old),time.time()))
         raw=legacy.serialize();legacy.close()
         validated=self.w.validate_backup(base64.b64encode(raw).decode(),{'a'})
         self.w.restore(validated)
-        self.assertEqual(self.act('conversation_get',id=identity)['archived'],0)
-        self.act('conversation_archive',id=identity,archived=True,revision=1)
-        reloaded=Workspace(self.home)
-        self.assertEqual(reloaded.action('a',{'action':'conversation_get','id':identity})['archived'],1)
+        self.assertIsNone(self.w.history_read('a')['history'])
+        self.assertEqual(self.w.snapshot('a')['projects'][0]['conversations'],[])
+        self.assertEqual(self.act('document_get',id=identity)['text'],'Texte conservé')
+        with self.w.db() as db:
+            self.assertIsNone(db.execute("SELECT name FROM sqlite_master WHERE name='assistants'").fetchone())
+            self.assertNotIn('assistant',{r[1] for r in db.execute('PRAGMA table_info(jobs)')})
+        # A new conversation survives later restarts; the reset happens once.
+        self.act('conversation_save',id=identity,project=self.p,title='Nouvelle',messages=[])
+        self.assertEqual(Workspace(self.home).snapshot('a')['projects'][0]['conversations'][0]['title'],'Nouvelle')
+
+    def test_old_clients_cannot_republish_deleted_discussions(self):
+        with self.assertRaises(Conflict):
+            self.w.action('a',{'action':'conversation_save','id':secrets.token_hex(16),'project':self.p,'title':'Ancienne','messages':[]})
 
     def test_storage_and_project_quotas(self):
         self.w.admin_action({'action':'policy','owner':'a','limits':{**DEFAULT_LIMITS,'projects':1,'storage_mb':1}},{'a'})
@@ -161,12 +172,12 @@ class WorkspaceTests(unittest.TestCase):
         j=self.job();self.w.generation=lambda *args:'';self.w.run_one()
         self.assertEqual(self.act('job_get',id=j)['state'],'failed')
 
-    def test_web_is_disabled_by_default_and_checked_per_assistant(self):
-        with self.assertRaises(Denied):self.job(kind='web',assistant='research',url='https://example.com')
+    def test_web_is_checked_per_client_and_server_without_profiles(self):
+        with self.assertRaises(Denied):self.job(kind='web',url='https://example.com')
         self.w.admin_action({'action':'web_config','enabled':True},{'a'})
+        with self.assertRaises(Denied):self.job(kind='web',url='https://example.com')
         self.w.admin_action({'action':'policy','owner':'a','limits':{**DEFAULT_LIMITS,'web':True}},{'a'})
-        with self.assertRaises(Denied):self.job(kind='web',assistant='writing',url='https://example.com')
-        j=self.job(kind='web',assistant='research',url='https://example.com')
+        j=self.job(kind='web',url='https://example.com')
         with patch('workspace.fetch_public',return_value={'url':'https://example.com','text':'public facts'}):
             self.w.generation=lambda owner,messages,cancel:messages[0]['content'];self.w.run_one()
         self.assertIn('public facts',self.act('job_get',id=j)['result'])
@@ -250,7 +261,7 @@ class GatewayWorkspaceTests(unittest.TestCase):
                 with remote.open('/v1/workspace') as response:self.assertEqual(json.load(response)['projects'][0]['id'],p)
                 d=post({'action':'document_create','project':p,'title':'note','text':'Texte privé'})['id']
                 self.assertEqual(post({'action':'document_get','id':d})['text'],'Texte privé')
-                j=post({'action':'job_create','project':p,'prompt':'Résume le texte','assistant':'analysis','request_key':secrets.token_hex(16)})['id']
+                j=post({'action':'job_create','project':p,'prompt':'Résume le texte','request_key':secrets.token_hex(16)})['id']
                 # The client tunnel is closed while the server completes the work.
                 remote.close()
                 deadline=time.monotonic()+10

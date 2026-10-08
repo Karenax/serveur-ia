@@ -1,7 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 from PyInstaller.utils.hooks import collect_all
 
-datas = [('D:/Serveur IA/client-qwen/workspace.html', '.'), ('D:/Serveur IA/client-qwen/ui.css', '.'), ('D:/Serveur IA/client-qwen/ui.js', '.'), ('D:/Serveur IA/client-qwen/markdown.js', '.'), ('D:/Serveur IA/client-qwen/corrector.js', '.'), ('D:/Serveur IA/client-qwen/vendor', 'vendor'), ('D:/Serveur IA/client-qwen/chat.html', '.'), ('D:/Serveur IA/client-qwen/LICENSE.txt', '.'), ('D:/Serveur IA/client-qwen/THIRD-PARTY.txt', '.')]
+datas = [('D:/Serveur IA/client-qwen/workspace.html', '.'), ('D:/Serveur IA/client-qwen/ui.css', '.'), ('D:/Serveur IA/client-qwen/ui.js', '.'), ('D:/Serveur IA/client-qwen/attachments.js', '.'), ('D:/Serveur IA/client-qwen/selection.js', '.'), ('D:/Serveur IA/client-qwen/thinking.js', '.'), ('D:/Serveur IA/client-qwen/markdown.js', '.'), ('D:/Serveur IA/client-qwen/corrector.js', '.'), ('D:/Serveur IA/client-qwen/vendor', 'vendor'), ('D:/Serveur IA/client-qwen/chat.html', '.'), ('D:/Serveur IA/client-qwen/LICENSE.txt', '.'), ('D:/Serveur IA/client-qwen/THIRD-PARTY.txt', '.')]
 binaries = [('D:/Serveur IA/client-qwen/wireguard-bridge.exe', '.')]
 hiddenimports = []
 tmp_ret = collect_all('webview')
@@ -47,4 +47,5 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
     version='D:/Serveur IA/client-qwen/product-version.txt',
+    icon=['D:/Serveur IA/client-qwen/fred.ico'],
 )

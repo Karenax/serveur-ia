@@ -84,8 +84,8 @@ Aucun réglage de tunnel, import de profil ou installation WireGuard à effectue
 Le client choisit l'adresse locale sur le même sous-réseau, puis l'adresse
 Internet. La rubrique Connexion au serveur accepte une adresse IP-ou-DNS:port pour
 dépanner. Les paramètres de la rubrique API locale sont des valeurs à copier.
-L'adresse API habituelle est http://127.0.0.1:8081/v1. Un port libre entre 8082
-et 8090 est choisi si 8081 est occupé. Les applications utilisent une API
+L'adresse API habituelle est http://127.0.0.1:17841/v1. Un port libre entre 17842
+et 17850 est choisi si 17841 est occupé. Les applications utilisent une API
 compatible OpenAI et Authorization: Bearer CLE_API_LOCALE.
 GET /v1/models et POST /v1/chat/completions sont disponibles avec streaming.
 Les appels d'outils côté application sont acceptés ; les outils du PC serveur

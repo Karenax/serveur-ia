@@ -1,6 +1,7 @@
 """Locally built releases with SHA-256 integrity and personal-client rollback."""
 import hashlib
 import json
+import re
 from pathlib import Path
 import shutil
 import struct
@@ -30,6 +31,9 @@ def profile(path):
         if not 1 <= size <= 65536: raise ValueError('Profil personnel invalide.')
         f.seek(-16-size,2)
         return json.loads(f.read(size))
+
+def download_name(path, name):
+    return 'Accès serveur Fred.exe'
 
 def manifest(home=HOME):
     source=ROOT/'client-qwen/dist/Accès serveur Fred.exe'
@@ -84,7 +88,7 @@ def _repackage(home):
         values=profile(target) if target.exists() else restored.get(record['id'])
         if values is None:continue
         match(record,values,settings.get('public_key') or None,vault.get('peers',{}).get(record['id']))
-        values.update(version=VERSION,protocol=3,update_public_key=public(home))
+        values.update(version=VERSION,protocol=3,update_public_key=public(home),client_name=record['name'])
         selected.append((target,values))
     stage=Path(tempfile.mkdtemp(prefix='preparation-',dir=directory));prepared=[];committed=[]
     original_versions=read_json(home/'versions-clients.json',{})

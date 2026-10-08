@@ -5,10 +5,20 @@ import sys
 import unittest
 
 sys.path.insert(0,str(Path(__file__).resolve().parent.parent/'client-qwen'))
-from connection_settings import parse,export
+from connection_settings import parse,export,HTTPS_ENDPOINT
 
 
 class ConnectionSettingsTests(unittest.TestCase):
+    def test_https_roundtrip_is_pinned_to_our_origin(self):
+        self.assertEqual(parse('HTTPS://IA.KARENAX.NET/'),HTTPS_ENDPOINT)
+        self.assertEqual(parse(json.dumps(export(HTTPS_ENDPOINT))),HTTPS_ENDPOINT)
+        self.assertEqual(export(HTTPS_ENDPOINT)['protocol'],'HTTPS')
+        for value in ('http://ia.karenax.net','https://other.example','https://ia.karenax.net.evil.example',
+                      'https://ia.karenax.net@evil.example','https://ia.karenax.net:444',
+                      'https://ia.karenax.net/v1','https://ia.karenax.net?token=x',
+                      json.dumps({**export(HTTPS_ENDPOINT),'protocol':'UDP'})):
+            with self.subTest(value=value),self.assertRaises(ValueError):parse(value)
+
     def test_plain_address_and_console_address(self):
         self.assertEqual(parse('  serveur.example:51820  '),'serveur.example:51820')
         self.assertEqual(parse('192.168.1.40:51820 / UDP'),'192.168.1.40:51820')

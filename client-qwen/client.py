@@ -22,11 +22,11 @@ import urllib.error
 import urllib.request
 import time
 from updater import VERSION
-from product import APP_NAME
+from product import APP_NAME, LOCAL_API_PORT, LOCAL_API_LAST_PORT
 import history_store
 from urllib.parse import urlsplit
 from wg_bridge import Bridge,validate_profile,validate_endpoint,connection_candidates
-from connection_settings import parse as parse_connection_settings
+from connection_settings import parse as parse_connection_settings, validate_connection_endpoint, HTTPS_ENDPOINT
 import app_integrations
 
 class Blob(ctypes.Structure):
@@ -56,7 +56,7 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
         return None
 
 class Remote:
-    def __init__(self, profile, opener=None, endpoint=None):
+    def __init__(self, profile, opener=None, endpoint=None, connection_required=False):
         validate_profile(profile)
         self.profile=copy.deepcopy(profile)
         self.url=profile['url']
@@ -67,8 +67,12 @@ class Remote:
         self.bridge=None
         self.bridge_lock=threading.RLock()
         self.opener = opener or urllib.request.build_opener(urllib.request.ProxyHandler({}),NoRedirect())
+        # Default HTTPSHandler verifies the certificate; honor the workplace proxy.
+        self.https_opener = opener or urllib.request.build_opener(urllib.request.ProxyHandler(),NoRedirect())
         self.model = ''
         self.models = []
+        self.model_capabilities = {}
+        self.connection_required = connection_required
         self.session = ""
         self.username = ""
         self.expires_epoch = 0
@@ -86,9 +90,11 @@ class Remote:
         self.diagnostic = {}
         self.events=deque(maxlen=60);self.bridge_starts=0;self.attempts=0
         self.checking=False;self.last_contact=0;self.stream={}
-        self.override=validate_endpoint(endpoint) if endpoint else None
+        self.override=validate_connection_endpoint(endpoint) if endpoint else None
         self.candidates=[self.override] if self.override else connection_candidates(profile)
         self.endpoint=self.candidates[0]
+        if self.connection_required:
+            self.code='connection_selection_required';self.error='Choisissez le mode de connexion.'
 
     def _switch_endpoint(self,endpoint):
         if self.bridge:self.bridge.close();self.bridge=None
@@ -107,10 +113,11 @@ class Remote:
         finally:self.bridge_lock.release()
 
     def set_endpoint(self,endpoint=None):
-        endpoint=validate_endpoint(endpoint) if endpoint else None
+        endpoint=validate_connection_endpoint(endpoint) if endpoint else None
         with self.activity_lock, self.bridge_lock:
             if self.active_requests or self.applying_update:
                 raise ValueError('Attendre la fin de la génération ou de la mise à jour avant de changer d’adresse.')
+            self.connection_required=False
             self.override=endpoint
             self.candidates=[endpoint] if endpoint else connection_candidates(self.profile)
             self._switch_endpoint(self.candidates[0])
@@ -120,9 +127,10 @@ class Remote:
             self.code='connecting';self.checked_at=0;self.diagnostic={}
 
     def state(self):
-        return {'connected':self.connected,'reachable':self.reachable,'model':self.model,
+        return {'connection_required':self.connection_required,'connected':self.connected,'reachable':self.reachable,'model':self.model,
                 'models':list(self.models),'error':self.error,'code':self.code,
                 'endpoint':self.endpoint,'automatic':self.override is None,
+                'transport':'https' if self.endpoint==HTTPS_ENDPOINT else 'wireguard',
                 'checked_at':self.checked_at,'checking':self.checking,'attempts':self.attempts,
                 'bridge_starts':self.bridge_starts,'last_contact':self.last_contact,
                 'events':list(self.events)[-12:],'stream':dict(self.stream),**self.diagnostic}
@@ -141,8 +149,12 @@ class Remote:
             self.model=model
 
     def open(self, path, data=None, request_id=None):
+        if not isinstance(path,str) or not path.startswith('/v1/') or any(c in path for c in ('\\','\r','\n')):
+            raise ValueError('Route API invalide.')
         with self.bridge_lock:
-            if not self.mock:
+            if self.connection_required:raise ValueError('Choisissez le mode de connexion avant de contacter le serveur.')
+            https=self.endpoint==HTTPS_ENDPOINT
+            if not self.mock and not https:
                 if self.bridge and self.bridge.process.poll() is not None:
                     self.bridge.close();self.bridge=None
                 if self.bridge is None:
@@ -150,13 +162,14 @@ class Remote:
                     profile['wireguard']['endpoint']=self.endpoint
                     self.bridge=Bridge(profile)
                     self.bridge_starts+=1;self.event('wireguard_started',number=self.bridge_starts)
-            url=self.url if self.mock else self.bridge.url
-            headers={'Authorization':'Bearer '+self.token} if self.mock else {'X-Qwen-Bridge':self.bridge.key}
+            url=HTTPS_ENDPOINT if https else self.url if self.mock else self.bridge.url
+            headers={'Authorization':'Bearer '+self.token} if self.mock or https else {'X-Qwen-Bridge':self.bridge.key}
+            opener=self.https_opener if https else self.opener
         # Capture the URL and its matching secret together; a reconnect may replace the bridge.
         request = urllib.request.Request(url + path, data=data,
-            headers={**headers, 'Content-Type': 'application/json','X-Qwen-Session':self.session,**({'X-Qwen-Request':request_id} if request_id else {})})
+            headers={**headers, 'User-Agent':'AccesServeurFred/'+VERSION+' (Windows; '+('HTTPS' if https else 'WireGuard')+')', 'Content-Type': 'application/json','X-Qwen-Session':self.session,**({'X-Qwen-Request':request_id} if request_id else {})})
         try:
-            response=self.opener.open(request, timeout=900 if path=="/v1/chat/completions" else 120 if path=="/v1/client/download" else 60 if path in ("/v1/workspace/action","/v1/history") else 30)
+            response=opener.open(request, timeout=900 if path=="/v1/chat/completions" else 120 if path=="/v1/client/download" else 60 if path in ("/v1/workspace/action","/v1/history") else 30)
             self.last_contact=time.time();self.event('server_response',route=path,status=getattr(response,'status',200))
             return response
         except urllib.error.HTTPError as error:
@@ -176,7 +189,6 @@ class Remote:
     def update(self,apply=False):
         with self.activity_lock:
             if self.applying_update:raise ValueError('Installation en cours. Attendre le redémarrage du client.')
-            if apply and self.active_requests:raise ValueError('Attendre la fin des requêtes API avant la mise à jour.')
             if not self.update_lock.acquire(blocking=False):raise ValueError('Une mise à jour est déjà en cours.')
             if apply:self.applying_update=True
         self.update_state={'busy':True,'message':'Téléchargement et vérification…' if apply else 'Vérification de la version serveur…'}
@@ -206,7 +218,7 @@ class Remote:
 
     def check(self):
         with self.bridge_lock:
-            if self.active_requests or self.applying_update:
+            if self.connection_required or self.active_requests or self.applying_update:
                 return self.state()
             candidates=list(dict.fromkeys([self.endpoint,*self.candidates]))
             self.checking=True
@@ -220,6 +232,7 @@ class Remote:
                         data=json.load(response).get('data')
                     if not isinstance(data,list):raise ValueError('Liste des modèles invalide dans /v1/models.')
                     models=list(dict.fromkeys(row['id'] for row in data if isinstance(row,dict) and isinstance(row.get('id'),str) and row['id'].strip() and len(row['id'])<=512))
+                    self.model_capabilities={row['id']:row.get('capabilities',{}) for row in data if isinstance(row,dict) and row.get('id') in models and isinstance(row.get('capabilities',{}),dict)}
                     self.models=models;self.reachable=True
                     if models:
                         if self.model not in models:self.model=models[0]
@@ -247,14 +260,14 @@ class Remote:
                         self.reachable=True
                 except (OSError,ValueError,KeyError,IndexError,TypeError,AttributeError) as error:
                     code='connection_error'
-                    self.error=str(error) if isinstance(error,ValueError) else 'Connexion impossible : vérifier l’adresse du serveur et son port UDP.'
+                    self.error=str(error) if isinstance(error,ValueError) else ('Connexion HTTPS impossible : vérifier le réseau, le proxy et le certificat.' if self.endpoint==HTTPS_ENDPOINT else 'Connexion impossible : vérifier l’adresse du serveur et son port UDP.')
                 diagnostic=self.bridge.status(self.opener) if self.bridge and not self.mock else {}
                 if self.reachable:break
             if not self.connected:self.models=[];self.model=''
             self.code=code;self.diagnostic=diagnostic;self.checked_at=time.time();self.checking=False
             return self.state()
 
-def serve_local(remote, key, port=8081):
+def serve_local(remote, key, port=LOCAL_API_PORT):
     from draft_store import DraftStore
     from history_sync import HistorySync
     drafts=DraftStore(settings_path(remote.profile),protect)
@@ -299,7 +312,7 @@ def serve_local(remote, key, port=8081):
             nonce = secrets.token_urlsafe(24)
             config = json.dumps({'key':key, 'model':remote.model, 'version':VERSION, 'storage':hashlib.sha256(key.encode()).hexdigest()[:20]}, ensure_ascii=False).replace('<', '\\u003c')
             template = Path(getattr(sys, '_MEIPASS', Path(__file__).parent)) / 'chat.html'
-            presentation = ''.join('<script nonce="__NONCE__">'+(template.parent/name).read_text(encoding='utf-8')+'</script>' for name in ('ui.js','corrector.js'))
+            presentation = ''.join('<script nonce="__NONCE__">'+(template.parent/name).read_text(encoding='utf-8')+'</script>' for name in ('ui.js','attachments.js','corrector.js','selection.js','thinking.js'))
             markdown=''.join('<script nonce="__NONCE__">'+path.read_text(encoding='utf-8').replace('</script','<\\/script')+'</script>' for path in (template.parent/'vendor/markdown-it.min.js',template.parent/'markdown.js'))
             content = template.read_text(encoding='utf-8').replace('</head>',markdown+'</head>').replace('</body>',(template.parent/'workspace.html').read_text(encoding='utf-8')+presentation+'</body>').replace('__UI_CSS__',(template.parent/'ui.css').read_text(encoding='utf-8')).replace('__CONFIG__', config).replace('__NONCE__', nonce).encode()
             self.send_response(200)
@@ -341,11 +354,11 @@ def serve_local(remote, key, port=8081):
                 if not state['connected']:return self.reply(401 if state['code'] in ('access_denied','access_revoked','access_suspended','access_expired','remote_disabled') else 503,{'error':{'code':state['code'],'message':state['error']}})
                 if not getattr(remote,'update_checked',False) and remote.profile.get('update_public_key'):
                     remote.update_checked=True;remote.update(False)
-                return self.reply(200,{'object':'list','data':[{'id':model,'object':'model'} for model in state['models']]})
+                return self.reply(200,{'object':'list','data':[{'id':model,'object':'model','capabilities':remote.model_capabilities.get(model,{})} for model in state['models']]})
             self.forward()
 
         def do_POST(self):
-            if self.path not in ('/v1/chat/completions', '/v1/cancel','/v1/workspace/action','/client/draft','/client/endpoint','/client/preferences','/client/update/check','/client/update/apply','/client/history','/client/history/sync','/client/history/flush','/client/history/recover','/client/integrations/apply'):
+            if self.path not in ('/v1/chat/completions','/v1/context', '/v1/cancel','/v1/workspace/action','/client/draft','/client/endpoint','/client/preferences','/client/update/check','/client/update/apply','/client/history','/client/history/sync','/client/history/flush','/client/history/recover','/client/integrations/apply'):
                 return self.reply(404, {'error': {'message': 'Route non disponible.'}})
             if not self.authorized():
                 return
@@ -353,7 +366,7 @@ def serve_local(remote, key, port=8081):
                 if self.headers.get('Transfer-Encoding') or not self.headers.get('Content-Type', '').startswith('application/json'):
                     raise ValueError('Corps JSON attendu.')
                 length = int(self.headers.get('Content-Length', '0'))
-                if not 1 <= length <= (10*1024*1024 if self.path.startswith('/client/history') else 8*1024*1024 if self.path=='/v1/workspace/action' else 2*1024*1024):
+                if not 1 <= length <= (10*1024*1024 if self.path.startswith('/client/history') or self.path in ('/v1/chat/completions','/v1/context') else 8*1024*1024 if self.path=='/v1/workspace/action' else 2*1024*1024):
                     raise ValueError('Requête trop volumineuse (maximum 2 Mo).')
                 body = self.rfile.read(length)
                 streaming = bool(json.loads(body).get('stream'))
@@ -508,7 +521,7 @@ def client_settings(profile):
     try:
         data=json.loads(protect(settings_path(profile).read_bytes(),decrypt=True))
         if not isinstance(data,dict):return {}
-        if data.get('endpoint'):data['endpoint']=validate_endpoint(data['endpoint'])
+        if data.get('endpoint'):data['endpoint']=validate_connection_endpoint(data['endpoint'])
         return data
     except (OSError,ValueError,KeyError):return {}
 
@@ -517,7 +530,8 @@ def save_endpoint(profile,endpoint=None):
     path=settings_path(profile)
     with locked(path):
         values=client_settings(profile)
-        if endpoint:values['endpoint']=validate_endpoint(endpoint)
+        values['connection_selected']=True
+        if endpoint:values['endpoint']=validate_connection_endpoint(endpoint)
         else:values.pop('endpoint',None)
         history_store.atomic(path,protect(json.dumps(values)))
 
@@ -527,7 +541,7 @@ def local_key(profile):
 
 def save_preferences(profile,values):
     allowed={'theme':('light','dark','system'),'font':('system','humanist','serif','mono'),
-             'text_size':('compact','standard','large','extra')}
+             'text_size':('compact','standard','large','extra'),'thinking_effort':('none','low','medium','high')}
     if not isinstance(values,dict) or set(values)-set(allowed)-{'thinking','sidebar_collapsed','corrector_text'}:raise ValueError('Réglages invalides.')
     for name,value in values.items():
         if name in allowed and value not in allowed[name]:raise ValueError('Réglage invalide : '+name)
@@ -576,6 +590,17 @@ def install_close_guard(window):
     window.events.closing+=closing
     return state
 
+def window_geometry():
+    """Keep the initial window inside the Windows work area, including scaled displays."""
+    width,height=1200,780
+    try:
+        area=wintypes.RECT()
+        if ctypes.windll.user32.SystemParametersInfoW(0x0030,0,ctypes.byref(area),0):
+            width=max(400,min(1440,int((area.right-area.left)*0.9)))
+            height=max(320,min(960,int((area.bottom-area.top)*0.9)))
+    except (AttributeError,OSError):pass
+    return {'width':width,'height':height,'min_size':(min(640,width),min(480,height))}
+
 def main():
     if '--self-test' in sys.argv:
         # Packaging smoke check, without a window or a model request.
@@ -607,14 +632,15 @@ def main():
     try:
         import webview
         profile=read_profile()
-        remote=Remote(profile,endpoint=client_settings(profile).get('endpoint'))
+        settings=client_settings(profile)
+        remote=Remote(profile,endpoint=settings.get('endpoint'),connection_required=not (settings.get('connection_selected') or settings.get('endpoint')))
         key=local_key(profile)
-        for port in range(8081,8091):
+        for port in range(LOCAL_API_PORT,LOCAL_API_LAST_PORT+1):
             try:server=serve_local(remote,key,port);break
             except OSError:pass
-        if server is None:raise ValueError('Les ports locaux 8081 à 8090 sont occupés.')
+        if server is None:raise ValueError(f'Les ports locaux {LOCAL_API_PORT} à {LOCAL_API_LAST_PORT} sont occupés.')
         threading.Thread(target=server.serve_forever,daemon=True).start()
-        window=webview.create_window(APP_NAME+' · '+VERSION,f'http://127.0.0.1:{server.server_port}/chat',width=1200,height=820,min_size=(760,600),background_color='#ffffff')
+        window=webview.create_window(APP_NAME+' · '+VERSION,f'http://127.0.0.1:{server.server_port}/chat',background_color='#ffffff',text_select=True,**window_geometry())
         remote.window=window
         install_close_guard(window)
         if '--update-ack' in sys.argv:
@@ -629,10 +655,12 @@ def main():
             def verify_window():
                 time.sleep(1)
                 try:
-                    result=window.evaluate_js("JSON.stringify({title:document.title,login:!!document.getElementById('client-navigation'),update:!!document.getElementById('update-apply'),chat:!!document.getElementById('composer'),state:document.getElementById('account-status').textContent,history:typeof bootstrap==='function',projects:!!document.getElementById('ws-project-list'),tasks:!!document.getElementById('ws-jobs'),assistants:!!document.getElementById('ws-assistants')})")
+                    result=window.evaluate_js("JSON.stringify({title:document.title,login:!!document.getElementById('client-navigation'),update:!!document.getElementById('update-apply'),chat:!!document.getElementById('composer'),state:document.getElementById('account-status').textContent,history:typeof bootstrap==='function',projects:!!document.getElementById('ws-project-list'),tasks:!!document.getElementById('ws-jobs'),assistants:!!document.getElementById('ws-assistants'),textSelection:getComputedStyle(document.body).userSelect,copySelection:!!document.getElementById('copy-selection'),thinkingModes:document.querySelectorAll('#thinking-bar input[type=radio]').length,thinkingInline:document.querySelector('.send-row').contains(document.getElementById('thinking')),documentMenu:!!document.getElementById('ui-context-panel'),attachmentPlus:document.getElementById('attach-file').textContent==='+'})")
                     if isinstance(result,str):result=json.loads(result)
                     assert result['login'] and result['update'] and result['chat'] and result['history'],result
-                    assert result['projects'] and result['tasks'] and result['assistants'],result
+                    assert result['projects'] and result['tasks'] and not result['assistants'],result
+                    assert window.text_select and result['textSelection']!='none' and result['copySelection'],result
+                    assert result['thinkingModes']==4 and result['thinkingInline'] and not result['documentMenu'] and result['attachmentPlus'],result
                     Path(sys.argv[sys.argv.index('--result')+1]).write_text(json.dumps({'ok':True,**result}),encoding='utf-8')
                 finally:window.destroy()
             window.events.loaded+=verify_window

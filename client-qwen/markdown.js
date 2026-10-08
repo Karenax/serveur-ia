@@ -29,7 +29,7 @@ function renderMarkdown(element, text) {
     language.textContent=[...code.classList].find(c=>c.startsWith('language-'))?.slice(9)||'Code';
     const copy=document.createElement('button');copy.type='button';copy.textContent='Copier';
     copy.setAttribute('aria-label','Copier le bloc de code');
-    copy.onclick=async()=>{try{await navigator.clipboard.writeText(code.textContent);copy.textContent='Copié';setTimeout(()=>copy.textContent='Copier',1500);}catch{copy.textContent='Sélectionnez le code';}};
+    copy.onclick=async()=>{try{await copyText(code.textContent);copy.textContent='Copié';setTimeout(()=>copy.textContent='Copier',1500);}catch{copy.textContent='Sélectionnez le code';}};
     toolbar.append(language,copy);pre.prepend(toolbar);
   }
 }

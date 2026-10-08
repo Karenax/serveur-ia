@@ -15,7 +15,7 @@ from unittest.mock import patch
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 sys.path.insert(0,str(Path(__file__).resolve().parent.parent/'client-qwen'))
 from history_sync import HistorySync,merge,fingerprints
-from workspace import Workspace,Conflict
+from workspace import Workspace,Conflict,HISTORY_RESET_ID
 from test_remote import client
 
 def history(text='Texte initial',identity='conversation'):
@@ -24,13 +24,13 @@ def history(text='Texte initial',identity='conversation'):
 class FakeRemote:
     def __init__(self):
         self.connected=True;self.reachable=True;self.code='';self.active_requests=0;self.activity_lock=threading.RLock()
-        self.value={'history':None,'revision':0}
+        self.value={'history':None,'revision':0,'reset_id':HISTORY_RESET_ID}
     def open(self,path,body=None):
         if not self.connected and self.code!='model_unloaded':raise urllib.error.URLError('Hors ligne')
         if body is not None:
             data=json.loads(body)
             if data['revision']!=self.value['revision']:raise urllib.error.HTTPError(path,409,'history_conflict',{},io.BytesIO())
-            self.value={'history':data['history'],'revision':self.value['revision']+1}
+            self.value={'history':data['history'],'revision':self.value['revision']+1,'reset_id':HISTORY_RESET_ID}
         return io.BytesIO(json.dumps(self.value).encode())
 
 class HistoryTests(unittest.TestCase):
@@ -77,7 +77,7 @@ class HistoryTests(unittest.TestCase):
 
     def test_background_revision_conflict_requires_merge(self):
         sync=self.sync();result=sync.synchronize(history())
-        self.remote.value={'history':history('Modification distante'),'revision':2}
+        self.remote.value={'history':history('Modification distante'),'revision':2,'reset_id':HISTORY_RESET_ID}
         sync.write(history('Modification locale'),result['revision']);sync.flush()
         self.assertTrue(sync.status()['needs_merge']);self.assertEqual(self.remote.value['history'],history('Modification distante'))
         merged=sync.synchronize();self.assertEqual(merged['merged'],1)
@@ -104,10 +104,10 @@ class HistoryTests(unittest.TestCase):
     def test_server_history_isolation_revision_and_backup_migration(self):
         workspace=Workspace(self.home);initial=history('Historique privé')
         try:
-            workspace.history_write('a',{'history':initial,'revision':0})
+            workspace.history_write('a',{'history':initial,'revision':0,'reset_id':HISTORY_RESET_ID})
             self.assertIsNone(workspace.history_read('b')['history'])
             owner=workspace.admin()['owners'][0];self.assertEqual(owner['projects'],0);self.assertEqual(owner['conversations'],1);self.assertGreater(owner['used_bytes'],0)
-            with self.assertRaises(Conflict):workspace.history_write('a',{'history':history('Écrasement'),'revision':0})
+            with self.assertRaises(Conflict):workspace.history_write('a',{'history':history('Écrasement'),'revision':0,'reset_id':HISTORY_RESET_ID})
             self.assertEqual(Workspace(self.home).history_read('a')['history'],initial)
             backup=workspace.backup();raw=workspace.validate_backup(backup,{'a'});workspace.restore(raw)
             self.assertEqual(workspace.history_read('a')['history'],initial)
@@ -116,8 +116,26 @@ class HistoryTests(unittest.TestCase):
             legacy=base64.b64encode(db.serialize()).decode();db.close()
             migrated=workspace.validate_backup(legacy,{'a'});workspace.restore(migrated)
             self.assertIsNone(workspace.history_read('a')['history'])
-            workspace.history_write('a',{'history':initial,'revision':0})
+            workspace.history_write('a',{'history':initial,'revision':0,'reset_id':HISTORY_RESET_ID})
         finally:workspace.stop.set()
+
+    def test_upgrade_erases_old_encrypted_cache_without_backup_or_reappearance(self):
+        import history_store
+        path=self.home/'legacy.history.dpapi';old=history('À effacer')
+        history_store.write(path,client.protect,old,'')
+        recovery=path.with_name(path.stem+'.unreadable-old.dpapi')
+        recovery.write_bytes(client.protect(b'ancienne copie'))
+        sync=HistorySync(self.remote,path,client.protect)
+        self.assertIsNone(sync.read()['history']);self.assertFalse(recovery.exists())
+        new=history('Nouvelle discussion')
+        sync.synchronize(new)
+        self.assertEqual(HistorySync(self.remote,path,client.protect).read()['history'],new)
+        self.assertEqual(self.remote.value['history'],new)
+
+    def test_server_rejects_old_client_history_upload_after_reset(self):
+        workspace=Workspace(self.home)
+        with self.assertRaises(Conflict):workspace.history_write('a',{'history':history('Ancienne copie'),'revision':0})
+        self.assertIsNone(workspace.history_read('a')['history'])
 
     def test_preferences_survive_restart_and_preserve_identity(self):
         profile={'url':'wireguard://10.77.0.1:8766','token':'isolated-settings-fixture-identity'}

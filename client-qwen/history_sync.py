@@ -40,9 +40,19 @@ class HistorySync:
     def __init__(self,remote,path,protect):
         self.remote=remote;self.path=Path(path);self.meta_path=self.path.with_suffix('.sync.dpapi');self.protect=protect
         self.lock=threading.RLock();self.worker_lock=threading.Lock();self.worker=None
+        self.reset_path=self.path.with_suffix('.reset-id')
+        with history_store.LOCK,history_store.locked(self.path):
+            reset=self.reset_path.read_text(encoding='utf-8') if self.reset_path.exists() else ''
+            if reset!=history_store.HISTORY_RESET_ID:
+                # This upgrade explicitly discards the old history, without an archive.
+                self.path.unlink(missing_ok=True);self.meta_path.unlink(missing_ok=True)
+                for old in self.path.parent.glob(self.path.stem+'.unreadable-*.dpapi'):
+                    old.unlink()
+                history_store.atomic(self.reset_path,history_store.HISTORY_RESET_ID.encode())
         try:self.meta=json.loads(protect(self.meta_path.read_bytes(),decrypt=True))
         except (OSError,ValueError):self.meta={}
         if not isinstance(self.meta,dict) or not isinstance(self.meta.get('base',{}),dict):self.meta={}
+        self.meta.setdefault('reset_id',history_store.HISTORY_RESET_ID)
         self.result={'server_synced':False,'pending':True,'message':'Copie locale chargée · connexion au serveur nécessaire.'}
 
     def status(self):return dict(self.result)
@@ -63,13 +73,15 @@ class HistorySync:
             with self.remote.activity_lock:self.remote.active_requests-=1
 
     def remember(self,history,local_revision,server_revision):
-        self.meta={'server_revision':server_revision,'local_revision':local_revision,'base':fingerprints(history)}
+        self.meta={'server_revision':server_revision,'local_revision':local_revision,'base':fingerprints(history),'reset_id':history_store.HISTORY_RESET_ID}
         history_store.atomic(self.meta_path,self.protect(json.dumps(self.meta,ensure_ascii=False).encode()))
 
     def synchronize(self,initial=None):
         with self.worker_lock,self.lock:
             try:
                 local=history_store.read(self.path,self.protect);server=self.api();history=local['history'];conflicts=0
+                if server.get('reset_id')!=history_store.HISTORY_RESET_ID:
+                    raise history_store.HistoryError('Mettre à jour le serveur pour utiliser ce client sans profils.')
                 if history is None:
                     # A fresh empty placeholder must never replace an existing server history.
                     history=server['history'] or history_store.validate(initial)
@@ -80,7 +92,7 @@ class HistorySync:
                         history,conflicts=merge(history,server['history'],self.meta.get('base',{}))
                 elif server['history']:history=server['history']
                 if history!=server['history']:
-                    saved=self.api({'history':history,'revision':server['revision']});server['revision']=saved['revision']
+                    saved=self.api({'history':history,'revision':server['revision'],'reset_id':history_store.HISTORY_RESET_ID});server['revision']=saved['revision']
                 if history!=local['history']:
                     local=history_store.write(self.path,self.protect,history,local['revision'])
                 self.remember(history,local['revision'],server['revision'])
@@ -103,7 +115,7 @@ class HistorySync:
                         local=history_store.read(self.path,self.protect);revision=self.meta['server_revision']
                         if not local['history'] or local['revision']==self.meta.get('local_revision'):break
                     # Writes can continue in the encrypted cache during an upload.
-                    saved=self.api({'history':local['history'],'revision':revision})
+                    saved=self.api({'history':local['history'],'revision':revision,'reset_id':history_store.HISTORY_RESET_ID})
                     with self.lock:
                         self.remember(local['history'],local['revision'],saved['revision'])
                         latest=history_store.read(self.path,self.protect)

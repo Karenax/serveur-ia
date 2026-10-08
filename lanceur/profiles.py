@@ -22,8 +22,12 @@ def validate_access(data):
         raise ValueError('Registre des accès invalide.')
     from remote import secure_url
     secure_url(data.get('url',''))
+    deleted=data.get('deleted_clients',[])
+    if not isinstance(deleted,list) or len(deleted)>10000 or any(not isinstance(c,dict) or c.get('revoked') is not True for c in deleted):
+        raise ValueError('Archive des clients supprimés invalide.')
+    deleted_ids={c.get('id') for c in deleted if isinstance(c.get('id'),str)}
     ids=set();addresses=set()
-    for record in data['clients']:
+    for record in data['clients']+deleted:
         identity=record.get('id') if isinstance(record,dict) else None
         if not isinstance(identity,str) or not re.fullmatch(r'[0-9a-f]{16}',identity) or identity in ids:
             raise ValueError('Identifiant client invalide ou dupliqué.')
@@ -38,8 +42,9 @@ def validate_access(data):
             address=ipaddress.ip_interface(record['address'])
             if address.network.prefixlen!=32 or address.ip not in ipaddress.ip_network('10.77.0.0/24') or int(str(address.ip).split('.')[-1]) not in range(2,255):raise ValueError('Adresse client invalide.')
             if len(base64.b64decode(record.get('wireguard_public_key',''),validate=True))!=32:raise ValueError('Clé publique client invalide.')
-            if record['address'] in addresses:raise ValueError('Adresse WireGuard client dupliquée.')
-            addresses.add(record['address'])
+            if identity not in deleted_ids:
+                if record['address'] in addresses:raise ValueError('Adresse WireGuard client dupliquée.')
+                addresses.add(record['address'])
     return data
 
 def match(record,profile,server_key=None,psk=None):

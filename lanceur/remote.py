@@ -89,7 +89,7 @@ class AccessStore:
     def metadata(self):
         with self.lock:
             data = read_json(self.path, {'enabled': False, 'url': '', 'clients': []})
-        return {**data, 'clients': [{k:v for k,v in client.items() if k != 'hash'} for client in data['clients']], 'active': self.active, 'queue': self.scheduler.snapshot(), 'last_connections': dict(self.seen), 'accounts':self.accounts.metadata()}
+        return {**{k:v for k,v in data.items() if k!='deleted_clients'}, 'clients': [{k:v for k,v in client.items() if k != 'hash'} for client in data['clients']], 'active': self.active, 'queue': self.scheduler.snapshot(), 'last_connections': dict(self.seen), 'accounts':self.accounts.metadata()}
 
     def configure(self, values):
         if not isinstance(values.get('enabled'), bool):
@@ -128,6 +128,32 @@ class AccessStore:
             client=next(c for c in data['clients'] if c['id']==identity)
             client.update(wireguard_public_key=public_key,address=address)
             write_json(self.path,data)
+
+    def rename(self, identity, name):
+        if not isinstance(name,str) or not 1<=len(name.strip())<=80 or any(ord(c)<32 or ord(c)==127 for c in name):
+            raise ValueError('Nom du client attendu, entre 1 et 80 caractères, sans caractères de contrôle.')
+        with self.lock:
+            data=read_json(self.path)
+            client=next((c for c in data['clients'] if c['id']==identity),None)
+            if client is None:raise ValueError('Client inconnu.')
+            client['name']=name.strip()
+            write_json(self.path,data)
+            self.audit('client_renamed',identity)
+        return {'message':'Client renommé. Le prochain téléchargement de son EXE utilisera ce nom.'}
+
+    def delete(self, identity):
+        with self.lock:
+            # Revoke first: a write failure must never leave the old EXE authorized.
+            self.revoke(identity)
+            data=read_json(self.path)
+            record=next(c for c in data['clients'] if c['id']==identity)
+            data.setdefault('deleted_clients',[]).append(record)
+            data['clients']=[c for c in data['clients'] if c['id']!=identity]
+            write_json(self.path,data)
+            self.seen.pop(identity,None)
+            write_json(self.home/'connexions.json',self.seen)
+            self.audit('client_deleted',identity)
+        return {'message':'Client supprimé et accès désactivé. Ses conversations et fichiers sont conservés sur le serveur.'}
 
     def executable(self, name, model, profile_factory=None):
         data = self.metadata()
@@ -237,13 +263,15 @@ class AccessStore:
                 return client['id']
         return None
 
+from chat_attachments import capabilities, validate_parts, normalize_reasoning
+
 def chat_request(value, model):
     if not isinstance(value, dict):
         raise ValueError('Requête de chat invalide.')
     allowed = {'model', 'messages', 'stream', 'max_tokens', 'max_completion_tokens', 'temperature',
                'top_p', 'top_k', 'min_p', 'seed', 'presence_penalty', 'frequency_penalty',
                'repetition_penalty', 'chat_template_kwargs', 'tools', 'tool_choice', 'response_format',
-               'parallel_tool_calls', 'stream_options'}
+               'parallel_tool_calls', 'stream_options', 'reasoning_effort'}
     if set(value) - allowed:
         raise ValueError('Paramètre non admis par cette passerelle API.')
     messages = value.get('messages')
@@ -252,8 +280,9 @@ def chat_request(value, model):
     for message in messages:
         if not isinstance(message, dict) or set(message) - {'role', 'content', 'reasoning_content', 'tool_calls', 'tool_call_id', 'name'} or message.get('role') not in ('system', 'user', 'assistant', 'tool'):
             raise ValueError('Message de conversation invalide.')
-        if not isinstance(message.get('content'), str) and not (message.get('content') is None and isinstance(message.get('tool_calls'), list)):
-            raise ValueError('Cette passerelle utilise les messages texte et les appels d’outils du client.')
+        if isinstance(message.get('content'),list):validate_parts(message['content'],message['role'])
+        elif not isinstance(message.get('content'), str) and not (message.get('content') is None and isinstance(message.get('tool_calls'), list)):
+            raise ValueError('Message texte, image ou appel d’outil attendu.')
         if 'reasoning_content' in message and not isinstance(message['reasoning_content'], str):
             raise ValueError('Texte de réflexion invalide.')
     value = dict(value)
@@ -266,8 +295,10 @@ def chat_request(value, model):
     if not isinstance(value.get('stream', False), bool):
         raise ValueError('Mode de réponse invalide.')
     template = value.get('chat_template_kwargs', {})
-    if not isinstance(template, dict) or set(template) - {'enable_thinking'} or ('enable_thinking' in template and not isinstance(template['enable_thinking'], bool)):
+    if not isinstance(template, dict) or set(template) - {'enable_thinking','reasoning_effort'} or ('enable_thinking' in template and not isinstance(template['enable_thinking'], bool)):
         raise ValueError('Réglage de réflexion invalide.')
+    if 'reasoning_effort' in value:value['reasoning_effort']=normalize_reasoning(value['reasoning_effort'])
+    if 'reasoning_effort' in template:template['reasoning_effort']=normalize_reasoning(template['reasoning_effort'])
     return value
 
 def serve_gateway(store, backend, port=GATEWAY_PORT):
@@ -372,7 +403,9 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 from releases import status
                 release=status(store.home)
                 if not release['verified']:return self.respond(503, {'error':{'message':'Version serveur absente ou invalide.'}})
-                if self.path.endswith('/release'):return self.respond(200,release['release'])
+                if self.path.endswith('/release'):
+                    record=next((c for c in store.metadata()['clients'] if c['id']==self.identity),{})
+                    return self.respond(200,{**release['release'],'client_name':record.get('name','Client')})
                 source=ROOT/'client-qwen/dist/Accès serveur Fred.exe'
                 self.send_response(200);self.send_header('Content-Type','application/octet-stream');self.send_header('Content-Length',str(source.stat().st_size));self.send_header('Cache-Control','no-store');self.end_headers()
                 with source.open('rb') as stream:shutil.copyfileobj(stream,self.wfile)
@@ -390,7 +423,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 return self.respond(503, {'error': {'code':'model_unloaded', 'message': 'Serveur connecté, mais le modèle n’est pas chargé. Le lancer dans la console serveur.'}})
             live_model=live.get('model')
             if isinstance(live_model,str) and live_model:model=live_model
-            self.respond(200, {'object': 'list', 'data': [{'id': model, 'object': 'model', 'owned_by': 'local'}]})
+            self.respond(200, {'object': 'list', 'data': [{'id': model, 'object': 'model', 'owned_by': 'local', 'capabilities': capabilities(live)}]})
 
         def do_POST(self):
             if self.path=='/v1/history':
@@ -427,7 +460,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 if not self.authorized(): return
                 scheduler.cancel(self.identity,self.headers.get('X-Qwen-Request') or None)
                 return self.respond(200, {'cancelled': True})
-            if self.path != '/v1/chat/completions':
+            if self.path not in ('/v1/chat/completions','/v1/context'):
                 return self.respond(404, {'error': {'message': 'Route non disponible.'}})
             if not self.authorized():
                 return
@@ -435,22 +468,58 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 return self.respond(415, {'error': {'message': 'Corps JSON attendu.'}})
             try:
                 length = int(self.headers.get('Content-Length', '0'))
-                if not 1 <= length <= 2 * 1024 * 1024:
+                if not 1 <= length <= 10 * 1024 * 1024:
                     raise ValueError('Requête trop volumineuse (maximum 2 Mo).')
                 upstream_port, model, key = backend()
                 raw=json.loads(self.rfile.read(length))
                 if not isinstance(raw,dict):raise ValueError('Requête invalide.')
-                project=raw.pop('project_id',None);assistant=raw.pop('assistant_id','general');document=raw.pop('document_id',None)
+                project=raw.pop('project_id',None);raw.pop('assistant_id',None);document=raw.pop('document_id',None)
                 data = chat_request(raw, model);sources=[]
-                if project or assistant!='general' or document:
-                    data['messages'],sources=store.workspace.context(self.identity,data['messages'],project,assistant,document)
+                if project or document:
+                    data['messages'],sources=store.workspace.context(self.identity,data['messages'],project,document)
             except (OSError, ValueError, TypeError, KeyError) as error:
                 return self.respond(400, {'error': {'message': str(error)}})
             live=health('127.0.0.1', upstream_port)
             if not live.get('loaded'):
                 return self.respond(503, {'error': {'code':'model_unloaded', 'message': 'Serveur connecté, mais le modèle n’est pas chargé. Le lancer dans la console serveur.'}})
+            if any(isinstance(m.get('content'),list) and any(p.get('type')=='image_url' for p in m['content']) for m in data['messages']) and live.get('images') is not True:
+                return self.respond(400,{'error':{'code':'image_not_supported','message':'Le modèle chargé ne dispose pas de la vision. Choisissez un modèle avec prise en charge des images.'}})
             live_model=live.get('model')
             if isinstance(live_model,str) and live_model:data['model']=live_model
+            if self.path == '/v1/context':
+                # Use the backend tokenizer without starting an inference or joining its queue.
+                effort=data.get('reasoning_effort','none')
+                count_request={'model':data['model'],'messages':[],
+                               'output_config':{'effort':effort}}
+                if effort=='none':count_request['thinking']={'type':'disabled'}
+                systems=[];has_images=False
+                for message in data['messages']:
+                    if message['role']=='system':
+                        systems.append(message['content']);continue
+                    content=message['content']
+                    if isinstance(content,list):
+                        has_images|=any(part.get('type')=='image_url' for part in content)
+                        content=''.join(part['text'] for part in content if part.get('type')=='text')
+                    if message.get('reasoning_content'):
+                        content=[{'type':'thinking','thinking':message['reasoning_content']},{'type':'text','text':content}]
+                    count_request['messages'].append({'role':message['role'],'content':content})
+                if systems:count_request['system']='\n'.join(systems)
+                counter=http.client.HTTPConnection('127.0.0.1',upstream_port,timeout=10)
+                try:
+                    headers={'Content-Type':'application/json'}
+                    if key:headers['Authorization']='Bearer '+key
+                    counter.request('GET','/props',headers=headers)
+                    props_response=counter.getresponse();props=json.loads(props_response.read())
+                    capacity=props.get('default_generation_settings',{}).get('n_ctx')
+                    counter.request('POST','/v1/messages/count_tokens',body=json.dumps(count_request),headers=headers)
+                    counted=counter.getresponse();result=json.loads(counted.read())
+                    tokens=result.get('input_tokens')
+                    if props_response.status!=200 or counted.status!=200 or type(capacity) is not int or capacity<=0 or type(tokens) is not int or tokens<0:
+                        raise ValueError('Comptage du contexte indisponible.')
+                    return self.respond(200,{'tokens':tokens,'capacity':capacity,'estimated':has_images,'model':data['model']})
+                except (OSError,ValueError,http.client.HTTPException):
+                    return self.respond(503,{'error':{'message':'Comptage du contexte indisponible.'}})
+                finally:counter.close()
             try:
                 item = scheduler.submit(self.identity,self.headers.get('X-Qwen-Request') or None)
             except ValueError as error:

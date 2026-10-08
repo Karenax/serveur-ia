@@ -8,5 +8,23 @@ const params={format:'acces-serveur-fred-connection',version:1,protocol:'UDP',en
 assert.equal(parse(JSON.stringify(params,null,2)),params.endpoint);
 assert.equal(parse(' serveur.example:51820 / UDP '),params.endpoint);
 assert.equal(parse('[2001:db8::1]:51820'),'[2001:db8::1]:51820');
+assert.equal(parse('HTTPS://IA.KARENAX.NET/'),'https://ia.karenax.net');
+assert.equal(parse(JSON.stringify({...params,protocol:'HTTPS',endpoint:'https://ia.karenax.net'})),'https://ia.karenax.net');
+for(const endpoint of ['https://other.example','https://ia.karenax.net@evil.example','https://ia.karenax.net/v1','https://ia.karenax.net?token=x'])assert.throws(()=>parse(endpoint));
+assert.throws(()=>parse(JSON.stringify({...params,endpoint:'https://ia.karenax.net'})));
 for(const text of ['','{',JSON.stringify({...params,protocol:'TCP'}),JSON.stringify({...params,token:'private'}),JSON.stringify({...params,endpoint:[]}),JSON.stringify({...params,version:true}),'x'.repeat(2049)])assert.throws(()=>parse(text));
 console.log('Connection clipboard parsing OK');
+const elements=new Map(),element=id=>{if(!elements.has(id))elements.set(id,{value:'',disabled:false});return elements.get(id);};
+const modes=vm.createContext({$:element,busy:false,endpointDirty:false});
+vm.runInContext(source.slice(source.indexOf('let uiWireGuardEndpoint='),source.indexOf('function uiReadConnectionParameters(text){')),modes);
+modes.uiConnectionSettings({internet_endpoint:'server.example:51820',connection:{transport:'wireguard'}});
+element('connection-mode').value='https';element('connection-mode').onchange();
+assert.equal(element('endpoint').value,'https://ia.karenax.net');assert.equal(element('endpoint').readOnly,true);
+assert.equal(element('automatic').disabled,true);
+modes.uiConnectionSettings({internet_endpoint:'server.example:51820',connection:{transport:'wireguard'}});
+assert.equal(element('connection-mode').value,'https'); // Unsaved choice survives status refresh.
+element('connection-mode').value='wireguard';element('connection-mode').onchange();
+assert.equal(element('endpoint').value,'server.example:51820');assert.equal(element('endpoint').readOnly,false);
+modes.endpointDirty=false;modes.uiConnectionSettings({connection:{transport:'https'}});
+assert.equal(element('connection-mode').value,'https');
+console.log('Explicit connection mode selection OK');

@@ -7,8 +7,10 @@ import tempfile
 import threading
 import secrets
 from file_lock import locked
+from chat_attachments import validate_message
 
 LOCK = threading.RLock()
+HISTORY_RESET_ID = '20261006-remove-assistants'
 
 class HistoryError(ValueError):
     pass
@@ -24,7 +26,7 @@ def validate(value):
         raise HistoryError('Conserver entre 1 et 200 conversations.')
     ids = set()
     for row in rows:
-        if not isinstance(row, dict) or set(row) - {'id', 'title', 'messages','project_id','assistant_id','document_id','server_revision','archived'}:
+        if not isinstance(row, dict) or set(row) - {'id', 'title', 'messages','project_id','document_id','server_revision','archived'}:
             raise HistoryError('Conversation invalide.')
         if 'archived' in row and type(row['archived']) is not bool:
             raise HistoryError('Archivage de conversation invalide.')
@@ -34,12 +36,13 @@ def validate(value):
         ids.add(identity)
         for field in ('project_id','document_id'):
             if row.get(field) is not None and (not isinstance(row[field],str) or len(row[field])!=32 or any(c not in '0123456789abcdef' for c in row[field])):raise HistoryError('Projet ou document invalide.')
-        if 'assistant_id' in row and (not isinstance(row['assistant_id'],str) or not 1<=len(row['assistant_id'])<=40):raise HistoryError('Assistant invalide.')
         if 'server_revision' in row and (type(row['server_revision']) is not int or row['server_revision']<0):raise HistoryError('Révision invalide.')
         if not isinstance(title, str) or not 1 <= len(title) <= 120 or not isinstance(messages, list) or len(messages) > 1000:
             raise HistoryError('Titre ou messages invalides.')
         for message in messages:
-            if not isinstance(message, dict) or set(message) - {'role', 'content', 'reasoning_content', 'interrupted'}:
+            try:validate_message(message)
+            except ValueError as error:raise HistoryError(str(error)) from error
+            if not isinstance(message, dict) or set(message) - {'role', 'content', 'reasoning_content', 'interrupted', 'attachments'}:
                 raise HistoryError('Message invalide.')
             if message.get('role') not in ('user', 'assistant') or not isinstance(message.get('content'), str):
                 raise HistoryError('Message texte attendu.')

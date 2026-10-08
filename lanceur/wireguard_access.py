@@ -152,6 +152,11 @@ class WireGuardAccess:
             self.store.revoke(identity)
             if self.engine and self.engine.running():self.engine.update(self.peers())
             return {'message':'Accès personnel révoqué dans l’API et dans le tunnel WireGuard.'}
+    def delete(self,identity):
+        with self.lock:
+            result=self.store.delete(identity)
+            if self.engine and self.engine.running():self.engine.update(self.peers())
+            return result
     def deactivate(self):
         with self.lock:
             self.store.configure({'enabled':False,'url':self.store.metadata()['url']})

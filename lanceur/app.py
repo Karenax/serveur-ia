@@ -12,11 +12,11 @@ import socket
 import subprocess
 import threading
 import time
-from urllib.parse import urlsplit
+from urllib.parse import urlsplit, quote
 import psutil
 from core import ROOT, HOME, BASE_PATH, PYTHON, HIDDEN, read_json, write_json, defaults_from_config, validate, build_config, health, matching_servers, process_identity, same_process, stop_processes, available_port, tail, arg
 from operations import Operations, VERSION
-from releases import status as release_status, repackage, rollback
+from releases import status as release_status, repackage, rollback, download_name
 from remote import AccessStore, GATEWAY_PORT, serve_gateway
 from wireguard_access import WireGuardAccess,firewall
 
@@ -293,9 +293,12 @@ def serve(port=8765, controller=None):
                 target = controller.home / 'clients' / (identity + '.exe')
                 if not record or not target.is_file():
                     return self.respond(404, {'error': 'Client absent ou révoqué.'})
+                filename=download_name(target,record['name'])
+                import unicodedata
+                fallback=unicodedata.normalize('NFKD',filename).encode('ascii','ignore').decode()
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/octet-stream')
-                self.send_header("Content-Disposition", f"attachment; filename=\"Acces serveur Fred-{identity}.exe\"; filename*=UTF-8''Acc%C3%A8s%20serveur%20Fred%20-%20{identity}.exe")
+                self.send_header('Content-Disposition', f'attachment; filename="{fallback}"; filename*=UTF-8\'\'{quote(filename,safe="")}')
                 self.send_header('Content-Length', str(target.stat().st_size))
                 self.send_header('Cache-Control', 'no-store')
                 self.send_header('X-Content-Type-Options', 'nosniff')
@@ -365,6 +368,10 @@ def serve(port=8765, controller=None):
                     result = controller.wireguard.create_client(data.get('name'), controller.remote_backend()[1])
                 elif path == '/api/remote/revoke':
                     result = controller.wireguard.revoke(data.get('id'))
+                elif path == '/api/remote/rename':
+                    result = controller.remote.rename(data.get('id'),data.get('name'))
+                elif path == '/api/remote/delete':
+                    result = controller.wireguard.delete(data.get('id'))
                 elif path == '/api/remote/firewall':
                     result = firewall(controller.home)
                 elif path == '/api/remote/activate':

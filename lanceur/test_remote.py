@@ -33,19 +33,77 @@ class FakeModel(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header('Content-Type', 'application/json')
         self.end_headers()
-        self.wfile.write(b'{"service":"strata","loaded":true}')
+        self.wfile.write(b'{"default_generation_settings":{"n_ctx":262144}}' if self.path=='/props' else b'{"service":"strata","loaded":true}')
     def do_POST(self):
         data = json.loads(self.rfile.read(int(self.headers['Content-Length'])))
         self.captured.append((dict(self.headers), data))
         self.send_response(200)
         self.send_header('Content-Type', 'text/event-stream' if data.get('stream') else 'application/json')
         self.end_headers()
+        if self.path=='/v1/messages/count_tokens':
+            self.wfile.write(json.dumps({'input_tokens':len(json.dumps(data).encode())}).encode());return
         if data.get('stream'):
             self.wfile.write(b'data: {"choices":[{"delta":{"content":"Bonjour"}}]}\n\ndata: [DONE]\n\n')
         else:
             self.wfile.write(b'{"choices":[{"message":{"content":"Bonjour"}}]}')
 
 class RemoteTests(unittest.TestCase):
+    def test_https_mode_preserves_personal_access_without_starting_wireguard(self):
+        from connection_settings import HTTPS_ENDPOINT
+        requests=[]
+        class Opener:
+            def open(inner,request,timeout):
+                requests.append(request)
+                return io.BytesIO(b'{"data":[{"id":"https-model"}]}')
+        remote=client.Remote(self.profile,endpoint=HTTPS_ENDPOINT)
+        remote.https_opener=Opener()
+        remote.session=self.session
+        with patch.object(client,'Bridge',side_effect=AssertionError('HTTPS must not start WireGuard')):
+            state=remote.check()
+            self.assertTrue(state['connected']);self.assertEqual(state['transport'],'https')
+            self.assertEqual(state['bridge_starts'],0)
+            for path in ('/v1/history','/v1/workspace/action','/v1/client/release','/v1/client/download','/v1/chat/completions'):
+                with remote.open(path,b'{}'):pass
+        for request in requests:
+            self.assertTrue(request.full_url.startswith(HTTPS_ENDPOINT+'/v1/'))
+            self.assertEqual(request.get_header('Authorization'),'Bearer '+self.access['token'])
+            self.assertEqual(request.get_header('X-qwen-session'),self.session)
+            self.assertIsNone(request.get_header('X-qwen-bridge'))
+        self.assertNotIn(self.access['token'],json.dumps(state))
+        with patch.dict('os.environ',{'LOCALAPPDATA':self.temporary.name}):
+            original=client.local_key(self.profile)
+            client.save_endpoint(self.profile,HTTPS_ENDPOINT)
+            self.assertEqual(client.client_settings(self.profile)['endpoint'],HTTPS_ENDPOINT)
+            self.assertEqual(client.local_key(self.profile),original)
+        remote.set_endpoint(None)
+        self.assertEqual(remote.state()['transport'],'wireguard')
+        self.assertEqual(remote.profile,self.profile)
+
+    def test_https_redirect_never_forwards_personal_token(self):
+        from connection_settings import HTTPS_ENDPOINT
+        redirected=[]
+        class Redirector(BaseHTTPRequestHandler):
+            def log_message(inner,*args):pass
+            def do_GET(inner):
+                if inner.path=='/start':
+                    inner.send_response(302);inner.send_header('Location','/capture');inner.end_headers()
+                else:
+                    redirected.append(dict(inner.headers));inner.send_response(200);inner.end_headers()
+        server=ThreadingHTTPServer(('127.0.0.1',0),Redirector)
+        threading.Thread(target=server.serve_forever,daemon=True).start()
+        remote=client.Remote(self.profile,endpoint=HTTPS_ENDPOINT)
+        try:
+            request=urllib.request.Request(f'http://127.0.0.1:{server.server_port}/start',headers={'Authorization':'Bearer fixture'})
+            with self.assertRaises(urllib.error.HTTPError) as error:remote.https_opener.open(request,timeout=3)
+            self.assertEqual(error.exception.code,302);error.exception.close()
+            self.assertEqual(redirected,[])
+            tls=next(h for h in remote.https_opener.handlers if isinstance(h,urllib.request.HTTPSHandler))
+            if tls._context is not None:
+                import ssl
+                self.assertEqual(tls._context.verify_mode,ssl.CERT_REQUIRED)
+                self.assertTrue(tls._context.check_hostname)
+        finally:server.shutdown();server.server_close()
+
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory(dir=HOME)
         self.store = AccessStore(Path(self.temporary.name))
@@ -112,7 +170,7 @@ class RemoteTests(unittest.TestCase):
             self.assertNotIn('max_completion_tokens',request)
     def test_server_history_requires_personal_access_and_is_isolated(self):
         history={'currentId':'test','conversations':[{'id':'test','title':'Privée','messages':[{'role':'user','content':'texte personnel'}]}]}
-        with self.request('/v1/history',{'history':history,'revision':0}) as response:self.assertEqual(json.load(response)['revision'],1)
+        with self.request('/v1/history',{'history':history,'revision':0,'reset_id':'20261006-remove-assistants'}) as response:self.assertEqual(json.load(response)['revision'],1)
         with self.request('/v1/history') as response:self.assertEqual(json.load(response)['history'],history)
         other=self.store.issue('Second accès isolé')
         with self.request('/v1/history',token=other['token']) as response:self.assertIsNone(json.load(response)['history'])

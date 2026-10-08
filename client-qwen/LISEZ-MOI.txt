@@ -1,11 +1,11 @@
-Accès serveur Fred — version 3.5.1
+Accès serveur Fred — version 3.5.12
 
 WireGuard utilise un emplacement permanent dans %LOCALAPPDATA%\AccesServeurFred\WireGuard.
 Windows conserve ainsi l'autorisation entre les lancements. Une première autorisation
 peut être nécessaire pour cet emplacement ou si le moteur WireGuard change.
 
 Lancez l’EXE personnel remis par le serveur. Il contient les clés du destinataire
-et se connecte automatiquement par WireGuard. Aucun compte ni mot de passe à saisir.
+et demande au premier lancement de choisir Internet (HTTPS) ou WireGuard. Aucun compte ni mot de passe à saisir.
 Chaque destinataire possède un accès distinct, révocable depuis la console serveur.
 
 La fenêtre est organisée par fonction :
@@ -16,13 +16,21 @@ La fenêtre est organisée par fonction :
   Le filtre Archivées retrouve les discussions conservées. Annuler la suppression
   restaure aussi leur publication dans le projet, pendant la session courante.
 - Projets : discussions publiées, consignes, documents éditables, fichiers et mémoire choisie.
-- Assistants : Général, Rédaction, Code, Analyse et Recherche, configurables sur le serveur.
 - Correcteur : texte français, correction grammaticale et orthographique, reformulations
   professionnelle ou amicale, copie et conservation des résultats.
 - Tâches : travail serveur client fermé, résultats, pause, annulation et planification.
 - Réglages : accès personnel, connexion, mises à jour et API locale pour les autres applications.
 
-Dans le chat, choisissez un projet et un assistant. Les passages utiles des documents
+Sélectionnez le texte affiché ou le contenu d’un champ, puis utilisez Ctrl+C,
+le bouton « Copier la sélection » dans l’en-tête ou le clic droit > Copier la sélection.
+Le clic droit propose aussi « Tout sélectionner dans cette zone ».
+La sélection reste possible pendant une réponse ou une correction en cours.
+
+Le bouton Réflexion, à côté de « Sans projet », ouvre une barre de sélection :
+Sans, Faible, Moyen, Élevé. Elle affiche les niveaux annoncés par le serveur.
+Le choix est conservé après fermeture et envoyé avec la prochaine demande.
+
+Dans le chat, choisissez un projet. Les passages utiles des documents
 du projet alimentent la réponse et s'affichent avec leurs références. Toutes les conversations sont enregistrées automatiquement
 sur le serveur, même sans projet. Enregistrer au projet ajoute une discussion au
 projet choisi. Une copie locale chiffrée conserve les modifications hors connexion
@@ -40,6 +48,12 @@ avec une URL HTTPS publique, aucune clé de recherche n'est nécessaire. La rech
 par sujet utilise une clé Brave configurée sur le serveur. Les exports sont en texte
 ou Markdown. Voir ../lanceur/ESPACES-FRED.txt pour les limites et réglages.
 
+Dans Réglages > Connexion, choisissez WireGuard ou HTTPS Cloudflare, puis
+Appliquer la connexion. HTTPS utilise https://ia.karenax.net et le même accès personnel.
+Cloudflare termine le chiffrement HTTPS et peut techniquement lire les données.
+Ce choix est conservé pour votre compte Windows ; aucun basculement automatique
+vers Cloudflare ne se produit. Aucune connexion ne démarre avant ce premier choix.
+
 Automatique privilégie le réseau local quand il est utilisable, puis l’adresse Internet.
 Dans la console serveur, Accès distant > Copier les paramètres pour le client distant
 copie l’adresse et le port UDP. Dans le client, Réglages > Connexion > Coller les
@@ -54,7 +68,7 @@ Gardez le client Fred ouvert ; relancez l’application si la liste n’est pas 
 Le modèle par défaut et les autres fournisseurs restent conservés. Une sauvegarde
 .fred-backup est créée à côté de la configuration avant chaque modification.
 Seule la clé API locale est transmise à ces applications, avec l’adresse locale
-et le nom du modèle. Le tunnel WireGuard reste géré par le client Fred.
+et le nom du modèle. La connexion choisie reste gérée par le client Fred.
 Sur le serveur lui-même, il essaie localhost. La clé publique du serveur reste vérifiée
 après un changement d’adresse. Les modèles sont annoncés par le serveur.
 Le diagnostic distingue modèle arrêté, tunnel indisponible, accès révoqué ou expiré.
@@ -74,12 +88,17 @@ Dans Réglages > Mises à jour, cliquez Vérifier puis Mettre à jour le client 
 proposée. Signature Ed25519, taille et SHA-256 sont vérifiés avant installation.
 Les clés personnelles sont conservées. L’ancienne version reste archivée et est
 restaurée si la nouvelle fenêtre ne confirme pas son démarrage. Une mise à jour
-ou un changement d’adresse attend la fin des requêtes de génération.
-Une mise à jour conserve le chemin de votre EXE existant. Les nouveaux téléchargements
-portent le nom « Accès serveur Fred - identifiant.exe ».
+peut être lancée pendant une discussion ou une requête API : la génération est
+interrompue au redémarrage du client. Un changement d’adresse attend la fin des requêtes.
+Une mise à jour conserve le dossier de votre EXE et lui donne le nom normal
+« Accès serveur Fred vVERSION - nom du client.exe », comme un nouveau téléchargement.
+L’ancien EXE est conservé dans « Sauvegardes client Fred » pour le retour automatique
+en cas d’échec du démarrage. Les suffixes .previous ne sont plus ajoutés au nom.
 
 Gardez l’application ouverte pour son API locale, généralement
-http://127.0.0.1:8081/v1. Un port libre jusqu’à 8090 est choisi si nécessaire.
+http://127.0.0.1:17841/v1. Un port libre jusqu’à 17850 est choisi si nécessaire.
+Après mise à jour depuis une ancienne version, recopiez cette adresse dans vos
+applications ou utilisez Ajouter à OpenCode 2 / Ajouter à Hermes pour l’actualiser.
 Utilisez la clé locale affichée dans API locale. Elle diffère de la clé distante intégrée.
 Fermer l’application ferme le tunnel et l’API locale.
 
@@ -102,3 +121,20 @@ Un EXE distinct par personne ou PC utilisé simultanément. Copier le même EXE
 partage la même identité WireGuard et peut détourner les réponses vers l’autre poste.
 Aucun plafond de tokens par réponse : la capacité de contexte du modèle reste finie.
 Voir ../lanceur/NOUVEAUTES-3.5.0.txt.
+
+Version 3.5.5 : profils Général/Rédaction/Code/Analyse/Recherche supprimés.
+Les anciennes discussions sont effacées du serveur et des copies locales lors de
+la mise à jour, sans archive. Les nouvelles discussions restent synchronisées.
+
+Version 3.5.6 : choix de connexion interne au premier lancement, réflexion visible
+et mémorisée, fichiers TXT/MD/PDF texte/DOCX joints au chat (2 Mo par fichier,
+4 pièces maximum), images PNG/JPEG/WebP si la vision du modèle est activée.
+Les fichiers sont extraits temporairement, puis conservés dans la conversation.
+
+Version 3.5.7 : police et taille appliquées dès la sélection, aperçu fidèle et
+confirmation d’enregistrement. Les titres, tableaux et blocs de code des réponses
+suivent également la taille choisie.
+
+Version 3.5.8 : mise en page adaptative, correcteur utilisant la largeur et la
+hauteur disponibles, texte et résultat côte à côte sur grand écran et empilés
+sur petite fenêtre. La fenêtre initiale respecte la zone de travail de Windows.

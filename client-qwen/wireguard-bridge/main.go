@@ -127,7 +127,7 @@ func runServer(cfg Config, decoder *json.Decoder) error {
 			http.Error(w, "Accès refusé", 403)
 			return
 		}
-		if !((r.Method == "GET" && (r.URL.Path == "/v1/history" || r.URL.Path == "/v1/workspace" || r.URL.Path == "/v1/models" || r.URL.Path == "/v1/status" || r.URL.Path == "/v1/client/release" || r.URL.Path == "/v1/client/download")) || (r.Method == "POST" && (r.URL.Path == "/v1/history" || r.URL.Path == "/v1/workspace/action" || r.URL.Path == "/v1/chat/completions" || r.URL.Path == "/v1/cancel"))) {
+		if !((r.Method == "GET" && (r.URL.Path == "/v1/history" || r.URL.Path == "/v1/workspace" || r.URL.Path == "/v1/models" || r.URL.Path == "/v1/status" || r.URL.Path == "/v1/client/release" || r.URL.Path == "/v1/client/download")) || (r.Method == "POST" && (r.URL.Path == "/v1/history" || r.URL.Path == "/v1/workspace/action" || r.URL.Path == "/v1/chat/completions" || r.URL.Path == "/v1/context" || r.URL.Path == "/v1/cancel"))) {
 			http.NotFound(w, r)
 			return
 		}
@@ -316,7 +316,7 @@ func run() error {
 			json.NewEncoder(w).Encode(status)
 			return
 		}
-		if r.URL.RawQuery != "" || !((r.Method == "GET" && (r.URL.Path == "/v1/history" || r.URL.Path == "/v1/workspace" || r.URL.Path == "/v1/models" || r.URL.Path == "/v1/status" || r.URL.Path == "/v1/client/release" || r.URL.Path == "/v1/client/download")) || (r.Method == "POST" && (r.URL.Path == "/v1/history" || r.URL.Path == "/v1/workspace/action" || r.URL.Path == "/v1/chat/completions" || r.URL.Path == "/v1/cancel"))) {
+		if r.URL.RawQuery != "" || !((r.Method == "GET" && (r.URL.Path == "/v1/history" || r.URL.Path == "/v1/workspace" || r.URL.Path == "/v1/models" || r.URL.Path == "/v1/status" || r.URL.Path == "/v1/client/release" || r.URL.Path == "/v1/client/download")) || (r.Method == "POST" && (r.URL.Path == "/v1/history" || r.URL.Path == "/v1/workspace/action" || r.URL.Path == "/v1/chat/completions" || r.URL.Path == "/v1/context" || r.URL.Path == "/v1/cancel"))) {
 			http.NotFound(w, r)
 			return
 		}

@@ -12,7 +12,7 @@ import time
 from cryptography.fernet import Fernet, InvalidToken
 from core import ROOT, HOME, PYTHON, HIDDEN, read_json, write_json
 
-VERSION = '3.5.1'
+VERSION = '3.5.15'
 FILES = ['reglages.json', 'reglages-par-defaut.json', 'base-strata.json', 'acces-distants.json', 'wireguard.json', 'comptes.json', 'exploitation.json']
 
 def cipher(password, salt):
@@ -106,6 +106,7 @@ class Operations:
             if clients.exists():
                 import struct
                 for exe in clients.glob('*.exe'):
+                    if len(exe.stem)!=16 or any(c not in '0123456789abcdef' for c in exe.stem):continue
                     with exe.open('rb') as f:
                         f.seek(-16, 2); footer=f.read(16)
                         if footer[4:] == b'QWENPROFILE1':
@@ -167,7 +168,7 @@ class Operations:
             if not isinstance(files.get('profiles',{}),dict):raise ValueError('Profils invalides.')
             from profiles import validate_access,match,public_key
             access=validate_access(files['acces-distants.json']) if 'acces-distants.json' in files else {'clients':[]}
-            records={record['id']:record for record in access['clients']}
+            records={record['id']:record for record in access['clients']+access.get('deleted_clients',[])}
             workspace_raw=c.remote.workspace.validate_backup(files['workspace'],set(records)) if 'workspace' in files else None
             web_raw=base64.b64decode(files['web_key'],validate=True) if 'web_key' in files else None
             if web_raw is not None and not 1<=len(web_raw)<=500:raise ValueError('Clé de recherche sauvegardée invalide.')

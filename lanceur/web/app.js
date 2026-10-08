@@ -122,7 +122,7 @@ function openTopic(id){
 }
 document.querySelectorAll('.tab').forEach(tab=>{tab.onclick=()=>openTopic(tab.dataset.tab);tab.onkeydown=e=>{if(!['ArrowDown','ArrowUp','Home','End'].includes(e.key))return;e.preventDefault();const tabs=[...document.querySelectorAll('.tab')];let next=e.key==='Home'?0:e.key==='End'?tabs.length-1:(tabs.indexOf(tab)+(e.key==='ArrowDown'?1:-1)+tabs.length)%tabs.length;openTopic(tabs[next].dataset.tab);tabs[next].focus();};});
 document.querySelectorAll('[data-open]').forEach(button=>button.onclick=()=>openTopic(button.dataset.open));
-window.addEventListener('hashchange',()=>openTopic(location.hash.slice(1)));if(!['spaces','assistants','tasks'].includes(location.hash.slice(1)))openTopic(location.hash.slice(1));
+window.addEventListener('hashchange',()=>openTopic(location.hash.slice(1)));if(!['spaces','tools','tasks'].includes(location.hash.slice(1)))openTopic(location.hash.slice(1));
 let clientsFingerprint='';
 function element(tag,text,className){const node=document.createElement(tag);if(text)node.textContent=text;if(className)node.className=className;return node;}
 function labelled(label,input,help){const field=element('div',null,'field'),lab=element('label',label);lab.htmlFor=input.id;field.append(lab,input);if(help)field.append(element('small',help));return field;}
@@ -137,6 +137,16 @@ function renderClients(value,force=false){
     const title=element('h3',client.name);
     const state=client.revoked?'Accès révoqué':client.suspended?'Accès suspendu':'Accès autorisé';
     header.append(title,element('span',state,'client-badge'+(client.suspended||client.revoked?' warning':'')));card.append(header);
+    const management=element('div',null,'key-row'),rename=element('button','Renommer','button secondary'),remove=element('button','Supprimer','button stop');
+    const editor=element('form',null,'client-name-editor'),name=element('input');editor.hidden=true;name.id='name-'+client.id;name.value=client.name;name.maxLength=80;name.required=true;
+    editor.append(labelled('Nom du client',name,'Ce nom sera repris dans le nom de l’EXE téléchargé.'));
+    const editActions=element('div',null,'key-row'),saveName=element('button','Enregistrer le nom','button primary'),cancelName=element('button','Annuler','button secondary');saveName.type='submit';cancelName.type='button';cancelName.onclick=()=>{editor.hidden=true;};editActions.append(saveName,cancelName);editor.append(editActions);
+    rename.onclick=()=>{editor.hidden=!editor.hidden;if(!editor.hidden){name.value=client.name;name.focus();name.select();}};
+    editor.onsubmit=async event=>{event.preventDefault();if(editor.reportValidity())await remoteAction('/api/remote/rename',{id:client.id,name:name.value});};
+    const deletion=element('div',null,'client-delete');deletion.hidden=true;
+    deletion.append(element('p','Supprimer « '+client.name+' » désactivera son EXE et retirera ce client de la liste. Ses conversations et fichiers resteront sur le serveur.','muted'));
+    const deleteActions=element('div',null,'key-row'),confirmDelete=element('button','Confirmer la suppression','button stop'),cancelDelete=element('button','Annuler','button secondary');confirmDelete.onclick=()=>remoteAction('/api/remote/delete',{id:client.id});cancelDelete.onclick=()=>{deletion.hidden=true;};deleteActions.append(confirmDelete,cancelDelete);deletion.append(deleteActions);
+    remove.onclick=()=>{deletion.hidden=!deletion.hidden;editor.hidden=true;};management.append(rename,remove);card.append(management,editor,deletion);
     card.append(element('p',(client.address?'Adresse privée : '+client.address.replace('/32','')+' · ':'')+(client.expires_epoch?'Expire le '+new Date(client.expires_epoch*1000).toLocaleString():'Accès sans expiration'),'muted'));
     if(client.revoked){card.append(element('p','Cet accès ne peut plus se connecter. Ajoutez un nouveau client pour créer un nouvel accès.','muted'));return card;}
     const downloadRow=element('div',null,'client-download');const link=element('a','Télécharger l’EXE personnel','button primary');link.href='/api/remote/client/'+client.id;downloadRow.append(link,element('small','Connexion automatique avec cet EXE. Conservez-le comme une clé d’accès personnelle.'));card.append(downloadRow);

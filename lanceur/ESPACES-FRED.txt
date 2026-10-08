@@ -1,9 +1,8 @@
-ACCÈS SERVEUR FRED 3.4.0 — ESPACES DE TRAVAIL
+ACCÈS SERVEUR FRED 3.5.5 — ESPACES DE TRAVAIL
 
 Fonctions intégrées
 - Projets : création, recherche, consignes, archivage et restauration.
-- Assistants : Général, Rédaction, Code, Analyse et Recherche ; profils modifiables
-  dans la console, utilisant tous le même modèle chargé.
+- Un seul modèle chargé pour les conversations et les tâches.
 - Documents : notes éditables et fichiers TXT, MD, DOCX et PDF texte ; import 2 Mo,
   extraction bornée dans un processus distinct, index textuel et passages sourcés.
 - Révisions par l'IA : préparation dans une tâche, brouillon à examiner, acceptation
@@ -15,9 +14,9 @@ Fonctions intégrées
 - Mémoire : préférences choisies, modifiables et supprimables par projet.
 - Tâches : analyse/rédaction/recherche web, travail serveur client fermé, résultat,
   pause, annulation, relance, départ différé, récurrence quotidienne ou hebdomadaire.
-- Outils : consultation des documents et de la mémoire selon le profil ; recherche
-  web selon le profil, le droit du client et l'activation globale du serveur.
-- Console : Espaces et fichiers / Assistants et outils / Tâches.
+- Outils : consultation des documents et de la mémoire du projet ; recherche
+  web selon le droit du client et l'activation globale du serveur.
+- Console : Espaces et fichiers / Recherche web / Tâches.
 
 Accès
 Toujours un EXE personnel par destinataire, sans compte ni mot de passe à saisir.
@@ -36,14 +35,14 @@ sur le PC client par DPAPI et récupérables après réouverture. Les conflits d
 une comparaison avant enregistrement. Les imports PDF scannés demandent un OCR préalable.
 
 Les sauvegardes chiffrées comprennent les espaces, fichiers originaux, conversations
-publiées, index, assistants, tâches et clé de recherche. Le schéma, l'intégrité et les
+publiées, index, tâches et clé de recherche. Le schéma, l'intégrité et les
 propriétaires sont contrôlés avant restauration. Les tâches restaurées et celles
 interrompues en cours d'exécution attendent une relance manuelle, pour éviter un rejeu
 silencieux. Les tâches en attente survivent à un redémarrage ordinaire du serveur.
 
 Recherche web
-Dans Assistants et outils : activer la recherche ; autoriser également le client
-dans Espaces et fichiers. Utiliser un assistant doté du droit web, comme Recherche.
+Dans Recherche web : activer la recherche ; autoriser également le client
+dans Espaces et fichiers.
 Dans le client, créer une tâche Recherche web :
 - Avec une URL HTTPS publique : lecture du site, sans clé de fournisseur.
 - Sans URL : recherche Brave Search, nécessitant sa clé API sur le serveur.
@@ -85,3 +84,7 @@ la coordination automatique d'agents et l'exécution de code dans des conteneurs
 restent des extensions futures. Elles n'étaient pas les lots retenus pour cette version.
 
 Interface 3.4.0 : voir REFONTE-INTERFACE.txt pour la nouvelle navigation et ses contrôles.
+
+Version 3.5.5 : les cinq profils sont supprimés. Les anciennes discussions du
+serveur et des caches locaux sont effacées sans archive. Une ancienne copie locale
+ne peut plus republier cet historique. Les nouvelles discussions se synchronisent.
