@@ -19,6 +19,7 @@ import threading
 import time
 from devices import Revocations, fields as device_fields
 from scheduler import Scheduler
+from text_transform import CancellableResponse, TextTransforms, transform_request
 from accounts import Accounts
 from operations import VERSION
 from workspace import Workspace, Conflict, Denied
@@ -80,6 +81,7 @@ class AccessStore:
         self.storage = None
         self.hermes = None
         self.scheduler = Scheduler()
+        self.text_transforms = TextTransforms()
         self.accounts = Accounts(home)
         self.workspace = Workspace(home)
         from voice import VoiceService
@@ -681,10 +683,32 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 except (ValueError,OSError,TypeError,ImportError) as error:return self.respond(400,{'error':{'message':str(error)}})
             if self.path == '/v1/cancel':
                 if not self.authorized(): return
+                try:
+                    if self.headers.get('Transfer-Encoding'):raise ValueError('Corps JSON attendu.')
+                    length=int(self.headers.get('Content-Length','0'))
+                    if not 0<=length<=4096:raise ValueError('Requête d’annulation trop volumineuse.')
+                    value={}
+                    if length:
+                        if not self.headers.get('Content-Type','').startswith('application/json'):raise ValueError('Corps JSON attendu.')
+                        value=json.loads(self.rfile.read(length))
+                    if not isinstance(value,dict) or set(value)-{'text_transform'}:raise ValueError('Requête d’annulation invalide.')
+                    direct='text_transform' in value
+                    if direct and value['text_transform'] is not True:raise ValueError('Annulation de transformation invalide.')
+                    request=self.headers.get('X-Qwen-Request') or None
+                    if request is not None or direct:store.text_transforms.request_id(request)
+                    # A receipt survives cancellation arriving before submit or during health checks.
+                    if direct:store.text_transforms.cancel(self.identity,request)
+                    with scheduler.condition:
+                        transforms=[item['id'] for item in scheduler.requests if item['owner']==self.identity and item.get('text_transform') and (request is None or item['id']==request)]
+                    for target in transforms:store.text_transforms.cancel(self.identity,target)
+                    scheduler.cancel(self.identity,request)
+                    manager=getattr(store.hermes,'conversations',None)
+                    agent_active=request is None and manager is not None and manager.context(self.identity) is not None
+                    if direct or (transforms and not agent_active):return self.respond(200,{'cancelled':True,'request_id':request})
+                except (ValueError,TypeError,OSError) as error:return self.respond(400,{'error':{'message':str(error)}})
                 if store.hermes:
-                    try:return self.respond(200,store.hermes.cancel(self.identity,self.headers.get('X-Qwen-Request') or None))
+                    try:return self.respond(200,store.hermes.cancel(self.identity,request))
                     except ValueError as error:return self.respond(400,{'error':{'message':str(error)}})
-                scheduler.cancel(self.identity,self.headers.get('X-Qwen-Request') or None)
                 return self.respond(200, {'cancelled': True})
             if self.path not in ('/v1/chat/completions','/v1/context'):
                 return self.respond(404, {'error': {'message': 'Route non disponible.'}})
@@ -706,8 +730,12 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                     for message in raw['messages']:
                         if isinstance(message,dict):message.pop('turn_id',None)
                 project=raw.pop('project_id',None);raw.pop('assistant_id',None);document=raw.pop('document_id',None)
-                data = chat_request(raw, model);sources=[]
-                if not (store.hermes and self.path=='/v1/chat/completions') and (project or document or getattr(store.workspace,'knowledge',None)):
+                text_transform='text_transform' in raw
+                if text_transform and self.path!='/v1/chat/completions':raise ValueError('Transformation réservée à la route de génération.')
+                data = chat_request(transform_request(raw) if text_transform else raw, model);sources=[]
+                direct_request=store.text_transforms.request_id(self.headers.get('X-Qwen-Request') or secrets.token_hex(16)) if text_transform else None
+                if text_transform and store.text_transforms.cancelled(self.identity,direct_request):raise ValueError('Demande annulée.')
+                if not text_transform and not (store.hermes and self.path=='/v1/chat/completions') and (project or document or getattr(store.workspace,'knowledge',None)):
                     data['messages'],sources=store.workspace.context(self.identity,data['messages'],project,document)
             except (OSError, ValueError, TypeError, KeyError) as error:
                 return self.respond(400, {'error': {'message': str(error)}})
@@ -718,7 +746,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 return self.respond(400,{'error':{'code':'image_not_supported','message':'Le modèle chargé ne dispose pas de la vision. Choisissez un modèle avec prise en charge des images.'}})
             live_model=live.get('model')
             if isinstance(live_model,str) and live_model:data['model']=live_model
-            if store.hermes and self.path=='/v1/chat/completions':
+            if store.hermes and not text_transform and self.path=='/v1/chat/completions':
                 request=self.headers.get('X-Qwen-Request') or turn or secrets.token_hex(16)
                 if turn and turn!=request:return self.respond(400,{'error':{'message':'Identité d’envoi incohérente.'}})
                 if not conversation:return self.respond(409,{'error':{'code':'client_update_required','message':'Mettez à jour le client pour utiliser votre assistant Hermes.'}})
@@ -783,7 +811,10 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                     return self.respond(503,{'error':{'message':'Comptage du contexte indisponible.'}})
                 finally:counter.close()
             try:
-                item = scheduler.submit(self.identity,self.headers.get('X-Qwen-Request') or None)
+                item = scheduler.submit(self.identity,direct_request or self.headers.get('X-Qwen-Request') or None)
+                if text_transform:
+                    with scheduler.condition:item['text_transform']=True
+                    if store.text_transforms.cancelled(self.identity,item['id']):scheduler.cancel(self.identity,item['id'])
             except ValueError as error:
                 return self.respond(429, {'error': {'message': str(error)}})
             connection = None
@@ -818,6 +849,8 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 store.audit('inference_started', self.identity)
                 # Fixed local destination. No user URL, forwarded identity or remote API key reaches Strata.
                 connection = http.client.HTTPConnection('127.0.0.1', upstream_port, timeout=120)
+                if text_transform:
+                    connection.response_class=lambda *args,**kwargs:CancellableResponse(*args,valid=lambda:not item['cancelled'] and store.authenticate(self.access_token)==self.identity,**kwargs)
                 headers = {'Content-Type': 'application/json'}
                 if key:
                     headers['Authorization'] = 'Bearer ' + key

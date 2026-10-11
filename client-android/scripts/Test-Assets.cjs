@@ -54,6 +54,7 @@ async function browserCheck(){
     if(req.url==='/v1/workspace')return respond(res,{projects:[project],jobs:[]});
     if(req.url==='/v1/context')return respond(res,{tokens:15,capacity:4096,estimated:false});
     if(req.url==='/v1/chat/completions'){
+      if(body.text_transform){assert.deepEqual(body,{text_transform:{mode:'correct',text:'Je veut vérifier la réponse JSON complète.'},stream:true});assert(state.jsonFallback);return respond(res,{choices:[{message:{role:'assistant',content:'Le correcteur accepte une réponse JSON.'},finish_reason:'stop'}]});}
       assert.equal(body.turn_id,req.headers['x-qwen-request']);assert.equal(typeof body.history_revision,'string');assert(body.conversation_id);
       if(state.jsonFallback)return respond(res,{choices:[{message:{role:'assistant',content:'Le correcteur accepte une réponse JSON.'},finish_reason:'stop'}]});
       res.writeHead(200,{'Content-Type':'text/event-stream; charset=utf-8','Cache-Control':'no-cache'});

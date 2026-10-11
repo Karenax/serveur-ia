@@ -1,6 +1,13 @@
 # Conversations Fred avec Hermes
 
-Les clients Windows 3.5.23 et Android 1.0.6/code 7 envoient leurs demandes à Fred. Le serveur confie chaque conversation à Hermes, qui utilise le Qwen local déjà chargé et les outils autorisés. Le correcteur et les tâches rédactionnelles utilisent également Hermes. Le modèle reste partagé : un compte ne charge pas un autre Qwen.
+Les clients Windows 3.5.24 et Android 1.0.7/code 8 envoient leurs demandes à Fred. Le serveur confie chaque conversation et les tâches rédactionnelles à Hermes, qui utilise le Qwen local déjà chargé et les outils autorisés. Les trois actions du correcteur — Corriger, Reformuler professionnel et Reformuler amical — utilisent directement Qwen. Le modèle reste partagé : un compte ne charge pas un autre Qwen.
+
+Le correcteur utilise la route authentifiée `/v1/chat/completions` avec
+`text_transform: {mode, text}`. Le serveur impose la consigne du mode choisi
+et traite le texte comme une entrée à transformer. Ce parcours conserve les
+autorisations Fred, la file du modèle et l’annulation ; il ne crée pas de session
+Hermes et n’appelle pas ses outils. Les conversations ordinaires conservent
+leurs sessions, leurs projets et les outils Hermes.
 
 ## Comptes et projets
 

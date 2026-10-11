@@ -27,6 +27,7 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--duration", type=int, default=3600)
     parser.add_argument("--lots6-8", action="store_true", help="Use actual isolated Workspace/Notifications modules")
+    parser.add_argument("--corrector", action="store_true", help="Verify direct-corrector bodies in the real Android tunnel")
     parser.add_argument("--engine", type=Path, help="Isolated staged bridge, leaving a live production executable untouched")
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[2]
@@ -36,6 +37,7 @@ def main():
     stop_file.unlink(missing_ok=True)
     token = "qwen_" + secrets.token_hex(8) + "_" + secrets.token_urlsafe(32)
     state = {"history": None, "revision": 0, "requests": {}, "rejected": 0}
+    corrector_modes = {}
     guard = threading.Lock()
     workspace = notifications = None
     owner = token.split("_")[1]
@@ -116,6 +118,21 @@ def main():
                         state["revision"] += 1
                     self.json_reply({"history": state["history"], "revision": str(state["revision"]), "reset_id": "20261006-remove-assistants"})
             elif self.path == "/v1/chat/completions":
+                if args.corrector:
+                    transform = body.get("text_transform", {})
+                    mode = transform.get("mode") if isinstance(transform, dict) else None
+                    valid = (set(body) <= {"text_transform", "stream", "model"}
+                             and isinstance(transform, dict) and set(transform) == {"mode", "text"}
+                             and mode in ("correct", "professional", "friendly")
+                             and transform.get("text") == "Texte synthétique Android à transformer."
+                             and not any(key in body for key in ("messages", "project", "document", "conversation_id"))
+                             and body.get("stream") is True
+                             and len(self.headers.get("X-Qwen-Request", "")) == 32)
+                    with guard:
+                        corrector_modes[str(mode)] = {"body_preserved": valid, "calls": corrector_modes.get(str(mode), {}).get("calls", 0) + 1}
+                    if not valid:
+                        self.json_reply({"error": {"message": "Synthetic corrector contract rejected"}}, 400)
+                        return
                 text = "Connexion Android WireGuard vérifiée. **Réponse de test** reçue par le tunnel."
                 if not body.get("stream"):
                     self.json_reply({"choices": [{"message": {"role": "assistant", "content": text}, "finish_reason": "stop"}]})
@@ -148,7 +165,9 @@ def main():
             else:
                 self.json_reply({"error": {"message": "Unknown fixture route"}}, 404)
             with guard:
-                (output / "request-counts.json").write_text(json.dumps({k: state[k] for k in ("requests", "rejected")}), encoding="utf-8")
+                counts = {k: state[k] for k in ("requests", "rejected")}
+                if args.corrector: counts["corrector_modes"] = corrector_modes
+                (output / "request-counts.json").write_text(json.dumps(counts), encoding="utf-8")
 
     api = ThreadingHTTPServer(("127.0.0.1", 0), API)
     threading.Thread(target=api.serve_forever, daemon=True).start()

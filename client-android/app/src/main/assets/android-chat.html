@@ -391,7 +391,7 @@ function renderMarkdown(element, text) {
       finally{window.conversationOnReplyEnd?.(answer);agentClearApproval();$('queue-state').textContent='';if(!answer.content&&!answer.reasoning_content){messages.pop();view.article.remove();}controller=null;cancelPending=false;save();try{await flushHistory();serverHistoryReady=false;await syncServerHistory(true);}catch(e){error(e);}busy=false;render();drawLibrary();buttons();if(matchMedia('(pointer:fine)').matches)$('prompt').focus();models();}
     });
     $('prompt').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)&&!e.isComposing){e.preventDefault();$('composer').requestSubmit();}});
-    $('cancel').onclick=async()=>{if(cancelPending||!busy)return;const oldController=controller,oldId=requestId;cancelPending=true;agentClearApproval();replyProgress.phase='stopping';$('queue-state').textContent='Arrêt en cours…';$('cancel').disabled=true;try{await api('/v1/cancel',{}, {'X-Qwen-Request':oldId});if(requestId===oldId)oldController?.abort();}catch(e){cancelPending=false;error(e);$('queue-state').textContent='Arrêt à confirmer · connexion au serveur nécessaire';}finally{$('cancel').disabled=false;}};
+    $('cancel').onclick=async()=>{if(cancelPending||!busy)return;const oldController=controller,oldId=requestId,cancelBody=window.generationCancelBody?.()||{};cancelPending=true;agentClearApproval();replyProgress.phase='stopping';$('queue-state').textContent='Arrêt en cours…';$('cancel').disabled=true;try{await api('/v1/cancel',cancelBody, {'X-Qwen-Request':oldId});if(requestId===oldId)oldController?.abort();}catch(e){cancelPending=false;error(e);$('queue-state').textContent='Arrêt à confirmer · connexion au serveur nécessaire';}finally{$('cancel').disabled=false;}};
     $('new').onclick=()=>{if(conversationLocked())return;if(library.length>=200){error('Limite de 200 conversations atteinte. Exportez votre historique.');return;}save();currentId=crypto.randomUUID();messages=[];chatAttachments=[];attachmentRender();library.unshift({id:currentId,title:'Nouvelle conversation',messages});$('conversation-filter').value='active';save();drawLibrary();render();showView('chat');error('');$('prompt').focus();};
     async function api(path,body,headers={}){try{const r=await fetch(path,{method:body?'POST':'GET',headers:{Authorization:'Bearer '+config.key,'Content-Type':'application/json',...headers},body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(path==='/v1/models'?90000:['/v1/workspace/action','/client/history/sync'].includes(path)?65000:35000)});const value=await r.json();if(!r.ok){const e=new Error(value.error?.message||'Action refusée');e.status=r.status;e.code=value.error?.code;throw e;}return value;}catch(e){if(path.startsWith('/v1/')&&['TypeError','TimeoutError'].includes(e.name)){e.code='connection_error';e.message='Le serveur ne répond pas. Vérifier la connexion puis réessayer.';}connectionFailure(e);throw e;}}
     async function clientState(){
@@ -957,11 +957,12 @@ uiPaths.corrector='M4 20l4-1L21 6l-3-3L5 16l-1 4M9 8l2 2 4-4M4 3h5';uiNavTitles.
 const correctorNav=wsElement('button','Correcteur','nav-button');correctorNav.dataset.viewButton='corrector';correctorNav.onclick=()=>showView('corrector');
 document.querySelector('#client-navigation').insertBefore(correctorNav,document.querySelector('[data-view-button="tasks"]'));uiDecorateNavigation();
 let correctorRunning=false,correctorDirty=false,correctorDraftTimer=null,correctorAnswer={content:''};
+window.generationCancelBody=()=>correctorRunning?{text_transform:true}:{};
 function correctorResultDisplay(){const show=correctorRunning||!!correctorAnswer.content;$('corrector-result-empty').hidden=show;$('corrector-result').hidden=!show;}
 const correctorModes={
-  correct:{label:'Corriger',instruction:'Corrige l’orthographe, la grammaire, la conjugaison, les accords et la ponctuation du texte français. Conserve son sens, son registre, ses paragraphes et ses informations. Retourne uniquement le texte corrigé, sans explication ni introduction.'},
-  professional:{label:'Reformuler professionnel',instruction:'Reformule intégralement le texte en français professionnel, clair, poli et naturel. Conserve toutes les informations et le sens exact. N’ajoute aucun fait ni engagement. Respecte les paragraphes utiles. Retourne uniquement le texte reformulé, sans explication ni introduction.'},
-  friendly:{label:'Reformuler amical',instruction:'Reformule intégralement le texte en français amical et familier, naturel et chaleureux, avec tutoiement. Corrige aussi l’orthographe et la grammaire. Conserve toutes les informations et le sens exact, sans ajouter de fait ni engagement. Retourne uniquement le texte reformulé, sans explication ni introduction.'}
+  correct:{label:'Corriger'},
+  professional:{label:'Reformuler professionnel'},
+  friendly:{label:'Reformuler amical'}
 };
 const correctorButtonsOnce=buttons;buttons=function(){correctorButtonsOnce();for(const id of ['corrector-correct','corrector-pro','corrector-friendly'])$(id).disabled=busy||historySyncPending||!connected;$('corrector-text').readOnly=correctorRunning;$('corrector-cancel').hidden=!correctorRunning;$('corrector-reuse').disabled=correctorRunning||!correctorAnswer.content;$('corrector-copy').disabled=!correctorAnswer.content;};
 const correctorShowOnce=showView;showView=function(name){correctorShowOnce(name);if(name==='corrector'){$('workspace-heading').textContent='Correcteur de français';if(!correctorRunning&&!correctorAnswer.content){const recent=library.find(c=>c.title.startsWith('Correcteur ·'));const answer=recent?.messages.findLast(m=>m.role==='assistant');if(answer?.content){correctorAnswer=answer;renderMarkdown($('corrector-result'),answer.content);$('corrector-result-card').hidden=false;correctorResultDisplay();}}}};
@@ -972,15 +973,15 @@ $('corrector-cancel').onclick=()=>{$('cancel').click();};
 async function correctorRun(mode){
   if(busy||historySyncPending||!connected)return;const source=$('corrector-text').value.trim();if(!source){$('corrector-status').textContent='Saisissez le texte à retravailler.';$('corrector-text').focus();return;}
   if(library.length>=200){error('Exportez puis supprimez une conversation pour enregistrer ce résultat.');return;}
-  try{await uiPersistPreferences();await flushHistory();}catch(e){error(e);return;}
-  const instruction=correctorModes[mode],turn=crypto.randomUUID().replaceAll('-','');currentId=crypto.randomUUID();correctorAnswer={role:'assistant',content:'',reasoning_content:'',turn_id:turn};
-  messages=[{role:'user',content:instruction.label+' :\n\n'+source,turn_id:turn},correctorAnswer];library.unshift({id:currentId,title:'Correcteur · '+instruction.label+' · '+source.slice(0,40),messages});
-  error('');correctorRunning=true;busy=true;replyProgress={phase:'requesting',started:Date.now(),lastEvent:Date.now()};controller=new AbortController();requestId=turn;cancelPending=false;agentClearApproval();buttons();save();
+  try{await uiPersistPreferences();}catch(e){error(e);return;}
+  const instruction=correctorModes[mode];currentId=crypto.randomUUID();correctorAnswer={role:'assistant',content:'',reasoning_content:''};
+  messages=[{role:'user',content:instruction.label+' :\n\n'+source},correctorAnswer];library.unshift({id:currentId,title:'Correcteur · '+instruction.label+' · '+source.slice(0,40),messages});
+  error('');correctorRunning=true;busy=true;replyProgress={phase:'requesting',started:Date.now(),lastEvent:Date.now()};controller=new AbortController();requestId=crypto.randomUUID().replaceAll('-','');cancelPending=false;buttons();save();
   $('corrector-result-card').hidden=false;correctorResultDisplay();renderMarkdown($('corrector-result'),'');$('corrector-status').textContent=instruction.label+' · en cours…';
   const details=wsElement('details'),reasoning=wsElement('div');details.hidden=true;
   const view={content:$('corrector-result'),details,reasoning};
   try{
-    await flushHistory();const response=await fetch('/v1/chat/completions',{method:'POST',headers:{Authorization:'Bearer '+config.key,'Content-Type':'application/json','X-Qwen-Request':requestId},signal:controller.signal,body:JSON.stringify({conversation_id:currentId,turn_id:requestId,history_revision:historyRevision,model:config.model,messages:[{role:'system',content:instruction.instruction},{role:'user',content:messages[0].content}],stream:true,chat_template_kwargs:{enable_thinking:false}})});
+    await flushHistory();const response=await fetch('/v1/chat/completions',{method:'POST',headers:{Authorization:'Bearer '+config.key,'Content-Type':'application/json','X-Qwen-Request':requestId},signal:controller.signal,body:JSON.stringify({text_transform:{mode,text:source},stream:true})});
     if(!response.ok){let value;try{value=await response.json();}catch{}throw Object.assign(new Error(value?.error?.message||'Le serveur a refusé la correction.'),{code:value?.error?.code});}
     if(response.headers.get('content-type')?.includes('text/event-stream')){
       const reader=response.body.getReader(),decoder=new TextDecoder();let pending='',complete=false;
@@ -994,8 +995,8 @@ async function correctorRun(mode){
     }
     if(!correctorAnswer.content.trim())throw new Error('Le modèle n’a pas renvoyé de texte corrigé. Réessayez.');
     $('corrector-status').textContent=instruction.label+' · terminé. Résultat enregistré dans vos conversations.';
-  }catch(e){let recovered=false;if(e.name!=='AbortError'&&!cancelPending)try{recovered=await agentReconcile(correctorAnswer,view);}catch{}if(recovered)$('corrector-status').textContent=instruction.label+' · terminé. Résultat récupéré du serveur.';else{correctorAnswer.interrupted=true;if(e.name==='TypeError')e.code='connection_error';$('corrector-status').textContent=e.name==='AbortError'?'Correction arrêtée. Le texte reçu est conservé.':e.message;if(e.name!=='AbortError')error(e);}}
-  finally{agentClearApproval();correctorRunning=false;correctorResultDisplay();controller=null;cancelPending=false;renderMarkdown($('corrector-result'),correctorAnswer.content);save();try{await flushHistory();serverHistoryReady=false;await syncServerHistory(true);}catch(e){error(e);}busy=false;render();drawLibrary();buttons();$('queue-state').textContent='';models();}
+  }catch(e){correctorAnswer.interrupted=true;if(e.name==='TypeError')e.code='connection_error';$('corrector-status').textContent=e.name==='AbortError'?'Correction arrêtée. Le texte reçu est conservé.':e.message;if(e.name!=='AbortError')error(e);}
+  finally{correctorRunning=false;correctorResultDisplay();controller=null;cancelPending=false;renderMarkdown($('corrector-result'),correctorAnswer.content);save();try{await flushHistory();serverHistoryReady=false;await syncServerHistory(true);}catch(e){error(e);}busy=false;render();drawLibrary();buttons();$('queue-state').textContent='';models();}
 }
 for(const [id,mode] of [['corrector-correct','correct'],['corrector-pro','professional'],['corrector-friendly','friendly']])$(id).onclick=()=>correctorRun(mode);
 buttons();

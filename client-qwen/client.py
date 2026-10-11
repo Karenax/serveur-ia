@@ -627,7 +627,7 @@ def install_close_guard(window):
                 if result.get('saved') or window.create_confirmation_dialog(APP_NAME,'Historique non enregistré : '+result.get('message','')+'\nExportez vos conversations pour les conserver. Fermer quand même ?'):
                     state['ready']=True;window.destroy()
                 else:state['pending']=False
-            try:window.evaluate_js("(async()=>{try{await window.voiceFinishForClose?.();controller?.abort();if(busy)await api('/v1/cancel',{}, {'X-Qwen-Request':requestId});await uiPersistPreferences();await flushHistory();await api('/client/history/flush',{});return {saved:true};}catch(e){return {saved:false,message:e.message};}})()",callback=complete)
+            try:window.evaluate_js("(async()=>{try{await window.voiceFinishForClose?.();const cancelBody=window.generationCancelBody?.()||{};controller?.abort();if(busy)await api('/v1/cancel',cancelBody, {'X-Qwen-Request':requestId});await uiPersistPreferences();await flushHistory();await api('/client/history/flush',{});return {saved:true};}catch(e){return {saved:false,message:e.message};}})()",callback=complete)
             except Exception as error:complete({'saved':False,'message':str(error)})
         threading.Thread(target=work,daemon=True).start()
         return False

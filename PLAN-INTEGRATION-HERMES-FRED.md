@@ -174,7 +174,15 @@ Conserver l’application et les parcours existants. Ajouter les informations ut
 
 Windows et Android doivent gérer identités de conversation/tour, états d’arrêt, reprise d’un résultat, approbations, sources et fichiers produits. Les appels d’outils sont exécutés côté Hermes ; le client n’exécute pas une seconde fois un appel reçu.
 
-La conversation vocale Windows passe par le même envoi de chat. La synthèse vocale lit la réponse finale, pas les commentaires et résultats d’outils. La dictée/TTS restent leurs services existants. Le correcteur et les tâches qui génèrent des réponses passent également par l’adaptateur Hermes, avec sessions et outils adaptés à leur fonction. Inventorier les entrées API locales Windows afin qu’aucune route de génération conversationnelle ne conserve un accès direct involontaire à Qwen.
+La conversation vocale Windows passe par le même envoi de chat. La synthèse vocale lit la réponse finale, pas les commentaires et résultats d’outils. La dictée/TTS restent leurs services existants. Les tâches qui génèrent des réponses passent également par l’adaptateur Hermes, avec sessions et outils adaptés à leur fonction. Les trois actions du correcteur utilisent directement Qwen selon la décision spécifique ci-dessous. Inventorier les entrées API locales Windows afin qu’aucune route de génération conversationnelle ne conserve un accès direct involontaire à Qwen.
+
+Décision spécifique du 11 octobre 2026 : **Corriger**, **Reformuler professionnel**
+et **Reformuler amical** utilisent le Qwen local sans session ni outils Hermes.
+Le contrat authentifié `/v1/chat/completions` contient
+`text_transform: {mode, text}` ; le serveur impose la consigne et conserve les
+droits Fred, la file GPU et l’annulation. Les conversations et tâches gardent
+Hermes. L’interface, les copies locales et l’enregistrement des résultats du
+correcteur restent inclus dans les vérifications H4.
 
 Dans « Clients & accès », ajouter état du profil, préparation/reprise, disponibilité et diagnostic borné. Le tableau de bord distingue runs actifs, outils, générations Qwen et attente de décision. Les notifications existantes reçoivent les résultats des tâches persistantes. Le redémarrage d’un service ne doit pas produire une avalanche d’alertes identiques.
 
@@ -198,7 +206,7 @@ Les clients actuels n’envoient pas l’identité stable requise. Publier des v
 | H1 — service et provisionnement | Supervision, registre versionné, secrets, création Windows/Android commune, reprise, suspension/révocation | Création d’accès fournit exactement un profil ; erreurs/restart ne laissent aucun accès exploitable incomplet ; aucun client réel modifié pendant les essais |
 | H2 — conversations et modèle | Sessions/runs persistants, adaptateur privé, files distinctes, SSE compatible, arrêt et idempotence | Deux clients conversent via Hermes ; un outil libère la file GPU ; doublon réseau n’exécute qu’un run ; continuation garde le résultat des outils |
 | H3 — outils Fred et décisions | EG2/documents/sources, mémoire, outils configurés, actions et téléchargements ; sandbox avant exécution arbitraire | Sources fidèles ; refus d’accès croisé ; action refusée/expirée sans effet ; arrêt/révocation bloque les enfants et outils |
-| H4 — interface et continuité | Clients Windows/Android, correcteur, tâches, voix Windows, copies locales, versions/capacités | Essais Windows et Android téléphone/tablette ; archivage/import/suppression/conflits/historique et conversation vocale préservés |
+| H4 — interface et continuité | Clients Windows/Android, correcteur direct Qwen, tâches Hermes, voix Windows, copies locales, versions/capacités | Essais Windows et Android téléphone/tablette ; archivage/import/suppression/conflits/historique et conversation vocale préservés |
 | H5 — récupération et exploitation | Sauvegarde/restauration, diagnostic, incidents, limites, charge, version Hermes | Restauration isolée complète ; modèle non déchargé par redémarrage Hermes ; aucune reprise d’action après incident ; mesures qualité/latence disponibles |
 | H6 — livraison | Accès pilote, observation, migration des autres accès autorisés, EXE/APK signés et publication | Tous les clients compatibles utilisent Hermes ; profils créés automatiquement ; rapport final et procédure de retour vérifiés |
 

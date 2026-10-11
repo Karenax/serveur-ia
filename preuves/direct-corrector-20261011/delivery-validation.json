@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-11",
+  "windows": {
+    "version": "3.5.24",
+    "protocol": 3,
+    "bytes": 93450088,
+    "sha256": "bfd4c61e566958406755eca886eadaacb372d19eff54f220756960cb7d01f60f",
+    "signature": "crIvRwIpZSPfKnbNH0BnVOLoHa5fTozhq8UAYHKHBZkjx52IbA44Y7zu2rU81C+L6z1Qa0iAWgjDv1+e2hc4Bw==",
+    "signing_public_key": "8fSJ5YLYBVF0GvxnS5RyD6LjgMSTi39H+4YGeS2Ac/M="
+  },
+  "android": {
+    "bytes": 18899220,
+    "sha256": "21f635362daca34f5972abb64cfbd127b3dab1323c33157b0fd884504c898ab8",
+    "package": "net.karenax.fred",
+    "version_code": 8,
+    "version": "1.0.7"
+  },
+  "personal_packages_prepared": 1,
+  "checks": {
+    "windows_release_verified": true,
+    "personal_windows_package_refreshed": true,
+    "android_update_announced": true,
+    "authenticated_downloads_verified": true,
+    "agent_and_voice_ready": true,
+    "direct_transform_validation_available": true,
+    "model_processes_preserved": true,
+    "model_loaded": true,
+    "model_name_preserved": true,
+    "access_settings_and_hermes_config_preserved": true
+  },
+  "production_history_modified_by_validation": false
+}

@@ -1,4 +1,4 @@
-Accès serveur Fred — version 3.5.23
+Accès serveur Fred — version 3.5.24
 
 WireGuard utilise un emplacement permanent dans %LOCALAPPDATA%\AccesServeurFred\WireGuard.
 Windows conserve ainsi l'autorisation entre les lancements. Une première autorisation
@@ -158,6 +158,11 @@ serveur. Lecture, préférences par type et rattrapage sont synchronisés.
 Les sauvegardes du serveur incluent cette boîte. Voir le mode d'emploi
 ../lanceur/RECHERCHE-NOTIFICATIONS.md et les preuves ../preuves/lots-6-8/VALIDATION.md.
 
+Version 3.5.24 : les trois actions du correcteur — Corriger, Reformuler
+professionnel et Reformuler amical — utilisent directement le Qwen local
+sur le serveur. Le texte retravaillé reste dans le correcteur, avec ses
+actions Copier et Reprendre. Les conversations et tâches conservent Hermes.
+
 Version 3.5.23 : la synchronisation automatique de l'historique conserve
 la conversation vocale et la lecture de la réponse. Le tour suivant attend
 la fin de cette synchronisation avant d'être envoyé.
@@ -168,7 +173,7 @@ outils apparaissent comme progression ; leurs commentaires ne sont pas lus
 par la voix. Une action demandant votre accord présente son effet et les choix
 Autoriser cette action ou Refuser. Une autorisation ne vaut que pour cette
 action. Les réponses finalisées sont retrouvées après une coupure de connexion,
-sans relancer le travail. Le correcteur utilise également Hermes.
+sans relancer le travail. Depuis 3.5.24, le correcteur utilise directement Qwen.
 Un accord en attente est retrouvé après la réouverture du client, en conservant
 la conversation et le projet concernés.
 

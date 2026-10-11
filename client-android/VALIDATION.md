@@ -1,5 +1,32 @@
 # Validation Android — 11 octobre 2026
 
+## Version 1.0.7 — correcteur direct Qwen
+
+APK Release **1.0.7**, code **8**, publié avec le certificat de distribution
+existant, signature v2/v3 et alignement 16 Ko vérifiés. `assembleRelease`,
+`lintRelease`, `assembleDebugAndroidTest` et les **13 tests de distribution**
+réussissent. Les ressources de l’interface et du correcteur adaptées à Android
+correspondent à celles incluses dans l’APK. Toutes les bibliothèques natives
+et le manifeste Whisper Small sont identiques bit à bit à l’APK 1.0.6.
+
+Les trois modes **Corriger**, **Reformuler professionnel** et **Reformuler
+amical** ont été exécutés sur le Release signé, après sa mise à jour depuis
+1.0.5 sur l’émulateur téléphone Android 16 x86_64. Le vrai proxy natif et
+le tunnel WireGuard transmettent le contrat strict `text_transform: {mode,
+text}` au serveur synthétique isolé et reçoivent une réponse SSE complète.
+Le serveur de test refuse les champs hors contrat ; chaque mode est reçu
+exactement une fois et aucune authentification n’est rejetée. Les exports
+de profils synthétiques et l’instrumentation ont été retirés après l’essai.
+
+Les **22 vérifications**, empreintes et limites sont dans
+[android-release.json](../preuves/direct-corrector-20261011/android-release.json)
+et le [rapport Android](../preuves/direct-corrector-20261011/ANDROID.md).
+Cette validation ciblée n’effectue aucun appel au modèle ni nouvelle mesure
+acoustique de la dictée. Les essais physiques ARM64 restent distincts.
+La publication de l’APK et le rechargement du serveur ont été coordonnés avec
+la livraison Windows 3.5.24 ; les téléchargements authentifiés sont vérifiés
+dans le [rapport global](../preuves/direct-corrector-20261011/VALIDATION.md).
+
 ## Version 1.0.6 — conversations Hermes
 
 APK Release **1.0.6**, code **7**, construit avec le même certificat depuis

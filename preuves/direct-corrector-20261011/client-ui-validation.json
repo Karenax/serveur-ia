@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "platform": "windows",
+      "passed": true,
+      "modes": [
+        "correct",
+        "professional",
+        "friendly"
+      ],
+      "progressive_sse": true,
+      "json_fallback": false,
+      "partial_cancel": true,
+      "close_cancel": true,
+      "failure_without_hermes_recovery": true,
+      "saved_history_survives_reload": true,
+      "ordinary_chat_stays_hermes": true,
+      "unique_request_ids": 6,
+      "simulation": "Local HTTP transport; no private user data or model"
+    },
+    {
+      "platform": "android",
+      "passed": true,
+      "modes": [
+        "correct",
+        "professional",
+        "friendly"
+      ],
+      "progressive_sse": true,
+      "json_fallback": true,
+      "partial_cancel": true,
+      "close_cancel": false,
+      "failure_without_hermes_recovery": true,
+      "saved_history_survives_reload": true,
+      "ordinary_chat_stays_hermes": true,
+      "unique_request_ids": 6,
+      "simulation": "Local HTTP transport; no private user data or model"
+    }
+  ]
+}

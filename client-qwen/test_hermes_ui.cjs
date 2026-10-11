@@ -36,6 +36,7 @@ async function main(){
       const pending=state.pending;assert(['once','deny'].includes(body.decision));assert.equal(body.request_id,pending.approval.request_id);assert.notEqual(body.request_id,pending.turn_id);assert.equal(req.headers['x-qwen-request'],pending.turn_id);assert.equal(body.conversation_id,pending.conversation_id);state.runs.set(pending.turn_id,{request_id:pending.turn_id,conversation_id:pending.conversation_id,status:'running',text:''});json(res,{accepted:true});const text=body.decision==='once'?'Action autorisée et résultat vérifié.':'Action refusée, aucun fichier modifié.';if(state.disconnectApproval)setTimeout(()=>pending.finish(text),1800);else pending.finish(text);return;
     }
     if(req.url==='/v1/chat/completions'){
+      if(body.text_transform){assert.deepEqual(body,{text_transform:{mode:'correct',text:'Je veut un texte correct.'},stream:true});res.writeHead(200,{'Content-Type':'text/event-stream; charset=utf-8'});res.end('data: '+JSON.stringify({choices:[{delta:{content:'Voici uniquement la réponse finale.'},finish_reason:'stop'}]})+'\n\ndata: [DONE]\n\n');return;}
       assert.equal(body.turn_id,req.headers['x-qwen-request']);assert(body.conversation_id);assert.equal(typeof body.history_revision,'string');
       res.writeHead(200,{'Content-Type':'text/event-stream; charset=utf-8'});
       const event=value=>res.write('data: '+JSON.stringify(value)+'\n\n');
@@ -67,8 +68,8 @@ async function main(){
     await page.reload();await page.waitForSelector('#agent-approval:not([hidden])');assert.equal(await page.evaluate(()=>requestId),pendingTurn);assert.equal(await page.evaluate(()=>currentId),pendingConversation);assert.equal(state.requests.filter(request=>request.path==='/v1/chat/completions').length,chatCount,'Reload must follow the original run without starting another chat');
     await page.click('#agent-approve');await page.waitForSelector('#send:not([disabled])');assert.equal(await page.locator('.message.assistant').count(),1);assert((await page.textContent('.message.assistant .content')).includes('résultat vérifié'));state.disconnectApproval=false;
     state.approval=false;await page.evaluate(()=>showView('corrector'));await page.fill('#corrector-text','Je veut un texte correct.');await page.click('#corrector-correct');await page.waitForFunction(()=>document.getElementById('corrector-status').textContent.includes('terminé'));await page.waitForFunction(()=>!busy&&!historySyncPending);
-    const correction=state.requests.filter(request=>request.path==='/v1/chat/completions').at(-1);const row=state.history.conversations.find(c=>c.id===correction.body.conversation_id);
-    assert.equal(correction.body.messages[1].content,row.messages[0].content);assert.equal(row.messages[1].turn_id,correction.body.turn_id);assert(correction.body.messages[0].content.includes('Corrige'));assert.deepEqual(errors,[]);
+    const correction=state.requests.filter(request=>request.path==='/v1/chat/completions').at(-1);const row=state.history.conversations.find(c=>c.id===state.history.currentId);
+    assert.deepEqual(correction.body.text_transform,{mode:'correct',text:'Je veut un texte correct.'});assert.equal(row.messages[0].content,'Corriger :\n\nJe veut un texte correct.');assert.equal(row.messages[1].turn_id,undefined);assert.deepEqual(errors,[]);
     console.log('Windows Hermes UI verified: final-only voice, stable turns, opaque approvals across heartbeat/disconnect/reload, once/refusal, corrector and shared scripts.');
     await page.close();
   }finally{await browser.close();await new Promise(resolve=>server.close(resolve));}

@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "scope": "disposable-account-and-gateway",
+  "provider": "already-loaded-local-Qwen",
+  "hermes": "unavailable-stub-never-called",
+  "document_and_memory_context": "never-called",
+  "production_history_modified": false,
+  "timing": "single smoke run; not a comparative benchmark",
+  "checks": [
+    {
+      "mode": "correct",
+      "complete": true,
+      "answer": "Bonjour, je vous envoie le document demain. Merci de votre aide.",
+      "first_text_seconds": 2.36,
+      "total_seconds": 2.875
+    },
+    {
+      "mode": "professional",
+      "complete": true,
+      "answer": "Bonjour,\n\nJe vous transmettrai le document demain.\n\nJe vous remercie pour votre aide.",
+      "first_text_seconds": 2.344,
+      "total_seconds": 3.063
+    },
+    {
+      "mode": "friendly",
+      "complete": true,
+      "answer": "Salut, je t'envoie le document demain. Merci pour ton aide !",
+      "first_text_seconds": 2.484,
+      "total_seconds": 3.0
+    }
+  ],
+  "preserved": {
+    "model_processes": true,
+    "model_loaded": true,
+    "model_name": true,
+    "access_and_settings": true
+  }
+}

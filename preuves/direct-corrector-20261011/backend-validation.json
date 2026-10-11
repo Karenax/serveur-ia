@@ -1,0 +1,395 @@
+{
+  "schema_version": 1,
+  "generated_utc": "2026-10-11T16:56:30Z",
+  "passed": true,
+  "server_windows_version": "3.5.24",
+  "android_version": "1.0.7",
+  "scope": {
+    "fixtures": "Disposable Fred accounts, temporary directories and loopback HTTP gateways/model servers; synthetic texts and credentials only.",
+    "private_user_data_used": false,
+    "production_history_modified": false,
+    "production_configuration_modified": false,
+    "real_model_used_in_these_tests": false,
+    "model_provider": "Synthetic loopback HTTP model; the separate native-validation.json records the real-Qwen smoke test.",
+    "hermes": "Synthetic Hermes accounts/service and ephemeral private HTTP ingress; no personal Hermes profile or secrets.",
+    "transport": "Real local WireGuard UDP fixture, local HTTP routes, mocked HTTPS request transport and a local redirect server.",
+    "published_release_read": "The post-publication EXE test reads and verifies the canonical Windows package and signature, copies it to a disposable profile, then starts its self-test.",
+    "server_process_reloaded": false
+  },
+  "verified_distinct_test_count": 44,
+  "test_execution_count": 45,
+  "verification_method": "24 targeted tests passed together. The full transport run passed 19 of 20 before publication; only the published-EXE prerequisite case was retried and passed after publication. The transport module was not rerun in full.",
+  "runs": [
+    {
+      "id": "targeted-backend",
+      "command": "& 'D:/Serveur IA/Strata-src/.venv/Scripts/python.exe' -m unittest -v test_text_transform test_remote_sources_revocation test_hermes_inference",
+      "cwd": "D:/Serveur IA/lanceur",
+      "duration_seconds": 29.327,
+      "executed": 24,
+      "passed": 24,
+      "failed": 0,
+      "exit_code": 0,
+      "modules": [
+        {
+          "module": "test_text_transform",
+          "count": 16,
+          "passed_tests": [
+            "test_text_transform.CancellationReceiptTests.test_receipts_expire_and_bound_each_owner_and_total",
+            "test_text_transform.TextTransformHTTPTests.test_cancel_after_headers_aborts_silent_stream",
+            "test_text_transform.TextTransformHTTPTests.test_cancel_during_health_cannot_race_submit",
+            "test_text_transform.TextTransformHTTPTests.test_cancel_validation_and_authorization",
+            "test_text_transform.TextTransformHTTPTests.test_early_cancel_is_scoped_to_owner_and_request",
+            "test_text_transform.TextTransformHTTPTests.test_fragmented_chunked_stream_keeps_complete_response",
+            "test_text_transform.TextTransformHTTPTests.test_generic_cancel_aborts_direct_active_read_without_hermes",
+            "test_text_transform.TextTransformHTTPTests.test_global_cancel_stops_direct_and_concurrent_native_run",
+            "test_text_transform.TextTransformHTTPTests.test_invalid_transform_cannot_inject_messages_or_call_upstream",
+            "test_text_transform.TextTransformHTTPTests.test_nonstream_and_maximum_text_need_no_agent_conversation",
+            "test_text_transform.TextTransformHTTPTests.test_normal_conversation_remains_hermes",
+            "test_text_transform.TextTransformHTTPTests.test_revocation_aborts_silent_stream_without_exposing_result",
+            "test_text_transform.TextTransformHTTPTests.test_revocation_during_health_prevents_first_private_response",
+            "test_text_transform.TextTransformHTTPTests.test_shared_gpu_queue_and_queued_cancellation",
+            "test_text_transform.TextTransformHTTPTests.test_three_modes_bypass_unavailable_hermes_and_force_server_prompt",
+            "test_text_transform.TextTransformHTTPTests.test_unauthorized_origin_and_maintenance_are_rejected"
+          ]
+        },
+        {
+          "module": "test_remote_sources_revocation",
+          "count": 5,
+          "passed_tests": [
+            "test_remote_sources_revocation.SourceAccessFenceTests.test_access_change_after_queue_still_prevents_backend_request",
+            "test_remote_sources_revocation.SourceAccessFenceTests.test_maintenance_during_context_emits_no_sources_or_inference",
+            "test_remote_sources_revocation.SourceAccessFenceTests.test_revocation_during_context_emits_no_sources_or_inference",
+            "test_remote_sources_revocation.SourceAccessFenceTests.test_suspension_during_context_emits_no_sources_or_inference",
+            "test_remote_sources_revocation.SourceAccessFenceTests.test_valid_stream_keeps_sources_result_and_balanced_active_counter"
+          ]
+        },
+        {
+          "module": "test_hermes_inference",
+          "count": 3,
+          "passed_tests": [
+            "test_hermes_inference.PrivateInferenceTests.test_mcp_lifecycle_without_run_but_tool_call_needs_active_authorization",
+            "test_hermes_inference.PrivateInferenceTests.test_provider_requires_own_active_run_and_forces_local_model_credentials",
+            "test_hermes_inference.PrivateInferenceTests.test_truncated_model_stream_never_counts_as_success"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "transport-before-publication",
+      "command": "& 'D:/Serveur IA/Strata-src/.venv/Scripts/python.exe' -m unittest -v test_remote",
+      "cwd": "D:/Serveur IA/lanceur",
+      "duration_seconds": 114.826,
+      "executed": 20,
+      "passed": 19,
+      "failed": 1,
+      "exit_code": 1,
+      "passed_tests": [
+        "test_remote.RemoteTests.test_api_failure_updates_connection_and_keeps_error_body",
+        "test_remote.RemoteTests.test_automatic_fallback_reaches_authenticated_server",
+        "test_remote.RemoteTests.test_client_discovers_models_and_tracks_inventory_changes",
+        "test_remote.RemoteTests.test_end_to_end_local_api_hides_remote_credentials",
+        "test_remote.RemoteTests.test_https_mode_preserves_personal_access_without_starting_wireguard",
+        "test_remote.RemoteTests.test_https_redirect_never_forwards_personal_token",
+        "test_remote.RemoteTests.test_key_never_stored_in_plaintext_and_revocation",
+        "test_remote.RemoteTests.test_live_backend_model_name_is_used_for_api_and_generation",
+        "test_remote.RemoteTests.test_local_network_selection_and_endpoint_validation",
+        "test_remote.RemoteTests.test_private_routes_and_mcp_rejected",
+        "test_remote.RemoteTests.test_real_wireguard_udp_api_streaming_and_peer_revocation",
+        "test_remote.RemoteTests.test_reconnect_preserves_keys_and_protected_settings",
+        "test_remote.RemoteTests.test_response_caps_are_removed_even_for_legacy_clients",
+        "test_remote.RemoteTests.test_server_history_requires_personal_access_and_is_isolated",
+        "test_remote.RemoteTests.test_streaming_and_private_upstream_key",
+        "test_remote.RemoteTests.test_two_personal_profiles_can_use_tunnel_concurrently",
+        "test_remote.RemoteTests.test_unloaded_backend_does_not_receive_generation",
+        "test_remote.RemoteTests.test_unloaded_model_is_distinct_from_unreachable_tunnel",
+        "test_remote.RemoteTests.test_wrong_wireguard_secret_cannot_reach_api"
+      ],
+      "failed_tests": [
+        {
+          "test": "test_remote.RemoteTests.test_windows_protection_and_preconfigured_exe_startup",
+          "assertion": "releases.status(HOME)['verified'] is True",
+          "reason": "The new 3.5.24 package had not yet been published; its subsequent isolated retry is recorded below.",
+          "resolved_by": "published-exe-after-publication"
+        }
+      ]
+    },
+    {
+      "id": "published-exe-after-publication",
+      "command": "& 'D:/Serveur IA/Strata-src/.venv/Scripts/python.exe' -m unittest -v test_remote.RemoteTests.test_windows_protection_and_preconfigured_exe_startup",
+      "cwd": "D:/Serveur IA/lanceur",
+      "duration_seconds": 7.822,
+      "executed": 1,
+      "passed": 1,
+      "failed": 0,
+      "exit_code": 0,
+      "passed_tests": [
+        "test_remote.RemoteTests.test_windows_protection_and_preconfigured_exe_startup"
+      ]
+    }
+  ],
+  "final_modules": [
+    {
+      "module": "test_text_transform",
+      "verified": 16,
+      "tests": [
+        {
+          "test": "test_text_transform.CancellationReceiptTests.test_receipts_expire_and_bound_each_owner_and_total",
+          "passed": true,
+          "run": "targeted-backend"
+        },
+        {
+          "test": "test_text_transform.TextTransformHTTPTests.test_cancel_after_headers_aborts_silent_stream",
+          "passed": true,
+          "run": "targeted-backend"
+        },
+        {
+          "test": "test_text_transform.TextTransformHTTPTests.test_cancel_during_health_cannot_race_submit",
+          "passed": true,
+          "run": "targeted-backend"
+        },
+        {
+          "test": "test_text_transform.TextTransformHTTPTests.test_cancel_validation_and_authorization",
+          "passed": true,
+          "run": "targeted-backend"
+        },
+        {
+          "test": "test_text_transform.TextTransformHTTPTests.test_early_cancel_is_scoped_to_owner_and_request",
+          "passed": true,
+          "run": "targeted-backend"
+        },
+        {
+          "test": "test_text_transform.TextTransformHTTPTests.test_fragmented_chunked_stream_keeps_complete_response",
+          "passed": true,
+          "run": "targeted-backend"
+        },
+        {
+          "test": "test_text_transform.TextTransformHTTPTests.test_generic_cancel_aborts_direct_active_read_without_hermes",
+          "passed": true,
+          "run": "targeted-backend"
+        },
+        {
+          "test": "test_text_transform.TextTransformHTTPTests.test_global_cancel_stops_direct_and_concurrent_native_run",
+          "passed": true,
+          "run": "targeted-backend"
+        },
+        {
+          "test": "test_text_transform.TextTransformHTTPTests.test_invalid_transform_cannot_inject_messages_or_call_upstream",
+          "passed": true,
+          "run": "targeted-backend"
+        },
+        {
+          "test": "test_text_transform.TextTransformHTTPTests.test_nonstream_and_maximum_text_need_no_agent_conversation",
+          "passed": true,
+          "run": "targeted-backend"
+        },
+        {
+          "test": "test_text_transform.TextTransformHTTPTests.test_normal_conversation_remains_hermes",
+          "passed": true,
+          "run": "targeted-backend"
+        },
+        {
+          "test": "test_text_transform.TextTransformHTTPTests.test_revocation_aborts_silent_stream_without_exposing_result",
+          "passed": true,
+          "run": "targeted-backend"
+        },
+        {
+          "test": "test_text_transform.TextTransformHTTPTests.test_revocation_during_health_prevents_first_private_response",
+          "passed": true,
+          "run": "targeted-backend"
+        },
+        {
+          "test": "test_text_transform.TextTransformHTTPTests.test_shared_gpu_queue_and_queued_cancellation",
+          "passed": true,
+          "run": "targeted-backend"
+        },
+        {
+          "test": "test_text_transform.TextTransformHTTPTests.test_three_modes_bypass_unavailable_hermes_and_force_server_prompt",
+          "passed": true,
+          "run": "targeted-backend"
+        },
+        {
+          "test": "test_text_transform.TextTransformHTTPTests.test_unauthorized_origin_and_maintenance_are_rejected",
+          "passed": true,
+          "run": "targeted-backend"
+        }
+      ]
+    },
+    {
+      "module": "test_remote_sources_revocation",
+      "verified": 5,
+      "tests": [
+        {
+          "test": "test_remote_sources_revocation.SourceAccessFenceTests.test_access_change_after_queue_still_prevents_backend_request",
+          "passed": true,
+          "run": "targeted-backend"
+        },
+        {
+          "test": "test_remote_sources_revocation.SourceAccessFenceTests.test_maintenance_during_context_emits_no_sources_or_inference",
+          "passed": true,
+          "run": "targeted-backend"
+        },
+        {
+          "test": "test_remote_sources_revocation.SourceAccessFenceTests.test_revocation_during_context_emits_no_sources_or_inference",
+          "passed": true,
+          "run": "targeted-backend"
+        },
+        {
+          "test": "test_remote_sources_revocation.SourceAccessFenceTests.test_suspension_during_context_emits_no_sources_or_inference",
+          "passed": true,
+          "run": "targeted-backend"
+        },
+        {
+          "test": "test_remote_sources_revocation.SourceAccessFenceTests.test_valid_stream_keeps_sources_result_and_balanced_active_counter",
+          "passed": true,
+          "run": "targeted-backend"
+        }
+      ]
+    },
+    {
+      "module": "test_hermes_inference",
+      "verified": 3,
+      "tests": [
+        {
+          "test": "test_hermes_inference.PrivateInferenceTests.test_mcp_lifecycle_without_run_but_tool_call_needs_active_authorization",
+          "passed": true,
+          "run": "targeted-backend"
+        },
+        {
+          "test": "test_hermes_inference.PrivateInferenceTests.test_provider_requires_own_active_run_and_forces_local_model_credentials",
+          "passed": true,
+          "run": "targeted-backend"
+        },
+        {
+          "test": "test_hermes_inference.PrivateInferenceTests.test_truncated_model_stream_never_counts_as_success",
+          "passed": true,
+          "run": "targeted-backend"
+        }
+      ]
+    },
+    {
+      "module": "test_remote",
+      "verified": 20,
+      "tests": [
+        {
+          "test": "test_remote.RemoteTests.test_api_failure_updates_connection_and_keeps_error_body",
+          "passed": true,
+          "run": "transport-before-publication"
+        },
+        {
+          "test": "test_remote.RemoteTests.test_automatic_fallback_reaches_authenticated_server",
+          "passed": true,
+          "run": "transport-before-publication"
+        },
+        {
+          "test": "test_remote.RemoteTests.test_client_discovers_models_and_tracks_inventory_changes",
+          "passed": true,
+          "run": "transport-before-publication"
+        },
+        {
+          "test": "test_remote.RemoteTests.test_end_to_end_local_api_hides_remote_credentials",
+          "passed": true,
+          "run": "transport-before-publication"
+        },
+        {
+          "test": "test_remote.RemoteTests.test_https_mode_preserves_personal_access_without_starting_wireguard",
+          "passed": true,
+          "run": "transport-before-publication"
+        },
+        {
+          "test": "test_remote.RemoteTests.test_https_redirect_never_forwards_personal_token",
+          "passed": true,
+          "run": "transport-before-publication"
+        },
+        {
+          "test": "test_remote.RemoteTests.test_key_never_stored_in_plaintext_and_revocation",
+          "passed": true,
+          "run": "transport-before-publication"
+        },
+        {
+          "test": "test_remote.RemoteTests.test_live_backend_model_name_is_used_for_api_and_generation",
+          "passed": true,
+          "run": "transport-before-publication"
+        },
+        {
+          "test": "test_remote.RemoteTests.test_local_network_selection_and_endpoint_validation",
+          "passed": true,
+          "run": "transport-before-publication"
+        },
+        {
+          "test": "test_remote.RemoteTests.test_private_routes_and_mcp_rejected",
+          "passed": true,
+          "run": "transport-before-publication"
+        },
+        {
+          "test": "test_remote.RemoteTests.test_real_wireguard_udp_api_streaming_and_peer_revocation",
+          "passed": true,
+          "run": "transport-before-publication"
+        },
+        {
+          "test": "test_remote.RemoteTests.test_reconnect_preserves_keys_and_protected_settings",
+          "passed": true,
+          "run": "transport-before-publication"
+        },
+        {
+          "test": "test_remote.RemoteTests.test_response_caps_are_removed_even_for_legacy_clients",
+          "passed": true,
+          "run": "transport-before-publication"
+        },
+        {
+          "test": "test_remote.RemoteTests.test_server_history_requires_personal_access_and_is_isolated",
+          "passed": true,
+          "run": "transport-before-publication"
+        },
+        {
+          "test": "test_remote.RemoteTests.test_streaming_and_private_upstream_key",
+          "passed": true,
+          "run": "transport-before-publication"
+        },
+        {
+          "test": "test_remote.RemoteTests.test_two_personal_profiles_can_use_tunnel_concurrently",
+          "passed": true,
+          "run": "transport-before-publication"
+        },
+        {
+          "test": "test_remote.RemoteTests.test_unloaded_backend_does_not_receive_generation",
+          "passed": true,
+          "run": "transport-before-publication"
+        },
+        {
+          "test": "test_remote.RemoteTests.test_unloaded_model_is_distinct_from_unreachable_tunnel",
+          "passed": true,
+          "run": "transport-before-publication"
+        },
+        {
+          "test": "test_remote.RemoteTests.test_windows_protection_and_preconfigured_exe_startup",
+          "passed": true,
+          "run": "published-exe-after-publication"
+        },
+        {
+          "test": "test_remote.RemoteTests.test_wrong_wireguard_secret_cannot_reach_api",
+          "passed": true,
+          "run": "transport-before-publication"
+        }
+      ]
+    }
+  ],
+  "total_recorded_duration_seconds": 151.975,
+  "duration_scope": "Durations are unittest run totals, not per-test timings or inference benchmarks.",
+  "source_sha256_at_report": {
+    "lanceur/test_text_transform.py": "dd2a839f36335ac0c54476b65f09afef817b402575cdfb570b77d015470cacdc",
+    "lanceur/test_remote_sources_revocation.py": "4957443b57c73e271c0852debb527c0957407e32eeca9a474d202ac87402a88a",
+    "lanceur/test_hermes_inference.py": "56e92e45bc52eca2557dbf06aa8ffede3f6648d691865ea149a7f2be0caae27f",
+    "lanceur/test_remote.py": "9229a0fd57715bef8a8750cde2683d3b7ef4bc2a64c55ea589ca6da3b2347831",
+    "lanceur/remote.py": "2ce8e237b54b295a6e0e2a96b731e2e487b736989d5dc5e83f6f3654a9d8b6e0",
+    "lanceur/text_transform.py": "fe165560050b2ec5f428cf68e4841556f15742c9d9762da01cfb45af9e373ad8"
+  },
+  "coverage": [
+    "Correct/professional/friendly modes enforce server instructions and disable thinking.",
+    "Corrector bypasses unavailable Hermes and document/project/EG2 context; ordinary chat remains Hermes.",
+    "Input validation, maximum text size, account authorization, maintenance and revocation boundaries.",
+    "Owner/request-scoped early cancellation, shared GPU queue, active silent reads on Windows and global direct/native cancellation.",
+    "Complete SSE responses with prebuffered and fragmented/chunked bodies.",
+    "Private ingress credentials, active-run tool authorization and truncated-stream failure accounting.",
+    "WireGuard UDP access, simultaneous profiles, tunnel reconnects, HTTPS identity/redirect fencing and published Windows EXE self-test."
+  ]
+}
