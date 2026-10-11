@@ -33,16 +33,20 @@ class ThinkingTests(unittest.TestCase):
         self.assertEqual(refused.exception.code,400)
         self.assertEqual(len(fixture.FakeModel.captured),before)
 
-    def test_aliases_are_the_same_levels_and_preferences_survive(self):
-        for alias in ['high','xhigh','max','maximum']:
-            self.assertEqual(normalize_reasoning(alias),'high')
-            self.assertEqual(effort_kwargs(alias),effort_kwargs('high'))
+    def test_canonical_levels_are_preserved_and_local_unsupported_levels_are_refused(self):
+        for level in ['none','minimal','low','medium','high','xhigh','max','ultra','on']:
+            self.assertEqual(normalize_reasoning(level),level)
+        self.assertEqual(normalize_reasoning('maximum'),'max')
+        for level in ['minimal','xhigh','max','ultra','on']:
+            with self.subTest(level=level),self.assertRaises(urllib.error.HTTPError) as refused:
+                self.request('/v1/chat/completions',{'messages':[{'role':'user','content':'Test'}],'reasoning_effort':level})
+            self.assertEqual(refused.exception.code,400)
         path=Path(self.temporary.name)/'settings.dpapi'
         with patch.object(fixture.client,'settings_path',return_value=path):
-            for mode in ['none','low','medium','high']:
+            for mode in ['none','minimal','low','medium','high','xhigh','max','ultra','on']:
                 fixture.client.save_preferences(self.profile,{'thinking_effort':mode})
                 self.assertEqual(fixture.client.client_settings(self.profile)['preferences']['thinking_effort'],mode)
-            with self.assertRaises(ValueError):fixture.client.save_preferences(self.profile,{'thinking_effort':'max'})
+            with self.assertRaises(ValueError):fixture.client.save_preferences(self.profile,{'thinking_effort':'invented'})
 
     def test_context_uses_same_template_and_includes_project_files_and_thinking(self):
         template=ChatTemplate(ROOT/'Strata-src/serve/chat_template.jinja')

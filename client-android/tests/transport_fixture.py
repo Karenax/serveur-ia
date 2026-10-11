@@ -29,6 +29,7 @@ def main():
     parser.add_argument("--lots6-8", action="store_true", help="Use actual isolated Workspace/Notifications modules")
     parser.add_argument("--corrector", action="store_true", help="Verify direct-corrector bodies in the real Android tunnel")
     parser.add_argument("--model-selection", action="store_true", help="Verify public catalogue and selected-model chat/context native transport")
+    parser.add_argument("--reasoning", action="store_true", help="Verify model-specific effort/toggle/automatic native reasoning transport")
     parser.add_argument("--engine", type=Path, help="Isolated staged bridge, leaving a live production executable untouched")
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[2]
@@ -40,6 +41,31 @@ def main():
     state = {"history": None, "revision": 0, "requests": {}, "rejected": 0}
     corrector_modes = {}
     model_checks = {"context": 0, "chat": 0, "retired": 0, "local_unloaded": 0, "rejected": 0}
+    reasoning_checks = {"context": 0, "chat": 0, "unsupported": 0, "rejected": 0, "combinations": {}}
+    reasoning_rows = [
+        {"id": "fred-qwen", "provider": "Qwen local", "reasoning_mode": "effort", "reasoning_efforts": ["none", "low", "medium", "high"]},
+        {"id": "fred-model-toggle", "provider": "NVIDIA", "reasoning_mode": "toggle", "reasoning_efforts": ["none", "on"]},
+        {"id": "fred-model-effort", "provider": "OpenRouter", "reasoning_mode": "effort", "reasoning_efforts": ["none", "minimal", "low", "medium", "high", "xhigh", "max", "ultra"]},
+        {"id": "fred-model-auto", "provider": "Nous Portal", "reasoning_mode": "none", "reasoning_efforts": []},
+    ]
+    def reasoning_request(body, chat):
+        required = {"model", "messages"} | ({"stream", "conversation_id"} if chat else set())
+        row = next((row for row in reasoning_rows if row["id"] == body.get("model")), None)
+        valid = (required <= set(body) <= required | {"reasoning_effort"} and row is not None
+                 and body.get("messages") == [{"role": "user", "content": "Test synthétique Android : raisonnement sélectionné."}]
+                 and (not chat or (body.get("stream") is True and isinstance(body.get("conversation_id"), str) and len(body["conversation_id"]) == 32)))
+        if not valid:
+            reasoning_checks["rejected"] += 1
+            return False, False
+        effort = body.get("reasoning_effort")
+        if ((row["reasoning_efforts"] and effort not in row["reasoning_efforts"])
+                or (not row["reasoning_efforts"] and "reasoning_effort" in body)):
+            reasoning_checks["unsupported"] += 1
+            return False, True
+        reasoning_checks["chat" if chat else "context"] += 1
+        label = body["model"] + ":" + (effort or "automatic")
+        reasoning_checks["combinations"][label] = reasoning_checks["combinations"].get(label, 0) + 1
+        return True, False
     cloud_model = "fred-model-0123456789abcdef"
     model_available = True
     guard = threading.Lock()
@@ -103,7 +129,11 @@ def main():
                 label = self.command + " " + self.path
                 state["requests"][label] = state["requests"].get(label, 0) + 1
             if self.path == "/v1/models":
-                if args.model_selection:
+                if args.reasoning:
+                    self.json_reply({"object": "list", "source": "hermes", "default_model": "fred-model-toggle", "data": [
+                        {"id": row["id"], "name": "Fixture " + row["reasoning_mode"], "provider": row["provider"], "available": True,
+                         "capabilities": {"thinking": bool(row["reasoning_efforts"]), "reasoning_mode": row["reasoning_mode"], "reasoning_efforts": row["reasoning_efforts"], "images": False, "vision": False, "context_length": 32768}} for row in reasoning_rows]})
+                elif args.model_selection:
                     self.json_reply({"object": "list", "source": "hermes", "default_model": cloud_model,
                                      "api_key": "SYNTHETIC_NOT_SECRET", "data": [
                                          {"id": "fred-qwen", "name": "Fixture local", "label": "Fixture local", "provider": "Qwen local", "available": False,
@@ -121,7 +151,12 @@ def main():
                 else:
                     self.json_reply({"id": token.split("_")[1], "server_epoch": time.time(), "declared": body})
             elif self.path == "/v1/context":
-                if args.model_selection:
+                if args.reasoning:
+                    with guard:
+                        valid, unsupported = reasoning_request(body, False)
+                    self.json_reply({"tokens": 100, "capacity": 32768, "estimated": True, "fits": True} if valid else
+                                    {"error": {"code": "reasoning_effort_unavailable" if unsupported else "fixture_rejected", "message": "Synthetic reasoning context rejected"}}, 200 if valid else 400)
+                elif args.model_selection:
                     valid = (set(body) == {"model", "messages"} and body.get("messages") == [{"role": "user", "content": "Test synthétique Android : modèle distant."}])
                     with guard:
                         if valid and body.get("model") == "fred-model-retired": model_checks["retired"] += 1
@@ -145,6 +180,15 @@ def main():
                         state["revision"] += 1
                     self.json_reply({"history": state["history"], "revision": str(state["revision"]), "reset_id": "20261006-remove-assistants"})
             elif self.path == "/v1/chat/completions":
+                if args.reasoning:
+                    with guard:
+                        valid, unsupported = reasoning_request(body, True)
+                        if len(self.headers.get("X-Qwen-Request", "")) != 32:
+                            valid = False
+                            reasoning_checks["rejected"] += 1
+                    if not valid:
+                        self.json_reply({"error": {"code": "reasoning_effort_unavailable" if unsupported else "fixture_rejected", "message": "Synthetic reasoning chat rejected"}}, 400)
+                        return
                 if args.model_selection:
                     if body == {"stream": True, "text_transform": {"mode": "correct", "text": "Texte synthétique Android à transformer."}}:
                         with guard:
@@ -213,6 +257,7 @@ def main():
                 counts = {k: state[k] for k in ("requests", "rejected")}
                 if args.corrector: counts["corrector_modes"] = corrector_modes
                 if args.model_selection: counts["model_selection"] = model_checks
+                if args.reasoning: counts["reasoning"] = reasoning_checks
                 (output / "request-counts.json").write_text(json.dumps(counts), encoding="utf-8")
 
     api = ThreadingHTTPServer(("127.0.0.1", 0), API)

@@ -44,7 +44,7 @@ for(const control of [uiFontSelect,uiSizeSelect]){
 let uiPreferencesPending=0,uiPreferencesWrites=Promise.resolve(),uiPreferencesLoaded=false;
 function uiPersistPreferences(){
   uiPreferencesLoaded=true;
-  const values={theme:uiTheme,font:uiFontSelect.value,text_size:uiSizeSelect.value,thinking_effort:thinkingEffort(),thinking:thinkingEffort()!=='none',sidebar_collapsed:document.body.classList.contains('sidebar-collapsed'),corrector_text:$('corrector-text')?.value||''};
+  const values={theme:uiTheme,font:uiFontSelect.value,text_size:uiSizeSelect.value,...uiThinkingPreferences(),sidebar_collapsed:document.body.classList.contains('sidebar-collapsed'),corrector_text:$('corrector-text')?.value||''};
   uiPreferencesPending++;
   uiPreferencesWrites=uiPreferencesWrites.catch(()=>{}).then(()=>api('/client/preferences',values)).then(result=>{if(typeof correctorDirty!=='undefined'&&$('corrector-text')?.value===values.corrector_text)correctorDirty=false;return result;}).finally(()=>uiPreferencesPending--);
   return uiPreferencesWrites;
@@ -54,7 +54,7 @@ function uiApplyPreferences(values){
   uiPreferencesLoaded=true;
   if(values.theme)uiSetTheme(values.theme);
   uiSetReading(values.font||uiFontSelect.value,values.text_size||uiSizeSelect.value);
-  if(!busy){uiThinkingSet(values.thinking_effort||(values.thinking?'high':'none'));}
+  if(!busy){uiThinkingLoad(values);}
   if(typeof values.corrector_text==='string'&&$('corrector-text')&&!correctorDirty&&document.activeElement!==$('corrector-text'))$('corrector-text').value=values.corrector_text;
   if(typeof values.sidebar_collapsed==='boolean'){document.body.classList.toggle('sidebar-collapsed',values.sidebar_collapsed);uiSyncSidebar();}
 }

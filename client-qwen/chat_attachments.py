@@ -5,12 +5,13 @@ import re
 MAX_FILE = 2 * 1024 * 1024
 FILE_TYPES = ['txt', 'md', 'pdf', 'docx']
 REASONING_EFFORTS = ['none', 'low', 'medium', 'high']
+CANONICAL_REASONING_EFFORTS = ['none', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max', 'ultra', 'on']
 
 def normalize_reasoning(value):
-    aliases={'none':'none','off':'none','minimal':'none','disabled':'none','false':'none',
-             'low':'low','medium':'medium','high':'high','xhigh':'high','max':'high','maximum':'high'}
+    aliases={value:value for value in CANONICAL_REASONING_EFFORTS}
+    aliases.update({'off':'none','disabled':'none','false':'none','maximum':'max'})
     if not isinstance(value,str) or value.strip().lower() not in aliases:
-        raise ValueError('Réflexion attendue : none, low, medium ou high.')
+        raise ValueError('Niveau de réflexion invalide.')
     return aliases[value.strip().lower()]
 
 def image_data(url):

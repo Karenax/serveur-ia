@@ -1,0 +1,39 @@
+{
+  "read_only": true,
+  "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+  "provider": "OpenRouter",
+  "provider_binding_fingerprint_verified": true,
+  "runs_newest_first": [
+    {
+      "created_local": "2026-10-11T23:50:54.378392+02:00",
+      "accepted_effort_fingerprint_matches": [
+        "high"
+      ],
+      "fingerprint_verified": true,
+      "prompts_printed": false,
+      "status": "completed"
+    },
+    {
+      "created_local": "2026-10-11T23:49:29.605553+02:00",
+      "accepted_effort_fingerprint_matches": [
+        "high"
+      ],
+      "fingerprint_verified": true,
+      "prompts_printed": false,
+      "status": "completed"
+    },
+    {
+      "created_local": "2026-10-11T23:48:35.416166+02:00",
+      "accepted_effort_fingerprint_matches": [
+        "none"
+      ],
+      "fingerprint_verified": true,
+      "prompts_printed": false,
+      "status": "completed"
+    }
+  ],
+  "method": "Recomputed each durable Fred request fingerprint from its stored visible history, retained assistant reasoning, scope and every canonical effort candidate; exact unique match. No messages or credentials copied to this report.",
+  "pre_fix_normalization": "max and xhigh were silently mapped to high; minimal to none.",
+  "retrospective_limit": "The fingerprint proves the effort accepted by Fred. No original outbound provider HTTP body is retained; transmission is verified separately through the native Hermes transport fixture.",
+  "production_history_modified": false
+}

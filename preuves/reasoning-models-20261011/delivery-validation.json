@@ -1,0 +1,91 @@
+{
+  "date": "2026-10-12",
+  "windows": {
+    "version": "3.5.27",
+    "protocol": 3,
+    "bytes": 93452405,
+    "sha256": "d02c7f4c41cd42f2dfa8e17228b1f8f837569b1230da39aef25df85eb7708d74",
+    "signature": "SEm/e7QdwNcHwp618cr+DbDbQixj0P43F7g4u4nfAW322UGbTAgWUVoACA8K1eITeGPoJQZuqcfWmuCKAqmaCg==",
+    "signing_public_key": "8fSJ5YLYBVF0GvxnS5RyD6LjgMSTi39H+4YGeS2Ac/M="
+  },
+  "android": {
+    "version_code": 11,
+    "package": "net.karenax.fred",
+    "version": "1.0.10",
+    "bytes": 18903316,
+    "sha256": "35a475887eac577461be85b13b6d1e6be5cc66d4a828a7dfdb65c47e7f9cc267"
+  },
+  "personal_packages_prepared": 1,
+  "checks": {
+    "catalogue_has_exact_model_controls": true,
+    "nemotron_available_levels_exact": true,
+    "nemotron_max_rejected_before_inference": true,
+    "windows_release_verified": true,
+    "personal_windows_package_refreshed": true,
+    "android_update_announced": true,
+    "authenticated_downloads_verified": true,
+    "agent_and_voice_ready": true,
+    "direct_transform_validation_available": true,
+    "model_sharing_and_exposure_policy_preserved": true,
+    "shared_catalogue_matches_admin_selection": true,
+    "unavailable_cloud_models_hidden": true,
+    "model_processes_preserved": true,
+    "model_loaded": true,
+    "model_name_preserved": true,
+    "access_settings_and_hermes_config_preserved": true
+  },
+  "production_history_modified_by_validation": false,
+  "cloud_model_count": 4,
+  "available_cloud_model_count": 4,
+  "nemotron_controls": {
+    "images": false,
+    "files": [
+      "txt",
+      "md",
+      "pdf",
+      "docx"
+    ],
+    "thinking": true,
+    "reasoning_efforts": [
+      "none",
+      "medium",
+      "high"
+    ],
+    "max_file_bytes": 2097152,
+    "vision": false,
+    "context_length": 1000000,
+    "reasoning_mode": "effort"
+  },
+  "providers": [
+    "ChatGPT or Codex Subscription",
+    "OpenRouter"
+  ],
+  "provider_connection_status": [
+    {
+      "label": "Qwen",
+      "available": true,
+      "error": ""
+    },
+    {
+      "label": "Nous Portal",
+      "available": true,
+      "error": ""
+    },
+    {
+      "label": "OpenRouter",
+      "available": true,
+      "error": ""
+    },
+    {
+      "label": "GitHub Copilot",
+      "available": false,
+      "error": ""
+    },
+    {
+      "label": "ChatGPT or Codex Subscription",
+      "available": true,
+      "error": ""
+    }
+  ],
+  "catalogue_contains_provider_secrets": false
+}

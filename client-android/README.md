@@ -7,7 +7,7 @@ Les appareils Android limités aux applications 32 bits ne sont pas pris en char
 ## Installer et ouvrir
 
 Le fichier à installer est `dist/Acces-serveur-Fred-Android.apk`, version
-**1.0.9** (`versionCode=10`). Installer le nouvel APK par-dessus l’application
+**1.0.10** (`versionCode=11`). Installer le nouvel APK par-dessus l’application
 existante pour conserver le profil et les conversations.
 Transférer cet APK sur l’appareil puis l’ouvrir et autoriser son installation
 depuis l’application utilisée pour ouvrir le fichier.
@@ -271,7 +271,7 @@ leur concordance avant d’exposer les routes authentifiées
 nouvelle compilation Release suffit ensuite à la proposer aux appareils.
 
 **Première installation :** les versions 1.0.4 et précédentes n’ont pas cette
-fonction. Installer une fois manuellement l’APK 1.0.9 par-dessus l’application
+fonction. Installer une fois manuellement l’APK 1.0.10 par-dessus l’application
 existante ; les versions suivantes pourront être téléchargées depuis Fred.
 
 ## Conversations Hermes 1.0.6
@@ -338,3 +338,17 @@ L’administrateur peut aussi choisir les modèles proposés dans la console.
 La [validation Android 1.0.9](../preuves/model-picker-fix-20261011/ANDROID.md)
 documente les huit contrôles du vrai menu Android, les 31 vérifications de
 l’APK signé et la validation isolée des contrôles de partage dans la console.
+
+## Réflexion par modèle 1.0.10
+
+Les boutons de réflexion suivent les niveaux annoncés pour le modèle choisi.
+Le choix est conservé par modèle dans les préférences chiffrées. Selon le
+modèle, Fred propose des niveaux précis, Sans/Activée ou un fonctionnement
+automatique sans réglage imposé. Pour Nemotron Ultra via OpenRouter, les choix
+sont Sans/Moyen/Élevé ; Élevé est son niveau maximal disponible.
+
+Le menu reste stable pendant un rafraîchissement de bibliothèque et les trois
+actions du correcteur gardent Qwen direct. La
+[validation Android 1.0.10](../preuves/reasoning-models-20261011/ANDROID.md)
+consigne les neuf contrôles de popup native, les 36 vérifications de l’APK
+et la transmission exacte des niveaux dans le contexte et le chat.

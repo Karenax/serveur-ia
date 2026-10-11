@@ -747,6 +747,9 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 if not text_transform and store.hermes and hasattr(store.hermes, 'select_model'):
                     selection = store.hermes.select_model(self.identity, raw.get('model'))
                 data = chat_request(transform_request(raw) if text_transform else raw, selection['id'] if selection else model);sources=[]
+                if not text_transform:
+                    from hermes_reasoning import request_reasoning
+                    request_reasoning(data,selection.get('capabilities',{}) if selection else capabilities({}))
                 direct_request=store.text_transforms.request_id(self.headers.get('X-Qwen-Request') or secrets.token_hex(16)) if text_transform else None
                 if text_transform and store.text_transforms.cancelled(self.identity,direct_request):raise ValueError('Demande annulée.')
                 if not text_transform and not (store.hermes and self.path=='/v1/chat/completions') and (project or document or getattr(store.workspace,'knowledge',None)):

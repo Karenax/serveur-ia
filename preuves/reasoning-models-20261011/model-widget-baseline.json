@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "baseline_failed_as_expected": true,
+  "source": "Current production source rendered in memory with only modelRefresh focus guard removed",
+  "failure": "Late workspace/library redraw changed the focused native model widget and its live loading status",
+  "private_providers_called": 0,
+  "production_modified": false
+}

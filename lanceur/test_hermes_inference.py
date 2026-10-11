@@ -88,6 +88,17 @@ class PrivateInferenceTests(unittest.TestCase):
         self.assertIn(b'"error"',raw)
         self.assertEqual(self.store.scheduler.succeeded, 0)
         self.assertEqual(self.store.scheduler.failed, 1)
+    def test_local_provider_cannot_change_the_admitted_thinking_choice(self):
+        for effort in ('none','low','medium','high'):
+            with self.subTest(effort=effort):
+                self.manager.active.clear();self.store.active=0
+                self.manager._prepare(self.a,{'messages':[{'role':'user','content':'Q'}],'reasoning_effort':effort},
+                    secrets.token_hex(16),'thinking-'+effort,None,None,False)
+                status,_=self.post('/v1/chat/completions',{'messages':[{'role':'user','content':'Q'}],
+                    'reasoning_effort':'low','chat_template_kwargs':{'enable_thinking':False},'stream':True},'key-A')
+                self.assertEqual(status,200);body=self.captured[-1][1]
+                self.assertEqual(body['reasoning_effort'],effort)
+                self.assertEqual(body['chat_template_kwargs']['enable_thinking'],effort!='none')
 
 
 if __name__ == '__main__': unittest.main()

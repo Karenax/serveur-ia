@@ -1,0 +1,292 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-12",
+  "status": "passed",
+  "unique_passed_tests": 100,
+  "test_runs": [
+    {
+      "passed": 36,
+      "duration_seconds": 90.483,
+      "tests_by_module": {
+        "test_hermes_models": [
+          "test_hermes_models.ModelsTests.test_central_credential_cache_never_reuses_a_different_native_profile",
+          "test_hermes_models.ModelsTests.test_console_exposure_filters_catalog_selection_profile_and_live_credential",
+          "test_hermes_models.ModelsTests.test_default_is_local_and_public_catalog_contains_no_server_route_or_secrets",
+          "test_hermes_models.ModelsTests.test_discovery_uses_valid_configured_providers_and_preserves_empty_metadata",
+          "test_hermes_models.ModelsTests.test_exposure_policy_roundtrips_through_real_encrypted_backup_and_restore",
+          "test_hermes_models.ModelsTests.test_exposure_schema_rejects_arbitrary_ids_and_preserves_previously_selected_offline_models",
+          "test_hermes_models.ModelsTests.test_fixed_native_key_helper_requires_private_run_and_returns_only_bounded_token",
+          "test_hermes_models.ModelsTests.test_history_projection_keeps_selected_model_and_does_not_merge_other_model",
+          "test_hermes_models.ModelsTests.test_identical_local_backend_is_reused_but_other_local_provider_model_remains_selectable",
+          "test_hermes_models.ModelsTests.test_incomplete_copilot_is_hidden_but_admin_retains_concise_diagnostic",
+          "test_hermes_models.ModelsTests.test_local_alias_compatibility_and_cloud_stays_available_with_qwen_unloaded",
+          "test_hermes_models.ModelsTests.test_low_context_cloud_is_hidden_and_cannot_be_selected",
+          "test_hermes_models.ModelsTests.test_native_credential_requests_coalesce_same_model_but_other_provider_is_independent",
+          "test_hermes_models.ModelsTests.test_native_credential_wait_is_bounded_and_near_expiry_tokens_are_not_cached",
+          "test_hermes_models.ModelsTests.test_newly_discovered_model_is_materialized_before_native_admission",
+          "test_hermes_models.ModelsTests.test_per_account_sharing_and_revocation_are_enforced_on_each_use",
+          "test_hermes_models.ModelsTests.test_policy_schema_is_strict_and_unknown_accounts_cannot_receive_grants",
+          "test_hermes_models.ModelsTests.test_private_broker_authenticates_active_owner_model_and_live_policy",
+          "test_hermes_models.ModelsTests.test_private_broker_refuses_changed_endpoint_and_does_not_expose_errors",
+          "test_hermes_models.ModelsTests.test_profile_migration_keeps_identity_and_binds_all_auxiliary_tasks_to_main",
+          "test_hermes_models.ModelsTests.test_reasoning_is_exact_and_invalid_level_is_refused_before_profile_or_run",
+          "test_hermes_models.ModelsTests.test_refresh_revokes_model_that_becomes_unavailable_and_keeps_native_efforts",
+          "test_hermes_models.ModelsTests.test_request_identity_includes_model_and_model_switch_branches_session",
+          "test_hermes_models.ModelsTests.test_toggle_is_structured_and_omission_keeps_native_default",
+          "test_hermes_models.NativeCloudTests.test_actual_native_gateway_keeps_max_effort_in_provider_http_request",
+          "test_hermes_models.NativeCloudTests.test_actual_native_gateway_selects_shared_cloud_and_preserves_private_session",
+          "test_hermes_models.NativeCloudTests.test_native_copilot_uses_live_limits_endpoints_and_rejects_degraded_github_key",
+          "test_hermes_models.NativeCloudTests.test_native_default_home_follows_sticky_profile_and_broker_binds_its_source",
+          "test_hermes_models.NativeCloudTests.test_native_inventory_discovers_configured_endpoint_without_cold_cache",
+          "test_hermes_models.NativeCloudTests.test_native_key_cmd_and_auxiliary_main_cover_chat_and_responses_without_qwen"
+        ],
+        "test_hermes_reasoning": [
+          "test_hermes_reasoning.NativeReasoningTests.test_openrouter_native_parser_profile_transport_and_sdk_preserve_exact_http_controls",
+          "test_hermes_reasoning.ReasoningTests.test_mandatory_and_uncontrollable_models_do_not_offer_fake_disable",
+          "test_hermes_reasoning.ReasoningTests.test_max_is_preserved_only_when_announced",
+          "test_hermes_reasoning.ReasoningTests.test_none_and_graded_levels_are_exact_and_unknown_levels_fail",
+          "test_hermes_reasoning.ReasoningTests.test_templates_are_consistent_and_fingerprint_intent_is_canonical",
+          "test_hermes_reasoning.ReasoningTests.test_toggle_is_explicit_structured_native_config_and_omission_is_unset"
+        ]
+      },
+      "command": "python -m unittest test_hermes_models test_hermes_reasoning -v"
+    },
+    {
+      "passed": 37,
+      "duration_seconds": 50.312,
+      "tests_by_module": {
+        "test_hermes_conversations": [
+          "test_hermes_conversations.ConversationsTests.test_cancel_before_admission_prevents_native_run_even_after_restart",
+          "test_hermes_conversations.ConversationsTests.test_completed_turn_replays_without_new_run_and_does_not_leak_to_other_account",
+          "test_hermes_conversations.ConversationsTests.test_continuation_retains_session_edited_history_and_project_switch_branch",
+          "test_hermes_conversations.ConversationsTests.test_disconnect_finishes_and_old_partial_never_overwrites_final",
+          "test_hermes_conversations.ConversationsTests.test_native_approval_uses_opaque_single_use_receipt_and_choice",
+          "test_hermes_conversations.ConversationsTests.test_pending_approval_survives_native_heartbeat",
+          "test_hermes_conversations.ConversationsTests.test_project_instructions_are_trusted_and_document_instructions_are_only_data",
+          "test_hermes_conversations.ConversationsTests.test_restart_marks_unfinished_turn_interrupted_without_replay",
+          "test_hermes_conversations.ConversationsTests.test_revocation_prevents_delivery_and_finished_result_is_not_replayed_after_revocation"
+        ],
+        "test_hermes_inference": [
+          "test_hermes_inference.PrivateInferenceTests.test_local_provider_cannot_change_the_admitted_thinking_choice",
+          "test_hermes_inference.PrivateInferenceTests.test_mcp_lifecycle_without_run_but_tool_call_needs_active_authorization",
+          "test_hermes_inference.PrivateInferenceTests.test_provider_requires_own_active_run_and_forces_local_model_credentials",
+          "test_hermes_inference.PrivateInferenceTests.test_truncated_model_stream_never_counts_as_success"
+        ],
+        "test_hermes_accounts": [
+          "test_hermes_accounts.ProfileContracts.test_config_upgrade_preserves_identity_and_disables_unscoped_search",
+          "test_hermes_accounts.ProfileContracts.test_failure_recovery_keeps_same_identity_and_no_exception_secret",
+          "test_hermes_accounts.ProfileContracts.test_idempotent_creation_secrets_survive_restart_and_are_protected",
+          "test_hermes_accounts.ProfileContracts.test_profile_directory_link_is_refused_before_any_write",
+          "test_hermes_accounts.ProfileContracts.test_profiles_keys_revocation_and_migration_are_per_access",
+          "test_hermes_accounts.ProfileContracts.test_suspend_then_resume_retains_credentials_and_profile_data",
+          "test_hermes_accounts.ProfileContracts.test_unsafe_id_and_destination_rejected_and_shell_keys_not_inherited"
+        ],
+        "test_hermes_restoration": [
+          "test_hermes_restoration.HermesRestorationTests.test_active_run_defers_snapshot_without_stopping_service",
+          "test_hermes_restoration.HermesRestorationTests.test_background_preparation_defers_snapshot_without_stopping_service",
+          "test_hermes_restoration.HermesRestorationTests.test_both_encrypted_formats_capture_profile_and_portable_credentials",
+          "test_hermes_restoration.HermesRestorationTests.test_complete_restore_rebuilds_facade_and_preserves_native_data",
+          "test_hermes_restoration.HermesRestorationTests.test_controller_owned_snapshot_can_finish_while_worker_waits_for_controller",
+          "test_hermes_restoration.HermesRestorationTests.test_crash_journal_recovers_hermes_before_any_runtime_starts",
+          "test_hermes_restoration.HermesRestorationTests.test_failed_recovery_can_resume_from_another_thread",
+          "test_hermes_restoration.HermesRestorationTests.test_failed_restore_returns_current_hermes_state",
+          "test_hermes_restoration.HermesRestorationTests.test_invalid_configuration_or_tampered_hermes_data_refused_without_pause",
+          "test_hermes_restoration.HermesRestorationTests.test_model_sharing_policy_roundtrip_and_invalid_policy_rejected",
+          "test_hermes_restoration.HermesRestorationTests.test_nested_snapshot_on_another_thread_cannot_retain_parent_locks",
+          "test_hermes_restoration.HermesRestorationTests.test_preparation_failure_releases_pause_and_rebuilds_without_mutation",
+          "test_hermes_restoration.HermesRestorationTests.test_restore_waits_for_run_without_holding_controller_or_workspace",
+          "test_hermes_restoration.HermesRestorationTests.test_saved_running_turn_restores_as_interrupted",
+          "test_hermes_restoration.HermesRestorationTests.test_snapshot_can_coexist_with_remote_revocation_lock_order",
+          "test_hermes_restoration.HermesRestorationTests.test_snapshot_refuses_restore_admission_without_retaining_controller",
+          "test_hermes_restoration.HermesRestorationTests.test_snapshot_restart_failure_does_not_leave_admission_frozen"
+        ]
+      },
+      "command": "python -m unittest test_hermes_conversations test_hermes_inference test_hermes_accounts test_hermes_restoration -v"
+    },
+    {
+      "passed": 27,
+      "duration_seconds": 40.052,
+      "tests_by_module": {
+        "test_model_selection_transport": [
+          "test_model_selection_transport.ModelSelectionTransportTests.test_catalog_survives_local_engine_unloaded_and_requires_auth",
+          "test_model_selection_transport.ModelSelectionTransportTests.test_cloud_context_is_explicit_estimate_without_inference",
+          "test_model_selection_transport.ModelSelectionTransportTests.test_cloud_turn_uses_selected_model_without_local_health",
+          "test_model_selection_transport.ModelSelectionTransportTests.test_image_is_rejected_for_selected_model_without_vision",
+          "test_model_selection_transport.ModelSelectionTransportTests.test_mandatory_reasoning_rejects_disable_and_toggle_on_is_not_downgraded",
+          "test_model_selection_transport.ModelSelectionTransportTests.test_max_model_preserves_canonical_level_and_conflicting_template_is_rejected",
+          "test_model_selection_transport.ModelSelectionTransportTests.test_nemotron_levels_are_exact_and_max_is_rejected_before_agent",
+          "test_model_selection_transport.ModelSelectionTransportTests.test_unavailable_local_unknown_and_forbidden_do_not_start_run"
+        ],
+        "test_thinking_modes": [
+          "test_thinking_modes.ThinkingTests.test_canonical_levels_are_preserved_and_local_unsupported_levels_are_refused",
+          "test_thinking_modes.ThinkingTests.test_context_uses_same_template_and_includes_project_files_and_thinking",
+          "test_thinking_modes.ThinkingTests.test_four_advertised_levels_reach_the_backend_and_render"
+        ],
+        "test_text_transform": [
+          "test_text_transform.CancellationReceiptTests.test_receipts_expire_and_bound_each_owner_and_total",
+          "test_text_transform.TextTransformHTTPTests.test_cancel_after_headers_aborts_silent_stream",
+          "test_text_transform.TextTransformHTTPTests.test_cancel_during_health_cannot_race_submit",
+          "test_text_transform.TextTransformHTTPTests.test_cancel_validation_and_authorization",
+          "test_text_transform.TextTransformHTTPTests.test_early_cancel_is_scoped_to_owner_and_request",
+          "test_text_transform.TextTransformHTTPTests.test_fragmented_chunked_stream_keeps_complete_response",
+          "test_text_transform.TextTransformHTTPTests.test_generic_cancel_aborts_direct_active_read_without_hermes",
+          "test_text_transform.TextTransformHTTPTests.test_global_cancel_stops_direct_and_concurrent_native_run",
+          "test_text_transform.TextTransformHTTPTests.test_invalid_transform_cannot_inject_messages_or_call_upstream",
+          "test_text_transform.TextTransformHTTPTests.test_nonstream_and_maximum_text_need_no_agent_conversation",
+          "test_text_transform.TextTransformHTTPTests.test_normal_conversation_remains_hermes",
+          "test_text_transform.TextTransformHTTPTests.test_revocation_aborts_silent_stream_without_exposing_result",
+          "test_text_transform.TextTransformHTTPTests.test_revocation_during_health_prevents_first_private_response",
+          "test_text_transform.TextTransformHTTPTests.test_shared_gpu_queue_and_queued_cancellation",
+          "test_text_transform.TextTransformHTTPTests.test_three_modes_bypass_unavailable_hermes_and_force_server_prompt",
+          "test_text_transform.TextTransformHTTPTests.test_unauthorized_origin_and_maintenance_are_rejected"
+        ]
+      },
+      "command": "python -m unittest test_model_selection_transport test_thinking_modes test_text_transform -v"
+    }
+  ],
+  "scope": "Isolated temporary Fred accounts, controllers, native profiles and synthetic HTTP model endpoints. Public capability metadata reads only; no cloud inference, production conversation content or deployment.",
+  "canonical_client_values": [
+    "none",
+    "minimal",
+    "low",
+    "medium",
+    "high",
+    "xhigh",
+    "max",
+    "ultra",
+    "on"
+  ],
+  "qwen_local_values": [
+    "none",
+    "low",
+    "medium",
+    "high"
+  ],
+  "normalization": "Canonical values remain exact. maximum aliases to max; off/disabled/false alias to none. No maximum or xhigh demotion to high.",
+  "public_contract": {
+    "reasoning_mode": [
+      "effort",
+      "toggle",
+      "none"
+    ],
+    "reasoning_efforts": "Exact supported ordered choices for this model and provider.",
+    "toggle_choices": [
+      "none",
+      "on"
+    ],
+    "toggle_on_native_options": {
+      "reasoning": {
+        "enabled": true
+      }
+    },
+    "omitted_choice_native_options": {},
+    "invalid_or_unadvertised_choice": "HTTP400 before native run or context computation."
+  },
+  "official_route_metadata": {
+    "provider": "OpenRouter",
+    "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+    "source": "https://openrouter.ai/api/v1/models",
+    "reasoning": {
+      "mandatory": false,
+      "default_enabled": true,
+      "supports_max_tokens": true,
+      "supported_efforts": [
+        "high",
+        "medium"
+      ],
+      "default_effort": "high"
+    },
+    "fred_reasoning_mode": "effort",
+    "fred_reasoning_efforts": [
+      "none",
+      "medium",
+      "high"
+    ],
+    "max_supported": false,
+    "native_metadata_discovery_verified": true
+  },
+  "native_http_captures": [
+    {
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "requested": "none",
+      "provider_body": {
+        "reasoning": {
+          "enabled": false
+        }
+      }
+    },
+    {
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "requested": "medium",
+      "provider_body": {
+        "reasoning": {
+          "enabled": true,
+          "effort": "medium"
+        }
+      }
+    },
+    {
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "requested": "high",
+      "provider_body": {
+        "reasoning": {
+          "enabled": true,
+          "effort": "high"
+        }
+      }
+    },
+    {
+      "model": "synthetic toggle model",
+      "requested": "on",
+      "provider_body": {
+        "reasoning": {
+          "enabled": true
+        }
+      }
+    },
+    {
+      "model": "openai/gpt-6-luna",
+      "requested": "max",
+      "provider_body": {
+        "reasoning": {
+          "enabled": true,
+          "effort": "max"
+        }
+      }
+    }
+  ],
+  "native_capture_path": "Installed api_server request parser -> OpenRouter provider profile -> ChatCompletionsTransport -> real SDK -> synthetic local HTTP endpoint.",
+  "complete_native_gateway_max_capture": {
+    "requested": "max",
+    "provider_body": {
+      "reasoning_effort": "max"
+    },
+    "scope": "Full Fred admission -> native Hermes gateway -> centrally brokered fixture credential -> real SDK -> synthetic HTTP provider."
+  },
+  "mandatory_or_uncontrollable_models": "Unsupported disable/effort choices rejected; controls are not invented when the route exposes none.",
+  "private_qwen_enforcement": "The admitted user thinking activation/effort is authoritative over generated private SDK fields.",
+  "retrospective_audit": "recent-messages-audit.json (root-owned); fingerprints establish the effort accepted by Fred, not an historical provider HTTP trace.",
+  "official_documentation": [
+    "https://openrouter.ai/docs/guides/best-practices/reasoning-tokens",
+    "https://openrouter.ai/nvidia/nemotron-3-ultra-550b-a55b:free",
+    "https://docs.nvidia.com/nim/large-language-models/1.15.0/thinking-budget-control.html"
+  ],
+  "source_sha256": {
+    "client-qwen/chat_attachments.py": "ed9f13f584abad3830bb330ddaddbdd9330f44e539c5fa7eb323f90fc30c39a2",
+    "lanceur/hermes_reasoning.py": "bb34bbcb3b0a8c1d0f51237e52331a35c12f9e50d5f2624b71992b2d6098b2eb",
+    "lanceur/hermes_models.py": "5ccd80944a4919dfc1498bf9a83245eea157cda3264dd01293c33dce527b713e",
+    "lanceur/hermes_conversations.py": "450edf4902dd46bf11e94aaa9f3edc15bb318a39d6ee25e1f70153028c1a6c90",
+    "lanceur/hermes_inference.py": "6fdda92df5707f9662d7e2520ab9aaea9d3e6264210e3005c1c630c582591040",
+    "lanceur/remote.py": "46a44817ba19513f2602d0bbf62a43d69f7afa2000850842f8c5391503db27ad",
+    "lanceur/test_hermes_reasoning.py": "f2248d43363df197a0f9f629befbfa686e7f085791375a5d956ea90155ccb75c",
+    "lanceur/test_hermes_models.py": "0273db9627c260ffd68b4eb25f905b192b15f058a6f05fb174f6c2d955cc57f9",
+    "lanceur/test_hermes_inference.py": "22c1bb4c4b799fedbdc1a6c952610a56d79cbe4be3fd9d0a925d9178fa32262e",
+    "lanceur/test_model_selection_transport.py": "96caac3d077260f7e48e0b1483842fd0252309588ba9dedcb724f4f5f42503f3",
+    "lanceur/test_thinking_modes.py": "d89ba086539e960c1fa91a07e8f8a469938ac81d2a1ff4623a90041d9f881269"
+  },
+  "verification": {
+    "python_compile": "passed",
+    "scoped_git_diff_check_with_cr_at_eol": "passed"
+  },
+  "secret_exposure": false
+}

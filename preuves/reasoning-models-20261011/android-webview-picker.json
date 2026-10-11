@@ -1,0 +1,28 @@
+{
+  "observed": "2026-10-11T22:20:17.074Z",
+  "passed": true,
+  "synthetic_only": true,
+  "real_webview": true,
+  "real_native_popup": true,
+  "debug_demo_no_server": true,
+  "serial": "emulator-5554",
+  "checks": [
+    "121 available options; unavailable model hidden",
+    "Native Android popup opens the long catalogue",
+    "Five attempted catalogue polls defer requests and preserve native popup and option nodes",
+    "Late startup drawLibrary preserves the native popup, status, option nodes and reasoning modes until blur",
+    "Four native swipe gestures move the options list",
+    "Native tap commits the scrolled model into its conversation",
+    "Changed catalogue waits for blur before changing the option list",
+    "A request started before opening the popup also waits for blur before applying its result",
+    "No horizontal overflow or unhandled WebView errors"
+  ],
+  "exceptions": 0,
+  "available_options": 121,
+  "native_swipes": 4,
+  "deferred_poll_attempts": 5,
+  "inflight_result_deferred": true,
+  "late_library_redraw_deferred": true,
+  "native_popup_dom_focus": true,
+  "selected_model_index": 114
+}

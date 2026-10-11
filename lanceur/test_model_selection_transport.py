@@ -19,6 +19,8 @@ class ModelSelectionTransportTests(unittest.TestCase):
         self.store.configure({'enabled': True, 'url': 'wireguard://10.77.0.1:8766'})
         self.access = self.store.issue('Temporary model selector')
         self.calls = []
+        self.cloud_caps={'vision':False,'context_length':32000,'thinking':True,
+                         'reasoning_mode':'effort','reasoning_efforts':['none','medium','high']}
         parent = self
 
         class Agent:
@@ -26,7 +28,7 @@ class ModelSelectionTransportTests(unittest.TestCase):
                 if requested == 'forbidden': raise Denied('Ce modèle n’est pas autorisé.')
                 if requested not in (None, 'fred-qwen', 'cloud-test'): raise ValueError('Modèle inconnu.')
                 return {'id': requested or 'fred-qwen', 'local': requested != 'cloud-test',
-                        'capabilities': {'vision': False, 'context_length': 32000}}
+                        'capabilities': dict(parent.cloud_caps)}
 
             def model_catalog(self, owner):
                 return {'object': 'list', 'default_model': 'fred-qwen', 'source': 'hermes', 'data': [
@@ -102,6 +104,33 @@ class ModelSelectionTransportTests(unittest.TestCase):
         code, raw = self.call('/v1/chat/completions', value)
         self.assertEqual(400, code); self.assertEqual([], self.calls)
         self.assertEqual('image_not_supported', json.loads(raw)['error']['code'])
+    def test_nemotron_levels_are_exact_and_max_is_rejected_before_agent(self):
+        for effort in ('none','medium','high'):
+            with self.subTest(effort=effort):
+                value={**self.body('cloud-test'),'reasoning_effort':effort}
+                self.assertEqual(self.call('/v1/chat/completions',value)[0],200)
+                self.assertEqual(self.calls[-1][1]['reasoning_effort'],effort)
+        before=len(self.calls)
+        for effort in ('max','low','xhigh'):
+            with self.subTest(effort=effort):
+                self.assertEqual(self.call('/v1/chat/completions',{**self.body('cloud-test'),'reasoning_effort':effort})[0],400)
+        self.assertEqual(len(self.calls),before)
+    def test_max_model_preserves_canonical_level_and_conflicting_template_is_rejected(self):
+        self.cloud_caps['reasoning_efforts']=['none','low','medium','high','xhigh','max']
+        value={**self.body('cloud-test'),'reasoning_effort':'max',
+            'chat_template_kwargs':{'enable_thinking':True,'reasoning_effort':'max'}}
+        self.assertEqual(self.call('/v1/chat/completions',value)[0],200)
+        self.assertEqual(self.calls[-1][1]['reasoning_effort'],'max')
+        self.assertEqual(self.calls[-1][1]['chat_template_kwargs']['reasoning_effort'],'max')
+        before=len(self.calls);value['chat_template_kwargs']['enable_thinking']=False
+        self.assertEqual(self.call('/v1/chat/completions',value)[0],400)
+        self.assertEqual(len(self.calls),before)
+    def test_mandatory_reasoning_rejects_disable_and_toggle_on_is_not_downgraded(self):
+        self.cloud_caps['reasoning_efforts']=['low','medium','high','max']
+        self.assertEqual(self.call('/v1/chat/completions',{**self.body('cloud-test'),'reasoning_effort':'none'})[0],400)
+        self.cloud_caps.update(reasoning_mode='toggle',reasoning_efforts=['none','on'])
+        self.assertEqual(self.call('/v1/chat/completions',{**self.body('cloud-test'),'reasoning_effort':'on'})[0],200)
+        self.assertEqual(self.calls[-1][1]['reasoning_effort'],'on')
 
 
 if __name__ == '__main__': unittest.main()

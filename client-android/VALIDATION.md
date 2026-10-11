@@ -1,4 +1,22 @@
-# Validation Android — 11 octobre 2026
+# Validation Android — 12 octobre 2026
+
+## Version 1.0.10 — réflexion propre à chaque modèle
+
+APK **1.0.10/code 11** publiée avec le certificat existant. Les 36 contrôles
+de l’artefact final et les neuf contrôles de la vraie popup Android passent.
+Une garde conserve le statut, les options et les niveaux pendant les redraws
+de bibliothèque. Les préférences chiffrées conservent les valeurs canoniques
+et les choix par modèle, y compris après réouverture.
+
+Quinze combinaisons annoncées sont transmises sans conversion dans le contexte
+et le chat SSE via WireGuard authentifié ; 19 préférences invalides sont refusées
+sans écriture. Les contrats du catalogue, du correcteur direct et de la mise
+à jour passent sur l’APK finale. Les 23 ressources vocales et JNI restent
+identiques à l’APK 1.0.9. Les réponses de fournisseur sont synthétiques ; aucun
+nouvel essai physique ARM64 ni acoustique n’est revendiqué.
+
+[Rapport Android](../preuves/reasoning-models-20261011/ANDROID.md),
+[contrôles de livraison](../preuves/reasoning-models-20261011/delivery-validation.json).
 
 ## Version 1.0.9 — menu de modèles stable
 

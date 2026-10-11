@@ -206,8 +206,13 @@ class HermesConversations:
         public = visible_messages(messages)
         if not public or not public[-1]['content'] and not isinstance(messages[-1].get('content'), list): raise ValueError('Message utilisateur vide.')
         selection=self.models.select(owner,data.get('model')) if self.models else {'id':'fred-qwen','local':True,'native_model':'fred-qwen'}
-        fingerprint = hashlib.sha256(encoded({'messages': messages, 'conversation': conversation, 'model':selection['id'],
-                                              'project': project, 'document': document, 'effort': data.get('reasoning_effort')}).encode()).hexdigest()
+        from hermes_reasoning import request_reasoning
+        from chat_attachments import capabilities as local_capabilities
+        reasoning_request=request_reasoning(data,selection.get('capabilities') or local_capabilities({}))
+        identity={'messages': messages, 'conversation': conversation, 'model':selection['id'],
+                  'project': project, 'document': document, 'effort':reasoning_request['effort']}
+        if reasoning_request['effort'] is None and reasoning_request['enabled'] is True:identity['thinking']=True
+        fingerprint=hashlib.sha256(encoded(identity).encode()).hexdigest()
         with self.admission(owner), self.db() as db:
             if self.models and not self.models.valid(owner,selection):raise Denied('Modèle désactivé pour ce compte.')
             if db.execute('SELECT 1 FROM agent_cancellations WHERE owner=? AND request=? AND created>?',(owner,request,time.time()-86400)).fetchone():
@@ -238,6 +243,7 @@ class HermesConversations:
                        'remote': '', 'created': time.monotonic(), 'model_calls': 0, 'tokens': 0,
                        'inference_phase': '', 'reasoning_content': ''}
             context['model_selection']=selection
+            context['reasoning_request']=reasoning_request
             context['cancel'] = context['cancelled']
             db.execute('INSERT INTO agent_runs(owner,request,conversation,session,fingerprint,state,input,messages,created,updated,model) VALUES(?,?,?,?,?,?,?,?,?,?,?)',
                        (owner, request, conversation, session, fingerprint, 'starting', encoded(public[-1]), encoded(public), time.time(), time.time(),selection['id'] if self.models else ''))
@@ -248,7 +254,7 @@ class HermesConversations:
             with self.store.lock: self.store.active += 1
         body = {'session_id': session, 'input': [{'role': 'user', 'content': messages[-1]['content']}],
                 'instructions': '\n'.join(m['content'] for m in messages if m['role'] == 'system'),
-                'model_options': {'reasoning_effort': data.get('reasoning_effort', 'none')}}
+                'model_options': reasoning_request['model_options']}
         if self.models:
             body['model']=selection['native_model']
             if not selection['local']:body['provider']=selection['native_provider']
@@ -443,7 +449,7 @@ class HermesConversations:
             if not self.valid(owner, context): raise Denied('Accès désactivé avant livraison.')
             output = terminal.get('output', '')
             if not isinstance(output, str) or not output.strip() or len(output.encode()) > 4 * 1024 * 1024: raise ValueError('Réponse de l’assistant vide, invalide ou trop volumineuse.')
-            reasoning = context['reasoning_content'] if data.get('reasoning_effort', 'none') != 'none' else ''
+            reasoning = context['reasoning_content'] if context['reasoning_request']['enabled'] is not False else ''
             # Serialize revocation and delivery commit, but never hold the
             # access lock while waiting for the model or an external tool.
             with self.store.lock:

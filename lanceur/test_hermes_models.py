@@ -33,7 +33,8 @@ class Source:
         self.key = 'fixture-provider-key'
         self.rows = [{'provider':'fixture','label':'Provider fixture','configured':True,
             'base_url':endpoint,'api_mode':'chat_completions','models':[
-                {'id':'model-a','name':'Model A','context_length':131072,'capabilities':{'vision':True,'thinking':True}},
+                {'id':'model-a','name':'Model A','context_length':131072,'capabilities':{'vision':True,'thinking':True,
+                    'reasoning_efforts':['none','low','medium','high','max']}},
                 {'id':'model-b','name':'Model B','context_length':65536}]}]
         self.calls = []
     def discover(self):return {'providers':copy.deepcopy(self.rows)}
@@ -152,6 +153,27 @@ class ModelsTests(unittest.TestCase):
         context=self.prepare(rows[0]['id'],request);first=context['body']['session_id'];self.clear()
         with self.assertRaises(Conflict):self.prepare(rows[1]['id'],request)
         second=self.prepare(rows[1]['id'])['body']['session_id'];self.assertNotEqual(first,second)
+    def test_reasoning_is_exact_and_invalid_level_is_refused_before_profile_or_run(self):
+        selected=self.shared()[0]['id']
+        data={'model':selected,'messages':[{'role':'user','content':'Q'}],'reasoning_effort':'max'}
+        context=self.manager._prepare(self.a,data,secrets.token_hex(16),'effort',None,None,False)[1]
+        self.assertEqual(context['body']['model_options'],{'reasoning_effort':'max'})
+        self.clear()
+        with self.accounts._db() as db:before=db.execute('SELECT COUNT(*) FROM hermes_bindings').fetchone()[0]
+        with self.assertRaises(ValueError):self.manager._prepare(self.a,{**data,'reasoning_effort':'xhigh'},
+            secrets.token_hex(16),'invalid-effort',None,None,False)
+        self.assertEqual(self.manager.active,{})
+        with self.accounts._db() as db:self.assertEqual(db.execute('SELECT COUNT(*) FROM hermes_bindings').fetchone()[0],before)
+        self.assertEqual(self.service.calls,[])
+    def test_toggle_is_structured_and_omission_keeps_native_default(self):
+        self.source.rows[0]['models'][0]['capabilities'].update(reasoning_mode='toggle',reasoning_efforts=['none','on'])
+        selected=self.shared()[0]['id'];data={'model':selected,'messages':[{'role':'user','content':'Q'}]}
+        context=self.manager._prepare(self.a,{**data,'reasoning_effort':'on'},secrets.token_hex(16),'toggle',None,None,False)[1]
+        self.assertEqual(context['body']['model_options'],{'reasoning':{'enabled':True}})
+        self.clear()
+        context=self.manager._prepare(self.a,data,secrets.token_hex(16),'default',None,None,False)[1]
+        self.assertEqual(context['body']['model_options'],{})
+        self.assertIsNone(context['reasoning_request']['enabled'])
     def test_history_projection_keeps_selected_model_and_does_not_merge_other_model(self):
         selected=self.shared()[0]['id'];request=secrets.token_hex(16)
         history={'currentId':'discussion','conversations':[{'id':'discussion','title':'Test','model':selected,
@@ -421,6 +443,14 @@ class NativeCloudTests(unittest.TestCase):
         self.assertNotIn(self.source.key,(profile/'.env').read_text())
         self.assertNotIn(self.source.key,(profile/'config.yaml').read_text())
         self.assertEqual(self.store.scheduler.snapshot()['active'],0)
+    def test_actual_native_gateway_keeps_max_effort_in_provider_http_request(self):
+        self.facade.start();model=self.facade.model_catalog(self.owner)['data'][1]
+        request=secrets.token_hex(16)
+        list(self.facade.stream(self.owner,{'model':model['id'],'messages':[{'role':'user','content':'Reply briefly.'}],
+            'reasoning_effort':'max'},request,'native-max'))
+        self.assertEqual(self.facade.conversations.reconcile(self.owner,request,'native-max')['status'],'completed')
+        self.assertTrue(self.cloud.calls)
+        self.assertEqual(self.cloud.calls[0][2].get('reasoning_effort'),'max')
     def test_native_key_cmd_and_auxiliary_main_cover_chat_and_responses_without_qwen(self):
         # Real installed SDK clients, provider resolver, key_cmd and Fred broker.
         # Only the network/model endpoint is synthetic.

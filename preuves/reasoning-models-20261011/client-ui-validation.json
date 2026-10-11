@@ -1,0 +1,229 @@
+{
+  "schema_version": 1,
+  "validated_at_utc": "2026-10-11T22:18:38.237187+00:00",
+  "passed": true,
+  "tests": [
+    {
+      "test": "client-qwen/test_thinking_ui.cjs",
+      "duration_seconds": 8.714,
+      "passed": true,
+      "result": {
+        "passed": true,
+        "checks": [
+          {
+            "platform": "windows",
+            "passed": true,
+            "all_eight_efforts_exact_in_chat_and_context": true,
+            "model_specific_controls": true,
+            "nemotron_maximum_is_announced_high": true,
+            "per_model_choice_restored": true,
+            "toggle_on_exact": true,
+            "automatic_override_omitted": true,
+            "automatic_note_visible": true,
+            "forced_level_preserved": true,
+            "forced_on_preserved": true,
+            "late_metadata_during_turn_keeps_snapshot": true,
+            "withdrawn_level_normalized_and_persisted": true,
+            "unavailable_model_keeps_preferences": true,
+            "restored_unknown_model_keeps_preferences": true,
+            "legacy_preferences_supported": true,
+            "corrector_direct_unchanged": true,
+            "phone_controls_fit": true
+          },
+          {
+            "platform": "android",
+            "passed": true,
+            "all_eight_efforts_exact_in_chat_and_context": true,
+            "model_specific_controls": true,
+            "nemotron_maximum_is_announced_high": true,
+            "per_model_choice_restored": true,
+            "toggle_on_exact": true,
+            "automatic_override_omitted": true,
+            "automatic_note_visible": true,
+            "forced_level_preserved": true,
+            "forced_on_preserved": true,
+            "late_metadata_during_turn_keeps_snapshot": true,
+            "withdrawn_level_normalized_and_persisted": true,
+            "unavailable_model_keeps_preferences": true,
+            "restored_unknown_model_keeps_preferences": true,
+            "legacy_preferences_supported": true,
+            "corrector_direct_unchanged": true,
+            "phone_controls_fit": true
+          }
+        ],
+        "simulation": "Local catalogue, preferences and SSE fixtures; no private provider, server model or credential"
+      },
+      "phase": "final model widget guard"
+    },
+    {
+      "test": "client-qwen/test_model_selector_ui.cjs",
+      "duration_seconds": 6.52,
+      "passed": true,
+      "result": {
+        "passed": true,
+        "checks": [
+          {
+            "platform": "windows",
+            "passed": true,
+            "initial_loading_placeholder": true,
+            "long_catalogue_keyboard": true,
+            "polling_preserves_option_nodes_and_focus": true,
+            "focused_polling_suspended_and_caught_up_on_blur": true,
+            "late_library_redraw_preserves_widget_and_reasoning": true,
+            "late_catalogue_reply_deferred_until_blur": true,
+            "late_catalogue_error_deferred_until_blur": true,
+            "changed_catalogue_deferred_until_blur": true,
+            "loading_keeps_picker_usable": true,
+            "loading_accessibility_outside_native_picker": true,
+            "unavailable_unselected_hidden": true,
+            "default_model": true,
+            "per_conversation_history": true,
+            "provider_labels": true,
+            "vision_capabilities": true,
+            "context_selected_model": true,
+            "unknown_capacity_without_percentage": true,
+            "refresh_without_substitution": true,
+            "inflight_model_binding": true,
+            "unavailable_or_removed_requires_choice": true,
+            "corrector_independent": true,
+            "legacy_catalogue": true,
+            "import_reload_preserves_choice": true
+          },
+          {
+            "platform": "android",
+            "passed": true,
+            "initial_loading_placeholder": true,
+            "long_catalogue_keyboard": true,
+            "polling_preserves_option_nodes_and_focus": true,
+            "focused_polling_suspended_and_caught_up_on_blur": true,
+            "late_library_redraw_preserves_widget_and_reasoning": true,
+            "late_catalogue_reply_deferred_until_blur": true,
+            "late_catalogue_error_deferred_until_blur": true,
+            "changed_catalogue_deferred_until_blur": true,
+            "loading_keeps_picker_usable": true,
+            "loading_accessibility_outside_native_picker": true,
+            "unavailable_unselected_hidden": true,
+            "default_model": true,
+            "per_conversation_history": true,
+            "provider_labels": true,
+            "vision_capabilities": true,
+            "context_selected_model": true,
+            "unknown_capacity_without_percentage": true,
+            "refresh_without_substitution": true,
+            "inflight_model_binding": true,
+            "unavailable_or_removed_requires_choice": true,
+            "corrector_independent": true,
+            "legacy_catalogue": true,
+            "import_reload_preserves_choice": true
+          }
+        ],
+        "simulation": "Local HTTP fixture; no private providers, credentials or server models"
+      },
+      "phase": "final model widget guard"
+    },
+    {
+      "test": "client-qwen/test_conversation_ui.cjs",
+      "duration_seconds": 8.994,
+      "passed": true,
+      "checks": 8,
+      "native_asr_chats": 4,
+      "reasoning": "exact max preserved",
+      "validated_chat_sha256": "992d4f320cf7c20b923fbb38e25622582a74aae88bc61c9f336ae18e21641c20",
+      "phase": "Before the final guard; all other product sources identical"
+    },
+    {
+      "test": "client-qwen/test_conversation_ui.cjs --automatic-reasoning",
+      "duration_seconds": 9.027,
+      "passed": true,
+      "checks": 8,
+      "native_asr_chats": 4,
+      "reasoning": "automatic override omitted",
+      "validated_chat_sha256": "992d4f320cf7c20b923fbb38e25622582a74aae88bc61c9f336ae18e21641c20",
+      "phase": "Before the final guard; all other product sources identical"
+    },
+    {
+      "test": "client-qwen/test_direct_corrector_ui.cjs",
+      "duration_seconds": 4.294,
+      "passed": true,
+      "platforms": [
+        "windows",
+        "android"
+      ],
+      "checks": [
+        "three direct modes",
+        "progressive SSE and Android JSON fallback",
+        "partial cancellation",
+        "failure without Hermes recovery",
+        "history after reload"
+      ],
+      "validated_chat_sha256": "992d4f320cf7c20b923fbb38e25622582a74aae88bc61c9f336ae18e21641c20",
+      "phase": "Before the final guard; all other product sources identical"
+    },
+    {
+      "test": "client-qwen/test_hermes_ui.cjs",
+      "duration_seconds": 5.626,
+      "passed": true,
+      "output": "Windows Hermes UI verified: final-only voice, stable turns, opaque approvals across heartbeat/disconnect/reload, once/refusal, corrector and shared scripts.",
+      "validated_chat_sha256": "992d4f320cf7c20b923fbb38e25622582a74aae88bc61c9f336ae18e21641c20",
+      "phase": "Before the final guard; all other product sources identical"
+    },
+    {
+      "test": "client-qwen/test_thinking_preferences.py",
+      "passed": true,
+      "tests": 4,
+      "test_duration_seconds": 0.174,
+      "checks": [
+        "9 exact canonical levels in encrypted DPAPI settings",
+        "global preference retained on automatic omission",
+        "512-entry model map and strict invalid-value rejection without writes",
+        "scalar aliases rejected"
+      ],
+      "phase": "Product Python unchanged by final HTML guard"
+    }
+  ],
+  "final_guard": {
+    "scope": "modelRefresh preserves the whole model widget and reasoning capabilities while picker is focused; change and blur apply forced updates",
+    "red_baseline": "model-widget-baseline.json",
+    "qualified_by": "Final Windows and Android UI fixtures; late drawLibrary, in-flight catalogue and error; native packaged checks are recorded separately by the release agents",
+    "observed_redraw_source": "Windows conversation.js refresh polls every 200 ms and calls refreshButtons -> drawLibrary even when voice conversation is inactive. The focused model widget guard covers this repeated update and late workspace/bootstrap redraws."
+  },
+  "scope": {
+    "ui": "Production Windows source and production Android transform rendered in memory",
+    "providers": "Synthetic metadata and localhost HTTP fixtures only",
+    "windows_preferences": "Actual DPAPI encrypted temporary settings",
+    "voice": "Simulated native ASR and PCM timing; no microphone",
+    "external_provider_requests": 0,
+    "generated_android_assets_changed_by_tests": false
+  },
+  "supported_values": [
+    "none",
+    "minimal",
+    "low",
+    "medium",
+    "high",
+    "xhigh",
+    "max",
+    "ultra",
+    "on"
+  ],
+  "contract": {
+    "metadata": "Only advertised capabilities.reasoning_efforts appear; no invented none/max for automatic or forced models",
+    "automatic": "reasoning_effort omitted from chat/context/voice",
+    "toggle": "none/on kept exact",
+    "preferences": "Bounded thinking_by_model preserves choices; absent capability does not overwrite restored global or model preferences",
+    "nemotron_fixture": "Ultra offers none/medium/high; its maximum is high, not max"
+  },
+  "source_sha256": {
+    "client-qwen/thinking.js": "4a9a7079f517e8150984cc63634e2f9030277523fdd0bfc6d9f9810b143a6f07",
+    "client-qwen/ui.js": "a29dfe033cd5279698ebe0ebf7097326ef4d37c103cefe206de954aabe638a5f",
+    "client-qwen/ui.css": "d2d73bf570866ff287cccf28fe91053e18d60777cdc34921f8887a514371dfa0",
+    "client-qwen/chat.html": "1e6565bd1994953d5882a0f23501a689896912fee2bd93df92d11b06ca69c61f",
+    "client-qwen/client.py": "34aa67e8399bcb8377ae547c4cd796993223fa3b6803b726371a7a3e746016c5",
+    "client-qwen/test_thinking_ui.cjs": "41dcfd441a1ac7dcd1f46e3981d5559c680ecf21ebb703ac61d40c5e0452babe",
+    "client-qwen/test_thinking_preferences.py": "089c8b36010403ba7fc435dc434aa4aaba65768bdfcf37a1025c94d05490c776",
+    "client-qwen/test_conversation_ui.cjs": "ea6b62ca329c35a6ed571ba2b7f2d7099267291ba91dd8d9a57a9b9bfcbf63e0",
+    "client-qwen/test_model_selector_ui.cjs": "624299532827c01956a2f3b4d3111477bd45d4e5016fae42e49f22e4bf92d096",
+    "client-android/scripts/Prepare-Assets.py": "1e9da996f08ec1b41332a149d4bd2285405648537128fb6f4b93dd539d0c2113",
+    "client-qwen/conversation.js": "5c1359d56d1bfc0b0d35eac3ded9ea592fa60f0af7782f635f2532071c01f8cd"
+  }
+}

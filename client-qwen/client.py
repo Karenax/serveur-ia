@@ -600,12 +600,13 @@ def local_key(profile):
 
 def save_preferences(profile,values):
     allowed={'theme':('light','dark','system'),'font':('system','humanist','serif','mono'),
-             'text_size':('compact','standard','large','extra'),'thinking_effort':('none','low','medium','high')}
-    if not isinstance(values,dict) or set(values)-set(allowed)-{'thinking','sidebar_collapsed','corrector_text'}:raise ValueError('Réglages invalides.')
+             'text_size':('compact','standard','large','extra'),'thinking_effort':('none','minimal','low','medium','high','xhigh','max','ultra','on')}
+    if not isinstance(values,dict) or set(values)-set(allowed)-{'thinking','thinking_by_model','sidebar_collapsed','corrector_text'}:raise ValueError('Réglages invalides.')
     for name,value in values.items():
         if name in allowed and value not in allowed[name]:raise ValueError('Réglage invalide : '+name)
         if name in ('thinking','sidebar_collapsed') and type(value) is not bool:raise ValueError('Réglage booléen attendu.')
         if name=='corrector_text' and (not isinstance(value,str) or len(value)>100000):raise ValueError('Brouillon du correcteur invalide (100 000 caractères maximum).')
+        if name=='thinking_by_model' and (not isinstance(value,dict) or len(value)>512 or any(not isinstance(model,str) or not model.strip() or len(model)>512 or any(ord(c)<32 for c in model) or not isinstance(effort,str) or effort not in allowed['thinking_effort'] for model,effort in value.items())):raise ValueError('Réflexion par modèle invalide.')
     from file_lock import locked
     path=settings_path(profile)
     with locked(path):
@@ -745,7 +746,7 @@ def main():
                     assert result['login'] and result['update'] and result['chat'] and result['history'],result
                     assert result['projects'] and result['tasks'] and not result['assistants'],result
                     assert window.text_select and result['textSelection']!='none' and result['copySelection'],result
-                    assert result['thinkingModes']==4 and result['thinkingInline'] and not result['documentMenu'] and result['attachmentPlus'],result
+                    assert result['thinkingModes']>=1 and result['thinkingInline'] and not result['documentMenu'] and result['attachmentPlus'],result
                     Path(sys.argv[sys.argv.index('--result')+1]).write_text(json.dumps({'ok':True,**result}),encoding='utf-8')
                 finally:window.destroy()
             window.events.loaded+=verify_window

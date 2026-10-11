@@ -103,6 +103,8 @@ class HermesPrivateServer:
                                'repetition_penalty', 'chat_template_kwargs', 'tools', 'tool_choice',
                                'response_format', 'parallel_tool_calls', 'stream_options', 'reasoning_effort'}
                     data = {k: v for k, v in data.items() if k in allowed}
+                    from hermes_reasoning import enforce_local_reasoning
+                    data=enforce_local_reasoning(data,context.get('reasoning_request'))
                     data['strata_mcp'] = False
                     cap = data.pop('max_completion_tokens', data.get('max_tokens', 8192))
                     data['max_tokens'] = min(16384, cap) if type(cap) is int and cap > 0 else 8192

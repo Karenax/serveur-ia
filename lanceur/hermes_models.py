@@ -18,6 +18,7 @@ from urllib.parse import urlsplit
 from core import HIDDEN, health, read_json, write_json
 from workspace import Denied
 from chat_attachments import capabilities as attachment_capabilities
+from hermes_reasoning import controls
 
 LOCAL = 'fred-qwen'
 MODEL_ID = re.compile(r'fred-model-[a-f0-9]{24}')
@@ -107,6 +108,9 @@ with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.St
   from hermes_cli.inventory import ConfigContext, build_models_payload
   from hermes_cli.config import coerce_provider_id, stringify_provider_map, get_compatible_custom_providers
   from agent.models_dev import get_model_info, get_model_capabilities
+  from agent.reasoning_effort import OPENAI_COMPAT_WIRE_EFFORTS, codex_supported_efforts
+  from hermes_cli.models_reasoning_caps import nous_model_reasoning_capabilities, openrouter_model_reasoning_capabilities
+  from hermes_cli.models_reasoning_caps import _fetch_caps, _NOUS_CAPS, _OPENROUTER_CAPS
   from hermes_cli.providers import determine_api_mode
   excluded=cfg.get('model_catalog',{}).get('excluded_providers',[])
   ctx=ConfigContext(coerce_provider_id(main.get('provider','')),str(main.get('default') or main.get('name') or ''),
@@ -129,6 +133,12 @@ with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.St
    url=str(candidate.get('api_url') or entry.get('base_url') or entry.get('api') or entry.get('url') or status.get('base_url') or (definition.base_url if definition else '') or '')
    if pid==main_provider:url=str(main.get('base_url') or url)
    selected=[];provider_available=True;unavailable_reason='';copilot_catalog=[]
+   # Discovery is bounded and outside admission locks. Refresh a single public
+   # capability catalogue per aggregator; a stale disk verdict must not cause
+   # Fred to advertise an effort that the route now silently clamps.
+   reasoning_catalog=None
+   if pid in {'nous','openrouter'}:
+    reasoning_catalog=_fetch_caps(_NOUS_CAPS if pid=='nous' else _OPENROUTER_CAPS,timeout=4,force=True)
    if pid in {'copilot','github-copilot'}:
     try:
      from hermes_cli.runtime_provider import resolve_runtime_provider
@@ -154,11 +164,35 @@ with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.St
      if pid in {'copilot','github-copilot'}:mode=copilot_mode(mid,copilot_catalog)
      elif models.opencode_provider_family(pid):mode=models.opencode_model_api_mode(pid,mid)
      elif pid=='azure-foundry':mode=models.azure_foundry_model_api_mode(mid) or mode
+     detail=None;efforts=supports.get('reasoning_effort') or caps.get('reasoning_efforts')
+     thinking=bool(supports.get('reasoning_effort') or supports.get('adaptive_thinking')) or getattr(native_caps,'supports_reasoning',None) is True
+     control_mode='effort' if isinstance(efforts,list) and efforts else 'none'
+     if pid in {'nous','openrouter'}:
+      detail=reasoning_catalog.get(mid) if isinstance(reasoning_catalog,dict) else None
+      if detail is not None:
+       thinking=detail.get('supports_reasoning') is True
+       efforts=detail.get('supported_efforts')
+       if thinking:
+        if isinstance(efforts,list) and efforts:
+         efforts=[e for e in OPENAI_COMPAT_WIRE_EFFORTS if e in efforts]
+         if not detail.get('mandatory') and 'none' not in efforts:efforts.insert(0,'none')
+         if detail.get('mandatory'):efforts=[e for e in efforts if e!='none']
+         if pid=='openrouter' and mid.startswith('openai/') and 'none' not in codex_supported_efforts(mid):efforts=[e for e in efforts if e!='none']
+         control_mode='effort'
+        else:
+         efforts=['on'] if detail.get('mandatory') else ['none','on'];control_mode='toggle'
+       else:efforts=[];control_mode='none'
+     elif pid=='openai-codex':
+      thinking=True;efforts=list(codex_supported_efforts(mid));control_mode='effort'
+     elif pid in {'nvidia','nvidia-nim'}:
+      # The pinned native NVIDIA profile emits no reasoning override. Do not
+      # claim an effort or toggle merely because the model can think internally.
+      efforts=[];control_mode='none'
+     if control_mode=='none':efforts=[]
      selected.append({'id':mid,'name':str(meta.get('name') or (info.name if info else '') or mid),
        'api_mode':mode,'context_length':limits.get('max_prompt_tokens') or limits.get('max_context_window_tokens') or meta.get('context_length') or meta.get('context_window') or (info.context_window if info else None),
        'capabilities':{'vision':supports.get('vision',caps.get('vision',meta.get('vision',getattr(native_caps,'supports_vision',None)))) is True,
-                       'thinking':bool(supports.get('reasoning_effort') or supports.get('adaptive_thinking')) or getattr(native_caps,'supports_reasoning',None) is True,
-                       'reasoning_efforts':supports.get('reasoning_effort')},
+                       'thinking':thinking,'reasoning_mode':control_mode,'reasoning_efforts':efforts},
        'available':provider_available and (not isinstance(meta.get('supported_endpoints'),list) or not meta['supported_endpoints'] or ('/responses' if mode=='codex_responses' else '/chat/completions') in meta['supported_endpoints'])})
    metadata=entry.get('models',{}) if isinstance(entry.get('models'),dict) else {}
    if copilot_catalog:
@@ -295,15 +329,13 @@ class HermesModels:
                         vision=capabilities.get('vision',item.get('vision',False)) is True
                         context=item.get('context_length') or item.get('context_window')
                         context=context if type(context) is int and 0<context<=10000000 else None
-                        efforts=capabilities.get('reasoning_efforts')
-                        efforts=[effort for effort in efforts if isinstance(effort,str) and effort in {'none','low','medium','high','xhigh','max','ultra'}] if isinstance(efforts,list) else None
+                        reasoning=controls(capabilities)
                         rows.append({'id':identity,'name':model,'label':str(item.get('name') or model),
                             'provider':str(provider.get('label') or native),'provider_id':native,'local':False,
                             'base_url':endpoint,'api_mode':mode,'available':provider.get('available',True) is True and item.get('available',True) is True and (context is None or context>=64000),
                             'capabilities':{**attachment_capabilities({'images':vision}),
                                 'vision':vision,'images':vision,'context_length':context,
-                                'thinking':capabilities.get('thinking') is True,
-                                'reasoning_efforts':efforts or (['none','low','medium','high'] if capabilities.get('thinking') is True else ['none'])},
+                                **reasoning},
                             'native_provider':'custom:'+identity,'native_model':model,'source_home':source_home})
                     providers[-1]['model_count']=len({row['id'] for row in rows if row['provider_id']==native})
                     providers[-1]['available_model_count']=len({row['id'] for row in rows if row['provider_id']==native and row['available']})
@@ -323,7 +355,7 @@ class HermesModels:
         context=state.get('context_length') or state.get('context_size') or 262144
         return {'id':LOCAL,'name':str(state.get('model') or alias or 'Qwen local'),'label':'Qwen local',
                 'provider':'Qwen local','local':True,'available':state.get('loaded') is True,
-                'capabilities':{**attachment_capabilities(state),'vision':vision,'context_length':context},'native_model':LOCAL}
+                'capabilities':{**attachment_capabilities(state),'vision':vision,'context_length':context,'reasoning_mode':'effort'},'native_model':LOCAL}
 
     @staticmethod
     def public(row):

@@ -1,10 +1,22 @@
 # Contexte de reprise — serveur Fred
 
-Mise à jour : 11 octobre 2026.
+Mise à jour : 12 octobre 2026.
 
 ## Objectif actuel
 
-Dernière demande : sélectionner les modèles Hermes par fournisseur dans la
+Dernière demande : vérifier le niveau de réflexion des messages Nemotron et
+proposer seulement les réglages disponibles pour chaque modèle. L’audit en
+lecture seule retrouve high pour les deux derniers envois, par correspondance
+exacte des empreintes Fred ; max était silencieusement normalisé vers high.
+Le Nemotron Ultra OpenRouter utilisé annonce medium/high, avec désactivation
+facultative : le maximum disponible est high. La correction conserve les
+efforts canoniques, contrôle les capacités du modèle et mémorise le choix par
+modèle dans les clients Windows/Android. Les modèles à simple activation ont
+Sans/Activée ; ceux sans réglage connu gardent le comportement automatique.
+Livraison publiée : Windows/serveur 3.5.27, Android 1.0.10/code 11.
+Preuves : `preuves/reasoning-models-20261011/`.
+
+Demande précédente : sélectionner les modèles Hermes par fournisseur dans la
 console admin, avec un bouton Tout désélectionner. Les cases par fournisseur
 permettent notamment de retirer Nous Portal en une action. Ces contrôles
 réutilisent exposed_models, passent en sélection manuelle et conservent les
@@ -31,7 +43,7 @@ Dernière correction : conversation vocale Windows arrêtée par la synchronisat
 
 Demande précédente du 11 octobre : intégration complète de Hermes pour toutes les conversations Windows/Android et création automatique de profils à chaque accès client. Hermes est activé et les clients signés Windows 3.5.22 / Android 1.0.6 code 7 ont été publiés. Les essais natifs avec le Qwen local et le contrôle authentifié du client existant passent ; une sauvegarde chiffrée réelle incluant Hermes est créée et vérifiée. La suite finale Hermes compte 59 tests réussis, avec 39 régressions sauvegarde/restauration et 73 régressions accès/espaces/appareils. Un profil par accès, une session par conversation et un projet natif Hermes par projet Fred ; les documents et recherches EG2 restent soumis aux droits Fred. Guide : [HERMES-FRED.md](lanceur/HERMES-FRED.md). Preuves : [validation](preuves/hermes-fred/VALIDATION.md). Les outils système sans isolation ne sont pas activés.
 
-L’utilisateur a autorisé le développement complet des cinq premiers lots du plan global, avec preuves : **lots 0, 1, 2, 3 et 4**. Le plan commence à 0. Il a choisi « Sauvegarde sur le serveur pour commencer » ; aucune destination NAS n’est activée. Il a ensuite demandé les **lots 6 et 8 en parallèle** et l’explication du lot 9, désormais livrés. **Whisper Small multilingue local** est livré sur Windows et Android. Demande précédente : intégrer la conversation vocale complète **uniquement dans Windows**, après la fin de l’autre chat Codex intégrant EG2 et la mémoire. Cette attente a été respectée : « Évaluer le dépôt Talorys » était terminé avant toute modification de cette intégration. La conversation Windows est livrée en 3.5.21 ; Android conserve la dictée manuelle ; les mises à jour automatiques, Hermes puis le correcteur direct puis le sélecteur portent la version actuelle à 1.0.9/code 10.
+L’utilisateur a autorisé le développement complet des cinq premiers lots du plan global, avec preuves : **lots 0, 1, 2, 3 et 4**. Le plan commence à 0. Il a choisi « Sauvegarde sur le serveur pour commencer » ; aucune destination NAS n’est activée. Il a ensuite demandé les **lots 6 et 8 en parallèle** et l’explication du lot 9, désormais livrés. **Whisper Small multilingue local** est livré sur Windows et Android. Demande précédente : intégrer la conversation vocale complète **uniquement dans Windows**, après la fin de l’autre chat Codex intégrant EG2 et la mémoire. Cette attente a été respectée : « Évaluer le dépôt Talorys » était terminé avant toute modification de cette intégration. La conversation Windows est livrée en 3.5.21 ; Android conserve la dictée manuelle ; les mises à jour automatiques, Hermes puis le correcteur direct puis le sélecteur portent la version actuelle à 1.0.10/code 11.
 
 Ces cinq premiers lots sont **achevés, validés et en service** : 191 tests de régression réussis, 32 scénarios de console, essais Android natifs sur émulateurs téléphone et tablette. Les empreintes des sources sont identiques avant/après cette suite complète. Les lots **6 et 8 sont achevés, validés et en service** : **246 tests de régression réussis en 354,218 s**, 27 scénarios navigateur sans exception JavaScript et essais Android téléphone/tablette sur émulateurs. Les binaires Windows et Android publiés correspondent aux sources vérifiées ; modèle, données, accès et programmation des sauvegardes ont été préservés. La refonte du tableau de bord du lot 5 et les extensions des lots 9/10 restent planifiées. Hermes fournit désormais les outils Fred contrôlés. La conversation du lot 7 est livrée dans Windows ; son extension Android est différée. Le socle minimal d’événements nécessaire aux notifications est intégré, sans déclarer le lot 5 complet.
 
@@ -102,7 +114,7 @@ L’intégration garde l’audio de dictée sur l’appareil et transmet le text
 
 ## Android déjà livré
 
-- APK signé : `client-android/dist/Acces-serveur-Fred-Android.apk`, package `net.karenax.fred`, version **1.0.9**, code 10, Android 8+ ARM64/x86_64, téléphone et tablette. Les trois modes du correcteur passent par Qwen direct ; les conversations gardent Hermes.
+- APK signé : `client-android/dist/Acces-serveur-Fred-Android.apk`, package `net.karenax.fred`, version **1.0.10**, code 11, Android 8+ ARM64/x86_64, téléphone et tablette. Les trois modes du correcteur passent par Qwen direct ; les conversations gardent Hermes, avec réflexion réglable selon le modèle.
 - Import `.fred-android` ou EXE personnel ; choix explicite HTTPS/WireGuard ; moteur WireGuard intégré.
 - Profil, historique et préférences chiffrés localement avec Android Keystore ; synchronisation avec le serveur.
 - Compilation et tests sur émulateurs Android 16 téléphone/tablette réussis ; tunnel réel et données synthétiques, transport HTTPS public vérifié sans accès réel. Voir le rapport pour la portée exacte. Validation sur appareil physique encore nécessaire.
@@ -112,7 +124,7 @@ L’intégration garde l’audio de dictée sur l’appareil et transmet le text
 
 ## Livraison et exploitation actuelles
 
-- Dernière livraison publiée : serveur et client Windows **3.5.26** ; APK Android **1.0.9**, code 10. Manifeste Windows Ed25519 et signature APK vérifiés ; clés existantes conservées. Le catalogue du profil Hermes natif et le menu stable sont publiés : 134 modèles externes utilisables plus Qwen, avec choix administrable et partage global. Le correcteur reste direct, les téléchargements authentifiés sont vérifiés et le modèle reste chargé. Preuves : `preuves/model-picker-fix-20261011/`.
+- Dernière livraison publiée : serveur et client Windows **3.5.27** ; APK Android **1.0.10**, code 11. Manifeste Windows Ed25519 et signature APK vérifiés ; clés existantes conservées. La réflexion suit les capacités du modèle et le choix est mémorisé par modèle ; max incompatible est refusé sans rabattement vers high. Le menu reste stable pendant les redraws et les polls vocaux. Le correcteur reste direct, les téléchargements authentifiés sont vérifiés et Qwen reste chargé ; politique de partage et sélection admin conservées. Preuves : `preuves/reasoning-models-20261011/`.
 - Console rechargée avec `Start-Interface-Qwen.ps1 -SansNavigateur -PreserverEtatModele`. Les processus Strata 8200 et 14628 et leurs dates de création sont inchangés ; le modèle reste chargé.
 - Archives initiales chiffrées créées et vérifiées sur les données actuelles. État réel et empreintes de cette livraison : `preuves/lots-6-8/production-validation.json`. L’état historique des lots 0–4 reste conservé dans leur propre rapport. Aucune restauration exécutée sur les données de production.
 - Phrase forte privée : `lanceur/sauvegardes/phrase-recuperation.txt`, dossier Windows protégé. Ne jamais recopier sa valeur dans ce contexte, Git, journaux ou messages. Secret automatique distinct protégé par DPAPI.
