@@ -4,7 +4,15 @@ Mise à jour : 11 octobre 2026.
 
 ## Objectif actuel
 
-Dernière demande : corriger le catalogue et le défilement du sélecteur Hermes.
+Dernière demande : sélectionner les modèles Hermes par fournisseur dans la
+console admin, avec un bouton Tout désélectionner. Les cases par fournisseur
+permettent notamment de retirer Nous Portal en une action. Ces contrôles
+réutilisent exposed_models, passent en sélection manuelle et conservent les
+droits de partage ; Qwen local reste disponible. La console sert les fichiers
+actualisés sans redémarrage ni nouvelle compilation des clients.
+Preuves : `preuves/provider-selector-20261011/`.
+
+Demande précédente : corriger le catalogue et le défilement du sélecteur Hermes.
 Fred lisait ~/.hermes au lieu du dossier natif Windows %LOCALAPPDATA%/hermes.
 La correction suit le profil actif et masque les modèles externes indisponibles.
 La console Clients → Modèles disponibles dans Hermes permet de proposer tous les

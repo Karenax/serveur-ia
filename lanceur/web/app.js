@@ -236,7 +236,26 @@ async function refreshHermesModels(force=false){
     const auto=element('input');auto.type='checkbox';auto.id='hermes-models-auto';auto.checked=automatic;auto.disabled=hermesModelsBusy;
     auto.onchange=()=>saveHermesModels({exposed_models:auto.checked?null:models.map(model=>model.id)});
     container.append(labelled('Proposer tous les modèles utilisables de Hermes',auto,'Désactivez cette option pour choisir les modèles affichés dans les clients.'));
+    const providerHeading=element('div',null,'hermes-provider-heading');
+    providerHeading.append(element('h4','Fournisseurs proposés aux clients'));
+    const clear=element('button','Tout désélectionner','button secondary');clear.type='button';clear.id='hermes-models-clear';clear.disabled=hermesModelsBusy||(!automatic&&!value.exposed_models.length);
+    clear.onclick=()=>saveHermesModels({exposed_models:[]});providerHeading.append(clear);container.append(providerHeading);
+    container.append(element('p','Cochez ou décochez un fournisseur pour sélectionner ou retirer tous ses modèles. Ces actions passent en sélection manuelle ; Qwen local reste disponible.','muted'));
     if(models.length){
+      const groups=new Map();for(const model of models){const provider=model.provider||'Fournisseur Hermes';if(!groups.has(provider))groups.set(provider,[]);groups.get(provider).push(model);}
+      const providerList=element('div',null,'hermes-provider-list');providerList.id='hermes-provider-list';
+      for(const [provider,group] of [...groups].sort(([a],[b])=>a.localeCompare(b,'fr'))){
+        const row=element('label',null,'hermes-provider-row'),choice=element('input'),text=element('span');
+        const selectedCount=group.filter(model=>automatic||model.exposed!==false).length;
+        choice.type='checkbox';choice.dataset.provider=provider;choice.checked=selectedCount===group.length;choice.indeterminate=selectedCount>0&&selectedCount<group.length;choice.disabled=hermesModelsBusy;
+        choice.onchange=()=>{
+          const selected=new Set(hermesModelsState.exposed_models??models.map(item=>item.id));
+          for(const model of group){if(choice.checked)selected.add(model.id);else selected.delete(model.id);}
+          saveHermesModels({exposed_models:[...selected]});
+        };
+        text.append(element('strong',provider),element('small',selectedCount+' / '+group.length+' modèles sélectionnés'));row.append(choice,text);providerList.append(row);
+      }
+      container.append(providerList);
       const search=element('input');search.type='search';search.id='hermes-model-search';search.placeholder='Rechercher un modèle ou un fournisseur';search.disabled=hermesModelsBusy;
       container.append(labelled('Modèles proposés aux clients',search));
       const list=element('div',null,'hermes-model-list');list.id='hermes-model-list';
