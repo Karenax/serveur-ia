@@ -12,7 +12,7 @@ import socket
 import subprocess
 import threading
 import time
-from urllib.parse import urlsplit, quote
+from urllib.parse import urlsplit, quote, parse_qs
 import psutil
 from core import ROOT, HOME, BASE_PATH, PYTHON, HIDDEN, read_json, write_json, defaults_from_config, validate, build_config, health, matching_servers, process_identity, same_process, stop_processes, available_port, tail, arg
 from operations import Operations, VERSION
@@ -305,7 +305,10 @@ def serve(port=8765, controller=None):
                 if not controller.hermes:
                     return self.respond(200, {'enabled': False, 'providers': [], 'share_all': False, 'shared_accounts': []})
                 try:
-                    return self.respond(200, {'enabled': True, **controller.hermes.models.admin()})
+                    models = controller.hermes.models
+                    if parse_qs(urlsplit(self.path).query).get('refresh') == ['1']:
+                        models.refresh(force=True)
+                    return self.respond(200, {'enabled': True, **models.admin()})
                 except (OSError, ValueError, RuntimeError):
                     return self.respond(503, {'error': 'Liste des fournisseurs Hermes indisponible.'})
             if path == '/api/client-storage':

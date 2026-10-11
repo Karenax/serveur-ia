@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "validated_at_utc": "2026-10-11T21:32:27.579417+00:00",
+  "passed": true,
+  "tests": [
+    {
+      "test": "client-qwen/test_model_selector_ui.cjs",
+      "duration_seconds": 6.069,
+      "result": {
+        "passed": true,
+        "checks": [
+          {
+            "platform": "windows",
+            "passed": true,
+            "initial_loading_placeholder": true,
+            "long_catalogue_keyboard": true,
+            "polling_preserves_option_nodes_and_focus": true,
+            "focused_polling_suspended_and_caught_up_on_blur": true,
+            "late_catalogue_reply_deferred_until_blur": true,
+            "late_catalogue_error_deferred_until_blur": true,
+            "changed_catalogue_deferred_until_blur": true,
+            "loading_keeps_picker_usable": true,
+            "loading_accessibility_outside_native_picker": true,
+            "unavailable_unselected_hidden": true,
+            "default_model": true,
+            "per_conversation_history": true,
+            "provider_labels": true,
+            "vision_capabilities": true,
+            "context_selected_model": true,
+            "unknown_capacity_without_percentage": true,
+            "refresh_without_substitution": true,
+            "inflight_model_binding": true,
+            "unavailable_or_removed_requires_choice": true,
+            "corrector_independent": true,
+            "legacy_catalogue": true,
+            "import_reload_preserves_choice": true
+          },
+          {
+            "platform": "android",
+            "passed": true,
+            "initial_loading_placeholder": true,
+            "long_catalogue_keyboard": true,
+            "polling_preserves_option_nodes_and_focus": true,
+            "focused_polling_suspended_and_caught_up_on_blur": true,
+            "late_catalogue_reply_deferred_until_blur": true,
+            "late_catalogue_error_deferred_until_blur": true,
+            "changed_catalogue_deferred_until_blur": true,
+            "loading_keeps_picker_usable": true,
+            "loading_accessibility_outside_native_picker": true,
+            "unavailable_unselected_hidden": true,
+            "default_model": true,
+            "per_conversation_history": true,
+            "provider_labels": true,
+            "vision_capabilities": true,
+            "context_selected_model": true,
+            "unknown_capacity_without_percentage": true,
+            "refresh_without_substitution": true,
+            "inflight_model_binding": true,
+            "unavailable_or_removed_requires_choice": true,
+            "corrector_independent": true,
+            "legacy_catalogue": true,
+            "import_reload_preserves_choice": true
+          }
+        ],
+        "simulation": "Local HTTP fixture; no private providers, credentials or server models"
+      }
+    },
+    {
+      "test": "client-qwen/test_conversation_ui.cjs",
+      "duration_seconds": 8.794,
+      "result": {
+        "passed": true,
+        "source": "working-tree",
+        "checks": [
+          "Hermes final + delayed sync preserves session and complete text",
+          "all three PCM frames finish without automatic cancellation",
+          "second ASR turn waits for history sync and submits exactly once",
+          "same conversation with unique turn IDs",
+          "real new speech during calculation cancels original turn",
+          "speech playback barge-in cancels correct audio and scheduled sources",
+          "hangup returns controls"
+        ],
+        "chats": 4,
+        "acks": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "simulation": "native ASR and PCM timing; no hardware microphone or server models"
+      }
+    }
+  ],
+  "long_catalogue_entries": 120,
+  "android_ui": "Rendered in memory using the production Prepare-Assets.py transform; generated assets were not changed by these tests",
+  "native_microphone": false,
+  "external_provider_requests": 0,
+  "source_sha256": {
+    "client-qwen/chat.html": "6b481bb36a2f6592f544142f3eacdbbf3b0888aa62f33dd5a980805ae83cc2ca",
+    "client-qwen/ui.css": "5507da1a65e0fe49cd55975edb5219c94112133283ea8663cb13e8efcdbb7419",
+    "client-qwen/test_model_selector_ui.cjs": "51a4c6b873cb6285b5a9ccccf68d4214c59ed1d1a8b1308a1014101ac422aac4",
+    "client-qwen/test_conversation_ui.cjs": "a26e7f2c6a19c980bb60f89afc105e81793be306ebe5f72302c2019825fc3597"
+  },
+  "loading_accessibility": "aria-busy stays on adjacent status; all models polling and late success/error rendering are deferred while the native select has focus, then automatically refreshed on blur. Updating live text during the Android native popup closes it."
+}

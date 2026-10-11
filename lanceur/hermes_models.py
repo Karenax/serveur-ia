@@ -25,7 +25,7 @@ MODES = {'chat_completions', 'anthropic_messages', 'codex_responses'}
 
 
 def normalize_policy(value):
-    if not isinstance(value,dict) or set(value)-{'version','share_all','shared_accounts'}:
+    if not isinstance(value,dict) or set(value)-{'version','share_all','shared_accounts','exposed_models'}:
         raise ValueError('Politique de modèles Hermes invalide.')
     if type(value.get('version',1)) is not int or value.get('version',1)!=1:
         raise ValueError('Version de politique Hermes invalide.')
@@ -33,26 +33,44 @@ def normalize_policy(value):
     owners=value.get('shared_accounts',[])
     if not isinstance(owners,list) or len(owners)>100 or any(not isinstance(owner,str) or not re.fullmatch(r'[a-f0-9]{16}',owner) for owner in owners):
         raise ValueError('Liste de comptes Hermes invalide.')
-    return {'version':1,'share_all':value.get('share_all',False),'shared_accounts':list(dict.fromkeys(owners))}
+    exposed=value.get('exposed_models')
+    if exposed is not None and (not isinstance(exposed,list) or len(exposed)>512 or any(not isinstance(model,str) or not MODEL_ID.fullmatch(model) for model in exposed)):
+        raise ValueError('Liste de modèles exposés invalide.')
+    return {'version':1,'share_all':value.get('share_all',False),'shared_accounts':list(dict.fromkeys(owners)),
+        'exposed_models':list(dict.fromkeys(exposed)) if exposed is not None else None}
 
 
 class ModelUnavailable(ValueError): pass
 
 
 _NATIVE = r'''
-import contextlib, io, json, logging, os
+import contextlib, copy, io, json, logging, os
 from pathlib import Path
 payload=json.load(__import__('sys').stdin)
 logging.disable(logging.CRITICAL)
 with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
- from hermes_constants import get_hermes_home
+ from hermes_constants import get_hermes_home, get_default_hermes_root
+ from hermes_cli import config_home, config_backups
+ config_home.initialize_home=lambda *a,**k:None
+ config_backups.backup_config=lambda *a,**k:None
+ from hermes_cli import config as native_config
+ # Native readonly loading can seed the home and snapshot personal config.
+ # Suppress that maintenance in this short-lived metadata/credential process.
+ native_config.ensure_hermes_home=lambda:None
+ config_backups.backup_config=lambda *a,**k:None
+ native_profile='fixed'
+ if payload.get('follow_active'):
+  from hermes_cli.profiles import get_active_profile, get_profile_dir, profile_exists
+  native_profile=get_active_profile(get_default_hermes_root())
+  if native_profile!='default' and not profile_exists(native_profile):raise ValueError('Active profile unavailable')
+  os.environ['HERMES_HOME']=str(get_profile_dir(native_profile))
  from dotenv import load_dotenv
  load_dotenv(get_hermes_home()/'.env', override=True)
  from hermes_cli.config import load_config_readonly, _normalize_root_model_keys
  from hermes_cli import models
  from hermes_cli.providers import get_provider, normalize_provider, custom_provider_slug
  from hermes_cli.auth import get_auth_status
- cfg=_normalize_root_model_keys(load_config_readonly())
+ cfg=_normalize_root_model_keys(copy.deepcopy(load_config_readonly()))
  def copilot_mode(mid,catalog):
   mode=models.copilot_model_api_mode(mid,catalog=catalog)
   item=next((item for item in catalog if item.get('id')==mid),{})
@@ -149,7 +167,8 @@ with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.St
     for mid in candidate.get('models',[]):add(mid,metadata.get(mid))
    rows.append({'provider':pid,'label':candidate.get('name') or pid,'configured':configured,
                 'base_url':url,'models':selected,'available':provider_available,'unavailable_reason':unavailable_reason})
-  result={'providers':rows}
+  result={'providers':rows,'home':str(get_hermes_home()),'profile':native_profile,
+          'main_model':str(main.get('default') or ''),'main_provider':main_provider}
 print(json.dumps(result,separators=(',',':')))
 '''
 
@@ -158,7 +177,10 @@ class NativeModelSource:
     """Read-only metadata; credential resolution is a separate execution-time operation."""
     def __init__(self, runtime=None, personal_home=None):
         self.runtime = runtime
-        self.personal_home = Path(personal_home) if personal_home else Path.home() / '.hermes'
+        # The native Windows home is LOCALAPPDATA/hermes, and its sticky active
+        # profile is resolved by Hermes itself. An explicitly supplied home is
+        # fixed (used by isolated tests and intentionally selected deployments).
+        self.personal_home = Path(personal_home) if personal_home is not None else None
         self.lock = threading.Lock()
         self.provider_locks = {}
         self.credential_cache = {}
@@ -170,9 +192,11 @@ class NativeModelSource:
         self.runtime=runtime
         timeout-=time.monotonic()-started
         if timeout<=0:raise ModelUnavailable('Connexion Hermes du fournisseur indisponible.')
-        env = child_environment(self.personal_home, runtime)
+        home=values.pop('source_home',None) or self.personal_home
+        env = child_environment(home or Path.home(), runtime)
+        if home is None:env.pop('HERMES_HOME',None)
         completed = subprocess.run([str(runtime['python']), '-c', _NATIVE],
-            input=json.dumps({'operation':operation, **values}).encode(),
+            input=json.dumps({'operation':operation,'follow_active':home is None, **values}).encode(),
             stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, cwd=runtime['source'],
             env=env, timeout=timeout, creationflags=HIDDEN)
         if completed.returncode or len(completed.stdout)>4*1024*1024:
@@ -184,7 +208,7 @@ class NativeModelSource:
         # Discovery can involve slow provider catalogue requests. Its lock must
         # never delay execution-time key_cmd beyond Hermes' 15-second deadline.
         if operation!='credential':return self._run(operation,35,**values)
-        provider=values['provider'];identity=(provider,values['model']);deadline=time.monotonic()+11.5
+        provider=values['provider'];identity=(provider,values['model'],values.get('source_home'));deadline=time.monotonic()+11.5
         # Refresh tokens rotate centrally, serialized per provider. Duplicate
         # same-model requests coalesce for at most two seconds; model-specific
         # pool selection is preserved, never reused for a different model.
@@ -211,7 +235,8 @@ class NativeModelSource:
         finally:guard.release()
 
     def discover(self): return self._request('discover')
-    def credential(self, provider, model): return self._request('credential',provider=provider,model=model)
+    def credential(self, provider, model, source_home=None):
+        return self._request('credential',provider=provider,model=model,**({'source_home':source_home} if source_home else {}))
 
 
 class HermesModels:
@@ -221,6 +246,8 @@ class HermesModels:
         self.path = Path(store.home) / 'hermes-models.json'
         self.clock = clock; self.lock = threading.RLock()
         self.cached = []; self.providers = []; self.cached_at = None; self.error = ''; self.on_changed = None
+        self.hermes_context={}
+        self.local_route=None
 
     def policy(self):
         value = read_json(self.path,{})
@@ -244,6 +271,8 @@ class HermesModels:
             if not force and self.cached_at is not None and self.clock()-self.cached_at<30:return self.cached
             try:
                 discovered=self.source.discover(); rows=[]; providers=[]
+                source_home=discovered.get('home') if isinstance(self.source,NativeModelSource) else None
+                self.hermes_context={key:discovered.get(key,'') for key in ('profile','main_model','main_provider')}
                 for provider in discovered.get('providers',[]):
                     if not isinstance(provider,dict) or provider.get('configured') is not True:continue
                     try:endpoint=self._endpoint(provider['base_url'])
@@ -267,7 +296,7 @@ class HermesModels:
                         context=item.get('context_length') or item.get('context_window')
                         context=context if type(context) is int and 0<context<=10000000 else None
                         efforts=capabilities.get('reasoning_efforts')
-                        efforts=[effort for effort in efforts if effort in {'none','low','medium','high','xhigh','max','ultra'}] if isinstance(efforts,list) else None
+                        efforts=[effort for effort in efforts if isinstance(effort,str) and effort in {'none','low','medium','high','xhigh','max','ultra'}] if isinstance(efforts,list) else None
                         rows.append({'id':identity,'name':model,'label':str(item.get('name') or model),
                             'provider':str(provider.get('label') or native),'provider_id':native,'local':False,
                             'base_url':endpoint,'api_mode':mode,'available':provider.get('available',True) is True and item.get('available',True) is True and (context is None or context>=64000),
@@ -275,18 +304,20 @@ class HermesModels:
                                 'vision':vision,'images':vision,'context_length':context,
                                 'thinking':capabilities.get('thinking') is True,
                                 'reasoning_efforts':efforts or (['none','low','medium','high'] if capabilities.get('thinking') is True else ['none'])},
-                            'native_provider':'custom:'+identity,'native_model':model})
+                            'native_provider':'custom:'+identity,'native_model':model,'source_home':source_home})
                     providers[-1]['model_count']=len({row['id'] for row in rows if row['provider_id']==native})
+                    providers[-1]['available_model_count']=len({row['id'] for row in rows if row['provider_id']==native and row['available']})
                 self.cached=list({row['id']:row for row in rows}.values()); self.providers=providers; self.error=''
             except Exception:
                 # Discovery errors can carry URLs or authentication details; never retain them.
-                self.cached=[]; self.providers=[]; self.error='Catalogue Hermes temporairement indisponible.'
+                self.cached=[]; self.providers=[]; self.hermes_context={};self.error='Catalogue Hermes temporairement indisponible.'
             self.cached_at=self.clock()
             return list(self.cached)
 
     def _local(self):
         try:
             port,alias,_=self.backend(); state=health('127.0.0.1',port)
+            self.local_route=(port,{str(alias),str(state.get('model') or '')})
         except Exception:alias='';state={}
         vision=state.get('images') is True
         context=state.get('context_length') or state.get('context_size') or 262144
@@ -298,9 +329,22 @@ class HermesModels:
     def public(row):
         return {key:row[key] for key in ('id','name','label','provider','available','capabilities')} | {'object':'model','owned_by':'fred'}
 
+    def exposed(self, identity):
+        exposed=self.policy()['exposed_models']
+        return exposed is None or identity in exposed
+
+    def duplicate_local(self,row):
+        if not self.local_route:return False
+        port,names=self.local_route;endpoint=urlsplit(row.get('base_url',''))
+        return bool(endpoint.hostname in {'127.0.0.1','localhost','::1'}
+            and (endpoint.port or (443 if endpoint.scheme=='https' else 80))==port
+            and row.get('native_model') in names)
+
+    def usable(self,row):return row['available'] and not self.duplicate_local(row)
+
     def catalog(self, owner):
         if not self.accounts.authorized(owner):raise Denied('Accès aux modèles désactivé.')
-        rows=[self._local()]+(self.refresh() if self.allowed(owner) else [])
+        rows=[self._local()]+([row for row in self.refresh() if self.usable(row) and self.exposed(row['id'])] if self.allowed(owner) else [])
         return {'object':'list','data':[self.public(row) for row in rows], 'default_model':LOCAL,'source':'hermes'}
 
     def select(self, owner, requested=None, *, require_available=True):
@@ -312,6 +356,8 @@ class HermesModels:
             if not self.allowed(owner):raise Denied('Ce compte ne peut pas utiliser les fournisseurs Hermes partagés.')
             selection=next((dict(row) for row in self.refresh() if row['id']==requested),None)
             if selection is None:raise ValueError('Modèle Hermes inconnu ou connexion retirée.')
+            if not self.exposed(requested):raise Denied('Ce modèle n’est pas exposé aux clients Fred.')
+            if self.duplicate_local(selection):raise Denied('Ce modèle est déjà disponible avec Qwen local.')
         if require_available and not selection['available']:raise ModelUnavailable('Le modèle sélectionné est indisponible.')
         return selection
 
@@ -320,12 +366,12 @@ class HermesModels:
         # Watchers and admission fences never perform network discovery while
         # holding account/controller locks. A credential is resolved afresh at
         # execution time; policy revocation is checked here on every use.
-        return bool(selection.get('local') or (self.allowed(owner) and any(row['id']==selection.get('id') and row['available'] for row in self.cached)))
+        return bool(selection.get('local') or (self.allowed(owner) and self.exposed(selection.get('id')) and any(row['id']==selection.get('id') and self.usable(row) for row in self.cached)))
 
     def credential(self, owner, selection):
         if selection.get('local') or not self.valid(owner,selection):raise Denied('Fournisseur non autorisé.')
         try:
-            value=self.source.credential(selection['provider_id'],selection['native_model'])
+            value=self.source.credential(selection['provider_id'],selection['native_model'],selection.get('source_home')) if isinstance(self.source,NativeModelSource) else self.source.credential(selection['provider_id'],selection['native_model'])
             if self._endpoint(value['base_url'])!=selection['base_url'] or value.get('api_mode')!=selection['api_mode']:
                 raise ModelUnavailable('La connexion Hermes a changé ; actualisez les modèles.')
             key=value['api_key']
@@ -336,13 +382,17 @@ class HermesModels:
         except Denied:raise
         except Exception:raise ModelUnavailable('Connexion Hermes du fournisseur indisponible.') from None
 
-    def admin(self):
-        rows=self.refresh()
-        return {**self.policy(),'providers':list(self.providers),'models':[self.public(row) for row in rows],
-                'default_model':LOCAL,'source':'hermes','error':self.error}
+    def admin(self,force=False):
+        self._local()
+        rows=self.refresh(force=force)
+        providers=[{**provider,'available_model_count':sum(self.usable(row) for row in rows if row['provider']==provider['label']),
+            'local_model_reused':any(self.duplicate_local(row) for row in rows if row['provider']==provider['label'])} for provider in self.providers]
+        return {**self.policy(),'providers':providers,
+                'models':[{**self.public(row),'exposed':self.exposed(row['id'])} for row in rows if self.usable(row)],
+                'default_model':LOCAL,'source':'hermes','error':self.error,'hermes_context':dict(self.hermes_context)}
 
     def configure(self, value):
-        if not isinstance(value,dict) or set(value)-{'share_all','shared_accounts'}:raise ValueError('Politique de modèles invalide.')
+        if not isinstance(value,dict) or set(value)-{'share_all','shared_accounts','exposed_models'}:raise ValueError('Politique de modèles invalide.')
         policy=self.policy()
         if 'share_all' in value:
             if type(value['share_all']) is not bool:raise ValueError('Partage global invalide.')
@@ -353,6 +403,14 @@ class HermesModels:
             if not isinstance(owners,list) or len(owners)>100 or any(not isinstance(owner,str) or owner not in known for owner in owners):
                 raise ValueError('Compte de partage inconnu.')
             policy['shared_accounts']=list(dict.fromkeys(owners))
+        if 'exposed_models' in value:
+            requested=normalize_policy({'exposed_models':value['exposed_models']})['exposed_models']
+            if requested is not None:
+                known={row['id'] for row in self.refresh() if self.usable(row)}
+                retained=set(policy['exposed_models'] or [])
+                if any(identity not in known and identity not in retained for identity in requested):
+                    raise ValueError('Modèle exposé inconnu ou indisponible.')
+            policy['exposed_models']=requested
         policy=normalize_policy(policy)
         with self.lock:write_json(self.path,policy)
         if self.on_changed:self.on_changed()
@@ -367,6 +425,7 @@ class HermesModels:
         command=[str(runtime['python']),str(Path(__file__).with_name('hermes_model_key.py'))]
         providers={}
         for row in self.refresh():
+            if not self.usable(row) or not self.exposed(row['id']):continue
             providers[row['id']]={'name':row['id'],'base_url':row['base_url'],'transport':row['api_mode'],
                 'default_model':row['native_model'],'key_cmd':subprocess.list2cmdline(command+[row['id']]),
                 'models':{row['native_model']:row['capabilities']},

@@ -213,29 +213,55 @@ for(const id of ['remote-host','remote-port'])$(id).addEventListener('input',()=
 $('remote-disable').onclick=()=>remoteAction('/api/remote/deactivate');
 $('remote-create').onclick=()=>remoteAction('/api/remote/create-client',{name:$('remote-client-name').value});
 remoteRefresh();setInterval(remoteRefresh,15000);
-async function refreshHermesModels(){
+async function refreshHermesModels(force=false){
   const container=$('hermes-model-sharing');if(!container)return;
   try{
-    const value=await request('/api/hermes/models');
+    const value=await request('/api/hermes/models'+(force?'?refresh=1':''));
     const changed=JSON.stringify(value)!==JSON.stringify(hermesModelsState);hermesModelsState=value;
     container.replaceChildren();container.hidden=!value.enabled;
     if(!value.enabled)return;
     container.append(element('h3','Modèles disponibles dans Hermes'));
+    const native=value.hermes_context;
+    if(native?.profile)container.append(element('p','Profil Hermes : '+native.profile+(native.main_model?' · Modèle courant : '+native.main_model:''),'muted'));
+    if(value.error)container.append(element('p',value.error,'muted'));
     const providers=value.providers.filter(p=>p.configured!==false);
-    container.append(element('p',providers.length?providers.map(p=>p.label+' · '+p.model_count+' modèle(s)'+(p.available===false?' · connexion indisponible':'')).join(' / '):'Aucun fournisseur externe connecté dans Hermes sur le serveur. Qwen local reste disponible.','muted'));
+    container.append(element('p',providers.length?providers.map(p=>p.label+' · '+(p.available_model_count??p.model_count)+' modèle(s) utilisable(s)'+(p.available===false?' · connexion indisponible':'')).join(' / '):'Aucun fournisseur externe connecté dans Hermes sur le serveur.','muted'));
+    container.append(element('p','Qwen local reste proposé aux clients. Les modèles indisponibles sont masqués.','muted'));
     container.append(element('p','Le partage donne accès aux modèles configurés sur ce PC. Les comptes utilisent alors les mêmes abonnements, crédits et quotas ; leurs conversations restent séparées.','muted'));
     const all=element('input');all.type='checkbox';all.id='hermes-share-all';all.checked=value.share_all;all.disabled=hermesModelsBusy;
     all.onchange=()=>saveHermesModels({share_all:all.checked});
     container.append(labelled('Partager les modèles avec tous les comptes Fred',all,'Sinon, autorisez chaque compte sur sa fiche ci-dessous. Les nouveaux comptes héritent seulement du partage global.'));
-    const refresh=element('button','Actualiser les modèles','button secondary');refresh.type='button';refresh.disabled=hermesModelsBusy;refresh.onclick=()=>refreshHermesModels();container.append(refresh);
+    const models=(value.models||[]).filter(model=>model.available!==false);
+    const automatic=value.exposed_models==null;
+    const auto=element('input');auto.type='checkbox';auto.id='hermes-models-auto';auto.checked=automatic;auto.disabled=hermesModelsBusy;
+    auto.onchange=()=>saveHermesModels({exposed_models:auto.checked?null:models.map(model=>model.id)});
+    container.append(labelled('Proposer tous les modèles utilisables de Hermes',auto,'Désactivez cette option pour choisir les modèles affichés dans les clients.'));
+    if(models.length){
+      const search=element('input');search.type='search';search.id='hermes-model-search';search.placeholder='Rechercher un modèle ou un fournisseur';search.disabled=hermesModelsBusy;
+      container.append(labelled('Modèles proposés aux clients',search));
+      const list=element('div',null,'hermes-model-list');list.id='hermes-model-list';
+      for(const model of models){
+        const row=element('label',null,'hermes-model-row'),choice=element('input'),text=element('span');
+        choice.type='checkbox';choice.dataset.model=model.id;choice.checked=automatic||model.exposed!==false;choice.disabled=hermesModelsBusy||automatic;
+        choice.onchange=()=>{
+          const selected=new Set(hermesModelsState.exposed_models||models.map(item=>item.id));
+          if(choice.checked)selected.add(model.id);else selected.delete(model.id);
+          saveHermesModels({exposed_models:[...selected]});
+        };
+        text.append(element('strong',model.name),element('small',model.provider));row.append(choice,text);list.append(row);
+      }
+      search.oninput=()=>{const query=search.value.trim().toLocaleLowerCase('fr');for(const row of list.children)row.hidden=!row.textContent.toLocaleLowerCase('fr').includes(query);};
+      container.append(list);
+    }else container.append(element('p','Aucun modèle externe utilisable détecté dans Hermes. Vérifiez sa connexion fournisseur, puis actualisez cette liste.','muted'));
+    const refresh=element('button','Actualiser les modèles','button secondary');refresh.type='button';refresh.disabled=hermesModelsBusy;refresh.onclick=()=>refreshHermesModels(true);container.append(refresh);
     if(changed)await remoteRefresh(true);
   }catch(error){container.replaceChildren(element('p',error.message,'muted'));}
 }
 async function saveHermesModels(values){
   if(hermesModelsBusy)return;hermesModelsBusy=true;
   document.querySelectorAll('#hermes-model-sharing input,#hermes-model-sharing button,#remote-clients input[id^="models-"]').forEach(n=>n.disabled=true);
-  try{await request('/api/hermes/models/configure',values);toast('Accès aux modèles enregistré.');}
-  catch(error){toast(error.message);}
+  try{await request('/api/hermes/models/configure',values);toast('Réglages des modèles enregistrés.');}
+  catch(error){toast(error.message,true);}
   finally{hermesModelsBusy=false;await refreshHermesModels();await remoteRefresh(true);}
 }
 refreshHermesModels();

@@ -7,7 +7,7 @@ Les appareils Android limités aux applications 32 bits ne sont pas pris en char
 ## Installer et ouvrir
 
 Le fichier à installer est `dist/Acces-serveur-Fred-Android.apk`, version
-**1.0.8** (`versionCode=9`). Installer le nouvel APK par-dessus l’application
+**1.0.9** (`versionCode=10`). Installer le nouvel APK par-dessus l’application
 existante pour conserver le profil et les conversations.
 Transférer cet APK sur l’appareil puis l’ouvrir et autoriser son installation
 depuis l’application utilisée pour ouvrir le fichier.
@@ -271,7 +271,7 @@ leur concordance avant d’exposer les routes authentifiées
 nouvelle compilation Release suffit ensuite à la proposer aux appareils.
 
 **Première installation :** les versions 1.0.4 et précédentes n’ont pas cette
-fonction. Installer une fois manuellement l’APK 1.0.8 par-dessus l’application
+fonction. Installer une fois manuellement l’APK 1.0.9 par-dessus l’application
 existante ; les versions suivantes pourront être téléchargées depuis Fred.
 
 ## Conversations Hermes 1.0.6
@@ -326,3 +326,15 @@ Les tâches utilisent le modèle par défaut du serveur via Hermes.
 La [validation Android 1.0.8](../preuves/model-selector-20261011/ANDROID.md)
 consigne le transport natif, l’historique chiffré, le correcteur et les contrôles
 de mise à jour exécutés sur le Release signé.
+
+## Sélecteur stable 1.0.9
+
+Le menu conserve son défilement et le modèle pointé pendant les actualisations
+du serveur. Les nouveaux modèles apparaissent après la fermeture du menu.
+Les modèles indisponibles sont masqués, sauf le choix déjà enregistré dans
+une conversation : celui-ci reste signalé jusqu’à un nouveau choix explicite.
+L’administrateur peut aussi choisir les modèles proposés dans la console.
+
+La [validation Android 1.0.9](../preuves/model-picker-fix-20261011/ANDROID.md)
+documente les huit contrôles du vrai menu Android, les 31 vérifications de
+l’APK signé et la validation isolée des contrôles de partage dans la console.

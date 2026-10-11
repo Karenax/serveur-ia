@@ -1,11 +1,11 @@
 {
   "format": 1,
   "entrypoint": "android-chat.html",
-  "sha256": "3a29284b14a9c3c2703e97ad5a977ddb5417b47b81bec2669e1fb9c3108649a3",
+  "sha256": "3ae838aa2d483a44274d7818fdbc0d9445014fc2751ba5db9b005eef1a8a5dfc",
   "shared_sources": {
-    "chat.html": "0ea69fdab9513aca59e86d5962eaaa0ffd51dac69e8b1581493150cde839a73e",
+    "chat.html": "6b481bb36a2f6592f544142f3eacdbbf3b0888aa62f33dd5a980805ae83cc2ca",
     "workspace.html": "d8d10bed02b1a17383e7d2243958aca97ebfa7c1c2fdcdcf1dcf076db7f77009",
-    "ui.css": "9a7134930bb5009acb39f5c391e9a616318b4574af3bde6e99895aa3e0a6f726",
+    "ui.css": "5507da1a65e0fe49cd55975edb5219c94112133283ea8663cb13e8efcdbb7419",
     "ui.js": "2bfebd942539fbf0a3a1e9796272706d5d5576ebbc808a832f4e17b5b2b3410b",
     "markdown.js": "48dd2beb1c941fe517b472959ff669a92ffa8cb51ca19fe8771c8281f366e21d",
     "corrector.js": "0eb3b92757313bebf090c0814eca3adbbed5b5a54b4ecb7c4f962a12b412d392",

@@ -1,5 +1,34 @@
 # Validation Android — 11 octobre 2026
 
+## Version 1.0.9 — menu de modèles stable
+
+APK Release **1.0.9**, code **10**, publié avec le certificat de distribution
+existant. Les **31 vérifications** passent : compilation, analyse Android,
+13 tests de distribution, signature v2/v3, alignement 16 Ko, ressources
+vocales et bibliothèques natives identiques bit à bit à l’APK 1.0.8.
+
+Huit contrôles passent dans la vraie WebView Android : liste de 121 modèles
+utilisables, popup native ouverte, cinq actualisations différées, quatre
+gestes de défilement et sélection du modèle 114, relecture au changement de
+focus, réponse déjà en vol différée jusqu’à la fermeture du menu, absence
+de débordement et d’exception. Cette vérification utilise la démo Debug sans
+serveur ; ses fichiers d’interface sont identiques bit à bit au Release signé.
+
+Le Release signé est installé sans désinstallation sur l’émulateur téléphone.
+Les six groupes de contrats natifs du catalogue et du modèle choisi, les
+trois modes stricts du correcteur direct Qwen et les contrôles `UpdateChecks`
+passent aussi. Le tunnel WireGuard est réel et authentifié ; ses réponses
+sont synthétiques. Le processus du modèle local reste chargé et inchangé.
+
+Les [empreintes et compteurs](../preuves/model-picker-fix-20261011/android-release.json),
+la [preuve WebView](../preuves/model-picker-fix-20261011/android-webview-picker.json)
+et le [rapport Android](../preuves/model-picker-fix-20261011/ANDROID.md)
+précisent les contrôles et leurs limites. Les essais physiques ARM64,
+une conversation HTTPS authentifiée et la mesure acoustique de la dictée
+ne sont pas refaits. Cette version est publiée avec Windows/serveur 3.5.26 ;
+les [téléchargements authentifiés](../preuves/model-picker-fix-20261011/delivery-validation.json)
+concordent avec les empreintes signées.
+
 ## Version 1.0.8 — choix du modèle par conversation
 
 APK Release **1.0.8**, code **9**, publié avec le certificat de distribution

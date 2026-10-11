@@ -73,7 +73,7 @@ main#messages{overflow-y:scroll;scrollbar-gutter:stable;overflow-anchor:none;scr
 
 .fred-nav-count{margin-left:auto;border-radius:10px;background:var(--raised);padding:0 6px;font-size:11px}.fred-notification small{display:block;margin-bottom:10px}.fred-notification button{margin-right:8px}
 
-.chat-view.is-empty .conversation-top{display:flex}.model-choice{display:flex;flex-direction:column;align-items:flex-end;gap:5px;max-width:50%;min-width:220px}.model-choice label{font-size:12px;color:var(--muted)}.model-choice select{max-width:100%;min-height:36px;padding:7px 10px;border:1px solid var(--line);border-radius:9px;background:var(--panel);color:var(--text)}.model-choice #model{display:block;font-size:11px;max-width:100%;text-align:right;overflow-wrap:anywhere;overflow:visible;white-space:normal}.model-unavailable{color:var(--danger)!important}@media(max-width:700px){.conversation-top{flex-wrap:wrap;gap:12px}.model-choice{max-width:100%;min-width:0;width:100%;align-items:flex-start}.model-choice select{width:100%;min-height:44px}.model-choice #model{text-align:left}}
+.chat-view.is-empty .conversation-top{display:flex}.model-choice{display:flex;flex-direction:column;align-items:flex-end;gap:5px;max-width:50%;min-width:220px}.model-choice label{font-size:12px;color:var(--muted)}.model-choice select{width:100%;max-width:100%;min-height:36px;box-sizing:border-box;padding:7px 10px;border:1px solid var(--line);border-radius:9px;background:var(--panel);color:var(--text);font-size:14px;text-overflow:ellipsis;cursor:pointer}.model-choice select:focus-visible{outline:2px solid var(--green);outline-offset:2px}.model-choice select:disabled{cursor:default}@media(pointer:coarse){.model-choice select{min-height:44px;font-size:16px}}.model-choice #model{display:block;font-size:11px;max-width:100%;text-align:right;overflow-wrap:anywhere;overflow:visible;white-space:normal}.model-unavailable{color:var(--danger)!important}@media(max-width:700px){.conversation-top{flex-wrap:wrap;gap:12px}.model-choice{max-width:100%;min-width:0;width:100%;align-items:flex-start}.model-choice select{width:100%;min-height:44px}.model-choice #model{text-align:left}}
 
 .send-row>.voice-button{width:auto;height:auto;min-width:72px;min-height:36px;margin-left:0;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--text);font-size:12px;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center}.send-row>#voice-start{margin-left:auto}.send-row>#send{margin-left:0}.voice-status{display:block;font-size:12px;color:var(--muted);padding:4px 8px;min-height:20px}.send-row>.voice-button[aria-pressed="true"]{color:#b82b2b;border-color:#b82b2b}.send-row{flex-wrap:wrap;gap:6px}@media(pointer:coarse){.send-row>.voice-button{min-height:44px}}
 
@@ -253,28 +253,42 @@ function renderMarkdown(element, text) {
     function validMessages(value){return Array.isArray(value)&&value.length<=1000&&value.every(m=>m&&['user','assistant'].includes(m.role)&&typeof m.content==='string'&&attachmentValid(m)&&(!m.reasoning_content||typeof m.reasoning_content==='string'));}
     if(!library.length)library=[{id:crypto.randomUUID(),title:'Conversation',messages}];
     currentId=library[0].id;messages=library[0].messages;
-    let modelCatalog=[],modelDefault='',modelSource='',modelKnown=new Map(),modelCapabilitySignature='';
+    let modelCatalog=[],modelDefault='',modelSource='',modelKnown=new Map(),modelCapabilitySignature='',modelControlSignature='',modelControlConversation=null,modelControlDeferred=false,modelCatalogLoading=false,modelPollDeferred=false;
+    function modelPickerActive(){return document.activeElement===$('conversation-model');}
     function conversationModel(){return library.find(c=>c.id===currentId)?.model||modelDefault||config.model||'';}
     function conversationModelEntry(){return modelCatalog.find(m=>m.id===conversationModel());}
     function conversationModelAvailable(){return conversationModelEntry()?.available===true;}
     function conversationModelLabel(){const entry=conversationModelEntry()||modelKnown.get(conversationModel());return entry?[entry.name,entry.provider].filter(Boolean).join(' · '):'Modèle de cette conversation';}
-    function modelRefresh(chooseDefault=true){
+    function modelControlRefresh(selected,force=false){
+      const control=$('conversation-model'),rows=modelCatalog.filter(row=>row.available);
+      if(selected&&!rows.some(row=>row.id===selected)&&library.find(c=>c.id===currentId)?.model){const known=modelKnown.get(selected);rows.unshift({id:selected,name:known?.name||'Modèle de cette conversation',provider:known?.provider||'',available:false});}
+      const options=rows.map(row=>({id:row.id,label:[row.name,row.provider].filter(Boolean).join(' · ')+(row.available?'':' · indisponible'),disabled:!row.available}));
+      if(!options.length)options.push({id:'',label:modelCatalogLoading?'Recherche des modèles…':connected?'Aucun modèle disponible':'Connexion requise',disabled:true});
+      const signature=JSON.stringify([currentId,selected,options]);
+      if(signature===modelControlSignature){modelControlDeferred=false;control.removeAttribute('data-catalogue-pending');return;}
+      // A native popup owns its highlighted row and scroll position. Background
+      // polls must leave it intact until the user commits a choice or blurs it.
+      if(!force&&document.activeElement===control&&modelControlConversation===currentId){modelControlDeferred=true;control.dataset.cataloguePending='true';return;}
+      const existing=new Map([...control.options].map(option=>[option.value,option]));let cursor=control.firstElementChild;
+      for(const row of options){const option=existing.get(row.id)||new Option(row.label,row.id);if(option.textContent!==row.label)option.textContent=row.label;if(option.disabled!==row.disabled)option.disabled=row.disabled;if(option===cursor)cursor=cursor.nextElementSibling;else control.insertBefore(option,cursor);existing.delete(row.id);}
+      for(const option of existing.values())option.remove();
+      control.value=options.some(row=>row.id===selected)?selected:options[0].id;modelControlSignature=signature;modelControlConversation=currentId;modelControlDeferred=false;control.removeAttribute('data-catalogue-pending');
+    }
+    function modelRefresh(chooseDefault=true,forceOptions=false){
       const current=library.find(c=>c.id===currentId);
       if(chooseDefault&&current&&!current.model&&modelCatalog.length){current.model=modelDefault||modelCatalog[0].id;save();}
       const selected=conversationModel(),entry=modelCatalog.find(m=>m.id===selected);if(selected)config.model=selected;
-      const control=$('conversation-model');control.replaceChildren();
-      if(selected&&!entry)control.append(new Option('Modèle de cette conversation indisponible',selected));
-      for(const row of modelCatalog){const option=new Option([row.name,row.provider].filter(Boolean).join(' · ')+(row.available?'':' · indisponible'),row.id);option.disabled=!row.available;control.append(option);}
-      if(!control.options.length)control.append(new Option('Connexion requise',''));control.value=selected;control.disabled=conversationLocked()||!connected;
+      const control=$('conversation-model');modelControlRefresh(selected,forceOptions);$('model').setAttribute('aria-busy',String(modelCatalogLoading));control.title=conversationModelLabel()+(entry?.available?'':' · indisponible');
       const ready=entry?.available===true,capabilities=ready?entry.capabilities:{};
       const signature=JSON.stringify([selected,ready,capabilities]);
       if(signature!==modelCapabilitySignature){modelCapabilitySignature=signature;if(typeof attachmentCapabilities==='function')attachmentCapabilities({...capabilities,images:capabilities.images===true||capabilities.vision===true});if(typeof thinkingCapabilities==='function')thinkingCapabilities(capabilities);}
-      $('model').textContent=!connected?'Catalogue · connexion requise':!ready?'Ce modèle n’est plus disponible. Choisissez-en un autre.':typeof capabilities.context_length==='number'?'Contexte · '+capabilities.context_length.toLocaleString('fr-FR')+' tokens':'Modèle utilisé pour les prochains messages';
+      const status=modelCatalogLoading&&!modelCatalog.length?'Recherche des modèles…':!connected?'Catalogue · connexion requise':!ready?'Ce modèle n’est plus disponible. Choisissez-en un autre.':modelCatalogLoading?'Actualisation des modèles…':typeof capabilities.context_length==='number'?'Contexte · '+capabilities.context_length.toLocaleString('fr-FR')+' tokens':'Modèle utilisé pour les prochains messages';if($('model').textContent!==status)$('model').textContent=status;
       $('model').classList.toggle('model-unavailable',connected&&!ready);
       if(typeof uiLoadedModel==='function')uiLoadedModel(connected?conversationModelLabel():'');
       buttons();
     }
-    $('conversation-model').onchange=()=>{if(conversationLocked()||!connected)return;const entry=modelCatalog.find(m=>m.id===$('conversation-model').value);if(!entry?.available){modelRefresh(false);return;}library.find(c=>c.id===currentId).model=entry.id;save();modelRefresh(false);buttons();contextRefresh();};
+    $('conversation-model').onchange=()=>{if(conversationLocked()||!connected){modelRefresh(false,true);return;}const entry=modelCatalog.find(m=>m.id===$('conversation-model').value);if(!entry?.available){modelRefresh(false,true);return;}library.find(c=>c.id===currentId).model=entry.id;save();modelRefresh(false,true);buttons();contextRefresh();if(modelPollDeferred)models();};
+    $('conversation-model').onblur=()=>{modelRefresh(false,true);if(modelPollDeferred)models();};
     function drawLibrary(){
       modelRefresh();
       const query=$('search-conversations').value.toLowerCase(),current=library.find(c=>c.id===currentId);$('conversation-title').value=current?.title||'Nouvelle conversation';
@@ -325,18 +339,24 @@ function renderMarkdown(element, text) {
     const restoreAckButton=document.createElement('button');restoreAckButton.id='history-restore-ack';restoreAckButton.textContent='Reprendre l’historique du serveur';restoreAckButton.hidden=true;restoreAckButton.className='secondary';$('history-status').after(restoreAckButton);
     restoreAckButton.onclick=async()=>{if(busy||historySyncPending)return;if(!confirm('Reprendre l’historique actuellement restauré sur le serveur ? Une copie chiffrée de votre historique local sera conservée avant son remplacement.'))return;historySyncPending=true;buttons();try{const result=await api('/client/history/restore-ack',{confirm:true});library=result.history.conversations;currentId=result.history.currentId;messages=library.find(c=>c.id===currentId).messages;historyRevision=result.revision;historyReady=true;serverHistoryReady=true;restoreAckButton.hidden=true;$('history-status').textContent=result.message;render();drawLibrary();}catch(e){error(e);}finally{historySyncPending=false;buttons();}};
     function models(){
+      // Android's native popup can close on changes to adjacent live text too.
+      // Suspend the whole polling cycle while choosing, including late replies.
+      if(modelPickerActive()){modelPollDeferred=true;return Promise.resolve(false);}
       if(modelsPending)return modelsPending;
       if(busy||!loggedIn||$('connection-choice').open||$('android-onboarding').open)return Promise.resolve(false);
-      modelsPending=(async()=>{
+      modelPollDeferred=false;modelCatalogLoading=true;modelRefresh(false);modelsPending=(async()=>{
         try{
           const d=await api('/v1/models'),rows=Array.isArray(d.data)?d.data.filter(m=>m&&typeof m.id==='string'&&m.id.trim()&&m.id.length<=512):[],ids=rows.map(m=>m.id);
+          if(modelPickerActive()){modelPollDeferred=true;return false;}
           if(!ids.length)throw Object.assign(new Error('Aucun modèle accessible.'),{code:'no_models'});
           const state=await api('/v1/status');if(state.protocol>4)throw new Error('Mettre à jour Accès serveur Fred pour ce serveur.');
+          if(modelPickerActive()){modelPollDeferred=true;return false;}
+          modelPollDeferred=false;
           modelCatalog=[...new Map(rows.map(m=>[m.id,{id:m.id,name:typeof m.name==='string'?m.name:typeof m.label==='string'?m.label:m.id,provider:typeof m.provider==='string'?m.provider:'',available:m.available!==false,capabilities:m.capabilities&&typeof m.capabilities==='object'?m.capabilities:{}}])).values()];modelDefault=ids.includes(d.default_model)?d.default_model:ids[0];modelSource=typeof d.source==='string'?d.source:'';for(const entry of modelCatalog)modelKnown.set(entry.id,entry);connected=true;lastConnectionUpdate=Date.now();modelRefresh();
           $('connection').textContent='● Connecté au serveur IA';$('connection').title='';$('connection').classList.add('online');
           if(networkBanner)error('');await syncServerHistory();await agentRecoverTurns();return true;
-        }catch(e){connected=false;uiLoadedModel('',e.code);$('model').textContent='Catalogue · connexion indisponible';$('connection').textContent='● Serveur indisponible';$('connection').title=e.message||'';$('connection').classList.remove('online');error(e);if(['model_unloaded','no_models'].includes(e.code))await syncServerHistory();return false;}
-        finally{buttons();modelsPending=null;contextRefresh();}
+        }catch(e){if(modelPickerActive()){modelPollDeferred=true;return false;}connected=false;uiLoadedModel('',e.code);$('model').textContent='Catalogue · connexion indisponible';$('connection').textContent='● Serveur indisponible';$('connection').title=e.message||'';$('connection').classList.remove('online');error(e);if(['model_unloaded','no_models'].includes(e.code))await syncServerHistory();return false;}
+        finally{modelCatalogLoading=false;modelsPending=null;if(modelPickerActive())modelPollDeferred=true;else{modelRefresh(false);contextRefresh();}}
       })();return modelsPending;
     }
     const agentApprovalPane=document.createElement('section');agentApprovalPane.id='agent-approval';agentApprovalPane.className='settings-card';agentApprovalPane.hidden=true;agentApprovalPane.setAttribute('aria-label','Action à confirmer');$('error').after(agentApprovalPane);

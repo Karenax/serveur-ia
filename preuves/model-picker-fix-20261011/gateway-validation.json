@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-11",
+  "passed": true,
+  "production_history_modified": false,
+  "suites": [
+    {
+      "modules": ["test_model_selection_transport", "test_model_sharing_admin", "test_text_transform", "test_remote_sources_revocation"],
+      "tests": 30,
+      "duration_seconds": 33.019,
+      "result": "OK"
+    },
+    {
+      "modules": ["test_hermes_accounts", "test_hermes_inference", "test_hermes_conversations"],
+      "tests": 19,
+      "duration_seconds": 11.527,
+      "result": "OK"
+    }
+  ]
+}

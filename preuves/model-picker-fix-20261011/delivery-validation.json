@@ -1,0 +1,70 @@
+{
+  "date": "2026-10-11",
+  "windows": {
+    "version": "3.5.26",
+    "protocol": 3,
+    "bytes": 93453982,
+    "sha256": "131cd85324ad66685677d687274dbdbd8465b619d7d21a9c37e19ef051360c99",
+    "signature": "wPgRTVUZapPK6KU9TwB/U8bsvtugsujTOIbSG2dIXD7K7sUYKUupbIKUpQKiFXU9OwnLhU8NFEMABpQGOo7lBg==",
+    "signing_public_key": "8fSJ5YLYBVF0GvxnS5RyD6LjgMSTi39H+4YGeS2Ac/M="
+  },
+  "android": {
+    "package": "net.karenax.fred",
+    "version": "1.0.9",
+    "bytes": 18903316,
+    "sha256": "a798cc18c1eb5a59a4473840e6c79974c724b61fe25ba6ea1a38f8687c70a427",
+    "version_code": 10
+  },
+  "personal_packages_prepared": 1,
+  "checks": {
+    "windows_release_verified": true,
+    "personal_windows_package_refreshed": true,
+    "android_update_announced": true,
+    "authenticated_downloads_verified": true,
+    "agent_and_voice_ready": true,
+    "direct_transform_validation_available": true,
+    "global_provider_sharing_enabled": true,
+    "shared_catalogue_matches_admin_selection": true,
+    "unavailable_cloud_models_hidden": true,
+    "model_processes_preserved": true,
+    "model_loaded": true,
+    "model_name_preserved": true,
+    "access_settings_and_hermes_config_preserved": true
+  },
+  "production_history_modified_by_validation": false,
+  "cloud_model_count": 134,
+  "available_cloud_model_count": 134,
+  "providers": [
+    "ChatGPT or Codex Subscription",
+    "Nous Portal",
+    "OpenRouter"
+  ],
+  "provider_connection_status": [
+    {
+      "label": "Qwen",
+      "available": true,
+      "error": ""
+    },
+    {
+      "label": "Nous Portal",
+      "available": true,
+      "error": ""
+    },
+    {
+      "label": "OpenRouter",
+      "available": true,
+      "error": ""
+    },
+    {
+      "label": "GitHub Copilot",
+      "available": false,
+      "error": ""
+    },
+    {
+      "label": "ChatGPT or Codex Subscription",
+      "available": true,
+      "error": ""
+    }
+  ],
+  "catalogue_contains_provider_secrets": false
+}

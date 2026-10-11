@@ -241,22 +241,86 @@ class ModelsTests(unittest.TestCase):
             with patch('hermes_models.time.monotonic',side_effect=[actual,actual+12]):
                 with self.assertRaises(ModelUnavailable):source.credential('provider','model')
         finally:guard.release()
-    def test_low_context_cloud_is_visible_but_cannot_be_selected(self):
+    def test_low_context_cloud_is_hidden_and_cannot_be_selected(self):
         self.source.rows[0]['models'][0]['context_length']=32000
-        selected=self.shared()[0]
+        self.models.configure({'share_all':True})
+        selected=self.models.refresh()[0]
         self.assertFalse(selected['available'])
+        self.assertNotIn(selected['id'],[row['id'] for row in self.models.catalog(self.a)['data']])
+        self.assertNotIn(selected['id'],[row['id'] for row in self.models.admin()['models']])
         with self.assertRaises(ModelUnavailable):self.models.select(self.a,selected['id'])
-    def test_incomplete_copilot_is_visible_unavailable_and_cannot_receive_credentials(self):
+    def test_incomplete_copilot_is_hidden_but_admin_retains_concise_diagnostic(self):
         self.source.rows[0].update(provider='copilot',label='GitHub Copilot',available=False)
-        selected=self.shared()[0]
+        self.models.configure({'share_all':True})
+        self.assertEqual(self.models.catalog(self.a)['data'][0]['id'],'fred-qwen')
+        self.assertEqual(len(self.models.catalog(self.a)['data']),1)
+        self.assertEqual(self.models.admin()['models'],[])
+        selected=self.models.refresh()[0]
         self.assertFalse(selected['available'])
         provider=self.models.admin()['providers'][0]
         self.assertFalse(provider['available']);self.assertEqual(provider['model_count'],2)
+        self.assertEqual(provider['available_model_count'],0)
         self.assertEqual(provider['unavailable_reason'],'Connexion Copilot incomplète ou non autorisée.')
         with self.assertRaises(ModelUnavailable):self.models.select(self.a,selected['id'])
         stale=self.models.select(self.a,selected['id'],require_available=False)
         with self.assertRaises(Denied):self.models.credential(self.a,stale)
         self.assertEqual(self.source.calls,[])
+    def test_console_exposure_filters_catalog_selection_profile_and_live_credential(self):
+        rows=self.shared();first,second=[row['id'] for row in rows]
+        selection=self.models.select(self.a,second)
+        self.models.configure({'exposed_models':[first]})
+        self.assertEqual([row['id'] for row in self.models.catalog(self.a)['data']],['fred-qwen',first])
+        self.assertEqual([row['exposed'] for row in self.models.admin()['models']],[True,False])
+        self.assertEqual(list(self.models.profile_config(self.a)['providers']),[first])
+        self.assertFalse(self.models.valid(self.a,selection))
+        with self.assertRaises(Denied):self.models.select(self.a,second)
+        with self.assertRaises(Denied):self.models.credential(self.a,selection)
+        self.models.configure({'exposed_models':[]})
+        self.assertEqual(len(self.models.catalog(self.a)['data']),1)
+        self.assertEqual(self.models.profile_config(self.a),{})
+        self.assertEqual(self.models.select(self.a)['id'],'fred-qwen')
+        self.models.configure({'exposed_models':None})
+        self.assertEqual(len(self.models.catalog(self.a)['data']),3)
+    def test_identical_local_backend_is_reused_but_other_local_provider_model_remains_selectable(self):
+        self.source.rows[0]['base_url']='http://localhost:1/v1'
+        self.source.rows[0]['models'][0]['id']='actual-local'
+        rows=self.shared()
+        self.assertEqual([row['name'] for row in rows],['model-b'])
+        duplicate=self.models.refresh()[0]
+        with self.assertRaises(Denied):self.models.select(self.a,duplicate['id'])
+        self.assertEqual(list(self.models.profile_config(self.a)['providers']),[rows[0]['id']])
+        self.assertTrue(self.models.admin()['providers'][0]['local_model_reused'])
+        self.assertEqual(self.models.admin()['providers'][0]['available_model_count'],1)
+        self.assertEqual(self.models.select(self.a,rows[0]['id'])['native_model'],'model-b')
+    def test_exposure_schema_rejects_arbitrary_ids_and_preserves_previously_selected_offline_models(self):
+        selected=self.shared()[0]['id']
+        for bad in (True,'all',['model-a'],[{}],['fred-qwen'],['fred-model-'+'a'*24]*513):
+            with self.subTest(bad=bad),self.assertRaises(ValueError):normalize_policy({'exposed_models':bad})
+        with self.assertRaises(ValueError):self.models.configure({'exposed_models':['fred-model-'+'f'*24]})
+        self.models.configure({'exposed_models':[selected]})
+        self.source.rows[0]['models'][0]['available']=False;self.models.refresh(force=True)
+        self.models.configure({'share_all':True,'exposed_models':[selected]})
+        self.assertEqual(self.models.policy()['exposed_models'],[selected])
+        self.assertEqual(len(self.models.catalog(self.a)['data']),1)
+        self.source.rows[0]['models'][0]['available']=True;self.models.refresh(force=True)
+        self.assertEqual(len(self.models.catalog(self.a)['data']),2)
+        self.models.configure({'exposed_models':[]})
+        self.source.rows[0]['models'][0]['available']=False;self.models.refresh(force=True)
+        with self.assertRaises(ValueError):self.models.configure({'exposed_models':[selected]})
+    def test_exposure_policy_roundtrips_through_real_encrypted_backup_and_restore(self):
+        import test_hermes_restoration as restoration_fixture
+        fixture=restoration_fixture.HermesRestorationTests('test_model_sharing_policy_roundtrip_and_invalid_policy_rejected')
+        fixture.setUp()
+        try:
+            policy=normalize_policy({'share_all':True,'shared_accounts':[fixture.owner],
+                'exposed_models':[self.shared()[0]['id']]})
+            write_json(fixture.home/'hermes-models.json',policy)
+            archive=fixture.backup()
+            self.assertNotIn(b'exposed_models',Path(archive['file']).read_bytes())
+            write_json(fixture.home/'hermes-models.json',normalize_policy({'exposed_models':[]}))
+            fixture.restore(archive)
+            self.assertEqual(read_json(fixture.home/'hermes-models.json'),policy)
+        finally:fixture.tearDown()
     def test_refresh_revokes_model_that_becomes_unavailable_and_keeps_native_efforts(self):
         self.source.rows[0]['models'][0]['capabilities']['reasoning_efforts']=['low','high','xhigh']
         selected=self.shared()[0];selection=self.models.select(self.a,selected['id'])
@@ -266,6 +330,15 @@ class ModelsTests(unittest.TestCase):
         self.models.refresh(force=True)
         self.assertFalse(self.models.valid(self.a,selection))
         with self.assertRaises(Denied):self.models.credential(self.a,selection)
+    def test_central_credential_cache_never_reuses_a_different_native_profile(self):
+        source=NativeModelSource();calls=[]
+        def run(operation,timeout,**values):
+            calls.append(values['source_home'])
+            return {'api_key':'fixture-'+values['source_home']}
+        source._run=run
+        self.assertNotEqual(source.credential('provider','model','profile-A'),source.credential('provider','model','profile-B'))
+        source.credential('provider','model','profile-A')
+        self.assertEqual(calls,['profile-A','profile-B'])
 
 
 class CloudFixture:
@@ -436,6 +509,49 @@ with contextlib.redirect_stdout(io.StringIO()),contextlib.redirect_stderr(io.Str
                     else:
                         credential=source.credential('copilot','gpt-5-mini')
                         self.assertEqual(credential['api_mode'],'codex_responses')
+    def test_native_default_home_follows_sticky_profile_and_broker_binds_its_source(self):
+        import hermes_models
+        root=Path(self.tmp.name)/'native-root';profile=root/'profiles'/'selected';profile.mkdir(parents=True)
+        (root/'active_profile').write_text('selected\n',encoding='utf-8')
+        write_json(root/'config.yaml',{'model':{'provider':'wrong','default':'wrong-model'}})
+        write_json(profile/'config.yaml',{'model':{'provider':'custom:fixture','default':'model-a'},
+            'providers':{'fixture':{'name':'Selected fixture','base_url':self.cloud.url,'key_env':'FIXTURE_PROVIDER_KEY'}}})
+        (profile/'.env').write_text('FIXTURE_PROVIDER_KEY=fixture-selected-key\n',encoding='utf-8')
+        files_before={path.relative_to(root).as_posix():path.read_bytes() for path in root.rglob('*') if path.is_file()}
+        preamble='''
+import contextlib,io
+with contextlib.redirect_stdout(io.StringIO()),contextlib.redirect_stderr(io.StringIO()):
+ import hermes_constants
+ from pathlib import Path
+ hermes_constants._get_platform_default_hermes_home=lambda:Path(ROOT)
+ from hermes_cli import config_home,config_backups
+ config_home.initialize_home=lambda *a,**k:None
+ config_backups.backup_config=lambda *a,**k:None
+ from hermes_cli import config as native_config
+ native_config.ensure_hermes_home=lambda:None
+ config_backups.backup_config=lambda *a,**k:None
+ from hermes_cli import inventory
+ inventory.build_models_payload=lambda ctx,**kw: {'providers':[{'slug':'fixture','name':'Selected fixture','authenticated':True,'models':[ctx.current_model]}]}
+'''.replace('ROOT',repr(str(root)))
+        source=NativeModelSource(installation())
+        with patch('hermes_models._NATIVE',preamble+hermes_models._NATIVE):
+            discovered=source.discover()
+            self.assertEqual(discovered['profile'],'selected')
+            self.assertEqual(Path(discovered['home']),profile)
+            self.assertEqual(discovered['main_model'],'model-a')
+            self.assertEqual(discovered['providers'][0]['models'][0]['id'],'model-a')
+            discovered_files={path.relative_to(root).as_posix():path.read_bytes() for path in root.rglob('*') if path.is_file()}
+            # Native model metadata may maintain its documented disk cache;
+            # personal settings, environment and persona must stay untouched.
+            cache_files={'profiles/selected/models_dev_cache.json','profiles/selected/models_dev_cache.etag'}
+            self.assertLessEqual(set(discovered_files)-set(files_before),cache_files)
+            self.assertTrue(all(files_before[name]==discovered_files[name] for name in files_before))
+            (root/'active_profile').write_text('default\n',encoding='utf-8')
+            credential=source.credential('custom:fixture','model-a',discovered['home'])
+            self.assertEqual(credential['api_key'],'fixture-selected-key')
+            self.assertNotIn('fixture-selected-key',json.dumps(discovered))
+        files_after={path.relative_to(root).as_posix():path.read_bytes() for path in root.rglob('*') if path.is_file()}
+        self.assertTrue(all(files_before[name]==files_after[name] for name in files_before if name!='active_profile'))
 
 
 if __name__=='__main__':unittest.main()

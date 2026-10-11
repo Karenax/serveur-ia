@@ -1,5 +1,7 @@
 # Sélecteur Hermes — livraison du 11 octobre 2026
 
+**Correction ultérieure :** le diagnostic fournisseur de cette livraison lisait `~/.hermes`, alors que Hermes utilise `%LOCALAPPDATA%\hermes` sous Windows. Il ne décrivait donc pas correctement le profil actif du PC. La résolution du profil, le filtrage des modèles et le menu sont corrigés dans [la livraison suivante](../model-picker-fix-20261011/VALIDATION.md). Les résultats ci-dessous restent les observations de la version 3.5.25.
+
 Windows/serveur **3.5.25** et Android **1.0.8/code 9** sont publiés. Le serveur
 annonce les mises à jour et fournit les deux fichiers après authentification.
 Les téléchargements correspondent aux empreintes des paquets validés ; le

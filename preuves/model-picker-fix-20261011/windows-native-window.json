@@ -1,0 +1,18 @@
+{
+  "ok": true,
+  "title": "Accès serveur Fred",
+  "login": true,
+  "update": true,
+  "chat": true,
+  "state": "EXE personnel · connexion automatique",
+  "history": true,
+  "projects": true,
+  "tasks": true,
+  "assistants": false,
+  "textSelection": "text",
+  "copySelection": true,
+  "thinkingModes": 4,
+  "thinkingInline": true,
+  "documentMenu": false,
+  "attachmentPlus": true
+}
