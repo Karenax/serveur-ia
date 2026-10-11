@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-12",
+  "scope": {
+    "server_sources_only": true,
+    "synthetic_profiles_and_history": true,
+    "production_history_read_or_written": false,
+    "production_cloud_llm_inference": false,
+    "personal_web_credentials_copied_to_fred_profiles": false,
+    "hermes_installation_sources_modified": false,
+    "web_provider_reads_use_native_active_profile": true,
+    "terminals_or_browser_tools_enabled": false
+  },
+  "installed_hermes_commit": "1cb26bf248e150f715ce8a487fdef2a2bef6b541",
+  "fred_profile_config_version": 5,
+  "real_native_web": {
+    "configuration_probe": {
+      "search_backend": "perplexity",
+      "extract_backend": "firecrawl",
+      "search_available": true,
+      "extract_available": true
+    },
+    "public_search": {
+      "success": true,
+      "result_count": 2,
+      "duration_seconds": 2.281
+    },
+    "public_page_extract": {
+      "success": true,
+      "result_count": 1,
+      "returned_characters": 2062,
+      "duration_seconds": 3.281
+    },
+    "llm_calls": 0
+  },
+  "isolated_tests": {
+    "command": "python -m unittest test_hermes_web -v",
+    "module": "lanceur/test_hermes_web.py",
+    "passed": 11,
+    "failed": 0,
+    "skipped": 0,
+    "duration_seconds": 31.399,
+    "cases": [
+      "WebBounds.test_only_two_native_tools_and_bounded_inputs_are_allowed",
+      "WebBounds.test_urls_private_credentials_and_reserved_hosts_are_refused",
+      "WebBounds.test_provider_errors_paths_and_extra_fields_never_reach_model",
+      "WebBounds.test_cancellation_and_revocation_interrupt_running_subprocess",
+      "WebBounds.test_timeout_and_oversized_subprocess_output_are_bounded",
+      "NativeWebTests.test_actual_native_firecrawl_search_extract_keep_keys_central_and_block_redirects",
+      "NativeWebTests.test_actual_native_ssrf_rebinding_redirect_and_fake_ip_policy_stay_fail_closed",
+      "NativeWebTests.test_actual_gateway_calls_native_web_through_authenticated_broker_and_returns_sources",
+      "NativeWebTests.test_native_bridge_multiplex_secret_scopes_do_not_leak_between_concurrent_profiles",
+      "NativeWebTests.test_delayed_cancelled_native_tool_cannot_execute_on_following_turn",
+      "NativeWebTests.test_native_keyless_firecrawl_attests_destination_before_returning_content"
+    ],
+    "native_gateway_fixture": {
+      "llm_transport": "local_synthetic_http",
+      "llm_calls": 3,
+      "native_tools_called": ["web_search", "web_extract"],
+      "web_provider": "native_firecrawl_sdk_with_local_synthetic_http",
+      "source_text_and_url_returned_to_fred": true,
+      "mcp_legacy_fred_web_tools_absent": true,
+      "web_tokens_absent_from_fred_profile_env_and_config": true,
+      "terminal_and_browser_tools_absent": true
+    },
+    "security": {
+      "owner_a_and_b_concurrent_secret_scopes_verified": true,
+      "native_run_id_captured_before_thread_or_http_send": true,
+      "delayed_cancelled_search_and_extract_cannot_adopt_following_turn": true,
+      "late_rpc_checked_through_real_private_mcp_ingress": true,
+      "unscoped_gateway_secret_lookup_fails_closed": true,
+      "cancel_and_revocation_stop_native_worker": true,
+      "user_private_urls_refused_before_worker": true,
+      "personal_allow_private_urls_true_cannot_override_fred": true,
+      "personal_fake_ip_ranges_cannot_override_fred": true,
+      "dns_preflight_and_connect_time_block_verified": true,
+      "private_final_redirect_refused_before_content_return": true,
+      "firecrawl_sdk_source_url_alias_normalized_before_native_redirect_check": true,
+      "keyless_firecrawl_final_destination_public_private_and_missing_cases_verified": true,
+      "ssrf_refusals_preserved_during_native_rescue": true,
+      "personal_extract_cache_not_reused": true,
+      "personal_cache_spill_paths_not_returned": true,
+      "provider_error_messages_are_bounded_and_sanitized": true
+    }
+  },
+  "static_checks": {
+    "py_compile": "passed",
+    "scoped_git_diff_check_cr_at_eol": "passed"
+  }
+}

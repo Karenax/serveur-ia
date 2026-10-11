@@ -9,7 +9,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from hermes_tools import FredTools, calculate
-from workspace import Workspace, public_url
+from workspace import Workspace
 from knowledge import Knowledge
 
 
@@ -26,7 +26,7 @@ class ToolsTests(unittest.TestCase):
         self.private = self.workspace.action('a', {'action': 'document_create', 'project': self.other,
                                                  'title': 'Document privé', 'text': 'Secret hors projet 9999 euros.'})['id']
         self.context = {'request_id': 'run-test', 'conversation_id': 'conversation-test',
-                        'project_id': self.project, 'document_id': None, 'cancel': threading.Event(), 'sources': []}
+                        'project_id': self.project, 'document_id': None, 'cancel': threading.Event(), 'sources': [], 'remote': 'run_test'}
 
     def tearDown(self):
         self.workspace.shutdown(); self.tmp.cleanup()
@@ -42,10 +42,29 @@ class ToolsTests(unittest.TestCase):
         self.assertFalse(result['isError'], result)
         return json.loads(result['content'][0]['text'])['data']
 
+    def enable_web(self):
+        with self.workspace.db() as db:
+            db.execute('INSERT OR REPLACE INTO policies VALUES(?,?)', ('a', json.dumps({'web': True})))
+
+    def native_call(self, name='web_search', arguments=None, run_id='run_test', **kwargs):
+        return self.request('fred/native-web/call', {'name': name, 'arguments': arguments or {'query': 'question publique'}, 'run_id': run_id}, **kwargs)
+
+    def web_fixture(self, result=None, callback=None):
+        calls = []
+        class Web:
+            def call(self, name, arguments, cancel=None, valid=None):
+                calls.append((name, arguments, cancel, valid))
+                if callback: callback(valid)
+                return result if result is not None else {'success': True, 'data': {'web': [
+                    {'url': 'https://example.com/article', 'title': 'Source native', 'description': 'Extrait public'}]}}
+        self.tools.web = Web()
+        return calls
+
     def test_mcp_lifecycle_and_argument_contract(self):
         self.assertEqual(self.request('initialize', {'protocolVersion': '2025-06-18'}, {})['result']['serverInfo']['name'], 'fred-tools')
         listing = self.request('tools/list', context={})['result']['tools']
-        self.assertEqual(len(listing), 8)
+        self.assertEqual(len(listing), 6)
+        self.assertFalse(any(t['name'] in ('fred_web_search', 'fred_web_read') for t in listing))
         self.assertTrue(all(t['annotations']['readOnlyHint'] for t in listing))
         self.assertIsNone(self.tools.dispatch('a', {}, {'jsonrpc': '2.0', 'method': 'notifications/initialized'}))
         refused = self.request('tools/call', {'name': 'fred_document_search', 'arguments': {'query': 'budget', 'owner': 'b'}})
@@ -92,22 +111,113 @@ class ToolsTests(unittest.TestCase):
         self.workspace.maintenance = False
         self.assertTrue(self.request('tools/call', {'name': 'fred_calculate', 'arguments': {'expression': '2+2'}}, context={})['result']['isError'])
 
-    def test_web_permission_and_post_read_revocation(self):
-        self.assertTrue(self.call('fred_web_read', url='https://example.com/')['isError'])
-        with self.workspace.db() as db:
-            db.execute('INSERT INTO policies VALUES(?,?)', ('a', json.dumps({'web': True})))
-            db.execute("INSERT INTO settings VALUES('web_enabled','true')")
-        with patch('workspace.fetch_public', return_value={'url': 'https://example.com/', 'text': 'Texte public'}):
-            self.assertEqual(self.data(self.call('fred_web_read', url='https://example.com/'))['sources'][0]['text'], 'Texte public')
-        def revoked(url):
+    def test_native_web_permission_ignores_legacy_brave_settings_and_old_tools_cannot_be_called(self):
+        calls = self.web_fixture()
+        self.assertEqual(self.native_call()['error']['code'], -32003)
+        self.assertFalse(calls)
+        self.enable_web()
+        with patch.object(self.workspace, 'web_sources', side_effect=AssertionError('Legacy web must never be invoked')):
+            self.assertTrue(self.native_call()['result']['success'])
+        self.assertEqual(len(calls), 1)
+        self.assertIs(calls[0][2], self.context['cancel'])
+        self.assertTrue(calls[0][3]())
+        self.assertEqual(self.context['sources'][0]['url'], 'https://example.com/article')
+        self.assertEqual(self.context['sources'][0]['origin'], 'hermes-web')
+        for name in ('fred_web_search', 'fred_web_read'):
+            self.assertEqual(self.request('tools/call', {'name': name, 'arguments': {}})['error']['code'], -32602)
+
+    def test_native_web_rechecks_revocation_and_web_permission_before_publishing(self):
+        self.enable_web()
+        def revoked(valid):
             self.active = False
-            return {'url': url, 'text': 'Donnée refusée après révocation'}
-        with patch('workspace.fetch_public', side_effect=revoked):
-            result = self.call('fred_web_read', url='https://example.com/revoked')
-        self.assertTrue(result['isError'])
-        self.assertNotIn('Donnée refusée', json.dumps(result))
+            self.assertFalse(valid())
+        self.web_fixture(callback=revoked)
+        refused = self.native_call()
+        self.assertEqual(refused['error']['code'], -32003)
+        self.assertNotIn('Extrait public', json.dumps(refused))
+        self.assertFalse(self.context['sources'])
+        self.active = True
+        def policy_removed(valid):
+            with self.workspace.db() as db:
+                db.execute('UPDATE policies SET settings=? WHERE owner=?', (json.dumps({'web': False}), 'a'))
+            self.assertFalse(valid())
+        self.web_fixture(callback=policy_removed)
+        self.assertEqual(self.native_call()['error']['code'], -32003)
+        self.assertFalse(self.context['sources'])
+
+    def test_native_web_has_no_owner_or_scope_override_and_checks_cancel_maintenance(self):
+        self.enable_web(); calls = self.web_fixture()
+        for params in [{'name': 'web_search', 'arguments': {'query': 'test'}, 'owner': 'b'},
+                       {'name': 'terminal', 'arguments': {}},
+                       {'name': 'web_search', 'arguments': {'query': 'test', 'owner': 'b'}},
+                       {'name': 'web_extract', 'arguments': {'urls': ['https://127.0.0.1/']}},
+                       {'name': 'web_search', 'arguments': {'query': 'test', 'limit': True}}]:
+            self.assertEqual(self.request('fred/native-web/call', {**params, 'run_id': 'run_test'})['error']['code'], -32602)
+        for kwargs in ({'owner': 'b'}, {'context': {}}):
+            self.assertEqual(self.native_call(**kwargs)['error']['code'], -32003)
+        self.context['cancel'].set(); self.assertEqual(self.native_call()['error']['code'], -32003)
+        self.context['cancel'].clear(); self.workspace.maintenance = True
+        self.assertEqual(self.native_call()['error']['code'], -32003)
+        self.workspace.maintenance = False
+        self.assertFalse(calls)
+
+    def test_native_web_extract_upgrades_search_excerpt_and_never_retains_private_or_failed_urls(self):
+        self.enable_web(); self.web_fixture(); self.native_call()
+        self.web_fixture(result={'results': [
+            {'url': 'https://example.com/article', 'title': 'Page consultée', 'content': 'Passage exact extrait'},
+            {'url': 'https://127.0.0.1/private', 'content': 'Interne'},
+            {'url': 'https://example.com/?token=secret', 'content': 'Secret'},
+            {'url': 'https://example.com/error', 'error': 'Échec privé'},
+            {'url': 'https://example.com/blocked', 'blocked_by_policy': True, 'content': 'Refusé'}]})
+        self.native_call('web_extract', {'urls': ['https://example.com/article']})
         self.assertEqual(len(self.context['sources']), 1)
-        with self.assertRaises(ValueError): public_url('https://127.0.0.1/')
+        self.assertEqual(self.context['sources'][0]['text'], 'Passage exact extrait')
+        self.assertTrue(self.context['sources'][0]['retrieved'])
+        self.web_fixture(); self.native_call()
+        self.assertEqual(self.context['sources'][0]['text'], 'Passage exact extrait')
+
+    def test_native_web_catalogue_and_calls_are_bounded(self):
+        self.enable_web()
+        rows = [{'url': 'https://example.com/'+str(i), 'title': 't'*1000, 'description': 's'*5000} for i in range(50)]
+        self.web_fixture(result={'success': True, 'data': {'web': rows}})
+        for offset in range(5):
+            for i, row in enumerate(rows):row['url']='https://example.com/'+str(offset*50+i)
+            self.native_call(arguments={'query': 'question publique', 'limit': 10})
+        self.assertEqual(len(self.context['sources']), 40)
+        self.assertTrue(all(len(row['title'])<=200 and len(row['text'])<=3000 for row in self.context['sources']))
+        for _ in range(11):self.assertIn('result', self.native_call())
+        self.assertEqual(self.native_call()['error']['code'], -32003)
+        self.assertEqual(self.context['native_web_calls'], 16)
+
+    def test_native_web_failure_does_not_publish_internal_diagnostics(self):
+        self.enable_web()
+        class Web:
+            def call(self, *args, **kwargs):raise RuntimeError('C:/private/config ENV_SECRET')
+        self.tools.web = Web()
+        value = self.native_call()
+        self.assertEqual(value['error']['code'], -32603)
+        self.assertNotIn('ENV_SECRET', json.dumps(value))
+        self.assertNotIn('C:/private', json.dumps(value))
+
+    def test_native_web_stale_run_cannot_be_attached_to_the_next_turn_of_the_same_owner(self):
+        self.enable_web(); calls=self.web_fixture()
+        self.context['remote']='run_new'
+        value=self.native_call(run_id='run_old')
+        self.assertEqual(value['error']['code'],-32003)
+        self.assertFalse(calls);self.assertFalse(self.context['sources'])
+        self.assertNotIn('native_web_calls',self.context)
+        value=self.request('fred/native-web/call',{'name':'web_search','arguments':{'query':'test'}})
+        self.assertEqual(value['error']['code'],-32602)
+
+    def test_native_web_first_tool_waits_for_its_accepted_id_without_adopting_incoming_id(self):
+        self.enable_web();calls=self.web_fixture();self.context['remote']='';self.context['remote_ready']=threading.Event()
+        def accepted():
+            self.context['remote']='run_accepted';self.context['remote_ready'].set()
+        timer=threading.Timer(.05,accepted);timer.start()
+        try:self.assertIn('result',self.native_call(run_id='run_accepted'))
+        finally:timer.join()
+        self.assertEqual(len(calls),1)
+        self.assertEqual(self.context['remote'],'run_accepted')
 
     def test_arithmetic_cannot_execute_code_or_consume_unbounded_resources(self):
         self.assertEqual(calculate('(2500 * 1.2) - 50')['result'], 2950.0)

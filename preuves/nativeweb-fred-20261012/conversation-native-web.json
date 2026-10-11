@@ -1,0 +1,165 @@
+{
+  "observed": "2026-10-12T00:52:12.788505+02:00",
+  "fixture_only": true,
+  "production_messages_sent": 0,
+  "tests": 27,
+  "duration_seconds": 11.706,
+  "passed": true,
+  "checks": [
+    {
+      "name": "test_hermes_tools.test_mcp_lifecycle_and_argument_contract",
+      "passed": true
+    },
+    {
+      "name": "test_hermes_tools.test_project_sources_and_bounded_document",
+      "passed": true
+    },
+    {
+      "name": "test_hermes_tools.test_source_cannot_escape_project_or_owner",
+      "passed": true
+    },
+    {
+      "name": "test_hermes_tools.test_selected_document_limits_all_tools",
+      "passed": true
+    },
+    {
+      "name": "test_hermes_tools.test_revocation_cancellation_and_maintenance",
+      "passed": true
+    },
+    {
+      "name": "test_hermes_tools.test_native_web_permission_ignores_legacy_brave_settings_and_old_tools_cannot_be_called",
+      "passed": true
+    },
+    {
+      "name": "test_hermes_tools.test_native_web_rechecks_revocation_and_web_permission_before_publishing",
+      "passed": true
+    },
+    {
+      "name": "test_hermes_tools.test_native_web_has_no_owner_or_scope_override_and_checks_cancel_maintenance",
+      "passed": true
+    },
+    {
+      "name": "test_hermes_tools.test_native_web_extract_upgrades_search_excerpt_and_never_retains_private_or_failed_urls",
+      "passed": true
+    },
+    {
+      "name": "test_hermes_tools.test_native_web_catalogue_and_calls_are_bounded",
+      "passed": true
+    },
+    {
+      "name": "test_hermes_tools.test_native_web_failure_does_not_publish_internal_diagnostics",
+      "passed": true
+    },
+    {
+      "name": "test_hermes_tools.test_native_web_stale_run_cannot_be_attached_to_the_next_turn_of_the_same_owner",
+      "passed": true
+    },
+    {
+      "name": "test_hermes_tools.test_native_web_first_tool_waits_for_its_accepted_id_without_adopting_incoming_id",
+      "passed": true
+    },
+    {
+      "name": "test_hermes_tools.test_arithmetic_cannot_execute_code_or_consume_unbounded_resources",
+      "passed": true
+    },
+    {
+      "name": "test_hermes_tools.test_project_archive_blocks_even_calculation",
+      "passed": true
+    },
+    {
+      "name": "test_hermes_tools.test_real_knowledge_sources_keep_personal_project_and_document_scopes",
+      "passed": true
+    },
+    {
+      "name": "test_hermes_conversations.test_completed_turn_replays_without_new_run_and_does_not_leak_to_other_account",
+      "passed": true
+    },
+    {
+      "name": "test_hermes_conversations.test_disconnect_finishes_and_old_partial_never_overwrites_final",
+      "passed": true
+    },
+    {
+      "name": "test_hermes_conversations.test_continuation_retains_session_edited_history_and_project_switch_branch",
+      "passed": true
+    },
+    {
+      "name": "test_hermes_conversations.test_revocation_prevents_delivery_and_finished_result_is_not_replayed_after_revocation",
+      "passed": true
+    },
+    {
+      "name": "test_hermes_conversations.test_native_approval_uses_opaque_single_use_receipt_and_choice",
+      "passed": true
+    },
+    {
+      "name": "test_hermes_conversations.test_restart_marks_unfinished_turn_interrupted_without_replay",
+      "passed": true
+    },
+    {
+      "name": "test_hermes_conversations.test_cancel_before_admission_prevents_native_run_even_after_restart",
+      "passed": true
+    },
+    {
+      "name": "test_hermes_conversations.test_pending_approval_survives_native_heartbeat",
+      "passed": true
+    },
+    {
+      "name": "test_hermes_conversations.test_project_instructions_are_trusted_and_document_instructions_are_only_data",
+      "passed": true
+    },
+    {
+      "name": "test_hermes_conversations.test_native_web_sources_survive_stream_replay_reconcile_and_restart_without_other_owner_leak",
+      "passed": true
+    },
+    {
+      "name": "test_hermes_conversations.test_revocation_during_native_web_call_refuses_sources_and_final_delivery",
+      "passed": true
+    }
+  ],
+  "source_sha256": {
+    "lanceur/hermes_tools.py": "d51efdbbe07c77d604657f29e99cc3fa8b37608d7462fe1271b27b15e14defd6",
+    "lanceur/hermes_conversations.py": "28327d93048c1a5ce130bb52b20a4c83d4d05f07f55a1c59a7e1b33f20927b9a",
+    "lanceur/test_hermes_tools.py": "82ebb069ef877f60ee0a1d6c4eda61162917bad42914dc8d979b5e8078d2bce8",
+    "lanceur/test_hermes_conversations.py": "61f303c7886018947ab33de8c257907a3f7d76e79349444796742e6c098d1b52"
+  },
+  "contract": {
+    "private_rpc": "fred/native-web/call",
+    "native_tools": [
+      "web_search",
+      "web_extract"
+    ],
+    "fred_mcp_tools": 6,
+    "web_calls_per_run": 16,
+    "source_catalogue_max": 40,
+    "source_title_max_characters": 200,
+    "source_excerpt_max_characters": 3000,
+    "owner_permission_rechecked_before_during_after": true,
+    "legacy_brave_key_or_global_setting_required": false,
+    "native_sources_preserved_in_stream_reconcile_replay_restart": true,
+    "direct_corrector_unchanged": true,
+    "workspace_legacy_web_jobs_unchanged": true,
+    "private_rpc_parameters": [
+      "name",
+      "arguments",
+      "run_id"
+    ],
+    "native_run_identity_source": "tools.approval_context._approval_session_key",
+    "native_run_identity_exact_server_match": true,
+    "first_admission_wait_seconds": 1,
+    "caller_identity_never_adopted": true
+  },
+  "limits": [
+    "Conversation and authorization checks use an isolated synthetic native web broker; the separate native helper validation covers actual installed Hermes web tools."
+  ],
+  "stale_native_rpc_regression": {
+    "passed": true,
+    "duration_seconds": 1.841,
+    "actual_native_bridge": true,
+    "actual_fred_mcp_ingress": true,
+    "old_turn_cancelled": true,
+    "executed_on_new_context": false,
+    "old_sources": 0,
+    "new_sources": 0,
+    "production_calls": 0,
+    "provider_calls": 0
+  }
+}

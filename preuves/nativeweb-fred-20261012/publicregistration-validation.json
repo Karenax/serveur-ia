@@ -1,0 +1,34 @@
+{
+  "observed": "2026-10-12T00:57:25.144438+02:00",
+  "read_only_production_check": true,
+  "production_conversations_sent": 0,
+  "provider_calls": 0,
+  "data_mutations": 0,
+  "ready_profiles": 1,
+  "eligible_idle_profiles": 1,
+  "config_version": 5,
+  "native_toolsets": {
+    "http_status": 200,
+    "platform": "api_server",
+    "web_enabled": true,
+    "web_configured_metadata": true,
+    "web_tools": [
+      "web_extract",
+      "web_search"
+    ],
+    "enabled": [
+      "memory",
+      "skills",
+      "todo",
+      "web"
+    ]
+  },
+  "inactive_rpc": {
+    "http_status": 200,
+    "rpc_error_code": -32003,
+    "result_delivered": false,
+    "refused": true,
+    "native_run_id_supplied": true
+  },
+  "passed": true
+}

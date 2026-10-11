@@ -22,7 +22,7 @@ from urllib.parse import urlsplit
 from core import HOME, write_json
 from wg_crypto import protect, private_directory
 
-CONFIG_VERSION = 4
+CONFIG_VERSION = 5
 _OWNER = re.compile(r'[a-z0-9][a-z0-9_-]{0,55}\Z')
 _STATES = {'provisioning', 'ready', 'error', 'suspended', 'revoked', 'archived'}
 
@@ -139,6 +139,7 @@ class HermesAccounts:
 
     def config(self, owner=None, port=8643, selection=None):
         tools = ['memory', 'skills', 'todo'] if owner else []
+        if owner and self.mcp_url: tools.append('web')
         config = {
             'model': {'default': self.model, 'provider': 'custom', 'base_url': self.inference_url,
                       'api_mode': 'chat_completions', 'key_env': 'FRED_INFERENCE_KEY',
@@ -209,6 +210,7 @@ class HermesAccounts:
             self._write_env(directory, {'API_SERVER_KEY': credentials['api_key'],
                                        'FRED_INFERENCE_KEY': credentials['inference_key'],
                                        'FRED_TOOL_KEY': credentials['tool_key'],
+                                       'FRED_WEB_URL': self.mcp_url,
                                        'FRED_PROVIDER_URL': self.inference_url+'/provider/credential'})
             return directory
 

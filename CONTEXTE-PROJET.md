@@ -4,7 +4,9 @@ Mise à jour : 12 octobre 2026.
 
 ## Objectif actuel
 
-Dernière demande : vérifier le niveau de réflexion des messages Nemotron et
+Dernière demande : laisser Hermes effectuer ses recherches web dans les conversations Fred. L’audit des deux derniers appels web retrouve un refus du droit Web du compte et l’ancien outil Brave Fred ; le profil Fred n’exposait pas les outils web natifs Hermes. La correction raccorde `web_search` et `web_extract` aux connexions du profil Hermes actif, sans dupliquer les secrets dans les profils Fred. Le droit Web du compte actuel est activé ; ses autres quotas restent conservés. Les appels sont liés au tour natif pour refuser ceux d’un message annulé, et les redirections privées sont filtrées. Les anciennes tâches Web restent sur leur moteur Brave/lecture d’URL, avec un libellé explicite dans la console. Livraison serveur effectuée après 151 tests réussis, avec recherche et lecture natives réelles validées. Qwen reste chargé, les clés/profils et la sélection des quatre modèles externes sont préservés. Les clients publiés Windows 3.5.27 et Android 1.0.10/code 11 conservent leur protocole et n’ont pas besoin d’une nouvelle installation pour cette correction serveur. Preuves : [recherche web native](preuves/nativeweb-fred-20261012/VALIDATION.md).
+
+Demande précédente : vérifier le niveau de réflexion des messages Nemotron et
 proposer seulement les réglages disponibles pour chaque modèle. L’audit en
 lecture seule retrouve high pour les deux derniers envois, par correspondance
 exacte des empreintes Fred ; max était silencieusement normalisé vers high.

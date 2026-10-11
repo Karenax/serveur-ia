@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-12",
+  "server_only_delivery": true,
+  "windows_version": "3.5.27",
+  "android_version": "1.0.10",
+  "profile_config_version": 5,
+  "checks": {
+    "native_profile_configuration_migrated": true,
+    "native_web_toolset_enabled": true,
+    "only_search_and_extract_enabled_for_web": true,
+    "legacy_conversation_web_tools_removed": true,
+    "web_outside_active_run_refused": true,
+    "current_account_web_authorized": true,
+    "account_quotas_preserved": true,
+    "other_account_policies_preserved": true,
+    "legacy_web_configuration_preserved": true,
+    "profile_identities_and_credentials_preserved": true,
+    "access_settings_and_model_policy_preserved": true,
+    "catalogue_matches_admin_selection": true,
+    "published_clients_unchanged": true,
+    "model_processes_preserved": true,
+    "model_loaded": true,
+    "model_name_preserved": true,
+    "agent_voice_direct_corrector_available": true
+  },
+  "web_permission_changed_for_current_account_only": true,
+  "cloud_model_count": 4,
+  "native_web_tools": [
+    "web_extract",
+    "web_search"
+  ],
+  "model_history_modified_by_validation": false,
+  "personal_web_secrets_copied": false
+}

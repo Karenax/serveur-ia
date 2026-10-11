@@ -1,0 +1,16 @@
+{
+  "date": "2026-10-12",
+  "scope": "static_admin_console_only",
+  "syntax_check": "passed",
+  "structure_and_render_assertions": 8,
+  "status": "passed",
+  "viewports": [
+    1180,
+    390
+  ],
+  "production_api_calls": 0,
+  "client_bundles_changed": false,
+  "control_ids_and_forms_preserved": true,
+  "visual_review": "passed",
+  "workspace_js_sha256": "e2599dd9ae66f472ccac78d0106ef6db84809b53a416a967820fdefece697ce3"
+}

@@ -17,7 +17,10 @@ import psutil
 
 from core import HIDDEN, read_json, write_json
 from hermes_accounts import CONFIG_VERSION
-from hermes_codex_compat import GATEWAY_BOOTSTRAP
+from hermes_codex_compat import PATCH_SOURCE as CODEX_PATCH
+from hermes_web import gateway_bootstrap
+
+GATEWAY_BOOTSTRAP = gateway_bootstrap(CODEX_PATCH)
 
 
 def installation(source=None):
@@ -114,7 +117,7 @@ def create_native_profile(accounts, owner, port=8643, source=None):
                'config': accounts.config(owner, port),
                'env': ''.join(f'{key}={value}\n' for key, value in {
                    'API_SERVER_KEY': credentials['api_key'], 'FRED_INFERENCE_KEY': credentials['inference_key'],
-                   'FRED_TOOL_KEY': credentials['tool_key']}.items())}
+                   'FRED_TOOL_KEY': credentials['tool_key'], 'FRED_WEB_URL': accounts.mcp_url}.items())}
     result = subprocess.run([str(runtime['python']), '-c', _CREATE_PROFILE], input=json.dumps(payload).encode(),
                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, cwd=runtime['source'],
                             env=child_environment(accounts.root, runtime), timeout=60, creationflags=HIDDEN)

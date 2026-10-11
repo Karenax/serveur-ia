@@ -10,6 +10,7 @@ from hermes_service import HermesService
 from hermes_inference import HermesPrivateServer
 from hermes_conversations import HermesConversations
 from hermes_tools import FredTools
+from hermes_web import NativeHermesWeb
 from hermes_projects import HermesProjects
 from hermes_models import HermesModels, NativeModelSource
 
@@ -29,6 +30,7 @@ class HermesFred:
         self.projects = HermesProjects(self.accounts, store.workspace, self.service)
         self.conversations.projects = self.projects
         self.tools = FredTools(store.workspace, self.tool_allowed)
+        self.tools.web = NativeHermesWeb(source=source)
         self.private.accounts, self.private.conversations, self.private.tools = self.accounts, self.conversations, self.tools
         self.started = False
         self.error = ''
