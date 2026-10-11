@@ -88,7 +88,7 @@
   };
   async function submitTurn(turn){
     if(!active)return;
-    if(busy){pendingTurns.push(turn);return;}
+    if(busy||historySyncPending||historySaving||agentRecoveryPending||conversationActionPending){pendingTurns.unshift(turn);return;}
     prompt.value=turn.text;window.conversationSubmitting=true;
     try{$('composer').requestSubmit();}finally{window.conversationSubmitting=false;}
   }
@@ -99,12 +99,14 @@
       if(!active&&native.phase==='installing')status.textContent='Installation des modèles · '+Math.floor(100*(native.downloaded_bytes||0)/native.model_bytes)+' %';
       else if(!active&&native.message)status.textContent=native.message;
       if(active){
-        if(!connected||historyBlocked||historySyncPending||conversationActionPending){await stop('Conversation arrêtée : vérifiez la connexion et la synchronisation.');return;}
+        // A normal history sync follows every answer. It pauses new sends,
+        // while the microphone and the completed answer's audio stay active.
+        if(!connected||historyBlocked||conversationActionPending){await stop('Conversation arrêtée : vérifiez la connexion et la synchronisation.');return;}
         if(native.session!==session||['stopped','error'].includes(native.phase)){await stop(native.message||'Conversation arrêtée.');return;}
         if(native.speech_id>seenSpeech){seenSpeech=native.speech_id;if(busy||speechRunning||sources.size)interrupt();}
         if(native.partial&&!busy&&!speechRunning)status.textContent='Vous : '+native.partial;
         for(const turn of native.turns||[]){if(turn.id<=seenTurn)continue;seenTurn=turn.id;pendingTurns.push(turn);await command('ack',{turn:turn.id});}
-        if(!busy&&pendingTurns.length)await submitTurn(pendingTurns.shift());
+        if(!busy&&!historySyncPending&&!historySaving&&!agentRecoveryPending&&pendingTurns.length)await submitTurn(pendingTurns.shift());
       }
       refreshButtons();
     }catch(e){if(active)await stop(e.message).catch(()=>{});else status.textContent=e.message;}

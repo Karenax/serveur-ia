@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-11",
+  "windows": {
+    "version": "3.5.23",
+    "sha256": "dd44e04f630dbf7876b74d859fb9d1ec1876cfc2a393f277b3e6135f93a5df42",
+    "bytes": 93450526,
+    "personal_packages_prepared": 1
+  },
+  "checks": {
+    "windows_release_verified": true,
+    "personal_windows_package_refreshed": true,
+    "agent_and_voice_ready": true,
+    "model_processes_preserved": true,
+    "model_loaded": true,
+    "model_name_preserved": true,
+    "access_registry_and_model_settings_preserved": true,
+    "android_unchanged": true
+  }
+}

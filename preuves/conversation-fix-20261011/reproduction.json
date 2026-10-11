@@ -1,0 +1,18 @@
+{
+  "scope": "isolated-synthetic-client",
+  "baseline_commit": "0354e91",
+  "baseline_version": "3.5.22",
+  "scenario": "Completed reply followed by automatic history sync while first speech segment is still pending",
+  "new_speech_events": 0,
+  "history_sync_pending": true,
+  "reply_completed": true,
+  "baseline_observed": {
+    "native_stop_calls": 1,
+    "generation_cancel_calls": 1,
+    "conversation_active": false,
+    "answer": "[Réponse interrompue avant la fin de sa première phrase.]",
+    "status": "Conversation arrêtée : vérifiez la connexion et la synchronisation."
+  },
+  "production_data_modified": false,
+  "microphone_or_model_used_for_this_reproduction": false
+}

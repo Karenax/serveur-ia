@@ -1,0 +1,50 @@
+{
+  "scope": "isolated-synthetic-fixture",
+  "passed": true,
+  "checks": [
+    {
+      "name": "Un brouillon empêche le démarrage sans perdre son texte",
+      "passed": true
+    },
+    {
+      "name": "Le mode garde le projet sélectionné pour le chat",
+      "passed": true
+    },
+    {
+      "name": "La session ferme les changements de conversation et la dictée",
+      "passed": true
+    },
+    {
+      "name": "Un tour final part automatiquement par le chat existant",
+      "passed": true
+    },
+    {
+      "name": "La réponse commence à parler avant la fin du LLM",
+      "passed": true
+    },
+    {
+      "name": "Reprendre la parole annule audio et génération",
+      "passed": true
+    },
+    {
+      "name": "Raccrocher ferme la session et rend le clavier",
+      "passed": true
+    },
+    {
+      "name": "Une erreur microphone ferme le mode conversation",
+      "passed": true
+    },
+    {
+      "name": "La console affiche le service vocal séparé",
+      "passed": true
+    },
+    {
+      "name": "Désactiver puis réactiver charge et arrête la vraie voix CPU",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "transport": "real WireGuard UDP + real Pocket TTS CPU; controlled local ASR and LLM",
+  "python_voice_tests": 9,
+  "windows_history_and_distribution_tests": 7
+}

@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "source": "working-tree",
+  "checks": [
+    "Hermes final + delayed sync preserves session and complete text",
+    "all three PCM frames finish without automatic cancellation",
+    "second ASR turn waits for history sync and submits exactly once",
+    "same conversation with unique turn IDs",
+    "real new speech during calculation cancels original turn",
+    "speech playback barge-in cancels correct audio and scheduled sources",
+    "hangup returns controls"
+  ],
+  "chats": 4,
+  "acks": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "simulation": "native ASR and PCM timing; no hardware microphone or server models"
+}

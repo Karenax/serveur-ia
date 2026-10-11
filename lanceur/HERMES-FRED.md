@@ -1,6 +1,6 @@
 # Conversations Fred avec Hermes
 
-Les clients Windows 3.5.22 et Android 1.0.6/code 7 envoient leurs demandes à Fred. Le serveur confie chaque conversation à Hermes, qui utilise le Qwen local déjà chargé et les outils autorisés. Le correcteur et les tâches rédactionnelles utilisent également Hermes. Le modèle reste partagé : un compte ne charge pas un autre Qwen.
+Les clients Windows 3.5.23 et Android 1.0.6/code 7 envoient leurs demandes à Fred. Le serveur confie chaque conversation à Hermes, qui utilise le Qwen local déjà chargé et les outils autorisés. Le correcteur et les tâches rédactionnelles utilisent également Hermes. Le modèle reste partagé : un compte ne charge pas un autre Qwen.
 
 ## Comptes et projets
 

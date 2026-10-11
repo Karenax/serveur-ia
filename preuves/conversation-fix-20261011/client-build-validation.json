@@ -1,0 +1,41 @@
+{
+  "windows": {
+    "version": "3.5.23",
+    "protocol": 3,
+    "bytes": 93450526,
+    "sha256": "dd44e04f630dbf7876b74d859fb9d1ec1876cfc2a393f277b3e6135f93a5df42",
+    "signature": "gj3sDdMf8pS8El1gdbCS7mYKt0dYerSqxkWy9e8cdEkgz9Y2OITXZoTo4lsd5RBAVifdlWgcqZvzw/L8+OBWCg==",
+    "signing_public_key": "8fSJ5YLYBVF0GvxnS5RyD6LjgMSTi39H+4YGeS2Ac/M=",
+    "agent_protocol": 4
+  },
+  "ed25519_verified": true,
+  "previous_updater_verified": true,
+  "pinned_public_key_unchanged": true,
+  "pe_version": "3.5.23",
+  "self_test": "Accès serveur Fred self-test OK",
+  "bundle_source_matches": true,
+  "bundled_native_files_verified": 481,
+  "conversation_js_sha256": "ce7ff7af1347eef1df8575fbea4bf0c2f2e055844d2614e17e4011dc43fa2a7d",
+  "regression": {
+    "passed": true,
+    "source": "working-tree",
+    "checks": [
+      "Hermes final + delayed sync preserves session and complete text",
+      "all three PCM frames finish without automatic cancellation",
+      "second ASR turn waits for history sync and submits exactly once",
+      "same conversation with unique turn IDs",
+      "real new speech during calculation cancels original turn",
+      "speech playback barge-in cancels correct audio and scheduled sources",
+      "hangup returns controls"
+    ],
+    "chats": 4,
+    "acks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "simulation": "native ASR and PCM timing; no hardware microphone or server models"
+  },
+  "publication": "staged_only"
+}

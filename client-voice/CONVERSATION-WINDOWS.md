@@ -1,10 +1,12 @@
-# Conversation vocale Windows — version 3.5.21
+# Conversation vocale Windows — version 3.5.23
 
 ## Utilisation
 
 Mettre à jour le client Windows personnel avec la mise à jour intégrée. Sur ce PC, les modèles sont déjà installés. Sur les autres PC, choisir **Installer la conversation** une fois : environ **138 Mo** téléchargés publiquement puis vérifiés par SHA-256. L’installation peut être arrêtée ; un nouvel essai recommence les fichiers. Une corruption détectée propose **Réparer la conversation**.
 
-Dans un chat connecté, terminer ou conserver son brouillon, sélectionner le projet voulu, puis cliquer **Conversation**. Parler normalement : le texte provisoire apparaît et une fin de tour déclenche automatiquement l’envoi à Fred. Fred lit les premières phrases de sa réponse pendant la génération. Reprendre la parole coupe la lecture et annule la génération de cette demande ; le prochain tour part dès que l’annulation est terminée. **Raccrocher** ferme le microphone et rend le clavier disponible. Le passage en arrière-plan arrête également le mode. Durée maximale : quinze minutes, puis il faut relancer Conversation.
+Dans un chat connecté, terminer ou conserver son brouillon, sélectionner le projet voulu, puis cliquer **Conversation**. Parler normalement : le texte provisoire apparaît et une fin de tour déclenche automatiquement l’envoi à Fred. Avec Hermes, Fred lit la réponse finale après la génération et les outils. Reprendre la parole coupe la lecture et annule la génération de cette demande ; le prochain tour part dès que l’annulation et l’enregistrement sont terminés. **Raccrocher** ferme le microphone et rend le clavier disponible. Le passage en arrière-plan arrête également le mode. Durée maximale : quinze minutes, puis il faut relancer Conversation.
+
+La synchronisation automatique de l’historique après chaque réponse conserve le microphone et la lecture actifs. Un nouveau tour vocal reçu pendant cette synchronisation attend son achèvement, puis part une seule fois. La version 3.5.23 corrige l’arrêt intempestif qui affichait « Réponse interrompue avant la fin de sa première phrase » lors d’une synchronisation lente.
 
 Le silence ne raccroche pas. Silero détecte la parole ; après environ 550 ms de silence, Smart Turn estime si le tour est terminé. S’il hésite, le moteur réévalue et termine après quatre secondes de silence au maximum. Un tour est borné à trente secondes. Il peut envoyer trop tôt ou attendre trop longtemps selon l’accent, le bruit et la manière de parler : ces seuils ne garantissent pas une compréhension parfaite de l’intention.
 
