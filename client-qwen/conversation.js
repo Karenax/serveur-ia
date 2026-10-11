@@ -10,7 +10,7 @@
   let answerRef=null,heard='',interrupted=false,llmDone=false,pendingTurns=[];
   window.conversationBusy=false;
   function needsRepair(){return native.phase==='error'&&native.message?.includes('corrompu');}
-  function refreshButtons(){buttons();drawLibrary();if(active)$('voice-start').disabled=true;button.textContent=active?'Raccrocher':native.phase==='installing'?'Arrêter l’installation':needsRepair()?'Réparer la conversation':native.installed?'Conversation':'Installer la conversation';button.disabled=acting||(!active&&conversationLocked());button.setAttribute('aria-pressed',String(active));}
+  function refreshButtons(){buttons();drawLibrary();if(active)$('voice-start').disabled=true;button.textContent=active?'Raccrocher':native.phase==='installing'?'Arrêter l’installation':needsRepair()?'Réparer la conversation':native.installed?'Conversation':'Installer la conversation';button.disabled=acting||(!active&&(conversationLocked()||!conversationModelAvailable()));button.setAttribute('aria-pressed',String(active));}
   async function command(action,extra={}){return api('/client/conversation',{action,...(['stop','ack'].includes(action)?{session}:{}),...extra});}
   function stopAudio(){
     epoch++;speechQueue=[];speechBuffer='';speechAbort?.abort();
@@ -88,7 +88,7 @@
   };
   async function submitTurn(turn){
     if(!active)return;
-    if(busy||historySyncPending||historySaving||agentRecoveryPending||conversationActionPending){pendingTurns.unshift(turn);return;}
+    if(busy||historySyncPending||historySaving||agentRecoveryPending||conversationActionPending||!conversationModelAvailable()){pendingTurns.unshift(turn);return;}
     prompt.value=turn.text;window.conversationSubmitting=true;
     try{$('composer').requestSubmit();}finally{window.conversationSubmitting=false;}
   }
@@ -102,11 +102,12 @@
         // A normal history sync follows every answer. It pauses new sends,
         // while the microphone and the completed answer's audio stay active.
         if(!connected||historyBlocked||conversationActionPending){await stop('Conversation arrêtée : vérifiez la connexion et la synchronisation.');return;}
+        if(!conversationModelAvailable()&&!busy&&!speechRunning&&!sources.size){await stop('Conversation arrêtée : choisissez un modèle disponible.');return;}
         if(native.session!==session||['stopped','error'].includes(native.phase)){await stop(native.message||'Conversation arrêtée.');return;}
         if(native.speech_id>seenSpeech){seenSpeech=native.speech_id;if(busy||speechRunning||sources.size)interrupt();}
         if(native.partial&&!busy&&!speechRunning)status.textContent='Vous : '+native.partial;
         for(const turn of native.turns||[]){if(turn.id<=seenTurn)continue;seenTurn=turn.id;pendingTurns.push(turn);await command('ack',{turn:turn.id});}
-        if(!busy&&!historySyncPending&&!historySaving&&!agentRecoveryPending&&pendingTurns.length)await submitTurn(pendingTurns.shift());
+        if(!busy&&!historySyncPending&&!historySaving&&!agentRecoveryPending&&conversationModelAvailable()&&pendingTurns.length)await submitTurn(pendingTurns.shift());
       }
       refreshButtons();
     }catch(e){if(active)await stop(e.message).catch(()=>{});else status.textContent=e.message;}
@@ -114,7 +115,7 @@
   }
   button.onclick=async()=>{
     if(acting)return;if(active||native.phase==='installing'){await stop().catch(error);return;}
-    if(conversationLocked()||!connected)return;
+    if(conversationLocked()||!connected||!conversationModelAvailable())return;
     if(prompt.value.trim()||chatAttachments.length){status.textContent='Envoyez ou conservez votre brouillon avant de démarrer une conversation vocale.';return;}
     acting=true;
     try{

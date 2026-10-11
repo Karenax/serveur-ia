@@ -648,7 +648,7 @@
     "bytes": 27294
   },
   "conversation-worker/_internal/base_library.zip": {
-    "sha256": "f8cb248c1893e0170f0381b40f7253b401e2c1c1c2919fdfbad1c931689c30b3",
+    "sha256": "dd33a868ce8e770c181c7c6ea12f623a847a0beeeecf2833767334268bf7ad96",
     "bytes": 1333490
   },
   "conversation-worker/_internal/onnxruntime/tools/qdq_helpers/__init__.py": {
@@ -1420,7 +1420,7 @@
     "bytes": 93696
   },
   "ggml-base.dll": {
-    "sha256": "93a26c89c7f3a35dafe38169b6adeb18a8a21f922ec5b48f61110df2398f94f4",
+    "sha256": "6c401efeb97c4b87064cd1061bff4ef57b8d56464bbe66e52fd905a1d33fb668",
     "bytes": 864256
   },
   "conversation-worker/_internal/onnxruntime/transformers/models/sam2/mask_decoder.py": {
@@ -1860,8 +1860,8 @@
     "bytes": 5238
   },
   "licenses/llamafile-LICENSE.txt": {
-    "sha256": "903db391399dc8ad508cb5ee0ebc0bbd4bb6f1fb8bf9a06e1bcd1d7e3eccd2e4",
-    "bytes": 1079
+    "sha256": "c5843750168debd92766cf0cf2f5040ce8a6eefe2ef7ebc652997b6897e1ba3b",
+    "bytes": 1058
   },
   "conversation-worker/_internal/numpy/linalg/_umath_linalg.cp312-win_amd64.pyd": {
     "sha256": "88c8d38d7b2f483542442292e149ca335462d1467b8e835b00a71a8b27125cf5",

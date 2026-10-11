@@ -1,0 +1,48 @@
+{
+  "date": "2026-10-11",
+  "windows": {
+    "version": "3.5.25",
+    "protocol": 3,
+    "bytes": 93453117,
+    "sha256": "b67c082a58beb3486c6579c25206d82fe427f292ec464023ffe5b05e26a3b02c",
+    "signature": "CDdLj2aeFCC4T5Uj2+JctL2FEV6XbwqGpxc33a3JeEZOX8RbCBin55qjv8MPmpC5xT3QXrhbenuAXY++s+iEBw==",
+    "signing_public_key": "8fSJ5YLYBVF0GvxnS5RyD6LjgMSTi39H+4YGeS2Ac/M="
+  },
+  "android": {
+    "version": "1.0.8",
+    "bytes": 18899220,
+    "version_code": 9,
+    "package": "net.karenax.fred",
+    "sha256": "16e1baa343081a463d857ed7a00f5a0af13e5aa7a218d9130ba1a85a8142737c"
+  },
+  "personal_packages_prepared": 1,
+  "checks": {
+    "windows_release_verified": true,
+    "personal_windows_package_refreshed": true,
+    "android_update_announced": true,
+    "authenticated_downloads_verified": true,
+    "agent_and_voice_ready": true,
+    "direct_transform_validation_available": true,
+    "global_provider_sharing_enabled": true,
+    "shared_public_catalogue_returned": true,
+    "provider_availability_preserved": true,
+    "model_processes_preserved": true,
+    "model_loaded": true,
+    "model_name_preserved": true,
+    "access_settings_and_hermes_config_preserved": true
+  },
+  "production_history_modified_by_validation": false,
+  "cloud_model_count": 51,
+  "available_cloud_model_count": 0,
+  "providers": [
+    "GitHub Copilot"
+  ],
+  "provider_connection_status": [
+    {
+      "label": "GitHub Copilot",
+      "available": false,
+      "error": "Connexion Copilot incomplète ou non autorisée."
+    }
+  ],
+  "catalogue_contains_provider_secrets": false
+}

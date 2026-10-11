@@ -1,0 +1,16 @@
+{
+  "date": "2026-10-11",
+  "passed": true,
+  "tests": 20,
+  "duration_seconds": 117.059,
+  "command": "python -m unittest test_remote",
+  "scope": "Isolated local HTTP and WireGuard fixtures with the published Windows build",
+  "checks": [
+    "Personal Windows executable startup and native self-test",
+    "Authenticated streaming through real WireGuard tunnels",
+    "Concurrent personal profiles and revocation",
+    "Legacy model discovery and inventory refresh",
+    "Local API does not expose remote credentials",
+    "Connection fallback and encrypted settings survive reconnect"
+  ]
+}

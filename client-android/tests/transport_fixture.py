@@ -28,6 +28,7 @@ def main():
     parser.add_argument("--duration", type=int, default=3600)
     parser.add_argument("--lots6-8", action="store_true", help="Use actual isolated Workspace/Notifications modules")
     parser.add_argument("--corrector", action="store_true", help="Verify direct-corrector bodies in the real Android tunnel")
+    parser.add_argument("--model-selection", action="store_true", help="Verify public catalogue and selected-model chat/context native transport")
     parser.add_argument("--engine", type=Path, help="Isolated staged bridge, leaving a live production executable untouched")
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[2]
@@ -38,6 +39,9 @@ def main():
     token = "qwen_" + secrets.token_hex(8) + "_" + secrets.token_urlsafe(32)
     state = {"history": None, "revision": 0, "requests": {}, "rejected": 0}
     corrector_modes = {}
+    model_checks = {"context": 0, "chat": 0, "retired": 0, "local_unloaded": 0, "rejected": 0}
+    cloud_model = "fred-model-0123456789abcdef"
+    model_available = True
     guard = threading.Lock()
     workspace = notifications = None
     owner = token.split("_")[1]
@@ -84,6 +88,7 @@ def main():
             self.route()
 
         def route(self):
+            nonlocal model_available
             if self.headers.get("Authorization") != "Bearer " + token:
                 with guard:
                     state["rejected"] += 1
@@ -98,7 +103,16 @@ def main():
                 label = self.command + " " + self.path
                 state["requests"][label] = state["requests"].get(label, 0) + 1
             if self.path == "/v1/models":
-                self.json_reply({"object": "list", "data": [{"id": "fred-fixture", "object": "model", "capabilities": {"thinking": True, "images": False, "files": ["txt", "md"]}}]})
+                if args.model_selection:
+                    self.json_reply({"object": "list", "source": "hermes", "default_model": cloud_model,
+                                     "api_key": "SYNTHETIC_NOT_SECRET", "data": [
+                                         {"id": "fred-qwen", "name": "Fixture local", "label": "Fixture local", "provider": "Qwen local", "available": False,
+                                          "capabilities": {"thinking": True, "vision": False, "images": False, "context_length": None}},
+                                         {"id": cloud_model, "name": "Fixture cloud", "label": "Fixture cloud", "provider": "OpenRouter", "available": model_available,
+                                          "api_key": "SYNTHETIC_NOT_SECRET", "base_url": "https://fixture.invalid/",
+                                          "capabilities": {"thinking": True, "vision": True, "images": True, "context_length": 131072, "files": ["txt", "md"]}}]})
+                else:
+                    self.json_reply({"object": "list", "data": [{"id": "fred-fixture", "object": "model", "capabilities": {"thinking": True, "images": False, "files": ["txt", "md"]}}]})
             elif self.path == "/v1/status":
                 self.json_reply({"status": "ready", "model": "fred-fixture", "model_loaded": True, "context_window": 32768})
             elif self.path == "/v1/device" and self.command == "POST":
@@ -107,7 +121,20 @@ def main():
                 else:
                     self.json_reply({"id": token.split("_")[1], "server_epoch": time.time(), "declared": body})
             elif self.path == "/v1/context":
-                self.json_reply({"tokens": 100, "capacity": 32768, "estimated": False, "fits": True})
+                if args.model_selection:
+                    valid = (set(body) == {"model", "messages"} and body.get("messages") == [{"role": "user", "content": "Test synthétique Android : modèle distant."}])
+                    with guard:
+                        if valid and body.get("model") == "fred-model-retired": model_checks["retired"] += 1
+                        elif valid and body.get("model") == cloud_model: model_checks["context"] += 1
+                        else: model_checks["rejected"] += 1
+                    if valid and body.get("model") == "fred-model-retired":
+                        self.json_reply({"error": {"code": "model_unavailable", "message": "Synthetic model unavailable"}}, 503)
+                    elif valid and body.get("model") == cloud_model:
+                        self.json_reply({"tokens": 100, "capacity": 131072, "estimated": True, "fits": True})
+                    else:
+                        self.json_reply({"error": {"message": "Synthetic model context contract rejected"}}, 400)
+                else:
+                    self.json_reply({"tokens": 100, "capacity": 32768, "estimated": False, "fits": True})
             elif self.path == "/v1/history":
                 with guard:
                     if self.command == "POST":
@@ -118,6 +145,24 @@ def main():
                         state["revision"] += 1
                     self.json_reply({"history": state["history"], "revision": str(state["revision"]), "reset_id": "20261006-remove-assistants"})
             elif self.path == "/v1/chat/completions":
+                if args.model_selection:
+                    if body == {"stream": True, "text_transform": {"mode": "correct", "text": "Texte synthétique Android à transformer."}}:
+                        with guard:
+                            model_checks["local_unloaded"] += 1
+                            (output / "request-counts.json").write_text(json.dumps({"requests": state["requests"], "rejected": state["rejected"], "model_selection": model_checks}), encoding="utf-8")
+                        self.json_reply({"error": {"code": "model_unloaded", "message": "Synthetic local Qwen unloaded"}}, 503)
+                        return
+                    valid = (set(body) == {"model", "messages", "stream", "conversation_id"}
+                             and body.get("model") == cloud_model and body.get("stream") is True
+                             and body.get("messages") == [{"role": "user", "content": "Test synthétique Android : modèle distant."}]
+                             and isinstance(body.get("conversation_id"), str) and len(body["conversation_id"]) == 32
+                             and len(self.headers.get("X-Qwen-Request", "")) == 32)
+                    with guard:
+                        model_checks["chat" if valid else "rejected"] += 1
+                    if not valid:
+                        self.json_reply({"error": {"message": "Synthetic selected model chat contract rejected"}}, 400)
+                        return
+                    model_available = False
                 if args.corrector:
                     transform = body.get("text_transform", {})
                     mode = transform.get("mode") if isinstance(transform, dict) else None
@@ -167,6 +212,7 @@ def main():
             with guard:
                 counts = {k: state[k] for k in ("requests", "rejected")}
                 if args.corrector: counts["corrector_modes"] = corrector_modes
+                if args.model_selection: counts["model_selection"] = model_checks
                 (output / "request-counts.json").write_text(json.dumps(counts), encoding="utf-8")
 
     api = ThreadingHTTPServer(("127.0.0.1", 0), API)

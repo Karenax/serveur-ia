@@ -33,20 +33,26 @@ function contextRefresh(){
 }
 async function contextCount(){
  if(contextPending)return;
- if(!connected){contextSignature='';$('context-label').textContent='Contexte · connexion requise';$('context-progress').value=0;return;}
+ if(!connected||!conversationModelAvailable()){contextSignature='';$('context-label').textContent=connected?'Contexte · choisissez un modèle disponible':'Contexte · connexion requise';$('context-progress').value=0;return;}
  const history=messages.map(m=>({role:m.role,content:chatRequestContent(m),...(m.reasoning_content?{reasoning_content:m.reasoning_content}:{})}));
  const text=$('prompt').value.trim();
  if(text||chatAttachments.length)history.push({role:'user',content:chatRequestContent({content:text,attachments:chatAttachments})});
  if(!history.length)history.push({role:'user',content:''});
- const payload={...workspaceFields(),model:config.model,messages:history,reasoning_effort:thinkingEffort()};
+ const payload={...workspaceFields(),model:conversationModel(),messages:history,reasoning_effort:thinkingEffort()};
  const signature=JSON.stringify(payload);if(signature===contextSignature)return;
  const revision=contextRevision;contextPending=true;contextSignature='';
  $('context-label').textContent='Contexte · calcul…';
  try{
   const result=await api('/v1/context',payload);
   if(revision!==contextRevision)return;
-  const percent=Math.round(result.tokens/result.capacity*1000)/10;
+  if(typeof result.tokens!=='number'||!Number.isFinite(result.tokens)||result.tokens<0)throw new Error('Comptage invalide.');
   contextSignature=signature;
+  if(typeof result.capacity!=='number'||!Number.isFinite(result.capacity)||result.capacity<=0){
+    $('context-progress').removeAttribute('value');contextGauge.dataset.level='normal';
+    $('context-label').textContent='Contexte '+(result.estimated?'≈ ':'')+result.tokens.toLocaleString('fr-FR')+' tokens · capacité non connue';
+    contextGauge.title='Estimation du contexte visible. La capacité de ce modèle n’est pas annoncée par le serveur.';return;
+  }
+  const percent=Math.round(result.tokens/result.capacity*1000)/10;
   $('context-progress').value=Math.min(100,percent);
   contextGauge.dataset.level=percent>=95?'full':percent>=80?'warning':'normal';
   $('context-label').textContent='Contexte '+(result.estimated?'≈ ':'')+percent+' % · '+result.tokens.toLocaleString('fr-FR')+' / '+result.capacity.toLocaleString('fr-FR');

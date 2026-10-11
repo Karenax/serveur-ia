@@ -1,5 +1,31 @@
 # Validation Android — 11 octobre 2026
 
+## Version 1.0.8 — choix du modèle par conversation
+
+APK Release **1.0.8**, code **9**, publié avec le certificat de distribution
+existant. Les **29 vérifications** passent : compilation et analyse Android,
+13 tests de distribution, signature v2/v3, alignement 16 Ko, ressources vocales
+et bibliothèques natives identiques bit à bit à l’APK 1.0.7, sources de
+l’interface concordantes avec le paquet.
+
+Le Release signé a été mis à jour depuis 1.0.7 sur l’émulateur téléphone Android
+16 x86_64. Six groupes natifs vérifient le catalogue multi-fournisseurs avec
+Qwen local déchargé, le maintien de la connexion après une erreur locale du
+correcteur, la conservation chiffrée du modèle et les scopes de fusion, le
+modèle transmis dans le contexte et le chat, la réponse SSE complète et un
+modèle retiré sans substitution. Le catalogue reste consultable lorsque tous
+les modèles sont indisponibles. Les trois modes directs du correcteur et les
+contrôles natifs `UpdateChecks` réussissent également.
+
+Les [empreintes et compteurs](../preuves/model-selector-20261011/android-release.json)
+et le [rapport Android](../preuves/model-selector-20261011/ANDROID.md) précisent
+les contrôles réels et leurs limites. Les fournisseurs répondent dans une
+fixture synthétique isolée ; le tunnel WireGuard et le proxy Android sont réels.
+Aucune inférence externe ni nouvelle mesure acoustique de la dictée n’est
+revendiquée. Les essais physiques ARM64 et une conversation HTTPS authentifiée
+restent distincts. Les instrumentations et profils synthétiques ont été retirés.
+La publication est coordonnée avec la livraison Windows/serveur 3.5.25.
+
 ## Version 1.0.7 — correcteur direct Qwen
 
 APK Release **1.0.7**, code **8**, publié avec le certificat de distribution

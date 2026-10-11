@@ -17,6 +17,7 @@ import psutil
 
 from core import HIDDEN, read_json, write_json
 from hermes_accounts import CONFIG_VERSION
+from hermes_codex_compat import GATEWAY_BOOTSTRAP
 
 
 def installation(source=None):
@@ -179,7 +180,7 @@ class HermesService:
         log_dir = self.root / 'logs'
         log_dir.mkdir(exist_ok=True)
         with (log_dir / 'fred-gateway.log').open('ab') as log:
-            self.process = subprocess.Popen([str(self.runtime['python']), '-m', 'hermes_cli.main',
+            self.process = subprocess.Popen([str(self.runtime['python']), '-c', GATEWAY_BOOTSTRAP,
                     'gateway', 'run', '--external-supervisor'], cwd=self.runtime['source'],
                     stdin=subprocess.DEVNULL, stdout=log, stderr=log,
                     env=child_environment(self.root, self.runtime), creationflags=HIDDEN)

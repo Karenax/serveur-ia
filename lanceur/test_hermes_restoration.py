@@ -79,6 +79,19 @@ class HermesRestorationTests(unittest.TestCase):
     def restore(self, archive):
         return self.controller.operations.restore({'file': archive['file'], 'password': PHRASE})
 
+    def test_model_sharing_policy_roundtrip_and_invalid_policy_rejected(self):
+        policy = {'version': 1, 'share_all': True, 'shared_accounts': [self.owner]}
+        write_json(self.home / 'hermes-models.json', policy)
+        archive = self.backup()
+        write_json(self.home / 'hermes-models.json', {'version': 1, 'share_all': False, 'shared_accounts': []})
+        self.restore(archive)
+        self.assertEqual(policy, read_json(self.home / 'hermes-models.json'))
+        self.assertEqual('Préférence enregistrée avant sauvegarde', self.memory.read_text(encoding='utf-8'))
+        for invalid in ({'share_all': 'true'}, {'shared_accounts': ['foreign-account']},
+                        {'share_all': True, 'api_key': 'must-not-be-imported'}):
+            with self.subTest(invalid=invalid), self.assertRaises(ValueError):
+                validate_package(self.controller, {'version': 1, 'files': {'hermes-models.json': invalid}})
+
     def test_both_encrypted_formats_capture_profile_and_portable_credentials(self):
         archive = self.backup()
         inspected = self.controller.operations.backups.inspect({'file': archive['file'], 'password': PHRASE})

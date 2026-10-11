@@ -1,16 +1,16 @@
 {
   "format": 1,
   "entrypoint": "android-chat.html",
-  "sha256": "b1e7a3fd76f0b5b12037ae782cd65398ba06d03e78e059f138024bd26eaab72c",
+  "sha256": "3a29284b14a9c3c2703e97ad5a977ddb5417b47b81bec2669e1fb9c3108649a3",
   "shared_sources": {
-    "chat.html": "e4caedf8070a21335f88b2609cb48cb9826f0074deb89549f8dc1701f206ee59",
+    "chat.html": "0ea69fdab9513aca59e86d5962eaaa0ffd51dac69e8b1581493150cde839a73e",
     "workspace.html": "d8d10bed02b1a17383e7d2243958aca97ebfa7c1c2fdcdcf1dcf076db7f77009",
-    "ui.css": "f6afac4b0bad5fe7d2d1f0f482ebffef4a1f31a1e3b27eef0ce344f2ef18da4a",
-    "ui.js": "9652f39014658c8c8eed5eebf627508835ca5d4d87946123d0fd96ac50177090",
+    "ui.css": "9a7134930bb5009acb39f5c391e9a616318b4574af3bde6e99895aa3e0a6f726",
+    "ui.js": "2bfebd942539fbf0a3a1e9796272706d5d5576ebbc808a832f4e17b5b2b3410b",
     "markdown.js": "48dd2beb1c941fe517b472959ff669a92ffa8cb51ca19fe8771c8281f366e21d",
     "corrector.js": "0eb3b92757313bebf090c0814eca3adbbed5b5a54b4ecb7c4f962a12b412d392",
-    "attachments.js": "6d2f5cd7946e5198130d9d3987f901614b23b437c09d05af05cc3a4556a963dc",
-    "thinking.js": "db84e4a3854ffe31460450acb80ea7e9bf13f4b4a1f121754e569b8603e32924",
+    "attachments.js": "8fb023f5c48e243b9f24d034c322a0ec53d7c391e2c73588a83c34a28a251867",
+    "thinking.js": "97ac785164760bb9d4b365ba21aa8504a8cf7a2f4e4a38dc989f50ed56ec0f92",
     "selection.js": "fb4fab5840149a8215c6735fc47919bdc7e59e52082cb476c724c7a68e8bb506",
     "voice.js": "4e285ddec832c618a48537ffde282faf89b67baf49f7f422fffefaa37f5cdc79",
     "vendor/markdown-it.min.js": "635972b985228e8af9f0143647c68616b7a3bb09f6946e7e4a52e43dcf5e7be5"

@@ -28,7 +28,7 @@ function attachmentRender(){
 }
 function attachmentCapabilities(value){chatCapabilities={images:value.images===true,files:Array.isArray(value.files)?value.files.filter(x=>['txt','md','pdf','docx'].includes(x)):[]};$('chat-file-input').accept=[...chatCapabilities.files.map(x=>'.'+x),...(chatCapabilities.images?['image/png','image/jpeg','image/webp']:[])].join(',');attachmentButtons();}
 function attachmentButtons(){
-  const locked=busy||attachmentLoading||conversationLocked()||!connected;
+  const locked=busy||attachmentLoading||conversationLocked()||!connected||!conversationModelAvailable();
   $('attach-file').disabled=locked||(!chatCapabilities.files.length&&!chatCapabilities.images);
   $('attach-file').setAttribute('aria-label',chatCapabilities.images?'Joindre un document ou une image':'Joindre un document');
   $('attach-file').title='Joindre un document'+(chatCapabilities.images?' ou une image':'')+' · '+chatCapabilities.files.join(', ').toUpperCase()+' · 2 Mo par fichier';

@@ -1,0 +1,158 @@
+{
+  "feature": "Hermes per-conversation model selector",
+  "date": "2026-10-11",
+  "passed": true,
+  "scope": [
+    "Windows shared UI and native Python catalogue",
+    "Android generated shared UI"
+  ],
+  "simulation": "Browser fixtures use public synthetic catalogue entries and local HTTP; no provider credentials or private account data",
+  "checks": {
+    "selector": {
+      "passed": true,
+      "checks": [
+        {
+          "platform": "windows",
+          "passed": true,
+          "default_model": true,
+          "per_conversation_history": true,
+          "provider_labels": true,
+          "vision_capabilities": true,
+          "context_selected_model": true,
+          "unknown_capacity_without_percentage": true,
+          "refresh_without_substitution": true,
+          "inflight_model_binding": true,
+          "unavailable_or_removed_requires_choice": true,
+          "corrector_independent": true,
+          "legacy_catalogue": true,
+          "import_reload_preserves_choice": true
+        },
+        {
+          "platform": "android",
+          "passed": true,
+          "default_model": true,
+          "per_conversation_history": true,
+          "provider_labels": true,
+          "vision_capabilities": true,
+          "context_selected_model": true,
+          "unknown_capacity_without_percentage": true,
+          "refresh_without_substitution": true,
+          "inflight_model_binding": true,
+          "unavailable_or_removed_requires_choice": true,
+          "corrector_independent": true,
+          "legacy_catalogue": true,
+          "import_reload_preserves_choice": true
+        }
+      ],
+      "simulation": "Local HTTP fixture; no private providers, credentials or server models",
+      "all_unavailable_catalogue_visible": true
+    },
+    "hermes": {
+      "passed": true,
+      "output": "Windows Hermes UI verified: final-only voice, stable turns, opaque approvals across heartbeat/disconnect/reload, once/refusal, corrector and shared scripts."
+    },
+    "corrector": {
+      "passed": true,
+      "checks": [
+        {
+          "platform": "windows",
+          "passed": true,
+          "modes": [
+            "correct",
+            "professional",
+            "friendly"
+          ],
+          "progressive_sse": true,
+          "json_fallback": false,
+          "partial_cancel": true,
+          "close_cancel": true,
+          "failure_without_hermes_recovery": true,
+          "saved_history_survives_reload": true,
+          "ordinary_chat_stays_hermes": true,
+          "unique_request_ids": 6,
+          "simulation": "Local HTTP transport; no private user data or model"
+        },
+        {
+          "platform": "android",
+          "passed": true,
+          "modes": [
+            "correct",
+            "professional",
+            "friendly"
+          ],
+          "progressive_sse": true,
+          "json_fallback": true,
+          "partial_cancel": true,
+          "close_cancel": false,
+          "failure_without_hermes_recovery": true,
+          "saved_history_survives_reload": true,
+          "ordinary_chat_stays_hermes": true,
+          "unique_request_ids": 6,
+          "simulation": "Local HTTP transport; no private user data or model"
+        }
+      ]
+    },
+    "conversation": {
+      "passed": true,
+      "source": "working-tree",
+      "checks": [
+        "Hermes final + delayed sync preserves session and complete text",
+        "all three PCM frames finish without automatic cancellation",
+        "second ASR turn waits for history sync and submits exactly once",
+        "same conversation with unique turn IDs",
+        "real new speech during calculation cancels original turn",
+        "speech playback barge-in cancels correct audio and scheduled sources",
+        "hangup returns controls"
+      ],
+      "chats": 4,
+      "acks": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "simulation": "native ASR and PCM timing; no hardware microphone or server models"
+    },
+    "assets": {
+      "passed": true,
+      "output": "Android inline JavaScript syntax verified (11 scripts)"
+    },
+    "history_sync": {
+      "passed": true,
+      "output": "............\n----------------------------------------------------------------------\nRan 12 tests in 1.507s\n\nOK"
+    }
+  },
+  "python": {
+    "native_catalogue_tests": 4,
+    "hermes_history_tests": 7,
+    "existing_history_sync_tests": 12,
+    "passed": true
+  },
+  "android_assets": {
+    "prepare_check": true,
+    "inline_scripts": 11,
+    "browser_regression": true
+  },
+  "screenshots": [
+    "selector-windows.png",
+    "selector-android.png"
+  ],
+  "no_build_installation_or_publication_by_this_agent": true,
+  "source_sha256": {
+    "client-qwen/chat.html": "0ea69fdab9513aca59e86d5962eaaa0ffd51dac69e8b1581493150cde839a73e",
+    "client-qwen/client.py": "00ae970aa88a30e1d2f4b660b2e186a6b2f50aef9edbfc5e1f73356b513dec17",
+    "client-qwen/ui.js": "2bfebd942539fbf0a3a1e9796272706d5d5576ebbc808a832f4e17b5b2b3410b",
+    "client-qwen/ui.css": "9a7134930bb5009acb39f5c391e9a616318b4574af3bde6e99895aa3e0a6f726",
+    "client-qwen/thinking.js": "97ac785164760bb9d4b365ba21aa8504a8cf7a2f4e4a38dc989f50ed56ec0f92",
+    "client-qwen/attachments.js": "8fb023f5c48e243b9f24d034c322a0ec53d7c391e2c73588a83c34a28a251867",
+    "client-qwen/conversation.js": "5c1359d56d1bfc0b0d35eac3ded9ea592fa60f0af7782f635f2532071c01f8cd",
+    "client-qwen/history_store.py": "e6618a900a3069fd650aece41f01fe8e1b9ab5d37f9fb4e2aa201fe709c5c3fb",
+    "client-qwen/history_sync.py": "7cecfa61264e3e9d703594cea126a8b28b1e2aeae3f7d39be83e34a583105f75",
+    "client-android/app/src/main/assets/android-chat.html": "3a29284b14a9c3c2703e97ad5a977ddb5417b47b81bec2669e1fb9c3108649a3",
+    "client-android/app/src/main/assets/ui-package.json": "208f86f0297f12d55f1445f92967cb019994ea113fc01cb67fc42feb474ee0e0"
+  },
+  "screenshots_sha256": {
+    "selector-windows.png": "6e1b9768253c0f3712a9030c98eab6fca4893ba24f2d7004ece84aea44dc1b40",
+    "selector-android.png": "607927d522ee9c084b7518e38c1d14092f74a2c8a6be38b269ff7682ff361a16"
+  }
+}

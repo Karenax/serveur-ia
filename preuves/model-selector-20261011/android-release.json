@@ -1,0 +1,189 @@
+{
+  "observed": "2026-10-11T20:58:41.871062+02:00",
+  "version": "1.0.8",
+  "version_code": 9,
+  "package": "net.karenax.fred",
+  "staged_apk": "toolchain/releases-staging/model-selector-20261011/android/Acces-serveur-Fred-Android.apk",
+  "bytes": 18899220,
+  "sha256": "16e1baa343081a463d857ed7a00f5a0af13e5aa7a218d9130ba1a85a8142737c",
+  "certificate_sha256": "40216ff897090b49b21e3cda66169b9fb7070e42dd2b8cb9ebe0f2c441997048",
+  "checks": {
+    "package_version": true,
+    "manifest_matches_apk": true,
+    "signature_v2": true,
+    "signature_v3": true,
+    "same_certificate": true,
+    "release_not_debuggable": true,
+    "android_min26": true,
+    "android_target36": true,
+    "align16k": true,
+    "asr_and_native_assets_bitwise_unchanged": true,
+    "bundled_android_ui_matches_source": true,
+    "bundled_ui_package_matches_source": true,
+    "no_personal_profile_files": true,
+    "android_model_selector_in_apk": true,
+    "shared_source_hashes_match": true,
+    "mobile_source_hashes_match": true,
+    "native_model_selection": true,
+    "native_six_groups": true,
+    "native_update_policy": true,
+    "native_corrector_three_modes": true,
+    "native_fixture_authenticated": true,
+    "native_model_bodies_valid": true,
+    "native_corrector_bodies_valid": true,
+    "signed_upgrade_installed_on_phone_emulator": true,
+    "lint_release_no_errors": true,
+    "distribution_tests_passed": true,
+    "published_dist_not_modified": true,
+    "model_listener_process_unchanged": true,
+    "model_still_loaded": true
+  },
+  "native_model_fixture_request_counts": {
+    "requests": {
+      "GET /v1/models": 2,
+      "POST /v1/device": 1,
+      "POST /v1/chat/completions": 2,
+      "POST /v1/context": 2
+    },
+    "rejected": 0,
+    "model_selection": {
+      "context": 1,
+      "chat": 1,
+      "retired": 1,
+      "local_unloaded": 1,
+      "rejected": 0
+    }
+  },
+  "native_corrector_fixture_request_counts": {
+    "requests": {
+      "GET /v1/models": 1,
+      "POST /v1/device": 1,
+      "POST /v1/chat/completions": 3
+    },
+    "rejected": 0,
+    "corrector_modes": {
+      "correct": {
+        "body_preserved": true,
+        "calls": 1
+      },
+      "professional": {
+        "body_preserved": true,
+        "calls": 1
+      },
+      "friendly": {
+        "body_preserved": true,
+        "calls": 1
+      }
+    }
+  },
+  "native_and_asr_assets": {
+    "lib/arm64-v8a/libfredvoice.so": {
+      "bytes": 3614624,
+      "sha256": "30ae4a33f3ea1b7163787a4a9da2b8e10c99c4687865c742cedf68e7e64da0cc"
+    },
+    "lib/arm64-v8a/libfredwireguard.so": {
+      "bytes": 10867752,
+      "sha256": "16c48a50e5d27b145029da766bc0fdb77d6be01d94683a81307a6695ac0c63b5"
+    },
+    "lib/x86_64/libfredvoice.so": {
+      "bytes": 77992,
+      "sha256": "168f2c480ecd01faad20ab0481bb0009d5a63fa3d64354d84a7d713c82eb1146"
+    },
+    "lib/x86_64/libfredwireguard.so": {
+      "bytes": 11679880,
+      "sha256": "136055e4cd2ec83cee84a1766c381495457a9ecefcfed3f3893e5da5d47ee57a"
+    },
+    "lib/x86_64/libggml-base.so": {
+      "bytes": 1381320,
+      "sha256": "5b453ce216b63de1625dee29e146cbad5db8a0ce82a670e31e2487033112cb12"
+    },
+    "lib/x86_64/libggml-cpu-alderlake.so": {
+      "bytes": 1521464,
+      "sha256": "033a6528fc00527c76b6ac9a1911dfd49241055c9a321fc34e91f092ca5aff75"
+    },
+    "lib/x86_64/libggml-cpu-cannonlake.so": {
+      "bytes": 1672176,
+      "sha256": "131b2e28850d9cbbabefb35a197d66392bfda6d421df43487a50a4f37ef3f1fb"
+    },
+    "lib/x86_64/libggml-cpu-cascadelake.so": {
+      "bytes": 1662592,
+      "sha256": "322f33f5f502ad186cbf1613d75cc8338f9696349bfdaddd459b53e23c8c4287"
+    },
+    "lib/x86_64/libggml-cpu-cooperlake.so": {
+      "bytes": 1662544,
+      "sha256": "167c75336b21d6b822031faf619a5950f405ecc100fe339de5840e6cd14ee660"
+    },
+    "lib/x86_64/libggml-cpu-haswell.so": {
+      "bytes": 1525608,
+      "sha256": "4635f049f0bab77fc5198c538c2ac18061025eab2bf53cdec6f1696a23ba8877"
+    },
+    "lib/x86_64/libggml-cpu-icelake.so": {
+      "bytes": 1669216,
+      "sha256": "687f8daa415258edd1796e304b0a213763ad272c48d8bee022dabeab7c827c4b"
+    },
+    "lib/x86_64/libggml-cpu-ivybridge.so": {
+      "bytes": 1416784,
+      "sha256": "17b12603ca0d5b7ffaddf7f1d0b5a3db38fbd0ce8316674c32c2f7a8758263cb"
+    },
+    "lib/x86_64/libggml-cpu-piledriver.so": {
+      "bytes": 1416944,
+      "sha256": "e5b33aa346b6b67c3b93ac8c5047630e8d661dcfa09880372352cb44daa34eb3"
+    },
+    "lib/x86_64/libggml-cpu-sandybridge.so": {
+      "bytes": 1417408,
+      "sha256": "b58eef9c8c8060b8f146d4c73f962e7a22859b8cb6f83357ac5cb31b41cba974"
+    },
+    "lib/x86_64/libggml-cpu-sapphirerapids.so": {
+      "bytes": 1910520,
+      "sha256": "0b86e1799c9c8973b48b622b214c0726d93dc1521825c57792dc14ee2f7441bd"
+    },
+    "lib/x86_64/libggml-cpu-skylakex.so": {
+      "bytes": 1665504,
+      "sha256": "0e1afad61af95c83268c338e7241198f8433a7ff2b00cbb69996e35041d4ad17"
+    },
+    "lib/x86_64/libggml-cpu-sse42.so": {
+      "bytes": 1145648,
+      "sha256": "5ca6c40016a4562bf5b3e4fd91788050e3380a898ad1341159944423dbbd0d72"
+    },
+    "lib/x86_64/libggml-cpu-x64.so": {
+      "bytes": 1145648,
+      "sha256": "db9715f8097529d0da653a34a137c3d3aa00e95127485a88fcca1e79aa134ecc"
+    },
+    "lib/x86_64/libggml-cpu-zen4.so": {
+      "bytes": 1669184,
+      "sha256": "4c3c862865e23e326f34a2ac7d17d6942402a7f249e762c61b91f0b2773d5840"
+    },
+    "lib/x86_64/libggml.so": {
+      "bytes": 157848,
+      "sha256": "416e6ff7718aaff877d4fc32c4a6f0d961c6261d41493a16d5241bd901e5518b"
+    },
+    "lib/x86_64/libparakeet.so": {
+      "bytes": 920920,
+      "sha256": "5c60832cadd7af1b4ac587901c8f0ab1ae5f766c99a2c2f19a8224d41ce6c7ac"
+    },
+    "lib/x86_64/libwhisper.so": {
+      "bytes": 1364424,
+      "sha256": "045594a4709f4698c78c0322ac9736f1d4e5d297a0451a766fed58eb05a50f11"
+    },
+    "assets/voice/model.json": {
+      "bytes": 508,
+      "sha256": "5dde5e5c0d565557189d8e81f261cd3e1588358e0d1906fb46aa97f53bbe0690"
+    }
+  },
+  "distribution_tests": 13,
+  "gradle_tasks": [
+    "assembleRelease",
+    "lintRelease",
+    "assembleDebugAndroidTest"
+  ],
+  "emulator": {
+    "serial": "emulator-5554",
+    "architecture": "x86_64",
+    "release_upgrade": "1.0.7/code8 -> 1.0.8/code9"
+  },
+  "limitations": [
+    "Native model catalogue and provider selection use an isolated synthetic API and real WireGuard transport; no external provider inference is performed.",
+    "ARM64 hardware, authenticated HTTPS conversation and acoustic ASR are not remeasured.",
+    "Publication coordinated separately by root."
+  ]
+}

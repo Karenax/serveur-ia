@@ -92,6 +92,9 @@ def validate_package(controller, package):
                 config.get('port',8643) == config.get('private_port',8768) or
                 ('version' in config and config['version'] != 1)):
             raise ValueError('Configuration Hermes sauvegardée invalide.')
+    if 'hermes-models.json' in files:
+        from hermes_models import normalize_policy
+        normalize_policy(files['hermes-models.json'])
     accounts=files.get('comptes.json',[])
     if not isinstance(accounts,list):raise ValueError('Comptes invalides.')
     for account in accounts:

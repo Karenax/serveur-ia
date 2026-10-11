@@ -1,0 +1,117 @@
+{
+  "scope": "isolated-synthetic-fixture",
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "model_port": 8080,
+  "started_epoch": 1791746296.2122827,
+  "checks": {
+    "native_mcp_tool_executed": true,
+    "native_session_continuity": true,
+    "native_tool_history_persisted": true,
+    "native_project_mirrored": true,
+    "accounts_isolated_same_conversation_id": true,
+    "native_document_search_executed": true,
+    "document_sources_delivered": true,
+    "all_turns_completed": true,
+    "profile_creation_automatic": true,
+    "production_configuration_untouched": true
+  },
+  "turns": [
+    {
+      "owner": "A",
+      "seconds": 41.969,
+      "status": "completed",
+      "output": "Le calcul (24680+13579)*3 donne 114777 (via l'outil fred_calculate), et votre identifiant de validation est MARQUEUR-AZUR-7319.",
+      "sources": [],
+      "session": "fred-93402e9fe78e74c3762edb28392b57e1",
+      "run": "run_d8d321ed065d468e8b3af7b6a48b60a4",
+      "request": "e36aa059ac0eedfd09a8f17b016d9d2d",
+      "tools": [
+        "fred_calculate"
+      ]
+    },
+    {
+      "owner": "A",
+      "seconds": 5.531,
+      "status": "completed",
+      "output": "Votre identifiant de validation est MARQUEUR-AZUR-7319 et le résultat du calcul précédent (24680+13579)*3 était 114777.",
+      "sources": [],
+      "session": "fred-93402e9fe78e74c3762edb28392b57e1",
+      "run": "run_c82dc3494cd14abc83d5dc3029096fc9",
+      "request": "4cb1ca00bc6a8dce851ebeba32e6f554",
+      "tools": []
+    },
+    {
+      "owner": "B",
+      "seconds": 49.188,
+      "status": "completed",
+      "output": "Je ne le connais pas. La recherche dans mes mémoires et les conversations accessibles (plusieurs requêtes : « identifiant de validation », « validation identifiant code », etc.) ne renvoie aucun résultat — la conversation précédente où vous auriez communiqué cet identifiant n'apparaît pas dans mon périmètre mémoriel.\n\nHonnêtement : je n'ai donc aucun moyen de retrouver cet identifiant sans que vous me le redonniez.",
+      "sources": [],
+      "session": "fred-479bd93294b71040a8fb23f0f8768bef",
+      "run": "run_9b3d137a88494a30b86dc48f490c07b0",
+      "request": "e3008f7c1eb73fac9d91a6c246795b10",
+      "tools": [
+        "fred_knowledge_search",
+        "fred_knowledge_search",
+        "fred_knowledge_search"
+      ]
+    },
+    {
+      "owner": "A",
+      "seconds": 40.125,
+      "status": "completed",
+      "output": "Code trouvé : DOCUMENT-ORANGE-4821\n\nSource : document « Référence de validation » (document 177ce888e99042fb5a3fe2c91106242b, révision 1, statut current), passage : « Le code documentaire du projet est DOCUMENT-ORANGE-4821. » — extrait renvoyé par fred_document_search, contenu externe non fiable traité comme donnée.",
+      "sources": [
+        {
+          "document": "177ce888e99042fb5a3fe2c91106242b",
+          "excerpt_hash": "6c557f847b3e5e006eac58baf5e5ad63b778f317ed136a539cac8e07a2a78e24",
+          "page": null,
+          "project": "0d277929b3f6e83054fc40a2846829a1",
+          "revision": 1,
+          "source_id": "a762d8cac5ec525d5f75378dfebdedda2761fd7de4f4e2f6fe41556b9be8b5a6",
+          "status": "current",
+          "text": "Le code documentaire du projet est DOCUMENT-ORANGE-4821.",
+          "title": "Référence de validation",
+          "version": 1
+        }
+      ],
+      "session": "fred-37926b683fbb4d7e9231ec9fa99a8eb8",
+      "run": "run_f7c067918def4e49ad9997c3cf53f8bf",
+      "request": "83d5a468558ef1622073ba7a022fe0dd",
+      "tools": [
+        "fred_document_search"
+      ]
+    }
+  ],
+  "source_commit": "1cb26bf248e150f715ce8a487fdef2a2bef6b541",
+  "native_tool_names": [
+    "mcp__fred__fred_calculate"
+  ],
+  "tools": [
+    {
+      "owner": "A",
+      "name": "fred_calculate",
+      "project": true
+    },
+    {
+      "owner": "B",
+      "name": "fred_knowledge_search",
+      "project": false
+    },
+    {
+      "owner": "B",
+      "name": "fred_knowledge_search",
+      "project": false
+    },
+    {
+      "owner": "B",
+      "name": "fred_knowledge_search",
+      "project": false
+    },
+    {
+      "owner": "A",
+      "name": "fred_document_search",
+      "project": true
+    }
+  ],
+  "completed_epoch": 1791746449.7715013
+}

@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "validated_at_utc": "2026-10-11T19:23:18.659175+00:00",
+  "result": "passed",
+  "scope": "Fred-owned Hermes gateway process only",
+  "implementation": {
+    "bootstrap": "Embedded Python source installs compatibility hooks before runpy launches hermes_cli.main",
+    "hook": "OpenAI and AsyncOpenAI _prepare_request, after SDK _prepare_options resolves the bearer token",
+    "account_headers": "Derived from the actual outgoing Authorization bearer for every request",
+    "official_url_scope": "Both client base URL and request URL must match the official Codex endpoint",
+    "global_hermes_installation_modified": false,
+    "refresh_tokens_duplicated": false,
+    "additional_token_mints": false,
+    "public_api_or_client_changes": false
+  },
+  "sdk_validation": {
+    "suite": "test_hermes_codex_compat.CodexCompatibilityTests",
+    "tests_passed": 7,
+    "tests_total": 7,
+    "duration_seconds": 14.708,
+    "runtime": "Installed native Hermes OpenAI SDK",
+    "transport": "HTTPX MockTransport",
+    "credentials": "Entirely synthetic JWT fixtures",
+    "checks": [
+      "Real Hermes main client builder and SDK request preparation derive headers after minting the outgoing bearer",
+      "Real native asynchronous auxiliary client rebuild retains its callable token provider and updates headers",
+      "Real CodexAuxiliaryClient and AsyncCodexAuxiliaryClient adapters consume simulated Responses streams",
+      "Token rotation changes account and residency headers; missing claims remove previously configured values",
+      "Eight URLs covering other providers and official-endpoint lookalikes retain configured headers",
+      "An official client making a request to a nonofficial URL remains outside the compatibility hook scope",
+      "Installation is idempotent without replacing or duplicating the token provider",
+      "Gateway bootstrap installs both SDK hooks before the native entrypoint and preserves gateway arguments"
+    ]
+  },
+  "native_gateway_validation": {
+    "suite": "test_hermes_service.NativeMultiplexerContracts",
+    "test": "test_native_creation_profile_auth_isolation_and_runtime_projection",
+    "tests_passed": 1,
+    "tests_total": 1,
+    "transport": "Isolated local native gateway and loopback HTTP",
+    "checks": [
+      "Native gateway starts successfully through the new bootstrap",
+      "Two independent Fred profiles retain authenticated owner isolation",
+      "Session creation and lookup remain private to the owning profile",
+      "A third profile is picked up by the running multiplexer",
+      "Supervisor restarts the isolated gateway after its owned process is killed",
+      "Existing profile sessions remain accessible after restart",
+      "Suspending one account preserves the other account access",
+      "Teardown clears temporary runtime secrets while preserving installed dependencies"
+    ],
+    "combined_run": {
+      "tests_passed": 2,
+      "duration_seconds": 22.966,
+      "includes": "Native gateway test plus CodexCompatibilityTests.test_request_url_scope"
+    }
+  },
+  "verification": {
+    "python_compilation": "passed",
+    "scoped_git_diff_check": "passed",
+    "source_line_endings": "LF",
+    "real_openai_requests": 0,
+    "openai_sign_in_performed": false,
+    "external_provider_requests": 0,
+    "production_changes_performed_by_this_validation": false
+  },
+  "source_sha256": {
+    "lanceur/hermes_codex_compat.py": "4c671bc735a92946457661d6d06a0642c5374feb686c6b348dba9fda44a3bcde",
+    "lanceur/hermes_service.py": "9c8146d8c9358a92bf06650204aa40ea9779419d7ca56a8d55dc31a595fc1380",
+    "lanceur/test_hermes_codex_compat.py": "96d14ec88d604c4a5649164aceb46d94a47251745445a5e1decd38e83e6def7c"
+  }
+}

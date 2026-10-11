@@ -299,6 +299,15 @@ def serve(port=8765, controller=None):
                 return self.respond(200, inventory(controller))
             if path == '/api/devices':
                 return self.respond(200, controller.remote.metadata())
+            if path == '/api/hermes/models':
+                if not hmac.compare_digest(self.headers.get('X-Launcher-Token', ''), token):
+                    return self.respond(403, {'error': 'Accès administrateur requis.'})
+                if not controller.hermes:
+                    return self.respond(200, {'enabled': False, 'providers': [], 'share_all': False, 'shared_accounts': []})
+                try:
+                    return self.respond(200, {'enabled': True, **controller.hermes.models.admin()})
+                except (OSError, ValueError, RuntimeError):
+                    return self.respond(503, {'error': 'Liste des fournisseurs Hermes indisponible.'})
             if path == '/api/client-storage':
                 return self.respond(200, controller.client_storage.status())
             if path.startswith('/api/remote/profile/'):
@@ -487,6 +496,9 @@ def serve(port=8765, controller=None):
                         else:
                             controller.hermes.ensure(client['id'],client['name'])
                             result={'message':'Assistant Hermes prêt.'}
+                    elif path == '/api/hermes/models/configure':
+                        if not controller.hermes:raise ValueError('Hermes n’est pas activé.')
+                        result = controller.hermes.models.configure(data)
                     elif path == '/api/remote/revoke':
                         result = controller.wireguard.revoke(data.get('id'))
                     elif path == '/api/remote/rename':

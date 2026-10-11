@@ -1,0 +1,155 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-11",
+  "status": "passed",
+  "scope": "Isolated temporary Fred accounts, profiles, state and ports; no production conversation history, restoration, deployment or global sharing-policy activation.",
+  "unique_passed_tests": 57,
+  "recorded_test_executions": 59,
+  "runs": [
+    {
+      "command": "python -m unittest test_hermes_models -v",
+      "passed": 21,
+      "duration_seconds": 55.182,
+      "tests": [
+        "test_hermes_models.ModelsTests.test_default_is_local_and_public_catalog_contains_no_server_route_or_secrets",
+        "test_hermes_models.ModelsTests.test_discovery_uses_valid_configured_providers_and_preserves_empty_metadata",
+        "test_hermes_models.ModelsTests.test_fixed_native_key_helper_requires_private_run_and_returns_only_bounded_token",
+        "test_hermes_models.ModelsTests.test_history_projection_keeps_selected_model_and_does_not_merge_other_model",
+        "test_hermes_models.ModelsTests.test_incomplete_copilot_is_visible_unavailable_and_cannot_receive_credentials",
+        "test_hermes_models.ModelsTests.test_local_alias_compatibility_and_cloud_stays_available_with_qwen_unloaded",
+        "test_hermes_models.ModelsTests.test_low_context_cloud_is_visible_but_cannot_be_selected",
+        "test_hermes_models.ModelsTests.test_native_credential_requests_coalesce_same_model_but_other_provider_is_independent",
+        "test_hermes_models.ModelsTests.test_native_credential_wait_is_bounded_and_near_expiry_tokens_are_not_cached",
+        "test_hermes_models.ModelsTests.test_newly_discovered_model_is_materialized_before_native_admission",
+        "test_hermes_models.ModelsTests.test_per_account_sharing_and_revocation_are_enforced_on_each_use",
+        "test_hermes_models.ModelsTests.test_policy_schema_is_strict_and_unknown_accounts_cannot_receive_grants",
+        "test_hermes_models.ModelsTests.test_private_broker_authenticates_active_owner_model_and_live_policy",
+        "test_hermes_models.ModelsTests.test_private_broker_refuses_changed_endpoint_and_does_not_expose_errors",
+        "test_hermes_models.ModelsTests.test_profile_migration_keeps_identity_and_binds_all_auxiliary_tasks_to_main",
+        "test_hermes_models.ModelsTests.test_refresh_revokes_model_that_becomes_unavailable_and_keeps_native_efforts",
+        "test_hermes_models.ModelsTests.test_request_identity_includes_model_and_model_switch_branches_session",
+        "test_hermes_models.NativeCloudTests.test_actual_native_gateway_selects_shared_cloud_and_preserves_private_session",
+        "test_hermes_models.NativeCloudTests.test_native_copilot_uses_live_limits_endpoints_and_rejects_degraded_github_key",
+        "test_hermes_models.NativeCloudTests.test_native_inventory_discovers_configured_endpoint_without_cold_cache",
+        "test_hermes_models.NativeCloudTests.test_native_key_cmd_and_auxiliary_main_cover_chat_and_responses_without_qwen"
+      ]
+    },
+    {
+      "command": "python -m unittest test_hermes_conversations test_hermes_inference test_hermes_accounts test_hermes_restoration -v",
+      "passed": 36,
+      "duration_seconds": 47.165,
+      "tests_by_module": {
+        "test_hermes_conversations": [
+          "test_hermes_conversations.ConversationsTests.test_cancel_before_admission_prevents_native_run_even_after_restart",
+          "test_hermes_conversations.ConversationsTests.test_completed_turn_replays_without_new_run_and_does_not_leak_to_other_account",
+          "test_hermes_conversations.ConversationsTests.test_continuation_retains_session_edited_history_and_project_switch_branch",
+          "test_hermes_conversations.ConversationsTests.test_disconnect_finishes_and_old_partial_never_overwrites_final",
+          "test_hermes_conversations.ConversationsTests.test_native_approval_uses_opaque_single_use_receipt_and_choice",
+          "test_hermes_conversations.ConversationsTests.test_pending_approval_survives_native_heartbeat",
+          "test_hermes_conversations.ConversationsTests.test_project_instructions_are_trusted_and_document_instructions_are_only_data",
+          "test_hermes_conversations.ConversationsTests.test_restart_marks_unfinished_turn_interrupted_without_replay",
+          "test_hermes_conversations.ConversationsTests.test_revocation_prevents_delivery_and_finished_result_is_not_replayed_after_revocation"
+        ],
+        "test_hermes_inference": [
+          "test_hermes_inference.PrivateInferenceTests.test_mcp_lifecycle_without_run_but_tool_call_needs_active_authorization",
+          "test_hermes_inference.PrivateInferenceTests.test_provider_requires_own_active_run_and_forces_local_model_credentials",
+          "test_hermes_inference.PrivateInferenceTests.test_truncated_model_stream_never_counts_as_success"
+        ],
+        "test_hermes_accounts": [
+          "test_hermes_accounts.ProfileContracts.test_config_upgrade_preserves_identity_and_disables_unscoped_search",
+          "test_hermes_accounts.ProfileContracts.test_failure_recovery_keeps_same_identity_and_no_exception_secret",
+          "test_hermes_accounts.ProfileContracts.test_idempotent_creation_secrets_survive_restart_and_are_protected",
+          "test_hermes_accounts.ProfileContracts.test_profile_directory_link_is_refused_before_any_write",
+          "test_hermes_accounts.ProfileContracts.test_profiles_keys_revocation_and_migration_are_per_access",
+          "test_hermes_accounts.ProfileContracts.test_suspend_then_resume_retains_credentials_and_profile_data",
+          "test_hermes_accounts.ProfileContracts.test_unsafe_id_and_destination_rejected_and_shell_keys_not_inherited"
+        ],
+        "test_hermes_restoration": [
+          "test_hermes_restoration.HermesRestorationTests.test_active_run_defers_snapshot_without_stopping_service",
+          "test_hermes_restoration.HermesRestorationTests.test_background_preparation_defers_snapshot_without_stopping_service",
+          "test_hermes_restoration.HermesRestorationTests.test_both_encrypted_formats_capture_profile_and_portable_credentials",
+          "test_hermes_restoration.HermesRestorationTests.test_complete_restore_rebuilds_facade_and_preserves_native_data",
+          "test_hermes_restoration.HermesRestorationTests.test_controller_owned_snapshot_can_finish_while_worker_waits_for_controller",
+          "test_hermes_restoration.HermesRestorationTests.test_crash_journal_recovers_hermes_before_any_runtime_starts",
+          "test_hermes_restoration.HermesRestorationTests.test_failed_recovery_can_resume_from_another_thread",
+          "test_hermes_restoration.HermesRestorationTests.test_failed_restore_returns_current_hermes_state",
+          "test_hermes_restoration.HermesRestorationTests.test_invalid_configuration_or_tampered_hermes_data_refused_without_pause",
+          "test_hermes_restoration.HermesRestorationTests.test_model_sharing_policy_roundtrip_and_invalid_policy_rejected",
+          "test_hermes_restoration.HermesRestorationTests.test_nested_snapshot_on_another_thread_cannot_retain_parent_locks",
+          "test_hermes_restoration.HermesRestorationTests.test_preparation_failure_releases_pause_and_rebuilds_without_mutation",
+          "test_hermes_restoration.HermesRestorationTests.test_restore_waits_for_run_without_holding_controller_or_workspace",
+          "test_hermes_restoration.HermesRestorationTests.test_saved_running_turn_restores_as_interrupted",
+          "test_hermes_restoration.HermesRestorationTests.test_snapshot_can_coexist_with_remote_revocation_lock_order",
+          "test_hermes_restoration.HermesRestorationTests.test_snapshot_refuses_restore_admission_without_retaining_controller",
+          "test_hermes_restoration.HermesRestorationTests.test_snapshot_restart_failure_does_not_leave_admission_frozen"
+        ]
+      }
+    },
+    {
+      "scope": "Two affected history tests repeated after the final legacy-model merge fence.",
+      "passed": 2,
+      "duration_seconds": 1.919,
+      "tests": [
+        "test_hermes_models.ModelsTests.test_history_projection_keeps_selected_model_and_does_not_merge_other_model",
+        "test_hermes_conversations.ConversationsTests.test_completed_turn_replays_without_new_run_and_does_not_leak_to_other_account"
+      ]
+    }
+  ],
+  "native_runtime_commit": "1cb26bf248e150f715ce8a487fdef2a2bef6b541",
+  "native_checks": {
+    "real_gateway_with_synthetic_http_provider": [
+      "chat_completions",
+      "codex_responses"
+    ],
+    "real_native_auxiliary_clients_with_synthetic_http_provider": [
+      "chat_completions",
+      "codex_responses"
+    ],
+    "qwen_required_for_shared_provider": false,
+    "cold_cache_authenticated_native_model_inventory": true,
+    "native_copilot_catalog_fixture_checks": [
+      "live context limits",
+      "live protocol endpoints",
+      "degraded GitHub credential refusal"
+    ],
+    "credential_concurrency": [
+      "per-provider serialization",
+      "duplicate same-model requests coalesced",
+      "different providers independent",
+      "different models not reused",
+      "bounded total wait",
+      "conservative expiry"
+    ],
+    "authorization": [
+      "explicit all-account or individual grant",
+      "owner plus active model binding",
+      "policy rechecked after credential resolution",
+      "withdrawn grant cancels active use",
+      "unavailable refreshed model rejected"
+    ],
+    "isolation": [
+      "opaque public model IDs",
+      "no server credentials or API URLs in public catalogue",
+      "no provider credentials copied into Fred profiles",
+      "selected model retained in history",
+      "model changes branch native sessions"
+    ]
+  },
+  "connection_validation": "provider-connection-validation.json",
+  "limitations": [
+    "The detected GitHub Copilot connection is incomplete or unauthorized; all 51 listed Copilot models are unavailable. No successful real shared-provider inference is claimed."
+  ],
+  "source_sha256": {
+    "lanceur\\hermes_models.py": "c8cb5ea86fd4184acc2382c0ce15de11cdf76a182a67d3cf35a9953e4feeee2d",
+    "lanceur\\hermes_model_key.py": "98f617c349be4d870221fe2c75e736f38d6cb7262c5418c820f49bd456d63f0e",
+    "lanceur\\hermes_accounts.py": "3b78dd003e77af6e0232b22751b64e2fe6dc745d3294528e943444502ec16df8",
+    "lanceur\\hermes_conversations.py": "e4b4f64652e27605ba262b3121ee9b8c665a8fe1f6c1cf06c96f8594ca8fc9d4",
+    "lanceur\\hermes_fred.py": "7af27028fa284441459af69ec1a838a35bf54d9bce21e0f421c0595bf26a4f6c",
+    "lanceur\\hermes_inference.py": "d8f673941268be1e1477267f454859fbf99bd2b15626682d97f4e2cc7dad8712",
+    "lanceur\\test_hermes_models.py": "2dfebf873c39d10a91a0d7f4534b28a0f2de39f40f1f5f178bdf36cedb856c2c"
+  },
+  "verification": {
+    "python_compile": "passed",
+    "scoped_git_diff_check_with_cr_at_eol": "passed"
+  }
+}

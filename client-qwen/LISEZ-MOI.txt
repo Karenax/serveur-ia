@@ -1,4 +1,4 @@
-Accès serveur Fred — version 3.5.24
+Accès serveur Fred — version 3.5.25
 
 WireGuard utilise un emplacement permanent dans %LOCALAPPDATA%\AccesServeurFred\WireGuard.
 Windows conserve ainsi l'autorisation entre les lancements. Une première autorisation
@@ -10,7 +10,9 @@ Chaque destinataire possède un accès distinct, révocable depuis la console se
 
 La fenêtre est organisée par fonction :
 - Conversations : chatbot intégré, recherche, renommage, suppression avec annulation,
-  copie des messages, import/export, réflexion, arrêt et nouvelle tentative.
+  copie des messages, import/export, choix du modèle Hermes, réflexion et arrêt.
+  Le modèle choisi est conservé par conversation et utilisé aussi par la voix.
+  Les accès fournisseurs partagés utilisent les abonnements et quotas du serveur.
   Glissez une discussion sur un projet dans la barre latérale ou dans Projets pour
   la déplacer. Le clic droit propose Déplacer, Archiver, Restaurer et Supprimer.
   Le filtre Archivées retrouve les discussions conservées. Annuler la suppression

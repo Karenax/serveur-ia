@@ -88,7 +88,7 @@ function updatePreview(){
   }
 }
 async function request(path,data){
-  const options=data===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json','X-Launcher-Token':token},body:JSON.stringify(data)};
+  const options=data===undefined?{headers:{'X-Launcher-Token':token}}:{method:'POST',headers:{'Content-Type':'application/json','X-Launcher-Token':token},body:JSON.stringify(data)};
   const response=await fetch(path,options);const result=await response.json();if(!response.ok)throw new Error(result.error||'La commande a échoué.');return result;
 }
 let toastTimer;function toast(message,error=false){$('toast').textContent=message;$('toast').className='toast show'+(error?' error':'');clearTimeout(toastTimer);toastTimer=setTimeout(()=>{$('toast').className='toast';},error?10000:4500);}
@@ -124,6 +124,7 @@ document.querySelectorAll('.tab').forEach(tab=>{tab.onclick=()=>openTopic(tab.da
 document.querySelectorAll('[data-open]').forEach(button=>button.onclick=()=>openTopic(button.dataset.open));
 window.addEventListener('hashchange',()=>openTopic(location.hash.slice(1)));if(!['spaces','tools','tasks','knowledge','devices','notifications'].includes(location.hash.slice(1)))openTopic(location.hash.slice(1));
 let clientsFingerprint='';
+let hermesModelsState=null, hermesModelsBusy=false;
 function element(tag,text,className){const node=document.createElement(tag);if(text)node.textContent=text;if(className)node.className=className;return node;}
 function labelled(label,input,help){const field=element('div',null,'field'),lab=element('label',label);lab.htmlFor=input.id;field.append(lab,input);if(help)field.append(element('small',help));return field;}
 function clientStorageInfo(storage){const box=element('div',null,'client-storage');if(!storage)return box;box.append(element('strong','Dossier des données sur le serveur'),element('code',storage.path,'client-storage-path'));const copy=element('button','Copier le chemin','button secondary');copy.type='button';copy.onclick=()=>action(async()=>{await navigator.clipboard.writeText(storage.path);toast('Chemin copié.');});box.append(copy);box.append(element('p',storage.error||(storage.status==='ready'?storage.conversations+' conversation(s) · dossier mis à jour le '+new Date(storage.updated*1000).toLocaleString():'Création du dossier en attente…'),'muted'));return box;}
@@ -143,6 +144,17 @@ function renderClients(value,force=false){
       const ready=client.hermes.ready&&!client.hermes_pending;
       card.append(element('p',ready?'Assistant Hermes prêt · projets et conversations associés':client.hermes.error||'Assistant Hermes à préparer','muted'));
       if(!ready&&!client.revoked&&!client.suspended){const retry=element('button','Reprendre la création Hermes','button secondary');retry.onclick=()=>remoteAction('/api/remote/hermes-retry',{id:client.id});card.append(retry);}
+      if(hermesModelsState?.enabled&&!client.revoked){
+        const shared=element('input');shared.type='checkbox';shared.id='models-'+client.id;
+        shared.checked=hermesModelsState.share_all||hermesModelsState.shared_accounts.includes(client.id);
+        shared.disabled=hermesModelsState.share_all||hermesModelsBusy||client.suspended||client.hermes_pending;
+        shared.onchange=()=>{
+          const accounts=new Set(hermesModelsState.shared_accounts);
+          if(shared.checked)accounts.add(client.id);else accounts.delete(client.id);
+          saveHermesModels({shared_accounts:[...accounts]});
+        };
+        card.append(labelled('Accès aux modèles du Hermes du serveur',shared,hermesModelsState.share_all?'Partage activé pour tous les comptes.':'Ces modèles utilisent les abonnements ou clés du serveur et leurs quotas.'));
+      }
     }
     const management=element('div',null,'key-row'),rename=element('button','Renommer','button secondary'),remove=element('button','Supprimer','button stop');
     const editor=element('form',null,'client-name-editor'),name=element('input');editor.hidden=true;name.id='name-'+client.id;name.value=client.name;name.maxLength=80;name.required=true;
@@ -201,6 +213,32 @@ for(const id of ['remote-host','remote-port'])$(id).addEventListener('input',()=
 $('remote-disable').onclick=()=>remoteAction('/api/remote/deactivate');
 $('remote-create').onclick=()=>remoteAction('/api/remote/create-client',{name:$('remote-client-name').value});
 remoteRefresh();setInterval(remoteRefresh,15000);
+async function refreshHermesModels(){
+  const container=$('hermes-model-sharing');if(!container)return;
+  try{
+    const value=await request('/api/hermes/models');
+    const changed=JSON.stringify(value)!==JSON.stringify(hermesModelsState);hermesModelsState=value;
+    container.replaceChildren();container.hidden=!value.enabled;
+    if(!value.enabled)return;
+    container.append(element('h3','Modèles disponibles dans Hermes'));
+    const providers=value.providers.filter(p=>p.configured!==false);
+    container.append(element('p',providers.length?providers.map(p=>p.label+' · '+p.model_count+' modèle(s)'+(p.available===false?' · connexion indisponible':'')).join(' / '):'Aucun fournisseur externe connecté dans Hermes sur le serveur. Qwen local reste disponible.','muted'));
+    container.append(element('p','Le partage donne accès aux modèles configurés sur ce PC. Les comptes utilisent alors les mêmes abonnements, crédits et quotas ; leurs conversations restent séparées.','muted'));
+    const all=element('input');all.type='checkbox';all.id='hermes-share-all';all.checked=value.share_all;all.disabled=hermesModelsBusy;
+    all.onchange=()=>saveHermesModels({share_all:all.checked});
+    container.append(labelled('Partager les modèles avec tous les comptes Fred',all,'Sinon, autorisez chaque compte sur sa fiche ci-dessous. Les nouveaux comptes héritent seulement du partage global.'));
+    const refresh=element('button','Actualiser les modèles','button secondary');refresh.type='button';refresh.disabled=hermesModelsBusy;refresh.onclick=()=>refreshHermesModels();container.append(refresh);
+    if(changed)await remoteRefresh(true);
+  }catch(error){container.replaceChildren(element('p',error.message,'muted'));}
+}
+async function saveHermesModels(values){
+  if(hermesModelsBusy)return;hermesModelsBusy=true;
+  document.querySelectorAll('#hermes-model-sharing input,#hermes-model-sharing button,#remote-clients input[id^="models-"]').forEach(n=>n.disabled=true);
+  try{await request('/api/hermes/models/configure',values);toast('Accès aux modèles enregistré.');}
+  catch(error){toast(error.message);}
+  finally{hermesModelsBusy=false;await refreshHermesModels();await remoteRefresh(true);}
+}
+refreshHermesModels();
 $('save').onclick=()=>action(async()=>{applySettings(await request('/api/save',form()));toast('Réglages enregistrés. Le serveur actif conserve sa configuration.');});
 $('set-default').onclick=()=>action(async()=>{const value=await request('/api/set-default',form());applySettings(value);showDefaults(value);toast('Ces réglages sont votre nouveau profil par défaut.');});
 $('restore-defaults').onclick=()=>action(async()=>{applySettings(await request('/api/defaults'));dirty=true;$('save-state').textContent='Valeurs par défaut restaurées · à enregistrer';toast('Valeurs par défaut restaurées dans le formulaire.');});

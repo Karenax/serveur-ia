@@ -14,6 +14,7 @@ class HermesPrivateServer:
     def __init__(self, store, backend, *, port=0):
         self.store, self.backend = store, backend
         self.accounts = self.conversations = self.tools = None
+        self.models = None
         outer = self
 
         class Handler(BaseHTTPRequestHandler):
@@ -56,6 +57,20 @@ class HermesPrivateServer:
                 return self.respond(404, {'error': {'message': 'Route privée non disponible.'}})
 
             def do_POST(self):
+                if self.path=='/v1/provider/credential':
+                    owner=self.authorized('inference')
+                    context=outer.conversations.context(owner) if owner and outer.conversations else None
+                    if not context or not outer.conversations.valid(owner,context) or not outer.models:
+                        return self.respond(401,{'error':{'message':'Aucune demande fournisseur autorisée.'}})
+                    try:
+                        value=self.body(4096)
+                        selection=context.get('model_selection',{})
+                        if set(value)!={'model_id'} or value['model_id']!=selection.get('id'):
+                            raise ValueError('Modèle fournisseur non autorisé.')
+                        credential=outer.models.credential(owner,selection)
+                        if not outer.conversations.valid(owner,context):raise ValueError('Demande désactivée.')
+                        return self.respond(200,credential)
+                    except Exception:return self.respond(403,{'error':{'message':'Connexion au fournisseur non autorisée ou indisponible.'}})
                 if self.path == '/mcp':
                     owner = self.authorized('tool')
                     if not owner: return self.respond(401, {'error': 'Outil non autorisé.'})
@@ -73,6 +88,8 @@ class HermesPrivateServer:
                 context = outer.conversations.context(owner) if owner and outer.conversations else None
                 if not context or not outer.conversations.valid(owner, context):
                     return self.respond(401, {'error': {'message': 'Aucune demande agent autorisée.'}})
+                if outer.models and not context.get('model_selection',{}).get('local'):
+                    return self.respond(403, {'error': {'message': 'Ce tour utilise un autre fournisseur.'}})
                 item = connection = None
                 sent = False
                 try:

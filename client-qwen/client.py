@@ -72,6 +72,7 @@ class Remote:
         self.model = ''
         self.models = []
         self.model_capabilities = {}
+        self.models_catalogue = {'object':'list','data':[]}
         self.connection_required = connection_required
         self.session = ""
         self.username = ""
@@ -136,6 +137,8 @@ class Remote:
                 'events':list(self.events)[-12:],'stream':dict(self.stream),**self.diagnostic}
 
     def failure(self,code,message):
+        if code=='model_unloaded' and self.models_catalogue.get('source')=='hermes' and any(row.get('available',True) for row in self.models_catalogue['data']):
+            return
         network=code in ('wireguard_unreachable','tunnel_request_failed','connection_error')
         if not network and code not in ('gateway_unavailable','access_denied','access_revoked',
                 'access_suspended','access_expired','remote_disabled','model_unloaded','no_models'):return
@@ -229,7 +232,7 @@ class Remote:
                 self.connected=False;self.reachable=False
                 try:
                     with self.open('/v1/models') as response:
-                        data=json.load(response).get('data')
+                        catalogue=json.load(response);data=catalogue.get('data')
                     if not isinstance(data,list):raise ValueError('Liste des modèles invalide dans /v1/models.')
                     # Display hints only; older servers may not implement this route.
                     if time.time()-getattr(self,'device_reported_at',0)>=60:
@@ -243,9 +246,21 @@ class Remote:
                         except (OSError,ValueError):pass
                     models=list(dict.fromkeys(row['id'] for row in data if isinstance(row,dict) and isinstance(row.get('id'),str) and row['id'].strip() and len(row['id'])<=512))
                     self.model_capabilities={row['id']:row.get('capabilities',{}) for row in data if isinstance(row,dict) and row.get('id') in models and isinstance(row.get('capabilities',{}),dict)}
+                    entries=[]
+                    for row in data:
+                        if not isinstance(row,dict) or row.get('id') not in models or any(entry['id']==row['id'] for entry in entries):continue
+                        entry={'id':row['id'],'object':'model','capabilities':self.model_capabilities.get(row['id'],{})}
+                        for field in ('name','label','provider'):
+                            if isinstance(row.get(field),str):entry[field]=row[field][:512]
+                        if type(row.get('available')) is bool:entry['available']=row['available']
+                        entries.append(entry)
+                    self.models_catalogue={'object':'list','data':entries}
+                    for field in ('default_model','source'):
+                        if isinstance(catalogue.get(field),str):self.models_catalogue[field]=catalogue[field][:512]
                     self.models=models;self.reachable=True
                     if models:
-                        if self.model not in models:self.model=models[0]
+                        available=[entry['id'] for entry in entries if entry.get('available',True)]
+                        if self.model not in available:self.model=catalogue.get('default_model') if catalogue.get('default_model') in available else (available or models)[0]
                         self.connected=True;self.error='';code='ready'
                     else:
                         self.model='';self.error='Serveur joint, mais aucun modèle accessible n’est annoncé par /v1/models.';code='no_models'
@@ -374,7 +389,7 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
                 if not state['connected']:return self.reply(401 if state['code'] in ('access_denied','access_revoked','access_suspended','access_expired','remote_disabled') else 503,{'error':{'code':state['code'],'message':state['error']}})
                 if not getattr(remote,'update_checked',False) and remote.profile.get('update_public_key'):
                     remote.update_checked=True;remote.update(False)
-                return self.reply(200,{'object':'list','data':[{'id':model,'object':'model','capabilities':remote.model_capabilities.get(model,{})} for model in state['models']]})
+                return self.reply(200,copy.deepcopy(remote.models_catalogue))
             self.forward()
 
         def do_POST(self):

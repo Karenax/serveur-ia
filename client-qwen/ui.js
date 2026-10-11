@@ -2,7 +2,7 @@
 'use strict';
 function uiLoadedModel(name,code=''){
   const label=$('loaded-model');
-  label.textContent=name?'Modèle chargé : '+name:['model_unloaded','no_models'].includes(code)?'Aucun modèle chargé':'Modèle : connexion requise';
+  label.textContent=name?'Modèle : '+name:['model_unloaded','no_models'].includes(code)?'Aucun modèle disponible':'Modèle : connexion requise';
   label.title=label.textContent;
 }
 const uiPaths={notifications:'M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4',chat:'M3 4h18v12H8l-5 4V4',projects:'M3 7V5h6l2 2h10v13H3V7',tasks:'M9 3h6v3H9V3m-3 2H4v16h16V5h-2M8 11l2 2 5-5M8 17h8',settings:'M4 6h16M4 12h16M4 18h16M8 3v6m8 0v6m-6 0v6',new:'M15 4l5 5M4 20l4-1L21 6l-3-3L5 16l-1 4',sidebar:'M3 4h18v16H3V4m5 0v16',project:'M3 7V5h6l2 2h10v13H3V7',writing:'M4 20l4-1L21 6l-3-3L5 16l-1 4',code:'M8 6l-6 6 6 6m8-12 6 6-6 6m-3-14-2 16',analysis:'M4 20h16M7 16v-5m5 5V4m5 12V8',research:'M15 15l6 6M17 9a8 8 0 1 1-16 0 8 8 0 0 1 16 0',general:'M12 3v18M3 12h18M5.6 5.6l12.8 12.8m0-12.8L5.6 18.4'};
@@ -93,7 +93,7 @@ uiDecorateNavigation();render();uiProjectTab('documents');
 
 let uiLastConnection={},uiIntegrations=null,uiIntegrationsLoading=false,uiIntegrationPending=false;
 function uiIntegrationButtons(){
-  const model=uiLastConnection.connected?(uiLastConnection.model||config.model):'';
+  const model=connected&&conversationModelAvailable()?conversationModel():'';
   $('integration-model').textContent=model?'Modèle à ajouter : '+model:'Connectez le client au serveur et chargez un modèle pour l’ajouter.';
   for(const name of ['opencode','hermes']){
     const app=uiIntegrations?.[name],button=$('integration-'+name);
@@ -112,7 +112,7 @@ for(const name of ['opencode','hermes'])$('integration-'+name).onclick=async()=>
   if(uiIntegrationPending)return;
   uiIntegrationPending=true;uiIntegrationButtons();$('integration-backup').hidden=true;$('integration-result').textContent='Ajout du modèle en cours…';
   try{
-    const result=await api('/client/integrations/apply',{app:name,model:uiLastConnection.model||config.model});
+    const result=await api('/client/integrations/apply',{app:name,model:conversationModel()});
     $('integration-result').textContent=result.message;
     if(result.backup){$('integration-backup-path').textContent=result.backup;$('integration-backup').hidden=false;}
   }catch(e){$('integration-result').textContent=e.message;}
@@ -123,7 +123,7 @@ const uiConnectionEvents={endpoint_selected:'Adresse sélectionnée',wireguard_s
 function uiConnectionStatus(state=uiLastConnection){
   uiLastConnection=state;const phase=busy?(replyProgress.phase||state.stream?.phase||'requesting'):null;
   uiIntegrationButtons();
-  uiLoadedModel(state.connected?(state.model||config.model):'',state.code);
+  uiLoadedModel(connected?conversationModelLabel():'',state.code);
   const https=state.transport==='https';
   let label=phase?(uiConnectionPhases[phase]||'Préparation de la réponse'):state.checking?(https?'Vérification HTTPS':'Vérification WireGuard'):connected?'Connecté au serveur IA':'Connexion indisponible';
   const elapsed=busy?Math.max(0,Math.round((Date.now()-(replyProgress.started||Date.now()))/1000)):0;

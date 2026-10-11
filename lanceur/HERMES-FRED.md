@@ -1,6 +1,6 @@
 # Conversations Fred avec Hermes
 
-Les clients Windows 3.5.24 et Android 1.0.7/code 8 envoient leurs demandes à Fred. Le serveur confie chaque conversation et les tâches rédactionnelles à Hermes, qui utilise le Qwen local déjà chargé et les outils autorisés. Les trois actions du correcteur — Corriger, Reformuler professionnel et Reformuler amical — utilisent directement Qwen. Le modèle reste partagé : un compte ne charge pas un autre Qwen.
+Les clients Windows 3.5.25 et Android 1.0.8/code 9 envoient leurs demandes à Fred. Le serveur confie chaque conversation à Hermes avec le modèle sélectionné et les outils autorisés. Le modèle Qwen local reste disponible ; les fournisseurs connectés dans Hermes sur le serveur peuvent être partagés entre les comptes Fred. Les tâches rédactionnelles gardent le modèle serveur par défaut. Les trois actions du correcteur — Corriger, Reformuler professionnel et Reformuler amical — utilisent directement Qwen.
 
 Le correcteur utilise la route authentifiée `/v1/chat/completions` avec
 `text_transform: {mode, text}`. Le serveur impose la consigne du mode choisi
@@ -15,7 +15,17 @@ La création d’un accès Fred crée automatiquement le profil natif `fred-<ide
 
 Chaque projet Fred possède un projet natif Hermes dans le profil du compte. Le nom, les consignes et l’archivage sont synchronisés ; le renommage conserve l’identité native. Le dossier `workspace/projects/<identifiant-projet>/` contient un catalogue des documents. Leur contenu demeure dans l’espace Fred et est lu par MCP avec les droits du compte et du projet. L’association d’une session à son projet passe par les API officielles Hermes et son dossier de travail, sans changer le projet actif de toutes les conversations.
 
-Chaque conversation utilise une session indépendante. Une continuation conserve les appels d’outils et leur résultat. Un changement de projet, une modification de l’historique ou une restauration ouvre une nouvelle session avec l’historique visible accepté.
+Chaque conversation utilise une session indépendante. Une continuation conserve les appels d’outils et leur résultat. Un changement de modèle, de projet, une modification de l’historique ou une restauration ouvre une nouvelle session avec l’historique visible accepté.
+
+## Choix du modèle et abonnements
+
+Le sélecteur de Windows et Android affiche le catalogue fourni par Hermes pour les accès autorisés. Le choix est conservé avec chaque conversation dans l’historique chiffré et synchronisé. Une disparition du modèle ou une perte d’accès bloque les nouveaux messages jusqu’à un autre choix explicite ; aucun modèle de secours n’est substitué. La conversation vocale utilise le même choix. Les modèles dont le contexte annoncé est inférieur à 64 000 tokens sont visibles mais indisponibles, car cette version de Hermes les refuse.
+
+Dans **Clients → Modèles disponibles dans Hermes**, la console permet le partage global ou l’autorisation compte par compte. Le partage global vaut aussi pour les nouveaux comptes. Une connexion du serveur partagée utilise le même abonnement, les mêmes crédits et les mêmes limites pour tous ces comptes ; les données des profils Fred restent séparées. Une connexion dans un navigateur ou une autre application du PC n’est pas en soi un accès Hermes.
+
+Les clients reçoivent des identifiants de modèles et des capacités publiques, jamais des clés ou des jetons du fournisseur. Le serveur contrôle le modèle et les droits à chaque envoi. Les connexions externes sont résolues et rafraîchies dans le magasin Hermes central ; les jetons de renouvellement ne sont pas dupliqués entre profils. Les demandes cloud ne dépendent pas du chargement du Qwen local. Leur jauge de contexte est une estimation explicite de l’historique visible, sans appel facturé de comptage ; une capacité inconnue n’est pas inventée.
+
+La politique sans secrets `hermes-models.json` est incluse dans les sauvegardes chiffrées. Sur un autre PC, les connexions aux fournisseurs doivent être rétablies dans Hermes : les abonnements personnels du PC source ne sont pas copiés par une sauvegarde Fred.
 
 ## Outils et mémoire
 
@@ -35,11 +45,11 @@ Les sauvegardes chiffrées Fred incluent le registre d’association, les sessio
 
 ## Fonctionnement sur ce PC
 
-L’installation Hermes personnelle reste distincte. Fred utilise les sources installées au commit `1cb26bf248e150f715ce8a487fdef2a2bef6b541`, leur runtime préparé et une racine de données dédiée. Deux ports privés sur `127.0.0.1` sont utilisés : 8643 pour la passerelle Hermes et 8768 pour le fournisseur Qwen et les outils Fred. Aucun client ne reçoit de clé Hermes et aucune de ces API n’est publiée directement.
+Les sessions, projets et mémoires Hermes de Fred restent dans une racine dédiée. Les accès fournisseurs de l’installation Hermes du PC sont utilisés uniquement suivant la politique de partage. Fred utilise les sources installées au commit `1cb26bf248e150f715ce8a487fdef2a2bef6b541` et leur runtime préparé. Deux ports privés sur `127.0.0.1` sont utilisés : 8643 pour la passerelle Hermes et 8768 pour le fournisseur Qwen, les outils Fred et la résolution des accès fournisseurs. Aucun client ne reçoit de clé Hermes et aucune de ces API n’est publiée directement.
 
 La configuration locale `lanceur/hermes-integration.json` contient `{"enabled": true, "port": 8643, "private_port": 8768}`. Elle est sauvegardée avec les réglages Fred et reste exclue de Git. Le démarrage et les redémarrages du service sont supervisés sans arrêter Qwen. Les capacités natives requises sont vérifiées avant d’accepter le service. Une indisponibilité ne détourne pas silencieusement les conversations vers l’ancien parcours.
 
-Quatre conversations Hermes au maximum peuvent avancer en parallèle, avec une seule demande active par accès. La file Fred réserve le GPU seulement pendant chaque appel au modèle. Les outils réseau ou documentaires ne le monopolisent pas. Les limites sont de 12 tours d’agent, 24 appels au fournisseur et 15 minutes par demande. Les clients montrent la progression des outils ; seule la réponse finale est rendue comme réponse et lue par la voix.
+Quatre conversations Hermes au maximum peuvent avancer en parallèle, avec une seule demande active par accès. La file Fred réserve le GPU seulement pendant les appels à Qwen local. Les outils réseau ou documentaires et les fournisseurs externes ne le monopolisent pas. La limite est de 12 tours d’agent et 15 minutes par demande, avec un maximum de 24 appels au fournisseur Qwen privé. Les appels externes consomment les quotas de la connexion Hermes partagée. Les clients montrent la progression des outils ; seule la réponse finale est rendue comme réponse et lue par la voix.
 
 ## Validation
 

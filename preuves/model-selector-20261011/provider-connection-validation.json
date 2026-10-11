@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-11",
+  "provider": "GitHub Copilot",
+  "available": false,
+  "unavailable_reason": "Connexion Copilot incomplète ou non autorisée.",
+  "read_only_metadata": {
+    "catalogue_status": 200,
+    "native_text_model_count": 51,
+    "native_picker_enabled_count": 0,
+    "main_model_configured": false,
+    "copilot_api_credential_exchange_status": 403,
+    "copilot_api_credential_obtained": false
+  },
+  "isolated_inference_checks": {
+    "attempts": 2,
+    "model": "gpt-5-mini",
+    "successful": false,
+    "provider_http_status": 400,
+    "public_error": "The requested model is not supported."
+  },
+  "corrected_native_discovery": {
+    "provider_available": false,
+    "visible_models": 51,
+    "available_models": 0
+  },
+  "scope": "Metadata inspection plus two explicitly authorized short synthetic inference checks with temporary Fred profiles. No production history was used, no login was initiated and no connection settings were changed.",
+  "secret_exposure": false
+}

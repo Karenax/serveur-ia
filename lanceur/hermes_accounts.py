@@ -22,7 +22,7 @@ from urllib.parse import urlsplit
 from core import HOME, write_json
 from wg_crypto import protect, private_directory
 
-CONFIG_VERSION = 3
+CONFIG_VERSION = 4
 _OWNER = re.compile(r'[a-z0-9][a-z0-9_-]{0,55}\Z')
 _STATES = {'provisioning', 'ready', 'error', 'suspended', 'revoked', 'archived'}
 
@@ -63,6 +63,7 @@ class HermesAccounts:
         self.protector = protector
         self.protect_directory = protect_directory
         self.lock = threading.RLock()
+        self.models = None
         if self.root.exists() and self.root.resolve() != self.root.absolute():
             raise ValueError('La racine Hermes Fred doit être un dossier privé réel.')
         protect_directory(self.root)
@@ -136,7 +137,7 @@ class HermesAccounts:
             return row['owner']
         return None
 
-    def config(self, owner=None, port=8643):
+    def config(self, owner=None, port=8643, selection=None):
         tools = ['memory', 'skills', 'todo'] if owner else []
         config = {
             'model': {'default': self.model, 'provider': 'custom', 'base_url': self.inference_url,
@@ -159,17 +160,25 @@ class HermesAccounts:
             'display': {'interim_assistant_messages': True},
             'terminal': {'cwd': str(self.root / 'profiles' / profile_name(owner) / 'workspace') if owner else str(self.root)},
         }
-        # Every auxiliary route is pinned locally too: no personal/cloud credentials are inherited.
-        config['auxiliary'] = {name: {'provider': 'custom', 'model': self.model, 'timeout': 900,
-                                     'base_url': self.inference_url, 'api_key': '${FRED_INFERENCE_KEY}'}
+        # Follow only the selected run's main route, with no other-provider fallback.
+        # Main credentials are minted centrally; personal refresh tokens are never cloned.
+        config['auxiliary'] = {name: {'provider': 'main', 'timeout': 900, 'fallback_chain': []}
                                for name in ('compression', 'vision', 'approval', 'mcp', 'skills_hub',
                                             'curator', 'title_generation', 'memory_query_rewrite')}
         config['auxiliary']['title_generation'].update(enabled=False, model_upgrade_enabled=False)
         config['auxiliary']['refine'] = {'enabled': False}
+        if selection and not selection.get('local'):
+            # Some native auxiliary entry points do not receive main_runtime.
+            # An explicit named route keeps them on this account's selected
+            # provider, with key_cmd rather than copying a provider credential.
+            for name,value in config['auxiliary'].items():
+                if name!='refine':value.update(provider=selection['native_provider'],
+                    model=selection['native_model'],api_mode=selection['api_mode'])
         if owner and self.mcp_url:
             config['mcp_servers'] = {'fred': {'url': self.mcp_url,
                 'headers': {'Authorization': 'Bearer ${FRED_TOOL_KEY}'}, 'connect_timeout': 10,
                 'request_timeout': 60}}
+        if owner and self.models:config.update(self.models.profile_config(owner))
         return config
 
     def _write_env(self, directory, values):
@@ -188,18 +197,20 @@ class HermesAccounts:
         finally:
             temporary.unlink(missing_ok=True)
 
-    def materialize(self, owner, port=8643):
-        credentials = self.credentials(owner)
-        directory = self.root / 'profiles' / credentials['profile']
-        self._check_profile_directory(directory)
-        if (not directory.is_dir() or directory.is_symlink()
-                or directory.resolve().parent != (self.root.resolve() / 'profiles')):
-            raise ValueError('Dossier de profil Hermes indisponible.')
-        write_json(directory / 'config.yaml', self.config(owner, port))
-        self._write_env(directory, {'API_SERVER_KEY': credentials['api_key'],
-                                   'FRED_INFERENCE_KEY': credentials['inference_key'],
-                                   'FRED_TOOL_KEY': credentials['tool_key']})
-        return directory
+    def materialize(self, owner, port=8643, selection=None):
+        with self.lock:
+            credentials = self.credentials(owner)
+            directory = self.root / 'profiles' / credentials['profile']
+            self._check_profile_directory(directory)
+            if (not directory.is_dir() or directory.is_symlink()
+                    or directory.resolve().parent != (self.root.resolve() / 'profiles')):
+                raise ValueError('Dossier de profil Hermes indisponible.')
+            write_json(directory / 'config.yaml', self.config(owner, port,selection))
+            self._write_env(directory, {'API_SERVER_KEY': credentials['api_key'],
+                                       'FRED_INFERENCE_KEY': credentials['inference_key'],
+                                       'FRED_TOOL_KEY': credentials['tool_key'],
+                                       'FRED_PROVIDER_URL': self.inference_url+'/provider/credential'})
+            return directory
 
     def _check_profile_directory(self, directory):
         profiles = self.root / 'profiles'

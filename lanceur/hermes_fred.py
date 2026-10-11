@@ -11,6 +11,7 @@ from hermes_inference import HermesPrivateServer
 from hermes_conversations import HermesConversations
 from hermes_tools import FredTools
 from hermes_projects import HermesProjects
+from hermes_models import HermesModels, NativeModelSource
 
 
 class HermesFred:
@@ -22,6 +23,9 @@ class HermesFred:
                                        authorized=self.profile_allowed)
         self.service = HermesService(self.accounts, port, source=source)
         self.conversations = HermesConversations(store, self.accounts, self.service)
+        self.models = HermesModels(store,backend,self.accounts,source=NativeModelSource())
+        self.accounts.models = self.conversations.models = self.private.models = self.models
+        self.models.on_changed = self._models_changed
         self.projects = HermesProjects(self.accounts, store.workspace, self.service)
         self.conversations.projects = self.projects
         self.tools = FredTools(store.workspace, self.tool_allowed)
@@ -84,11 +88,24 @@ class HermesFred:
 
     def public(self, owner): return self.accounts.public(owner)
 
+    def model_catalog(self, owner): return self.models.catalog(owner)
+    def select_model(self, owner, requested=None): return self.models.select(owner,requested)
+
+    def _models_changed(self):
+        with self.conversations.lock:
+            for owner,context in list(self.conversations.active.items()):
+                if not self.models.valid(owner,context['model_selection']):self.conversations.cancel(owner,context['request_id'])
+            for owner in self.accounts.owners(ready_only=True):
+                if self.profile_allowed(owner):
+                    context=self.conversations.active.get(owner)
+                    selected=context['model_selection'] if context and self.models.valid(owner,context['model_selection']) else None
+                    self.accounts.materialize(owner,self.service.port,selection=selected)
+
     def watch(self):
         while not self.halt.wait(.5):
             with self.conversations.lock: contexts = list(self.conversations.active.items())
             for owner, context in contexts:
-                if not self.store.valid_owner(owner) or time.monotonic() - context['created'] > self.conversations.timeout:
+                if not self.conversations.valid(owner,context) or time.monotonic() - context['created'] > self.conversations.timeout:
                     self.conversations.cancel(owner, context['request_id'])
                 pending = context.get('approval')
                 if pending and pending['expires_epoch'] < time.time(): self.conversations.cancel(owner, context['request_id'])

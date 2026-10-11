@@ -66,11 +66,14 @@ class HermesConversations:
         self.active = {}
         self.workers = set()
         self.projects = None
+        self.models = None
         self.max_runs, self.timeout = max_runs, timeout
         self.closed = False
         self.admission_paused = False
         with self.db() as db:
             db.executescript(SCHEMA)
+            if 'model' not in {r['name'] for r in db.execute('PRAGMA table_info(agent_runs)')}:
+                db.execute("ALTER TABLE agent_runs ADD COLUMN model TEXT NOT NULL DEFAULT ''")
             # Side effects cannot be replayed on restart. Native Hermes also marks
             # shutdown turns interrupted; preserve the Fred result independently.
             db.execute("UPDATE agent_runs SET state='interrupted',updated=? WHERE state NOT IN ('completed','failed','cancelled','interrupted')", (time.time(),))
@@ -85,7 +88,8 @@ class HermesConversations:
 
     def valid(self, owner, context=None):
         return (not self.closed and self.store.valid_owner(owner)
-                and (context is None or not context['cancelled'].is_set()))
+                and (context is None or (not context['cancelled'].is_set()
+                     and (not self.models or self.models.valid(owner,context.get('model_selection',{'local':True}))))))
 
     @contextlib.contextmanager
     def admission(self, owner):
@@ -116,6 +120,7 @@ class HermesConversations:
         if row is None: return {'request_id': request, 'conversation_id': conversation, 'status': 'cancelled' if cancelled else 'unknown'}
         value = {'request_id': request, 'conversation_id': conversation, 'status': row['state'],
                  'text': row['output'], 'reasoning_content': row['reasoning'], 'sources': json.loads(row['sources'])}
+        if row['model']:value['model']=row['model']
         context = self.context(owner)
         pending = context.get('approval') if context and context['request_id'] == request else None
         if pending and pending['expires_epoch'] > time.time():
@@ -200,9 +205,11 @@ class HermesConversations:
         if not messages or messages[-1].get('role') != 'user': raise ValueError('Le dernier message doit être une demande utilisateur.')
         public = visible_messages(messages)
         if not public or not public[-1]['content'] and not isinstance(messages[-1].get('content'), list): raise ValueError('Message utilisateur vide.')
-        fingerprint = hashlib.sha256(encoded({'messages': messages, 'conversation': conversation,
+        selection=self.models.select(owner,data.get('model')) if self.models else {'id':'fred-qwen','local':True,'native_model':'fred-qwen'}
+        fingerprint = hashlib.sha256(encoded({'messages': messages, 'conversation': conversation, 'model':selection['id'],
                                               'project': project, 'document': document, 'effort': data.get('reasoning_effort')}).encode()).hexdigest()
         with self.admission(owner), self.db() as db:
+            if self.models and not self.models.valid(owner,selection):raise Denied('Modèle désactivé pour ce compte.')
             if db.execute('SELECT 1 FROM agent_cancellations WHERE owner=? AND request=? AND created>?',(owner,request,time.time()-86400)).fetchone():
                 raise Denied('Cette demande a été annulée avant son démarrage.')
             existing = db.execute('SELECT * FROM agent_runs WHERE owner=? AND request=?', (owner, request)).fetchone()
@@ -213,9 +220,13 @@ class HermesConversations:
             if owner in self.active: raise BlockingIOError('Une demande de ce compte est déjà en cours.')
             if len(self.active) >= self.max_runs: raise BlockingIOError('Les agents sont occupés. Réessayez après la fin d’une demande.')
             self.accounts.ensure(owner, port=self.service.port)
+            # A newly discovered model can appear after the profile was created.
+            # Refresh its named native route before resolving this turn.
+            if self.models:self.accounts.materialize(owner,self.service.port,selection=selection)
             from server_state import generation
             epoch = generation(self.store.home)['id']
             scope = encoded({'project': project, 'document': document,
+                             'model':selection['id'],
                              'system': [m['content'] for m in messages if m['role'] == 'system']})
             previous = db.execute('SELECT * FROM agent_conversations WHERE owner=? AND conversation=?', (owner, conversation)).fetchone()
             continuation = (previous and previous['scope'] == scope and previous['generation'] == epoch
@@ -226,9 +237,10 @@ class HermesConversations:
                        'cancelled': threading.Event(), 'sources': [], 'background': background,
                        'remote': '', 'created': time.monotonic(), 'model_calls': 0, 'tokens': 0,
                        'inference_phase': '', 'reasoning_content': ''}
+            context['model_selection']=selection
             context['cancel'] = context['cancelled']
-            db.execute('INSERT INTO agent_runs(owner,request,conversation,session,fingerprint,state,input,messages,created,updated) VALUES(?,?,?,?,?,?,?,?,?,?)',
-                       (owner, request, conversation, session, fingerprint, 'starting', encoded(public[-1]), encoded(public), time.time(), time.time()))
+            db.execute('INSERT INTO agent_runs(owner,request,conversation,session,fingerprint,state,input,messages,created,updated,model) VALUES(?,?,?,?,?,?,?,?,?,?,?)',
+                       (owner, request, conversation, session, fingerprint, 'starting', encoded(public[-1]), encoded(public), time.time(), time.time(),selection['id'] if self.models else ''))
             db.execute('INSERT INTO agent_conversations VALUES(?,?,?,?,?,?,?) ON CONFLICT(owner,conversation) DO UPDATE SET session=excluded.session,scope=excluded.scope,generation=excluded.generation,updated=excluded.updated',
                        (owner, conversation, session, scope, encoded(public[:-1]), epoch, time.time()))
             db.commit()
@@ -237,6 +249,9 @@ class HermesConversations:
         body = {'session_id': session, 'input': [{'role': 'user', 'content': messages[-1]['content']}],
                 'instructions': '\n'.join(m['content'] for m in messages if m['role'] == 'system'),
                 'model_options': {'reasoning_effort': data.get('reasoning_effort', 'none')}}
+        if self.models:
+            body['model']=selection['native_model']
+            if not selection['local']:body['provider']=selection['native_provider']
         if not continuation: body['conversation_history'] = public[:-1]
         # Preserve the current EG2 retrieval while allowing the agent to search
         # again. Documents are explicit untrusted turn data, never a new global
@@ -270,6 +285,10 @@ class HermesConversations:
             history = json.loads(row['history'])
             target = next((c for c in history['conversations'] if c['id'] == conversation), None)
             if not target: return  # The user may have deleted it; never resurrect.
+            if self.models:
+                model=context['model_selection']['id']
+                if target.get('model') and target['model']!=model:return
+                target['model']=model
             messages = target['messages']
             user_index = next((i for i, m in enumerate(messages) if m.get('role') == 'user' and m.get('turn_id') == request), None)
             if user_index is None:
@@ -296,11 +315,14 @@ class HermesConversations:
     def merge_completed(self, owner, history):
         """An older local partial reply cannot overwrite an accepted server final."""
         with self.db() as db:
-            rows = db.execute("SELECT request,conversation,output,reasoning FROM agent_runs WHERE owner=? AND state='completed' ORDER BY updated DESC LIMIT 200", (owner,)).fetchall()
+            rows = db.execute("SELECT request,conversation,output,reasoning,model FROM agent_runs WHERE owner=? AND state='completed' ORDER BY updated DESC LIMIT 200", (owner,)).fetchall()
         by_conversation = {c['id']: c for c in history['conversations']}
         for row in rows:
             conversation = by_conversation.get(row['conversation'])
             if not conversation: continue
+            # Older journals were local-Qwen only. Their missing model must not
+            # overwrite a conversation that has since selected a shared model.
+            if conversation.get('model','fred-qwen')!=(row['model'] or 'fred-qwen'):continue
             messages = conversation['messages']
             for i, message in enumerate(messages):
                 if message.get('role') == 'user' and message.get('turn_id') == row['request']:

@@ -19,7 +19,7 @@ def authoritative_turns(local, server):
     conversation scope must still agree; unrelated simultaneous edits keep the
     existing conflict-copy behavior.
     """
-    if any(local.get(k) != server.get(k) for k in ('id', 'project_id', 'document_id', 'archived')):
+    if any(local.get(k) != server.get(k) for k in ('id', 'project_id', 'document_id', 'archived', 'model')):
         return None
     left, right = local['messages'], server['messages']
     if len(left) > len(right): return None

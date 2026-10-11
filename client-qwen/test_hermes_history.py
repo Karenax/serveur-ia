@@ -44,5 +44,24 @@ class HermesHistoryTests(unittest.TestCase):
         for message in value['conversations'][0]['messages']:message.pop('turn_id')
         history_store.validate(value)
 
+    def test_model_choice_is_optional_and_bounded_for_imported_histories(self):
+        legacy=self.history();history_store.validate(legacy)
+        selected=copy.deepcopy(legacy);selected['conversations'][0]['model']='m'*512
+        self.assertEqual(history_store.validate(selected),selected)
+        for invalid in (None,True,'','   ','m'*513):
+            bad=copy.deepcopy(selected);bad['conversations'][0]['model']=invalid
+            with self.assertRaises(history_store.HistoryError):history_store.validate(bad)
+
+    def test_authoritative_reply_preserves_model_but_cannot_erase_an_offline_choice(self):
+        local=self.history();local['conversations'][0]['model']='fred-cloud'
+        server=self.history('Réponse définitive',False);server['conversations'][0]['model']='fred-cloud'
+        result,conflicts=merge(local,server,{})
+        self.assertEqual(conflicts,0);self.assertEqual(result,server)
+        local['conversations'][0]['model']='fred-local'
+        result,conflicts=merge(local,server,{})
+        self.assertEqual(conflicts,1)
+        self.assertEqual({row['model'] for row in result['conversations']},{'fred-cloud','fred-local'})
+        self.assertEqual(next(row for row in result['conversations'] if row['model']=='fred-local')['messages'],local['conversations'][0]['messages'])
+
 
 if __name__=='__main__':unittest.main()

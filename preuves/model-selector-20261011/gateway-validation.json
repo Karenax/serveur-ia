@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-11",
+  "passed": true,
+  "tests": 29,
+  "duration_seconds": 32.182,
+  "modules": [
+    "test_model_selection_transport",
+    "test_model_sharing_admin",
+    "test_text_transform",
+    "test_remote_sources_revocation"
+  ],
+  "checks": [
+    "Authenticated public model catalogue with Qwen unloaded",
+    "Selected cloud model retained in chat and context requests",
+    "Unknown or unauthorized selection refused before inference",
+    "Vision and explicit context estimation follow selected model",
+    "Console sharing requires local admin token and allowed origin",
+    "Three corrector modes remain direct local Qwen requests",
+    "Streaming cancellation and access revocation retain their fences"
+  ],
+  "scope": "Isolated HTTP fixtures; no production history or provider inference"
+}

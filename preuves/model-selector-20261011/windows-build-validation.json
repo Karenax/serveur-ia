@@ -1,0 +1,31 @@
+{
+  "windows": {
+    "version": "3.5.25",
+    "protocol": 3,
+    "bytes": 93453117,
+    "sha256": "b67c082a58beb3486c6579c25206d82fe427f292ec464023ffe5b05e26a3b02c",
+    "signature": "CDdLj2aeFCC4T5Uj2+JctL2FEV6XbwqGpxc33a3JeEZOX8RbCBin55qjv8MPmpC5xT3QXrhbenuAXY++s+iEBw==",
+    "signing_public_key": "8fSJ5YLYBVF0GvxnS5RyD6LjgMSTi39H+4YGeS2Ac/M=",
+    "agent_protocol": 4
+  },
+  "ed25519_verified": true,
+  "previous_updater_verified": true,
+  "pinned_public_key_unchanged": true,
+  "pe_version": "3.5.25",
+  "self_test": "Accès serveur Fred self-test OK",
+  "bundle_source_matches": true,
+  "bundled_native_files_verified": 481,
+  "assets_sha256": {
+    "chat.html": "0ea69fdab9513aca59e86d5962eaaa0ffd51dac69e8b1581493150cde839a73e",
+    "workspace.html": "d8d10bed02b1a17383e7d2243958aca97ebfa7c1c2fdcdcf1dcf076db7f77009",
+    "corrector.js": "0eb3b92757313bebf090c0814eca3adbbed5b5a54b4ecb7c4f962a12b412d392",
+    "conversation.js": "5c1359d56d1bfc0b0d35eac3ded9ea592fa60f0af7782f635f2532071c01f8cd",
+    "ui.js": "2bfebd942539fbf0a3a1e9796272706d5d5576ebbc808a832f4e17b5b2b3410b",
+    "thinking.js": "97ac785164760bb9d4b365ba21aa8504a8cf7a2f4e4a38dc989f50ed56ec0f92",
+    "attachments.js": "8fb023f5c48e243b9f24d034c322a0ec53d7c391e2c73588a83c34a28a251867",
+    "ui.css": "9a7134930bb5009acb39f5c391e9a616318b4574af3bde6e99895aa3e0a6f726"
+  },
+  "window_close_cancel_body_embedded": true,
+  "client_ui_validation": "client-ui-validation.json",
+  "publication": "staged_only"
+}

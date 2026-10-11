@@ -36,7 +36,7 @@ async function main(){
       if(body.action==='stop'){assert.equal(body.session,state.native.session);state.stops++;state.native={...state.native,phase:'stopped',turns:[],partial:''};}
       return json(res,state.native);
     }
-    if(req.url==='/v1/models')return json(res,{data:[{id:'Fred-test',capabilities:{images:false,thinking:true,reasoning_efforts:['none','low','medium','high']}}]});
+    if(req.url==='/v1/models')return json(res,{source:'hermes',default_model:'Fred-test',data:[{id:'Fred-test',name:'Modèle local',available:true,capabilities:{images:false,thinking:true,reasoning_efforts:['none','low','medium','high']}},{id:'fred-test-cloud',name:'Modèle vocal choisi',provider:'Cloud de test',available:true,capabilities:{vision:false,thinking:false}}]});
     if(req.url==='/v1/status')return json(res,{protocol:3,agent_protocol:4,version:'test'});
     if(req.url==='/v1/workspace')return json(res,{projects:[],jobs:[]});
     if(req.url==='/v1/notifications')return json(res,{items:[],unread:0});
@@ -56,6 +56,7 @@ async function main(){
       return json(res,{cancelled:true});
     }
     if(req.url==='/v1/chat/completions'){
+      assert.equal(body.model,'fred-test-cloud','Native ASR must use the conversation model selected before the call');
       assert.equal(body.turn_id,req.headers['x-qwen-request']);state.chats.push(body);state.runs.set(body.turn_id,{request_id:body.turn_id,conversation_id:body.conversation_id,status:'running',text:''});
       res.writeHead(200,{'Content-Type':'text/event-stream; charset=utf-8'});event(res,{hermes_status:{phase:'working',message:'Hermes prépare la réponse'}});
       if(state.holdChat){state.pendingChat={body,res};return;}
@@ -77,7 +78,7 @@ async function main(){
         createBufferSource(){const context=this,source={connect(){},start(time){window.__audio.started++;this.timer=setTimeout(()=>{window.__audio.ended++;this.onended?.();},Math.max(0,(time-context.currentTime+this.buffer.duration)*1000));},stop(){clearTimeout(this.timer);window.__audio.stopped++;this.onended?.();}};return source;}
       };
     });
-    await page.goto('http://127.0.0.1:'+server.address().port);await page.waitForSelector('#conversation-start:not([disabled])');await page.click('#conversation-start');await page.waitForFunction(()=>window.conversationBusy);
+    await page.goto('http://127.0.0.1:'+server.address().port);await page.waitForSelector('#conversation-start:not([disabled])');await page.selectOption('#conversation-model','fred-test-cloud');await page.click('#conversation-start');await page.waitForFunction(()=>window.conversationBusy);assert.equal(await page.isDisabled('#conversation-model'),true,'Model choice stays bound during a voice session');
     state.syncDelay=1200;state.native.speech_id=1;state.native.turns=[{id:1,text:'Quelle est la livraison du projet Orion ?'}];
     await page.waitForFunction(()=>historySyncPending&&messages.some(message=>message.role==='assistant'&&message.content));await sleep(350);
     snapshot=await page.evaluate(()=>({active:window.conversationBusy,busy,historySyncPending,text:messages.at(-1).content,status:document.getElementById('conversation-status').textContent}));

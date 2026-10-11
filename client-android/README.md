@@ -7,7 +7,7 @@ Les appareils Android limités aux applications 32 bits ne sont pas pris en char
 ## Installer et ouvrir
 
 Le fichier à installer est `dist/Acces-serveur-Fred-Android.apk`, version
-**1.0.7** (`versionCode=8`). Installer le nouvel APK par-dessus l’application
+**1.0.8** (`versionCode=9`). Installer le nouvel APK par-dessus l’application
 existante pour conserver le profil et les conversations.
 Transférer cet APK sur l’appareil puis l’ouvrir et autoriser son installation
 depuis l’application utilisée pour ouvrir le fichier.
@@ -271,7 +271,7 @@ leur concordance avant d’exposer les routes authentifiées
 nouvelle compilation Release suffit ensuite à la proposer aux appareils.
 
 **Première installation :** les versions 1.0.4 et précédentes n’ont pas cette
-fonction. Installer une fois manuellement l’APK 1.0.7 par-dessus l’application
+fonction. Installer une fois manuellement l’APK 1.0.8 par-dessus l’application
 existante ; les versions suivantes pourront être téléchargées depuis Fred.
 
 ## Conversations Hermes 1.0.6
@@ -291,9 +291,8 @@ la même conversation et le même projet.
 importés et les mises à jour automatiques APK sont conservés.
 
 Le transport annonce le protocole conversationnel 4 ; les profils existants
-au format 3 restent importables. Le modèle Qwen continue de calculer les
-réponses sur le serveur. Aucun agent ni secret Hermes n’est installé sur
-l’appareil. Une panne Hermes est signalée explicitement.
+au format 3 restent importables. Hermes utilise le modèle choisi parmi ceux autorisés par le serveur. Aucun
+agent ni secret de fournisseur n’est installé sur l’appareil. Une panne Hermes est signalée explicitement.
 
 ## Correcteur direct 1.0.7
 
@@ -307,3 +306,23 @@ tâches continuent d’utiliser Hermes et ses outils autorisés.
 Le profil importé, l’historique chiffré, la dictée locale Whisper Small et
 les mises à jour automatiques sont conservés. Installer cette version
 par-dessus l’application existante.
+
+## Choix du modèle 1.0.8
+
+Le sélecteur près du champ de message affiche les modèles autorisés par le
+serveur, avec leur fournisseur et leur disponibilité. Le choix est enregistré
+avec chaque conversation et retrouvé après sa réouverture, son import ou la
+synchronisation de l’historique. Une nouvelle conversation utilise le modèle
+par défaut du serveur.
+
+Le modèle choisi sert au chat, au contexte et à la réflexion. Les possibilités
+d’image suivent ses capacités. Si ce modèle devient indisponible ou est retiré,
+Fred conserve le choix et demande de sélectionner un modèle disponible avant
+d’envoyer ; il ne remplace pas silencieusement le modèle. Un fournisseur distant
+peut répondre lorsque le Qwen local est déchargé.
+
+Les trois boutons du correcteur continuent d’utiliser directement le Qwen local.
+Les tâches utilisent le modèle par défaut du serveur via Hermes.
+La [validation Android 1.0.8](../preuves/model-selector-20261011/ANDROID.md)
+consigne le transport natif, l’historique chiffré, le correcteur et les contrôles
+de mise à jour exécutés sur le Release signé.

@@ -425,6 +425,7 @@ def chat_request(value, model):
 def serve_gateway(store, backend, port=GATEWAY_PORT):
     """backend returns (loopback port, model alias, private upstream API key)."""
     scheduler = store.scheduler
+    from hermes_models import ModelUnavailable
     def valid_owner(owner):
         return store.valid_owner(owner)
     def generate(owner,messages,cancel):
@@ -577,6 +578,16 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 return self.respond(404, {'error': {'message': 'Route non disponible.'}})
             if not self.authorized():
                 return
+            if store.hermes and hasattr(store.hermes, 'model_catalog'):
+                try:
+                    catalog = store.hermes.model_catalog(self.identity)
+                    if store.authenticate(self.access_token) != self.identity:
+                        raise Denied('Accès désactivé.')
+                    return self.respond(200, catalog)
+                except Denied as error:
+                    return self.respond(403, {'error': {'message': str(error)}})
+                except (OSError, ValueError, RuntimeError):
+                    return self.respond(503, {'error': {'message': 'Liste des modèles Hermes indisponible.'}})
             upstream_port, model, _ = backend()
             live = health('127.0.0.1', upstream_port)
             if not live.get('loaded'):
@@ -732,20 +743,43 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 project=raw.pop('project_id',None);raw.pop('assistant_id',None);document=raw.pop('document_id',None)
                 text_transform='text_transform' in raw
                 if text_transform and self.path!='/v1/chat/completions':raise ValueError('Transformation réservée à la route de génération.')
-                data = chat_request(transform_request(raw) if text_transform else raw, model);sources=[]
+                selection = None
+                if not text_transform and store.hermes and hasattr(store.hermes, 'select_model'):
+                    selection = store.hermes.select_model(self.identity, raw.get('model'))
+                data = chat_request(transform_request(raw) if text_transform else raw, selection['id'] if selection else model);sources=[]
                 direct_request=store.text_transforms.request_id(self.headers.get('X-Qwen-Request') or secrets.token_hex(16)) if text_transform else None
                 if text_transform and store.text_transforms.cancelled(self.identity,direct_request):raise ValueError('Demande annulée.')
                 if not text_transform and not (store.hermes and self.path=='/v1/chat/completions') and (project or document or getattr(store.workspace,'knowledge',None)):
                     data['messages'],sources=store.workspace.context(self.identity,data['messages'],project,document)
+            except Denied as error:
+                return self.respond(403, {'error': {'code': 'model_access_denied', 'message': str(error)}})
+            except ModelUnavailable as error:
+                return self.respond(503, {'error': {'code': 'model_unavailable', 'message': str(error)}})
             except (OSError, ValueError, TypeError, KeyError) as error:
                 return self.respond(400, {'error': {'message': str(error)}})
-            live=health('127.0.0.1', upstream_port)
-            if not live.get('loaded'):
-                return self.respond(503, {'error': {'code':'model_unloaded', 'message': 'Serveur connecté, mais le modèle n’est pas chargé. Le lancer dans la console serveur.'}})
-            if any(isinstance(m.get('content'),list) and any(p.get('type')=='image_url' for p in m['content']) for m in data['messages']) and live.get('images') is not True:
+            local = selection is None or selection.get('local', True)
+            live=health('127.0.0.1', upstream_port) if local else {}
+            if local and not live.get('loaded'):
+                return self.respond(503, {'error': {'code':'model_unavailable' if selection else 'model_unloaded', 'message': 'Serveur connecté, mais le modèle n’est pas chargé. Le lancer dans la console serveur.'}})
+            selected_caps = selection.get('capabilities', {}) if selection else {}
+            vision = live.get('images') is True if local else selected_caps.get('vision') is True or selected_caps.get('images') is True
+            if any(isinstance(m.get('content'),list) and any(p.get('type')=='image_url' for p in m['content']) for m in data['messages']) and not vision:
                 return self.respond(400,{'error':{'code':'image_not_supported','message':'Le modèle chargé ne dispose pas de la vision. Choisissez un modèle avec prise en charge des images.'}})
             live_model=live.get('model')
-            if isinstance(live_model,str) and live_model:data['model']=live_model
+            if selection is None and isinstance(live_model,str) and live_model:data['model']=live_model
+            if self.path == '/v1/context' and not local:
+                # A local tokenizer cannot measure another provider. Return an
+                # explicit visible-history estimate, without an inference call.
+                characters = sum(len(m['content']) if isinstance(m.get('content'), str)
+                                 else sum(len(p.get('text', '')) for p in m.get('content', []) if p.get('type') == 'text')
+                                 for m in data['messages'])
+                capacity = selection.get('capabilities', {}).get('context_length')
+                if type(capacity) is not int or capacity <= 0: capacity = None
+                if store.authenticate(self.access_token) != self.identity:
+                    return self.respond(403, {'error': {'message': 'Accès désactivé.'}})
+                return self.respond(200, {'tokens': (characters + 2) // 3 + 6 * len(data['messages']),
+                                         'capacity': capacity, 'estimated': True, 'model': data['model'],
+                                         'scope': 'visible_history', 'agent_context': True})
             if store.hermes and not text_transform and self.path=='/v1/chat/completions':
                 request=self.headers.get('X-Qwen-Request') or turn or secrets.token_hex(16)
                 if turn and turn!=request:return self.respond(400,{'error':{'message':'Identité d’envoi incohérente.'}})
@@ -779,7 +813,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
             if self.path == '/v1/context':
                 # Use the backend tokenizer without starting an inference or joining its queue.
                 effort=data.get('reasoning_effort','none')
-                count_request={'model':data['model'],'messages':[],
+                count_request={'model':live_model or data['model'],'messages':[],
                                'output_config':{'effort':effort}}
                 if effort=='none':count_request['thinking']={'type':'disabled'}
                 systems=[];has_images=False
