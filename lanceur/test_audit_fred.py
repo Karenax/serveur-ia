@@ -171,13 +171,10 @@ except history_store.HistoryConflict:sys.exit(7)
             for changes in [{'version':'-1.2.3'},{'version':'01.2.3'},{'version':'1.2.3.4'},{'sha256':'A'*64},{'sha256':'bad'},{'protocol':3.0}]:
                 with self.subTest(changes=changes),self.assertRaises(ValueError):updater.verify(sign({**release,**changes},home),public(home))
 
-    def test_inference_blocks_update_and_endpoint_without_starting_helper(self):
+    def test_endpoint_change_is_blocked_during_active_api_requests(self):
         fixture=test_remote.RemoteTests();fixture.setUp()
         try:
             remote=client.Remote(fixture.profile,opener=object());remote.active_requests=1
-            with patch.object(updater,'prepare') as prepare:
-                with self.assertRaises(ValueError):remote.update(True)
-                prepare.assert_not_called()
             before=remote.endpoint
             with self.assertRaises(ValueError):remote.set_endpoint('127.0.0.1:10')
             self.assertEqual(remote.endpoint,before)

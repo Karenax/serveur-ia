@@ -8,6 +8,8 @@ import queue
 import re
 import secrets
 import socket
+import os
+import tempfile
 import subprocess
 import threading
 import psutil
@@ -85,7 +87,17 @@ class WireGuardAccess:
         self.vault_path=self.directory/'secrets.dpapi'
         self.lock=threading.RLock();self.engine=None
         if not self.settings_path.exists():write_json(self.settings_path,{'public_host':'','listen_port':UDP_PORT,'public_key':''})
+        self.store.on_access_changed = self.refresh_peers
         atexit.register(self.close)
+
+    def refresh_peers(self):
+        """Apply a policy immediately, closing the tunnel if updating it fails."""
+        with self.lock:
+            if self.engine and self.engine.running():
+                try:self.engine.update(self.peers())
+                except (ValueError, OSError):
+                    self.close()
+                    raise ValueError('Accès désactivé. Le tunnel a été arrêté car sa mise à jour a échoué ; réactivez WireGuard dans la console.')
 
     def settings(self):return read_json(self.settings_path)
     def vault(self):
@@ -109,10 +121,11 @@ class WireGuardAccess:
             self.store.configure({'enabled':self.store.metadata()['enabled'],'url':'wireguard://10.77.0.1:8766'})
             return self.status()
     def peers(self):
+        import time
         vault=self.vault()
         return [{'public_key':c['wireguard_public_key'],'address':c['address'],
                  'preshared_key':vault['peers'][c['id']]} for c in self.store.metadata()['clients']
-                if not c['revoked'] and c.get('wireguard_public_key') and c['id'] in vault['peers']]
+                if not c['revoked'] and not c.get('suspended') and (not c.get('expires_epoch') or c['expires_epoch']>time.time()) and c.get('wireguard_public_key') and c['id'] in vault['peers']]
     def new_peer(self,access):
         with self.lock:
             settings=validate_settings(self.settings());vault=self.vault()
@@ -137,8 +150,95 @@ class WireGuardAccess:
                     self.store.revoke(result['id'])
                     raise
             return {**result,'message':'EXE personnel prêt. Remettez-le à son destinataire : aucun login requis.'}
+
+    def create_android(self, name, model, owner='', kind='phone'):
+        """Issue a portable JSON profile without requiring a Windows release."""
+        from devices import fields
+        fields({'name':name, 'owner':owner, 'kind':kind})
+        with self.lock:
+            self.vault()
+            access=self.store.issue(name)
+            target=self.directory/'profils-restaures.dpapi'
+            temporary=None
+            try:
+                from signing import public
+                from profiles import match
+                profile={**self.new_peer(access), 'version':__import__('operations').VERSION,
+                         'protocol':3, 'update_public_key':public(self.home), 'client_name':access['name']}
+                if isinstance(model,str) and model:profile['model']=model
+                record=next(c for c in read_json(self.store.path)['clients'] if c['id']==access['id'])
+                match(record, profile, self.settings()['public_key'], self.vault()['peers'][access['id']])
+                raw=json.dumps(profile,ensure_ascii=False,indent=2).encode('utf-8')
+                if len(raw)>65536:raise ValueError('Le profil Android dépasse 64 Ko.')
+                profiles=json.loads(protect(target.read_bytes(),decrypt=True)) if target.exists() else {}
+                if not isinstance(profiles,dict):raise ValueError('Registre des profils personnels illisible.')
+                profiles[access['id']]=profile
+                descriptor,name=tempfile.mkstemp(prefix='android-',suffix='.tmp',dir=self.directory)
+                temporary=Path(name)
+                with os.fdopen(descriptor,'wb') as stream:
+                    stream.write(protect(json.dumps(profiles,ensure_ascii=False).encode('utf-8')));stream.flush();os.fsync(stream.fileno())
+                os.replace(temporary,target)
+                with self.store.lock:
+                    data=read_json(self.store.path)
+                    next(c for c in data['clients'] if c['id']==access['id'])['android_profile']=True
+                    write_json(self.store.path,data)
+                self.store.device({'id':access['id'],'owner':owner,'kind':kind})
+                self.refresh_peers()
+                self.store.audit('android_profile_created', access['id'])
+            except Exception:
+                self.store.revoke(access['id'])
+                raise
+            finally:
+                if temporary:temporary.unlink(missing_ok=True)
+            return {'id':access['id'],'name':access['name'],'download':'/api/remote/profile/'+access['id'],
+                    'message':'Profil Android personnel prêt. Importez ce fichier dans le téléphone ou la tablette.'}
+
+    def android_profile(self, identity):
+        """Admin-only download; never reveal an archived/revoked identity."""
+        import re
+        if not isinstance(identity,str) or not re.fullmatch('[0-9a-f]{16}',identity):
+            raise ValueError('Appareil inconnu.')
+        with self.lock, self.store.lock:
+            record=next((c for c in self.store.metadata()['clients'] if c['id']==identity and not c['revoked']),None)
+            path=self.directory/'profils-restaures.dpapi'
+            if record is None or not record.get('android_profile') or not path.is_file():
+                raise ValueError('Profil Android absent ou révoqué.')
+            profiles=json.loads(protect(path.read_bytes(),decrypt=True))
+            profile=profiles.get(identity)
+            raw_record=next(c for c in read_json(self.store.path)['clients'] if c['id']==identity)
+            from profiles import match
+            match(raw_record,profile,self.settings()['public_key'],self.vault()['peers'].get(identity))
+            profile={**profile,'client_name':record['name']}
+            raw=json.dumps(profile,ensure_ascii=False,indent=2).encode('utf-8')
+            if len(raw)>65536:raise ValueError('Profil Android trop volumineux.')
+            return raw
+
+    def replace(self, identity, model, platform='android', name=None, owner=None, kind=None):
+        if platform not in ('android','windows'):raise ValueError('Plateforme attendue : Android ou Windows.')
+        with self.lock:
+            old=next((c for c in self.store.metadata()['clients'] if c['id']==identity),None)
+            if old is None:raise ValueError('Appareil à remplacer inconnu.')
+            name=old['name'] if name is None else name
+            owner=old['device_owner'] if owner is None else owner
+            kind=('phone' if platform=='android' else 'pc') if kind is None else kind
+            from devices import fields
+            fields({'name':name,'owner':owner,'kind':kind})
+            result=self.create_android(name,model,owner,kind) if platform=='android' else self.create_client(name,model)
+            try:
+                if platform=='windows':self.store.device({'id':result['id'],'owner':owner,'kind':kind})
+                self.store.delete(identity)
+                self.store.audit('device_replaced', identity)
+            except Exception:
+                self.store.revoke(result['id'])
+                raise
+            return {**result,'replaces_id':identity,'message':'Nouvel accès créé ; ancien appareil révoqué et archivé. Ses conversations et fichiers restent conservés dans son espace distinct.'}
+
+    def policy(self, values):
+        with self.lock:
+            return self.store.policy(values)
     def activate(self,gateway_ready=True):
         with self.lock:
+            if self.store.maintenance:raise ValueError('Le serveur est en maintenance ; WireGuard ne peut pas être activé.')
             if not gateway_ready:raise ValueError('La passerelle IA locale ne fonctionne pas sur le port 8766.')
             settings=validate_settings(self.settings())
             if self.engine and self.engine.running():self.engine.update(self.peers())
@@ -150,12 +250,10 @@ class WireGuardAccess:
     def revoke(self,identity):
         with self.lock:
             self.store.revoke(identity)
-            if self.engine and self.engine.running():self.engine.update(self.peers())
             return {'message':'Accès personnel révoqué dans l’API et dans le tunnel WireGuard.'}
     def delete(self,identity):
         with self.lock:
             result=self.store.delete(identity)
-            if self.engine and self.engine.running():self.engine.update(self.peers())
             return result
     def deactivate(self):
         with self.lock:

@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "form": "phone",
+  "mode": "clear-read",
+  "checks": [
+    "synthetic fixture read state synchronized before system click test"
+  ],
+  "exceptions": 0,
+  "transport": "real Android WireGuard UDP",
+  "backend": "actual isolated Workspace and Notifications"
+}

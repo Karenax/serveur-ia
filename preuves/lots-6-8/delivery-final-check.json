@@ -1,0 +1,55 @@
+{
+  "created_at": "2026-10-10T23:33:39.941899+02:00",
+  "result": "PASS",
+  "regression_tests": 246,
+  "product_and_test_sources_match_frozen_run": true,
+  "research_tests": 94,
+  "targeted_notification_tests": {
+    "notifications/notifications-tests.json": 28,
+    "notifications/worker-recovery-tests.json": 11
+  },
+  "source_revocation_tests": 5,
+  "browser_scenarios": {
+    "client-ui/client-lots6-8-ui.json": 16,
+    "notifications/notifications-ui.json": 11
+  },
+  "windows": {
+    "version": "3.5.18",
+    "sha256": "6a1fb9951921db6082c48420fbee7a5d1b500697c5305101c8822502b7e6a153",
+    "bytes": 25594164,
+    "embedded_resources_match": true,
+    "signed_manifest_verified": true
+  },
+  "android": {
+    "version": "1.0.2",
+    "version_code": 3,
+    "sha256": "cf400128ca9714a84b57016daa3b4c339411dd7d86b2aaea2eff88a19abc6dd3",
+    "bytes": 8505669,
+    "certificate_sha256": "40216ff897090b49b21e3cda66169b9fb7070e42dd2b8cb9ebe0f2c441997048",
+    "packaged_assets_match": true,
+    "native_core_runs": 4,
+    "native_udp_runs": 2,
+    "webview_checks": 26,
+    "profile_preserved_upgrade": [
+      "phone 1.0.1 -> 1.0.2",
+      "tablet 1.0.1 -> 1.0.2"
+    ]
+  },
+  "live": {
+    "model_processes_preserved": true,
+    "existing_data_settings_access_keys_preserved": true,
+    "automatic_backups_preserved": true,
+    "model_loaded": true,
+    "maintenance_idle": true,
+    "console_static_assets_http_200": [
+      "/notifications.js",
+      "/notifications.css"
+    ],
+    "connected_notifications_no_external_push": true
+  },
+  "private_paths_ignored": true,
+  "private_acl_protected": true,
+  "documentation_links_existing": 101,
+  "git_diff_check": "PASS",
+  "contains_secret_values": false
+}

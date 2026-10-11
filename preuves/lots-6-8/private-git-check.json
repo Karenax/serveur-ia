@@ -1,0 +1,15 @@
+{
+  "checked_paths": [
+    "lanceur/sauvegardes/phrase-recuperation.txt",
+    "lanceur/sauvegardes/signatures-fred.fredkeys",
+    "lanceur/espaces-prives/espaces.sqlite3",
+    "lanceur/wireguard-prive/secrets.dpapi",
+    "lanceur/wireguard-prive/signature.dpapi",
+    "lanceur/acces-distants.json",
+    "lanceur/wireguard.json",
+    "lanceur/securite/generation.json",
+    "toolchain/android-signing"
+  ],
+  "all_private_paths_ignored": true,
+  "contains_secret_values": false
+}

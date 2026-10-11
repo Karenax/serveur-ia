@@ -1,0 +1,97 @@
+{
+  "passed": true,
+  "checked_at_utc": "2026-10-11T08:59:37.585138+00:00",
+  "artifacts": {
+    "client-qwen\\dist\\Accès serveur Fred.exe": {
+      "bytes": 31969815,
+      "sha256": "529f21aa22d14076e228f650d03e87751850641c0bd17aa52d80a9c3e83dea2d"
+    },
+    "client-android\\dist\\Acces-serveur-Fred-Android.apk": {
+      "bytes": 18886932,
+      "sha256": "18cfee473417fd2b178e2db500aefa0dfd873f4ea6d652a5af63d33854263f90"
+    }
+  },
+  "emulator_signed_upgrade": {
+    "emulator-5554": {
+      "passed": true,
+      "upgrade_to": "1.0.3",
+      "first_install_unchanged": true,
+      "uninstall_performed": false,
+      "installed_sha256": "18cfee473417fd2b178e2db500aefa0dfd873f4ea6d652a5af63d33854263f90"
+    },
+    "emulator-5556": {
+      "passed": true,
+      "upgrade_to": "1.0.3",
+      "first_install_unchanged": true,
+      "uninstall_performed": false,
+      "installed_sha256": "18cfee473417fd2b178e2db500aefa0dfd873f4ea6d652a5af63d33854263f90"
+    }
+  },
+  "emulator_installed_code": {
+    "emulator-5554": {
+      "classes.dex": true,
+      "lib/x86_64/libfredvoice.so": true,
+      "assets/voice/model.json": true,
+      "assets/android-chat.html": true
+    },
+    "emulator-5556": {
+      "classes.dex": true,
+      "lib/x86_64/libfredvoice.so": true,
+      "assets/voice/model.json": true,
+      "assets/android-chat.html": true
+    }
+  },
+  "android_elf_16k": true,
+  "production_model_processes_and_protected_files_unchanged": true,
+  "tests": {
+    "regressions.log": 246,
+    "delivery-targeted-tests.log": 15,
+    "service-tests.log": 8,
+    "http-tests.log": 3,
+    "android-python-tests.log": 13
+  },
+  "broad_regressions_before_final_css_and_version_metadata": true,
+  "final_css_native_ui_and_version_targeted_tests_passed": true,
+  "physical_android_tested": false,
+  "sources": {
+    "client-android\\app\\build.gradle": "436239053ca3f1425c4afe7315f3d01aff7e4e3c34bc267b068fb0d3e7b350c9",
+    "client-android\\app\\src\\main\\AndroidManifest.xml": "b6741760a15440c2d9661feeb3aa7bc19cb46592a78428d508f8ae27237a6380",
+    "client-android\\app\\src\\main\\java\\net\\karenax\\fred\\ClientBackend.java": "1e11a75dba0cad83212933029e3b14d3d2fcd8f63e78e3a7d23d5700254f1faa",
+    "client-android\\app\\src\\main\\java\\net\\karenax\\fred\\HistorySync.java": "37b957104f49eb38cb9455314dd5d86c31acb143bf0c11b4318eed91cb0a2bb9",
+    "client-android\\app\\src\\main\\java\\net\\karenax\\fred\\Json.java": "285774f246a2207874d7775724226d2705d3e9211d9fe0d8842495d1fec4b1ad",
+    "client-android\\app\\src\\main\\java\\net\\karenax\\fred\\LocalVoice.java": "6de1d18c900c45e7f7c482aa37c65ce205c7309f5585527ccc8d3dfce5bfda78",
+    "client-android\\app\\src\\main\\java\\net\\karenax\\fred\\LoopbackServer.java": "c88de974fdfe0023b9665cdb8659a2c59802cb6a7228bdd9406842fc0c9a2e6c",
+    "client-android\\app\\src\\main\\java\\net\\karenax\\fred\\MainActivity.java": "22a44472888b5429cf472e8b4503ab3d1ff44ff693049a8eeb17eb3bebb33e18",
+    "client-android\\app\\src\\main\\java\\net\\karenax\\fred\\NativeNotifications.java": "afa2da7d1a46d3bd95408632239052c2c77ce52de6de40f6f6993cdf4bc5b2dd",
+    "client-android\\app\\src\\main\\java\\net\\karenax\\fred\\Profile.java": "9f0dae3a66c37275b1a13e2da5b4eaeb4d3d58837deb00a2a57a319e3d266e73",
+    "client-android\\app\\src\\main\\java\\net\\karenax\\fred\\Remote.java": "a19b86701e9533a31b3fd5c0ba4de44487f1b6972547389d946ae3d43bbbf200",
+    "client-android\\app\\src\\main\\java\\net\\karenax\\fred\\SecureStore.java": "77d08d14c72e526b0fde3b751c549227fe8ced2e810d68ae51c694ab89d19114",
+    "client-android\\app\\src\\main\\java\\net\\karenax\\fred\\WireGuardBridge.java": "3e1fdc81db1b0b8174bfd27ea5a5c005703d1077e5c8e2d5e49818f04e835ae2",
+    "client-android\\Build-Android.ps1": "11a5bca40d61f1444d71086c9f849e6d1eb74f07713ee863d0914ac51913dfc8",
+    "client-android\\scripts\\Build-Voice-Android.ps1": "5771235cc6d6cad75358f14db333b4ffd321d6e70d794af159c5cab12b73d9bf",
+    "client-android\\scripts\\Prepare-Assets.py": "3618a0ee5594df52bc502d999db6139a1e4271f18a3a91da423700427fb127bd",
+    "client-android\\scripts\\Prepare-Licenses.py": "1459663b7cbd0ce0392e0e0608b8adef00e87612566897b77b9f11315a57cad4",
+    "client-qwen\\Build-Client.ps1": "93f33d9774c20536741ec0e65ac3d42388c9db53a4b4bdb5aa92764f85f869ec",
+    "client-qwen\\chat.html": "d14bb0817175b82bfbdf8d39e1ace5eed7322dd6de7ecedcfe4fb8b96b879d39",
+    "client-qwen\\client.py": "50727a5c5e303684edf23ed3041eaa0552bc313980e9ecf7a55b9c5dfa315d94",
+    "client-qwen\\local_voice.py": "d9f72ee989e2d8424a935d552c6c36ad3fdbc98cf3cc73ae39a120bd5ebf374c",
+    "client-qwen\\ui.css": "f6afac4b0bad5fe7d2d1f0f482ebffef4a1f31a1e3b27eef0ce344f2ef18da4a",
+    "client-qwen\\updater.py": "761724bfe10fd93beb5dd032f78cc6e87916fee8d1261747e341bffd97b2e2f8",
+    "client-qwen\\voice.js": "4e285ddec832c618a48537ffde282faf89b67baf49f7f422fffefaa37f5cdc79",
+    "client-voice\\Build-Voice.cmd": "2174ef21dc848eb68f3cc202c8188da89389badfb9614b7a61fc26b3227f3fe5",
+    "client-voice\\CMakeLists.txt": "3d774d29c01250a193b40e33e1d8ecca56fc376a4a9dd43e73001075c8a696ac",
+    "client-voice\\fred_voice.cpp": "71df9feaf1d5403b79fb1f9b7e7707fc94005fd13aab832c2253557364457102",
+    "client-voice\\fred_voice.h": "2a7eebbb3ed0370d2a3d346cb66e2b80778a1ec3f7e15995e9a26c5a3e3d5001",
+    "client-voice\\fred_voice_jni.cpp": "a59e127dbde4730e9554ecff090e62cb5a670718b3a84018cad5586c621f5d19",
+    "client-voice\\licenses\\ggml-LICENSE.txt": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d",
+    "client-voice\\licenses\\llamafile-LICENSE.txt": "903db391399dc8ad508cb5ee0ebc0bbd4bb6f1fb8bf9a06e1bcd1d7e3eccd2e4",
+    "client-voice\\licenses\\whisper-model-LICENSE.txt": "b5d65a59060e68c4ff940e1eddfa6f94b2d68fdf58ed7f4dd57721c997e35e9d",
+    "client-voice\\licenses\\whisper.cpp-LICENSE.txt": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d",
+    "client-voice\\model.json": "5dde5e5c0d565557189d8e81f261cd3e1588358e0d1906fb46aa97f53bbe0690",
+    "client-voice\\Prepare-Windows.ps1": "6a284e2a6fda7fd96b832cd3c50dca234655ea5f78a4918d672ac2887b8e59e3",
+    "client-voice\\prepare_model.py": "54224f6a77d4e8822ff82cec551ca7711e2cd535ed86807225f3915080883b40",
+    "client-voice\\test_http.py": "3222ead3a8708d53988ec910993aaa607c85c686129a0e2fd2ebdc0f30492965",
+    "client-voice\\test_service.py": "ad4632ec13716c6a004c87dd0e5b1a0ed480bc66d4333686c2998f90fef5cfb6",
+    "lanceur\\operations.py": "a3361e01b75c7be6a65b541ee7a4fc8a202a9576607d5ab89c0f1f6c4246ec8a"
+  }
+}

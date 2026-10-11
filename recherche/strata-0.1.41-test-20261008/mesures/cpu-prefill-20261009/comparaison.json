@@ -1,0 +1,107 @@
+{
+  "quality_pass": true,
+  "median_decode_ratio": 1.1335311572700297,
+  "min_document_prefill_ratio": 0.6388415672913118,
+  "acceptable": false,
+  "rows": [
+    {
+      "name": "r1-ciel",
+      "quality_pass": true,
+      "prompt_tokens": 40,
+      "production_ttft_s": 1.8356802000052994,
+      "cpu_ttft_s": 1.1514517999894451,
+      "production_prefill_tps": 22.3,
+      "cpu_prefill_tps": 35.9,
+      "prefill_ratio": 1.609865470852018,
+      "decode_ratio": 1.143884892086331
+    },
+    {
+      "name": "r1-fibonacci",
+      "quality_pass": true,
+      "prompt_tokens": 45,
+      "production_ttft_s": 1.860703400001512,
+      "cpu_ttft_s": 1.1580102000007173,
+      "production_prefill_tps": 24.8,
+      "cpu_prefill_tps": 40.2,
+      "prefill_ratio": 1.620967741935484,
+      "decode_ratio": 1.1875
+    },
+    {
+      "name": "r1-calcul",
+      "quality_pass": true,
+      "prompt_tokens": 58,
+      "production_ttft_s": 2.095109899993986,
+      "cpu_ttft_s": 1.244111799998791,
+      "production_prefill_tps": 28.3,
+      "cpu_prefill_tps": 48.1,
+      "prefill_ratio": 1.6996466431095407,
+      "decode_ratio": 1.7422222222222223
+    },
+    {
+      "name": "r2-ciel",
+      "quality_pass": true,
+      "prompt_tokens": 40,
+      "production_ttft_s": 1.900311999997939,
+      "cpu_ttft_s": 1.1333796999970218,
+      "production_prefill_tps": 21.5,
+      "cpu_prefill_tps": 36.4,
+      "prefill_ratio": 1.6930232558139535,
+      "decode_ratio": 1.179930795847751
+    },
+    {
+      "name": "r2-fibonacci",
+      "quality_pass": true,
+      "prompt_tokens": 45,
+      "production_ttft_s": 1.8494118999951752,
+      "cpu_ttft_s": 1.1548895000014454,
+      "production_prefill_tps": 24.9,
+      "cpu_prefill_tps": 40.3,
+      "prefill_ratio": 1.6184738955823292,
+      "decode_ratio": 1.1198830409356724
+    },
+    {
+      "name": "r2-calcul",
+      "quality_pass": true,
+      "prompt_tokens": 58,
+      "production_ttft_s": 2.0713342999952147,
+      "cpu_ttft_s": 1.2453581000008853,
+      "production_prefill_tps": 28.6,
+      "cpu_prefill_tps": 48.2,
+      "prefill_ratio": 1.6853146853146854,
+      "decode_ratio": 1.0972644376899696
+    },
+    {
+      "name": "dossier-64",
+      "quality_pass": true,
+      "prompt_tokens": 1534,
+      "production_ttft_s": 7.625038199999835,
+      "cpu_ttft_s": 7.12117080000462,
+      "production_prefill_tps": 202.5,
+      "cpu_prefill_tps": 216.6,
+      "prefill_ratio": 1.0696296296296297,
+      "decode_ratio": 1.1335311572700297
+    },
+    {
+      "name": "dossier-256",
+      "quality_pass": true,
+      "prompt_tokens": 5950,
+      "production_ttft_s": 17.857718799990835,
+      "cpu_ttft_s": 18.53576030000113,
+      "production_prefill_tps": 334.5,
+      "cpu_prefill_tps": 321.8,
+      "prefill_ratio": 0.9620328849028401,
+      "decode_ratio": 1.0825958702064897
+    },
+    {
+      "name": "dossier-1024",
+      "quality_pass": true,
+      "prompt_tokens": 23614,
+      "production_ttft_s": 67.19158730001072,
+      "cpu_ttft_s": 105.00357500000973,
+      "production_prefill_tps": 352.2,
+      "cpu_prefill_tps": 225.0,
+      "prefill_ratio": 0.6388415672913118,
+      "decode_ratio": 1.0969696969696972
+    }
+  ]
+}

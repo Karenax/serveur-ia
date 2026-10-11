@@ -1,0 +1,21 @@
+{
+  "version": "3.5.10",
+  "releaseVerified": true,
+  "nativeUi": {
+    "ok": true,
+    "title": "Accès serveur Fred",
+    "login": true,
+    "update": true,
+    "chat": true,
+    "state": "EXE personnel · connexion automatique",
+    "history": true,
+    "projects": true,
+    "tasks": true,
+    "assistants": false,
+    "textSelection": "text",
+    "copySelection": true
+  },
+  "tests": "10 tests Python et test JS de mise à jour pendant une génération réussis",
+  "exe": "Accès serveur Fred v3.5.10 - Fred.exe",
+  "sha256": "dd4548da427afb0bc5fb995722157a22661eebd3726dcf7ae7b523935c890020"
+}

@@ -1,0 +1,93 @@
+{
+  "synthetic_only": true,
+  "checks": [
+    "owner_isolation",
+    "project_personal_isolation",
+    "all_french_expected_top_scores",
+    "qwen_context_contains_exact_sources",
+    "worker_process_stops_with_service",
+    "lexical_fallback_when_engine_stopped"
+  ],
+  "load_seconds": 13.203000000001339,
+  "engine": {
+    "model": "EmbeddingGemma 2",
+    "engine": "Sentence Transformers / PyTorch",
+    "enabled": true,
+    "status": "pret",
+    "error": "",
+    "device": "cpu",
+    "precision": "float32",
+    "threads": 2,
+    "dimensions": 768,
+    "pid": 17988,
+    "last_seconds": null,
+    "parameters": 271002624
+  },
+  "rss_mib": 1670.77734375,
+  "index_seconds": 0.6869999999980791,
+  "index": {
+    "indexed": 8,
+    "pending": 0,
+    "entries": 8,
+    "personal": 1,
+    "project": 7,
+    "limited": false,
+    "max_entries": 16000,
+    "max_owner_entries": 4000,
+    "last_sync": 1791711742.6147482,
+    "error": "",
+    "reconstructible": true
+  },
+  "questions": [
+    {
+      "question": "Combien de temps garde-t-on les copies de secours ?",
+      "expected_top": true,
+      "expected_score": 0.7347979177205246,
+      "next_score": 0.6387955435697199,
+      "retrieved_expected": true,
+      "results": 1
+    },
+    {
+      "question": "À quelle date change-t-on les roues pour la saison froide ?",
+      "expected_top": true,
+      "expected_score": 0.7538655164308905,
+      "next_score": 0.59746253321333,
+      "retrieved_expected": true,
+      "results": 1
+    },
+    {
+      "question": "Qui est responsable des travaux ?",
+      "expected_top": true,
+      "expected_score": 0.7704204502895763,
+      "next_score": 0.65044719163003,
+      "retrieved_expected": true,
+      "results": 1
+    },
+    {
+      "question": "Quand recevra-t-on le paquet ?",
+      "expected_top": true,
+      "expected_score": 0.7653174537653873,
+      "next_score": 0.6391624163848854,
+      "retrieved_expected": true,
+      "results": 1
+    },
+    {
+      "question": "Quel numéro de port utilise le service atelier ?",
+      "expected_top": true,
+      "expected_score": 0.8302062632728203,
+      "next_score": 0.6190464566096958,
+      "retrieved_expected": true,
+      "results": 1
+    },
+    {
+      "question": "Quelle somme a été autorisée pour rénover ?",
+      "expected_top": true,
+      "expected_score": 0.8127381264793874,
+      "next_score": 0.5872409389135503,
+      "retrieved_expected": true,
+      "results": 1
+    }
+  ],
+  "personal_retrieval": true,
+  "passed": true
+}

@@ -1,0 +1,13 @@
+{
+  "format": 1,
+  "engine": "whisper.cpp",
+  "engine_version": "1.9.5",
+  "engine_commit": "d1be6fde11ac6e0407606b4e42fe72d34add8037",
+  "model": "small",
+  "language": "fr",
+  "bytes": 487601967,
+  "sha256": "1be3a9b2063867b937e64e2ec7483364a79917e157fa98c5d94b5c1fffea987b",
+  "url": "https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/ggml-small.bin",
+  "license": "MIT",
+  "source": "https://github.com/ggml-org/whisper.cpp/releases/tag/v1.9.5"
+}

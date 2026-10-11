@@ -1,0 +1,179 @@
+{
+  "format": 1,
+  "components": [
+    {
+      "name": "Accès serveur Fred",
+      "license_files": [
+        "application/LICENSE.txt"
+      ]
+    },
+    {
+      "name": "Go runtime",
+      "version": "go1.27.1",
+      "license_files": [
+        "go/LICENSE"
+      ]
+    },
+    {
+      "name": "markdown-it",
+      "version": "15.0.2",
+      "license_files": [
+        "markdown-it/LICENSE.txt"
+      ]
+    },
+    {
+      "name": "whisper.cpp",
+      "version": "1.9.5",
+      "license_files": [
+        "whisper/whisper.cpp-LICENSE.txt"
+      ]
+    },
+    {
+      "name": "ggml",
+      "version": "1.9.5",
+      "license_files": [
+        "whisper/ggml-LICENSE.txt"
+      ]
+    },
+    {
+      "name": "whisper-model",
+      "version": "small",
+      "license_files": [
+        "whisper/whisper-model-LICENSE.txt"
+      ]
+    },
+    {
+      "name": "llamafile",
+      "version": "1.9.5",
+      "license_files": [
+        "whisper/llamafile-LICENSE.txt"
+      ]
+    },
+    {
+      "name": "github.com/google/btree",
+      "version": "v1.1.2",
+      "license_files": [
+        "modules/github.com/google/btree/LICENSE"
+      ],
+      "android_binary_dependency": true
+    },
+    {
+      "name": "golang.org/x/crypto",
+      "version": "v0.37.0",
+      "license_files": [
+        "modules/golang.org/x/crypto/LICENSE"
+      ],
+      "android_binary_dependency": true
+    },
+    {
+      "name": "golang.org/x/net",
+      "version": "v0.39.0",
+      "license_files": [
+        "modules/golang.org/x/net/LICENSE"
+      ],
+      "android_binary_dependency": true
+    },
+    {
+      "name": "golang.org/x/sys",
+      "version": "v0.32.0",
+      "license_files": [
+        "modules/golang.org/x/sys/LICENSE"
+      ],
+      "android_binary_dependency": true
+    },
+    {
+      "name": "golang.org/x/time",
+      "version": "v0.7.0",
+      "license_files": [
+        "modules/golang.org/x/time/LICENSE"
+      ],
+      "android_binary_dependency": true
+    },
+    {
+      "name": "golang.zx2c4.com/wintun",
+      "version": "v0.0.0-20230126152724-0fa3db229ce2",
+      "license_files": [
+        "modules/golang.zx2c4.com/wintun/LICENSE"
+      ],
+      "android_binary_dependency": false
+    },
+    {
+      "name": "golang.zx2c4.com/wireguard",
+      "version": "v0.0.0-20260522210424-ecfc5a8d5446",
+      "license_files": [
+        "modules/golang.zx2c4.com/wireguard/LICENSE"
+      ],
+      "android_binary_dependency": true
+    },
+    {
+      "name": "gvisor.dev/gvisor",
+      "version": "v0.0.0-20250503011706-39ed1f5ac29c",
+      "license_files": [
+        "modules/gvisor.dev/gvisor/LICENSE"
+      ],
+      "android_binary_dependency": true
+    }
+  ],
+  "files": {
+    "application/LICENSE.txt": {
+      "sha256": "a8c0ece200113587f8ce377f023e8221f7568aaed96b8aee8a53434bfed1292b",
+      "bytes": 1082
+    },
+    "go/LICENSE": {
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad",
+      "bytes": 1453
+    },
+    "markdown-it/LICENSE.txt": {
+      "sha256": "792c48c5a849a15fdf9e37e8bcf9e6d1dd13b32b46c642a748a0a46a9919d473",
+      "bytes": 1073
+    },
+    "modules/github.com/google/btree/LICENSE": {
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "bytes": 11358
+    },
+    "modules/golang.org/x/crypto/LICENSE": {
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad",
+      "bytes": 1453
+    },
+    "modules/golang.org/x/net/LICENSE": {
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad",
+      "bytes": 1453
+    },
+    "modules/golang.org/x/sys/LICENSE": {
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad",
+      "bytes": 1453
+    },
+    "modules/golang.org/x/time/LICENSE": {
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad",
+      "bytes": 1453
+    },
+    "modules/golang.zx2c4.com/wintun/LICENSE": {
+      "sha256": "91276db973f25602d1aa43491f59cbc84cb88e6f151e1d0cc82a755563ce0195",
+      "bytes": 1023
+    },
+    "modules/golang.zx2c4.com/wireguard/LICENSE": {
+      "sha256": "91276db973f25602d1aa43491f59cbc84cb88e6f151e1d0cc82a755563ce0195",
+      "bytes": 1023
+    },
+    "modules/gvisor.dev/gvisor/LICENSE": {
+      "sha256": "5af94223052169198cfa2195455b7d87209d9aa0fff4705822f328b4b272facb",
+      "bytes": 12519
+    },
+    "whisper/ggml-LICENSE.txt": {
+      "sha256": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d",
+      "bytes": 1078
+    },
+    "whisper/llamafile-LICENSE.txt": {
+      "sha256": "903db391399dc8ad508cb5ee0ebc0bbd4bb6f1fb8bf9a06e1bcd1d7e3eccd2e4",
+      "bytes": 1079
+    },
+    "whisper/whisper-model-LICENSE.txt": {
+      "sha256": "b5d65a59060e68c4ff940e1eddfa6f94b2d68fdf58ed7f4dd57721c997e35e9d",
+      "bytes": 1063
+    },
+    "whisper/whisper.cpp-LICENSE.txt": {
+      "sha256": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d",
+      "bytes": 1078
+    }
+  }
+}

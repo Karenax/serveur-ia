@@ -1,0 +1,458 @@
+{
+  "version": "3.5.9",
+  "responsive": [
+    {
+      "page": "Projet Documents",
+      "width": 1920,
+      "geometry": {
+        "body": 1920,
+        "overflow": [],
+        "viewport": 1920
+      }
+    },
+    {
+      "page": "Projet Discussions",
+      "width": 1920,
+      "geometry": {
+        "body": 1920,
+        "overflow": [],
+        "viewport": 1920
+      }
+    },
+    {
+      "page": "Projet Mémoire",
+      "width": 1920,
+      "geometry": {
+        "body": 1920,
+        "overflow": [],
+        "viewport": 1920
+      }
+    },
+    {
+      "page": "Projet Consignes",
+      "width": 1920,
+      "geometry": {
+        "body": 1920,
+        "overflow": [],
+        "viewport": 1920
+      }
+    },
+    {
+      "page": "Projet Documents",
+      "width": 1280,
+      "geometry": {
+        "body": 1280,
+        "overflow": [],
+        "viewport": 1280
+      }
+    },
+    {
+      "page": "Projet Discussions",
+      "width": 1280,
+      "geometry": {
+        "body": 1280,
+        "overflow": [],
+        "viewport": 1280
+      }
+    },
+    {
+      "page": "Projet Mémoire",
+      "width": 1280,
+      "geometry": {
+        "body": 1280,
+        "overflow": [],
+        "viewport": 1280
+      }
+    },
+    {
+      "page": "Projet Consignes",
+      "width": 1280,
+      "geometry": {
+        "body": 1280,
+        "overflow": [],
+        "viewport": 1280
+      }
+    },
+    {
+      "page": "Projet Documents",
+      "width": 640,
+      "geometry": {
+        "body": 640,
+        "overflow": [],
+        "viewport": 640
+      }
+    },
+    {
+      "page": "Projet Discussions",
+      "width": 640,
+      "geometry": {
+        "body": 640,
+        "overflow": [],
+        "viewport": 640
+      }
+    },
+    {
+      "page": "Projet Mémoire",
+      "width": 640,
+      "geometry": {
+        "body": 640,
+        "overflow": [],
+        "viewport": 640
+      }
+    },
+    {
+      "page": "Projet Consignes",
+      "width": 640,
+      "geometry": {
+        "body": 640,
+        "overflow": [],
+        "viewport": 640
+      }
+    },
+    {
+      "page": "Projet Documents",
+      "width": 390,
+      "geometry": {
+        "body": 390,
+        "overflow": [],
+        "viewport": 390
+      }
+    },
+    {
+      "page": "Projet Discussions",
+      "width": 390,
+      "geometry": {
+        "body": 390,
+        "overflow": [],
+        "viewport": 390
+      }
+    },
+    {
+      "page": "Projet Mémoire",
+      "width": 390,
+      "geometry": {
+        "body": 390,
+        "overflow": [],
+        "viewport": 390
+      }
+    },
+    {
+      "page": "Projet Consignes",
+      "width": 390,
+      "geometry": {
+        "body": 390,
+        "overflow": [],
+        "viewport": 390
+      }
+    },
+    {
+      "page": "Tâches formulaire et résultat",
+      "width": 1920,
+      "geometry": {
+        "body": 1920,
+        "overflow": [],
+        "viewport": 1920
+      }
+    },
+    {
+      "page": "Tâches formulaire et résultat",
+      "width": 1280,
+      "geometry": {
+        "body": 1280,
+        "overflow": [],
+        "viewport": 1280
+      }
+    },
+    {
+      "page": "Tâches formulaire et résultat",
+      "width": 640,
+      "geometry": {
+        "body": 640,
+        "overflow": [],
+        "viewport": 640
+      }
+    },
+    {
+      "page": "Tâches formulaire et résultat",
+      "width": 390,
+      "geometry": {
+        "body": 390,
+        "overflow": [],
+        "viewport": 390
+      }
+    },
+    {
+      "page": "Réglages Mon accès personnel",
+      "width": 1920,
+      "geometry": {
+        "body": 1920,
+        "overflow": [],
+        "viewport": 1920
+      }
+    },
+    {
+      "page": "Réglages Mon accès personnel",
+      "width": 1280,
+      "geometry": {
+        "body": 1280,
+        "overflow": [],
+        "viewport": 1280
+      }
+    },
+    {
+      "page": "Réglages Mon accès personnel",
+      "width": 640,
+      "geometry": {
+        "body": 640,
+        "overflow": [],
+        "viewport": 640
+      }
+    },
+    {
+      "page": "Réglages Mon accès personnel",
+      "width": 390,
+      "geometry": {
+        "body": 390,
+        "overflow": [],
+        "viewport": 390
+      }
+    },
+    {
+      "page": "Réglages Connexion au serveur",
+      "width": 1920,
+      "geometry": {
+        "body": 1920,
+        "overflow": [],
+        "viewport": 1920
+      }
+    },
+    {
+      "page": "Réglages Connexion au serveur",
+      "width": 1280,
+      "geometry": {
+        "body": 1280,
+        "overflow": [],
+        "viewport": 1280
+      }
+    },
+    {
+      "page": "Réglages Connexion au serveur",
+      "width": 640,
+      "geometry": {
+        "body": 640,
+        "overflow": [],
+        "viewport": 640
+      }
+    },
+    {
+      "page": "Réglages Connexion au serveur",
+      "width": 390,
+      "geometry": {
+        "body": 390,
+        "overflow": [],
+        "viewport": 390
+      }
+    },
+    {
+      "page": "Réglages Mises à jour",
+      "width": 1920,
+      "geometry": {
+        "body": 1920,
+        "overflow": [],
+        "viewport": 1920
+      }
+    },
+    {
+      "page": "Réglages Mises à jour",
+      "width": 1280,
+      "geometry": {
+        "body": 1280,
+        "overflow": [],
+        "viewport": 1280
+      }
+    },
+    {
+      "page": "Réglages Mises à jour",
+      "width": 640,
+      "geometry": {
+        "body": 640,
+        "overflow": [],
+        "viewport": 640
+      }
+    },
+    {
+      "page": "Réglages Mises à jour",
+      "width": 390,
+      "geometry": {
+        "body": 390,
+        "overflow": [],
+        "viewport": 390
+      }
+    },
+    {
+      "page": "Réglages API locale",
+      "width": 1920,
+      "geometry": {
+        "body": 1920,
+        "overflow": [],
+        "viewport": 1920
+      }
+    },
+    {
+      "page": "Réglages API locale",
+      "width": 1280,
+      "geometry": {
+        "body": 1280,
+        "overflow": [],
+        "viewport": 1280
+      }
+    },
+    {
+      "page": "Réglages API locale",
+      "width": 640,
+      "geometry": {
+        "body": 640,
+        "overflow": [],
+        "viewport": 640
+      }
+    },
+    {
+      "page": "Réglages API locale",
+      "width": 390,
+      "geometry": {
+        "body": 390,
+        "overflow": [],
+        "viewport": 390
+      }
+    },
+    {
+      "page": "Conversation avec messages",
+      "width": 1920,
+      "geometry": {
+        "body": 1920,
+        "overflow": [],
+        "viewport": 1920
+      }
+    },
+    {
+      "page": "Conversation avec messages",
+      "width": 1280,
+      "geometry": {
+        "body": 1280,
+        "overflow": [],
+        "viewport": 1280
+      }
+    },
+    {
+      "page": "Conversation avec messages",
+      "width": 640,
+      "geometry": {
+        "body": 640,
+        "overflow": [],
+        "viewport": 640
+      }
+    },
+    {
+      "page": "Conversation avec messages",
+      "width": 390,
+      "geometry": {
+        "body": 390,
+        "overflow": [],
+        "viewport": 390
+      }
+    },
+    {
+      "page": "Document outils ouverts",
+      "width": 1280,
+      "geometry": {
+        "body": 1280,
+        "overflow": [],
+        "viewport": 1280
+      }
+    },
+    {
+      "page": "Document outils ouverts",
+      "width": 640,
+      "geometry": {
+        "body": 640,
+        "overflow": [],
+        "viewport": 640
+      }
+    },
+    {
+      "page": "Document outils ouverts",
+      "width": 390,
+      "geometry": {
+        "body": 390,
+        "overflow": [],
+        "viewport": 390
+      }
+    },
+    {
+      "page": "Correcteur avec commande de copie",
+      "width": 1920,
+      "geometry": {
+        "body": 1920,
+        "overflow": [],
+        "viewport": 1920
+      }
+    },
+    {
+      "page": "Correcteur avec commande de copie",
+      "width": 1280,
+      "geometry": {
+        "body": 1280,
+        "overflow": [],
+        "viewport": 1280
+      }
+    },
+    {
+      "page": "Correcteur avec commande de copie",
+      "width": 640,
+      "geometry": {
+        "body": 640,
+        "overflow": [],
+        "viewport": 640
+      }
+    },
+    {
+      "page": "Correcteur avec commande de copie",
+      "width": 390,
+      "geometry": {
+        "body": 390,
+        "overflow": [],
+        "viewport": 390
+      }
+    }
+  ],
+  "copyChecks": [
+    "Texte affiché : Ctrl+C puis Ctrl+V, identiques",
+    "Contenu du document : Ctrl+A puis Ctrl+C",
+    "Nom de projet : Ctrl+A puis Ctrl+C",
+    "Mémoire du projet : Ctrl+A puis Ctrl+C",
+    "Résultat de tâche : sélection et Ctrl+C",
+    "Adresse API locale : sélection et Ctrl+C",
+    "Réponse du chat : bouton global et Ctrl+C",
+    "Correcteur pendant la génération : champ readonly, non désactivé, Ctrl+A et Ctrl+C",
+    "Clic droit > Copier la sélection : confirmation affichée"
+  ],
+  "preview": "isolated",
+  "nativeUi": {
+    "ok": true,
+    "title": "Accès serveur Fred",
+    "login": true,
+    "update": true,
+    "chat": true,
+    "state": "EXE personnel · connexion automatique",
+    "history": true,
+    "projects": true,
+    "tasks": true,
+    "assistants": false,
+    "textSelection": "text",
+    "copySelection": true
+  },
+  "exeSelfTest": "Accès serveur Fred self-test OK",
+  "releaseVerified": true,
+  "exe": "Accès serveur Fred v3.5.9 - Fred.exe",
+  "exeSha256": "ef23d5ab0a2f7830d28037d11e20d38d9d97519c650bdac096dbac0aefe3e51d"
+}

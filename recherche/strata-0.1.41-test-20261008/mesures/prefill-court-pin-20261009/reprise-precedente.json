@@ -1,0 +1,47 @@
+{
+  "verified_at": "2026-10-09T18:58:01+0200",
+  "health": {
+    "status": "ok",
+    "max_context": 262144,
+    "model": "qwen3.8-flash-next-iq4-xs",
+    "images": false,
+    "api_key": false,
+    "loaded": true,
+    "service": "strata"
+  },
+  "session_status": "pret",
+  "engine_version": "0.1.35",
+  "engine_pid": 13576,
+  "engine_exe": "D:\\Serveur IA\\strata-build-p100\\strata.exe",
+  "production_files": [
+    {
+      "path": "D:\\Serveur IA\\lanceur\\reglages.json",
+      "unchanged": true
+    },
+    {
+      "path": "D:\\Serveur IA\\lanceur\\base-strata.json",
+      "unchanged": true
+    },
+    {
+      "path": "D:\\Serveur IA\\strata-iq4-p100-hybride.json",
+      "unchanged": true
+    },
+    {
+      "path": "D:\\Serveur IA\\strata-build-p100\\strata.exe",
+      "unchanged": true
+    },
+    {
+      "path": "D:\\Serveur IA\\lanceur\\sessions\\20261008-200015-679575\\strata.json",
+      "unchanged": true
+    }
+  ],
+  "test_port_closed": true,
+  "inference": {
+    "passed": true,
+    "answer": "{\n  \"resultat\": 301\n}",
+    "elapsed_s": 2.187999999994645
+  },
+  "launcher_health": {
+    "service": "qwen-launcher"
+  }
+}

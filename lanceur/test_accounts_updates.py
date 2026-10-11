@@ -152,8 +152,8 @@ class AccountsTests(unittest.TestCase):
                 fail_startup[0]=False;plan.write_bytes(plan_blob);shutil.copyfile(source,payload)
                 updater.apply(plan,protect,lambda:profile)
             import releases
-            renamed=target
-            self.assertTrue(target.exists())
+            renamed=home/updater.client_filename(updater.VERSION,'Fred')
+            self.assertFalse(target.exists())
             installed=releases.profile(renamed)
             self.assertEqual(installed['wireguard'],profile['wireguard']);self.assertEqual(installed['token'],profile['token'])
             self.assertEqual(installed['version'],updater.VERSION)
@@ -162,7 +162,7 @@ class AccountsTests(unittest.TestCase):
             self.assertEqual([p.name for p in backups],[target.name])
             self.assertEqual(hashlib.sha256(backups[0].read_bytes()).hexdigest(),old)
             self.assertFalse(plan.exists());self.assertTrue(read_json(home/'QwenClient-update-result.json')['ok'])
-            # A second update preserves the filename and archives the current version.
+            # A second update uses the new version and the registered client name.
             next_version='.'.join(map(str,(*updater.version(updater.VERSION)[:2],updater.version(updater.VERSION)[2]+1)))
             shutil.copyfile(source,payload)
             next_release=sign({'version':next_version,'protocol':3,'bytes':payload.stat().st_size,'sha256':hashlib.sha256(payload.read_bytes()).hexdigest()},home)
@@ -170,9 +170,9 @@ class AccountsTests(unittest.TestCase):
             plan.write_bytes(protect(json.dumps({'target':str(renamed.resolve()),'source':str(payload.resolve()),'profile':installed,'release':next_release,'pid':99999999,'created':0}).encode()))
             with patch.object(updater.sys,'executable',str(helper.resolve())),patch.object(updater.subprocess,'Popen',side_effect=test_launch),patch.object(updater.subprocess,'run',return_value=SimpleNamespace(returncode=0)):
                 updater.apply(plan,protect,lambda:installed)
-            self.assertTrue(renamed.exists())
-            self.assertEqual([p.name for p in home.glob('*.exe')],[target.name])
-            self.assertEqual(sorted(p.name for p in (home/'Sauvegardes client Fred').rglob('*.exe')),[target.name,target.name])
+            self.assertFalse(renamed.exists())
+            self.assertEqual([p.name for p in home.glob('*.exe')],[updater.client_filename(next_version,'Fred')])
+            self.assertEqual(sorted(p.name for p in (home/'Sauvegardes client Fred').rglob('*.exe')),sorted([target.name,renamed.name]))
 
 class AuthGatewayTests(unittest.TestCase):
     # Reuse the fixture, without inheriting and rerunning its full test suite.

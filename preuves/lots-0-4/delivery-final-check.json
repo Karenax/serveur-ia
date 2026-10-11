@@ -1,0 +1,26 @@
+{
+  "created_at": "2026-10-10T22:36:27.783641+02:00",
+  "result": "PASS",
+  "versions": {
+    "windows": "3.5.17",
+    "android": "1.0.1",
+    "android_version_code": 2,
+    "server": "3.5.17"
+  },
+  "artifacts_match_delivery_report": true,
+  "windows_manifest_matches": true,
+  "windows_sha256": "307f5e3bcce5e31617606c56e034636026707c16d4a26ccfd1316927a4d78738",
+  "existing_settings_access_keys_unchanged": true,
+  "model_process_identity_unchanged": true,
+  "loaded": true,
+  "automatic_backups_enabled": true,
+  "next_run": "2026-10-11T03:00:00+02:00",
+  "verified_backup_unchanged": true,
+  "private_permissions_verified": true,
+  "secret_paths_ignored_by_git": true,
+  "maintenance_active": false,
+  "full_regression": "PASS",
+  "full_regression_test_count": 191,
+  "product_sources_still_match_regression": true,
+  "model_still_loaded_after_full_suite": true
+}

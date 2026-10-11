@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "checks": [
+    "clients_show_distinct_server_paths",
+    "copy_exact_client_path",
+    "devices_show_client_path",
+    "selected_client_location",
+    "manual_sync",
+    "mobile_path_wrapping",
+    "admin_token_required"
+  ],
+  "errors": [],
+  "synthetic_only": true
+}

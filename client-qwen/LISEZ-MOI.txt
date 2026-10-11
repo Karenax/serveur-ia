@@ -1,4 +1,4 @@
-Accès serveur Fred — version 3.5.12
+Accès serveur Fred — version 3.5.21
 
 WireGuard utilise un emplacement permanent dans %LOCALAPPDATA%\AccesServeurFred\WireGuard.
 Windows conserve ainsi l'autorisation entre les lancements. Une première autorisation
@@ -91,7 +91,10 @@ restaurée si la nouvelle fenêtre ne confirme pas son démarrage. Une mise à j
 peut être lancée pendant une discussion ou une requête API : la génération est
 interrompue au redémarrage du client. Un changement d’adresse attend la fin des requêtes.
 Une mise à jour conserve le dossier de votre EXE et lui donne le nom normal
-« Accès serveur Fred vVERSION - nom du client.exe », comme un nouveau téléchargement.
+« Accès serveur Fred VERSION - NOM DU CLIENT.exe », comme un nouveau téléchargement.
+Le nom du client est celui enregistré dans l’interface d’administration lors de la création
+ou du dernier renommage. Exemple : « Accès serveur Fred 3.5.16 - Fred.exe ».
+La version correspond au binaire téléchargé ou installé.
 L’ancien EXE est conservé dans « Sauvegardes client Fred » pour le retour automatique
 en cas d’échec du démarrage. Les suffixes .previous ne sont plus ajoutés au nom.
 
@@ -138,3 +141,19 @@ suivent également la taille choisie.
 Version 3.5.8 : mise en page adaptative, correcteur utilisant la largeur et la
 hauteur disponibles, texte et résultat côte à côte sur grand écran et empilés
 sur petite fenêtre. La fenêtre initiale respecte la zone de travail de Windows.
+
+Version 3.5.21 : conversation vocale Windows. Installer la conversation une fois
+(environ 138 Mo), puis Conversation : parler, attendre la fin du tour, Fred répond
+à voix haute. Reprendre la parole interrompt la réponse ; Raccrocher ferme le
+microphone. La voix serveur se pilote dans Démarrage et surveillance.
+Guide et limites : ../client-voice/CONVERSATION-WINDOWS.md.
+
+Version 3.5.18 : sources consultables et notifications.
+Dans Projets, développez « Rechercher un passage dans les documents », puis
+cliquez « Ouvrir le passage cité » pour vérifier le texte exact, sa révision
+et sa page lorsqu'elle est connue. Une ancienne citation signale si le document
+a été modifié ou supprimé. Les résultats de tâches conservent leurs sources.
+La rubrique Notifications retrouve vos alertes de tâches et documents sur le
+serveur. Lecture, préférences par type et rattrapage sont synchronisés.
+Les sauvegardes du serveur incluent cette boîte. Voir le mode d'emploi
+../lanceur/RECHERCHE-NOTIFICATIONS.md et les preuves ../preuves/lots-6-8/VALIDATION.md.

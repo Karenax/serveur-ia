@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-10T23:24:09+0200",
+  "tests": 11,
+  "result": "PASS",
+  "duration_seconds": 7.554,
+  "failures": 0,
+  "errors": 0,
+  "production_data_used": false,
+  "source_unchanged": true,
+  "source_before": {
+    "lanceur/workspace.py": "f4f3a90f0723586b3b6f625bb5bfc893ec6a96b6b990fd7722f58dd46da57d68",
+    "lanceur/notifications.py": "a948d01c072f7dfd4eace6bc2bef08cb1c6db6efd89380e583cc0e11e4e8e7a9",
+    "lanceur/test_notifications_worker_recovery.py": "2463375da9a6f1487d72ff8cd1a4b1cee5503796b424c780248b082e333dc1fa"
+  },
+  "source_after": {
+    "lanceur/workspace.py": "f4f3a90f0723586b3b6f625bb5bfc893ec6a96b6b990fd7722f58dd46da57d68",
+    "lanceur/notifications.py": "a948d01c072f7dfd4eace6bc2bef08cb1c6db6efd89380e583cc0e11e4e8e7a9",
+    "lanceur/test_notifications_worker_recovery.py": "2463375da9a6f1487d72ff8cd1a4b1cee5503796b424c780248b082e333dc1fa"
+  }
+}

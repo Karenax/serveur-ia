@@ -1,0 +1,23 @@
+{
+  "old_console": {
+    "pid": 8224,
+    "created": 1791667550.7702224
+  },
+  "wireguard_children": [
+    {
+      "pid": 31664,
+      "created": 1791667551.8687866,
+      "name": "wireguard-bridge.exe"
+    }
+  ],
+  "models_untouched": [
+    {
+      "pid": 8200,
+      "created": 1791651021.7995121
+    },
+    {
+      "pid": 14628,
+      "created": 1791651021.777978
+    }
+  ]
+}

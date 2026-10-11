@@ -1,0 +1,8 @@
+/.venv/
+/engine-cuda12/
+/telechargements/
+/tokenizer/
+/donnees/
+/logs/
+/test-process.json
+/production-sauvegarde/

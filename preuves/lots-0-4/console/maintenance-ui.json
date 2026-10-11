@@ -1,0 +1,684 @@
+{
+  "fixture": true,
+  "liveDataUsed": false,
+  "date": "2026-10-10T19:57:29.685Z",
+  "checks": [
+    {
+      "name": "Navigation, catalogue et rendu sans erreur",
+      "passed": true
+    },
+    {
+      "name": "Brouillon de programmation conservé pendant les actualisations",
+      "passed": true
+    },
+    {
+      "name": "Configuration hebdomadaire, conservation et secret effacé",
+      "passed": true
+    },
+    {
+      "name": "Sauvegarde asynchrone suivie et archive vérifiée",
+      "passed": true
+    },
+    {
+      "name": "Phrase incorrecte refusée, aucune restauration proposée",
+      "passed": true
+    },
+    {
+      "name": "Aperçu vérifié et effets affichés",
+      "passed": true
+    },
+    {
+      "name": "Confirmation périmée : erreur visible, nouvelle vérification et restauration",
+      "passed": true
+    },
+    {
+      "name": "Inventaire du périmètre lisible",
+      "passed": true
+    },
+    {
+      "name": "Création d’un accès Android distinct",
+      "passed": true
+    },
+    {
+      "name": "Profil privé téléchargé avec token dans l’en-tête",
+      "passed": true
+    },
+    {
+      "name": "Métadonnées et filtres de propriétaire",
+      "passed": true
+    },
+    {
+      "name": "Suspension puis réactivation",
+      "passed": true
+    },
+    {
+      "name": "Remplacement avec révocation de l’ancien appareil",
+      "passed": true
+    },
+    {
+      "name": "Révocation définitive puis archive avec données conservées",
+      "passed": true
+    },
+    {
+      "name": "Téléphone : panneaux et dialogue sans débordement horizontal",
+      "passed": true
+    },
+    {
+      "name": "Aucune exception JavaScript",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "requests": [
+    {
+      "path": "/api/remote",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": false
+    },
+    {
+      "path": "/api/backups",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/settings",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": false
+    },
+    {
+      "path": "/api/defaults",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": false
+    },
+    {
+      "path": "/api/operations",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": false
+    },
+    {
+      "path": "/api/releases",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": false
+    },
+    {
+      "path": "/api/workspace",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": false
+    },
+    {
+      "path": "/api/maintenance",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/devices",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/remote",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": false
+    },
+    {
+      "path": "/api/state",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": false
+    },
+    {
+      "path": "/api/backups",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/maintenance",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/backups/configure",
+      "method": "POST",
+      "fields": [
+        "enabled",
+        "time",
+        "frequency",
+        "weekday",
+        "destination",
+        "secondary_destination",
+        "retention",
+        "password"
+      ],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/backups",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/maintenance",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/devices",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/backups/create",
+      "method": "POST",
+      "fields": [
+        "password"
+      ],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/backups",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/maintenance",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/devices",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/state",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": false
+    },
+    {
+      "path": "/api/backups",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/maintenance",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/backups",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/maintenance",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/backups/verify",
+      "method": "POST",
+      "fields": [
+        "id",
+        "password"
+      ],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/backups",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/maintenance",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/devices",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/backups/verify",
+      "method": "POST",
+      "fields": [
+        "id",
+        "password"
+      ],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/backups",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/maintenance",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/devices",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/backups/restore",
+      "method": "POST",
+      "fields": [
+        "id",
+        "password",
+        "restore_token",
+        "confirm"
+      ],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/backups",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/maintenance",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/devices",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/backups/verify",
+      "method": "POST",
+      "fields": [
+        "id",
+        "password"
+      ],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/backups",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/maintenance",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/devices",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/backups/restore",
+      "method": "POST",
+      "fields": [
+        "id",
+        "password",
+        "restore_token",
+        "confirm"
+      ],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/backups",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/maintenance",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/devices",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/state",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": false
+    },
+    {
+      "path": "/api/backups",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/maintenance",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/backups",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/maintenance",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/settings",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/defaults",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/remote",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": false
+    },
+    {
+      "path": "/api/inventory",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/devices",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/devices/create",
+      "method": "POST",
+      "fields": [
+        "platform",
+        "name",
+        "owner",
+        "kind"
+      ],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/backups",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/maintenance",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/devices",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/remote/profile/createdfixture",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/backups",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/maintenance",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/devices",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/devices/configure",
+      "method": "POST",
+      "fields": [
+        "id",
+        "name",
+        "owner",
+        "version",
+        "kind"
+      ],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/backups",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/maintenance",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/devices",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/remote/policy",
+      "method": "POST",
+      "fields": [
+        "id",
+        "suspended"
+      ],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/backups",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/maintenance",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/devices",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/remote/policy",
+      "method": "POST",
+      "fields": [
+        "id",
+        "suspended"
+      ],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/backups",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/maintenance",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/devices",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/devices/replace",
+      "method": "POST",
+      "fields": [
+        "id",
+        "platform",
+        "name",
+        "owner",
+        "kind"
+      ],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/backups",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/maintenance",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/devices",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/remote/revoke",
+      "method": "POST",
+      "fields": [
+        "id"
+      ],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/backups",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/maintenance",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/devices",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/remote/delete",
+      "method": "POST",
+      "fields": [
+        "id"
+      ],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/backups",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/maintenance",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/devices",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/remote",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": false
+    },
+    {
+      "path": "/api/state",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": false
+    },
+    {
+      "path": "/api/devices",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    },
+    {
+      "path": "/api/devices",
+      "method": "GET",
+      "fields": [],
+      "hasAuthorization": true
+    }
+  ],
+  "retainedDocuments": 1
+}

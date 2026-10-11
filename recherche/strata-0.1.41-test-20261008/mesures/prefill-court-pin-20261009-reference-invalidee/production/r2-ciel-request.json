@@ -1,0 +1,18 @@
+{
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Explique en français pourquoi le ciel est bleu, puis pourquoi il devient rouge au coucher du soleil. Donne une explication précise et accessible."
+    }
+  ],
+  "stream": true,
+  "temperature": 0,
+  "seed": 42,
+  "max_tokens": 192,
+  "cache_prompt": false,
+  "chat_template_kwargs": {
+    "enable_thinking": false
+  },
+  "reasoning_effort": "none"
+}

@@ -1,0 +1,14 @@
+{
+  "version": "3.5.11",
+  "file": "Accès serveur Fred v3.5.11 - Fred.exe",
+  "clientNameReturnedByServer": "Fred",
+  "sha256": "4e0ff54caa051ee5d5ebc22dd03ab04943587d5d0fcd3167e4f32320c5d42bbf",
+  "tests": [
+    "Renommage depuis un nom contenant plusieurs suffixes .previous",
+    "Deux mises à jour successives sans accumulation de suffixes",
+    "Retour automatique en cas d’échec de démarrage",
+    "Signature et identité personnelle conservées",
+    "Tests de gestion des clients",
+    "Démarrage EXE et interface WebView2"
+  ]
+}

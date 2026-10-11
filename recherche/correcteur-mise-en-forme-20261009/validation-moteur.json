@@ -1,0 +1,101 @@
+{
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "results": [
+    {
+      "mode": "correct",
+      "elapsed_s": 6.702999999994063,
+      "protocol_pass": true,
+      "issue": null,
+      "raw": "{\"fragments\":[{\"id\":\"f0\",\"text\":\"Bonjour,\"},{\"id\":\"f1\",\"text\":\"Je vous envoie les \"},{\"id\":\"f2\",\"text\":\"documents demandés\"},{\"id\":\"f3\",\"text\":\". Pouvez-vous confirmer leur réception ?\"},{\"id\":\"f4\",\"text\":\"Merci et bonne journée.\"}]}",
+      "parsed": {
+        "fragments": [
+          {
+            "id": "f0",
+            "text": "Bonjour,"
+          },
+          {
+            "id": "f1",
+            "text": "Je vous envoie les "
+          },
+          {
+            "id": "f2",
+            "text": "documents demandés"
+          },
+          {
+            "id": "f3",
+            "text": ". Pouvez-vous confirmer leur réception ?"
+          },
+          {
+            "id": "f4",
+            "text": "Merci et bonne journée."
+          }
+        ]
+      },
+      "finish": "stop"
+    },
+    {
+      "mode": "professional",
+      "elapsed_s": 8.625,
+      "protocol_pass": true,
+      "issue": null,
+      "raw": "{\n  \"fragments\": [\n    {\n      \"id\": \"f0\",\n      \"text\": \"Bonjour,\"\n    },\n    {\n      \"id\": \"f1\",\n      \"text\": \"Je vous envoie les \"\n    },\n    {\n      \"id\": \"f2\",\n      \"text\": \"documents demandés\"\n    },\n    {\n      \"id\": \"f3\",\n      \"text\": \". Pourriez-vous confirmer leur réception ?\"\n    },\n    {\n      \"id\": \"f4\",\n      \"text\": \"Merci et bonne journée.\"\n    }\n  ]\n}",
+      "parsed": {
+        "fragments": [
+          {
+            "id": "f0",
+            "text": "Bonjour,"
+          },
+          {
+            "id": "f1",
+            "text": "Je vous envoie les "
+          },
+          {
+            "id": "f2",
+            "text": "documents demandés"
+          },
+          {
+            "id": "f3",
+            "text": ". Pourriez-vous confirmer leur réception ?"
+          },
+          {
+            "id": "f4",
+            "text": "Merci et bonne journée."
+          }
+        ]
+      },
+      "finish": "stop"
+    },
+    {
+      "mode": "friendly",
+      "elapsed_s": 6.547000000005937,
+      "protocol_pass": true,
+      "issue": null,
+      "raw": "{\"fragments\":[{\"id\":\"f0\",\"text\":\"Bonjour,\"},{\"id\":\"f1\",\"text\":\"Je t'envoie les \"},{\"id\":\"f2\",\"text\":\"documents demandés\"},{\"id\":\"f3\",\"text\":\". Peux-tu confirmer leur réception ?\"},{\"id\":\"f4\",\"text\":\"Merci et bonne journée.\"}]}",
+      "parsed": {
+        "fragments": [
+          {
+            "id": "f0",
+            "text": "Bonjour,"
+          },
+          {
+            "id": "f1",
+            "text": "Je t'envoie les "
+          },
+          {
+            "id": "f2",
+            "text": "documents demandés"
+          },
+          {
+            "id": "f3",
+            "text": ". Peux-tu confirmer leur réception ?"
+          },
+          {
+            "id": "f4",
+            "text": "Merci et bonne journée."
+          }
+        ]
+      },
+      "finish": "stop"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+[
+  {
+    "name": "r1-ciel",
+    "cpu_seconds_during_prefill": 16.40625,
+    "wall_s": 1.0646107196807861,
+    "average_cpu_cores": 15.410562468241222
+  },
+  {
+    "name": "r1-fibonacci",
+    "cpu_seconds_during_prefill": 15.984375,
+    "wall_s": 1.0646369457244873,
+    "average_cpu_cores": 15.013921003016296
+  },
+  {
+    "name": "r1-calcul",
+    "cpu_seconds_during_prefill": 16.15625,
+    "wall_s": 1.0695958137512207,
+    "average_cpu_cores": 15.105004892771404
+  },
+  {
+    "name": "r2-ciel",
+    "cpu_seconds_during_prefill": 15.796875,
+    "wall_s": 1.0659971237182617,
+    "average_cpu_cores": 14.818872066839688
+  },
+  {
+    "name": "r2-fibonacci",
+    "cpu_seconds_during_prefill": 16.25,
+    "wall_s": 1.071422815322876,
+    "average_cpu_cores": 15.16674814797837
+  },
+  {
+    "name": "r2-calcul",
+    "cpu_seconds_during_prefill": 16.28125,
+    "wall_s": 1.0520703792572021,
+    "average_cpu_cores": 15.475438070497834
+  },
+  {
+    "name": "dossier-64",
+    "cpu_seconds_during_prefill": 44.390625,
+    "wall_s": 6.911500930786133,
+    "average_cpu_cores": 6.422718515781331
+  },
+  {
+    "name": "dossier-256",
+    "cpu_seconds_during_prefill": 163.4375,
+    "wall_s": 18.324530601501465,
+    "average_cpu_cores": 8.91905520278966
+  },
+  {
+    "name": "dossier-1024",
+    "cpu_seconds_during_prefill": 835.765625,
+    "wall_s": 105.00156807899475,
+    "average_cpu_cores": 7.959553750390061
+  }
+]

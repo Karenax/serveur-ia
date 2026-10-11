@@ -1,0 +1,51 @@
+{
+  "passed": true,
+  "fixture": "Synthetic French speech, Microsoft Hortense Desktop",
+  "audio_seconds": 10.05,
+  "model": "small multilingual",
+  "loading_seconds": 0.4530000000013388,
+  "progress": [
+    {
+      "seconds": 3,
+      "text": "Bonjour Fred, je souhaite préparer."
+    },
+    {
+      "seconds": 7,
+      "text": "Bonjour Fred. Je souhaite préparer une réunion demain matin. Ajoute les"
+    }
+  ],
+  "final": {
+    "phase": "ready",
+    "message": "Texte prêt. Corrigez-le puis envoyez votre message.",
+    "text": "Bonjour Fred. Je souhaite préparer une réunion demain matin. Ajoute les documents du projet et résume les décisions importantes.",
+    "seconds": 11,
+    "revision": 126,
+    "pending": 0,
+    "processing": false,
+    "inference_seconds": 7.87539
+  },
+  "silence": {
+    "phase": "ready",
+    "message": "Texte prêt. Corrigez-le puis envoyez votre message.",
+    "text": "",
+    "seconds": 0,
+    "revision": 4,
+    "pending": 0,
+    "processing": false,
+    "inference_seconds": 0
+  },
+  "cancel": {
+    "phase": "cancelled",
+    "message": "Dictée annulée.",
+    "text": "",
+    "seconds": 0,
+    "revision": 3,
+    "pending": 0,
+    "processing": false,
+    "inference_seconds": 0
+  },
+  "baseline_rss_bytes": 24006656,
+  "peak_rss_bytes": 703557632,
+  "released_rss_bytes": 30027776,
+  "capture": "WinMM microphone opened and closed"
+}

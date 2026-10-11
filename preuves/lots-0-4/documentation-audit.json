@@ -1,0 +1,36 @@
+{
+  "created_at": "2026-10-10T22:29:49.223191+02:00",
+  "result": "PASS",
+  "method": "Independent read-only review by console agent; no additional tests executed",
+  "documents_checked": [
+    "preuves/lots-0-4/VALIDATION.md",
+    "CONTEXTE-PROJET.md",
+    "PLAN-GLOBAL-SERVEUR-FRED.md",
+    "PLAN-SAUVEGARDES-APPAREILS.md",
+    "lanceur/SAUVEGARDES-APPAREILS.md",
+    "client-android/README.md",
+    "client-android/VALIDATION.md"
+  ],
+  "local_markdown_links_present": 91,
+  "console_sha256_checked": 17,
+  "windows_published_sha256": "307f5e3bcce5e31617606c56e034636026707c16d4a26ccfd1316927a4d78738",
+  "apk_sha256": "a0cdb80a49c892f38b647aaa6d300398cac53b1eee64727636594f0fb9bf5751",
+  "reviewed_logs": {
+    "backups": 38,
+    "signature_recovery": 11,
+    "restoration": 10,
+    "restoration_clients": 2,
+    "devices": 17,
+    "worker": 5,
+    "windows_update_compatibility": 2
+  },
+  "console_scenarios_pass": 32,
+  "console_javascript_errors": 0,
+  "native_phone_tablet": "Core, WireGuard UDP/SSE, device report: ALL CHECKS PASSED",
+  "findings_corrected": [
+    "Updated Windows artifact SHA and byte count",
+    "Updated global plan backup/device inventory rows",
+    "Marked 70-test run as intermediate validation"
+  ],
+  "full_suite_status": "Tracked separately in regressions-final.json"
+}

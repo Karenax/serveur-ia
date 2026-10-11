@@ -1,0 +1,9 @@
+C:\Users\karen\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\threading.py:299: ResourceWarning: unclosed <socket.socket [closed] fd=5544, family=2, type=1, proto=0>
+  def __enter__(self):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+----------------------------------------------------------------------
+
+VOLUME_PROOF {"document_count": 8, "original_bytes": 16777216, "archive_bytes": 30237247, "backup_seconds": 1.594, "restore_seconds": 5.062, "snapshot_lock_seconds": 0.172, "peak_rss_bytes": 367525888, "rss_increase_bytes": 299970560, "sha256_match": true}
+Ran 257 tests in 513.054s
+
+OK

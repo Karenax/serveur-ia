@@ -1,0 +1,31 @@
+{
+  "created_utc": "2026-10-10T20:01:20.4088028Z",
+  "scope": "Isolated Windows production client regression checks after 3.5.17 publication",
+  "binary": {
+    "file": "D:\\Serveur IA\\client-qwen\\dist\\Accès serveur Fred.exe",
+    "bytes": 25591089,
+    "sha256": "166bfcb7c358d589bc7bbde0060b7e4b29487396eff6fd191413376ff891f602"
+  },
+  "tests": [
+    {
+      "name": "test_accounts_updates.AccountsTests.test_helper_replaces_verified_exe_preserves_profile_and_keeps_previous",
+      "result": "PASS",
+      "elapsed_seconds": 33.372,
+      "log": "windows-update-helper-final.log"
+    },
+    {
+      "name": "test_audit_fred.AuditTests.test_inference_blocks_update_and_endpoint_without_starting_helper",
+      "result": "FAIL",
+      "elapsed_seconds": 20.081,
+      "log": "windows-inference-update-final.log",
+      "diagnosis": "Remote.update(apply=True) does not reject active_requests before launching its background worker; missing synchronous guard in client-qwen/client.py:189."
+    },
+    {
+      "name": "test_remote.RemoteTests.test_windows_protection_and_preconfigured_exe_startup",
+      "result": "PASS",
+      "elapsed_seconds": 9.534,
+      "log": "windows-profile-startup-final.log"
+    }
+  ],
+  "source_changes": "none"
+}

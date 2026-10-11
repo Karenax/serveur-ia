@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "checks": [
+    "direct_navigation",
+    "independent_engine_start",
+    "personal_memory_create",
+    "personal_search_isolation",
+    "project_search_isolation",
+    "engine_stop_and_lexical_fallback",
+    "navigation_between_views",
+    "admin_token_required"
+  ],
+  "errors": [],
+  "synthetic_only": true
+}

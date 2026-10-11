@@ -33,7 +33,8 @@ def profile(path):
         return json.loads(f.read(size))
 
 def download_name(path, name):
-    return 'Accès serveur Fred.exe'
+    from updater import client_filename
+    return client_filename(profile(path)['version'],name)
 
 def manifest(home=HOME):
     source=ROOT/'client-qwen/dist/Accès serveur Fred.exe'
@@ -88,7 +89,7 @@ def _repackage(home):
         values=profile(target) if target.exists() else restored.get(record['id'])
         if values is None:continue
         match(record,values,settings.get('public_key') or None,vault.get('peers',{}).get(record['id']))
-        values.update(version=VERSION,protocol=3,update_public_key=public(home),client_name=record['name'])
+        values.update(version=VERSION,protocol=3,update_public_key=public(home),client_name=record.get('name',values.get('client_name','Client')))
         selected.append((target,values))
     stage=Path(tempfile.mkdtemp(prefix='preparation-',dir=directory));prepared=[];committed=[]
     original_versions=read_json(home/'versions-clients.json',{})

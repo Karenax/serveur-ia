@@ -1,0 +1,159 @@
+{
+  "corrector": [
+    {
+      "input": [
+        748,
+        682
+      ],
+      "pageOverflow": false,
+      "paneOverflow": false,
+      "viewport": [
+        1920,
+        1080
+      ]
+    },
+    {
+      "canScroll": false,
+      "input": [
+        1068,
+        1042
+      ],
+      "layout": "two-columns",
+      "pageOverflow": false,
+      "paneOverflow": false,
+      "viewport": [
+        2560,
+        1440
+      ]
+    },
+    {
+      "canScroll": false,
+      "input": [
+        561,
+        476
+      ],
+      "layout": "two-columns",
+      "pageOverflow": false,
+      "paneOverflow": false,
+      "viewport": [
+        1536,
+        864
+      ]
+    },
+    {
+      "canScroll": false,
+      "input": [
+        441,
+        312
+      ],
+      "layout": "two-columns",
+      "pageOverflow": false,
+      "paneOverflow": false,
+      "viewport": [
+        1280,
+        720
+      ]
+    },
+    {
+      "canScroll": true,
+      "input": [
+        659,
+        274
+      ],
+      "layout": "stacked",
+      "pageOverflow": false,
+      "paneOverflow": false,
+      "viewport": [
+        960,
+        720
+      ]
+    },
+    {
+      "canScroll": true,
+      "input": [
+        572,
+        240
+      ],
+      "layout": "stacked",
+      "pageOverflow": false,
+      "paneOverflow": false,
+      "viewport": [
+        640,
+        480
+      ]
+    },
+    {
+      "canScroll": true,
+      "input": [
+        322,
+        321
+      ],
+      "layout": "stacked",
+      "pageOverflow": false,
+      "paneOverflow": false,
+      "viewport": [
+        390,
+        844
+      ]
+    }
+  ],
+  "desktopViews": [
+    {
+      "overflow": false,
+      "view": "Conversations",
+      "workspaceOverflow": false
+    },
+    {
+      "overflow": false,
+      "view": "Projets",
+      "workspaceOverflow": false
+    },
+    {
+      "overflow": false,
+      "view": "Tâches",
+      "workspaceOverflow": false
+    },
+    {
+      "overflow": false,
+      "view": "Réglages · Mon accès",
+      "workspaceOverflow": false
+    }
+  ],
+  "smallViews": [
+    {
+      "overflow": false,
+      "view": "Conversations",
+      "workspaceOverflow": false
+    },
+    {
+      "overflow": false,
+      "view": "Projets",
+      "workspaceOverflow": false
+    },
+    {
+      "overflow": false,
+      "view": "Tâches",
+      "workspaceOverflow": false
+    },
+    {
+      "overflow": false,
+      "view": "Réglages · Mon accès",
+      "workspaceOverflow": false
+    }
+  ],
+  "version": "3.5.8",
+  "native_ui": {
+    "ok": true,
+    "title": "Accès serveur Fred",
+    "login": true,
+    "update": true,
+    "chat": true,
+    "state": "EXE personnel · connexion automatique",
+    "history": true,
+    "projects": true,
+    "tasks": true,
+    "assistants": false
+  },
+  "release_verified": true,
+  "exe_sha256": "eb300a7b98fa3a4a95996f1345c44bb6a68bc56d9f6db8a470024bfca00132d4"
+}

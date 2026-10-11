@@ -1,0 +1,11 @@
+{
+  "console_reconnected": true,
+  "previous_pid": 23448,
+  "new_pid": 11844,
+  "engine_pid_unchanged": 26180,
+  "preserve_model_state": true,
+  "autoload_and_restart_settings": {
+    "autoload": true,
+    "restart": true
+  }
+}

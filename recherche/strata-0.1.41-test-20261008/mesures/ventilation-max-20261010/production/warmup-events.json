@@ -1,0 +1,202 @@
+[
+  {
+    "id": "chatcmpl-bc55315556544cc5995453a8",
+    "object": "chat.completion.chunk",
+    "created": 1791644249,
+    "model": "qwen3.8-flash-next-iq4-xs",
+    "choices": [
+      {
+        "index": 0,
+        "delta": {
+          "role": "assistant",
+          "content": ""
+        },
+        "finish_reason": null
+      }
+    ]
+  },
+  {
+    "id": "chatcmpl-bc55315556544cc5995453a8",
+    "object": "chat.completion.chunk",
+    "created": 1791644249,
+    "model": "qwen3.8-flash-next-iq4-xs",
+    "choices": [
+      {
+        "index": 0,
+        "delta": {
+          "content": "{"
+        },
+        "finish_reason": null
+      }
+    ]
+  },
+  {
+    "id": "chatcmpl-bc55315556544cc5995453a8",
+    "object": "chat.completion.chunk",
+    "created": 1791644249,
+    "model": "qwen3.8-flash-next-iq4-xs",
+    "choices": [
+      {
+        "index": 0,
+        "delta": {
+          "content": "\n "
+        },
+        "finish_reason": null
+      }
+    ]
+  },
+  {
+    "id": "chatcmpl-bc55315556544cc5995453a8",
+    "object": "chat.completion.chunk",
+    "created": 1791644249,
+    "model": "qwen3.8-flash-next-iq4-xs",
+    "choices": [
+      {
+        "index": 0,
+        "delta": {
+          "content": " \""
+        },
+        "finish_reason": null
+      }
+    ]
+  },
+  {
+    "id": "chatcmpl-bc55315556544cc5995453a8",
+    "object": "chat.completion.chunk",
+    "created": 1791644249,
+    "model": "qwen3.8-flash-next-iq4-xs",
+    "choices": [
+      {
+        "index": 0,
+        "delta": {
+          "content": "result"
+        },
+        "finish_reason": null
+      }
+    ]
+  },
+  {
+    "id": "chatcmpl-bc55315556544cc5995453a8",
+    "object": "chat.completion.chunk",
+    "created": 1791644249,
+    "model": "qwen3.8-flash-next-iq4-xs",
+    "choices": [
+      {
+        "index": 0,
+        "delta": {
+          "content": "at"
+        },
+        "finish_reason": null
+      }
+    ]
+  },
+  {
+    "id": "chatcmpl-bc55315556544cc5995453a8",
+    "object": "chat.completion.chunk",
+    "created": 1791644249,
+    "model": "qwen3.8-flash-next-iq4-xs",
+    "choices": [
+      {
+        "index": 0,
+        "delta": {
+          "content": "\":"
+        },
+        "finish_reason": null
+      }
+    ]
+  },
+  {
+    "id": "chatcmpl-bc55315556544cc5995453a8",
+    "object": "chat.completion.chunk",
+    "created": 1791644249,
+    "model": "qwen3.8-flash-next-iq4-xs",
+    "choices": [
+      {
+        "index": 0,
+        "delta": {
+          "content": " "
+        },
+        "finish_reason": null
+      }
+    ]
+  },
+  {
+    "id": "chatcmpl-bc55315556544cc5995453a8",
+    "object": "chat.completion.chunk",
+    "created": 1791644249,
+    "model": "qwen3.8-flash-next-iq4-xs",
+    "choices": [
+      {
+        "index": 0,
+        "delta": {
+          "content": "4"
+        },
+        "finish_reason": null
+      }
+    ]
+  },
+  {
+    "id": "chatcmpl-bc55315556544cc5995453a8",
+    "object": "chat.completion.chunk",
+    "created": 1791644249,
+    "model": "qwen3.8-flash-next-iq4-xs",
+    "choices": [
+      {
+        "index": 0,
+        "delta": {
+          "content": "2"
+        },
+        "finish_reason": null
+      }
+    ]
+  },
+  {
+    "id": "chatcmpl-bc55315556544cc5995453a8",
+    "object": "chat.completion.chunk",
+    "created": 1791644249,
+    "model": "qwen3.8-flash-next-iq4-xs",
+    "choices": [
+      {
+        "index": 0,
+        "delta": {
+          "content": "\n}"
+        },
+        "finish_reason": null
+      }
+    ]
+  },
+  {
+    "id": "chatcmpl-bc55315556544cc5995453a8",
+    "object": "chat.completion.chunk",
+    "created": 1791644249,
+    "model": "qwen3.8-flash-next-iq4-xs",
+    "choices": [
+      {
+        "index": 0,
+        "delta": {},
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 31,
+      "completion_tokens": 13,
+      "total_tokens": 44,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 31,
+      "prompt_ms": 1529.0,
+      "prompt_per_token_ms": 49.323,
+      "prompt_per_second": 20.3,
+      "predicted_n": 13,
+      "predicted_ms": 357.9,
+      "predicted_per_token_ms": 27.531,
+      "predicted_per_second": 36.3,
+      "draft_n": 8,
+      "draft_n_accepted": 8
+    }
+  }
+]

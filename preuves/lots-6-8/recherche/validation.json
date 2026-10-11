@@ -1,0 +1,86 @@
+{
+  "status": "PASS",
+  "tests_run": 94,
+  "failures": 0,
+  "errors": 0,
+  "seconds": 154.08023230000254,
+  "sources_before": {
+    "lanceur\\workspace.py": "f4f3a90f0723586b3b6f625bb5bfc893ec6a96b6b990fd7722f58dd46da57d68",
+    "lanceur\\notifications.py": "a948d01c072f7dfd4eace6bc2bef08cb1c6db6efd89380e583cc0e11e4e8e7a9",
+    "lanceur\\test_document_research.py": "472a0d4840f66e03f60e0d41a48bece10e4e64108809172df684da4baf6cdcbd"
+  },
+  "sources_after": {
+    "lanceur\\workspace.py": "f4f3a90f0723586b3b6f625bb5bfc893ec6a96b6b990fd7722f58dd46da57d68",
+    "lanceur\\notifications.py": "a948d01c072f7dfd4eace6bc2bef08cb1c6db6efd89380e583cc0e11e4e8e7a9",
+    "lanceur\\test_document_research.py": "472a0d4840f66e03f60e0d41a48bece10e4e64108809172df684da4baf6cdcbd"
+  },
+  "sources_unchanged": true,
+  "scope": "isolated temporary owners, SQLite, documents and server fixtures; no production access",
+  "measurement": {
+    "questions": [
+      {
+        "question": "Quel est le budget annuel validé pour 2027 ?",
+        "expected_answer": "42500",
+        "correct_document_at_rank_1": true,
+        "answer_in_literal_excerpt": true,
+        "no_invented_page": true,
+        "query_seconds": 0.005841499998496147
+      },
+      {
+        "question": "Quand est prévue la réception définitive du satellite Orion ?",
+        "expected_answer": "14 novembre",
+        "correct_document_at_rank_1": true,
+        "answer_in_literal_excerpt": true,
+        "no_invented_page": true,
+        "query_seconds": 0.0056643999996595085
+      },
+      {
+        "question": "Quelle est la durée de rétention des factures ?",
+        "expected_answer": "11 ans",
+        "correct_document_at_rank_1": true,
+        "answer_in_literal_excerpt": true,
+        "no_invented_page": true,
+        "query_seconds": 0.005642800002533477
+      },
+      {
+        "question": "Quel port utilise le service atelier ?",
+        "expected_answer": "9483",
+        "correct_document_at_rank_1": true,
+        "answer_in_literal_excerpt": true,
+        "no_invented_page": true,
+        "query_seconds": 0.005406700001913123
+      },
+      {
+        "question": "Qui est responsable du programme Calypso ?",
+        "expected_answer": "Élise Martel",
+        "correct_document_at_rank_1": true,
+        "answer_in_literal_excerpt": true,
+        "no_invented_page": true,
+        "query_seconds": 0.006288900000072317
+      }
+    ],
+    "long_document": {
+      "characters": 460075,
+      "utf8_bytes": 487955,
+      "passages": 288,
+      "index_state": "ready",
+      "index_seconds": 0.03260079999745358,
+      "query_seconds": 0.009221899999829475,
+      "tail_answer_retrieved": true
+    },
+    "pdf": {
+      "original_bytes": 1007,
+      "extraction_subprocess_seconds": 0.294920500000444,
+      "expected_page": 2,
+      "actual_page": 2,
+      "correct_document": true,
+      "answer_in_literal_excerpt": true
+    },
+    "missing_answer": {
+      "empty": true
+    },
+    "precision_at_1": 1.0,
+    "literal_answer_rate": 1.0,
+    "all_checks_pass": true
+  }
+}

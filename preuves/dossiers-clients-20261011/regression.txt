@@ -1,0 +1,70 @@
+C:\Users\karen\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\subprocess.py:1023: ResourceWarning: unclosed <socket.socket [closed] fd=8200, family=2, type=1, proto=0>
+  self.stderr = io.TextIOWrapper(self.stderr,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+======================================================================
+ERROR: test_helper_replaces_verified_exe_preserves_profile_and_keeps_previous (test_accounts_updates.AccountsTests.test_helper_replaces_verified_exe_preserves_profile_and_keeps_previous)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Serveur IA\client-qwen\updater.py", line 147, in apply
+    smoke=subprocess.run([str(staged),'--self-test','--with-profile'],timeout=60,creationflags=0x08000000)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\karen\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\subprocess.py", line 550, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\karen\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\subprocess.py", line 1228, in communicate
+    sts = self.wait(timeout=self._remaining_time(endtime))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\karen\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\subprocess.py", line 1264, in wait
+    return self._wait(timeout=timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\karen\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\subprocess.py", line 1593, in _wait
+    raise TimeoutExpired(self.args, timeout)
+subprocess.TimeoutExpired: Command '['D:\\Serveur IA\\lanceur\\tmpaxzsojxu\\update\\QwenClient.personal.exe', '--self-test', '--with-profile']' timed out after 60.0 seconds
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Serveur IA\lanceur\test_accounts_updates.py", line 150, in test_helper_replaces_verified_exe_preserves_profile_and_keeps_previous
+    with self.assertRaisesRegex(ValueError,'d�marrage'):updater.apply(plan,protect,lambda:profile)
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Serveur IA\client-qwen\updater.py", line 187, in apply
+    plan_path.unlink(missing_ok=True);source.unlink(missing_ok=True);staged.unlink(missing_ok=True)
+                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\karen\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\pathlib.py", line 1342, in unlink
+    os.unlink(self)
+PermissionError: [WinError 5] Acc�s refus�: 'D:\\Serveur IA\\lanceur\\tmpaxzsojxu\\update\\QwenClient.personal.exe'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\karen\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py", line 633, in _rmtree_unsafe
+    os.unlink(fullname)
+PermissionError: [WinError 5] Acc�s refus�: 'D:\\Serveur IA\\lanceur\\tmpaxzsojxu\\update\\QwenClient.personal.exe'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Serveur IA\lanceur\test_accounts_updates.py", line 119, in test_helper_replaces_verified_exe_preserves_profile_and_keeps_previous
+    with tempfile.TemporaryDirectory(dir=HOME) as folder:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\karen\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 950, in __exit__
+    self.cleanup()
+  File "C:\Users\karen\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 954, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+  File "C:\Users\karen\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 934, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+  File "C:\Users\karen\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py", line 781, in rmtree
+    return _rmtree_unsafe(path, onexc)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\karen\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\shutil.py", line 635, in _rmtree_unsafe
+    onexc(os.unlink, fullname, err)
+  File "C:\Users\karen\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 909, in onexc
+    _os.unlink(path)
+PermissionError: [WinError 5] Acc�s refus�: 'D:\\Serveur IA\\lanceur\\tmpaxzsojxu\\update\\QwenClient.personal.exe'
+
+----------------------------------------------------------------------
+Ran 268 tests in 580.887s
+
+FAILED (errors=1)
+
+VOLUME_PROOF {"document_count": 8, "original_bytes": 16777216, "archive_bytes": 30251795, "backup_seconds": 1.734, "restore_seconds": 5.61, "snapshot_lock_seconds": 0.188, "peak_rss_bytes": 488345600, "rss_increase_bytes": 420962304, "sha256_match": true}

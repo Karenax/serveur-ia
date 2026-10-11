@@ -1,0 +1,25 @@
+{
+  "created_at": "2026-10-10T20:15:06.5674304Z",
+  "production_mutated": false,
+  "passed": 5,
+  "log": "worker-lifecycle-tests.log",
+  "diagnostic": "A shutdown timeout left an exited worker reference blocking every later start. An explicit restart now waits for the old worker to exit, retains its lease while it lives, starts one replacement, and explicit shutdown cancels a pending restart.",
+  "scenarios": [
+    "Slow worker restart with concurrent start calls and an independent instance respecting the lease",
+    "Explicit shutdown cancels pending restart",
+    "Maintenance blocks claiming queued work and publishing the cancelled result",
+    "Actual restoration refused before applying resumes after slow worker exits, original generation preserved",
+    "Stale and malformed leases remain replaceable"
+  ],
+  "sources": [
+    {
+      "file": "lanceur/workspace.py",
+      "sha256": "97918b18b33d9a05666bde43bd9602ef92156d9441eac6f5fed04a366ebf524f"
+    },
+    {
+      "file": "lanceur/test_workspace_worker.py",
+      "sha256": "29ce665bdad7b726e01f027fdbbaf705c83294106e4ab5d4f42f48361b98bfab"
+    }
+  ],
+  "log_sha256": "6f7f55cdff3715c1400386bcc3d6f2aa7d97b5f257f89aea30d34d0b731ecba5"
+}

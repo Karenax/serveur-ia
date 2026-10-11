@@ -1,0 +1,70 @@
+[
+  {
+    "file": "01-backend-sauvegardes.png",
+    "sha256": "78964cf3206f52d0631e347c0eca21029330aecabf904f5f27a7fcde05be5336"
+  },
+  {
+    "file": "01-sauvegardes-desktop.png",
+    "sha256": "872ccf8f414d59b39a00b4f02c4fe855f0281ef3e87e55a84d233538e4f010a5"
+  },
+  {
+    "file": "02-backend-restauration-apercu.png",
+    "sha256": "afe5568af57ed5420beada770bd5be777913a038f677b80028af1dde05d87d86"
+  },
+  {
+    "file": "02-restauration-apercu.png",
+    "sha256": "7b08acce83685e1278d10af2b71e5bf0bbe1e84631b061456dec037cc955a262"
+  },
+  {
+    "file": "03-appareils-desktop.png",
+    "sha256": "bff1be237b6fa24f207944664ce31cb15cbda8b47b534d7971f2d922a0418da2"
+  },
+  {
+    "file": "03-backend-restauration-terminee.png",
+    "sha256": "5d269c2b0d4c90df36cb74a5ec8793163dbb067930bed4b5c2d2e6c841a9cc42"
+  },
+  {
+    "file": "04-appareils-telephone.png",
+    "sha256": "6c84a40d29f4ae1d547c8e788663db5114ab34b0d166ea5d022d21181767661b"
+  },
+  {
+    "file": "04-backend-appareil-archive.png",
+    "sha256": "c1a8c1cc4f39115b39311fc7c3517453c14dc3a0e0136c5227e9d3a1dee20510"
+  },
+  {
+    "file": "05-backend-appareils-desktop.png",
+    "sha256": "ef762a26cae1e37e7223bc79d2d792b48f66effa4ff3050f3b3682c2e5e7f1a2"
+  },
+  {
+    "file": "05-sauvegardes-telephone.png",
+    "sha256": "1fb358637391ff07532f88c8f52cbccafe1118253f1a59a9565ba023cad02cc4"
+  },
+  {
+    "file": "06-backend-appareils-telephone.png",
+    "sha256": "525527ff26c2025b11f090a97699398ae62a905fc49dc87878782aefa6c4ac46"
+  },
+  {
+    "file": "06-restauration-telephone.png",
+    "sha256": "b3b2d125f6783923b600a07acad1a215b70394ae3d425109bc71a56c162c98ec"
+  },
+  {
+    "file": "07-backend-sauvegardes-telephone.png",
+    "sha256": "59bda323666324990b882f83b1a844a72d248ecb24eb29446b8a8e65d8a6aad5"
+  },
+  {
+    "file": "08-backend-retour-echec.png",
+    "sha256": "ecd7808a2dbc21c2d600ac3c37da3d3e256dd6712154239d93baa131c8fed047"
+  },
+  {
+    "file": "09-backend-retour-reussi.png",
+    "sha256": "815a21b52b4f3f7ffb4c87424a7198ead269fde76f8340d6477a039adfa0d2cb"
+  },
+  {
+    "file": "maintenance-backend-ui.json",
+    "sha256": "33447de55ca23ce3f8b61cf0b3fa9de6a58cd518bc9bab464c22474b36ce5e73"
+  },
+  {
+    "file": "maintenance-ui.json",
+    "sha256": "5063891b53e136265ccfef8581d28ea5e9ca71300da94e646d20ff98a19c3f8a"
+  }
+]

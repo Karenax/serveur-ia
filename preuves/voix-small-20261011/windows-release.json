@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "version": "3.5.20",
+  "sha256": "529f21aa22d14076e228f650d03e87751850641c0bd17aa52d80a9c3e83dea2d",
+  "bytes": 31969815,
+  "signature_verified": true,
+  "packaged_native_small_load_stop": "PASS"
+}

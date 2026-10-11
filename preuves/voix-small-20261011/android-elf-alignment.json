@@ -1,0 +1,105 @@
+{
+  "passed": true,
+  "load_alignment_bytes": {
+    "lib/arm64-v8a/libfredvoice.so": [
+      16384,
+      16384,
+      16384
+    ],
+    "lib/x86_64/libfredvoice.so": [
+      16384,
+      16384,
+      16384
+    ],
+    "lib/x86_64/libggml-base.so": [
+      16384,
+      16384,
+      16384
+    ],
+    "lib/x86_64/libggml-cpu-alderlake.so": [
+      16384,
+      16384,
+      16384
+    ],
+    "lib/x86_64/libggml-cpu-cannonlake.so": [
+      16384,
+      16384,
+      16384
+    ],
+    "lib/x86_64/libggml-cpu-cascadelake.so": [
+      16384,
+      16384,
+      16384
+    ],
+    "lib/x86_64/libggml-cpu-cooperlake.so": [
+      16384,
+      16384,
+      16384
+    ],
+    "lib/x86_64/libggml-cpu-haswell.so": [
+      16384,
+      16384,
+      16384
+    ],
+    "lib/x86_64/libggml-cpu-icelake.so": [
+      16384,
+      16384,
+      16384
+    ],
+    "lib/x86_64/libggml-cpu-ivybridge.so": [
+      16384,
+      16384,
+      16384
+    ],
+    "lib/x86_64/libggml-cpu-piledriver.so": [
+      16384,
+      16384,
+      16384
+    ],
+    "lib/x86_64/libggml-cpu-sandybridge.so": [
+      16384,
+      16384,
+      16384
+    ],
+    "lib/x86_64/libggml-cpu-sapphirerapids.so": [
+      16384,
+      16384,
+      16384
+    ],
+    "lib/x86_64/libggml-cpu-skylakex.so": [
+      16384,
+      16384,
+      16384
+    ],
+    "lib/x86_64/libggml-cpu-sse42.so": [
+      16384,
+      16384,
+      16384
+    ],
+    "lib/x86_64/libggml-cpu-x64.so": [
+      16384,
+      16384,
+      16384
+    ],
+    "lib/x86_64/libggml-cpu-zen4.so": [
+      16384,
+      16384,
+      16384
+    ],
+    "lib/x86_64/libggml.so": [
+      16384,
+      16384,
+      16384
+    ],
+    "lib/x86_64/libparakeet.so": [
+      16384,
+      16384,
+      16384
+    ],
+    "lib/x86_64/libwhisper.so": [
+      16384,
+      16384,
+      16384
+    ]
+  }
+}

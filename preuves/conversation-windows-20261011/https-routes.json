@@ -1,0 +1,22 @@
+{
+  "routes": [
+    {
+      "path": "/v1/models",
+      "unauthenticated_status": 401
+    },
+    {
+      "path": "/v1/voice/status",
+      "unauthenticated_status": 401
+    },
+    {
+      "path": "/v1/voice/speech",
+      "unauthenticated_status": 401
+    },
+    {
+      "path": "/v1/voice/cancel",
+      "unauthenticated_status": 401
+    }
+  ],
+  "authenticated_audio_test": false,
+  "user_agent": "AccesServeurFred/3.5.21 (Windows; HTTPS)"
+}

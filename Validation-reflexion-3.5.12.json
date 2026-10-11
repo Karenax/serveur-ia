@@ -1,0 +1,112 @@
+{
+  "version": "3.5.12",
+  "modes": [
+    "none",
+    "low",
+    "medium",
+    "high"
+  ],
+  "ui": [
+    {
+      "barScroll": 408,
+      "barWidth": 408,
+      "bodyWidth": 2560,
+      "panel": [
+        948,
+        1388,
+        632,
+        809
+      ],
+      "panelScroll": 438,
+      "panelWidth": 438,
+      "visible": true,
+      "width": 2560
+    },
+    {
+      "barScroll": 408,
+      "barWidth": 408,
+      "bodyWidth": 1920,
+      "panel": [
+        628,
+        1068,
+        632,
+        809
+      ],
+      "panelScroll": 438,
+      "panelWidth": 438,
+      "visible": true,
+      "width": 1920
+    },
+    {
+      "barScroll": 408,
+      "barWidth": 408,
+      "bodyWidth": 1280,
+      "panel": [
+        499,
+        939,
+        632,
+        809
+      ],
+      "panelScroll": 438,
+      "panelWidth": 438,
+      "visible": true,
+      "width": 1280
+    },
+    {
+      "barScroll": 408,
+      "barWidth": 408,
+      "bodyWidth": 640,
+      "panel": [
+        173,
+        613,
+        632,
+        809
+      ],
+      "panelScroll": 438,
+      "panelWidth": 438,
+      "visible": true,
+      "width": 640
+    },
+    {
+      "barScroll": 330,
+      "barWidth": 330,
+      "bodyWidth": 390,
+      "panel": [
+        14,
+        376,
+        635,
+        812
+      ],
+      "panelScroll": 360,
+      "panelWidth": 360,
+      "visible": true,
+      "width": 390
+    }
+  ],
+  "selectionPersists": true,
+  "serverTemplateVerified": true,
+  "nativeUi": {
+    "ok": true,
+    "title": "Accès serveur Fred",
+    "login": true,
+    "update": true,
+    "chat": true,
+    "state": "EXE personnel · connexion automatique",
+    "history": true,
+    "projects": true,
+    "tasks": true,
+    "assistants": false,
+    "textSelection": "text",
+    "copySelection": true,
+    "thinkingModes": 4,
+    "thinkingInMenu": true
+  },
+  "releaseVerified": true,
+  "productionModes": [
+    "none",
+    "low",
+    "medium",
+    "high"
+  ],
+  "tests": "6 tests Python réussis"
+}

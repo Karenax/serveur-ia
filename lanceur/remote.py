@@ -17,6 +17,7 @@ import struct
 import subprocess
 import threading
 import time
+from devices import Revocations, fields as device_fields
 from scheduler import Scheduler
 from accounts import Accounts
 from operations import VERSION
@@ -29,6 +30,7 @@ GATEWAY_PORT = 8766
 class GatewayHTTPServer(ThreadingHTTPServer):
     def server_close(self):
         if getattr(self,'workspace',None):self.workspace.shutdown()
+        if getattr(self,'voice',None):self.voice.close()
         super().server_close()
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -68,14 +70,25 @@ def secure_url(value):
 
 class AccessStore:
     def __init__(self, home=HOME):
-        self.home = home
+        self.home = Path(home)
+        home = self.home
         self.path = home / 'acces-distants.json'
         self.lock = threading.RLock()
         self.active = 0
+        self.maintenance = False
+        self.on_access_changed = None
+        self.storage = None
         self.scheduler = Scheduler()
         self.accounts = Accounts(home)
         self.workspace = Workspace(home)
+        from voice import VoiceService
+        self.voice = VoiceService(home)
+        from notifications import Notifications
+        self.notifications = Notifications(self.workspace)
         self.seen = read_json(home / 'connexions.json', {})
+        self.activity_path = home / 'appareils-activite.json'
+        self.activity = read_json(self.activity_path, {})
+        self.seen_saved_at = 0
         if not self.path.exists():
             write_json(self.path, {'enabled': False, 'url': '', 'clients': []})
         else:
@@ -85,11 +98,37 @@ class AccessStore:
                 for field in ('max_tokens','max_completion_tokens'):
                     if field in client:client.pop(field);changed=True
             if changed:write_json(self.path,data)
+        self.revocations = Revocations(home)
+        records = read_json(self.path, {})
+        for client in records.get('clients', []) + records.get('deleted_clients', []):
+            if client.get('revoked'):
+                self.revocations.revoke(client['id'], 'migration')
+
+    def _access_changed(self):
+        if self.on_access_changed:
+            self.on_access_changed()
+
+    def _public_device(self, client, revoked):
+        record = {k:v for k,v in client.items() if k != 'hash'}
+        declaration = self.activity.get(client['id'], {})
+        record.update(revoked=bool(client.get('revoked') or client['id'] in revoked),
+                      device_kind=client.get('device_kind', 'unknown'), device_owner=client.get('device_owner', ''),
+                      device_version=client.get('device_version', ''), reported_kind=declaration.get('kind', 'unknown'),
+                      reported_version=declaration.get('version', ''), last_transport=declaration.get('transport', 'unknown'),
+                      last_activity_epoch=self.seen.get(client['id'], declaration.get('epoch')),
+                      has_android_profile=bool(client.get('android_profile') and (self.home/'wireguard-prive/profils-restaures.dpapi').is_file()))
+        record['status'] = 'revoked' if record['revoked'] else 'suspended' if client.get('suspended') else 'expired' if client.get('expires_epoch') and client['expires_epoch'] <= time.time() else 'authorized'
+        return record
 
     def metadata(self):
         with self.lock:
             data = read_json(self.path, {'enabled': False, 'url': '', 'clients': []})
-        return {**{k:v for k,v in data.items() if k!='deleted_clients'}, 'clients': [{k:v for k,v in client.items() if k != 'hash'} for client in data['clients']], 'active': self.active, 'queue': self.scheduler.snapshot(), 'last_connections': dict(self.seen), 'accounts':self.accounts.metadata()}
+            revoked = self.revocations.snapshot()['revocations']
+            clients = [self._public_device(c, revoked) for c in data['clients']]
+            archived = [self._public_device(c, revoked) for c in data.get('deleted_clients', [])]
+            if self.storage:
+                for client in clients+archived:client['storage']=self.storage.client_status(client['id'])
+        return {**{k:v for k,v in data.items() if k!='deleted_clients'}, 'clients': clients, 'archived_clients': archived, 'maintenance':self.maintenance, 'active': self.active, 'queue': self.scheduler.snapshot(), 'last_connections': dict(self.seen), 'accounts':self.accounts.metadata()}
 
     def configure(self, values):
         if not isinstance(values.get('enabled'), bool):
@@ -104,10 +143,11 @@ class AccessStore:
                     self.scheduler.cancel(client['id']);self.accounts.invalidate(client['id'])
                     self.workspace.cancel_owner(client['id'])
             self.audit('remote_enabled' if values['enabled'] else 'remote_disabled')
+        self._access_changed()
         return self.metadata()
 
     def issue(self, name):
-        if not isinstance(name, str) or not 1 <= len(name.strip()) <= 80:
+        if not isinstance(name, str) or not 1 <= len(name.strip()) <= 80 or any(ord(c)<32 or ord(c)==127 for c in name):
             raise ValueError('Nom du client attendu, entre 1 et 80 caractères.')
         identity = secrets.token_hex(8)
         token = 'qwen_' + identity + '_' + secrets.token_urlsafe(32)
@@ -121,6 +161,44 @@ class AccessStore:
             write_json(self.path, data)
             self.audit('client_created', identity)
         return {'id': identity, 'name': client['name'], 'token': token, 'url': data['url']}
+
+    def device(self, values):
+        update = device_fields(values)
+        with self.lock:
+            data = read_json(self.path)
+            client = next((c for c in data['clients'] if c['id'] == values.get('id')), None)
+            if client is None:
+                raise ValueError('Appareil inconnu.')
+            for field in ('kind', 'owner', 'version'):
+                if field in update: client['device_'+field] = update[field]
+            if 'name' in update: client['name'] = update['name']
+            write_json(self.path, data)
+            self.audit('device_configured', client['id'])
+        return self.metadata()
+
+    def heartbeat(self, identity, values):
+        declaration = device_fields(values, declaration=True)
+        with self.lock:
+            if not self.valid_owner(identity):
+                raise Denied('Accès appareil désactivé.')
+            now = time.time()
+            self.seen[identity] = now
+            self.activity[identity] = {**self.activity.get(identity, {}), **declaration, 'epoch': now}
+            write_json(self.activity_path, self.activity)
+            write_json(self.home/'connexions.json', self.seen)
+            self.seen_saved_at = now
+            if self.storage:self.storage.changed()
+            return {'id': identity, 'server_epoch': now, 'declared': declaration}
+
+    def valid_owner(self, identity):
+        with self.lock:
+            if self.maintenance: return False
+            data = read_json(self.path, {})
+            if not data.get('enabled'): return False
+            try:
+                if self.revocations.contains(identity): return False
+            except (ValueError, OSError): return False
+            return any(c['id'] == identity and not c['revoked'] and not c.get('suspended') and (not c.get('expires_epoch') or c['expires_epoch'] > time.time()) for c in data.get('clients', []))
 
     def set_peer(self, identity, public_key, address):
         with self.lock:
@@ -142,9 +220,10 @@ class AccessStore:
         return {'message':'Client renommé. Le prochain téléchargement de son EXE utilisera ce nom.'}
 
     def delete(self, identity):
+        # Revoke without nesting the store lock around the tunnel callback.
+        self.revoke(identity)
         with self.lock:
             # Revoke first: a write failure must never leave the old EXE authorized.
-            self.revoke(identity)
             data=read_json(self.path)
             record=next(c for c in data['clients'] if c['id']==identity)
             data.setdefault('deleted_clients',[]).append(record)
@@ -176,7 +255,7 @@ class AccessStore:
         try:
             from signing import public
             from profiles import match
-            values={**profile_factory(access), 'version':VERSION, 'protocol':3, 'update_public_key':public(self.home)}
+            values={**profile_factory(access), 'version':VERSION, 'protocol':3, 'update_public_key':public(self.home),'client_name':access['name']}
             record=next(c for c in read_json(self.path)['clients'] if c['id']==access['id'])
             match(record,values)
             profile=json.dumps(values,ensure_ascii=False).encode()
@@ -195,20 +274,25 @@ class AccessStore:
         return {'id': access['id'], 'name': access['name'], 'download': '/api/remote/client/' + access['id']}
 
     def revoke(self, identity):
-        with self.lock:
-            data = read_json(self.path)
-            found = False
-            for client in data['clients']:
-                if client['id'] == identity:
-                    client['revoked'] = True
-                    self.scheduler.cancel(identity)
-                    self.accounts.invalidate(identity)
-                    self.workspace.cancel_owner(identity)
-                    self.audit('revoke', identity)
-                    found = True
-            if not found:
-                raise ValueError('Client inconnu.')
-            write_json(self.path, data)
+        committed = False
+        try:
+            with self.lock:
+                data = read_json(self.path)
+                if not any(client['id'] == identity for client in data['clients']):
+                    raise ValueError('Client inconnu.')
+                # Commit the monotonic ledger before any fallible metadata mutation.
+                self.revocations.revoke(identity)
+                committed = True
+                self.scheduler.cancel(identity)
+                self.accounts.invalidate(identity)
+                self.workspace.cancel_owner(identity)
+                self.notifications.revoke(identity)
+                for client in data['clients']:
+                    if client['id'] == identity:client['revoked'] = True
+                write_json(self.path, data)
+                self.audit('revoke', identity)
+        finally:
+            if committed:self._access_changed()
         return self.metadata()
 
     def policy(self, values):
@@ -228,6 +312,7 @@ class AccessStore:
             if suspended or (days is not None and days):self.accounts.invalidate(identity)
             if suspended:self.workspace.cancel_owner(identity)
             self.audit('policy', identity)
+        self._access_changed()
         return self.metadata()
 
     def audit(self, event, identity=''):
@@ -236,14 +321,18 @@ class AccessStore:
             rows = read_json(path, [])
             rows.append({'epoch': time.time(), 'event': event, 'client': identity})
             write_json(path, rows[-1000:])
+            if self.storage:self.storage.changed()
 
     def denial(self,token):
+        if self.maintenance:return 'maintenance','Serveur en maintenance : réessayer après la restauration.'
         digest=hashlib.sha256(token.encode()).hexdigest()
         with self.lock:data=read_json(self.path)
         if not data['enabled']:return 'remote_disabled','Accès distant désactivé sur le serveur.'
         record=next((c for c in data['clients'] if hmac.compare_digest(c['hash'],digest)),None)
         if record:
-            if record['revoked']:return 'access_revoked','Accès client révoqué sur le serveur.'
+            try:revoked = self.revocations.contains(record['id'])
+            except (ValueError, OSError):return 'access_denied','Registre de sécurité indisponible : accès refusé.'
+            if record['revoked'] or revoked:return 'access_revoked','Accès client révoqué sur le serveur.'
             if record.get('suspended'):return 'access_suspended','Compte client suspendu sur le serveur.'
             if record.get('expires_epoch') and record['expires_epoch']<=time.time():return 'access_expired','Accès client expiré.'
         return 'access_denied','Accès client invalide.'
@@ -254,13 +343,18 @@ class AccessStore:
         digest = hashlib.sha256(token.encode()).hexdigest()
         with self.lock:
             data = read_json(self.path)
-        if not data['enabled']:
-            return None
-        for client in data['clients']:
-            if not client['revoked'] and not client.get('suspended', False) and (not client.get('expires_epoch') or client['expires_epoch'] > time.time()) and hmac.compare_digest(client['hash'], digest):
-                with self.lock:
-                    self.seen[client['id']] = time.time()
-                return client['id']
+            if self.maintenance or not data['enabled']: return None
+            try:revoked = self.revocations.snapshot()['revocations']
+            except (ValueError, OSError):return None
+            for client in data['clients']:
+                if client['id'] not in revoked and not client['revoked'] and not client.get('suspended', False) and (not client.get('expires_epoch') or client['expires_epoch'] > time.time()) and hmac.compare_digest(client['hash'], digest):
+                    now = time.time()
+                    self.seen[client['id']] = now
+                    if now-self.seen_saved_at >= 30:
+                        write_json(self.home/'connexions.json', self.seen)
+                        self.seen_saved_at = now
+                    if self.storage:self.storage.changed()
+                    return client['id']
         return None
 
 from chat_attachments import capabilities, validate_parts, normalize_reasoning
@@ -305,8 +399,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
     """backend returns (loopback port, model alias, private upstream API key)."""
     scheduler = store.scheduler
     def valid_owner(owner):
-        data=read_json(store.path,{})
-        return bool(data.get('enabled') and any(c['id']==owner and not c['revoked'] and not c.get('suspended') and (not c.get('expires_epoch') or c['expires_epoch']>time.time()) for c in data.get('clients',[])))
+        return store.valid_owner(owner)
     def generate(owner,messages,cancel):
         item=None;connection=None;deadline=time.monotonic()+900
         try:
@@ -376,6 +469,9 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
             self.wfile.write(content)
 
         def authorized(self, session=True):
+            if store.maintenance:
+                self.respond(503, {'error': {'code':'maintenance','message':'Serveur en maintenance : réessayer après la restauration.'}})
+                return False
             # Native client; arbitrary browser pages cannot submit authenticated commands.
             if self.headers.get('Origin'):
                 self.respond(403, {'error': {'message': 'Utiliser le client Windows ou un client API.'}})
@@ -392,6 +488,18 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
             return True
 
         def do_GET(self):
+            if self.path == '/v1/voice/status':
+                if not self.authorized():return
+                return self.respond(200,store.voice.status())
+            if self.path == '/v1/notifications':
+                if not self.authorized(): return
+                try:
+                    with store.lock:
+                        if store.authenticate(self.access_token) != self.identity: raise Denied('Accès désactivé.')
+                        result = store.notifications.snapshot(self.identity)
+                    return self.respond(200, result)
+                except Denied as error: return self.respond(403, {'error': {'message': str(error)}})
+                except (ValueError, OSError, TypeError) as error: return self.respond(400, {'error': {'message': str(error)}})
             if self.path=='/v1/history':
                 if not self.authorized():return
                 return self.respond(200,store.workspace.history_read(self.identity))
@@ -426,6 +534,58 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
             self.respond(200, {'object': 'list', 'data': [{'id': model, 'object': 'model', 'owned_by': 'local', 'capabilities': capabilities(live)}]})
 
         def do_POST(self):
+            if self.path in ('/v1/voice/speech','/v1/voice/cancel'):
+                if not self.authorized():return
+                frames=None;sent=False
+                try:
+                    if self.headers.get('Transfer-Encoding') or not self.headers.get('Content-Type','').startswith('application/json'):raise ValueError('JSON attendu.')
+                    length=int(self.headers.get('Content-Length','0'))
+                    if not 1<=length<=8192:raise ValueError('Requête vocale limitée à 8 Ko.')
+                    value=json.loads(self.rfile.read(length))
+                    if self.path.endswith('/cancel'):
+                        if not isinstance(value,dict) or set(value)!={'request_id'} or not isinstance(value['request_id'],str):raise ValueError('Annulation vocale invalide.')
+                        return self.respond(200,store.voice.cancel(self.identity,value['request_id']))
+                    frames=store.voice.stream(self.identity,value,lambda:store.authenticate(self.access_token)==self.identity)
+                    self.send_response(200);self.send_header('Content-Type','text/event-stream')
+                    self.send_header('Cache-Control','no-store');self.send_header('Connection','close');self.end_headers();sent=True
+                    for frame in frames:
+                        self.wfile.write(('data: '+json.dumps(frame,ensure_ascii=False)+'\n\n').encode('utf-8'));self.wfile.flush()
+                except BlockingIOError as error:
+                    if not sent:self.respond(429,{'error':{'message':str(error)}})
+                except (ValueError,OSError,TypeError,PermissionError) as error:
+                    if not sent:self.respond(400,{'error':{'message':str(error)}})
+                finally:
+                    if frames:frames.close()
+                return
+            if self.path == '/v1/notifications/action':
+                if not self.authorized(): return
+                try:
+                    if self.headers.get('Transfer-Encoding') or not self.headers.get('Content-Type', '').startswith('application/json'):
+                        raise ValueError('JSON attendu.')
+                    length = int(self.headers.get('Content-Length', '0'))
+                    if not 1 <= length <= 65536: raise ValueError('Notifications : requête limitée à 64 Ko.')
+                    value = json.loads(self.rfile.read(length))
+                    with store.lock:
+                        if store.authenticate(self.access_token) != self.identity: raise Denied('Accès désactivé.')
+                        result = store.notifications.action(self.identity, value)
+                    return self.respond(200, result)
+                except Conflict as error: return self.respond(409, {'error': {'message': str(error)}})
+                except Denied as error: return self.respond(403, {'error': {'message': str(error)}})
+                except (ValueError, OSError, TypeError) as error: return self.respond(400, {'error': {'message': str(error)}})
+            if self.path == '/v1/device':
+                if not self.authorized():return
+                try:
+                    if self.headers.get('Transfer-Encoding') or not self.headers.get('Content-Type', '').startswith('application/json'):
+                        raise ValueError('JSON attendu.')
+                    length = int(self.headers.get('Content-Length', '0'))
+                    if not 1 <= length <= 2048: raise ValueError('Déclaration appareil limitée à 2 Ko.')
+                    value = json.loads(self.rfile.read(length))
+                    with store.lock:
+                        if store.authenticate(self.access_token) != self.identity: raise Denied('Accès désactivé.')
+                        result = store.heartbeat(self.identity, value)
+                    return self.respond(200, result)
+                except Denied as error:return self.respond(403, {'error': {'message': str(error)}})
+                except (ValueError, OSError, TypeError) as error:return self.respond(400, {'error': {'message': str(error)}})
             if self.path=='/v1/history':
                 if not self.authorized():return
                 try:
@@ -475,7 +635,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 if not isinstance(raw,dict):raise ValueError('Requête invalide.')
                 project=raw.pop('project_id',None);raw.pop('assistant_id',None);document=raw.pop('document_id',None)
                 data = chat_request(raw, model);sources=[]
-                if project or document:
+                if project or document or getattr(store.workspace,'knowledge',None):
                     data['messages'],sources=store.workspace.context(self.identity,data['messages'],project,document)
             except (OSError, ValueError, TypeError, KeyError) as error:
                 return self.respond(400, {'error': {'message': str(error)}})
@@ -526,18 +686,25 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 return self.respond(429, {'error': {'message': str(error)}})
             connection = None
             headers_sent = False
-            with store.lock:
-                store.active += 1
+            active_registered = False
             try:
-                if data.get('stream'):
-                    self.send_response(200)
-                    self.send_header('Content-Type', 'text/event-stream')
-                    self.send_header('Cache-Control', 'no-store')
-                    self.send_header('Connection', 'close')
-                    self.end_headers()
-                    headers_sent = True
-                    if sources:
-                        self.wfile.write(('data: '+json.dumps({'workspace_sources':sources},ensure_ascii=False)+'\n\n').encode());self.wfile.flush()
+                # Context extraction and model health checks can outlive a
+                # suspension/revocation. Commit the first private response only
+                # while that access is still valid, serialized with revocation.
+                with store.lock:
+                    if item['cancelled'] or store.authenticate(self.access_token) != self.identity:
+                        raise Denied('Demande annulée ou accès désactivé.')
+                    store.active += 1
+                    active_registered = True
+                    if data.get('stream'):
+                        self.send_response(200)
+                        self.send_header('Content-Type', 'text/event-stream')
+                        self.send_header('Cache-Control', 'no-store')
+                        self.send_header('Connection', 'close')
+                        self.end_headers()
+                        headers_sent = True
+                        if sources:
+                            self.wfile.write(('data: '+json.dumps({'workspace_sources':sources},ensure_ascii=False)+'\n\n').encode());self.wfile.flush()
                 def heartbeat(position):
                     if select.select([self.connection], [], [], 0)[0] and self.connection.recv(1, socket.MSG_PEEK) == b'':
                         raise OSError('Client déconnecté.')
@@ -552,6 +719,12 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 headers = {'Content-Type': 'application/json'}
                 if key:
                     headers['Authorization'] = 'Bearer ' + key
+                # A second check covers access changes while the request was
+                # queued. Keep network I/O outside the access mutex so an
+                # unavailable engine cannot delay a later revocation.
+                with store.lock:
+                    if item['cancelled'] or store.authenticate(self.access_token) != self.identity:
+                        raise Denied('Demande annulée ou accès désactivé.')
                 connection.request('POST', '/v1/chat/completions', json.dumps(data).encode(), headers)
                 upstream_socket = connection.sock
                 def abort():
@@ -579,6 +752,8 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                         line = response.readline(2 * 1024 * 1024)
                         if not line:
                             break
+                        if item['cancelled'] or not store.authenticate(self.access_token):
+                            raise ValueError('Demande annulée ou accès désactivé.')
                         if line.strip() == b'data: [DONE]': complete = True
                         if line.startswith(b'data: '):
                             try:
@@ -611,15 +786,21 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                         self.wfile.flush()
                     except OSError: pass
                 if not headers_sent:
-                    self.respond(503, {'error': {'message': 'Le modèle local est indisponible ou ne répond pas.'}})
+                    if store.authenticate(self.access_token) != self.identity:
+                        code, message = store.denial(self.access_token)
+                        self.respond(503 if code == 'maintenance' else 401, {'error': {'code': code, 'message': message}})
+                    else:
+                        self.respond(503, {'error': {'message': 'Le modèle local est indisponible ou ne répond pas.'}})
             finally:
                 if connection:
                     connection.close()
-                with store.lock:
-                    store.active -= 1
+                if active_registered:
+                    with store.lock:
+                        store.active -= 1
                 scheduler.finish(item)
     server = GatewayHTTPServer(('127.0.0.1', port), Handler)
     server.workspace=store.workspace
+    server.voice=store.voice
     store.workspace.start(generate,valid_owner)
     server.daemon_threads = True
     return server

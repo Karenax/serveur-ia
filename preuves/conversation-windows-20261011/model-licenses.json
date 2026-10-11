@@ -1,0 +1,17 @@
+[
+  {
+    "repo": "shaojieli/sherpa-onnx-streaming-zipformer-fr-2023-04-14",
+    "revision": "3db9565d9633758d6b87b9a7b3dc09ebfb6b2c73",
+    "license": "apache-2.0"
+  },
+  {
+    "repo": "pipecat-ai/smart-turn-v3",
+    "revision": "f766f81d3cfdf7737ac64aad813d91bbfd56bf93",
+    "license": "bsd-2-clause"
+  },
+  {
+    "repo": "kyutai/pocket-tts-without-voice-cloning",
+    "revision": "8843db76457a91db32077edf8dfcd1c0e3e755fd",
+    "license": "cc-by-4.0"
+  }
+]

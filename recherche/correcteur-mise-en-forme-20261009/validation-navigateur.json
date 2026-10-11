@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "browser": "Chromium",
+  "unitChecks": 11,
+  "originalPreserved": true,
+  "stylesCompared": true,
+  "richCopy": true,
+  "partialSelectionRichCopy": true,
+  "plainChatCopyUnaffected": true,
+  "persistence": true,
+  "invalidResponsePreservesResult": true,
+  "truncatedResponsePreservesResult": true,
+  "reuse": true,
+  "pageErrors": []
+}

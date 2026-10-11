@@ -1,0 +1,67 @@
+{
+  "date": "2026-10-10T20:54:59.584Z",
+  "realBackend": true,
+  "syntheticStorage": true,
+  "liveDataUsed": false,
+  "checks": [
+    {
+      "name": "Lien direct Notifications, 4 alertes réelles et propriétaire privé exclu",
+      "passed": true
+    },
+    {
+      "name": "Marquer lu conserve lecture dans la vraie base",
+      "passed": true
+    },
+    {
+      "name": "Filtre non lu et état synchronisé après rechargement",
+      "passed": true
+    },
+    {
+      "name": "Préférences par type restent persistantes et boîte visible",
+      "passed": true
+    },
+    {
+      "name": "Panne réseau affichée puis rattrapage sans doublon",
+      "passed": true
+    },
+    {
+      "name": "Action en maintenance refusée sans perdre le message d’erreur",
+      "passed": true
+    },
+    {
+      "name": "Notifications accumulées console fermée retrouvées à la reconnexion",
+      "passed": true
+    },
+    {
+      "name": "Lecture de toutes les alertes affichées avec persistance",
+      "passed": true
+    },
+    {
+      "name": "Téléphone : pas de débordement et commandes utilisables",
+      "passed": true
+    },
+    {
+      "name": "Clic Consulter ouvre la rubrique pertinente",
+      "passed": true
+    },
+    {
+      "name": "Aucune exception JavaScript",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "final": {
+    "adminUnread": 0,
+    "privateUnread": 1,
+    "preferences": {
+      "types": {
+        "backup_failed": false,
+        "backup_copy_failed": true,
+        "storage_low": true,
+        "restore_failed": true
+      },
+      "discreet": true,
+      "revision": 1
+    }
+  }
+}

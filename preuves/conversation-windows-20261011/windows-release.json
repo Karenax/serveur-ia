@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "version": "3.5.21",
+  "sha256": "b2cfaae34e17e94ea91ade7452800398d1c75d7143f317468c0a0ba32dccf595",
+  "bytes": 93445912,
+  "embedded_files_verified": {
+    "chat.html": "dcfa352ed7555663bcb7a396df31d01d20c47edd37d540e0e0bcacbbc68de59e",
+    "conversation.js": "faf742dc0d5a61e45f323a16df7982978d9a63caf9dd52e6f999d5b88b72de9c",
+    "voice.js": "4e285ddec832c618a48537ffde282faf89b67baf49f7f422fffefaa37f5cdc79",
+    "THIRD-PARTY.txt": "ff2a9fbae6cf5f106eac4640da96c6d017de1ba81206550a7eb2761d3b3c0319",
+    "wireguard-bridge.exe": "15135be87d23e16a361893e09e728731b3bbd3efac5a57520b41b00c24806f0d",
+    "voice/conversation-models.json": "e1a6f67dad2f0ba35783e606e3da2962abb01799a25c68533a89905fff274459",
+    "voice/native-manifest.json": "2a314c68eb589807d3e6e21bd13f1fd3f425e8ec0cecfea6f4180476081d101e",
+    "voice/fredaec.dll": "825d02ad0351d61d3ef98c439e0aa281febf88656ed184425b1eee8021a71d86",
+    "voice/conversation-worker/conversation-worker.exe": "fd51565582c4aa425f0868a3dbc4234f5ca3aee8d2f9f1ff0bf4ed5ec4a4fb5f",
+    "voice/licenses/CONVERSATION-NOTICES.txt": "5ec9a447fe722f7e5ce3a35e84920b640b7037dc6204e8692c276479b898948c",
+    "voice/licenses/silero-vad-LICENSE.txt": "2e63e9a38b6e8fc0c7bc37ce174caca1862870856c6daf5697cfb785e925520b",
+    "voice/licenses/smart-turn-LICENSE.txt": "0d66364067f678c08586ebb60a16a2aed4fa081ec11057df35585759ce0e774f"
+  },
+  "self_test_exit_code": 0
+}

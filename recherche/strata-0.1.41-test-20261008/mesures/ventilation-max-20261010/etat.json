@@ -1,0 +1,6 @@
+{
+  "outcomes": [],
+  "phase": "essais-arretes-utilisateur",
+  "previous_phase": "reference-production",
+  "reason": "Arret demande par utilisateur : chauffe persistante avec ventilation maximale."
+}

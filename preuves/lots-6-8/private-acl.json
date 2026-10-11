@@ -1,0 +1,47 @@
+[
+  {
+    "Path": "D:\\Serveur IA\\lanceur\\sauvegardes",
+    "InheritanceDisabled": true,
+    "GrantedTo": [
+      "AUTORITE NT\\Système",
+      "BUILTIN\\Administrateurs",
+      "DESKTOP-OGQE53D\\karen"
+    ]
+  },
+  {
+    "Path": "D:\\Serveur IA\\lanceur\\wireguard-prive",
+    "InheritanceDisabled": true,
+    "GrantedTo": [
+      "AUTORITE NT\\Système",
+      "BUILTIN\\Administrateurs",
+      "DESKTOP-OGQE53D\\karen"
+    ]
+  },
+  {
+    "Path": "D:\\Serveur IA\\lanceur\\espaces-prives",
+    "InheritanceDisabled": true,
+    "GrantedTo": [
+      "AUTORITE NT\\Système",
+      "BUILTIN\\Administrateurs",
+      "DESKTOP-OGQE53D\\karen"
+    ]
+  },
+  {
+    "Path": "D:\\Serveur IA\\lanceur\\securite",
+    "InheritanceDisabled": true,
+    "GrantedTo": [
+      "AUTORITE NT\\Système",
+      "BUILTIN\\Administrateurs",
+      "DESKTOP-OGQE53D\\karen"
+    ]
+  },
+  {
+    "Path": "D:\\Serveur IA\\toolchain\\android-signing",
+    "InheritanceDisabled": true,
+    "GrantedTo": [
+      "AUTORITE NT\\Système",
+      "BUILTIN\\Administrateurs",
+      "DESKTOP-OGQE53D\\karen"
+    ]
+  }
+]

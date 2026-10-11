@@ -1,0 +1,310 @@
+{
+  "prepared_at": "2026-10-11 12:12:53 +0200",
+  "before": {
+    "models": [
+      {
+        "pid": 8200,
+        "created": 1791651021.7995121
+      },
+      {
+        "pid": 14628,
+        "created": 1791651021.777978
+      }
+    ],
+    "preserved_files": {
+      "acces-distants.json": "1d357907389d2056a608c5e98b47d2fa31f519521af1f18e8f3666eb36e16037",
+      "wireguard.json": "6cbd6b81bd61645cce770ac2a7e03cdb99f86b800c95d4f05e0a425e3a6aa7dd",
+      "reglages.json": "63d67efcbd295491ce77dc49198426e1290d6dfeabc0119befe3e1b172ee1762",
+      "wireguard-prive/secrets.dpapi": "0bf5ae5faca3ad22177ce07af1d8587441ad569f0595a46a3c8c4d4184600a93",
+      "wireguard-prive/signature.dpapi": "240cd390a95972957889009bfabb7e54942f33d7f99d9ebb9a211ab1f9754a4a"
+    },
+    "user_data": {
+      "client_histories": {
+        "count": 1,
+        "sha256": "ed1cf2db46a4c82a2a35007a9a5dd9ed31f8533d7dc41d53aa0892ea1e91925b"
+      },
+      "projects": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "documents": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "memories": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "conversations": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "policies": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "jobs": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    },
+    "backups": {
+      "enabled": true,
+      "time": "03:00",
+      "frequency": "daily",
+      "weekday": 0,
+      "destination": "D:\\Serveur IA\\lanceur\\sauvegardes",
+      "secondary_destination": "",
+      "retention": {
+        "daily": 7,
+        "weekly": 4,
+        "monthly": 6
+      },
+      "secret_configured": true
+    },
+    "knowledge": {
+      "engine": {
+        "model": "EmbeddingGemma 2",
+        "engine": "Sentence Transformers / PyTorch",
+        "enabled": true,
+        "status": "pret",
+        "error": "",
+        "device": "cpu",
+        "precision": "float32",
+        "threads": 2,
+        "dimensions": 768,
+        "pid": 27804,
+        "last_seconds": 5.172000000005937,
+        "parameters": 271002624
+      },
+      "index": {
+        "indexed": 36,
+        "pending": 0,
+        "entries": 36,
+        "personal": 36,
+        "project": 0,
+        "limited": false,
+        "max_entries": 16000,
+        "max_owner_entries": 4000,
+        "last_sync": 1791713556.822706,
+        "error": "",
+        "reconstructible": true
+      }
+    }
+  },
+  "pre_rollout_backup": {
+    "file": "D:\\Serveur IA\\lanceur\\sauvegardes\\fred-20261011-121252-9f1be7cdd4c273970f0c474a.qwenbackup",
+    "size": 519827,
+    "sha256": "608b35a0931f77f2cb2fc59e3e873527b14311f293737f6370f0790abbdbda1c",
+    "version": 2,
+    "verified": true
+  },
+  "pre_rollout_counts": {
+    "profiles": 0,
+    "accounts": 0,
+    "projects": 0,
+    "documents": 0,
+    "memories": 0,
+    "conversations": 0,
+    "jobs": 0,
+    "client_histories": 1,
+    "policies": 0,
+    "document_original_bytes": 0,
+    "document_sources": 0,
+    "notifications": 0,
+    "notification_preferences": 0,
+    "notification_subscriptions": 0,
+    "personal_memories": 0,
+    "knowledge_exclusions": 0
+  },
+  "contains_secret_values": false,
+  "result": "PASS",
+  "activated_at": "2026-10-11 12:19:24 +0200",
+  "root": "D:\\Serveur IA\\lanceur\\donnees-clients",
+  "clients": [
+    {
+      "id": "0402a094eeb03bdc",
+      "path": "D:\\Serveur IA\\lanceur\\donnees-clients\\0402a094eeb03bdc",
+      "bytes": 464635,
+      "managed_files": 17,
+      "all_file_hashes_verified": true,
+      "tables": {
+        "client_histories": {
+          "count": 1,
+          "sha256": "ed1cf2db46a4c82a2a35007a9a5dd9ed31f8533d7dc41d53aa0892ea1e91925b"
+        },
+        "projects": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "documents": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "chunks": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "memories": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "policies": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "conversations": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "jobs": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "events": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "document_index": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "document_sources": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "notifications": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "notification_preferences": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "notification_subscriptions": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "notification_deliveries": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "personal_memories": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "knowledge_exclusions": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        }
+      }
+    },
+    {
+      "id": "8ab49467b5ff732e",
+      "path": "D:\\Serveur IA\\lanceur\\donnees-clients\\8ab49467b5ff732e",
+      "bytes": 202356,
+      "managed_files": 9,
+      "all_file_hashes_verified": true,
+      "tables": {
+        "client_histories": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "projects": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "documents": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "chunks": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "memories": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "policies": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "conversations": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "jobs": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "events": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "document_index": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "document_sources": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "notifications": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "notification_preferences": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "notification_subscriptions": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "notification_deliveries": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "personal_memories": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "knowledge_exclusions": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        }
+      }
+    }
+  ],
+  "post_rollout_backup": {
+    "file": "D:\\Serveur IA\\lanceur\\sauvegardes\\fred-20261011-121923-e70f01b34984adc60e7dece2.qwenbackup",
+    "size": 520019,
+    "sha256": "5d1c22b6bb39ccb141299df2dc2f168de324ec87da40fb8d3b3698cb971a5d86",
+    "version": 2,
+    "verified": true
+  },
+  "included_counts": {
+    "profiles": 0,
+    "accounts": 0,
+    "projects": 0,
+    "documents": 0,
+    "memories": 0,
+    "conversations": 0,
+    "jobs": 0,
+    "client_histories": 1,
+    "policies": 0,
+    "document_original_bytes": 0,
+    "document_sources": 0,
+    "notifications": 0,
+    "notification_preferences": 0,
+    "notification_subscriptions": 0,
+    "personal_memories": 0,
+    "knowledge_exclusions": 0
+  },
+  "qwen_processes_preserved": true,
+  "user_data_preserved": true,
+  "access_settings_and_backup_schedule_preserved": true,
+  "eg2_ready": true,
+  "storage_automatic": true
+}

@@ -1,0 +1,74 @@
+[
+  {
+    "name": "warmup",
+    "warmup": true,
+    "ttft_s": 1.5864301000001433,
+    "elapsed_s": 1.9870236000006116,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 31,
+      "prompt_ms": 1531.0,
+      "prompt_per_token_ms": 49.387,
+      "prompt_per_second": 20.2,
+      "predicted_n": 13,
+      "predicted_ms": 448.8,
+      "predicted_per_token_ms": 34.523,
+      "predicted_per_second": 29.0,
+      "draft_n": 8,
+      "draft_n_accepted": 8
+    },
+    "quality_pass": true,
+    "finish": "stop",
+    "text_sha256": "6c6b7785bb6580ec4281862cef4411347c281fd3f0f7d0ed7f1a9f4231c2b6eb",
+    "rss_peak_gib": 38.92607116699219,
+    "read_mib": 1.562666893005371
+  },
+  {
+    "name": "r1-ciel",
+    "warmup": false,
+    "ttft_s": 1.8359027999995305,
+    "elapsed_s": 8.851758299999346,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 40,
+      "prompt_ms": 1791.2,
+      "prompt_per_token_ms": 44.78,
+      "prompt_per_second": 22.3,
+      "predicted_n": 192,
+      "predicted_ms": 7051.3,
+      "predicted_per_token_ms": 36.726,
+      "predicted_per_second": 27.2,
+      "draft_n": 152,
+      "draft_n_accepted": 94
+    },
+    "quality_pass": true,
+    "finish": "length",
+    "text_sha256": "a882e900a6a771f7bdc966c4da071144feb50165d7ebfd0166be73941b1c1045",
+    "rss_peak_gib": 42.31035614013672,
+    "read_mib": 12.922098159790039
+  },
+  {
+    "name": "r1-fibonacci",
+    "warmup": false,
+    "ttft_s": 1.857233599999745,
+    "elapsed_s": 3.357300399999076,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 45,
+      "prompt_ms": 1812.9,
+      "prompt_per_token_ms": 40.287,
+      "prompt_per_second": 24.8,
+      "predicted_n": 48,
+      "predicted_ms": 1537.9,
+      "predicted_per_token_ms": 32.04,
+      "predicted_per_second": 31.2,
+      "draft_n": 34,
+      "draft_n_accepted": 30
+    },
+    "quality_pass": false,
+    "finish": "stop",
+    "text_sha256": "e70b0338ee51052337b5facef564ffd85d42d9ab4f1b76412b63e59b9747ed80",
+    "rss_peak_gib": 43.61669921875,
+    "read_mib": 2.386951446533203
+  }
+]

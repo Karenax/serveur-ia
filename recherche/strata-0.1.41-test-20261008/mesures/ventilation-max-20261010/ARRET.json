@@ -1,0 +1,54 @@
+{
+  "stopped_at": "2026-10-10T17:00:56+0200",
+  "reason": "Arret demande par utilisateur; chauffe persistante.",
+  "benchmark_processes_remaining": [],
+  "engine": {
+    "pid": 26180,
+    "exe": "D:\\Serveur IA\\strata-build-p100\\strata.exe"
+  },
+  "health": {
+    "status": "ok",
+    "max_context": 262144,
+    "model": "qwen3.8-flash-next-iq4-xs",
+    "images": false,
+    "api_key": false,
+    "loaded": true,
+    "service": "strata"
+  },
+  "slots": [
+    {
+      "id": 0,
+      "n_ctx": 262144,
+      "is_processing": false
+    }
+  ],
+  "test_port_closed": true,
+  "production_files": [
+    {
+      "path": "D:\\Serveur IA\\lanceur\\reglages.json",
+      "unchanged": true
+    },
+    {
+      "path": "D:\\Serveur IA\\lanceur\\base-strata.json",
+      "unchanged": true
+    },
+    {
+      "path": "D:\\Serveur IA\\strata-iq4-p100-hybride.json",
+      "unchanged": true
+    },
+    {
+      "path": "D:\\Serveur IA\\strata-build-p100\\strata.exe",
+      "unchanged": true
+    },
+    {
+      "path": "D:\\Serveur IA\\lanceur\\sessions\\20261008-200015-679575\\strata.json",
+      "unchanged": true
+    }
+  ],
+  "gpu_after": [
+    "Quadro P2200, 40, 139, 0x0000000000000001, 5",
+    "Tesla P100-PCIE-16GB, 71, 1189, 0x0000000000000000, 0",
+    "Tesla P100-PCIE-16GB, 73, 1189, 0x0000000000000000, 0"
+  ],
+  "experimental_engine_started": false
+}

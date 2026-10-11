@@ -1,0 +1,62 @@
+{
+  "created_utc": "2026-10-10T20:24:20.4575589Z",
+  "scope": "Lots 0-4 device backend and client delivery proofs",
+  "device_tests": {
+    "count": 17,
+    "elapsed_seconds": 64.954,
+    "result": "PASS",
+    "logs": "device-tests-final.log"
+  },
+  "android_emulators": {
+    "phone": "Fred_Telephone_API36 Android 16 x86_64",
+    "tablet": "Fred_Tablette_API36 Android 16 x86_64",
+    "core_generation_restore_ack": "PASS both; encrypted previous local history decrypts under new backup filename",
+    "native_wireguard_udp_sse_device_report": "PASS both",
+    "release_install_onboarding_demo_ignored": "PASS both",
+    "physical_devices": "not tested"
+  },
+  "versions": {
+    "windows": "3.5.17",
+    "android": "1.0.1",
+    "android_version_code": 2,
+    "server": "3.5.17"
+  },
+  "android_signing_certificate_sha256": "40216ff897090b49b21e3cda66169b9fb7070e42dd2b8cb9ebe0f2c441997048",
+  "artifacts": {
+    "windows": {
+      "file": "D:\\Serveur IA\\toolchain\\releases-staging\\windows-3.5.17\\Accès serveur Fred.exe",
+      "bytes": 25590937,
+      "sha256": "307f5e3bcce5e31617606c56e034636026707c16d4a26ccfd1316927a4d78738",
+      "production_file": "D:\\Serveur IA\\client-qwen\\dist\\Accès serveur Fred.exe"
+    },
+    "android": {
+      "file": "D:\\Serveur IA\\client-android\\dist\\Acces-serveur-Fred-Android.apk",
+      "bytes": 8493381,
+      "sha256": "a0cdb80a49c892f38b647aaa6d300398cac53b1eee64727636594f0fb9bf5751"
+    },
+    "previous_android": {
+      "file": "D:\\Serveur IA\\toolchain\\releases-staging\\android-1.0.0\\Acces-serveur-Fred-Android.apk",
+      "bytes": 8493381,
+      "sha256": "4af4c6ceec76894599b45a31cb2a4f4d883534a821f16ab2561c792b99200670"
+    }
+  },
+  "android_limitations": [
+    "ARM64 and x86_64; 32-bit unsupported",
+    "Native core tests use debug instrumentation and isolated synthetic transport; release installs verified separately",
+    "Emulator userdebug WebView may force DevTools despite release DEBUG=false"
+  ],
+  "regression_fixed": "AES-GCM filename AAD: restore recovery copy re-encrypted rather than raw ciphertext copied",
+  "windows_update_compatibility": {
+    "result": "PASS",
+    "count": 2,
+    "elapsed_seconds": 3.114,
+    "log": "windows-update-compatibility-final.log",
+    "build_log": "windows-3.5.17-build.log",
+    "self_test": "windows-3.5.17-selftest-compatibility.txt",
+    "behavior": "Existing contract restored: updates may begin with API requests active, duplicate updates are rejected, and the window closes only after preparation; endpoint changes remain blocked during active API requests.",
+    "source_change": "Removed the temporary active_requests guard from Remote.update; obsolete audit now tests endpoint changes only.",
+    "publication": "Published to client-qwen/dist; SHA-256 and existing-key signed manifest verified."
+  },
+  "updated_at": "2026-10-10T22:27:00.092286+02:00",
+  "production_validation": "production-validation.json"
+}

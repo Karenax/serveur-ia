@@ -1,0 +1,60 @@
+{
+  "profiles": [
+    {
+      "profile": "reference",
+      "version": "strata 0.1.41",
+      "tokenizer": "ok",
+      "paths": "ok"
+    },
+    {
+      "profile": "trim",
+      "version": "strata 0.1.41",
+      "tokenizer": "ok",
+      "paths": "ok"
+    },
+    {
+      "profile": "pipeline",
+      "version": "strata 0.1.41",
+      "tokenizer": "ok",
+      "paths": "ok"
+    },
+    {
+      "profile": "benchmark",
+      "version": "strata 0.1.41",
+      "tokenizer": "ok",
+      "paths": "ok"
+    },
+    {
+      "profile": "fp16",
+      "version": "strata 0.1.41",
+      "tokenizer": "ok",
+      "paths": "ok"
+    },
+    {
+      "profile": "cpu-prefill",
+      "version": "strata 0.1.41",
+      "tokenizer": "ok",
+      "paths": "ok"
+    },
+    {
+      "profile": "cpu-court",
+      "version": "strata 0.1.41",
+      "tokenizer": "ok",
+      "paths": "ok"
+    },
+    {
+      "profile": "cpu-court-pin",
+      "version": "strata 0.1.41",
+      "tokenizer": "ok",
+      "paths": "ok"
+    },
+    {
+      "profile": "cpu-court-pin-4096",
+      "version": "strata 0.1.41",
+      "tokenizer": "ok",
+      "paths": "ok"
+    }
+  ],
+  "model_loaded": false,
+  "gpu_inference_tested": false
+}

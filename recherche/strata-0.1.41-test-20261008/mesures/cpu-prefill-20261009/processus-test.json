@@ -1,0 +1,9 @@
+{
+  "pid": 19368,
+  "env": {
+    "STRATA_PREFILL_CPU_SHARE": "auto",
+    "STRATA_PREFILL_CPU_SHARE_MAX": "3072"
+  },
+  "rss_gib": 97.64770126342773,
+  "read_gib": 3.533208142966032
+}

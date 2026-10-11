@@ -1,0 +1,13 @@
+{
+  "phase": "production-retablie",
+  "production_pid": 25124,
+  "test_pid": 19368,
+  "result": {
+    "quality_pass": true,
+    "median_decode_ratio": 1.1335311572700297,
+    "min_document_prefill_ratio": 0.6388415672913118,
+    "acceptable": false
+  },
+  "production_version": "0.1.35",
+  "recovery_note": "Verification reprise terminee; console reconnectee apres apparition du processus moteur."
+}

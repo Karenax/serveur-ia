@@ -1,0 +1,35 @@
+[
+  {
+    "profile": "Actuel 0.1.35",
+    "measured": 9,
+    "exact_value_checks_passed": 7,
+    "exact_value_checks_total": 7,
+    "nonempty_science_answers": 2,
+    "strict_json": 5,
+    "decode_ratio_median": 1.0,
+    "minimum_document_prefill_ratio": 1.0,
+    "acceptable": true
+  },
+  {
+    "profile": "Officiel 0.1.41",
+    "measured": 9,
+    "exact_value_checks_passed": 7,
+    "exact_value_checks_total": 7,
+    "nonempty_science_answers": 2,
+    "strict_json": 5,
+    "decode_ratio_median": 1.139751552795031,
+    "minimum_document_prefill_ratio": 0.8283867176021157,
+    "acceptable": false
+  },
+  {
+    "profile": "0.1.41 avec FP16",
+    "measured": 9,
+    "exact_value_checks_passed": 7,
+    "exact_value_checks_total": 7,
+    "nonempty_science_answers": 2,
+    "strict_json": 5,
+    "decode_ratio_median": 1.148606811145511,
+    "minimum_document_prefill_ratio": 0.7807816632383191,
+    "acceptable": false
+  }
+]

@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "engine": "Pocket TTS 3.3.0",
+  "language": "fr",
+  "voice": "estelle",
+  "device": "cpu",
+  "first_chunk_seconds": 0.17199999999866122,
+  "compute_seconds": 1.389999999999418,
+  "audio_seconds": 3.92,
+  "rss_bytes": 901070848
+}

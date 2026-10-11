@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "form": "tablet",
+  "mode": "granted",
+  "checks": [
+    "granted Android permission enables discreet alerts"
+  ],
+  "exceptions": 0,
+  "transport": "real Android WireGuard UDP",
+  "backend": "actual isolated Workspace and Notifications"
+}

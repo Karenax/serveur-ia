@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "form": "tablet",
+  "mode": "reconnected",
+  "checks": [
+    "closed/reopened client catches up persistent event generated while stopped"
+  ],
+  "exceptions": 0,
+  "transport": "real Android WireGuard UDP",
+  "backend": "actual isolated Workspace and Notifications"
+}

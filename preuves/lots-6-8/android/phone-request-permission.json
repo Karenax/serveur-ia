@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "form": "phone",
+  "mode": "request-permission",
+  "checks": [
+    "permission requested only after user taps activation"
+  ],
+  "exceptions": 0,
+  "transport": "real Android WireGuard UDP",
+  "backend": "actual isolated Workspace and Notifications"
+}

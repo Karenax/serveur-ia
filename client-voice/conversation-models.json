@@ -1,0 +1,46 @@
+{
+  "format": 1,
+  "model": "Zipformer fran\u00e7ais + Silero + Smart Turn 3.2",
+  "files": [
+    {
+      "name": "encoder.onnx",
+      "url": "https://huggingface.co/shaojieli/sherpa-onnx-streaming-zipformer-fr-2023-04-14/resolve/3db9565d9633758d6b87b9a7b3dc09ebfb6b2c73/encoder-epoch-29-avg-9-with-averaged-model.int8.onnx",
+      "bytes": 126655903,
+      "sha256": "47a94a7fdc8dff63d708be4ea0535747640224467f91e238311f1ddbdd09327e"
+    },
+    {
+      "name": "decoder.onnx",
+      "url": "https://huggingface.co/shaojieli/sherpa-onnx-streaming-zipformer-fr-2023-04-14/resolve/3db9565d9633758d6b87b9a7b3dc09ebfb6b2c73/decoder-epoch-29-avg-9-with-averaged-model.int8.onnx",
+      "bytes": 1307157,
+      "sha256": "e72b2b9ed36355bd0dd43433f7dd258e7226ab54c9ef42b28c73ebb785805623"
+    },
+    {
+      "name": "joiner.onnx",
+      "url": "https://huggingface.co/shaojieli/sherpa-onnx-streaming-zipformer-fr-2023-04-14/resolve/3db9565d9633758d6b87b9a7b3dc09ebfb6b2c73/joiner-epoch-29-avg-9-with-averaged-model.int8.onnx",
+      "bytes": 259572,
+      "sha256": "fc2f3bb851a15a532c6f2422d53eecd1ca949f12b0897e07a852021c30481711"
+    },
+    {
+      "name": "tokens.txt",
+      "url": "https://huggingface.co/shaojieli/sherpa-onnx-streaming-zipformer-fr-2023-04-14/resolve/3db9565d9633758d6b87b9a7b3dc09ebfb6b2c73/tokens.txt",
+      "bytes": 4819,
+      "sha256": "37fb3f2a7bcb85e5fff3f1f66be04e6fbb05077a22f56d177fe85704e945fb31"
+    },
+    {
+      "name": "smart-turn.onnx",
+      "url": "https://huggingface.co/pipecat-ai/smart-turn-v3/resolve/f766f81d3cfdf7737ac64aad813d91bbfd56bf93/smart-turn-v3.2-cpu.onnx",
+      "bytes": 8679182,
+      "sha256": "2bb026316b14a660486a75b1733cd3fbab8c2fd0314dc9af7be49f8cca967e4f"
+    },
+    {
+      "name": "silero-vad.onnx",
+      "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/silero_vad.onnx",
+      "bytes": 643854,
+      "sha256": "9e2449e1087496d8d4caba907f23e0bd3f78d91fa552479bb9c23ac09cbb1fd6"
+    }
+  ],
+  "revisions": {
+    "shaojieli/sherpa-onnx-streaming-zipformer-fr-2023-04-14": "3db9565d9633758d6b87b9a7b3dc09ebfb6b2c73",
+    "pipecat-ai/smart-turn-v3": "f766f81d3cfdf7737ac64aad813d91bbfd56bf93"
+  }
+}

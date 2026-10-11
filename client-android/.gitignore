@@ -1,0 +1,9 @@
+.gradle/
+local.properties
+*.apk
+*.aab
+*.jks
+*.keystore
+*.p12
+*.fred-android
+exports-prives/

@@ -1,0 +1,26 @@
+{
+  "outcomes": [
+    {
+      "profile": "cpu-court",
+      "quality_pass": true,
+      "median_decode_ratio": 1.1441826923076923,
+      "min_document_prefill_ratio": 0.953625081645983,
+      "long_ttft_median_s": 168.45368579999922,
+      "long_prefill_ratio": 0.9839500314315566,
+      "acceptable": true
+    },
+    {
+      "profile": "cpu-court-pin",
+      "quality_pass": true,
+      "median_decode_ratio": 1.1336018769299776,
+      "min_document_prefill_ratio": 1.016434262948207,
+      "long_ttft_median_s": 155.5898376499972,
+      "long_prefill_ratio": 1.072340917310715,
+      "acceptable": true
+    }
+  ],
+  "phase": "production-retablie",
+  "profile": "cpu-court-pin",
+  "pid": 7712,
+  "production_version": "0.1.35"
+}

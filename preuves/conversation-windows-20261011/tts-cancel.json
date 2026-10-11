@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "engine": "real Pocket TTS CPU offline",
+  "cancel_before_speak": {
+    "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "done": true,
+    "cancelled": true
+  },
+  "next_request_frames": 30,
+  "pcm_bytes": 145920,
+  "first_chunk_seconds": 0.17199999999866122,
+  "clean_exit": true,
+  "no_audio_saved": true
+}

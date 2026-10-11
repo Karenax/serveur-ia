@@ -44,6 +44,8 @@
 **/espaces-prives/
 **/sessions/
 **/sauvegardes/
+**/securite/
+*.fredkeys
 **/local-data/
 **/comptes.json
 **/acces-distants.json
@@ -53,6 +55,7 @@
 **/connexions.json
 **/audit.json
 /lanceur/*.json
+/lanceur/donnees-clients/
 !/lanceur/base-strata.json
 !/lanceur/reglages-par-defaut.json
 !/lanceur/derniers-reglages-valides.json
@@ -99,3 +102,27 @@
 **/build.ninja
 **/.ninja_deps
 **/.ninja_log
+
+# Environnement et artefacts du client Android.
+/client-android/.gradle/
+/client-android/local.properties
+*.apk
+*.aab
+*.jks
+*.keystore
+*.p12
+*.fred-android
+
+# Profils et téléchargements temporaires des essais navigateur.
+**/chrome-*-profile/
+**/chrome-profile*/
+**/downloads-*/
+
+# Moteurs empaquetés et poids optionnels ; conserver sources/catalogues/licences.
+/client-qwen/voice/conversation-worker/
+*.pyd
+*.onnx
+*.tflite
+*.pt
+*.pth
+*.ckpt

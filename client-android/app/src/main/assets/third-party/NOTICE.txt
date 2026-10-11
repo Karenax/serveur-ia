@@ -1,0 +1,52 @@
+Accès serveur Fred Android — licences incluses
+
+Le code applicatif est sous licence MIT. Chaque composant conserve sa licence.
+Les textes originaux complets sont fournis dans ce dossier, sans modification.
+Les modules Go téléchargés du bridge sont inclus ; des licences supplémentaires
+peuvent concerner uniquement la variante Windows de ce même bridge.
+
+Accès serveur Fred
+  application/LICENSE.txt
+
+Go runtime go1.27.1
+  go/LICENSE
+
+markdown-it 15.0.2
+  markdown-it/LICENSE.txt
+
+whisper.cpp 1.9.5
+  whisper/whisper.cpp-LICENSE.txt
+
+ggml 1.9.5
+  whisper/ggml-LICENSE.txt
+
+whisper-model small
+  whisper/whisper-model-LICENSE.txt
+
+llamafile 1.9.5
+  whisper/llamafile-LICENSE.txt
+
+github.com/google/btree v1.1.2
+  modules/github.com/google/btree/LICENSE
+
+golang.org/x/crypto v0.37.0
+  modules/golang.org/x/crypto/LICENSE
+
+golang.org/x/net v0.39.0
+  modules/golang.org/x/net/LICENSE
+
+golang.org/x/sys v0.32.0
+  modules/golang.org/x/sys/LICENSE
+
+golang.org/x/time v0.7.0
+  modules/golang.org/x/time/LICENSE
+
+golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2
+  modules/golang.zx2c4.com/wintun/LICENSE
+
+golang.zx2c4.com/wireguard v0.0.0-20260522210424-ecfc5a8d5446
+  modules/golang.zx2c4.com/wireguard/LICENSE
+
+gvisor.dev/gvisor v0.0.0-20250503011706-39ed1f5ac29c
+  modules/gvisor.dev/gvisor/LICENSE
+

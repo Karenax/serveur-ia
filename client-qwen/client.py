@@ -169,7 +169,7 @@ class Remote:
         request = urllib.request.Request(url + path, data=data,
             headers={**headers, 'User-Agent':'AccesServeurFred/'+VERSION+' (Windows; '+('HTTPS' if https else 'WireGuard')+')', 'Content-Type': 'application/json','X-Qwen-Session':self.session,**({'X-Qwen-Request':request_id} if request_id else {})})
         try:
-            response=opener.open(request, timeout=900 if path=="/v1/chat/completions" else 120 if path=="/v1/client/download" else 60 if path in ("/v1/workspace/action","/v1/history") else 30)
+            response=opener.open(request, timeout=900 if path=="/v1/chat/completions" else 120 if path=="/v1/client/download" else 60 if path in ("/v1/workspace/action","/v1/history") else 3 if path=="/v1/device" else 30)
             self.last_contact=time.time();self.event('server_response',route=path,status=getattr(response,'status',200))
             return response
         except urllib.error.HTTPError as error:
@@ -231,6 +231,16 @@ class Remote:
                     with self.open('/v1/models') as response:
                         data=json.load(response).get('data')
                     if not isinstance(data,list):raise ValueError('Liste des modèles invalide dans /v1/models.')
+                    # Display hints only; older servers may not implement this route.
+                    if time.time()-getattr(self,'device_reported_at',0)>=60:
+                        self.device_reported_at=time.time()
+                        try:
+                            declaration={'kind':'pc','version':VERSION,'transport':'https' if self.endpoint==HTTPS_ENDPOINT else 'wireguard'}
+                            with self.open('/v1/device',json.dumps(declaration).encode()) as response:response.read(2048)
+                        except urllib.error.HTTPError as error:
+                            if error.code in (401,403):raise
+                            error.close()
+                        except (OSError,ValueError):pass
                     models=list(dict.fromkeys(row['id'] for row in data if isinstance(row,dict) and isinstance(row.get('id'),str) and row['id'].strip() and len(row['id'])<=512))
                     self.model_capabilities={row['id']:row.get('capabilities',{}) for row in data if isinstance(row,dict) and row.get('id') in models and isinstance(row.get('capabilities',{}),dict)}
                     self.models=models;self.reachable=True
@@ -268,6 +278,10 @@ class Remote:
             return self.state()
 
 def serve_local(remote, key, port=LOCAL_API_PORT):
+    from local_voice import VoiceService
+    voice=VoiceService(Path(getattr(sys, "_MEIPASS", Path(__file__).parent))/"voice")
+    from conversation_service import ConversationService
+    conversation=ConversationService(Path(getattr(sys, "_MEIPASS", Path(__file__).parent))/"voice")
     from draft_store import DraftStore
     from history_sync import HistorySync
     drafts=DraftStore(settings_path(remote.profile),protect)
@@ -312,7 +326,7 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
             nonce = secrets.token_urlsafe(24)
             config = json.dumps({'key':key, 'model':remote.model, 'version':VERSION, 'storage':hashlib.sha256(key.encode()).hexdigest()[:20]}, ensure_ascii=False).replace('<', '\\u003c')
             template = Path(getattr(sys, '_MEIPASS', Path(__file__).parent)) / 'chat.html'
-            presentation = ''.join('<script nonce="__NONCE__">'+(template.parent/name).read_text(encoding='utf-8')+'</script>' for name in ('ui.js','attachments.js','corrector.js','selection.js','thinking.js'))
+            presentation = ''.join('<script nonce="__NONCE__">'+(template.parent/name).read_text(encoding='utf-8')+'</script>' for name in ('ui.js','attachments.js','corrector.js','selection.js','thinking.js','voice.js','conversation.js'))
             markdown=''.join('<script nonce="__NONCE__">'+path.read_text(encoding='utf-8').replace('</script','<\\/script')+'</script>' for path in (template.parent/'vendor/markdown-it.min.js',template.parent/'markdown.js'))
             content = template.read_text(encoding='utf-8').replace('</head>',markdown+'</head>').replace('</body>',(template.parent/'workspace.html').read_text(encoding='utf-8')+presentation+'</body>').replace('__UI_CSS__',(template.parent/'ui.css').read_text(encoding='utf-8')).replace('__CONFIG__', config).replace('__NONCE__', nonce).encode()
             self.send_response(200)
@@ -325,8 +339,14 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
             self.wfile.write(content)
 
         def do_GET(self):
+            if self.path == '/client/conversation':
+                if not self.authorized():return
+                return self.reply(200,conversation.status())
             if self.path in ('/', '/chat'):
                 return self.chat()
+            if self.path == '/client/voice':
+                if not self.authorized():return
+                return self.reply(200,voice.status())
             if self.path == '/client/integrations':
                 if not self.authorized():return
                 return self.reply(200,{'apps':app_integrations.detect()})
@@ -345,7 +365,7 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
                 try:
                     return self.reply(200,drafts.read())
                 except (OSError,ValueError):return self.reply(500,{'error':{'message':'Brouillon local illisible : le fichier est conservé.'}})
-            if self.path not in ('/v1/models', '/v1/status','/v1/workspace'):
+            if self.path not in ('/v1/models', '/v1/status','/v1/workspace','/v1/notifications','/v1/voice/status'):
                 return self.reply(404, {'error': {'message': 'Route non disponible.'}})
             if not self.authorized():
                 return
@@ -358,7 +378,7 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
             self.forward()
 
         def do_POST(self):
-            if self.path not in ('/v1/chat/completions','/v1/context', '/v1/cancel','/v1/workspace/action','/client/draft','/client/endpoint','/client/preferences','/client/update/check','/client/update/apply','/client/history','/client/history/sync','/client/history/flush','/client/history/recover','/client/integrations/apply'):
+            if self.path not in ('/v1/chat/completions','/v1/context', '/v1/cancel','/v1/workspace/action','/v1/notifications/action','/v1/voice/speech','/v1/voice/cancel','/client/conversation','/client/draft','/client/endpoint','/client/preferences','/client/update/check','/client/update/apply','/client/history','/client/history/sync','/client/history/restore-ack','/client/history/flush','/client/history/recover','/client/integrations/apply','/client/voice'):
                 return self.reply(404, {'error': {'message': 'Route non disponible.'}})
             if not self.authorized():
                 return
@@ -376,7 +396,15 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
                 try:
                     values=json.loads(body)
                     if not isinstance(values,dict):raise ValueError('Paramètres invalides.')
-                    if self.path=='/client/integrations/apply':
+                    if self.path in ('/client/update/apply','/client/endpoint') and (voice.status()['phase'] in ('loading','listening','finishing','cancelling') or conversation.status()['phase'] in ('loading','listening','stopping')):
+                        raise ValueError('Terminez la dictée avant de mettre le client à jour.')
+                    if self.path=='/client/conversation':
+                        if values.get('action')=='start' and voice.status()['phase'] in ('loading','listening','finishing','cancelling'):raise ValueError('Terminez la dictée avant de converser.')
+                        result=conversation.action(values)
+                    elif self.path=='/client/voice':
+                        if values.get('action')=='start' and conversation.status()['phase'] in ('loading','listening','stopping'):raise ValueError('Raccrochez avant de dicter.')
+                        result=voice.action(values)
+                    elif self.path=='/client/integrations/apply':
                         if set(values)-{'app','model'}:raise ValueError('Paramètres d’intégration invalides.')
                         state=remote.check()
                         if not state['connected']:raise ValueError('Connectez le client au serveur et chargez un modèle avant de l’ajouter.')
@@ -393,6 +421,7 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
                         result=histories.write(values.get('history'),values.get('revision',''))
                     elif self.path=='/client/history/sync':
                         result=histories.synchronize(values.get('initial'))
+                    elif self.path=='/client/history/restore-ack':result=histories.acknowledge_restore(values.get('confirm'))
                     elif self.path=='/client/history/flush':result=histories.flush()
                     elif self.path=='/client/preferences':result=save_preferences(remote.profile,values)
                     elif self.path=='/client/history/recover':
@@ -433,6 +462,9 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
                         done=False
                         for line in response:
                             if line.strip()==b'data: [DONE]':done=True
+                            if self.path=='/v1/voice/speech' and line.startswith(b'data: '):
+                                try:done=done or bool(json.loads(line[6:]).get('done'))
+                                except (ValueError,AttributeError):pass
                             if chat_stream:
                                 remote.stream['last_event']=time.time()
                                 if line.startswith(b': qwen-queue '):
@@ -459,7 +491,7 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
                                 break
                             self.wfile.write(block)
             except (OSError, ValueError, urllib.error.URLError):
-                remote.failure('connection_error','Connexion au serveur IA interrompue. Réessayer la requête.')
+                if self.path!='/v1/voice/speech':remote.failure('connection_error','Connexion au serveur IA interrompue. Réessayer la requête.')
                 if not sent:
                     self.reply(503, {'error': {'message': 'Connexion au serveur IA indisponible.'}})
                 elif streaming:
@@ -471,6 +503,8 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
                 if tracked:
                     with remote.activity_lock:remote.active_requests-=1
     server = LocalHTTPServer(('127.0.0.1', port), Handler)
+    server.voice = voice
+    server.conversation = conversation
     server.daemon_threads = True
     return server
 
@@ -479,6 +513,11 @@ class LocalHTTPServer(ThreadingHTTPServer):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.workers=threading.BoundedSemaphore(24)
+
+    def server_close(self):
+        if hasattr(self, "conversation"):self.conversation.close()
+        if hasattr(self, "voice"):self.voice.close()
+        super().server_close()
 
     def process_request(self,request,address):
         if not self.workers.acquire(blocking=False):
@@ -583,7 +622,7 @@ def install_close_guard(window):
                 if result.get('saved') or window.create_confirmation_dialog(APP_NAME,'Historique non enregistré : '+result.get('message','')+'\nExportez vos conversations pour les conserver. Fermer quand même ?'):
                     state['ready']=True;window.destroy()
                 else:state['pending']=False
-            try:window.evaluate_js("(async()=>{try{controller?.abort();if(busy)await api('/v1/cancel',{}, {'X-Qwen-Request':requestId});await uiPersistPreferences();await flushHistory();await api('/client/history/flush',{});return {saved:true};}catch(e){return {saved:false,message:e.message};}})()",callback=complete)
+            try:window.evaluate_js("(async()=>{try{await window.voiceFinishForClose?.();controller?.abort();if(busy)await api('/v1/cancel',{}, {'X-Qwen-Request':requestId});await uiPersistPreferences();await flushHistory();await api('/client/history/flush',{});return {saved:true};}catch(e){return {saved:false,message:e.message};}})()",callback=complete)
             except Exception as error:complete({'saved':False,'message':str(error)})
         threading.Thread(target=work,daemon=True).start()
         return False
@@ -614,6 +653,32 @@ def main():
         assert all((Path(getattr(sys, '_MEIPASS', Path(__file__).parent)) / name).is_file() for name in ('ui.css','ui.js'))
         engine=Path(getattr(sys,'_MEIPASS',Path(__file__).parent))/'wireguard-bridge.exe'
         assert subprocess.run([str(engine),'--self-test'],capture_output=True,timeout=10,creationflags=0x08000000).returncode==0
+        if '--voice-self-test' in sys.argv:
+            from local_voice import VoiceService, NativeEngine
+            resources=Path(getattr(sys,'_MEIPASS',Path(__file__).parent))/'voice'
+            voice=VoiceService(resources)
+            voice._verify()
+            native=NativeEngine(resources,voice.model)
+            try:
+                deadline=time.monotonic()+30
+                while native.status()['phase']=='loading' and time.monotonic()<deadline:time.sleep(.05)
+                assert native.status()['phase']=='listening',native.status()
+                native.feed(b'\0'*3200);native.stop()
+                while native.status()['phase']=='finishing' and time.monotonic()<deadline:time.sleep(.05)
+                assert native.status()['phase']=='ready' and native.status()['text']=='',native.status()
+            finally:native.close();voice.close()
+        if '--conversation-self-test' in sys.argv:
+            from conversation_service import ConversationService
+            resources=Path(getattr(sys,'_MEIPASS',Path(__file__).parent))/'voice'
+            conversation=ConversationService(resources)
+            try:
+                status=conversation.action({'action':'start'});deadline=time.monotonic()+30
+                while conversation.status()['phase']=='loading' and time.monotonic()<deadline:time.sleep(.1)
+                assert conversation.status()['phase']=='listening' and conversation.status().get('aec'),conversation.status()
+                time.sleep(.5);conversation.action({'action':'stop','session':status['session']})
+                while conversation.status()['phase']=='stopping' and time.monotonic()<deadline:time.sleep(.1)
+                assert conversation.status()['phase']=='stopped',conversation.status()
+            finally:conversation.close()
         if '--result' in sys.argv:
             Path(sys.argv[sys.argv.index('--result')+1]).write_text(APP_NAME+' self-test OK', encoding='utf-8')
         else:

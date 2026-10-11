@@ -36,6 +36,9 @@ def validate_access(data):
             raise ValueError('Empreinte ou révocation client invalide.')
         if type(record.get('suspended',False)) is not bool:
             raise ValueError('Politique client invalide.')
+        from devices import fields
+        fields({key:record['device_'+key] for key in ('kind','owner','version') if 'device_'+key in record})
+        if type(record.get('android_profile',False)) is not bool:raise ValueError('Format de profil appareil invalide.')
         expiry=record.get('expires_epoch')
         if expiry is not None and (type(expiry) not in (int,float) or not math.isfinite(expiry) or expiry<=0):raise ValueError('Expiration client invalide.')
         if 'address' in record:

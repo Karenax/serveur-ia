@@ -1,0 +1,14 @@
+test_automatic_committed_update_and_restore_refresh (test_client_storage.ClientStorageTests.test_automatic_committed_update_and_restore_refresh) ... ok
+test_connection_profile_is_stored_encrypted_not_in_readable_exports (test_client_storage.ClientStorageTests.test_connection_profile_is_stored_encrypted_not_in_readable_exports) ... ok
+test_document_delete_removes_only_managed_files (test_client_storage.ClientStorageTests.test_document_delete_removes_only_managed_files) ... ok
+test_folder_database_and_readable_exports_are_owner_isolated (test_client_storage.ClientStorageTests.test_folder_database_and_readable_exports_are_owner_isolated) ... ok
+test_missing_or_corrupt_generated_file_is_rebuilt (test_client_storage.ClientStorageTests.test_missing_or_corrupt_generated_file_is_rebuilt) ... ok
+test_rename_and_archiving_keep_stable_folder_and_history (test_client_storage.ClientStorageTests.test_rename_and_archiving_keep_stable_folder_and_history) ... ok
+test_snapshot_before_restoration_cannot_be_published_after_generation_changes (test_client_storage.ClientStorageTests.test_snapshot_before_restoration_cannot_be_published_after_generation_changes) ... ok
+test_unchanged_snapshot_is_not_rewritten_and_manual_files_survive (test_client_storage.ClientStorageTests.test_unchanged_snapshot_is_not_rewritten_and_manual_files_survive) ... ok
+test_unsafe_names_and_linked_directories_are_refused (test_client_storage.ClientStorageTests.test_unsafe_names_and_linked_directories_are_refused) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 12.566s
+
+OK

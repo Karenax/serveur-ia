@@ -1,0 +1,17 @@
+{
+  "result": "PASS",
+  "documents_checked": [
+    "CONTEXTE-PROJET.md",
+    "PLAN-GLOBAL-SERVEUR-FRED.md",
+    "PLAN-SAUVEGARDES-APPAREILS.md",
+    "README.md",
+    "lanceur/SAUVEGARDES-APPAREILS.md",
+    "lanceur/RECUPERATION-SIGNATURES.md",
+    "preuves/lots-0-4/VALIDATION.md",
+    "preuves/lots-0-4/console/INDEX.md",
+    "client-android/README.md",
+    "client-android/VALIDATION.md"
+  ],
+  "local_links_present": 112,
+  "final_regressions": "191 PASS"
+}

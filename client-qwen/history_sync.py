@@ -72,8 +72,8 @@ class HistorySync:
         finally:
             with self.remote.activity_lock:self.remote.active_requests-=1
 
-    def remember(self,history,local_revision,server_revision):
-        self.meta={'server_revision':server_revision,'local_revision':local_revision,'base':fingerprints(history),'reset_id':history_store.HISTORY_RESET_ID}
+    def remember(self,history,local_revision,server_revision,generation=None):
+        self.meta={'server_revision':server_revision,'local_revision':local_revision,'base':fingerprints(history),'reset_id':history_store.HISTORY_RESET_ID,'generation':generation or self.meta.get('generation','')}
         history_store.atomic(self.meta_path,self.protect(json.dumps(self.meta,ensure_ascii=False).encode()))
 
     def synchronize(self,initial=None):
@@ -82,6 +82,9 @@ class HistorySync:
                 local=history_store.read(self.path,self.protect);server=self.api();history=local['history'];conflicts=0
                 if server.get('reset_id')!=history_store.HISTORY_RESET_ID:
                     raise history_store.HistoryError('Mettre à jour le serveur pour utiliser ce client sans profils.')
+                if history is not None and server.get('generation') and self.meta.get('generation')!=server['generation'] and (self.meta.get('generation') or server.get('restored')):
+                    self.result={'server_synced':False,'pending':True,'needs_merge':True,'requires_restore_ack':True,'message':'État serveur différent : confirmer sa reprise. Votre copie locale sera conservée.'}
+                    return {**local,**self.status()}
                 if history is None:
                     # A fresh empty placeholder must never replace an existing server history.
                     history=server['history'] or history_store.validate(initial)
@@ -92,10 +95,10 @@ class HistorySync:
                         history,conflicts=merge(history,server['history'],self.meta.get('base',{}))
                 elif server['history']:history=server['history']
                 if history!=server['history']:
-                    saved=self.api({'history':history,'revision':server['revision'],'reset_id':history_store.HISTORY_RESET_ID});server['revision']=saved['revision']
+                    saved=self.api({'history':history,'revision':server['revision'],'reset_id':history_store.HISTORY_RESET_ID,'generation':server.get('generation','')});server['revision']=saved['revision']
                 if history!=local['history']:
                     local=history_store.write(self.path,self.protect,history,local['revision'])
-                self.remember(history,local['revision'],server['revision'])
+                self.remember(history,local['revision'],server['revision'],server.get('generation',''))
                 self.result={'server_synced':True,'pending':False,'message':'Historique enregistré sur le serveur · copie locale chiffrée.','merged':conflicts}
                 return {'history':history,'revision':local['revision'],**self.status()}
             except Exception as error:
@@ -104,6 +107,22 @@ class HistorySync:
 
     def available(self):
         return self.remote.connected or (getattr(self.remote,'reachable',False) and getattr(self.remote,'code','') in ('model_unloaded','no_models'))
+
+    def acknowledge_restore(self,confirmed=False):
+        if confirmed is not True:raise history_store.HistoryError('Confirmez la reprise de l’historique du serveur.')
+        with self.worker_lock,self.lock:
+            local=history_store.read(self.path,self.protect);server=self.api()
+            if server.get('reset_id')!=history_store.HISTORY_RESET_ID or not server.get('generation'):
+                raise history_store.HistoryError('État de reprise serveur incompatible.')
+            if not self.result.get('requires_restore_ack'):raise history_store.HistoryError('Aucune reprise à confirmer ; resynchronisez le client.')
+            backup=self.path.with_name(self.path.stem+'.avant-restauration-'+secrets.token_hex(6)+'.dpapi')
+            if self.path.exists():history_store.atomic(backup,self.path.read_bytes())
+            history=server['history'] or {'conversations':[{'id':secrets.token_hex(16),'title':'Nouvelle conversation','messages':[]}],'currentId':''}
+            if not history['currentId']:history['currentId']=history['conversations'][0]['id']
+            saved=history_store.write(self.path,self.protect,history,local['revision'])
+            self.remember(history,saved['revision'],server['revision'],server['generation'])
+            self.result={'server_synced':True,'pending':False,'message':'Historique serveur repris ; copie précédente chiffrée conservée.','restore_backup':str(backup)}
+            return {'history':history,'revision':saved['revision'],**self.status()}
 
     def schedule(self):
         if not self.available() or 'server_revision' not in self.meta or self.result.get('needs_merge'):return
@@ -115,7 +134,7 @@ class HistorySync:
                         local=history_store.read(self.path,self.protect);revision=self.meta['server_revision']
                         if not local['history'] or local['revision']==self.meta.get('local_revision'):break
                     # Writes can continue in the encrypted cache during an upload.
-                    saved=self.api({'history':local['history'],'revision':revision,'reset_id':history_store.HISTORY_RESET_ID})
+                    saved=self.api({'history':local['history'],'revision':revision,'reset_id':history_store.HISTORY_RESET_ID,'generation':self.meta.get('generation','')})
                     with self.lock:
                         self.remember(local['history'],local['revision'],saved['revision'])
                         latest=history_store.read(self.path,self.protect)

@@ -1,0 +1,18 @@
+{
+  "model": "qwen3.8-flash-next-iq4-xs-test-0141",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Réponds uniquement avec un objet JSON valide contenant la clé fibonacci : les 10 premiers nombres de Fibonacci, en commençant par 0 et 1."
+    }
+  ],
+  "stream": true,
+  "temperature": 0,
+  "seed": 42,
+  "max_tokens": 128,
+  "cache_prompt": false,
+  "chat_template_kwargs": {
+    "enable_thinking": false
+  },
+  "reasoning_effort": "none"
+}

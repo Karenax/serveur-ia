@@ -1,0 +1,605 @@
+{
+  "realBackend": true,
+  "syntheticStorage": true,
+  "liveDataUsed": false,
+  "date": "2026-10-10T20:13:52.899Z",
+  "checks": [
+    {
+      "name": "Programmation réelle, rétention et secret DPAPI",
+      "passed": true
+    },
+    {
+      "name": "Création réelle chiffrée et copie secondaire vérifiée",
+      "passed": true
+    },
+    {
+      "name": "Mauvaise phrase refusée par le vrai backend",
+      "passed": true
+    },
+    {
+      "name": "Archive déchiffrée : aperçu, empreinte et token de confirmation",
+      "passed": true
+    },
+    {
+      "name": "Restauration réelle guidée et complète",
+      "passed": true
+    },
+    {
+      "name": "Création Android réelle sans compilation EXE",
+      "passed": true
+    },
+    {
+      "name": "Profil Android réel téléchargé de manière privée",
+      "passed": true
+    },
+    {
+      "name": "Édition administrative et expiration réelle",
+      "passed": true
+    },
+    {
+      "name": "Suspension et réactivation effectives de l’accès",
+      "passed": true
+    },
+    {
+      "name": "Révocation réelle conservant les autorisations et données de l’autre appareil",
+      "passed": true
+    },
+    {
+      "name": "Archivage réel et fiche consultable",
+      "passed": true
+    },
+    {
+      "name": "Remplacement réel : nouvelle identité, ancien accès archivé et données conservées",
+      "passed": true
+    },
+    {
+      "name": "Lien direct Appareils conservé au rechargement",
+      "passed": true
+    },
+    {
+      "name": "Téléphone : rendu réel sans débordement",
+      "passed": true
+    },
+    {
+      "name": "Échec de stockage : accès bloqués, retour explicite et nouvel essai réel",
+      "passed": true
+    },
+    {
+      "name": "Aucune exception JavaScript",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "requests": [
+    {
+      "path": "/api/defaults",
+      "status": 200
+    },
+    {
+      "path": "/api/operations",
+      "status": 200
+    },
+    {
+      "path": "/api/settings",
+      "status": 200
+    },
+    {
+      "path": "/api/remote",
+      "status": 200
+    },
+    {
+      "path": "/api/backups",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/remote",
+      "status": 200
+    },
+    {
+      "path": "/api/devices",
+      "status": 200
+    },
+    {
+      "path": "/api/workspace",
+      "status": 200
+    },
+    {
+      "path": "/api/releases",
+      "status": 200
+    },
+    {
+      "path": "/api/state",
+      "status": 200
+    },
+    {
+      "path": "/api/backups/configure",
+      "status": 200
+    },
+    {
+      "path": "/api/backups",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/devices",
+      "status": 200
+    },
+    {
+      "path": "/api/backups/create",
+      "status": 200
+    },
+    {
+      "path": "/api/backups",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/devices",
+      "status": 200
+    },
+    {
+      "path": "/api/backups",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/backups",
+      "status": 200
+    },
+    {
+      "path": "/api/backups/verify",
+      "status": 400
+    },
+    {
+      "path": "/api/backups",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/devices",
+      "status": 200
+    },
+    {
+      "path": "/api/backups/verify",
+      "status": 200
+    },
+    {
+      "path": "/api/backups",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/devices",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/backups/restore",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/backups",
+      "status": 200
+    },
+    {
+      "path": "/api/devices",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/state",
+      "status": 200
+    },
+    {
+      "path": "/api/backups",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/backups",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/defaults",
+      "status": 200
+    },
+    {
+      "path": "/api/settings",
+      "status": 200
+    },
+    {
+      "path": "/api/remote",
+      "status": 200
+    },
+    {
+      "path": "/api/devices",
+      "status": 200
+    },
+    {
+      "path": "/api/state",
+      "status": 200
+    },
+    {
+      "path": "/api/devices/create",
+      "status": 200
+    },
+    {
+      "path": "/api/backups",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/devices",
+      "status": 200
+    },
+    {
+      "path": "/api/remote/profile/ec049078598f2ea4",
+      "status": 200
+    },
+    {
+      "path": "/api/backups",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/devices",
+      "status": 200
+    },
+    {
+      "path": "/api/devices/configure",
+      "status": 200
+    },
+    {
+      "path": "/api/backups",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/devices",
+      "status": 200
+    },
+    {
+      "path": "/api/remote/policy",
+      "status": 200
+    },
+    {
+      "path": "/api/backups",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/devices",
+      "status": 200
+    },
+    {
+      "path": "/api/remote/policy",
+      "status": 200
+    },
+    {
+      "path": "/api/backups",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/devices",
+      "status": 200
+    },
+    {
+      "path": "/api/remote/policy",
+      "status": 200
+    },
+    {
+      "path": "/api/backups",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/devices",
+      "status": 200
+    },
+    {
+      "path": "/api/remote/revoke",
+      "status": 200
+    },
+    {
+      "path": "/api/backups",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/devices",
+      "status": 200
+    },
+    {
+      "path": "/api/remote/delete",
+      "status": 200
+    },
+    {
+      "path": "/api/backups",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/devices",
+      "status": 200
+    },
+    {
+      "path": "/api/devices/replace",
+      "status": 200
+    },
+    {
+      "path": "/api/backups",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/devices",
+      "status": 200
+    },
+    {
+      "path": "/api/devices",
+      "status": 200
+    },
+    {
+      "path": "/api/state",
+      "status": 200
+    },
+    {
+      "path": "/api/backups",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/remote",
+      "status": 200
+    },
+    {
+      "path": "/api/backups/recover",
+      "status": 400
+    },
+    {
+      "path": "/api/backups",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/devices",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/backups/recover",
+      "status": 200
+    },
+    {
+      "path": "/api/backups",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    },
+    {
+      "path": "/api/defaults",
+      "status": 200
+    },
+    {
+      "path": "/api/settings",
+      "status": 200
+    },
+    {
+      "path": "/api/remote",
+      "status": 200
+    },
+    {
+      "path": "/api/devices",
+      "status": 200
+    },
+    {
+      "path": "/api/maintenance",
+      "status": 200
+    }
+  ],
+  "checksumProof": {
+    "before": {
+      "settings_sha256": "59f826a1ae137c358d3a7b10babcbf4db788c5cc5427a594cdf2cc61f758f7db",
+      "history_sha256": "5f3bac37927cf89172210d471136d30f6305494ffbc4efc8f52d49be1d481863",
+      "original_sha256": "ebdea453eb57acaefc3083af4c79b1e94aa077a126a3892a4028107859fe9e73",
+      "generation": "c7e068a0d84fe8157f13e70350ad72e3",
+      "documents": 1,
+      "devices": 1,
+      "enabled": false,
+      "owner_valid": false,
+      "owner_revoked": false,
+      "owner_suspended": false
+    },
+    "changed": {
+      "settings_sha256": "31ab1a715c64ef701f87eec8f9aa7c9c60c4eed255cd622227a38980fd565d5e",
+      "history_sha256": "c9a6e1830f80ba3544be2d0e9bda31295e55865d2a12915dddf818ab4be96086",
+      "original_sha256": "ebdea453eb57acaefc3083af4c79b1e94aa077a126a3892a4028107859fe9e73",
+      "generation": "c7e068a0d84fe8157f13e70350ad72e3",
+      "documents": 2,
+      "devices": 1,
+      "enabled": false,
+      "owner_valid": false,
+      "owner_revoked": false,
+      "owner_suspended": false
+    },
+    "after": {
+      "settings_sha256": "59f826a1ae137c358d3a7b10babcbf4db788c5cc5427a594cdf2cc61f758f7db",
+      "history_sha256": "5f3bac37927cf89172210d471136d30f6305494ffbc4efc8f52d49be1d481863",
+      "original_sha256": "ebdea453eb57acaefc3083af4c79b1e94aa077a126a3892a4028107859fe9e73",
+      "generation": "ffdf4290fd475535cd2c8cf1c8a9e9b6",
+      "documents": 1,
+      "devices": 1,
+      "enabled": false,
+      "owner_valid": false,
+      "owner_revoked": false,
+      "owner_suspended": false
+    }
+  }
+}

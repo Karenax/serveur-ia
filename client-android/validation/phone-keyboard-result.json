@@ -1,0 +1,64 @@
+{
+  "form": "phone",
+  "before": {
+    "height": 846,
+    "visualHeight": 846,
+    "keyboard": false,
+    "focused": "",
+    "prompt": {
+      "top": 590,
+      "bottom": 658,
+      "height": 68
+    },
+    "send": {
+      "top": 658,
+      "bottom": 702,
+      "height": 44
+    },
+    "overflow": false
+  },
+  "keyboard": {
+    "height": 533,
+    "visualHeight": 533,
+    "keyboard": true,
+    "focused": "prompt",
+    "prompt": {
+      "top": 298,
+      "bottom": 366,
+      "height": 68
+    },
+    "send": {
+      "top": 366,
+      "bottom": 410,
+      "height": 44
+    },
+    "overflow": false
+  },
+  "restored": {
+    "height": 846,
+    "visualHeight": 846,
+    "keyboard": false,
+    "focused": "prompt",
+    "prompt": {
+      "top": 590,
+      "bottom": 658,
+      "height": 68
+    },
+    "send": {
+      "top": 658,
+      "bottom": 702,
+      "height": 44
+    },
+    "overflow": false
+  },
+  "checks": [
+    "native IME visibility",
+    "WebView height reduction",
+    "prompt/send above keyboard",
+    "keyboard dismissal",
+    "blocked close refuses save",
+    "healthy close flush"
+  ],
+  "errors": 0,
+  "ok": true
+}

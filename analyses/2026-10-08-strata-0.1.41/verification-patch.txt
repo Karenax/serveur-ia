@@ -1,0 +1,18 @@
+error: patch failed: CMakeLists.txt:484
+error: CMakeLists.txt: patch does not apply
+error: patch failed: include/strata/prefill/gemm.hpp:59
+error: include/strata/prefill/gemm.hpp: patch does not apply
+error: patch failed: src/core/expert_source.cpp:1677
+error: src/core/expert_source.cpp: patch does not apply
+error: patch failed: src/core/native_dense.cpp:99
+error: src/core/native_dense.cpp: patch does not apply
+error: patch failed: src/core/verify.cpp:471
+error: src/core/verify.cpp: patch does not apply
+error: patch failed: src/kernels/ngram.cpp:260
+error: src/kernels/ngram.cpp: patch does not apply
+error: patch failed: src/prefill/gemm.cu:1
+error: src/prefill/gemm.cu: patch does not apply
+error: patch failed: src/program/generate.cpp:1618
+error: src/program/generate.cpp: patch does not apply
+error: patch failed: tests/cuda/prefill_mmq_kquant_test.cpp:94
+error: tests/cuda/prefill_mmq_kquant_test.cpp: patch does not apply

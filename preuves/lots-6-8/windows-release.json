@@ -1,0 +1,14 @@
+{
+  "version": "3.5.18",
+  "bytes": 25594164,
+  "sha256": "6a1fb9951921db6082c48420fbee7a5d1b500697c5305101c8822502b7e6a153",
+  "self_test": "PASS",
+  "self_test_seconds": 2.688,
+  "staged_file": "D:\\Serveur IA\\toolchain\\releases-staging\\windows-3.5.18\\Accès serveur Fred.exe",
+  "embedded_final_source_sha256": {
+    "workspace.html": "d8d10bed02b1a17383e7d2243958aca97ebfa7c1c2fdcdcf1dcf076db7f77009",
+    "ui.js": "7eff2cff09c768ff635c4519c28467b36db28ddd1342e14b9c99d5f5ef09ae88",
+    "ui.css": "d3fd378c8780be068067ed3a829f21b3e628b3e2c17be1a8ab7ff713a56ce437",
+    "wireguard-bridge.exe": "7008346435c612d9dcc4e819bd19d754c760887496aaf90f1b374762f9092f60"
+  }
+}

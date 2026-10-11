@@ -12,13 +12,22 @@ import time
 from cryptography.fernet import Fernet, InvalidToken
 from core import ROOT, HOME, PYTHON, HIDDEN, read_json, write_json
 
-VERSION = '3.5.15'
-FILES = ['reglages.json', 'reglages-par-defaut.json', 'base-strata.json', 'acces-distants.json', 'wireguard.json', 'comptes.json', 'exploitation.json']
+VERSION = '3.5.21'
+FILES = ['reglages.json', 'reglages-par-defaut.json', 'derniers-reglages-valides.json', 'base-strata.json', 'acces-distants.json', 'wireguard.json', 'comptes.json', 'exploitation.json', 'voix.json']
 
 def cipher(password, salt):
     if not isinstance(password, str) or not 12 <= len(password) <= 1024:
         raise ValueError('Phrase de sauvegarde : 12 à 1024 caractères.')
     return Fernet(base64.urlsafe_b64encode(hashlib.pbkdf2_hmac('sha256', password.encode(), salt, 600000, 32)))
+
+
+def registered_profile_ids(files):
+    """The snapshot registry defines profile ownership, including archived devices."""
+    from profiles import validate_access
+    access = files.get('acces-distants.json')
+    if access is None: return set()
+    validate_access(access)
+    return {record['id'] for record in access['clients'] + access.get('deleted_clients', [])}
 
 class Operations:
     def __init__(self, controller):
@@ -27,6 +36,10 @@ class Operations:
         self.attempts = [t for t in read_json(controller.home/'relances.json', []) if time.time()-t<3600]
         self.desired = False
         self.last_error = ''
+        from backups import BackupManager
+        from restoration import RestoreManager
+        self.backups = BackupManager(controller)
+        self.restorations = RestoreManager(controller)
 
     def settings(self):
         return read_json(self.path, {'autoload': False, 'restart': False})
@@ -65,6 +78,11 @@ class Operations:
         while True:
             try:
                 c = self.controller
+                self.notification_tick()
+                self.backups.tick()
+                if c.remote.maintenance:
+                    time.sleep(1)
+                    continue
                 with c.remote.lock:
                     write_json(c.home/'connexions.json', dict(c.remote.seen))
                 c.remote.scheduler.expire()
@@ -92,26 +110,52 @@ class Operations:
                 self.last_error = str(error)
             time.sleep(30)
 
+    def notification_tick(self):
+        """Publish durable operational alerts without exposing paths or error content."""
+        remote = self.controller.remote
+        if getattr(remote, 'maintenance', False): return
+        notifications = getattr(remote, 'notifications', None)
+        if notifications is None: return
+        state = self.backups.status()
+        job = state.get('job', {})
+        if job.get('state') == 'failed':
+            identity = str(job.get('id') or job.get('started_at') or 'unknown')
+            notifications.publish('admin', 'backup_failed', 'backup_failed:' + identity)
+            if any(word in state.get('last_error', '').lower() for word in ('espace', 'plein')):
+                notifications.publish('admin', 'storage_low', 'backup_storage:' + identity)
+        for record in state.get('catalog', []):
+            if record.get('secondary', {}).get('status') == 'error':
+                notifications.publish('admin', 'backup_copy_failed', 'backup_copy:' + record['id'])
+        restore = self.restorations.status()
+        if restore.get('state') in ('failed', 'recovery_failed'):
+            detail = restore.get('job', restore)
+            identity = str(detail.get('id') or detail.get('started') or 'unknown')
+            notifications.publish('admin', 'restore_failed', 'restore_failed:' + identity)
+
     def backup(self, password):
         c = self.controller
         with c.lock, c.wireguard.lock, c.remote.lock, c.remote.workspace.lock:
             content = {name:read_json(c.home/name) for name in FILES if (c.home/name).exists()}
+            registered = registered_profile_ids(content)
             if c.wireguard.vault_path.exists(): content['vault'] = c.wireguard.vault()
             clients = c.home/'clients'
             from wg_crypto import protect
             saved=c.wireguard.directory/'profils-restaures.dpapi'
             profiles = json.loads(protect(saved.read_bytes(),decrypt=True)) if saved.exists() else {}
+            if not isinstance(profiles,dict):raise ValueError('Registre des profils personnels illisible.')
+            profiles = {identity:profile for identity,profile in profiles.items() if identity in registered}
             signing=c.wireguard.directory/'signature.dpapi'
             if signing.exists():content['signing_seed']=base64.b64encode(protect(signing.read_bytes(),decrypt=True)).decode()
             if clients.exists():
                 import struct
                 for exe in clients.glob('*.exe'):
                     if len(exe.stem)!=16 or any(c not in '0123456789abcdef' for c in exe.stem):continue
+                    if exe.stem not in registered or exe.stat().st_size<16:continue
                     with exe.open('rb') as f:
                         f.seek(-16, 2); footer=f.read(16)
                         if footer[4:] == b'QWENPROFILE1':
                             size=struct.unpack('<I', footer[:4])[0]
-                            if 0 < size <= 65536:
+                            if 0 < size <= 65536 and size+16<=exe.stat().st_size:
                                 f.seek(-16-size, 2); profiles[exe.stem]=json.loads(f.read(size))
             content['profiles']=profiles
             content['workspace']=c.remote.workspace.backup()
@@ -121,10 +165,20 @@ class Operations:
             encrypted=cipher(password,salt).encrypt(json.dumps({'version':1,'files':content}).encode())
             directory=c.home/'sauvegardes';directory.mkdir(exist_ok=True)
             target=directory/(time.strftime('%Y%m%d-%H%M%S')+'-'+secrets.token_hex(3)+'.qwenbackup')
-            target.write_bytes(b'QWENBACKUP1'+salt+encrypted)
+            from wg_crypto import private_directory
+            private_directory(directory)
+            from tempfile import NamedTemporaryFile
+            with NamedTemporaryFile(dir=directory, suffix='.tmp', delete=False) as stream:
+                temporary=Path(stream.name)
+                stream.write(b'QWENBACKUP1'+salt+encrypted);stream.flush();os.fsync(stream.fileno())
+            try:os.replace(temporary,target)
+            finally:temporary.unlink(missing_ok=True)
         return {'file':str(target), 'message':'Sauvegarde chiffrée créée.'}
 
     def restore(self, data):
+        return self.restorations.restore_sync(data, guided=False)
+
+    def _restore_legacy(self, data):
         c=self.controller
         if c.processes() or c.supervisor(c.current_run()) or c.remote.metadata()['enabled']:
             raise ValueError('Arrêter le modèle et désactiver WireGuard avant la restauration.')

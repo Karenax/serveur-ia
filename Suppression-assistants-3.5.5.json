@@ -1,0 +1,17 @@
+{
+  "version": "3.5.5",
+  "removed_server_histories": 1,
+  "removed_project_conversations": 0,
+  "removed_local_caches": 16,
+  "preserved_projects": 0,
+  "preserved_documents": 0,
+  "clients_prepared": 1,
+  "release_verified": true,
+  "remaining_saved_messages": 0,
+  "validation": {
+    "regression_checks": 72,
+    "native_ui": true,
+    "browser_client_and_console": true,
+    "browser_errors": 0
+  }
+}

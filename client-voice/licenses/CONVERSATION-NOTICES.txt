@@ -1,0 +1,19 @@
+Conversation Windows Fred — attribution
+
+Sherpa-ONNX 1.13.8, k2-fsa : Apache-2.0.
+Modèle Zipformer français, Shaojie Li / k2-fsa, shaojieli/sherpa-onnx-streaming-zipformer-fr-2023-04-14 : Apache-2.0.
+https://huggingface.co/shaojieli/sherpa-onnx-streaming-zipformer-fr-2023-04-14
+Les révisions et empreintes exactes sont dans conversation-models.json.
+Silero VAD, Silero Team : MIT. https://github.com/snakers4/silero-vad
+Smart Turn v3.2, Pipecat / Daily : BSD-2-Clause. https://github.com/pipecat-ai/smart-turn
+ONNX Runtime 1.24.4, Microsoft : MIT.
+NumPy 2.2.6 : BSD-3-Clause, avec notices de ses bibliothèques embarquées.
+Textes des moteurs dans licenses/conversation et licences des modèles dans ce dossier.
+
+La voix est calculée sur le serveur, sans redistribution de ses poids dans le client.
+Pocket TTS 3.3.0, Kyutai : code MIT. https://github.com/kyutai-labs/pocket-tts
+Poids pocket-tts-without-voice-cloning, voix française Estelle : CC-BY-4.0.
+https://huggingface.co/kyutai/pocket-tts-without-voice-cloning
+https://creativecommons.org/licenses/by/4.0/
+Le serveur utilise la configuration française officielle ; aucun clonage vocal.
+Modification Fred : intégration CPU, commande d'arrêt et transport PCM en mémoire.

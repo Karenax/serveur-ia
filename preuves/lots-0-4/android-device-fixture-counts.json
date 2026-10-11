@@ -1,0 +1,8 @@
+{
+  "requests": {
+    "GET /v1/models": 4,
+    "POST /v1/chat/completions": 2,
+    "POST /v1/device": 2
+  },
+  "rejected": 0
+}

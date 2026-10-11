@@ -1,0 +1,5 @@
+apercu*.log
+tests-*.log
+mode-reponse.txt
+derniere-requete.json
+client/__pycache__/

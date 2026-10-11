@@ -1,0 +1,19 @@
+{
+  "main": {
+    "head_sha": "fb58e0dbc8399662c0e47c76578c6e878b14f6cf",
+    "status": "identical",
+    "ahead_by": 0
+  },
+  "latest_release": {
+    "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.41",
+    "published_at": "2026-10-08T12:14:59Z",
+    "tag": "v0.1.41"
+  },
+  "review_date": "2026-10-09",
+  "active_engine": {
+    "workers": 15,
+    "pcie_frac": "0.00",
+    "model": "qwen3.8-flash-next-iq4-xs",
+    "version": "0.1.35"
+  }
+}

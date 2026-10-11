@@ -1,0 +1,5 @@
+{
+  "produit": 391,
+  "somme": 500,
+  "capitale": "Paris"
+}

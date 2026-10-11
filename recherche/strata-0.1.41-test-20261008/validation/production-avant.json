@@ -1,0 +1,22 @@
+{
+  "pid": 17188,
+  "version": "0.1.35",
+  "files": [
+    {
+      "Path": "D:\\Serveur IA\\strata-build-p100\\strata.exe",
+      "Hash": "9B07C8C1E2367D217E17199F137F6C8D33F5832AB02DF594B68652BA5C9488D0"
+    },
+    {
+      "Path": "D:\\Serveur IA\\lanceur\\base-strata.json",
+      "Hash": "52CB471684ADB8F233BB912A6E681CC56BC7A0C64E40AB83065E28E46248CFE6"
+    },
+    {
+      "Path": "D:\\Serveur IA\\lanceur\\reglages.json",
+      "Hash": "63D67EFCBD295491CE77DC49198426E1290D6DFEABC0119BEFE3E1B172EE1762"
+    },
+    {
+      "Path": "D:\\Serveur IA\\strata-iq4-p100-hybride.json",
+      "Hash": "52CB471684ADB8F233BB912A6E681CC56BC7A0C64E40AB83065E28E46248CFE6"
+    }
+  ]
+}

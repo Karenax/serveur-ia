@@ -1,0 +1,32 @@
+[
+  {
+    "path": "D:\\Serveur IA\\lanceur\\sauvegardes",
+    "exists": true,
+    "restricted_to_account_system_admins": true,
+    "foreign_allow_rules": 0
+  },
+  {
+    "path": "D:\\Serveur IA\\lanceur\\securite",
+    "exists": true,
+    "restricted_to_account_system_admins": true,
+    "foreign_allow_rules": 0
+  },
+  {
+    "path": "D:\\Serveur IA\\lanceur\\sauvegardes\\phrase-recuperation.txt",
+    "exists": true,
+    "restricted_to_account_system_admins": true,
+    "foreign_allow_rules": 0
+  },
+  {
+    "path": "D:\\Serveur IA\\lanceur\\sauvegardes\\automatisation.dpapi",
+    "exists": true,
+    "restricted_to_account_system_admins": true,
+    "foreign_allow_rules": 0
+  },
+  {
+    "path": "D:\\Serveur IA\\lanceur\\sauvegardes\\signatures-fred.fredkeys",
+    "exists": true,
+    "restricted_to_account_system_admins": true,
+    "foreign_allow_rules": 0
+  }
+]

@@ -1,0 +1,11 @@
+{
+  "pid": 7712,
+  "exe": "D:\\Serveur IA\\recherche\\strata-0.1.41-test-20261008\\engine-cuda12\\strata.exe",
+  "env": {
+    "STRATA_DBG_CPU_GATE": "1",
+    "STRATA_LOOKAHEAD": "0",
+    "STRATA_PREFILL_CPU_SHARE": "auto",
+    "STRATA_PREFILL_CPU_SHARE_MAX": "1024",
+    "STRATA_PREFILL_TIMING": "1"
+  }
+}

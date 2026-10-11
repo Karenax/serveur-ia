@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "packaged_worker": true,
+  "aec": true,
+  "listening_after_seconds": 2.25,
+  "peak_rss_bytes": 261201920,
+  "events": 21,
+  "stopped": true,
+  "exit_code": 0,
+  "microphone_audio_saved": false,
+  "microphone_transcripts_saved": false
+}

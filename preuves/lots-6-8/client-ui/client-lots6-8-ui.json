@@ -1,0 +1,292 @@
+{
+  "date": "2026-10-10T21:08:13.759Z",
+  "realBackend": true,
+  "syntheticStorage": true,
+  "liveDataUsed": false,
+  "transport": "real-WireGuard-UDP",
+  "checks": [
+    {
+      "name": "Recherche owner-scoped réelle et aucun contenu tiers",
+      "passed": true
+    },
+    {
+      "name": "Passage cité ouvrable, révision fidèle et page absente pour note",
+      "passed": true
+    },
+    {
+      "name": "Ancienne référence modifiée conserve version et extrait",
+      "passed": true
+    },
+    {
+      "name": "Tâche réelle : notification et ouverture du bon résultat",
+      "passed": true
+    },
+    {
+      "name": "Sources conservées avec résultat de tâche",
+      "passed": true
+    },
+    {
+      "name": "Préférences enregistrées côté serveur",
+      "passed": true
+    },
+    {
+      "name": "Rattrapage paginé de 110 événements sans doublon",
+      "passed": true
+    },
+    {
+      "name": "Lecture depuis autre session synchronisée",
+      "passed": true
+    },
+    {
+      "name": "Reconnexion retrouve boîte et préférences persistantes",
+      "passed": true
+    },
+    {
+      "name": "Suppression signalée sans ouvrir une version imaginaire",
+      "passed": true
+    },
+    {
+      "name": "Vue téléphone : passage et inbox sans débordement",
+      "passed": true
+    },
+    {
+      "name": "Changement de génération entre pages repart du début",
+      "passed": true
+    },
+    {
+      "name": "Expiration pendant accusé de livraison ne révoque pas un accès valide",
+      "passed": true
+    },
+    {
+      "name": "Notification expirée affiche erreur et laisse boîte utilisable",
+      "passed": true
+    },
+    {
+      "name": "Révocation bloque et purge la boîte affichée",
+      "passed": true
+    },
+    {
+      "name": "Aucune exception JavaScript",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "requests": [
+    {
+      "path": "/v1/models",
+      "status": 200
+    },
+    {
+      "path": "/v1/status",
+      "status": 200
+    },
+    {
+      "path": "/v1/workspace",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/workspace",
+      "status": 200
+    },
+    {
+      "path": "/v1/workspace/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/workspace/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/workspace/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/workspace",
+      "status": 200
+    },
+    {
+      "path": "/v1/workspace",
+      "status": 200
+    },
+    {
+      "path": "/v1/context",
+      "status": 200
+    },
+    {
+      "path": "/v1/workspace",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/workspace",
+      "status": 200
+    },
+    {
+      "path": "/v1/workspace",
+      "status": 200
+    },
+    {
+      "path": "/v1/workspace/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/workspace/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/models",
+      "status": 200
+    },
+    {
+      "path": "/v1/status",
+      "status": 200
+    },
+    {
+      "path": "/v1/workspace",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/workspace/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/context",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 403
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 403
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 401
+    }
+  ]
+}

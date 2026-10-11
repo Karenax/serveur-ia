@@ -1,0 +1,132 @@
+{
+  "prepared_at": "2026-10-10 21:56:44 +0200",
+  "before": {
+    "model_processes": [
+      {
+        "pid": 8200,
+        "created": 1791651021.7995121
+      },
+      {
+        "pid": 14628,
+        "created": 1791651021.777978
+      }
+    ],
+    "preserved_file_sha256": {
+      "acces-distants.json": "1d357907389d2056a608c5e98b47d2fa31f519521af1f18e8f3666eb36e16037",
+      "wireguard.json": "6cbd6b81bd61645cce770ac2a7e03cdb99f86b800c95d4f05e0a425e3a6aa7dd",
+      "reglages.json": "63d67efcbd295491ce77dc49198426e1290d6dfeabc0119befe3e1b172ee1762",
+      "wireguard-prive/secrets.dpapi": "0bf5ae5faca3ad22177ce07af1d8587441ad569f0595a46a3c8c4d4184600a93",
+      "wireguard-prive/signature.dpapi": "240cd390a95972957889009bfabb7e54942f33d7f99d9ebb9a211ab1f9754a4a"
+    }
+  },
+  "pre_rollout_backup": {
+    "file": "D:\\Serveur IA\\lanceur\\sauvegardes\\20261010-215644-4d4eb6.qwenbackup",
+    "bytes": 494291,
+    "sha256": "acc66c888f582213d5f35a8822511566b3f3fe8a1cbeb4d171ec0dff8f1a3aba"
+  },
+  "recovery_file": "D:\\Serveur IA\\lanceur\\sauvegardes\\phrase-recuperation.txt",
+  "contains_secret_values": false,
+  "windows_release": {
+    "version": "3.5.17",
+    "sha256": "307f5e3bcce5e31617606c56e034636026707c16d4a26ccfd1316927a4d78738",
+    "bytes": 25590937,
+    "signature_verified": true
+  },
+  "activated_at": "2026-10-10 22:26:22 +0200",
+  "result": "PASS",
+  "automatic_backups": {
+    "enabled": true,
+    "time": "03:00",
+    "frequency": "daily",
+    "retention": {
+      "daily": 7,
+      "weekly": 4,
+      "monthly": 6
+    },
+    "destination": "D:\\Serveur IA\\lanceur\\sauvegardes",
+    "secondary_destination": "",
+    "secret_configured": true,
+    "next_run": "2026-10-11T03:00:00+02:00"
+  },
+  "initial_verified_backup": {
+    "file": "D:\\Serveur IA\\lanceur\\sauvegardes\\fred-20261010-222618-15822d5eb5880316d1fe5bd6.qwenbackup",
+    "size": 497983,
+    "sha256": "1778d715a29ef3b77828073a233fb4a656893676ee87ceb301e65bb1c630607e",
+    "created_at": "2026-10-10T22:26:18+02:00",
+    "version": 2,
+    "verified": true
+  },
+  "included_counts": {
+    "profiles": 0,
+    "accounts": 0,
+    "projects": 0,
+    "documents": 0,
+    "memories": 0,
+    "conversations": 0,
+    "jobs": 0,
+    "client_histories": 1,
+    "policies": 0,
+    "document_original_bytes": 0
+  },
+  "inventory": {
+    "storage": {
+      "history_count": 1,
+      "projects": 0,
+      "documents": 0,
+      "jobs": 0,
+      "owners": 1,
+      "workspace_bytes": 86974
+    },
+    "migration": {
+      "workspace_schema": 1,
+      "access_model": "per_device"
+    },
+    "limits": {
+      "global_bytes": 134217728,
+      "wireguard_request_bytes": 2097152
+    }
+  },
+  "devices": {
+    "active_records": 1,
+    "remote_enabled": true
+  },
+  "after": {
+    "model_processes": [
+      {
+        "pid": 8200,
+        "created": 1791651021.7995121
+      },
+      {
+        "pid": 14628,
+        "created": 1791651021.777978
+      }
+    ],
+    "preserved_file_sha256": {
+      "acces-distants.json": "1d357907389d2056a608c5e98b47d2fa31f519521af1f18e8f3666eb36e16037",
+      "wireguard.json": "6cbd6b81bd61645cce770ac2a7e03cdb99f86b800c95d4f05e0a425e3a6aa7dd",
+      "reglages.json": "63d67efcbd295491ce77dc49198426e1290d6dfeabc0119befe3e1b172ee1762",
+      "wireguard-prive/secrets.dpapi": "0bf5ae5faca3ad22177ce07af1d8587441ad569f0595a46a3c8c4d4184600a93",
+      "wireguard-prive/signature.dpapi": "240cd390a95972957889009bfabb7e54942f33d7f99d9ebb9a211ab1f9754a4a"
+    },
+    "model_running": true,
+    "model_health": {
+      "status": "ok",
+      "max_context": 262144,
+      "model": "qwen3.8-flash-next-iq4-xs",
+      "images": false,
+      "api_key": false,
+      "loaded": true,
+      "service": "strata"
+    },
+    "maintenance": {
+      "state": "idle",
+      "phase": "",
+      "active": false,
+      "message": "Aucune restauration en cours.",
+      "retry_allowed": false,
+      "job": {}
+    }
+  },
+  "personal_clients_updated": 0,
+  "restoration_on_production": "not performed; validated on isolated fixtures"
+}

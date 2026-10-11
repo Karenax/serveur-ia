@@ -1,0 +1,31 @@
+{
+  "passed": true,
+  "version": "1.0.3",
+  "version_code": 4,
+  "bytes": 18886932,
+  "sha256": "18cfee473417fd2b178e2db500aefa0dfd873f4ea6d652a5af63d33854263f90",
+  "native_libraries": {
+    "lib/arm64-v8a/libfredvoice.so": "dda92338a4b434428449e40479b6f126597e2441b923c0de16e5aa7b85894a76",
+    "lib/x86_64/libfredvoice.so": "168f2c480ecd01faad20ab0481bb0009d5a63fa3d64354d84a7d713c82eb1146",
+    "lib/x86_64/libggml-base.so": "3a89e35fb558a013680e38ef4a0b81ce3b8eeeaa6437bd1ba550e552ab4e1097",
+    "lib/x86_64/libggml-cpu-alderlake.so": "033a6528fc00527c76b6ac9a1911dfd49241055c9a321fc34e91f092ca5aff75",
+    "lib/x86_64/libggml-cpu-cannonlake.so": "131b2e28850d9cbbabefb35a197d66392bfda6d421df43487a50a4f37ef3f1fb",
+    "lib/x86_64/libggml-cpu-cascadelake.so": "322f33f5f502ad186cbf1613d75cc8338f9696349bfdaddd459b53e23c8c4287",
+    "lib/x86_64/libggml-cpu-cooperlake.so": "167c75336b21d6b822031faf619a5950f405ecc100fe339de5840e6cd14ee660",
+    "lib/x86_64/libggml-cpu-haswell.so": "4635f049f0bab77fc5198c538c2ac18061025eab2bf53cdec6f1696a23ba8877",
+    "lib/x86_64/libggml-cpu-icelake.so": "687f8daa415258edd1796e304b0a213763ad272c48d8bee022dabeab7c827c4b",
+    "lib/x86_64/libggml-cpu-ivybridge.so": "17b12603ca0d5b7ffaddf7f1d0b5a3db38fbd0ce8316674c32c2f7a8758263cb",
+    "lib/x86_64/libggml-cpu-piledriver.so": "e5b33aa346b6b67c3b93ac8c5047630e8d661dcfa09880372352cb44daa34eb3",
+    "lib/x86_64/libggml-cpu-sandybridge.so": "b58eef9c8c8060b8f146d4c73f962e7a22859b8cb6f83357ac5cb31b41cba974",
+    "lib/x86_64/libggml-cpu-sapphirerapids.so": "0b86e1799c9c8973b48b622b214c0726d93dc1521825c57792dc14ee2f7441bd",
+    "lib/x86_64/libggml-cpu-skylakex.so": "0e1afad61af95c83268c338e7241198f8433a7ff2b00cbb69996e35041d4ad17",
+    "lib/x86_64/libggml-cpu-sse42.so": "5ca6c40016a4562bf5b3e4fd91788050e3380a898ad1341159944423dbbd0d72",
+    "lib/x86_64/libggml-cpu-x64.so": "db9715f8097529d0da653a34a137c3d3aa00e95127485a88fcca1e79aa134ecc",
+    "lib/x86_64/libggml-cpu-zen4.so": "4c3c862865e23e326f34a2ac7d17d6942402a7f249e762c61b91f0b2773d5840",
+    "lib/x86_64/libggml.so": "416e6ff7718aaff877d4fc32c4a6f0d961c6261d41493a16d5241bd901e5518b",
+    "lib/x86_64/libparakeet.so": "5c60832cadd7af1b4ac587901c8f0ab1ae5f766c99a2c2f19a8224d41ce6c7ac",
+    "lib/x86_64/libwhisper.so": "045594a4709f4698c78c0322ac9736f1d4e5d297a0451a766fed58eb05a50f11"
+  },
+  "model_embedded": false,
+  "debug_and_release_native_match": true
+}

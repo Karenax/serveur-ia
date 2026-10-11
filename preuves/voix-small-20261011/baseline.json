@@ -1,0 +1,19 @@
+{
+  "time": 1791703591.280593,
+  "files": {
+    "client-qwen/dist/Acc\u00e8s serveur Fred.exe": "6a1fb9951921db6082c48420fbee7a5d1b500697c5305101c8822502b7e6a153",
+    "client-android/dist/Acces-serveur-Fred-Android.apk": "cf400128ca9714a84b57016daa3b4c339411dd7d86b2aaea2eff88a19abc6dd3",
+    "lanceur/acces-distants.json": "1d357907389d2056a608c5e98b47d2fa31f519521af1f18e8f3666eb36e16037",
+    "lanceur/wireguard.json": "6cbd6b81bd61645cce770ac2a7e03cdb99f86b800c95d4f05e0a425e3a6aa7dd"
+  },
+  "models": [
+    {
+      "pid": 8200,
+      "created": 1791651021.7995121
+    },
+    {
+      "pid": 14628,
+      "created": 1791651021.777978
+    }
+  ]
+}

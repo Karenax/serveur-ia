@@ -1,0 +1,53 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "name": "Le brouillon existant est conservé",
+      "passed": true
+    },
+    {
+      "name": "Texte provisoire, aucun envoi automatique",
+      "passed": true
+    },
+    {
+      "name": "Terminer ferme le micro et attend le texte final",
+      "passed": true
+    },
+    {
+      "name": "Annuler restaure exactement le brouillon",
+      "passed": true
+    },
+    {
+      "name": "Une erreur de capture permet de reprendre le clavier",
+      "passed": true
+    },
+    {
+      "name": "Affichage téléphone et tablette sans débordement",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "voiceTransport": "controlled fixture; native engine tested separately",
+  "requests": [
+    {
+      "path": "/v1/models",
+      "status": 200
+    },
+    {
+      "path": "/v1/status",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 200
+    },
+    {
+      "path": "/v1/workspace",
+      "status": 200
+    },
+    {
+      "path": "/v1/notifications/action",
+      "status": 200
+    }
+  ]
+}

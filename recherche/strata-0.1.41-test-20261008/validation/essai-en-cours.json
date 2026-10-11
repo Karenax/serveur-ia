@@ -1,0 +1,18 @@
+{
+  "phase": "production-retablie",
+  "baseline_quality": true,
+  "profile": "fp16",
+  "engine_pid": 17984,
+  "outcomes": [
+    {
+      "profile": "fp16",
+      "quality_pass": true,
+      "median_decode_ratio": 1.148606811145511,
+      "median_long_prefill_ratio": 0.9674074074074074,
+      "min_long_prefill_ratio": 0.7807816632383191,
+      "acceptable": false
+    }
+  ],
+  "error": "Traceback (most recent call last):\n  File \"D:\\Serveur IA\\recherche\\strata-0.1.41-test-20261008\\.venv\\Lib\\site-packages\\psutil\\_pswindows.py\", line 666, in wrapper\n    return fun(self, *args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\Serveur IA\\recherche\\strata-0.1.41-test-20261008\\.venv\\Lib\\site-packages\\psutil\\_pswindows.py\", line 844, in kill\n    return cext.proc_kill(self.pid)\n           ^^^^^^^^^^^^^^^^^^^^^^^^\nProcessLookupError: [Errno 3] force no such process (originated from GetExitCodeProcess != STILL_ACTIVE)\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"D:\\Serveur IA\\recherche\\strata-0.1.41-test-20261008\\Stop-Test.py\", line 32, in <module>\n    proc.terminate()\n  File \"D:\\Serveur IA\\recherche\\strata-0.1.41-test-20261008\\.venv\\Lib\\site-packages\\psutil\\__init__.py\", line 1330, in terminate\n    self._proc.kill()\n  File \"D:\\Serveur IA\\recherche\\strata-0.1.41-test-20261008\\.venv\\Lib\\site-packages\\psutil\\_pswindows.py\", line 668, in wrapper\n    raise convert_oserror(err, pid=self.pid, name=self._name) from err\npsutil.NoSuchProcess: process no longer exists (pid=936)\n",
+  "production_version": "0.1.35"
+}

@@ -1,0 +1,255 @@
+<template id="ws-layout">
+<section class="settings-view" data-view="projects" hidden><h2>Projets</h2><p>Un espace pour vos documents, vos discussions et vos idées.</p>
+<div class="page-toolbar"><div class="ws-project-tools"><input id="ws-project-search" class="ws-field" type="search" placeholder="Rechercher un projet…" aria-label="Rechercher un projet"><label><input id="ws-archived" type="checkbox"> Archivés</label></div><div class="ws-toolbar"><button id="ui-project-create" class="secondary primary" type="button">＋ Nouveau projet</button><button type="button" class="icon-button" aria-label="Actualiser les projets" title="Actualiser" id="ws-refresh">↻</button></div></div>
+<form id="ws-create-project" class="ui-create-project" hidden><input class="ws-field" id="ws-project-name" maxlength="120" placeholder="Nom du projet" aria-label="Nom du nouveau projet" required><button class="secondary primary">Créer</button></form>
+<div class="ws-grid"><div id="ws-project-list" class="ws-list"></div><div><p id="ws-project-empty" class="ws-project-empty">Sélectionnez un projet pour retrouver votre travail.<br>Ou créez votre premier espace.</p><div id="ws-project-detail" hidden>
+<div class="project-detail-header"><h3 id="ui-project-title">Votre projet</h3><button id="ws-project-chat" type="button" class="secondary">Discuter du projet ↗</button></div>
+<nav class="project-tabs" aria-label="Rubriques du projet"><button type="button" data-project-tab="documents" class="active">Documents</button><button type="button" data-project-tab="conversations">Discussions</button><button type="button" data-project-tab="memory">Mémoire</button><button type="button" data-project-tab="instructions">Consignes</button></nav>
+<div class="project-pane" data-project-pane="documents"><div class="ws-doc-workspace"><div class="ws-doc-library"><div class="ws-toolbar"><button id="ws-new-document" class="secondary">＋ Note</button><label class="secondary" tabindex="0" role="button" id="ui-upload-label">Importer<input id="ws-upload" type="file" accept=".txt,.md,.docx,.pdf" hidden></label></div><small class="muted">TXT, MD, Word, PDF texte<br>2 Mo par fichier · Envoi au serveur</small><div id="ws-documents" class="ws-list"></div></div>
+<div><div id="ui-document-empty" class="ws-empty">Choisissez un document,<br>ou commencez avec une nouvelle note.</div><div id="ws-document-editor" class="ws-card" hidden><div class="editor-heading"><input id="ws-document-title" class="ws-field ws-document-title" maxlength="180" aria-label="Titre du document"><details class="menu"><summary aria-label="Actions du document">···</summary><div class="menu-body"><button id="ws-document-save" class="secondary">Enregistrer maintenant</button><button id="ws-document-reload" class="secondary">Comparer au serveur</button><button id="ws-document-export" class="secondary">Exporter le texte</button><button id="ws-document-original" class="secondary">Fichier d’origine</button><button id="ws-document-delete" class="secondary danger">Supprimer le document</button></div></details></div><textarea id="ws-document-text" class="ws-editor" maxlength="500000" aria-label="Texte du document" placeholder="Commencez à écrire…"></textarea><div class="editor-footer"><span id="ws-document-status" class="ws-status" role="status"></span><button id="ws-document-chat" class="secondary">Discuter du document ↗</button></div>
+<details class="revision-details"><summary>Améliorer le texte avec l’IA</summary><form id="ws-revise"><label class="ws-label" for="ws-revise-prompt">Votre demande</label><input id="ws-revise-prompt" class="ws-field" maxlength="4000" placeholder="Clarifier les phrases, conserver les chiffres…" required><button class="secondary">Préparer un brouillon</button></form></details><div id="ws-proposal" hidden><h3>Brouillon à examiner</h3><textarea id="ws-proposal-text" class="ws-editor" aria-label="Révision proposée"></textarea><div class="ws-toolbar"><button id="ws-proposal-accept" class="secondary primary">Accepter et enregistrer</button><button id="ws-proposal-decline" class="secondary">Refuser</button></div><p class="muted">Le document actuel reste visible au-dessus pour comparaison.</p></div></div></div></div>
+<details class="revision-details"><summary>Rechercher un passage dans les documents</summary><form id="ws-search-form" class="ws-card"><input id="ws-search-query" class="ws-field" maxlength="2000" placeholder="Question ou mots à rechercher" aria-label="Rechercher dans les documents" required><button class="secondary">Chercher</button><div id="ws-sources"></div></form></details></div>
+<div class="project-pane" data-project-pane="conversations" hidden><div class="ws-card"><h3>Discussions du projet</h3><p class="muted">Glissez une conversation sur un projet pour la déplacer. Clic droit pour déplacer, archiver ou supprimer.</p><label class="muted"><input id="ws-conversation-archived" type="checkbox"> Afficher les discussions archivées</label><div id="ws-conversations" class="ws-list"></div></div></div>
+<div class="project-pane" data-project-pane="memory" hidden><div class="ws-card"><h3>Ce que l’assistant doit retenir</h3><p class="muted">Choisissez les faits et préférences utiles pour ce projet.</p><form id="ws-memory-form"><textarea id="ws-memory-text" maxlength="2000" placeholder="Une préférence, un fait, une règle à retenir…" aria-label="Nouvelle mémoire du projet" required></textarea><button class="secondary">Ajouter à la mémoire</button></form><div id="ws-memories"></div></div></div>
+<div class="project-pane" data-project-pane="instructions" hidden><form id="ws-project-form" class="ws-card"><label class="ws-label" for="ws-project-title">Nom du projet</label><input id="ws-project-title" class="ws-field" maxlength="120" required><label class="ws-label" for="ws-project-instructions">Consignes du projet</label><textarea id="ws-project-instructions" class="ws-instructions" maxlength="12000" placeholder="Objectif, destinataire, contraintes…"></textarea><div class="ws-toolbar"><button class="secondary primary">Enregistrer les consignes</button><button id="ws-project-archive" type="button" class="secondary">Archiver</button></div><span id="ws-project-status" class="ws-status" role="status"></span></form></div>
+</div></div></div></section>
+<section class="settings-view" data-view="tasks" hidden><h2>Tâches</h2><p>Confiez un travail au serveur. Retrouvez le résultat même après avoir fermé l’application.</p><details class="task-composer" id="ui-task-create"><summary>＋ Nouvelle tâche</summary><form id="ws-task-form" class="ws-card"><div class="task-form-grid"><div><label class="ws-label" for="ws-task-project">Projet</label><select id="ws-task-project" required></select></div><div class="full"><label class="ws-label" for="ws-task-prompt">Ce qu’il faut préparer</label><textarea id="ws-task-prompt" maxlength="12000" required placeholder="Décrivez le résultat attendu…"></textarea></div></div>
+<details class="task-options"><summary>Recherche et planification</summary><div><label class="ws-label" for="ws-task-kind">Type de travail</label><select id="ws-task-kind"><option value="analysis">Analyse ou rédaction</option><option value="web">Recherche web</option></select><div id="ui-task-web" hidden><label class="ws-label" for="ws-task-url">URL HTTPS publique (facultatif)</label><input id="ws-task-url" class="ws-field" maxlength="2000" placeholder="https://…"><small class="muted">Sans URL, la question est transmise à Brave. Les documents du projet ne sont pas envoyés à ce fournisseur.</small></div><div class="ws-toolbar"><label>Démarrer <select id="ws-task-delay"><option value="0">Maintenant</option><option value="60">Dans 1 heure</option><option value="1440">Demain</option></select></label><label>Répéter <select id="ws-task-repeat"><option value="0">Une seule fois</option><option value="24">Tous les jours</option><option value="168">Chaque semaine</option></select></label></div></div></details><div class="ws-toolbar"><button class="secondary primary">Lancer la tâche</button><button type="button" class="secondary" id="ws-task-refresh">Actualiser</button></div></form></details>
+<span id="ws-task-notice" class="ws-status" role="status"></span><nav class="task-filter" aria-label="Filtrer les tâches"><button type="button" data-job-filter="all" class="active">Toutes</button><button type="button" data-job-filter="active">En cours</button><button type="button" data-job-filter="completed">Terminées</button><button type="button" data-job-filter="attention">À reprendre</button></nav><div id="ws-jobs"></div><div id="ui-jobs-empty" class="ws-empty" hidden>Aucune tâche dans cette rubrique.</div><div id="ws-job-result" class="ws-card" hidden><h3 id="ws-job-title"></h3><div id="ws-job-content" class="ws-result"></div><div id="ws-job-sources"></div><div class="ws-toolbar"><button id="ws-job-save" class="secondary">Enregistrer comme document</button><button id="ws-job-export" class="secondary">Exporter</button></div></div></section>
+<aside id="ws-side" class="ws-document-side" aria-label="Document et sources" hidden><button id="ws-side-close" class="secondary">Fermer ×</button><h3 id="ws-side-title"></h3><div id="ws-side-text" class="ws-result"></div></aside>
+</template>
+<script nonce="__NONCE__">
+document.querySelector('.workspace').append($('ws-layout').content.cloneNode(true));
+const ws={data:null,project:null,document:null,dirty:false,conflict:false,timer:null,writes:Promise.resolve(),draftWrites:Promise.resolve(),revisionJob:null,revisionDoc:null,result:null,seen:new Set(),initialized:false,polling:false,projectDirty:false};
+function wsElement(tag,value,klass){const n=document.createElement(tag);if(value!==undefined)n.textContent=value;if(klass)n.className=klass;return n;}
+function wsButton(title,run){const b=wsElement('button',title,'secondary');b.type='button';b.onclick=()=>wsTry(run);return b;}
+async function wsTry(run){try{error('');return await run();}catch(e){error(e);return null;}}
+function wsAction(action,body={}){return api('/v1/workspace/action',{action,reset_id:'20261006-remove-assistants',...body});}
+function wsCurrent(){return library.find(c=>c.id===currentId);}
+// Keep a single save in flight, including edits arriving during a request.
+const wsFlushOnce=wsFlush;let wsFlushPending=null;
+wsFlush=function(){if(wsFlushPending)return wsFlushPending;wsFlushPending=(async()=>{do{await wsFlushOnce();}while(ws.dirty&&!ws.conflict);})().finally(()=>wsFlushPending=null);return wsFlushPending;};
+function workspaceFields(){const c=wsCurrent();return {project_id:c?.project_id||null,document_id:c?.document_id||null};}
+function workspaceShowSources(sources){$('ws-side-title').textContent='Passages utilisés pour cette réponse';wsDrawSources($('ws-side-text'),sources);$('ws-side').hidden=false;}
+function wsOptions(select,rows,empty){const old=select.value;select.replaceChildren();if(empty)select.append(new Option(empty,''));for(const r of rows)select.append(new Option(r.title||r.name,r.id));if([...select.options].some(o=>o.value===old))select.value=old;}
+const pickers=wsElement('div',undefined,'ws-pickers');pickers.innerHTML='<label>Projet <select id="ws-chat-project" aria-label="Projet de la discussion"></select></label><label>Document <select id="ws-chat-document" aria-label="Document de référence"></select></label><button id="ws-publish" class="secondary">Enregistrer au projet</button><button id="ws-panel" class="secondary">Voir le document</button>';
+document.querySelector('[data-view="chat"] .conversation-top').after(pickers);
+for(const [view,title] of [['projects','Projets'],['tasks','Tâches']]){const b=wsElement('button',title,'nav-button');b.dataset.viewButton=view;b.onclick=()=>showView(view);document.querySelector('#client-navigation').insertBefore(b,document.querySelector('[data-view-button="access"]'));}
+const originalShowView=showView;showView=function(name){originalShowView(name);if(['projects','tasks'].includes(name)){$('workspace-heading').textContent=({projects:'Projets',tasks:'Tâches'})[name];wsRefresh().catch(e=>error(e));}if(name!=='chat')$('ws-side').hidden=true;};
+const wsSettings=wsElement('section',undefined,'settings-view');wsSettings.dataset.view='settings';wsSettings.hidden=true;
+const wsSettingsNav=wsElement('nav',undefined,'ws-toolbar');wsSettingsNav.setAttribute('aria-label','Réglages du client');wsSettings.append(wsElement('h2','Réglages'),wsSettingsNav);
+for(const name of ['access','connection','updates','api']){const b=document.querySelector('[data-view-button="'+name+'"]');b.className='secondary';wsSettingsNav.append(b);const pane=document.querySelector('[data-view="'+name+'"]');pane.style.padding='0';pane.style.overflow='visible';wsSettings.append(pane);}
+document.querySelector('.workspace').append(wsSettings);
+const wsSettingsButton=wsElement('button','Réglages','nav-button');wsSettingsButton.dataset.viewButton='settings';document.querySelector('#client-navigation').append(wsSettingsButton);
+const wsShowViewOnce=showView;showView=function(name){const selected=name==='settings'?'access':name;wsShowViewOnce(selected);wsSettings.hidden=!['access','connection','updates','api'].includes(selected);wsSettingsButton.classList.toggle('active',!wsSettings.hidden);if(!wsSettings.hidden)$('workspace-heading').textContent='Réglages · '+({access:'Mon accès',connection:'Connexion',updates:'Mises à jour',api:'API locale'})[selected];};
+wsSettingsButton.onclick=()=>showView('settings');
+const originalDrawLibrary=drawLibrary;drawLibrary=function(){originalDrawLibrary();wsChatSelections();};
+const wsFillProjectOnce=wsFillProject;wsFillProject=function(){if(document.activeElement?.closest('#ws-memories'))return;wsFillProjectOnce();ws.projectRevision=ws.data?.projects.find(p=>p.id===ws.project)?.revision;};
+function wsChatSelections(){if(!ws.data)return;const c=wsCurrent();wsOptions($('ws-chat-project'),ws.data.projects.filter(p=>!p.archived||p.id===c?.project_id),'Sans projet');$('ws-chat-project').value=c?.project_id||'';const p=ws.data.projects.find(p=>p.id===c?.project_id);wsOptions($('ws-chat-document'),p?.documents||[],'Tous les documents');$('ws-chat-document').value=c?.document_id||'';for(const id of ['ws-chat-project','ws-chat-document','ws-publish'])$(id).disabled=conversationLocked();$('ws-panel').hidden=!c?.document_id;}
+for(const id of ['ws-chat-project','ws-chat-document'])$(id).onchange=()=>wsTry(async()=>{if(conversationLocked())return;const c=wsCurrent();if(id==='ws-chat-project'){const target=$('ws-chat-project').value||null;wsChatSelections();await wsMoveConversation(c.id,target);return;}c.document_id=$('ws-chat-document').value||null;save();wsChatSelections();});
+$('ws-publish').onclick=()=>wsTry(()=>wsConversationAction(async()=>{const c=wsCurrent();if(!c.project_id)throw new Error('Choisissez un projet pour enregistrer la discussion sur le serveur.');const r=await wsAction('conversation_save',{id:c.id.replaceAll('-',''),project:c.project_id,title:c.title,messages:c.messages,archived:Boolean(c.archived),revision:c.server_revision||0});c.server_revision=r.revision;}));
+$('ws-panel').onclick=()=>wsTry(async()=>{const c=wsCurrent();if(!c.document_id)return;const d=await wsAction('document_get',{id:c.document_id});$('ws-side-title').textContent=d.title;$('ws-side-text').textContent=d.text;$('ws-side').hidden=false;});$('ws-side-close').onclick=()=>$('ws-side').hidden=true;
+async function wsRefresh(){if(ws.polling)return;ws.polling=true;try{const data=await api('/v1/workspace');ws.data=data;wsChatSelections();wsDrawProjects();wsDrawJobs();wsOptions($('ws-task-project'),data.projects.filter(p=>!p.archived));if(ws.project&&!ws.projectDirty)wsFillProject();if(!ws.initialized){ws.seen=new Set(data.jobs.filter(j=>j.state==='completed').map(j=>j.id));ws.initialized=true;}else{const incoming=data.jobs.filter(j=>j.state==='completed'&&!ws.seen.has(j.id));if(incoming.length){$('ws-task-notice').textContent=incoming.length+' nouveau(x) résultat(s) disponible(s).';const b=document.querySelector('[data-view-button="tasks"]');b.textContent='Tâches · résultats disponibles';for(const j of incoming)ws.seen.add(j.id);}}}finally{ws.polling=false;}}
+const wsRefreshOnce=wsRefresh;wsRefresh=function(){if(ws.refreshPending)return ws.refreshPending;ws.refreshPending=wsRefreshOnce().finally(()=>ws.refreshPending=null);return ws.refreshPending;};
+function wsDrawProjects(){const query=$('ws-project-search').value.toLocaleLowerCase(),all=ws.data?.projects||[];const list=all.filter(p=>(!p.archived||$('ws-archived').checked)&&(p.title+' '+p.instructions).toLocaleLowerCase().includes(query));$('ws-project-list').replaceChildren(...list.map(p=>{const b=wsButton(p.title+(p.archived?' · archivé':''),()=>wsSelectProject(p.id));b.classList.toggle('selected',p.id===ws.project);return b;}));if(!list.length)$('ws-project-list').append(wsElement('p','Aucun projet correspondant.','muted'));}
+async function wsSelectProject(id){await wsFlush();if(ws.projectDirty)throw new Error('Enregistrez les consignes du projet avant de changer de projet.');ws.project=id;ws.document=null;ws.dirty=false;ws.conflict=false;$('ws-document-editor').hidden=true;$('ws-proposal').hidden=true;wsFillProject();wsDrawProjects();}
+function wsFillProject(){const p=ws.data?.projects.find(p=>p.id===ws.project);$('ws-project-empty').hidden=!!p;$('ws-project-detail').hidden=!p;if(!p)return;$('ws-project-title').value=p.title;$('ws-project-instructions').value=p.instructions;$('ws-project-archive').textContent=p.archived?'Restaurer le projet':'Archiver';$('ws-project-status').textContent=p.archived?'Projet archivé':'';$('ws-documents').replaceChildren(...p.documents.map(d=>wsButton(d.title,()=>wsOpenDocument(d.id))));$('ws-memories').replaceChildren(...p.memories.map(m=>{const row=wsElement('div',undefined,'ws-card'),input=wsElement('textarea');input.value=m.text;input.maxLength=2000;row.append(input,wsButton('Modifier',async()=>{await wsAction('memory_save',{id:m.id,text:input.value});await wsRefresh();}),wsButton('Supprimer',async()=>{await wsAction('memory_delete',{id:m.id});await wsRefresh();}));return row;}));}
+$('ws-project-search').oninput=wsDrawProjects;$('ws-archived').onchange=wsDrawProjects;
+$('ws-create-project').onsubmit=e=>{e.preventDefault();wsTry(async()=>{const r=await wsAction('project_create',{title:$('ws-project-name').value});$('ws-project-name').value='';await wsRefresh();await wsSelectProject(r.id);});};
+for(const id of ['ws-project-title','ws-project-instructions'])$(id).oninput=()=>{ws.projectDirty=true;$('ws-project-status').textContent='Consignes à enregistrer';};
+async function wsSaveProject(archived){const p=ws.data.projects.find(p=>p.id===ws.project);await wsAction('project_save',{id:p.id,title:$('ws-project-title').value,instructions:$('ws-project-instructions').value,archived:archived??!!p.archived,revision:ws.projectRevision});ws.projectDirty=false;await wsRefresh();$('ws-project-status').textContent='Projet enregistré';}
+$('ws-project-form').onsubmit=e=>{e.preventDefault();wsTry(()=>wsSaveProject());};$('ws-project-archive').onclick=()=>wsTry(async()=>{await wsFlush();const p=ws.data.projects.find(p=>p.id===ws.project);await wsSaveProject(!p.archived);});
+$('ws-project-chat').onclick=()=>wsTry(async()=>{if(busy)throw new Error('Attendez la fin de la réponse.');$('new').click();const c=wsCurrent();c.project_id=ws.project;save();wsChatSelections();showView('chat');});
+async function wsLoadConversation(id){return wsConversationAction(async()=>{
+  const remote=await wsAction('conversation_get',{id});if(!validMessages(remote.messages))throw new Error('Discussion serveur invalide.');
+  let c=library.find(c=>c.id.replaceAll('-','')===id);
+  if(c&&JSON.stringify(c.messages)!==JSON.stringify(remote.messages)&&!confirm('Votre copie locale est différente. La remplacer par la version du serveur ? Exportez-la d’abord si nécessaire.'))return;
+  if(!c){if(library.length>=200)throw new Error('Limite de 200 discussions locales.');c={id:remote.id,title:remote.title,messages:remote.messages};library.unshift(c);}
+  Object.assign(c,{title:remote.title,messages:remote.messages,project_id:remote.project,server_revision:remote.revision,archived:Boolean(remote.archived)});
+  currentId=c.id;messages=c.messages;$('conversation-filter').value=c.archived?'archived':'active';showView('chat');
+});}
+
+async function wsOpenDocument(id){await wsFlush();const d=await wsAction('document_get',{id});ws.document=d;ws.dirty=false;ws.conflict=false;$('ws-document-title').value=d.title;$('ws-document-text').value=d.text;$('ws-document-editor').hidden=false;$('ws-proposal').hidden=true;$('ws-document-original').hidden=d.kind==='note';$('ws-document-status').textContent='Enregistré sur le serveur';}
+function wsDraft(){if(!ws.document)return null;return {id:ws.document.id,project:ws.document.project,title:$('ws-document-title').value,text:$('ws-document-text').value,revision:ws.document.revision};}
+function wsKeepDraft(){const draft=wsDraft();ws.draftWrites=ws.draftWrites.catch(()=>{}).then(()=>api('/client/draft',{draft}));return ws.draftWrites;}
+async function wsFlush(){clearTimeout(ws.timer);await ws.draftWrites;await ws.writes;if(!ws.dirty||!ws.document)return;if(ws.conflict)throw new Error('Brouillon conservé : comparez avec la version serveur avant d’enregistrer.');const draft=wsDraft(),active=ws.document;ws.writes=wsAction('document_save',{id:draft.id,project:draft.project,title:draft.title,text:draft.text,revision:draft.revision}).then(async r=>{active.revision=r.revision;if(ws.document!==active)return;const unchanged=$('ws-document-title').value===draft.title&&$('ws-document-text').value===draft.text;ws.dirty=!unchanged;$('ws-document-status').textContent=unchanged?'Enregistré sur le serveur':'Modifications à enregistrer';if(unchanged)await api('/client/draft',{draft:null});else await wsKeepDraft();}).catch(e=>{if(e.status===409)ws.conflict=true;$('ws-document-status').textContent='Brouillon conservé : '+e.message;throw e;});try{await ws.writes;}finally{ws.writes=Promise.resolve();}}
+for(const id of ['ws-document-title','ws-document-text'])$(id).oninput=()=>{ws.dirty=true;$('ws-document-status').textContent='Enregistrement…';wsKeepDraft().catch(e=>error(e));clearTimeout(ws.timer);if(!ws.conflict)ws.timer=setTimeout(()=>wsFlush().catch(e=>error(e)),1200);};
+const originalFlushHistory=flushHistory;flushHistory=async function(){await wsFlush();if(ws.projectDirty)await wsSaveProject();return originalFlushHistory();};
+$('ws-document-save').onclick=()=>wsTry(()=>wsFlush());
+$('ws-document-reload').onclick=()=>wsTry(async()=>{if(!ws.document)return;const server=await wsAction('document_get',{id:ws.document.id});$('ws-side-title').textContent='Version serveur · '+server.title;$('ws-side-text').textContent=server.text;$('ws-side').hidden=false;if(confirm('La version serveur s’affiche à droite. Conserver votre texte actuel comme brouillon basé sur cette révision ?')){ws.document.revision=server.revision;ws.conflict=false;ws.dirty=true;await wsKeepDraft();$('ws-document-status').textContent='Brouillon conservé. Enregistrez pour remplacer cette version serveur.';}});
+function wsDownload(title,data,type='text/markdown;charset=utf-8'){const url=URL.createObjectURL(new Blob([data],{type})),a=wsElement('a');a.href=url;a.download=title;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+$('ws-document-export').onclick=()=>wsDownload(($('ws-document-title').value||'document')+'.md',$('ws-document-text').value);
+$('ws-document-original').onclick=()=>wsTry(async()=>{const r=await wsAction('document_download',{id:ws.document.id});wsDownload(r.title,Uint8Array.from(atob(r.data),c=>c.charCodeAt(0)),'application/octet-stream');});
+$('ws-new-document').onclick=()=>wsTry(async()=>{await wsFlush();const r=await wsAction('document_create',{project:ws.project,title:'Nouvelle note',text:''});await wsRefresh();await wsOpenDocument(r.id);$('ws-document-title').focus();});
+$('ws-upload').onchange=()=>wsTry(async()=>{try{const file=$('ws-upload').files[0];if(!file)return;if(file.size>2*1024*1024)throw new Error('Maximum 2 Mo par fichier.');const data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result.split(',')[1]);reader.onerror=()=>reject(new Error('Lecture du fichier impossible.'));reader.readAsDataURL(file);});$('ws-project-status').textContent='Import et extraction du fichier…';const r=await wsAction('document_upload',{project:ws.project,title:file.name,data});await wsRefresh();await wsOpenDocument(r.id);}finally{$('ws-upload').value='';}});
+$('ws-document-delete').onclick=()=>wsTry(async()=>{if(!confirm('Supprimer ce document et son index du serveur ?'))return;await wsFlush();await wsAction('document_delete',{id:ws.document.id,revision:ws.document.revision});ws.document=null;ws.dirty=false;$('ws-document-editor').hidden=true;await api('/client/draft',{draft:null});await wsRefresh();});
+$('ws-document-chat').onclick=()=>wsTry(async()=>{if(busy)throw new Error('Attendez la fin de la réponse.');await wsFlush();$('new').click();const c=wsCurrent();c.project_id=ws.project;c.document_id=ws.document.id;save();wsChatSelections();showView('chat');$('ws-panel').click();});
+function wsDrawSources(container,sources){container.replaceChildren();for(const s of sources){const row=wsElement('div',undefined,'ws-source');row.append(wsElement('strong',s.title||s.url||'Source'));if(s.page)row.append(wsElement('span',' · page '+s.page));row.append(wsElement('p',s.text||''));if(s.url){try{const parsed=new URL(s.url);if(parsed.protocol==='https:'){const a=wsElement('a','Ouvrir la source');a.href=parsed.href;a.target='_blank';a.rel='noopener noreferrer';row.append(a);}}catch{}}container.append(row);}}
+$('ws-search-form').onsubmit=e=>{e.preventDefault();wsTry(async()=>{const r=await wsAction('search',{project:ws.project,query:$('ws-search-query').value});wsDrawSources($('ws-sources'),r.sources);if(!r.sources.length)$('ws-sources').textContent='Aucun passage correspondant. Essayez d’autres mots.';});};
+$('ws-memory-form').onsubmit=e=>{e.preventDefault();wsTry(async()=>{await wsAction('memory_create',{project:ws.project,text:$('ws-memory-text').value});$('ws-memory-text').value='';await wsRefresh();});};
+const wsStates={queued:'En attente',running:'En cours',completed:'Terminé',failed:'Échec',cancelled:'Annulé',paused:'En pause'};
+function wsDrawJobs(){$('ws-jobs').replaceChildren(...(ws.data?.jobs||[]).map(j=>{const card=wsElement('div',undefined,'ws-card');card.append(wsElement('h3',j.title),wsElement('p',(wsStates[j.state]||j.state)+' · '+new Date(j.due*1000).toLocaleString()+(j.repeat_hours?' · récurrence '+j.repeat_hours+' h':''),'muted'));if(j.error)card.append(wsElement('p',j.error,'ws-warning'));const row=wsElement('div',undefined,'ws-toolbar');if(j.state==='completed')row.append(wsButton('Voir le résultat',()=>wsOpenJob(j.id)));if(['queued','running'].includes(j.state))row.append(wsButton('Pause',async()=>{await wsAction('job_pause',{id:j.id});await wsRefresh();}));if(['queued','running','paused'].includes(j.state))row.append(wsButton('Annuler',async()=>{await wsAction('job_cancel',{id:j.id});await wsRefresh();}));if(['failed','cancelled','paused'].includes(j.state))row.append(wsButton('Relancer',async()=>{await wsAction('job_retry',{id:j.id});await wsRefresh();}));card.append(row);return card;}));}
+async function wsOpenJob(id){const job=await wsAction('job_get',{id});ws.result={...job,...JSON.parse(job.result||'{}')};$('ws-job-title').textContent=job.title;$('ws-job-content').textContent=ws.result.text||'';wsDrawSources($('ws-job-sources'),ws.result.sources||[]);$('ws-job-result').hidden=false;document.querySelector('[data-view-button="tasks"]').textContent='Tâches';}
+$('ws-task-form').onsubmit=e=>{e.preventDefault();wsTry(async()=>{const b=$('ws-task-form').querySelector('button');b.disabled=true;try{await wsAction('job_create',{project:$('ws-task-project').value,kind:$('ws-task-kind').value,prompt:$('ws-task-prompt').value,url:$('ws-task-url').value,delay_minutes:Number($('ws-task-delay').value),repeat_hours:Number($('ws-task-repeat').value),request_key:crypto.randomUUID().replaceAll('-','')});$('ws-task-prompt').value='';$('ws-task-notice').textContent='Tâche enregistrée sur le serveur.';await wsRefresh();}finally{b.disabled=false;}});};
+$('ws-job-save').onclick=()=>wsTry(async()=>{if(!ws.result)return;const r=await wsAction('document_create',{project:ws.result.project,title:ws.result.title,text:ws.result.text||''});await wsRefresh();await wsSelectProject(ws.result.project);await wsOpenDocument(r.id);showView('projects');});$('ws-job-export').onclick=()=>{if(ws.result)wsDownload(ws.result.title+'.md',ws.result.text||'');};
+$('ws-revise').onsubmit=e=>{e.preventDefault();wsTry(async()=>{await wsFlush();if($('ws-document-text').value.length>7500)throw new Error('Révision complète limitée à 7 500 caractères. Travaillez par passages dans le chat pour un document plus long.');const d=ws.document,r=await wsAction('job_create',{project:d.project,title:'Révision : '+d.title,prompt:'Révise uniquement le document ci-dessous selon la demande. Retourne le texte révisé sans commentaire préalable.\nDemande : '+$('ws-revise-prompt').value+'\nDocument :\n'+$('ws-document-text').value,request_key:crypto.randomUUID().replaceAll('-','')});ws.revisionJob=r.id;ws.revisionDoc={id:d.id,revision:d.revision};$('ws-document-status').textContent='Révision en préparation sur le serveur. Le document reste inchangé.';await wsRefresh();});};
+$('ws-proposal-accept').onclick=()=>wsTry(async()=>{if(!ws.document||ws.document.id!==ws.revisionDoc?.id||ws.document.revision!==ws.revisionDoc.revision||ws.dirty)throw new Error('Le document a changé depuis la demande. Comparez le brouillon avant de le copier dans le document actuel.');$('ws-document-text').value=$('ws-proposal-text').value;ws.dirty=true;await wsKeepDraft();await wsFlush();$('ws-proposal').hidden=true;});$('ws-proposal-decline').onclick=()=>{$('ws-proposal').hidden=true;ws.revisionJob=null;};
+const originalDraw=draw;draw=function(message){const view=originalDraw(message);if(message.role==='assistant'&&message.content)view.article.append(wsButton('Enregistrer comme document',async()=>{const p=wsCurrent()?.project_id;if(!p)throw new Error('Choisissez un projet dans la discussion.');const r=await wsAction('document_create',{project:p,title:wsCurrent().title,text:message.content});await wsRefresh();await wsSelectProject(p);await wsOpenDocument(r.id);showView('projects');}));return view;};
+const originalButtons=buttons;buttons=function(){originalButtons();wsChatSelections();};
+$('ws-refresh').onclick=()=>wsTry(()=>wsRefresh());$('ws-task-refresh').onclick=()=>wsTry(()=>wsRefresh());
+async function wsPoll(){if(!connected||busy||historySyncPending||conversationActionPending||wsDraggedConversation)return;if(!ws.bootstrapDone){await wsBootstrap();return;}try{await wsRefresh();if(ws.revisionJob){const j=ws.data.jobs.find(j=>j.id===ws.revisionJob);if(j?.state==='completed'&&ws.document?.id===ws.revisionDoc?.id){const result=await wsAction('job_get',{id:j.id});$('ws-proposal-text').value=JSON.parse(result.result).text;$('ws-proposal').hidden=false;ws.revisionJob=null;}else if(j&&['failed','cancelled'].includes(j.state)){$('ws-document-status').textContent='Révision '+wsStates[j.state]+' : '+j.error;ws.revisionJob=null;}}}catch(e){$('ws-task-notice').textContent='Actualisation indisponible : '+e.message;}}
+let wsBootstrapping=false;
+async function wsBootstrap(){if(wsBootstrapping||ws.bootstrapDone)return;wsBootstrapping=true;try{await clientReady;if(!connected)return;await wsRefresh();const r=await api('/client/draft');ws.bootstrapDone=true;if(r.draft){const d=r.draft;await wsSelectProject(d.project);await wsOpenDocument(d.id);$('ws-document-title').value=d.title;$('ws-document-text').value=d.text;ws.dirty=true;ws.conflict=ws.document.revision!==d.revision;ws.document.revision=d.revision;$('ws-document-status').textContent='Brouillon local récupéré'+(ws.conflict?' : comparer avec le serveur avant enregistrement.':'.');showView('projects');}render();drawLibrary();}catch(e){$('ws-task-notice').textContent=e.message;}finally{wsBootstrapping=false;}}
+wsBootstrap();setInterval(wsPoll,5000);
+// Conversation actions share one lock so a reply or history sync cannot change their target.
+function wsConversationRecord(id){
+  const canonical=id.replaceAll('-',''),local=library.find(c=>c.id.replaceAll('-','')===canonical);
+  let published=null;
+  for(const p of ws.data?.projects||[]){const row=p.conversations.find(c=>c.id===canonical);if(row){published={...row,project:p.id};break;}}
+  if(!local&&!published)throw new Error('Conversation introuvable. Actualisez les projets.');
+  return {id:canonical,local,published,revision:local?.server_revision||published?.revision||0};
+}
+async function wsConversationAction(run){
+  if(conversationLocked())throw new Error('Attendez la fin de l’action en cours.');
+  conversationActionPending=true;wsCloseConversationMenu();buttons();drawLibrary();
+  try{save();await flushHistory();await run();save();await flushHistory();if(ws.data&&connected)await wsRefresh();}
+  finally{conversationActionPending=false;render();drawLibrary();wsDrawProjectConversations();buttons();}
+}
+async function wsMoveConversation(id,project){
+  return wsConversationAction(async()=>{
+    const row=wsConversationRecord(id),previous=row.local?.project_id||row.published?.project||null;
+    if(previous===project)return;
+    const target=ws.data?.projects.find(p=>p.id===project);
+    if(project&&(!target||target.archived))throw new Error('Choisissez un projet actif.');
+    let revision=row.revision;
+    if(revision){
+      if(!project){
+        if(!row.local)throw new Error('Ouvrez cette discussion avant de la retirer du projet.');
+        // Removing the publication leaves the complete personal history intact.
+        await wsAction('conversation_delete',{id:row.id,revision});revision=0;
+      }else revision=(await wsAction('conversation_move',{id:row.id,project,revision})).revision;
+    }
+    if(row.local){row.local.project_id=project;row.local.document_id=null;row.local.server_revision=revision;}
+  });
+}
+async function wsArchiveConversation(id){
+  return wsConversationAction(async()=>{
+    const row=wsConversationRecord(id),archived=!Boolean(row.local?.archived??row.published?.archived);
+    const result=row.revision?await wsAction('conversation_archive',{id:row.id,revision:row.revision,archived}):null;
+    if(row.local){row.local.archived=archived;if(result)row.local.server_revision=result.revision;}
+  });
+}
+async function wsDeleteConversation(id){
+  return wsConversationAction(async()=>{
+    const row=wsConversationRecord(id),local=row.local?JSON.parse(JSON.stringify(row.local)):null;
+    let remote=null;
+    if(row.revision){remote=await wsAction('conversation_get',{id:row.id});await wsAction('conversation_delete',{id:row.id,revision:row.revision});}
+    const index=local?library.indexOf(row.local):-1;
+    if(local)library.splice(index,1);
+    let placeholder=null;
+    if(!library.length){placeholder=crypto.randomUUID();library.push({id:placeholder,title:'Nouvelle conversation',messages:[]});}
+    if(!library.some(c=>c.id===currentId)){currentId=(library.find(c=>!c.archived)||library[0]).id;messages=wsCurrent().messages;}
+    deletedConversation={local,remote,index,placeholder};$('undo-delete').hidden=false;
+  });
+}
+async function wsUndoConversationDelete(){
+  if(!deletedConversation)return;
+  return wsConversationAction(async()=>{
+    const deleted=deletedConversation,candidate=library.filter(c=>c.id!==deleted.placeholder||c.messages.length||c.project_id||c.title!=='Nouvelle conversation');
+    if(deleted.local){candidate.splice(Math.max(0,deleted.index),0,deleted.local);if(candidate.length>200)throw new Error('Maximum 200 conversations.');
+      if(new TextEncoder().encode(JSON.stringify({conversations:candidate,currentId:deleted.local.id})).length>9*1024*1024)throw new Error('Historique total limité à 9 Mo.');}
+    if(deleted.remote){const r=deleted.remote,result=await wsAction('conversation_save',{id:r.id,project:r.project,title:r.title,messages:r.messages,archived:Boolean(r.archived),revision:0});if(deleted.local)deleted.local.server_revision=result.revision;}
+    if(deleted.local){library=candidate;currentId=deleted.local.id;messages=deleted.local.messages;$('conversation-filter').value=deleted.local.archived?'archived':'active';}
+    deletedConversation=null;$('undo-delete').hidden=true;
+  });
+}
+function wsConversationButton(c,published=false){
+  const b=wsButton(c.title,async()=>{
+    if(published)return wsLoadConversation(c.id);
+    if(conversationLocked())return;save();currentId=c.id;messages=c.messages;render();drawLibrary();showView('chat');
+  });
+  b.dataset.conversationId=c.id;b.classList.add('conversation-item');b.disabled=conversationLocked();
+  b.classList.toggle('selected',c.id.replaceAll('-','')===currentId.replaceAll('-',''));
+  if(c.archived)b.append(wsElement('small','Archivée'));
+  wsPrepareConversationDrag(b);return b;
+}
+function wsDrawProjectConversations(){
+  const p=ws.data?.projects.find(p=>p.id===ws.project);if(!p)return;
+  const local=library.filter(c=>c.project_id===p.id),known=new Set(local.map(c=>c.id.replaceAll('-','')));
+  const rows=[...local.map(c=>({c,published:false})),...p.conversations.filter(c=>!known.has(c.id)).map(c=>({c,published:true}))];
+  const shown=rows.filter(({c})=>!c.archived||$('ws-conversation-archived').checked);
+  $('ws-conversations').replaceChildren(...shown.map(({c,published})=>{
+    const row=wsElement('div',undefined,'ws-conversation-row'),b=wsConversationButton(c,published),actions=wsButton('···',()=>wsOpenConversationMenu(c.id,actions));
+    actions.setAttribute('aria-label','Actions de la discussion '+c.title);actions.disabled=conversationLocked();row.append(b,actions);return row;
+  }));
+  if(!shown.length)$('ws-conversations').append(wsElement('p','Aucune discussion à afficher.','muted'));
+  $('ws-conversations').dataset.projectDrop=p.archived?'':p.id;
+}
+const wsConversationFill=wsFillProject;wsFillProject=function(){wsConversationFill();wsDrawProjectConversations();};
+$('ws-conversation-archived').onchange=wsDrawProjectConversations;
+
+// Keep both conversations and project destinations reachable in the sidebar.
+const wsHistoryNavigation=wsElement('div',undefined,'history-navigation'),wsSidebarProjects=wsElement('div');wsSidebarProjects.id='ws-sidebar-projects';
+const wsHistoryLabel=document.querySelector('.sidebar > .section-label');wsHistoryLabel.before(wsHistoryNavigation);
+wsHistoryNavigation.append(wsHistoryLabel,document.querySelector('.history-search'),$('conversation-list'),wsSidebarProjects);
+function wsDrawSidebarProjects(){
+  const open=new Set([...wsSidebarProjects.querySelectorAll('details[open]')].map(n=>n.dataset.projectDrop));
+  wsSidebarProjects.replaceChildren(wsElement('div','Projets','section-label'));
+  for(const p of ws.data?.projects.filter(p=>!p.archived)||[]){
+    const group=wsElement('details',undefined,'sidebar-project');group.dataset.projectDrop=p.id;group.open=open.has(p.id);
+    const summary=wsElement('summary',p.title);summary.title='Déposer une conversation dans '+p.title;
+    const view=wsButton('Ouvrir le projet',async()=>{await wsSelectProject(p.id);showView('projects');});
+    group.append(summary,view);
+    const local=library.filter(c=>c.project_id===p.id&&!c.archived),known=new Set(library.filter(c=>c.project_id===p.id).map(c=>c.id.replaceAll('-','')));
+    for(const c of local)group.append(wsConversationButton(c));
+    for(const c of p.conversations.filter(c=>!c.archived&&!known.has(c.id)))group.append(wsConversationButton(c,true));
+    wsSidebarProjects.append(group);
+  }
+  const unassigned=wsElement('div','Sans projet','conversation-drop-none');unassigned.dataset.projectDrop='none';wsSidebarProjects.append(unassigned);
+}
+const wsConversationLibrary=drawLibrary;drawLibrary=function(){wsConversationLibrary();for(const b of $('conversation-list').querySelectorAll('[data-conversation-id]'))wsPrepareConversationDrag(b);wsDrawSidebarProjects();wsDrawProjectConversations();};
+const wsConversationProjects=wsDrawProjects;wsDrawProjects=function(){
+  wsConversationProjects();const query=$('ws-project-search').value.toLocaleLowerCase();
+  const visible=(ws.data?.projects||[]).filter(p=>(!p.archived||$('ws-archived').checked)&&(p.title+' '+p.instructions).toLocaleLowerCase().includes(query));
+  [...$('ws-project-list').querySelectorAll('button')].forEach((b,i)=>{if(!visible[i].archived)b.dataset.projectDrop=visible[i].id;});wsDrawSidebarProjects();
+};
+let wsDraggedConversation=null;
+function wsPrepareConversationDrag(b){
+  b.draggable=!conversationLocked();b.title='Clic droit pour les actions · glissez vers un projet';
+  b.ondragstart=e=>{if(conversationLocked()){e.preventDefault();return;}wsCloseConversationMenu();wsDraggedConversation=b.dataset.conversationId;e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('application/x-fred-conversation',wsDraggedConversation);b.classList.add('dragging');document.body.classList.add('conversation-dragging');};
+  b.ondragend=wsClearConversationDrag;
+}
+function wsClearConversationDrag(){wsDraggedConversation=null;document.body.classList.remove('conversation-dragging');document.querySelectorAll('.dragging,.conversation-drop-hover').forEach(n=>n.classList.remove('dragging','conversation-drop-hover'));}
+function wsDropTarget(e){const target=e.target.closest('[data-project-drop]');return target?.dataset.projectDrop?target:null;}
+document.addEventListener('dragover',e=>{const target=wsDropTarget(e);if(!wsDraggedConversation||!target||conversationLocked())return;e.preventDefault();e.dataTransfer.dropEffect='move';document.querySelectorAll('.conversation-drop-hover').forEach(n=>n.classList.remove('conversation-drop-hover'));target.classList.add('conversation-drop-hover');});
+document.addEventListener('dragleave',e=>{const target=wsDropTarget(e);if(target&&!target.contains(e.relatedTarget))target.classList.remove('conversation-drop-hover');});
+document.addEventListener('drop',e=>{const target=wsDropTarget(e),id=wsDraggedConversation;if(!id||!target)return;e.preventDefault();const project=target.dataset.projectDrop==='none'?null:target.dataset.projectDrop;wsClearConversationDrag();wsTry(()=>wsMoveConversation(id,project));});
+
+const wsConversationMenu=wsElement('div',undefined,'conversation-context-menu');wsConversationMenu.hidden=true;wsConversationMenu.setAttribute('role','dialog');wsConversationMenu.setAttribute('aria-label','Actions de la conversation');document.body.append(wsConversationMenu);
+let wsConversationMenuAnchor=null;
+function wsCloseConversationMenu(restoreFocus=false){wsConversationMenu.hidden=true;if(restoreFocus&&wsConversationMenuAnchor?.isConnected)wsConversationMenuAnchor.focus();wsConversationMenuAnchor=null;}
+function wsOpenConversationMenu(id,anchor,event){
+  if(conversationLocked())return;const row=wsConversationRecord(id),archived=Boolean(row.local?.archived??row.published?.archived);
+  wsConversationMenuAnchor=anchor;wsConversationMenu.replaceChildren(wsElement('strong',row.local?.title||row.published.title));
+  const archive=wsButton(archived?'Restaurer la conversation':'Archiver la conversation',()=>wsArchiveConversation(id));
+  const remove=wsButton('Supprimer la conversation',()=>wsDeleteConversation(id));remove.classList.add('danger');
+  const label=wsElement('label','Déplacer vers'),select=wsElement('select');select.setAttribute('aria-label','Projet de destination');
+  if(row.local)select.append(new Option('Sans projet',''));
+  for(const p of ws.data?.projects.filter(p=>!p.archived)||[])select.append(new Option(p.title,p.id));
+  select.value=row.local?.project_id||row.published?.project||'';
+  const move=wsButton('Déplacer',()=>wsMoveConversation(id,select.value||null));move.disabled=!select.options.length;
+  label.append(select);wsConversationMenu.append(archive,label,move,remove);wsConversationMenu.hidden=false;
+  const rect=anchor.getBoundingClientRect(),x=event?.clientX??rect.right,y=event?.clientY??rect.bottom;
+  wsConversationMenu.style.left=Math.max(8,Math.min(x,innerWidth-wsConversationMenu.offsetWidth-8))+'px';
+  wsConversationMenu.style.top=Math.max(8,Math.min(y,innerHeight-wsConversationMenu.offsetHeight-8))+'px';archive.focus();
+}
+document.addEventListener('contextmenu',e=>{const anchor=e.target.closest('[data-conversation-id]');if(!anchor)return;e.preventDefault();wsOpenConversationMenu(anchor.dataset.conversationId,anchor,e);});
+document.addEventListener('click',e=>{if(!wsConversationMenu.hidden&&!wsConversationMenu.contains(e.target)&&!wsConversationMenuAnchor?.contains(e.target))wsCloseConversationMenu();});
+document.addEventListener('keydown',e=>{
+  const anchor=e.target.closest('[data-conversation-id]');if(anchor&&(e.key==='ContextMenu'||e.key==='F10'&&e.shiftKey)){e.preventDefault();wsOpenConversationMenu(anchor.dataset.conversationId,anchor);}
+  if(!wsConversationMenu.hidden&&e.key==='Escape'){e.preventDefault();wsCloseConversationMenu(true);}
+});
+window.addEventListener('resize',()=>wsCloseConversationMenu());
+document.addEventListener('scroll',e=>{if(!wsConversationMenu.contains(e.target))wsCloseConversationMenu();},true);
+drawLibrary();
+</script>

@@ -1,0 +1,14 @@
+{
+  "emulator-5554": {
+    "classes.dex": true,
+    "lib/x86_64/libfredvoice.so": true,
+    "assets/voice/model.json": true,
+    "assets/android-chat.html": true
+  },
+  "emulator-5556": {
+    "classes.dex": true,
+    "lib/x86_64/libfredvoice.so": true,
+    "assets/voice/model.json": true,
+    "assets/android-chat.html": true
+  }
+}

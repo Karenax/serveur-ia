@@ -1,0 +1,236 @@
+{
+  "prepared_at": "2026-10-10 23:03:52 +0200",
+  "before": {
+    "model_processes": [
+      {
+        "pid": 8200,
+        "created": 1791651021.7995121
+      },
+      {
+        "pid": 14628,
+        "created": 1791651021.777978
+      }
+    ],
+    "preserved_file_sha256": {
+      "acces-distants.json": "1d357907389d2056a608c5e98b47d2fa31f519521af1f18e8f3666eb36e16037",
+      "wireguard.json": "6cbd6b81bd61645cce770ac2a7e03cdb99f86b800c95d4f05e0a425e3a6aa7dd",
+      "reglages.json": "63d67efcbd295491ce77dc49198426e1290d6dfeabc0119befe3e1b172ee1762",
+      "wireguard-prive/secrets.dpapi": "0bf5ae5faca3ad22177ce07af1d8587441ad569f0595a46a3c8c4d4184600a93",
+      "wireguard-prive/signature.dpapi": "240cd390a95972957889009bfabb7e54942f33d7f99d9ebb9a211ab1f9754a4a"
+    },
+    "user_data": {
+      "client_histories": {
+        "count": 1,
+        "sha256": "ed1cf2db46a4c82a2a35007a9a5dd9ed31f8533d7dc41d53aa0892ea1e91925b"
+      },
+      "projects": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "documents": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "memories": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "conversations": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "policies": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "jobs": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    },
+    "automatic_backups": {
+      "enabled": true,
+      "time": "03:00",
+      "frequency": "daily",
+      "weekday": 0,
+      "destination": "D:\\Serveur IA\\lanceur\\sauvegardes",
+      "secondary_destination": "",
+      "retention": {
+        "daily": 7,
+        "weekly": 4,
+        "monthly": 6
+      },
+      "secret_configured": true
+    }
+  },
+  "pre_rollout_backup": {
+    "file": "D:\\Serveur IA\\lanceur\\sauvegardes\\20261010-230352-4ce61a.qwenbackup",
+    "bytes": 495571,
+    "sha256": "fbe8d00bd9cd1ce6b9777a1ecb3a0e2d9bde935f07118a498f100169b60a0525"
+  },
+  "contains_secret_values": false,
+  "console_restart": {
+    "previous_pid": 12460,
+    "previous_created": 1791663279.386865,
+    "wireguard_children_stopped": 1,
+    "model_processes_preserved": true
+  },
+  "windows_release": {
+    "version": "3.5.18",
+    "sha256": "6a1fb9951921db6082c48420fbee7a5d1b500697c5305101c8822502b7e6a153",
+    "bytes": 25594164,
+    "signature_verified": true,
+    "self_test": "PASS",
+    "wireguard_sha256": "7008346435c612d9dcc4e819bd19d754c760887496aaf90f1b374762f9092f60"
+  },
+  "activated_at": "2026-10-10 23:26:05 +0200",
+  "result": "PASS",
+  "automatic_backups": {
+    "enabled": true,
+    "time": "03:00",
+    "frequency": "daily",
+    "weekday": 0,
+    "destination": "D:\\Serveur IA\\lanceur\\sauvegardes",
+    "secondary_destination": "",
+    "retention": {
+      "daily": 7,
+      "weekly": 4,
+      "monthly": 6
+    },
+    "secret_configured": true,
+    "next_run": "2026-10-11T03:00:00+02:00"
+  },
+  "initial_verified_backup": {
+    "file": "D:\\Serveur IA\\lanceur\\sauvegardes\\fred-20261010-232602-dafedf7e9c0ce249b84b2152.qwenbackup",
+    "size": 497983,
+    "sha256": "96386326da5caa2656976f463d705408712981cbb2e0344bc0aa6d4cf89f1ff8",
+    "created_at": "2026-10-10T23:26:02+02:00",
+    "version": 2,
+    "verified": true
+  },
+  "included_counts": {
+    "profiles": 0,
+    "accounts": 0,
+    "projects": 0,
+    "documents": 0,
+    "memories": 0,
+    "conversations": 0,
+    "jobs": 0,
+    "client_histories": 1,
+    "policies": 0,
+    "document_original_bytes": 0,
+    "document_sources": 0,
+    "notifications": 0,
+    "notification_preferences": 0,
+    "notification_subscriptions": 0
+  },
+  "notifications": {
+    "item_count": 0,
+    "delivery": {
+      "mode": "connected",
+      "push": false
+    },
+    "preferences_revision": 0,
+    "retention": {
+      "days": 90,
+      "per_owner": 1000,
+      "global": 20000
+    }
+  },
+  "after": {
+    "model_processes": [
+      {
+        "pid": 8200,
+        "created": 1791651021.7995121
+      },
+      {
+        "pid": 14628,
+        "created": 1791651021.777978
+      }
+    ],
+    "preserved_file_sha256": {
+      "acces-distants.json": "1d357907389d2056a608c5e98b47d2fa31f519521af1f18e8f3666eb36e16037",
+      "wireguard.json": "6cbd6b81bd61645cce770ac2a7e03cdb99f86b800c95d4f05e0a425e3a6aa7dd",
+      "reglages.json": "63d67efcbd295491ce77dc49198426e1290d6dfeabc0119befe3e1b172ee1762",
+      "wireguard-prive/secrets.dpapi": "0bf5ae5faca3ad22177ce07af1d8587441ad569f0595a46a3c8c4d4184600a93",
+      "wireguard-prive/signature.dpapi": "240cd390a95972957889009bfabb7e54942f33d7f99d9ebb9a211ab1f9754a4a"
+    },
+    "user_data": {
+      "client_histories": {
+        "count": 1,
+        "sha256": "ed1cf2db46a4c82a2a35007a9a5dd9ed31f8533d7dc41d53aa0892ea1e91925b"
+      },
+      "projects": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "documents": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "memories": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "conversations": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "policies": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "jobs": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    },
+    "model_running": true,
+    "model_health": {
+      "status": "ok",
+      "max_context": 262144,
+      "model": "qwen3.8-flash-next-iq4-xs",
+      "images": false,
+      "api_key": false,
+      "loaded": true,
+      "service": "strata"
+    },
+    "maintenance": {
+      "state": "idle",
+      "phase": "",
+      "active": false,
+      "message": "Aucune restauration en cours.",
+      "retry_allowed": false,
+      "job": {}
+    }
+  },
+  "personal_clients_updated": 0,
+  "restoration_on_production": "not performed; validated on isolated fixtures",
+  "android_release": {
+    "version": "1.0.2",
+    "version_code": 3,
+    "file": "D:\\Serveur IA\\client-android\\dist\\Acces-serveur-Fred-Android.apk",
+    "bytes": 8505669,
+    "sha256": "cf400128ca9714a84b57016daa3b4c339411dd7d86b2aaea2eff88a19abc6dd3",
+    "certificate_sha256": "40216ff897090b49b21e3cda66169b9fb7070e42dd2b8cb9ebe0f2c441997048",
+    "signature_verified": true,
+    "profile_preserved_upgrade_verified_on_both_emulators": true,
+    "packaged_assets_match_final_sources": true
+  },
+  "console_restart_history": [
+    {
+      "previous_pid": 12460,
+      "previous_created": 1791663279.386865,
+      "wireguard_children_stopped": 1,
+      "model_processes_preserved": true
+    },
+    {
+      "previous_pid": 10568,
+      "previous_created": 1791666305.8390188,
+      "wireguard_children_stopped": 1,
+      "model_processes_preserved": true,
+      "reason": "final worker recovery and retry notification fixes",
+      "at": "2026-10-10 23:25:35 +0200"
+    }
+  ]
+}

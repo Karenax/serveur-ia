@@ -1,0 +1,36 @@
+{
+  "version": "3.5.6",
+  "exe": "D:\\Serveur IA\\lanceur\\clients\\Accès serveur Fred v3.5.6 - Fred.exe",
+  "sha256": "0180072636fbe7a1d624a753e220fc4d21d0ea43adb38d0587ca92a40c60f30f",
+  "release_verified": true,
+  "models": [
+    {
+      "id": "qwen3.8-flash-next-iq4-xs",
+      "object": "model",
+      "owned_by": "local",
+      "capabilities": {
+        "images": false,
+        "files": [
+          "txt",
+          "md",
+          "pdf",
+          "docx"
+        ],
+        "thinking": true,
+        "max_file_bytes": 2097152
+      }
+    }
+  ],
+  "checks": [
+    "Choix initial sans requête réseau ni tunnel avant sélection",
+    "HTTPS et WireGuard mémorisés",
+    "Réflexion conservée après rechargement",
+    "Fichier TXT envoyé sans texte supplémentaire puis rechargé",
+    "Image sélectionnée, envoyée et rechargée avec modèle de test compatible",
+    "Images rejetées avant inférence avec modèle sans vision",
+    "Contexte et publication de projet avec image",
+    "Tests de passerelle, espaces, historique et paramètres de connexion",
+    "EXE personnel et fenêtre WebView2 testés",
+    "Modèle de production conservé pendant le redémarrage du lanceur"
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "created_utc": "2026-10-10T20:24:20.4815938Z",
+  "scope": "Final Windows update compatibility and endpoint safety checks",
+  "binary": {
+    "file": "D:\\Serveur IA\\toolchain\\releases-staging\\windows-3.5.17\\Accès serveur Fred.exe",
+    "bytes": 25590937,
+    "version": "3.5.17",
+    "sha256": "307f5e3bcce5e31617606c56e034636026707c16d4a26ccfd1316927a4d78738"
+  },
+  "test_run": {
+    "count": 2,
+    "elapsed_seconds": 3.114,
+    "result": "PASS",
+    "log": "windows-update-compatibility-final.log"
+  },
+  "tests": [
+    {
+      "name": "test_accounts_updates.AccountsTests.test_update_starts_with_active_api_requests_and_closes_after_preparation",
+      "result": "PASS",
+      "behavior": "Update starts with three active API requests, preparation is called once, duplicate application is rejected, and the window closes only after successful preparation."
+    },
+    {
+      "name": "test_audit_fred.AuditTests.test_endpoint_change_is_blocked_during_active_api_requests",
+      "result": "PASS",
+      "behavior": "Endpoint change is refused during an active API request and the endpoint remains unchanged."
+    }
+  ],
+  "build": {
+    "result": "PASS",
+    "log": "windows-3.5.17-build.log"
+  },
+  "compiled_self_test": {
+    "result": "PASS",
+    "log": "windows-3.5.17-selftest-compatibility.txt"
+  },
+  "previous_binary_checks": {
+    "sha256": "166bfcb7c358d589bc7bbde0060b7e4b29487396eff6fd191413376ff891f602",
+    "tests": [
+      {
+        "name": "test_accounts_updates.AccountsTests.test_helper_replaces_verified_exe_preserves_profile_and_keeps_previous",
+        "result": "PASS",
+        "elapsed_seconds": 33.372,
+        "log": "windows-update-helper-final.log"
+      },
+      {
+        "name": "test_remote.RemoteTests.test_windows_protection_and_preconfigured_exe_startup",
+        "result": "PASS",
+        "elapsed_seconds": 9.534,
+        "log": "windows-profile-startup-final.log"
+      }
+    ]
+  },
+  "source_changes": "Remote.update restored to its original behavior; obsolete audit narrowed and renamed to cover endpoint changes; Android unchanged."
+}

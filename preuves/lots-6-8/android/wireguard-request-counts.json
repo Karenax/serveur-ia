@@ -1,0 +1,1 @@
+{"requests": {"GET /v1/models": 129, "POST /v1/chat/completions": 6, "POST /v1/device": 41, "GET /v1/workspace": 343, "POST /v1/workspace/action": 92, "GET /v1/notifications": 12, "POST /v1/notifications/action": 227, "GET /v1/status": 118, "GET /v1/history": 26, "POST /v1/history": 20, "POST /v1/context": 31}, "rejected": 0}

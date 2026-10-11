@@ -1,0 +1,62 @@
+[
+  {
+    "profile": "production",
+    "case": "dossier-1024",
+    "ttft_s": 154.3936163999897,
+    "sample_count": 52,
+    "thermal_samples": 29,
+    "max_temperature": 80.0,
+    "min_clock_mhz": 405.0,
+    "median_clock_mhz": 562.5
+  },
+  {
+    "profile": "production",
+    "case": "dossier-1024-repeat2",
+    "ttft_s": 177.60633550000784,
+    "sample_count": 114,
+    "thermal_samples": 56,
+    "max_temperature": 80.0,
+    "min_clock_mhz": 405.0,
+    "median_clock_mhz": 550.0
+  },
+  {
+    "profile": "cpu-court",
+    "case": "dossier-1024",
+    "ttft_s": 161.83645489999617,
+    "sample_count": 104,
+    "thermal_samples": 54,
+    "max_temperature": 80.0,
+    "min_clock_mhz": 405.0,
+    "median_clock_mhz": 607.0
+  },
+  {
+    "profile": "cpu-court",
+    "case": "dossier-1024-repeat2",
+    "ttft_s": 175.07091670000227,
+    "sample_count": 112,
+    "thermal_samples": 75,
+    "max_temperature": 81.0,
+    "min_clock_mhz": 405.0,
+    "median_clock_mhz": 423.5
+  },
+  {
+    "profile": "cpu-court-pin",
+    "case": "dossier-1024",
+    "ttft_s": 137.5274223000015,
+    "sample_count": 88,
+    "thermal_samples": 48,
+    "max_temperature": 81.0,
+    "min_clock_mhz": 405.0,
+    "median_clock_mhz": 632.5
+  },
+  {
+    "profile": "cpu-court-pin",
+    "case": "dossier-1024-repeat2",
+    "ttft_s": 173.65225299999292,
+    "sample_count": 112,
+    "thermal_samples": 80,
+    "max_temperature": 81.0,
+    "min_clock_mhz": 405.0,
+    "median_clock_mhz": 430.0
+  }
+]

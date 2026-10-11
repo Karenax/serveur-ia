@@ -1,0 +1,207 @@
+{
+  "before": {
+    "models": [
+      {
+        "pid": 8200,
+        "created": 1791651021.7995121
+      },
+      {
+        "pid": 14628,
+        "created": 1791651021.777978
+      }
+    ],
+    "files": {
+      "acces-distants.json": "1d357907389d2056a608c5e98b47d2fa31f519521af1f18e8f3666eb36e16037",
+      "wireguard.json": "6cbd6b81bd61645cce770ac2a7e03cdb99f86b800c95d4f05e0a425e3a6aa7dd",
+      "reglages.json": "63d67efcbd295491ce77dc49198426e1290d6dfeabc0119befe3e1b172ee1762",
+      "wireguard-prive/secrets.dpapi": "0bf5ae5faca3ad22177ce07af1d8587441ad569f0595a46a3c8c4d4184600a93",
+      "wireguard-prive/signature.dpapi": "240cd390a95972957889009bfabb7e54942f33d7f99d9ebb9a211ab1f9754a4a"
+    },
+    "users": {
+      "client_histories": {
+        "count": 1,
+        "sha256": "ed1cf2db46a4c82a2a35007a9a5dd9ed31f8533d7dc41d53aa0892ea1e91925b"
+      },
+      "projects": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "documents": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "memories": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "conversations": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "policies": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "jobs": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "personal_memories": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "knowledge_exclusions": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    },
+    "backups": {
+      "enabled": true,
+      "time": "03:00",
+      "frequency": "daily",
+      "weekday": 0,
+      "destination": "D:\\Serveur IA\\lanceur\\sauvegardes",
+      "secondary_destination": "",
+      "retention": {
+        "daily": 7,
+        "weekly": 4,
+        "monthly": 6
+      },
+      "secret_configured": true
+    }
+  },
+  "contains_secret_values": false,
+  "release": {
+    "version": "3.5.21",
+    "sha256": "b2cfaae34e17e94ea91ade7452800398d1c75d7143f317468c0a0ba32dccf595",
+    "bytes": 93445912,
+    "signature_verified": true
+  },
+  "personal_clients_prepared": {
+    "message": "0 clients préparés. Distribuer les EXE personnels à leurs destinataires.",
+    "count": 0
+  },
+  "after": {
+    "models": [
+      {
+        "pid": 8200,
+        "created": 1791651021.7995121
+      },
+      {
+        "pid": 14628,
+        "created": 1791651021.777978
+      }
+    ],
+    "files": {
+      "acces-distants.json": "1d357907389d2056a608c5e98b47d2fa31f519521af1f18e8f3666eb36e16037",
+      "wireguard.json": "6cbd6b81bd61645cce770ac2a7e03cdb99f86b800c95d4f05e0a425e3a6aa7dd",
+      "reglages.json": "63d67efcbd295491ce77dc49198426e1290d6dfeabc0119befe3e1b172ee1762",
+      "wireguard-prive/secrets.dpapi": "0bf5ae5faca3ad22177ce07af1d8587441ad569f0595a46a3c8c4d4184600a93",
+      "wireguard-prive/signature.dpapi": "240cd390a95972957889009bfabb7e54942f33d7f99d9ebb9a211ab1f9754a4a"
+    },
+    "users": {
+      "client_histories": {
+        "count": 1,
+        "sha256": "ed1cf2db46a4c82a2a35007a9a5dd9ed31f8533d7dc41d53aa0892ea1e91925b"
+      },
+      "projects": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "documents": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "memories": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "conversations": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "policies": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "jobs": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "personal_memories": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "knowledge_exclusions": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    },
+    "backups": {
+      "enabled": true,
+      "time": "03:00",
+      "frequency": "daily",
+      "weekday": 0,
+      "destination": "D:\\Serveur IA\\lanceur\\sauvegardes",
+      "secondary_destination": "",
+      "retention": {
+        "daily": 7,
+        "weekly": 4,
+        "monthly": 6
+      },
+      "secret_configured": true
+    }
+  },
+  "passed": true,
+  "voice": {
+    "enabled": true,
+    "phase": "ready",
+    "ready": true,
+    "engine": "Pocket TTS 3.3.0",
+    "language": "fr",
+    "voice": "Estelle",
+    "device": "cpu",
+    "error": "",
+    "busy": false,
+    "max_text_chars": 600,
+    "max_parallel": 1
+  },
+  "knowledge": {
+    "engine": {
+      "model": "EmbeddingGemma 2",
+      "engine": "Sentence Transformers / PyTorch",
+      "enabled": true,
+      "status": "pret",
+      "error": "",
+      "device": "cpu",
+      "precision": "float32",
+      "threads": 2,
+      "dimensions": 768,
+      "pid": 34928,
+      "last_seconds": null,
+      "parameters": 271002624
+    },
+    "index": {
+      "indexed": 36,
+      "pending": 0,
+      "entries": 36,
+      "personal": 36,
+      "project": 0,
+      "limited": false,
+      "max_entries": 16000,
+      "max_owner_entries": 4000,
+      "last_sync": 1791713809.884039,
+      "error": "",
+      "reconstructible": true
+    }
+  },
+  "qwen_loaded": true,
+  "release_served_verified": true,
+  "backup_created": {
+    "file": "D:\\Serveur IA\\lanceur\\sauvegardes\\fred-20261011-121706-da80b0ac2ea3244b55cd1953.qwenbackup",
+    "size": 520019,
+    "sha256": "849e036c8d61f215122057a7bce2c82bdbd5b0e8ba7a0294a030f8ecf34162d8",
+    "version": 2,
+    "verified": true
+  }
+}

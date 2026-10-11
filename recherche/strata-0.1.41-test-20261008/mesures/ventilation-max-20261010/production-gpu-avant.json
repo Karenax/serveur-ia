@@ -1,0 +1,8 @@
+{
+  "rows": [
+    "Quadro P2200, 40, 139, 0x0000000000000001",
+    "Tesla P100-PCIE-16GB, 50, 1189, 0x0000000000000000",
+    "Tesla P100-PCIE-16GB, 53, 1189, 0x0000000000000000"
+  ],
+  "cooling_target_reached": true
+}

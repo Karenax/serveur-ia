@@ -1,0 +1,21 @@
+{
+  "files": {
+    "client-android/dist/Acces-serveur-Fred-Android.apk": "18cfee473417fd2b178e2db500aefa0dfd873f4ea6d652a5af63d33854263f90",
+    "client-qwen/dist/Acc\u00e8s serveur Fred.exe": "529f21aa22d14076e228f650d03e87751850641c0bd17aa52d80a9c3e83dea2d",
+    "lanceur/acces-distants.json": "1d357907389d2056a608c5e98b47d2fa31f519521af1f18e8f3666eb36e16037",
+    "lanceur/wireguard.json": "6cbd6b81bd61645cce770ac2a7e03cdb99f86b800c95d4f05e0a425e3a6aa7dd",
+    "lanceur/reglages.json": "63d67efcbd295491ce77dc49198426e1290d6dfeabc0119befe3e1b172ee1762",
+    "lanceur/wireguard-prive/secrets.dpapi": "0bf5ae5faca3ad22177ce07af1d8587441ad569f0595a46a3c8c4d4184600a93",
+    "lanceur/wireguard-prive/signature.dpapi": "240cd390a95972957889009bfabb7e54942f33d7f99d9ebb9a211ab1f9754a4a"
+  },
+  "models": [
+    {
+      "pid": 8200,
+      "created": 1791651021.7995121
+    },
+    {
+      "pid": 14628,
+      "created": 1791651021.777978
+    }
+  ]
+}

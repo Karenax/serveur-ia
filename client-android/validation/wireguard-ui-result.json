@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "checks": [
+    "installed WireGuard executable",
+    "authenticated UDP tunnel",
+    "incremental chat SSE",
+    "Markdown",
+    "encrypted history persistence",
+    "structured tunnel size errors for chat/context"
+  ],
+  "reopened": true
+}

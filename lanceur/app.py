@@ -25,6 +25,8 @@ class Controller:
         self.home = Path(home)
         self.include_legacy = include_legacy
         self.home.mkdir(parents=True, exist_ok=True)
+        from restoration import recover
+        recover(self.home)
         self.base_path = self.home / 'base-strata.json'
         if not self.base_path.exists():
             write_json(self.base_path, read_json(BASE_PATH))
@@ -42,6 +44,14 @@ class Controller:
         self.disk_before = (time.monotonic(), psutil.disk_io_counters(perdisk=True))
         self.last_error = ''
         self.remote = AccessStore(self.home)
+        self.voice = self.remote.voice
+        from embeddings import EmbeddingService
+        from knowledge import Knowledge
+        self.embeddings = EmbeddingService(self.remote.workspace)
+        self.remote.workspace.knowledge = Knowledge(self.remote.workspace,self.embeddings)
+        from client_storage import ClientStorage
+        self.client_storage = ClientStorage(self.remote)
+        self.remote.storage = self.client_storage
         self.wireguard = WireGuardAccess(self.remote,self.home)
         self.gateway = None
         self.operations = Operations(self)
@@ -109,6 +119,7 @@ class Controller:
 
     def start(self, settings):
         with self.lock:
+            if self.remote.maintenance:raise ValueError('Serveur en maintenance : lancement suspendu.')
             s = validate(settings, check_paths=True)
             run = self.current_run()
             if self.processes() or self.supervisor(run):
@@ -271,8 +282,42 @@ def serve(port=8765, controller=None):
                 return self.respond(200, {'service': 'qwen-launcher'})
             if path == '/api/operations':
                 return self.respond(200, controller.operations.status())
+            if path == '/api/backups':
+                return self.respond(200, controller.operations.backups.status())
+            if path == '/api/maintenance':
+                return self.respond(200, controller.operations.restorations.status())
+            if path == '/api/inventory':
+                from server_state import inventory
+                return self.respond(200, inventory(controller))
+            if path == '/api/devices':
+                return self.respond(200, controller.remote.metadata())
+            if path == '/api/client-storage':
+                return self.respond(200, controller.client_storage.status())
+            if path.startswith('/api/remote/profile/'):
+                if not hmac.compare_digest(self.headers.get('X-Launcher-Token',''),token):
+                    return self.respond(403, {'error':'Accès administrateur requis.'})
+                identity=path.removeprefix('/api/remote/profile/')
+                try:raw=controller.wireguard.android_profile(identity)
+                except (ValueError,OSError):return self.respond(404, {'error':'Profil absent, suspendu ou révoqué.'})
+                self.send_response(200)
+                self.send_header('Content-Type','application/octet-stream')
+                self.send_header('Content-Length',str(len(raw)))
+                self.send_header('Cache-Control','no-store')
+                self.send_header('X-Content-Type-Options','nosniff')
+                self.send_header('Content-Disposition','attachment; filename="profil-'+identity+'.fred-android"')
+                self.end_headers();self.wfile.write(raw);return
             if path=='/api/workspace':
                 return self.respond(200,controller.remote.workspace.admin())
+            if path=='/api/knowledge':
+                return self.respond(200,{'engine':controller.embeddings.status(),'index':controller.remote.workspace.knowledge.status()})
+            if path=='/api/voice':
+                return self.respond(200,controller.voice.status())
+            if path == '/api/notifications':
+                with controller.lock:
+                    if controller.remote.maintenance:
+                        return self.respond(503, {'error': 'Notifications suspendues pendant la restauration.'})
+                    result = controller.remote.notifications.admin()
+                return self.respond(200, result)
             if path == '/api/releases':
                 return self.respond(200, release_status(controller.home))
             if path == '/api/diagnostic':
@@ -312,16 +357,17 @@ def serve(port=8765, controller=None):
                     return self.respond(200, controller.state())
                 except Exception as error:
                     return self.respond(500, {'error': str(error)})
-            if path in ('/', '/app.css', '/app.js','/workspace.js','/interface.css','/interface.js'):
+            if path in ('/', '/app.css', '/app.js','/workspace.js','/interface.css','/interface.js','/maintenance.js','/maintenance.css','/notifications.js','/notifications.css','/voice.js'):
                 filename = 'index.html' if path == '/' else path[1:]
                 data = (HOME / 'web' / filename).read_bytes()
                 if filename == 'index.html':
                     data = data.replace(b'__TOKEN__', token.encode())
-                content_type = {'index.html': 'text/html; charset=utf-8', 'app.css': 'text/css; charset=utf-8', 'app.js': 'application/javascript; charset=utf-8','workspace.js':'application/javascript; charset=utf-8','interface.js':'application/javascript; charset=utf-8','interface.css':'text/css; charset=utf-8'}[filename]
+                content_type = 'text/html; charset=utf-8' if filename=='index.html' else 'text/css; charset=utf-8' if filename.endswith('.css') else 'application/javascript; charset=utf-8'
                 return self.respond(200, data, content_type)
             self.respond(404, {'error': 'Page introuvable.'})
 
         def do_POST(self):
+            path = urlsplit(self.path).path
             origin = self.headers.get('Origin', '')
             if not self.own_host() or (origin and origin not in (f'http://127.0.0.1:{port}', f'http://localhost:{port}')):
                 return self.respond(403, {'error': 'Commande refusée depuis une autre page.'})
@@ -330,56 +376,109 @@ def serve(port=8765, controller=None):
             if not self.headers.get('Content-Type', '').startswith('application/json'):
                 return self.respond(415, {'error': 'JSON attendu.'})
             try:
+                if getattr(controller.remote,'maintenance',False) and path not in ('/api/backups/verify','/api/backups/recover'):
+                    raise ValueError('Serveur en maintenance ; action suspendue.')
                 length = int(self.headers.get('Content-Length', '0'))
                 if not 0 <= length <= 65536:
                     raise ValueError('Requête trop volumineuse.')
                 data = json.loads(self.rfile.read(length) or b'{}')
-                path = urlsplit(self.path).path
-                if path == '/api/operations':
-                    result = controller.operations.configure(data)
-                elif path=='/api/workspace':
-                    with controller.remote.lock:
-                        result=controller.remote.workspace.admin_action(data,{c['id'] for c in controller.remote.metadata()['clients']})
-                elif path == '/api/releases/prepare':
-                    with controller.lock,controller.wireguard.lock,controller.remote.lock:result = repackage(controller.home)
-                elif path == '/api/releases/rollback':
-                    with controller.lock,controller.wireguard.lock,controller.remote.lock:result = rollback(controller.home)
-                elif path == '/api/startup':
-                    result = controller.operations.startup(data.get('enabled'))
-                elif path == '/api/backup':
-                    result = controller.operations.backup(data.get('password'))
-                elif path == '/api/restore':
-                    result = controller.operations.restore(data)
-                elif path == '/api/remote/policy':
-                    result = controller.remote.policy(data)
-                elif path == '/api/save':
-                    result = controller.save(data)
-                elif path == '/api/set-default':
-                    result = controller.save(data, True)
-                elif path == '/api/start':
-                    result = controller.start(data)
-                elif path == '/api/stop':
-                    result = controller.stop()
-                elif path == '/api/key':
-                    result = {'api_key': secrets.token_urlsafe(36)}
-                elif path == '/api/remote/configure':
-                    result = controller.wireguard.configure(data)
-                elif path == '/api/remote/create-client':
-                    result = controller.wireguard.create_client(data.get('name'), controller.remote_backend()[1])
-                elif path == '/api/remote/revoke':
-                    result = controller.wireguard.revoke(data.get('id'))
-                elif path == '/api/remote/rename':
-                    result = controller.remote.rename(data.get('id'),data.get('name'))
-                elif path == '/api/remote/delete':
-                    result = controller.wireguard.delete(data.get('id'))
-                elif path == '/api/remote/firewall':
-                    result = firewall(controller.home)
-                elif path == '/api/remote/activate':
-                    result = controller.wireguard.activate(controller.gateway is not None)
-                elif path == '/api/remote/deactivate':
-                    result = controller.wireguard.deactivate()
-                else:
-                    return self.respond(404, {'error': 'Commande inconnue.'})
+                if not isinstance(data,dict):raise ValueError('Objet JSON attendu.')
+                with controller.lock:
+                    if getattr(controller.remote,'maintenance',False) and path not in ('/api/backups/verify','/api/backups/recover'):
+                        raise ValueError('Serveur en maintenance ; action suspendue.')
+                    path = urlsplit(self.path).path
+                    if path == '/api/voice':
+                        result=controller.voice.configure(data.get('enabled'))
+                    elif path == '/api/operations':
+                        result = controller.operations.configure(data)
+                    elif path == '/api/client-storage':
+                        if data.get('action')!='sync':raise ValueError('Commande des dossiers clients inconnue.')
+                        result = controller.client_storage.synchronize()
+                    elif path == '/api/notifications/action':
+                        result = controller.remote.notifications.admin_action(data)
+                    elif path=='/api/workspace':
+                        with controller.remote.lock:
+                            result=controller.remote.workspace.admin_action(data,{c['id'] for c in controller.remote.metadata()['clients']})
+                    elif path=='/api/knowledge':
+                        action=data.get('action')
+                        if action in ('start','stop'):
+                            result=controller.embeddings.configure(action=='start')
+                            if action=='start':controller.remote.workspace.knowledge.start()
+                        elif action=='reindex':
+                            controller.remote.workspace.knowledge.reset();result={'saved':True}
+                        else:raise ValueError('Commande EG2 inconnue.')
+                    elif path=='/api/knowledge/memory':
+                        with controller.remote.lock:
+                            owner=data.pop('owner',None)
+                            if owner not in {c['id'] for c in controller.remote.metadata()['clients'] if not c.get('revoked')}:raise ValueError('Accès personnel inconnu.')
+                            if data.get('action')=='list':
+                                snapshot=controller.remote.workspace.snapshot(owner)
+                                result={'memories':snapshot['personal_memories'],'projects':[{'id':p['id'],'title':p['title']} for p in snapshot['projects'] if not p['archived']]}
+                            else:
+                                if data.get('action') not in ('personal_memory_create','personal_memory_save','personal_memory_delete','knowledge_search'):raise ValueError('Commande mémoire inconnue.')
+                                result=controller.remote.workspace.action(owner,data)
+                    elif path == '/api/releases/prepare':
+                        with controller.lock,controller.wireguard.lock,controller.remote.lock:result = repackage(controller.home)
+                    elif path == '/api/releases/rollback':
+                        with controller.lock,controller.wireguard.lock,controller.remote.lock:result = rollback(controller.home)
+                    elif path == '/api/startup':
+                        result = controller.operations.startup(data.get('enabled'))
+                    elif path == '/api/backup':
+                        result = controller.operations.backup(data.get('password'))
+                    elif path == '/api/backups/configure':
+                        result = controller.operations.backups.configure(data)
+                    elif path == '/api/backups/create':
+                        result = controller.operations.backups.start(data)
+                    elif path == '/api/backups/verify':
+                        result = controller.operations.restorations.preview(data)
+                    elif path == '/api/backups/restore':
+                        result = controller.operations.restorations.start(data)
+                    elif path == '/api/backups/recover':
+                        if data.get('confirm') is not True:raise ValueError('Confirmer le retour à l’état précédent.')
+                        result = controller.operations.restorations.recover_now()
+                    elif path == '/api/restore':
+                        result = controller.operations.restore(data)
+                    elif path == '/api/remote/policy':
+                        result = controller.wireguard.policy(data)
+                    elif path == '/api/devices/configure':
+                        result = controller.remote.device(data)
+                    elif path == '/api/devices/create':
+                        if data.get('platform','android')=='android':
+                            result=controller.wireguard.create_android(data.get('name'),controller.remote_backend()[1],data.get('owner',''),data.get('kind','phone'))
+                        elif data.get('platform')=='windows':
+                            result=controller.wireguard.create_client(data.get('name'),controller.remote_backend()[1])
+                            controller.remote.device({'id':result['id'],'kind':'pc','owner':data.get('owner','')})
+                        else:raise ValueError('Plateforme attendue : Android ou Windows.')
+                    elif path == '/api/devices/replace':
+                        result=controller.wireguard.replace(data.get('id'),controller.remote_backend()[1],data.get('platform','android'),data.get('name'),data.get('owner'),data.get('kind'))
+                    elif path == '/api/save':
+                        result = controller.save(data)
+                    elif path == '/api/set-default':
+                        result = controller.save(data, True)
+                    elif path == '/api/start':
+                        result = controller.start(data)
+                    elif path == '/api/stop':
+                        result = controller.stop()
+                    elif path == '/api/key':
+                        result = {'api_key': secrets.token_urlsafe(36)}
+                    elif path == '/api/remote/configure':
+                        result = controller.wireguard.configure(data)
+                    elif path == '/api/remote/create-client':
+                        result = controller.wireguard.create_client(data.get('name'), controller.remote_backend()[1])
+                    elif path == '/api/remote/revoke':
+                        result = controller.wireguard.revoke(data.get('id'))
+                    elif path == '/api/remote/rename':
+                        result = controller.remote.rename(data.get('id'),data.get('name'))
+                    elif path == '/api/remote/delete':
+                        result = controller.wireguard.delete(data.get('id'))
+                    elif path == '/api/remote/firewall':
+                        result = firewall(controller.home)
+                    elif path == '/api/remote/activate':
+                        result = controller.wireguard.activate(controller.gateway is not None)
+                    elif path == '/api/remote/deactivate':
+                        result = controller.wireguard.deactivate()
+                    else:
+                        return self.respond(404, {'error': 'Commande inconnue.'})
                 self.respond(200, result)
             except (ValueError, OSError, RuntimeError, psutil.Error) as error:
                 self.respond(400, {'error': str(error)})
@@ -393,6 +492,9 @@ if __name__ == '__main__':
     parser.add_argument('--preserve-model-state',action='store_true')
     args = parser.parse_args()
     controller = Controller()
+    controller.client_storage.start()
+    controller.remote.workspace.knowledge.start()
+    if controller.voice.settings()['enabled']:controller.voice.start()
     server = serve(args.port, controller)
     write_json(HOME / 'interface.pid.json', process_identity(psutil.Process()))
     # HTTP remains on loopback; WireGuard has an isolated in-process network stack.

@@ -95,7 +95,7 @@ class ClientManagementTests(unittest.TestCase):
         profile={**self.profile,'version':'3.5.3'};encoded=json.dumps(profile).encode()
         target.write_bytes(b'MZfixture'+encoded+struct.pack('<I',len(encoded))+b'QWENPROFILE1')
         with socket.socket() as sock:sock.bind(('127.0.0.1',0));port=sock.getsockname()[1]
-        controller=SimpleNamespace(home=home,remote=self.store,wireguard=self.wireguard)
+        controller=SimpleNamespace(home=home,remote=self.store,wireguard=self.wireguard,lock=threading.RLock())
         server=serve(port,controller);threading.Thread(target=server.serve_forever,daemon=True).start()
         base=f'http://127.0.0.1:{port}'
         try:
@@ -111,7 +111,7 @@ class ClientManagementTests(unittest.TestCase):
             with post('/api/remote/rename',{'id':self.access['id'],'name':'PC Frédéric'}) as response:self.assertEqual(response.status,200)
             with urllib.request.urlopen(base+'/api/remote/client/'+self.access['id']) as response:
                 filename=unquote(response.headers['Content-Disposition'].split("filename*=UTF-8''")[1])
-                self.assertEqual(filename,'Accès serveur Fred.exe')
+                self.assertEqual(filename,'Accès serveur Fred 3.5.3 - PC Frédéric.exe')
                 self.assertEqual(response.read(),target.read_bytes())
             with post('/api/remote/delete',{'id':self.access['id']}) as response:self.assertEqual(response.status,200)
             with self.assertRaises(urllib.error.HTTPError) as error:urllib.request.urlopen(base+'/api/remote/client/'+self.access['id'])

@@ -1,0 +1,131 @@
+{
+  "profile": "cpu-court",
+  "quality_pass": true,
+  "median_decode_ratio": 1.1441826923076923,
+  "min_document_prefill_ratio": 0.953625081645983,
+  "long_ttft_median_s": 168.45368579999922,
+  "long_prefill_ratio": 0.9839500314315566,
+  "acceptable": true,
+  "rows": [
+    {
+      "name": "r1-ciel",
+      "quality_pass": true,
+      "strict_json": null,
+      "prompt_tokens": 40,
+      "production_ttft_s": 1.8347108000016306,
+      "trial_ttft_s": 1.1636152999999467,
+      "production_prefill_tps": 22.3,
+      "trial_prefill_tps": 35.5,
+      "prefill_ratio": 1.5919282511210762,
+      "decode_ratio": 1.0999999999999999
+    },
+    {
+      "name": "r1-fibonacci",
+      "quality_pass": true,
+      "strict_json": false,
+      "prompt_tokens": 45,
+      "production_ttft_s": 1.8541451999917626,
+      "trial_ttft_s": 1.1841997000010451,
+      "production_prefill_tps": 24.9,
+      "trial_prefill_tps": 39.4,
+      "prefill_ratio": 1.5823293172690764,
+      "decode_ratio": 1.1331360946745561
+    },
+    {
+      "name": "r1-calcul",
+      "quality_pass": true,
+      "strict_json": true,
+      "prompt_tokens": 58,
+      "production_ttft_s": 2.075789499998791,
+      "trial_ttft_s": 1.2743659000116168,
+      "production_prefill_tps": 28.5,
+      "trial_prefill_tps": 46.9,
+      "prefill_ratio": 1.6456140350877193,
+      "decode_ratio": 1.204892966360856
+    },
+    {
+      "name": "r2-ciel",
+      "quality_pass": true,
+      "strict_json": null,
+      "prompt_tokens": 40,
+      "production_ttft_s": 1.8367797999962931,
+      "trial_ttft_s": 1.1491443999984767,
+      "production_prefill_tps": 22.3,
+      "trial_prefill_tps": 35.9,
+      "prefill_ratio": 1.609865470852018,
+      "decode_ratio": 1.1923076923076923
+    },
+    {
+      "name": "r2-fibonacci",
+      "quality_pass": true,
+      "strict_json": false,
+      "prompt_tokens": 45,
+      "production_ttft_s": 1.8765998000017134,
+      "trial_ttft_s": 1.1754663000028813,
+      "production_prefill_tps": 24.9,
+      "trial_prefill_tps": 39.5,
+      "prefill_ratio": 1.5863453815261046,
+      "decode_ratio": 1.1641337386018236
+    },
+    {
+      "name": "r2-calcul",
+      "quality_pass": true,
+      "strict_json": true,
+      "prompt_tokens": 58,
+      "production_ttft_s": 2.0814830000017537,
+      "trial_ttft_s": 1.2707449000008637,
+      "production_prefill_tps": 28.5,
+      "trial_prefill_tps": 47.0,
+      "prefill_ratio": 1.6491228070175439,
+      "decode_ratio": 1.0914634146341464
+    },
+    {
+      "name": "dossier-64",
+      "quality_pass": true,
+      "strict_json": true,
+      "prompt_tokens": 1534,
+      "production_ttft_s": 7.688621299996157,
+      "trial_ttft_s": 7.84338169998955,
+      "production_prefill_tps": 200.8,
+      "trial_prefill_tps": 197.0,
+      "prefill_ratio": 0.9810756972111553,
+      "decode_ratio": 1.1078717201166182
+    },
+    {
+      "name": "dossier-256",
+      "quality_pass": true,
+      "strict_json": true,
+      "prompt_tokens": 5950,
+      "production_ttft_s": 22.054856299990206,
+      "trial_ttft_s": 22.299514999991516,
+      "production_prefill_tps": 270.6,
+      "trial_prefill_tps": 267.4,
+      "prefill_ratio": 0.9881744271988173,
+      "decode_ratio": 1.1529051987767585
+    },
+    {
+      "name": "dossier-1024",
+      "quality_pass": true,
+      "strict_json": true,
+      "prompt_tokens": 23614,
+      "production_ttft_s": 154.3936163999897,
+      "trial_ttft_s": 161.83645489999617,
+      "production_prefill_tps": 153.1,
+      "trial_prefill_tps": 146.0,
+      "prefill_ratio": 0.953625081645983,
+      "decode_ratio": 1.1446153846153848
+    },
+    {
+      "name": "dossier-1024-repeat2",
+      "quality_pass": true,
+      "strict_json": true,
+      "prompt_tokens": 23622,
+      "production_ttft_s": 177.60633550000784,
+      "trial_ttft_s": 175.07091670000227,
+      "production_prefill_tps": 133.1,
+      "trial_prefill_tps": 135.0,
+      "prefill_ratio": 1.0142749812171301,
+      "decode_ratio": 1.14375
+    }
+  ]
+}

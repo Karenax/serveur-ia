@@ -1,0 +1,43 @@
+{
+  "exit_code": 0,
+  "success": true,
+  "test_count": 38,
+  "test_seconds": 111.54,
+  "isolated": true,
+  "source_files_unchanged_during_run": true,
+  "source_sha256": {
+    "app.py": "e4f0f6129e616b98d28c5d1bdafae31505de915a71ec915284264990faa6b27d",
+    "operations.py": "bdbffb36cce0d13a2601a29fad921c57ea748dca6971854d81b1cc77e544e6c6",
+    "backups.py": "5ab32be63cb9b3c10635f79d398fe20d6ece3c872d98b4393ba1eb66b0077e16",
+    "restoration.py": "ffcf8575029d5b4bd84c5d2c61fa40f1d5dbae40fba4f6a12feae1640d2a3fc9",
+    "server_state.py": "4072e325cc5f14ab45fd31c578a8e0ea7ad7f6ae69e9ec371bc859fe1244d11b",
+    "workspace.py": "97918b18b33d9a05666bde43bd9602ef92156d9441eac6f5fed04a366ebf524f",
+    "remote.py": "1f4ad622d41df97e4a8b699761e0406b00674ef87e8edfbb5c220f7a3b6759c0",
+    "devices.py": "76494212d2d1db9fc3bbfcda149aaa497b24f897b513bcf3513f6135b0b41500",
+    "test_backups.py": "e43bd1928df5a29007fff42178d7fa212fa8e3b4053a79e988785144bd890498",
+    "test_restoration.py": "e8bec4715cbbf38c29ddc29931d078629ee0cd5b1e57f03eac7868eb6944e331"
+  },
+  "volume": {
+    "document_count": 8,
+    "original_bytes": 16777216,
+    "archive_bytes": 30084327,
+    "backup_seconds": 1.672,
+    "restore_seconds": 6.343,
+    "snapshot_lock_seconds": 0.157,
+    "peak_rss_bytes": 417533952,
+    "rss_increase_bytes": 365473792,
+    "sha256_match": true
+  },
+  "limits": {
+    "source_document_bytes": 2097152,
+    "owner_storage_bytes": 20971520,
+    "global_storage_bytes": 134217728,
+    "sqlite_restore_bytes": 268435456,
+    "encrypted_archive_bytes": 419430400
+  },
+  "notes": [
+    "Archives Fernet en mémoire avec limites explicites ; mesures de volume sur 8 DOCX valides.",
+    "L’horloge de programmation est celle du serveur ; le processus serveur doit fonctionner.",
+    "Seconde copie : une erreur conserve la source locale et déclenche une nouvelle tentative."
+  ]
+}

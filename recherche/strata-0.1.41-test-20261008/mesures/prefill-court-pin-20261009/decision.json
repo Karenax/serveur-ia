@@ -1,0 +1,13 @@
+{
+  "deployment_validated": false,
+  "reason": "Limitation thermique observee; les meilleurs temps historiques de prefill ne sont pas retrouves.",
+  "profiles_measured": [
+    "cpu-court",
+    "cpu-court-pin"
+  ],
+  "profiles_prepared_but_not_measured": [
+    "cpu-court-pin-4096"
+  ],
+  "next_priority": "Ameliorer le refroidissement des deux P100, puis refaire un A/B avec temperatures et frequences controlees.",
+  "production_restored": true
+}

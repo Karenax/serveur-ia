@@ -1,0 +1,11 @@
+{
+  "form": "tablet",
+  "checks": [
+    "real back gesture confirmation",
+    "blocked close keeps app open",
+    "healthy close finishes activity",
+    "encrypted history preserved after reopening"
+  ],
+  "errors": 0,
+  "ok": true
+}

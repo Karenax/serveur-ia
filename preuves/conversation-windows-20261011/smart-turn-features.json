@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "shape": [
+    1,
+    80,
+    800
+  ],
+  "max_absolute_error": 4.26173210144043e-06,
+  "tolerance": 1e-05,
+  "reference": "transformers.WhisperFeatureExtractor(chunk_length=8)"
+}

@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-10T23:24:18+0200",
+  "tests": 28,
+  "result": "PASS",
+  "duration_seconds": 16.441,
+  "failures": 0,
+  "errors": 0,
+  "production_data_used": false,
+  "source_unchanged": true,
+  "source_before": {
+    "lanceur/notifications.py": "a948d01c072f7dfd4eace6bc2bef08cb1c6db6efd89380e583cc0e11e4e8e7a9",
+    "lanceur/workspace.py": "f4f3a90f0723586b3b6f625bb5bfc893ec6a96b6b990fd7722f58dd46da57d68",
+    "lanceur/remote.py": "9dd81347a1329fe8cc90a50bf7ee7813fc1e2a735e191d93c11a2c049b8145c2",
+    "lanceur/operations.py": "a4dfcca0ce7bf76b3b79bde64b98c614d7b2b72bc4a7e7b38c05680b1c0f2c4a",
+    "lanceur/app.py": "1fe990a0296bda200782a23ea2e953d13b4b0e3abdb64fd6e764adb4af7f9fdd",
+    "lanceur/web/notifications.js": "6849896b5968b8b1291ae21916acaa090af984ed8d251706486fad089cb04e87",
+    "lanceur/web/notifications.css": "58384913e8d7f20307b0df69389a7899c3ba34d18b91f2bc4880d02885fec17f"
+  },
+  "source_after": {
+    "lanceur/notifications.py": "a948d01c072f7dfd4eace6bc2bef08cb1c6db6efd89380e583cc0e11e4e8e7a9",
+    "lanceur/workspace.py": "f4f3a90f0723586b3b6f625bb5bfc893ec6a96b6b990fd7722f58dd46da57d68",
+    "lanceur/remote.py": "9dd81347a1329fe8cc90a50bf7ee7813fc1e2a735e191d93c11a2c049b8145c2",
+    "lanceur/operations.py": "a4dfcca0ce7bf76b3b79bde64b98c614d7b2b72bc4a7e7b38c05680b1c0f2c4a",
+    "lanceur/app.py": "1fe990a0296bda200782a23ea2e953d13b4b0e3abdb64fd6e764adb4af7f9fdd",
+    "lanceur/web/notifications.js": "6849896b5968b8b1291ae21916acaa090af984ed8d251706486fad089cb04e87",
+    "lanceur/web/notifications.css": "58384913e8d7f20307b0df69389a7899c3ba34d18b91f2bc4880d02885fec17f"
+  }
+}

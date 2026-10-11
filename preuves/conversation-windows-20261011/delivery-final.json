@@ -1,0 +1,67 @@
+{
+  "passed": true,
+  "windows_server_version": "3.5.21",
+  "android_version_unchanged": "1.0.3/code4",
+  "release_sha256": "b2cfaae34e17e94ea91ade7452800398d1c75d7143f317468c0a0ba32dccf595",
+  "regression": {
+    "passed": 276,
+    "seconds": 538.208
+  },
+  "targeted_test_logs": {
+    "unit-tests.log": {
+      "passed": 9,
+      "seconds": 0.034
+    },
+    "http-tests.log": {
+      "passed": 6,
+      "seconds": 25.318
+    },
+    "restoration-tests.log": {
+      "passed": 11,
+      "seconds": 36.449
+    },
+    "small-service-tests.log": {
+      "passed": 8,
+      "seconds": 0.192
+    },
+    "small-http-tests.log": {
+      "passed": 3,
+      "seconds": 1.617
+    }
+  },
+  "conversation_browser_scenarios": 10,
+  "small_browser_scenarios": 6,
+  "native_capture": {
+    "passed": true,
+    "packaged_worker": true,
+    "aec": true,
+    "listening_after_seconds": 2.25,
+    "peak_rss_bytes": 261201920,
+    "events": 21,
+    "stopped": true,
+    "exit_code": 0,
+    "microphone_audio_saved": false,
+    "microphone_transcripts_saved": false
+  },
+  "tts": {
+    "passed": true,
+    "engine": "Pocket TTS 3.3.0",
+    "language": "fr",
+    "voice": "estelle",
+    "device": "cpu",
+    "first_chunk_seconds": 0.17199999999866122,
+    "compute_seconds": 1.389999999999418,
+    "audio_seconds": 3.92,
+    "rss_bytes": 901070848
+  },
+  "voice_ready": true,
+  "eg2_ready": true,
+  "eg2_passages": 36,
+  "qwen_preserved": true,
+  "user_rows_preserved": true,
+  "backup_config_preserved": true,
+  "backup_archive_verified": true,
+  "all_preservation_hashes_match": true,
+  "human_acoustic_trial_performed": false,
+  "authenticated_public_https_audio_trial_performed": false
+}

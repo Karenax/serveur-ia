@@ -1,0 +1,19 @@
+{
+  "device": "emulator-5554",
+  "app": "net.karenax.fred.voiceqa",
+  "public_model_only": true,
+  "stages": [
+    {
+      "stage": "cancel_real_https_download",
+      "bytes": 1389524,
+      "passed": true
+    },
+    {
+      "stage": "resume_and_verify_sha256",
+      "bytes": 487601967,
+      "resumed": true,
+      "passed": true
+    }
+  ],
+  "passed": true
+}

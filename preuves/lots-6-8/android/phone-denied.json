@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "form": "phone",
+  "mode": "denied",
+  "checks": [
+    "denied Android permission preserves server inbox"
+  ],
+  "exceptions": 0,
+  "transport": "real Android WireGuard UDP",
+  "backend": "actual isolated Workspace and Notifications"
+}

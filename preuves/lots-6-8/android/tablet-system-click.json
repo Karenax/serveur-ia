@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "form": "tablet",
+  "mode": "system-click",
+  "checks": [
+    "real system notification click opens authorized matching job and marks read"
+  ],
+  "exceptions": 0,
+  "transport": "real Android WireGuard UDP",
+  "backend": "actual isolated Workspace and Notifications"
+}

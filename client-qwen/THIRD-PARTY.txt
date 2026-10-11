@@ -1057,3 +1057,7 @@ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
+
+Dictée locale : whisper.cpp 1.9.5 et ggml (MIT), Whisper Small multilingue OpenAI (MIT). Les textes complets sont inclus dans voice/licenses. Le modèle optionnel est téléchargé puis vérifié ; aucun poids n’est inclus dans le binaire.
+
+Conversation Windows : Sherpa-ONNX / Zipformer français (Apache-2.0), Silero VAD (MIT), Smart Turn v3.2 (BSD-2-Clause), ONNX Runtime (MIT), NumPy (BSD-3-Clause). Notices, versions et licences complètes incluses dans voice/licenses. Modèles optionnels téléchargés et vérifiés par SHA-256. Synthèse française serveur : Pocket TTS, Kyutai (code MIT, poids CC-BY-4.0), voix Estelle ; attribution et sources dans voice/licenses/CONVERSATION-NOTICES.txt.

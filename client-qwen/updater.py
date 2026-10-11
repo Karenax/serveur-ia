@@ -13,13 +13,18 @@ import tempfile
 import time
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 
-VERSION='3.5.15'
+VERSION='3.5.21'
+
+def client_filename(number,name):
+    version(number)
+    label=re.sub(r'[\x00-\x1f\x7f<>:"/\\|?*]','-',str(name)).strip(' .')[:80] or 'Client'
+    return f'Accès serveur Fred {number} - {label}.exe'
 
 def recipient_name(profile,path,release):
     for value in (release.get('client_name'),profile.get('client_name')):
         if isinstance(value,str) and value.strip():return value
     stem=re.sub(r'(?:\.previous-\d+\.\d+\.\d+)+$','',path.stem)
-    match=re.fullmatch(r'Accès serveur Fred v\d+\.\d+\.\d+ - (.+)',stem)
+    match=re.fullmatch(r'Accès serveur Fred v?\d+\.\d+\.\d+ - (.+)',stem)
     return match.group(1) if match else 'Client'
 
 def verify(release, pinned):
@@ -129,6 +134,8 @@ def apply(plan_path, protect, read_profile):
         if version(release['version'])<=version(trusted.get('version',VERSION)):raise ValueError('Version ancienne refusée.')
         if source.stat().st_size!=release['bytes'] or digest(source)!=release['sha256']:raise ValueError('Binaire altéré après téléchargement.')
         name=recipient_name(trusted,target,release)
+        installed=target.with_name(client_filename(release['version'],name))
+        if installed!=target and installed.exists():raise ValueError('Le fichier '+installed.name+' existe déjà. Utiliser ce client ou le déplacer avant de réessayer.')
         deadline=time.monotonic()+60
         while running():
             if time.monotonic()>=deadline:raise ValueError('Le client est encore ouvert. Fermer puis réessayer.')
@@ -156,6 +163,7 @@ def apply(plan_path, protect, read_profile):
             if launched.poll() is not None:raise ValueError('La nouvelle application s’est arrêtée au démarrage.')
             time.sleep(.25)
         else:raise ValueError('La nouvelle fenêtre n’a pas confirmé son démarrage. Retour à la version précédente.')
+        if installed!=target:target.unlink()
     except Exception:
         if replaced:
             if launched and launched.poll() is None:
@@ -167,6 +175,7 @@ def apply(plan_path, protect, read_profile):
                     _,alive=psutil.wait_procs(alive,timeout=10)
                     if alive:raise ValueError('La nouvelle application reste ouverte. La copie précédente est conservée dans '+backup.name+'.')
                 except psutil.NoSuchProcess:pass
+            if installed!=target:installed.unlink(missing_ok=True)
             rollback=directory/'rollback.exe';shutil.copyfile(backup,rollback);replace_retry(rollback,target)
         if not running() and personal_profile(target)==trusted:
             subprocess.Popen([str(target)],creationflags=0x08000000,close_fds=True)

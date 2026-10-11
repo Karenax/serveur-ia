@@ -1,0 +1,7 @@
+[strata] done: 8 tokens in 0 s (8000000.0 tok/s) (length, cancel=False)
+[strata] the reply reached max tokens while still thinking, so it has no answer: a thinking budget (reasoning_budget_tokens, in the request or in strata-<model>.json for every request) leaves room to answer
+...................................................
+----------------------------------------------------------------------
+Ran 51 tests in 12.040s
+
+OK
