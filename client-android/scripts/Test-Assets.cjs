@@ -13,7 +13,7 @@ const scripts=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].ma
 assert.equal(scripts.length,11,'All shared scripts and the Android layer must be assembled');
 scripts.forEach((script,index)=>new vm.Script(script,{filename:'android-inline-'+index+'.js'}));
 assert(!source.includes('__UI_CSS__'));
-assert(!source.includes("'/client/update/"));
+assert(!source.includes("'/client/update/apply"));
 assert(!source.includes("'/client/integrations"));
 assert(!source.includes('EXE'));
 console.log('Android inline JavaScript syntax verified ('+scripts.length+' scripts)');
@@ -23,7 +23,7 @@ async function browserCheck(){
   const playwrightPath=process.env.PLAYWRIGHT_MODULE||'playwright';
   const {chromium}=require(playwrightPath);
   const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe'});
-  const state={profile:false,required:true,transport:'https',history:null,revision:'1',draft:null,preferences:{},requests:[],jsonFallback:false};
+  const state={profile:false,required:true,transport:'https',history:null,revision:'1',draft:null,preferences:{},requests:[],jsonFallback:false,update:{phase:'current',message:'À jour.',available:false}};
   const project={id:'project-1',title:'Projet mobile',instructions:'',archived:false,revision:1,documents:[],memories:[],conversations:[]};
   const respond=(res,value,status=200)=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8'});res.end(JSON.stringify(value));};
   const server=http.createServer(async(req,res)=>{
@@ -33,7 +33,8 @@ async function browserCheck(){
     if(req.url==='/__bridge/mode'){state.transport=body.mode;state.required=false;return respond(res,{ok:true});}
     state.requests.push({path:req.url,method:req.method});
     if(req.headers.authorization!=='Bearer '+config.key)return respond(res,{error:{message:'Clé locale manquante'}},401);
-    if(req.url==='/client/state')return respond(res,{version:'Android-test',profile_required:!state.profile,profile:{name:'Profil mobile de test'},preferences:state.preferences,history:{message:'Historique enregistré',needs_merge:false},endpoint:'https://example.test',connection:{transport:state.transport,endpoint:'https://example.test',connected:state.profile&&!state.required,connection_required:state.required,checked_at:Date.now()/1000}});
+    if(req.url==='/client/state')return respond(res,{version:'Android-test',profile_required:!state.profile,profile:{name:'Profil mobile de test'},preferences:state.preferences,update:state.update,history:{message:'Historique enregistré',needs_merge:false},endpoint:'https://example.test',connection:{transport:state.transport,endpoint:'https://example.test',connected:state.profile&&!state.required,connection_required:state.required,checked_at:Date.now()/1000}});
+    if(req.url==='/client/update/check'){state.update={phase:'ready',available:true,version:'1.0.6',message:'Mise à jour prête.'};return respond(res,state.update);}
     if(req.url==='/client/history'&&req.method==='GET')return respond(res,{history:state.history,revision:state.revision});
     if(req.url==='/client/history/sync'){state.history=state.history||body.initial;return respond(res,{history:state.history,revision:state.revision,message:'Historique synchronisé',merged:false});}
     if(req.url==='/client/history'){state.history=body.history;state.revision=String(Number(state.revision)+1);return respond(res,{saved:true,revision:state.revision,message:'Historique enregistré'});}
@@ -66,6 +67,7 @@ async function browserCheck(){
       window.__androidCalls=[];
       function nativeRequest(route,value){const request=new XMLHttpRequest();request.open('POST',route,false);request.setRequestHeader('Content-Type','application/json');request.send(JSON.stringify(value||{}));return request.responseText;}
       window.AndroidClient={
+        installUpdate(){window.__androidCalls.push({method:'installUpdate'});},
         importProfile(){window.__androidCalls.push({method:'importProfile'});nativeRequest('/__bridge/import');location.reload();},
         setConnectionMode(mode){window.__androidCalls.push({method:'setConnectionMode',mode});return nativeRequest('/__bridge/mode',{mode});},
         openSettings(){window.__androidCalls.push({method:'openSettings'});},
@@ -96,6 +98,14 @@ async function browserCheck(){
     await page.click('.message.assistant .message-copy');
     assert((await page.evaluate(()=>window.__androidCalls)).some(call=>call.method==='copyText'&&call.text.includes('Android')));
     await page.evaluate(()=>showView('access'));
+    assert.equal(await page.isVisible('#android-update-banner'),false,'No installation banner while up to date');
+    await page.click('#android-update-check');
+    await page.waitForSelector('#android-update-banner:not([hidden])');
+    await page.click('#android-update-install');
+    await page.waitForFunction(()=>window.__androidCalls.some(call=>call.method==='installUpdate'));
+    const blockedInstall=await page.evaluate(async()=>{historyBlocked=true;androidUpdateState({phase:'ready',available:true,version:'1.0.6'});const disabled=document.getElementById('android-update-install').disabled;historyBlocked=false;androidUpdateState({phase:'ready',available:true,version:'1.0.6'});return disabled;});
+    assert(blockedInstall,'Blocked history must disable installation');
+    assert.equal(await page.locator('#retry').count(),0,'The removed response retry button must stay absent');
     await page.click('#export-conversations');
     await page.waitForFunction(()=>window.__androidCalls.some(call=>call.method==='exportFile'));
     const exported=await page.evaluate(()=>window.__androidCalls.find(call=>call.method==='exportFile'));

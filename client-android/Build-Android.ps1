@@ -67,6 +67,16 @@ $apk = Join-Path $distribution $name
 Copy-Item -LiteralPath $compiled -Destination $apk -Force
 $digest = (Get-FileHash -LiteralPath $apk -Algorithm SHA256).Hash.ToLowerInvariant()
 [System.IO.File]::WriteAllText($apk + '.sha256', $digest + '  ' + $name + [Environment]::NewLine, [System.Text.Encoding]::ASCII)
+if ($Configuration -eq 'Release') {
+    $versionSource = Get-Content -LiteralPath (Join-Path $PSScriptRoot 'app\build.gradle') -Raw
+    $releaseVersion = [regex]::Match($versionSource, "versionName\s+'([^']+)'").Groups[1].Value
+    $releaseCode = [int][regex]::Match($versionSource, 'versionCode\s+(\d+)').Groups[1].Value
+    if (!$releaseVersion -or $releaseCode -lt 1) { throw 'Version Android absente.' }
+    $manifest = @{ package='net.karenax.fred'; version=$releaseVersion; version_code=$releaseCode; bytes=(Get-Item -LiteralPath $apk).Length; sha256=$digest }
+    $manifestPath = Join-Path $distribution 'release.json'
+    [System.IO.File]::WriteAllText($manifestPath + '.tmp', ($manifest | ConvertTo-Json) + [Environment]::NewLine, [System.Text.UTF8Encoding]::new($false))
+    Move-Item -LiteralPath ($manifestPath + '.tmp') -Destination $manifestPath -Force
+}
 Write-Host "APK pret : $apk"
 Write-Host "SHA-256 : $digest"
 if ($Configuration -eq 'Release') {

@@ -488,6 +488,27 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
             return True
 
         def do_GET(self):
+            if self.path in ('/v1/client/android/release', '/v1/client/android/download'):
+                if not self.authorized(): return
+                from android_releases import status as android_status
+                try:
+                    release, source = android_status()
+                except ValueError as error:
+                    return self.respond(503, {'error': {'message': str(error)}})
+                if self.path.endswith('/release'):
+                    return self.respond(200, release)
+                with source.open('rb') as stream:
+                    self.send_response(200)
+                    self.send_header('Content-Type', 'application/vnd.android.package-archive')
+                    self.send_header('Content-Length', str(os.fstat(stream.fileno()).st_size))
+                    self.send_header('Cache-Control', 'no-store')
+                    self.send_header('X-Content-Type-Options', 'nosniff')
+                    self.send_header('Connection', 'close')
+                    self.end_headers()
+                    while chunk := stream.read(65536):
+                        if store.authenticate(self.access_token) != self.identity: return
+                        self.wfile.write(chunk)
+                return
             if self.path == '/v1/voice/status':
                 if not self.authorized():return
                 return self.respond(200,store.voice.status())

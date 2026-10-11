@@ -14,6 +14,7 @@ public final class SelfTestInstrumentation extends Instrumentation {
     private Bundle arguments;
     @Override public void onCreate(Bundle arguments){super.onCreate(arguments);this.arguments=arguments;start();}
     @Override public void onStart(){Bundle result=new Bundle();StringBuilder log=new StringBuilder();try{
+        if(arguments!=null&&arguments.containsKey("fred_updates")){UpdateChecks.run(getTargetContext(),log);result.putString("stream",log.toString());finish(-1,result);return;}
         if(arguments!=null&&arguments.containsKey("fred_voice")){result.putString("stream",VoiceChecks.run(this,arguments));finish(-1,result);return;}
         SecureStore store=new SecureStore(getTargetContext(),arguments!=null&&arguments.containsKey("fred_profile_b64")?"vault":"test-vault");
         if(arguments!=null&&arguments.containsKey("fred_profile_b64")){

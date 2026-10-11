@@ -51,6 +51,13 @@ def prepare(source: Path) -> str:
     for name in ("access", "connection"):
         chat = sub_once(chat, rf'<section class="settings-view" data-view="{name}" hidden>.*?</section>', read(MOBILE / f"{name}.html"), f"{name} pane")
     chat = chat.replace("EXE personnel · connexion automatique", "Accès personnel · Android")
+    chat = sub_once(chat, r'<details class="composer-options"><summary>Options</summary>.*?</details>',
+                    '<button id="retry-without-thinking" type="button" class="secondary" hidden>Réessayer sans réflexion</button>',
+                    "Android response retry menu")
+    chat = replace_once(chat, "$('retry').onclick=()=>{", "function retryLastResponse(){", "Android conditional retry action")
+    chat = replace_once(chat, ",'retry']", "]", "Android response retry button state")
+    chat = replace_once(chat, "if(value?.code==='thinking_without_answer')$('retry-without-thinking').closest('details').open=true;", "", "Android retry popover")
+    chat = replace_once(chat, "$('retry').click();", "retryLastResponse();", "Android retry without thinking")
     chat = sub_once(chat, r"async function clientState\(\)\{.*?(?=\n\s*\$\('endpoint'\)\.oninput)", read(MOBILE / "client-state.js").rstrip(), "Android state")
     chat = sub_once(chat, r"\s*\$\('endpoint'\)\.oninput=.*?(?=\n\s*async function bootstrap)", "", "desktop endpoint/update events")
     chat = sub_once(chat, r"\s*\$\('toggle-api-key'\)\.onclick=.*?(?=\n)", "", "desktop local API event")
@@ -95,8 +102,11 @@ def validate(html: str) -> None:
     assert html.count("__CONFIG__") == 1
     assert "__UI_CSS__" not in html
     assert "data-view=\"api\"" not in html and "data-view=\"updates\"" not in html
-    assert "'/client/update/" not in html and "'/client/integrations" not in html
+    assert "'/client/update/apply" not in html and "'/client/integrations" not in html
+    assert "android-update-install" in html and "'/client/update/check'" in html
     assert "EXE" not in html and "Comme Windows" not in html
+    assert 'id="retry"' not in html and "$('retry')" not in html
+    assert "Réessayer la réponse" not in html
     for item in ("android-onboarding", "AndroidClient", "exportFile", "ws-project-list", "ws-document-editor",
                  "ws-jobs", "corrector-text", "thinking-bar", "chat-file-input", "/v1/chat/completions",
                  "/client/history/sync", "stream:true", "reader.read()"):
@@ -123,7 +133,7 @@ def main() -> None:
     manifest = {"format": 1, "entrypoint": "android-chat.html", "sha256": hashlib.sha256(html.encode()).hexdigest(),
                 "shared_sources": {name: hashlib.sha256((args.source / name).read_bytes()).hexdigest() for name in SHARED},
                 "mobile_sources": {path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in sorted(MOBILE.iterdir()) if path.is_file()}}
-    (target.parent / "ui-package.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    (target.parent / "ui-package.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
     print(f"Android UI prepared: {target} ({len(html.encode())} bytes)")
 
 

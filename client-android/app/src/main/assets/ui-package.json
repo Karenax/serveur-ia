@@ -1,9 +1,9 @@
 {
   "format": 1,
   "entrypoint": "android-chat.html",
-  "sha256": "f887530c19aa7891db15fe4790a53c8d80cb6d8b416ee3b1418b26ba18711001",
+  "sha256": "fcb57ba428480800aa26f428a9abc8c60c14cafdbda960f1e7c5412ea3eb8a39",
   "shared_sources": {
-    "chat.html": "d14bb0817175b82bfbdf8d39e1ace5eed7322dd6de7ecedcfe4fb8b96b879d39",
+    "chat.html": "dcfa352ed7555663bcb7a396df31d01d20c47edd37d540e0e0bcacbbc68de59e",
     "workspace.html": "d8d10bed02b1a17383e7d2243958aca97ebfa7c1c2fdcdcf1dcf076db7f77009",
     "ui.css": "f6afac4b0bad5fe7d2d1f0f482ebffef4a1f31a1e3b27eef0ce344f2ef18da4a",
     "ui.js": "7eff2cff09c768ff635c4519c28467b36db28ddd1342e14b9c99d5f5ef09ae88",
@@ -18,8 +18,8 @@
   "mobile_sources": {
     "access.html": "844cd43f9564d81cfa3f6f453ae10d02ef0edbd39041b405ead2a097d4aa2087",
     "android.css": "0d291e29fe3405cab1f06483af1b30412cc5ad21d1e20617bde74e9dc5aa921d",
-    "android.js": "70608b12c481a1fd912e50a9ba217575a7e6421530ae5c9bbf4346270ecd2799",
-    "client-state.js": "931e2ec44d5afebed878f390047214c6da93b41f5201e42eaf20fcfdf6a28ed1",
+    "android.js": "7032b02b70374571a0c26345bc2fd249a9e3960f8a947b1f6adf2dfb8cae6263",
+    "client-state.js": "a4c2506c61cbe719a250b888a2f716af2cbf347d4204f2e72b0ea403ddce87f0",
     "connection.html": "4e8441e4a1da13a6c9812acfccf1e4d4eefe994769c93c1f34a24c4a476063e6",
     "corrector-response.js": "f72de7f91645b87978efed2bcb2ee190d0113120c3c8effb1d51756f386a962f",
     "onboarding.html": "cfd0d455e9a9394637950eac551071b2b380af2646057d559b5ec2d23a253a0c"

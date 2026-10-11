@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "release": {
+    "sha256": "50d745e1af73c5cf6a3943d1e13d620d65490d8a3eb91a3d41778138129cd2cd",
+    "package": "net.karenax.fred",
+    "version_code": 6,
+    "version": "1.0.5",
+    "bytes": 18895124
+  },
+  "python_delivery_tests": 13,
+  "server_update_tests": 3,
+  "browser_phone_tablet": true,
+  "native_policy_phone_tablet": true,
+  "native_signed_download_phone_tablet": true,
+  "android_update_confirmation_phone_tablet": true,
+  "future_test_release_only": "1.0.6/code7",
+  "physical_tablet_installed": false
+}

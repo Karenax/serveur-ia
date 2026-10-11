@@ -21,6 +21,42 @@ window.androidProfileImported=()=>location.reload();
 window.androidProfileError=message=>{$('android-profile-message').textContent=String(message||'Import du profil impossible.');};
 window.androidConnectionChanged=async()=>{endpointDirty=false;await clientState();if(!$('connection-choice').open)await models();};
 
+// Native downloads keep credentials and APK bytes out of the WebView.
+let androidUpdateInstalling=false;
+function androidUpdateState(update){
+  const pane=document.querySelector('[data-view="access"]');if(!pane)return;
+  if(!$('android-update-status')){
+    const card=wsElement('div',undefined,'settings-card');
+    card.append(wsElement('h3','Mises à jour Android'));
+    const status=wsElement('p');status.id='android-update-status';status.setAttribute('role','status');
+    const check=wsElement('button','Rechercher une mise à jour','secondary');check.type='button';check.id='android-update-check';
+    check.onclick=()=>wsTry(async()=>androidUpdateState(await api('/client/update/check',{})));
+    card.append(status,check,wsElement('p','Fred recherche et télécharge les nouvelles versions pendant son utilisation. Android vous demandera de confirmer l’installation.'));
+    pane.append(card);
+    const banner=wsElement('div',undefined,'settings-card');banner.id='android-update-banner';banner.hidden=true;
+    const label=wsElement('span');label.id='android-update-label';
+    const install=wsElement('button','Installer la mise à jour','secondary');install.type='button';install.id='android-update-install';
+    install.onclick=()=>wsTry(async()=>{
+      if(androidUpdateInstalling||conversationLocked())return;
+      androidUpdateInstalling=true;install.disabled=true;
+      try{
+        if(!await window.androidFlush())throw new Error('Enregistrement non confirmé. Réessayez avant d’installer la mise à jour.');
+        androidRequireBridge().installUpdate();
+      }finally{androidUpdateInstalling=false;install.disabled=conversationLocked();}
+    });
+    banner.append(label,document.createTextNode(' '),install);
+    document.querySelector('.workspace-top').after(banner);
+  }
+  const value=update||{},phase=value.phase||'idle';
+  $('android-update-status').textContent=value.message||'Les mises à jour sont recherchées automatiquement.';
+  if(phase==='downloading'&&value.bytes>0)$('android-update-status').textContent+=' '+Math.min(100,Math.round(value.received/value.bytes*100))+' %';
+  $('android-update-check').disabled=!loggedIn||['checking','downloading'].includes(phase);
+  $('android-update-banner').hidden=!value.available;
+  $('android-update-label').textContent=value.available?'Fred Android '+value.version+' est prêt à installer.':'';
+  $('android-update-install').disabled=androidUpdateInstalling||conversationLocked()||['checking','downloading'].includes(phase);
+}
+androidUpdateState();
+
 // The server inbox survives a closed app. System alerts are optional and only
 // delivered while this client is active; no external push account is involved.
 let androidLastInbox=null,androidOpeningNotification=false,androidLastNotificationOpen=0;

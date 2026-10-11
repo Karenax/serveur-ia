@@ -1,6 +1,7 @@
 async function clientState(){
   try{
     const state=await api('/client/state');
+    if(typeof androidUpdateState==='function')androidUpdateState(state.update);
     const profileRequired=state.profile_required===true;
     loggedIn=!profileRequired;
     if(typeof uiApplyPreferences==='function')uiApplyPreferences(state.preferences);

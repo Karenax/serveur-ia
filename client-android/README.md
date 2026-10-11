@@ -7,8 +7,8 @@ Les appareils Android limités aux applications 32 bits ne sont pas pris en char
 ## Installer et ouvrir
 
 Le fichier à installer est `dist/Acces-serveur-Fred-Android.apk`, version
-**1.0.2** (`versionCode=3`). Le Release signé a été installé et vérifié
-sur les émulateurs téléphone et tablette Android 16.
+**1.0.5** (`versionCode=6`). Installer le nouvel APK par-dessus l’application
+existante pour conserver le profil et les conversations.
 Transférer cet APK sur l’appareil puis l’ouvrir et autoriser son installation
 depuis l’application utilisée pour ouvrir le fichier.
 
@@ -117,11 +117,11 @@ source reste à l’emplacement choisi dans les fichiers de l’appareil.
 | Copie | Presse-papiers Android |
 | Connexion | Choix explicite HTTPS ou WireGuard, accès personnels existants |
 | Appareil | Déclaration authentifiée du format téléphone/tablette, de la version et du transport ; activité consultable dans la console |
-| Mise à jour | Installer un nouvel APK signé avec la même clé |
+| Mise à jour | Détection et téléchargement automatiques ; installation confirmée dans Android |
 
 Dans le champ de message, **Entrée** ajoute une ligne ; le bouton **↑**
 envoie le message. Les intégrations spécifiques au PC et l’installation
-des mises à jour EXE sont retirées de l’interface Android.
+des mises à jour Windows sont retirées de l’interface Android.
 En WireGuard, chaque requête complète (messages et pièces jointes) est
 limitée à 2 Mo : alléger les grosses images ou envoyer moins de pièces à la fois.
 
@@ -231,3 +231,45 @@ un compte autorisé restent à effectuer.
 ## Dictée locale 1.0.3
 
 Whisper Small français est disponible avec les boutons Installer la dictée, Dicter et Terminer la dictée. Télécharger le modèle une fois (environ 488 Mo), autoriser le microphone, dicter puis corriger et envoyer le texte. Aucun envoi automatique, aucun audio transmis au serveur. Small peut prendre du retard selon le CPU. [Guide commun](../client-voice/README.md) et [preuves téléphone/tablette](../preuves/voix-small-20261011/VALIDATION.md). Installer l’APK signé par-dessus l’application existante ; aucune désinstallation n’est nécessaire.
+
+## Interface Android 1.0.4
+
+Le bouton « Réessayer la réponse » et son menu Options sont supprimés sur
+Android. L’action « Réessayer sans réflexion » reste disponible uniquement
+si le modèle termine sa réflexion sans réponse finale. La préparation de
+l’interface vérifie l’absence du bouton supprimé à chaque compilation.
+
+Validation du 11 octobre 2026 : 13 tests Python réussis, vérification de la
+syntaxe JavaScript, essais navigateur téléphone/tablette réussis, compilation
+Release et signature v2/v3 vérifiées. La tablette physique doit recevoir le
+nouvel APK pour appliquer cette modification.
+
+## Mises à jour automatiques 1.0.5
+
+Pendant l’utilisation de Fred, l’application recherche une nouvelle version
+au démarrage après le choix de connexion, puis toutes les dix minutes.
+Elle télécharge automatiquement l’APK dans son stockage privé, via HTTPS ou
+WireGuard, avec l’accès personnel importé. Dans **Mon accès personnel →
+Mises à jour Android**, **Rechercher une mise à jour** permet de relancer la
+vérification ou un téléchargement interrompu. L’application arrêtée ne
+recherche pas de mises à jour.
+
+Quand l’APK est prêt, le bandeau **Installer la mise à jour** apparaît.
+L’installation attend la fin de la conversation et un enregistrement confirmé.
+Android peut demander d’autoriser Fred à installer des applications ; au retour,
+l’installateur s’ouvre et demande la confirmation. Une annulation conserve
+l’application et ses données ; le bouton permet de recommencer.
+
+Le téléchargement est borné à 128 Mo. Le client vérifie sa taille et son SHA-256,
+le nom du paquet, une version strictement plus récente et la même signature que
+l’application installée. L’APK est partagé avec l’installateur par une URI
+temporaire en lecture seule. Aucun accès personnel n’est inclus dans le paquet.
+
+`Build-Android.ps1` publie l’APK signé et `dist/release.json`. Le serveur vérifie
+leur concordance avant d’exposer les routes authentifiées
+`/v1/client/android/release` et `/v1/client/android/download`. La publication d’une
+nouvelle compilation Release suffit ensuite à la proposer aux appareils.
+
+**Première installation :** les versions 1.0.4 et précédentes n’ont pas cette
+fonction. Installer une fois manuellement l’APK 1.0.5 par-dessus l’application
+existante ; les versions suivantes pourront être téléchargées depuis Fred.

@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "release": {
+    "sha256": "50d745e1af73c5cf6a3943d1e13d620d65490d8a3eb91a3d41778138129cd2cd",
+    "package": "net.karenax.fred",
+    "version_code": 6,
+    "version": "1.0.5",
+    "bytes": 18895124
+  },
+  "model_processes_preserved": [
+    {
+      "pid": 8200,
+      "created": 1791651021.7995121
+    },
+    {
+      "pid": 14628,
+      "created": 1791651021.777978
+    }
+  ],
+  "access_and_settings_preserved": true,
+  "authenticated_download_verified": true,
+  "contains_secrets": false,
+  "public_https_authenticated_download_verified": true
+}

@@ -209,7 +209,7 @@ function renderMarkdown(element, text) {
 <section class="chat-view" data-view="chat"><div class="conversation-top"><div class="conversation-title"><input id="conversation-title" aria-label="Nom de la conversation" maxlength="120"><details class="menu" id="ui-conversation-menu"><summary aria-label="Actions de la conversation">···</summary><div class="menu-body"><button id="rename-conversation" class="secondary">Enregistrer le nom</button><button id="archive-conversation" class="secondary">Archiver la conversation</button><button id="delete-conversation" class="secondary danger">Supprimer la conversation</button><button id="undo-delete" class="secondary" hidden>Annuler la suppression</button></div></details></div><div id="model">Recherche du modèle…</div></div>
 <main id="messages" aria-label="Conversation"><div class="empty" id="empty"><div class="assistant-avatar" aria-hidden="true">✳</div><div class="eyebrow">VOTRE ESPACE POUR AVANCER</div><h2>Qu’allons-nous préparer ?</h2><p>Une idée, un document, une question.<br>Commencez simplement, votre assistant s’occupe de la suite.</p><div class="suggestions"><button data-prompt="Aide-moi à structurer un projet. Pose-moi les questions nécessaires.">Préparer un projet</button><button data-prompt="Aide-moi à rédiger un texte clair. Demande-moi le sujet et le destinataire.">Rédiger un texte</button><button data-prompt="Aide-moi à comprendre un sujet complexe. Demande-moi lequel.">Explorer un sujet</button><button data-prompt="Aide-moi à analyser et améliorer du code. Je vais te fournir un extrait.">Travailler sur du code</button></div></div></main>
 <form class="composer" id="composer"><div class="input-box"><textarea id="prompt" aria-label="Votre message" placeholder="Posez une question ou décrivez ce que vous voulez faire…"></textarea><div class="send-row"><span class="hint">Touchez la flèche pour envoyer</span><button id="send" type="submit" aria-label="Envoyer le message" title="Envoyer le message" disabled>↑</button><button id="cancel" type="button" aria-label="Arrêter la réponse" title="Arrêter la réponse" hidden>■</button></div></div>
-<div class="composer-bottom"><div class="privacy" id="history-status" role="status">Historique sur le serveur · copie locale chiffrée</div><fieldset id="thinking" class="thinking-control" disabled><legend>Réflexion</legend><div id="thinking-bar" class="thinking-bar" role="radiogroup" aria-label="Niveau de réflexion"></div><p id="thinking-note">Connectez-vous au serveur pour choisir un niveau.</p></fieldset><details class="composer-options"><summary>Options</summary><div><div class="controls"><button id="retry" type="button" class="secondary">Réessayer la réponse</button><button id="retry-without-thinking" type="button" class="secondary" hidden>Réessayer sans réflexion</button></div></div></details></div><span id="queue-state" role="status"></span><button id="history-recover" class="secondary" type="button" hidden>Récupérer l’enregistrement de l’historique</button></form></section>
+<div class="composer-bottom"><div class="privacy" id="history-status" role="status">Historique sur le serveur · copie locale chiffrée</div><fieldset id="thinking" class="thinking-control" disabled><legend>Réflexion</legend><div id="thinking-bar" class="thinking-bar" role="radiogroup" aria-label="Niveau de réflexion"></div><p id="thinking-note">Connectez-vous au serveur pour choisir un niveau.</p></fieldset><button id="retry-without-thinking" type="button" class="secondary" hidden>Réessayer sans réflexion</button></div><span id="queue-state" role="status"></span><button id="history-recover" class="secondary" type="button" hidden>Récupérer l’enregistrement de l’historique</button></form></section>
 <section class="settings-view" data-view="access" hidden><h2>Mon accès personnel</h2><p>Votre profil connecte cet appareil au serveur Fred.</p>
 <div class="settings-card"><span class="access-badge">Accès personnel · Android</span><h3>Votre profil</h3><p id="android-profile-name">Profil à importer</p><button id="android-manage-profile" class="secondary" type="button">Gérer mon accès</button><small>Le profil contient votre accès personnel. Conservez-le pour vous. Le serveur peut suspendre ou révoquer cet accès.</small></div>
 <div class="settings-card"><h3>Vos conversations</h3><p>Vos conversations sont enregistrées sur le serveur. Une copie locale chiffrée conserve vos changements pendant une coupure et les synchronise à la reconnexion.</p><small>Vous pouvez importer et exporter l’historique. Les fichiers exportés ne sont pas chiffrés.</small></div></section>
@@ -229,9 +229,9 @@ function renderMarkdown(element, text) {
     let networkBanner=false,modelsPending=null,lastConnectionUpdate=0,replyProgress={};
     const connectionCodes=new Set(['wireguard_unreachable','tunnel_request_failed','connection_error','gateway_unavailable','access_denied','access_revoked','access_suspended','access_expired','remote_disabled','model_unloaded','no_models']);
     function connectionFailure(e){if(!connectionCodes.has(e?.code))return;connected=false;lastConnectionUpdate=Date.now();$('connection').textContent='● Connexion indisponible';$('connection').title=e.message||'';$('connection').classList.remove('online');buttons();}
-    function error(value){if($('retry-without-thinking'))$('retry-without-thinking').hidden=value?.code!=='thinking_without_answer';const text=typeof value==='string'?value:value?.message;if(value?.code==='thinking_without_answer')$('retry-without-thinking').closest('details').open=true;networkBanner=connectionCodes.has(value?.code);if(networkBanner)connectionFailure(value);$('error').hidden=!text;$('error').textContent=text||'';}
+    function error(value){if($('retry-without-thinking'))$('retry-without-thinking').hidden=value?.code!=='thinking_without_answer';const text=typeof value==='string'?value:value?.message;networkBanner=connectionCodes.has(value?.code);if(networkBanner)connectionFailure(value);$('error').hidden=!text;$('error').textContent=text||'';}
     let saveTimer=null,historyWrites=Promise.resolve(),historyRevision="",historyReady=false,historyBlocked=false,endpointDirty=false,deletedConversation=null,conversationActionPending=false;
-    function conversationLocked(){return busy||Boolean(window.voiceBusy)||Boolean(window.chatAttachmentLoading)||historySyncPending||conversationActionPending||!historyReady||historyBlocked;}
+    function conversationLocked(){return busy||Boolean(window.voiceBusy)||Boolean(window.conversationBusy)||Boolean(window.chatAttachmentLoading)||historySyncPending||conversationActionPending||!historyReady||historyBlocked;}
     function save(){
       const c=library.find(c=>c.id===currentId);if(c)c.messages=messages;
       if(!historyReady||historyBlocked)return;clearTimeout(saveTimer);saveTimer=setTimeout(()=>flushHistory().catch(()=>{}),400);
@@ -271,7 +271,7 @@ function renderMarkdown(element, text) {
     $('archive-conversation').onclick=()=>wsTry(()=>wsArchiveConversation(currentId));
     $('undo-delete').onclick=()=>wsTry(()=>wsUndoConversationDelete());
     $('history-recover').onclick=async()=>{if(!confirm('Conserver une copie chiffrée du fichier illisible et enregistrer les conversations actuellement affichées ?'))return;try{const result=await api('/client/history/recover',{history:{conversations:library,currentId}});historyRevision=result.revision;historyReady=true;historyBlocked=false;$('history-recover').hidden=true;$('history-status').textContent='Historique récupéré. Original conservé : '+result.backup;error('');}catch(e){error(e);}};
-    $('retry').onclick=()=>{if(conversationLocked())return;let i=messages.length-1;if(messages[i]?.role==='assistant')i--;if(messages[i]?.role!=='user')return;const text=messages[i].content;chatAttachments=structuredClone(messages[i].attachments||[]);attachmentRender();messages=messages.slice(0,i);save();render();$('prompt').value=text;$('composer').requestSubmit();};
+    function retryLastResponse(){if(conversationLocked())return;let i=messages.length-1;if(messages[i]?.role==='assistant')i--;if(messages[i]?.role!=='user')return;const text=messages[i].content;chatAttachments=structuredClone(messages[i].attachments||[]);attachmentRender();messages=messages.slice(0,i);save();render();$('prompt').value=text;$('composer').requestSubmit();};
     drawLibrary();
     function draw(message){
       const article=document.createElement('article');article.className='message '+message.role;
@@ -284,7 +284,7 @@ function renderMarkdown(element, text) {
       return {article,content,details,reasoning};
     }
     function render(){$('messages').querySelectorAll('.message').forEach(m=>m.remove());$('empty').hidden=messages.length>0;messages.forEach(draw);}
-    function buttons(){for(const id of ['conversations','rename-conversation','archive-conversation','delete-conversation','undo-delete','import-conversations','retry'])$(id).disabled=conversationLocked();$('send').disabled=conversationLocked()||!connected;$('send').hidden=busy;$('cancel').hidden=!busy;$('new').disabled=conversationLocked();$('thinking').disabled=busy||!connected;if(typeof attachmentButtons==='function')attachmentButtons();$('prompt').readOnly=busy||Boolean(window.voiceBusy)||historySyncPending||conversationActionPending;}
+    function buttons(){for(const id of ['conversations','rename-conversation','archive-conversation','delete-conversation','undo-delete','import-conversations'])$(id).disabled=conversationLocked();$('send').disabled=conversationLocked()||!connected;$('send').hidden=busy;$('cancel').hidden=!busy;$('new').disabled=conversationLocked();$('thinking').disabled=busy||!connected||Boolean(window.conversationBusy);if(typeof attachmentButtons==='function')attachmentButtons();$('prompt').readOnly=busy||Boolean(window.voiceBusy)||Boolean(window.conversationBusy)||historySyncPending||conversationActionPending;}
     async function syncServerHistory(){
       if(historyBlocked||busy||conversationActionPending||serverHistoryReady||historySyncPending)return;
       historySyncPending=true;buttons();drawLibrary();
@@ -321,20 +321,20 @@ function renderMarkdown(element, text) {
       if(data==='[DONE]'){replyProgress.phase='complete';return true;}if(!data)return false;
       const value=JSON.parse(data);if(value.workspace_sources){workspaceShowSources(value.workspace_sources);return;}if(value.queue){$('queue-state').textContent=value.queue.position?`En attente · position ${value.queue.position}`:'Génération en cours';return;}if(value.error)throw Object.assign(new Error(value.error.message||'La génération a échoué.'),{code:value.error.code});
       replyProgress.lastEvent=Date.now();const choice=value.choices?.[0]||{},d=choice.delta||{};if(choice.finish_reason)replyProgress.finish=choice.finish_reason;
-      if(typeof d.content==='string'&&d.content){answer.content+=d.content;replyProgress.phase='answering';}
+      if(typeof d.content==='string'&&d.content){answer.content+=d.content;replyProgress.phase='answering';window.conversationDelta?.(d.content);}
       const reason=d.reasoning_content??d.reasoning;if(typeof reason==='string'&&reason){answer.reasoning_content+=reason;replyProgress.phase='thinking';}
       save();queueMarkdown(view.content,answer.content);view.reasoning.textContent=answer.reasoning_content;view.details.hidden=!answer.reasoning_content;
 
     }
     $('composer').addEventListener('submit',async event=>{
-      event.preventDefault();const text=$('prompt').value.trim();if((!text&&!chatAttachments.length)||attachmentLoading||conversationLocked()||!connected)return;
+      event.preventDefault();const text=$('prompt').value.trim();if((!text&&!chatAttachments.length)||attachmentLoading||busy||historyBlocked||historySyncPending||conversationActionPending||Boolean(window.voiceBusy)||(conversationLocked()&&!window.conversationSubmitting)||!connected)return;
       if(chatAttachments.some(a=>a.kind==='image')&&!chatCapabilities.images){error('Le modèle chargé ne prend pas en charge les images.');return;}
       const userMessage={role:'user',content:text,...(chatAttachments.length?{attachments:structuredClone(chatAttachments)}:{})};
       const candidate=structuredClone(library);candidate.find(c=>c.id===currentId).messages=[...messages,userMessage];
       if(new TextEncoder().encode(JSON.stringify({conversations:candidate,currentId})).length>8*1024*1024){error('Historique trop volumineux. Exportez puis supprimez des conversations.');return;}
       error('');const current=library.find(c=>c.id===currentId);if(!messages.length&&/^Conversation|^Nouvelle conversation/.test(current?.title||'')){current.title=(text||chatAttachments[0]?.name||'Pièce jointe').slice(0,70);drawLibrary();}messages.push(userMessage);chatAttachments=[];attachmentRender();$('prompt').value='';render();save();
       const history=messages.map(m=>({role:m.role,content:chatRequestContent(m),...(m.reasoning_content?{reasoning_content:m.reasoning_content}:{})}));
-      const answer={role:'assistant',content:'',reasoning_content:''};messages.push(answer);const view=draw(answer);chatScrollLatest();
+      const answer={role:'assistant',content:'',reasoning_content:''};messages.push(answer);const view=draw(answer);chatScrollLatest();window.conversationOnReplyStart?.(answer);
       replyProgress={phase:'requesting',started:Date.now(),lastEvent:Date.now()};busy=true;drawLibrary();controller=new AbortController();requestId=crypto.randomUUID().replaceAll('-','');buttons();
       try{
         const response=await fetch('/v1/chat/completions',{method:'POST',headers:{Authorization:'Bearer '+config.key,'Content-Type':'application/json','X-Qwen-Request':requestId},signal:controller.signal,body:JSON.stringify({...workspaceFields(),model:config.model,messages:history,stream:true,reasoning_effort:thinkingEffort()})});
@@ -347,7 +347,7 @@ function renderMarkdown(element, text) {
         }
         if(!answer.content&&answer.reasoning_content)throw Object.assign(new Error('Le modèle a terminé sa réflexion sans réponse finale. Réessayez sans réflexion approfondie.'),{code:'thinking_without_answer'});if(replyProgress.finish==='length')throw new Error('Le modèle a atteint sa capacité de contexte : la réponse peut être incomplète.');
       }catch(e){answer.interrupted=true;if(e.name==='TypeError')e.code='connection_error';error(e.name==='AbortError'?'Réponse interrompue.':e);}
-      finally{$('queue-state').textContent='';if(!answer.content&&!answer.reasoning_content){messages.pop();view.article.remove();}busy=false;controller=null;save();render();drawLibrary();buttons();if(matchMedia('(pointer:fine)').matches)$('prompt').focus();models();}
+      finally{window.conversationOnReplyEnd?.(answer);$('queue-state').textContent='';if(!answer.content&&!answer.reasoning_content){messages.pop();view.article.remove();}busy=false;controller=null;save();render();drawLibrary();buttons();if(matchMedia('(pointer:fine)').matches)$('prompt').focus();models();}
     });
     $('prompt').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)&&!e.isComposing){e.preventDefault();$('composer').requestSubmit();}});
     $('cancel').onclick=()=>{const oldController=controller,oldId=requestId;oldController?.abort();if(oldId)fetch('/v1/cancel',{method:'POST',headers:{Authorization:'Bearer '+config.key,'Content-Type':'application/json','X-Qwen-Request':oldId},body:'{}',signal:AbortSignal.timeout(5000)}).catch(()=>{});};
@@ -356,6 +356,7 @@ function renderMarkdown(element, text) {
     async function clientState(){
   try{
     const state=await api('/client/state');
+    if(typeof androidUpdateState==='function')androidUpdateState(state.update);
     const profileRequired=state.profile_required===true;
     loggedIn=!profileRequired;
     if(typeof uiApplyPreferences==='function')uiApplyPreferences(state.preferences);
@@ -391,7 +392,7 @@ function renderMarkdown(element, text) {
     function showView(name){for(const pane of document.querySelectorAll('[data-view]'))pane.hidden=pane.dataset.view!==name;for(const button of document.querySelectorAll('[data-view-button]')){const active=button.dataset.viewButton===name;button.classList.toggle('active',active);button.setAttribute('aria-selected',String(active));}$('workspace-heading').textContent=({chat:'Conversations',access:'Mon accès',connection:'Connexion au serveur',updates:'Mises à jour',api:'API locale'})[name]||'Conversations';}
     document.querySelectorAll('[data-view-button]').forEach(button=>button.onclick=()=>showView(button.dataset.viewButton));
     document.querySelectorAll('[data-prompt]').forEach(button=>button.onclick=()=>{if(conversationLocked())return;$('prompt').value=button.dataset.prompt;$('prompt').focus();});
-    $('retry-without-thinking').onclick=()=>{uiThinkingSet('none');if(typeof uiPersistPreferences==='function')uiPersistPreferences().catch(e=>error(e));$('retry').click();};
+    $('retry-without-thinking').onclick=()=>{uiThinkingSet('none');if(typeof uiPersistPreferences==='function')uiPersistPreferences().catch(e=>error(e));retryLastResponse();};
     $('reconnect').onclick=async()=>{const b=$('reconnect');b.disabled=true;try{await models();await clientState();}finally{b.disabled=false;}};
     showView('chat');const clientReady=bootstrap();setInterval(()=>{if(!document.hidden)models();},15000);setInterval(()=>{if(!document.hidden)clientState();},2000);window.addEventListener('pagehide',()=>{if(!historyReady||historyBlocked)return;const c=library.find(c=>c.id===currentId);if(c)c.messages=messages;fetch('/client/history',{method:'POST',headers:{Authorization:'Bearer '+config.key,'Content-Type':'application/json'},body:JSON.stringify({history:{conversations:library,currentId},revision:historyRevision}),keepalive:true}).catch(()=>{});});
   </script><template id="ws-layout">
@@ -1154,6 +1155,42 @@ $('android-network-settings').onclick=()=>wsTry(()=>androidRequireBridge().openS
 window.androidProfileImported=()=>location.reload();
 window.androidProfileError=message=>{$('android-profile-message').textContent=String(message||'Import du profil impossible.');};
 window.androidConnectionChanged=async()=>{endpointDirty=false;await clientState();if(!$('connection-choice').open)await models();};
+
+// Native downloads keep credentials and APK bytes out of the WebView.
+let androidUpdateInstalling=false;
+function androidUpdateState(update){
+  const pane=document.querySelector('[data-view="access"]');if(!pane)return;
+  if(!$('android-update-status')){
+    const card=wsElement('div',undefined,'settings-card');
+    card.append(wsElement('h3','Mises à jour Android'));
+    const status=wsElement('p');status.id='android-update-status';status.setAttribute('role','status');
+    const check=wsElement('button','Rechercher une mise à jour','secondary');check.type='button';check.id='android-update-check';
+    check.onclick=()=>wsTry(async()=>androidUpdateState(await api('/client/update/check',{})));
+    card.append(status,check,wsElement('p','Fred recherche et télécharge les nouvelles versions pendant son utilisation. Android vous demandera de confirmer l’installation.'));
+    pane.append(card);
+    const banner=wsElement('div',undefined,'settings-card');banner.id='android-update-banner';banner.hidden=true;
+    const label=wsElement('span');label.id='android-update-label';
+    const install=wsElement('button','Installer la mise à jour','secondary');install.type='button';install.id='android-update-install';
+    install.onclick=()=>wsTry(async()=>{
+      if(androidUpdateInstalling||conversationLocked())return;
+      androidUpdateInstalling=true;install.disabled=true;
+      try{
+        if(!await window.androidFlush())throw new Error('Enregistrement non confirmé. Réessayez avant d’installer la mise à jour.');
+        androidRequireBridge().installUpdate();
+      }finally{androidUpdateInstalling=false;install.disabled=conversationLocked();}
+    });
+    banner.append(label,document.createTextNode(' '),install);
+    document.querySelector('.workspace-top').after(banner);
+  }
+  const value=update||{},phase=value.phase||'idle';
+  $('android-update-status').textContent=value.message||'Les mises à jour sont recherchées automatiquement.';
+  if(phase==='downloading'&&value.bytes>0)$('android-update-status').textContent+=' '+Math.min(100,Math.round(value.received/value.bytes*100))+' %';
+  $('android-update-check').disabled=!loggedIn||['checking','downloading'].includes(phase);
+  $('android-update-banner').hidden=!value.available;
+  $('android-update-label').textContent=value.available?'Fred Android '+value.version+' est prêt à installer.':'';
+  $('android-update-install').disabled=androidUpdateInstalling||conversationLocked()||['checking','downloading'].includes(phase);
+}
+androidUpdateState();
 
 // The server inbox survives a closed app. System alerts are optional and only
 // delivered while this client is active; no external push account is involved.
