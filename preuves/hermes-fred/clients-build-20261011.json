@@ -1,0 +1,65 @@
+{
+  "windows": {
+    "version": "3.5.22",
+    "protocol": 3,
+    "bytes": 93449556,
+    "sha256": "a45da215e239bf759ca7a6b8eafc5f17c51c54ed3d9f7f5c9c55f2825172689a",
+    "signature": "aHc6eWtmw8hdmdZxa/XuzR9azY5nlg9O8biBqB309vg2N9lDOtXrBfMTzXbqO2fTgZc0p2oxEBX7RuAFYUS9BQ==",
+    "signing_public_key": "8fSJ5YLYBVF0GvxnS5RyD6LjgMSTi39H+4YGeS2Ac/M=",
+    "agent_protocol": 4,
+    "ed25519_verified": true,
+    "self_test": "Accès serveur Fred self-test OK",
+    "windows_bundle_source_matches": true,
+    "windows_bridge_matches_staged": true,
+    "windows_native_files_verified": 481,
+    "previous_updater_accepts_release": true
+  },
+  "android": {
+    "sha256": "5d1ea7ae54cb5838c358138e433fd3533317c8f514a30b6ac344c2224f7eef10",
+    "bytes": 18899220,
+    "version": "1.0.6",
+    "version_code": 7,
+    "package": "net.karenax.fred",
+    "agent_protocol": 4,
+    "packaged_ui_matches_source": true,
+    "certificate_sha256": "40216ff897090b49b21e3cda66169b9fb7070e42dd2b8cb9ebe0f2c441997048",
+    "signature_schemes": [
+      "v2",
+      "v3"
+    ],
+    "zipalign_16k_verified": true,
+    "lint_errors": 0,
+    "lint_warnings": 5
+  },
+  "bridge": {
+    "bytes": 10779648,
+    "sha256": "aa83ce6f93dff31b041b3004245f55c7b07d8b94de4615b534635a4f3de6913e"
+  },
+  "publication": "published_and_verified",
+  "artifacts": {
+    "windows": "toolchain/releases-staging/hermes-fred-20261011/windows/Accès serveur Fred.exe",
+    "android": "toolchain/releases-staging/hermes-fred-20261011/android/Acces-serveur-Fred-Android.apk",
+    "bridge": "toolchain/releases-staging/hermes-fred-20261011/wireguard-bridge.exe"
+  },
+  "tests": {
+    "client_history": 5,
+    "windows_distribution": 2,
+    "android_distribution": 13,
+    "existing_history_server": 16,
+    "windows_ui": "passed",
+    "android_ui_phone_tablet": "passed",
+    "approval_heartbeat_once_and_deny": "passed_both_clients",
+    "approval_disconnect_reload_same_run": "passed_both_clients",
+    "android_lintRelease": "passed"
+  },
+  "signing_note": "Windows manifest Ed25519 (no Authenticode claim); Android APK existing certificate v2/v3.",
+  "logs": {
+    "windows": "toolchain/releases-staging/hermes-fred-20261011/windows-build-final.log",
+    "android": "toolchain/releases-staging/hermes-fred-20261011/android-build-final.log",
+    "android_align": "toolchain/releases-staging/hermes-fred-20261011/android-align-final.log",
+    "android_lint": "toolchain/releases-staging/hermes-fred-20261011/android-lint-final.log",
+    "windows_ui": "toolchain/releases-staging/hermes-fred-20261011/windows-ui-final.log",
+    "android_ui": "toolchain/releases-staging/hermes-fred-20261011/android-ui-final.log"
+  },
+  "delivery_proof": "delivery-validation.json"
+}

@@ -1,6 +1,6 @@
 # Plan global du serveur Fred et de ses clients
 
-Date : 11 octobre 2026. Statut : lots **0 à 4 achevés, validés et en service** — 191 tests réussis, 32 scénarios console et essais Android téléphone/tablette sur émulateurs. Les **lots 6 et 8 sont achevés, validés et en service**, développés en parallèle : **246 tests de régression réussis**, 27 scénarios navigateur et essais Android sur émulateurs téléphone/tablette. La refonte du tableau de bord du lot 5 et les lots 9 et 10 restent planifiés ; le lot 7 comprend désormais la dictée Windows/Android et la conversation Windows.
+Date : 11 octobre 2026. Statut : lots **0 à 4 achevés, validés et en service** — 191 tests réussis, 32 scénarios console et essais Android téléphone/tablette sur émulateurs. Les **lots 6 et 8 sont achevés, validés et en service**, développés en parallèle : **246 tests de régression réussis**, 27 scénarios navigateur et essais Android sur émulateurs téléphone/tablette. Hermes est activé pour les conversations et les outils Fred autorisés. La refonte du tableau de bord du lot 5 et les extensions des lots 9/10 restent planifiées ; le lot 7 comprend désormais la dictée Windows/Android et la conversation Windows.
 
 ## Demande et décisions
 
@@ -8,9 +8,9 @@ Le périmètre comprend les sept axes proposés : sauvegardes automatiques et re
 
 Les sauvegardes et autorisations d’appareils sont exécutées côté serveur et administrées depuis la console locale. Aucun client ouvert n’est requis pour les sauvegardes. Le serveur reste responsable des données, droits, traitements et travaux persistants ; Windows et Android fournissent les interactions nécessaires : microphone, lecture audio, affichage des sources, notifications et demandes de validation.
 
-Développer par lots utilisables, sans remplacer le stockage ni refaire la console. Préserver les accès, projets et historiques actuels. Après les cinq premiers lots, l’utilisateur a autorisé **les lots 6 et 8 en parallèle** et demandé une **explication du lot 9**. L’implantation du lot 9 n’est pas demandée. Le journal minimal d’événements nécessaire aux notifications est intégré au périmètre des lots 6/8 ; il ne constitue pas la refonte du tableau de bord prévue au lot 5.
+Développer par lots utilisables, sans remplacer le stockage ni refaire la console. Préserver les accès, projets et historiques actuels. Après les cinq premiers lots, l’utilisateur a autorisé **les lots 6 et 8 en parallèle** et demandé une **explication du lot 9**. Une demande ultérieure autorise l’intégration complète de Hermes et des outils Fred contrôlés ; les outils système libres et connecteurs externes ne sont pas activés. Le journal minimal d’événements nécessaire aux notifications est intégré au périmètre des lots 6/8 ; il ne constitue pas la refonte du tableau de bord prévue au lot 5.
 
-Livraison actuelle : serveur et Windows **3.5.18**, Android **1.0.2, code 3**. Sauvegardes actives chaque jour à 03 h avec conservation 7/4/6, sur le serveur selon le choix du demandeur ; deuxième destination laissée vide. Le modèle chargé et les clés existantes ont été préservés lors de la mise en service. Voir le [mode d’emploi](lanceur/SAUVEGARDES-APPAREILS.md), le [rapport de validation](preuves/lots-0-4/VALIDATION.md) et le [contexte](CONTEXTE-PROJET.md).
+Livraison actuelle : serveur et Windows **3.5.22**, Android **1.0.6, code 7**. Sauvegardes actives chaque jour à 03 h avec conservation 7/4/6, sur le serveur selon le choix du demandeur ; deuxième destination laissée vide. Le modèle chargé et les clés existantes ont été préservés lors de la mise en service. Voir le [mode d’emploi](lanceur/SAUVEGARDES-APPAREILS.md), le [rapport de validation](preuves/lots-0-4/VALIDATION.md) et le [contexte](CONTEXTE-PROJET.md).
 
 Livraison des lots 6/8 : EXE et APK publiés, signés avec les clés existantes, ressources incorporées vérifiées et mise à jour Android conservant profil et conversation. Le [rapport final](preuves/lots-6-8/VALIDATION.md) et le [contrôle de livraison](preuves/lots-6-8/delivery-final-check.json) rassemblent les preuves effectives. Le serveur a été rechargé sans arrêter les processus du modèle ; données, accès, clés et programmation des sauvegardes sont préservés.
 
@@ -28,6 +28,8 @@ Livraison des lots 6/8 : EXE et APK publiés, signés avec les clés existantes,
 
 Modules principaux : `lanceur/operations.py`, `workspace.py`, `notifications.py`, `remote.py`, `accounts.py`, `wireguard_access.py`, `app.py`, `lanceur/web/`, `client-qwen/`, `client-android/`.
 
+Orientation demandée le 11 octobre 2026 : faire traiter toutes les conversations clientes par Hermes, déjà installé sur ce PC, et créer automatiquement un profil Hermes à la création de chaque accès. Le [plan d’intégration Hermes/Fred](PLAN-INTEGRATION-HERMES-FRED.md) définit l’architecture, les sessions, les outils, la migration et les lots H0 à H6. L’intégration est implantée et activée, avec profil par accès, session par conversation et projet natif par projet Fred. Les essais avec le Qwen local, les clients signés et les contrôles de livraison sont dans [les preuves](preuves/hermes-fred/VALIDATION.md). Les outils système libres restent désactivés.
+
 ## Lots et dépendances
 
 | Lot | Résultat livrable | Dépendances | Statut |
@@ -41,10 +43,10 @@ Modules principaux : `lanceur/operations.py`, `workspace.py`, `notifications.py`
 | 6 | Recherche documentaire et sources améliorées | 0 ; alimentation des états de 5 | Achevé, validé et en service sur Windows et Android |
 | 7 | Messages vocaux et lecture des réponses | 0, 4, 5 | Dictée Windows/Android et conversation Windows livrées ; conversation Android différée |
 | 8 | Notifications persistantes et livraison aux appareils | 4 ; socle d’événements de 5 ; événements de 6, puis 7 quand implanté | Achevé, validé et en service ; livraison connectée et rattrapage |
-| 9 | Outils serveur et validation des actions | 4, 5, 6, 8 | Expliqué, planifié ; implantation non demandée |
+| 9 | Outils serveur et validation des actions | 4, 5, 6, 8 | Outils Fred contrôlés via Hermes livrés ; outils système et actions externes différés |
 | 10 | Récupération complète, compatibilité et livraison globale | 1 à 9 | Planifié |
 
-L’ordre initial était 0 → 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10. La demande actuelle priorise **6 et 8 en parallèle**, avec le socle d’événements strictement nécessaire ; le tableau de bord complet reste planifié ; la dictée locale et la conversation Windows sont livrées. Chaque lot a sa propre validation ; le lot 10 vérifiera tous les axes ensemble.
+L’ordre initial était 0 → 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10. La demande initiale a priorisé **6 et 8 en parallèle**, avec le socle d’événements strictement nécessaire ; le tableau de bord complet reste planifié ; la dictée locale et la conversation Windows sont livrées. Chaque lot a sa propre validation ; le lot 10 vérifiera tous les axes ensemble.
 
 ## Lot 0 — fondations et inventaire
 

@@ -92,8 +92,8 @@
     "bytes": 103
   },
   "build-info.json": {
-    "sha256": "f74fb7857a7afe35d92cf732d8b30e744875f39e5606faf7b7fc0d0105feef41",
-    "bytes": 1024
+    "sha256": "fe59aa2d4ea66d61b932c4ba5628143072517052e44a9ba3aff1cb4958420030",
+    "bytes": 1007
   },
   "conversation-worker/_internal/onnxruntime/tools/onnxruntime_test.py": {
     "sha256": "4afaa0c2b8e22297ffbec65f1e6904fc53d72640c0d7c999a70628ca332fe60d",
@@ -224,8 +224,8 @@
     "bytes": 69049
   },
   "licenses/conversation/onnxruntime/LICENSE": {
-    "sha256": "c250d6278f0b47a6439fb7592b08b58a55eb9f535aa49a1db63211c3f982b674",
-    "bytes": 1094
+    "sha256": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c",
+    "bytes": 1073
   },
   "conversation-worker/_internal/numpy-2.2.6.dist-info/RECORD": {
     "sha256": "2cd98b1d3a3679681ff2ecaa1fca7897e12db89af4de31d343b3310c8065bd35",
@@ -320,8 +320,8 @@
     "bytes": 4209
   },
   "licenses/conversation/sherpa-onnx-core/VERSION.txt": {
-    "sha256": "c70f965665545d007cf72695f8c6f8dbebd4e226e01b28bab2e2513033fbe630",
-    "bytes": 25
+    "sha256": "8bb4cc6ebad14d50d6296a71c43e3d1b989abd2e083b0354886c9259b2bcfe7e",
+    "bytes": 24
   },
   "conversation-worker/_internal/onnxruntime/transformers/quantize_helper.py": {
     "sha256": "c1ca6d310e11892675f038613c5019f006caadb371fbe5068fadd2ea50553a28",
@@ -512,8 +512,8 @@
     "bytes": 3806
   },
   "licenses/conversation/numpy/LICENSE.md": {
-    "sha256": "b4bc2f4fa1c95778f1ed3dd8f14706bece399475b978f9f34b5d3cd72521b48a",
-    "bytes": 3582
+    "sha256": "103166b62b80443afb9eb3488e052ea06be0cff566b908f199e561fde49af19f",
+    "bytes": 3511
   },
   "conversation-worker/_internal/onnxruntime/capi/onnxruntime_collect_build_info.py": {
     "sha256": "b03f19d92d794074afb8ed63eed82a24a78e44351ab70cd49b3bc2f148fd7003",
@@ -536,8 +536,8 @@
     "bytes": 7831
   },
   "licenses/conversation/numpy/LICENSE.txt": {
-    "sha256": "d544761558b510866c21f7e8a2d5716fca76e0b98117e3b6b86314db7244d150",
-    "bytes": 1039
+    "sha256": "fbc539f47d0cf83bc61378080fb873d5c14630126cacbfe754035c3926daa5ec",
+    "bytes": 1018
   },
   "conversation-worker/_internal/onnxruntime/quantization/operators/softmax.py": {
     "sha256": "7b74e154e8764c6d41f25b86eb15a4a13fe109dbec3118ef4e54e37bc096f984",
@@ -648,7 +648,7 @@
     "bytes": 27294
   },
   "conversation-worker/_internal/base_library.zip": {
-    "sha256": "20e08638394a47f888935f1e42837d798664c08de2a294a06dceb0beda7a98e9",
+    "sha256": "f8cb248c1893e0170f0381b40f7253b401e2c1c1c2919fdfbad1c931689c30b3",
     "bytes": 1333490
   },
   "conversation-worker/_internal/onnxruntime/tools/qdq_helpers/__init__.py": {
@@ -788,8 +788,8 @@
     "bytes": 2490
   },
   "licenses/conversation/sherpa-onnx-core/LICENSE": {
-    "sha256": "3ddf9be5c28fe27dad143a5dc76eea25222ad1dd68934a047064e56ed2fa40c5",
-    "bytes": 11560
+    "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "bytes": 11358
   },
   "conversation-worker/_internal/onnxruntime/tools/mobile_helpers/usability_checker.py": {
     "sha256": "b04693f34f98c0dc14c506debf747647333369a191d3ab2519d26e529b927517",
@@ -844,8 +844,8 @@
     "bytes": 1031
   },
   "licenses/conversation/numpy/VERSION.txt": {
-    "sha256": "f4bfcfcc7af63d62b947b454f2aee5332265b299ff17cfb8b2a57f99e0171a6d",
-    "bytes": 13
+    "sha256": "d7da8fbec6ebcedaf6caa03a88a9c59782d4c65cc2146042b48100d3834ba89e",
+    "bytes": 12
   },
   "ggml-cpu-sandybridge.dll": {
     "sha256": "8f4384b39a3e2fd9e09debf0d4f5311fea3fb97bb4ff6436e6c43e25c3a44aa4",
@@ -1092,8 +1092,8 @@
     "bytes": 59696
   },
   "licenses/conversation/onnxruntime/VERSION.txt": {
-    "sha256": "b0c2ee60944f5dbf9a3d7a6cc7a6204c193be61084af60a9417c38ac0931b81d",
-    "bytes": 20
+    "sha256": "60c8147709ee9bd504c09fad9d784fd66d808aa55ce9cd624520a2d085e3e13c",
+    "bytes": 19
   },
   "conversation-worker/_internal/onnxruntime/transformers/models/t5/t5_encoder.py": {
     "sha256": "c528f2f409ac70c772083cd29febf9f715ea4badf8940b35126b0952c05a0741",
@@ -1112,8 +1112,8 @@
     "bytes": 22468
   },
   "licenses/conversation/sherpa-onnx/VERSION.txt": {
-    "sha256": "84b0bd2c64b382081c67483262dd6d70785947661f3c825b6e6d6013341eb06f",
-    "bytes": 20
+    "sha256": "97b36f93cebcb3e70f91cdf9c50a1e15b3d1445dc6d35a54bfcf315035640480",
+    "bytes": 19
   },
   "ggml-cpu-cannonlake.dll": {
     "sha256": "9523dcd64ee647041825dde312ef475ac7037898a647d2ea409ca3587eb9b83f",
@@ -1360,8 +1360,8 @@
     "bytes": 31064
   },
   "licenses/conversation/numpy/LICENSE": {
-    "sha256": "d78dbb208b80d92b4d333e41a4baae50d12444f46e53199fa7726a91de6e2da7",
-    "bytes": 1616
+    "sha256": "05f3b88351988ecfad10abe92c0c50e5875c6452d5009a0084cc291551ffcca6",
+    "bytes": 1593
   },
   "conversation-worker/_internal/sherpa_onnx-1.13.8.dist-info/METADATA": {
     "sha256": "a7d15d519c40063fc92210cc4e28e557371a9ad01074b238b4930bd5f62626de",
@@ -1420,7 +1420,7 @@
     "bytes": 93696
   },
   "ggml-base.dll": {
-    "sha256": "5a65ece8bbf66c671cd7c5ba68620dce11636fdad1fe969ca6bb259591cd4022",
+    "sha256": "93a26c89c7f3a35dafe38169b6adeb18a8a21f922ec5b48f61110df2398f94f4",
     "bytes": 864256
   },
   "conversation-worker/_internal/onnxruntime/transformers/models/sam2/mask_decoder.py": {
@@ -1888,8 +1888,8 @@
     "bytes": 8003376
   },
   "licenses/conversation/sherpa-onnx/LICENSE": {
-    "sha256": "3ddf9be5c28fe27dad143a5dc76eea25222ad1dd68934a047064e56ed2fa40c5",
-    "bytes": 11560
+    "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "bytes": 11358
   },
   "conversation-worker/_internal/_ssl.pyd": {
     "sha256": "35ef17999c0981408ebc0b7bf0efe0fe7ee1c238bcf10cba49bedfd22e50aa26",

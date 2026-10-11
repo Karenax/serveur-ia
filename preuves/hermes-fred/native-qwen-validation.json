@@ -1,0 +1,111 @@
+{
+  "scope": "isolated-synthetic-fixture",
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "model_port": 8080,
+  "started_epoch": 1791731799.0100286,
+  "checks": {
+    "native_mcp_tool_executed": true,
+    "native_session_continuity": true,
+    "native_tool_history_persisted": true,
+    "native_project_mirrored": true,
+    "accounts_isolated_same_conversation_id": true,
+    "native_document_search_executed": true,
+    "document_sources_delivered": true,
+    "all_turns_completed": true,
+    "profile_creation_automatic": true,
+    "production_configuration_untouched": true
+  },
+  "turns": [
+    {
+      "owner": "A",
+      "seconds": 38.14,
+      "status": "completed",
+      "output": "Le calcul (24680+13579)*3 donne 114777, et votre identifiant de validation est MARQUEUR-AZUR-7319.",
+      "sources": [],
+      "session": "fred-a4562b150ac2fcb399bd65d3fafafe6d",
+      "run": "run_4e78d2bab98f45d89e86942cbe0b131d",
+      "request": "b45b49b9c3546a93c12550170b1e29b4",
+      "tools": [
+        "fred_calculate"
+      ]
+    },
+    {
+      "owner": "A",
+      "seconds": 5.547,
+      "status": "completed",
+      "output": "Votre identifiant de validation est MARQUEUR-AZUR-7319 et le résultat du calcul (24680+13579)*3 était 114777.",
+      "sources": [],
+      "session": "fred-a4562b150ac2fcb399bd65d3fafafe6d",
+      "run": "run_c747611fed8640049c8055a7f0cbf446",
+      "request": "583e908b7d755d60758dd2f1f949f151",
+      "tools": []
+    },
+    {
+      "owner": "B",
+      "seconds": 45.922,
+      "status": "completed",
+      "output": "Je ne le connais pas. J'ai interrogé ma mémoire et l'historique des conversations (recherches sur « identifiant de validation ») sans aucun résultat — aucune conversation précédente contenant cet identifiant n'est enregistrée dans mon périmètre. Si vous me le redonnez, je peux le noter.",
+      "sources": [],
+      "session": "fred-485c3f5e2e8691427976f35b2f1c20a2",
+      "run": "run_69f3795cdaa64d95a847cb7f8ea51122",
+      "request": "77cebc791a606fe5eb450ab7eedd5c68",
+      "tools": [
+        "fred_knowledge_search",
+        "fred_knowledge_search"
+      ]
+    },
+    {
+      "owner": "A",
+      "seconds": 52.844,
+      "status": "completed",
+      "output": "Code trouvé : DOCUMENT-ORANGE-4821\n\nSource : « Référence de validation » (document c8ec19bd2b01777dcad0ac5dd83ff0fb, version 1, révision 1 ; page non indiquée dans la source).",
+      "sources": [
+        {
+          "document": "c8ec19bd2b01777dcad0ac5dd83ff0fb",
+          "excerpt_hash": "6c557f847b3e5e006eac58baf5e5ad63b778f317ed136a539cac8e07a2a78e24",
+          "page": null,
+          "project": "6841fc58d6d8035c9bd3b06211553232",
+          "revision": 1,
+          "source_id": "053606e5c9519c7cab8473609801bfe381a5033ec974dab23ba9c9e7f5713c0a",
+          "status": "current",
+          "text": "Le code documentaire du projet est DOCUMENT-ORANGE-4821.",
+          "title": "Référence de validation",
+          "version": 1
+        }
+      ],
+      "session": "fred-3687a9ca7aecdaedc93c7f866e4efb3c",
+      "run": "run_f8688df1445a41359ffc763f9f07b252",
+      "request": "484816363c12fa200ad23bb45e7d7219",
+      "tools": [
+        "fred_document_search"
+      ]
+    }
+  ],
+  "source_commit": "1cb26bf248e150f715ce8a487fdef2a2bef6b541",
+  "native_tool_names": [
+    "mcp__fred__fred_calculate"
+  ],
+  "tools": [
+    {
+      "owner": "A",
+      "name": "fred_calculate",
+      "project": true
+    },
+    {
+      "owner": "B",
+      "name": "fred_knowledge_search",
+      "project": false
+    },
+    {
+      "owner": "B",
+      "name": "fred_knowledge_search",
+      "project": false
+    },
+    {
+      "owner": "A",
+      "name": "fred_document_search",
+      "project": true
+    }
+  ],
+  "completed_epoch": 1791731967.6214597
+}

@@ -1,4 +1,4 @@
-Accès serveur Fred — version 3.5.21
+Accès serveur Fred — version 3.5.22
 
 WireGuard utilise un emplacement permanent dans %LOCALAPPDATA%\AccesServeurFred\WireGuard.
 Windows conserve ainsi l'autorisation entre les lancements. Une première autorisation
@@ -157,3 +157,19 @@ La rubrique Notifications retrouve vos alertes de tâches et documents sur le
 serveur. Lecture, préférences par type et rattrapage sont synchronisés.
 Les sauvegardes du serveur incluent cette boîte. Voir le mode d'emploi
 ../lanceur/RECHERCHE-NOTIFICATIONS.md et les preuves ../preuves/lots-6-8/VALIDATION.md.
+
+Version 3.5.22 : chaque conversation est traitée par Hermes sur le serveur,
+avec un profil par accès et une session par discussion. Les recherches et
+outils apparaissent comme progression ; leurs commentaires ne sont pas lus
+par la voix. Une action demandant votre accord présente son effet et les choix
+Autoriser cette action ou Refuser. Une autorisation ne vaut que pour cette
+action. Les réponses finalisées sont retrouvées après une coupure de connexion,
+sans relancer le travail. Le correcteur utilise également Hermes.
+Un accord en attente est retrouvé après la réouverture du client, en conservant
+la conversation et le projet concernés.
+
+Le client annonce le protocole conversationnel 4. Les profils et manifestes
+de mise à jour au format 3 restent acceptés pour conserver les accès et
+permettre aux anciennes versions de télécharger la nouvelle application.
+Une indisponibilité de Hermes est signalée par le serveur ; les copies locales
+chiffrées et les mécanismes de mise à jour sont conservés.

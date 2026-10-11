@@ -113,7 +113,7 @@ func runServer(cfg Config, decoder *json.Decoder) error {
 	proxy := &httputil.ReverseProxy{FlushInterval: -1, ErrorLog: log.New(io.Discard, "", 0),
 		Rewrite: func(r *httputil.ProxyRequest) {
 			r.SetURL(target)
-			r.Out.Header = http.Header{"Authorization": {r.In.Header.Get("Authorization")}, "Content-Type": {"application/json"}, "X-Qwen-Session": {r.In.Header.Get("X-Qwen-Session")}, "X-Qwen-Request": {r.In.Header.Get("X-Qwen-Request")}}
+			r.Out.Header = http.Header{"Authorization": {r.In.Header.Get("Authorization")}, "Content-Type": {"application/json"}, "X-Qwen-Session": {r.In.Header.Get("X-Qwen-Session")}, "X-Qwen-Request": {r.In.Header.Get("X-Qwen-Request")}, "X-Fred-Agent-Protocol": {r.In.Header.Get("X-Fred-Agent-Protocol")}}
 		},
 		ErrorHandler: func(w http.ResponseWriter, r *http.Request, e error) {
 			w.Header().Set("Content-Type", "application/json")
@@ -127,7 +127,7 @@ func runServer(cfg Config, decoder *json.Decoder) error {
 			http.Error(w, "Accès refusé", 403)
 			return
 		}
-		if !((r.Method == "GET" && (r.URL.Path == "/v1/history" || r.URL.Path == "/v1/workspace" || r.URL.Path == "/v1/notifications" || r.URL.Path == "/v1/models" || r.URL.Path == "/v1/status" || r.URL.Path == "/v1/voice/status" || r.URL.Path == "/v1/client/release" || r.URL.Path == "/v1/client/download" || r.URL.Path == "/v1/client/android/release" || r.URL.Path == "/v1/client/android/download")) || (r.Method == "POST" && (r.URL.Path == "/v1/device" || r.URL.Path == "/v1/history" || r.URL.Path == "/v1/workspace/action" || r.URL.Path == "/v1/notifications/action" || r.URL.Path == "/v1/chat/completions" || r.URL.Path == "/v1/context" || r.URL.Path == "/v1/cancel" || r.URL.Path == "/v1/voice/speech" || r.URL.Path == "/v1/voice/cancel"))) {
+		if !((r.Method == "GET" && (r.URL.Path == "/v1/history" || r.URL.Path == "/v1/workspace" || r.URL.Path == "/v1/notifications" || r.URL.Path == "/v1/models" || r.URL.Path == "/v1/status" || r.URL.Path == "/v1/agent/state" || r.URL.Path == "/v1/voice/status" || r.URL.Path == "/v1/client/release" || r.URL.Path == "/v1/client/download" || r.URL.Path == "/v1/client/android/release" || r.URL.Path == "/v1/client/android/download")) || (r.Method == "POST" && (r.URL.Path == "/v1/device" || r.URL.Path == "/v1/history" || r.URL.Path == "/v1/workspace/action" || r.URL.Path == "/v1/notifications/action" || r.URL.Path == "/v1/chat/completions" || r.URL.Path == "/v1/context" || r.URL.Path == "/v1/cancel" || r.URL.Path == "/v1/agent/action" || r.URL.Path == "/v1/voice/speech" || r.URL.Path == "/v1/voice/cancel"))) {
 			http.NotFound(w, r)
 			return
 		}
@@ -273,7 +273,7 @@ func run() error {
 		Transport: transport, FlushInterval: -1, ErrorLog: log.New(io.Discard, "", 0),
 		Rewrite: func(r *httputil.ProxyRequest) {
 			r.SetURL(target)
-			r.Out.Header = http.Header{"Authorization": {"Bearer " + cfg.APIToken}, "Content-Type": {"application/json"}, "X-Qwen-Session": {r.In.Header.Get("X-Qwen-Session")}, "X-Qwen-Request": {r.In.Header.Get("X-Qwen-Request")}}
+			r.Out.Header = http.Header{"Authorization": {"Bearer " + cfg.APIToken}, "Content-Type": {"application/json"}, "X-Qwen-Session": {r.In.Header.Get("X-Qwen-Session")}, "X-Qwen-Request": {r.In.Header.Get("X-Qwen-Request")}, "X-Fred-Agent-Protocol": {r.In.Header.Get("X-Fred-Agent-Protocol")}}
 		},
 		ErrorHandler: func(w http.ResponseWriter, r *http.Request, e error) {
 			w.Header().Set("Content-Type", "application/json")
@@ -322,7 +322,7 @@ func run() error {
 			json.NewEncoder(w).Encode(status)
 			return
 		}
-		if r.URL.RawQuery != "" || !((r.Method == "GET" && (r.URL.Path == "/v1/history" || r.URL.Path == "/v1/workspace" || r.URL.Path == "/v1/notifications" || r.URL.Path == "/v1/models" || r.URL.Path == "/v1/status" || r.URL.Path == "/v1/voice/status" || r.URL.Path == "/v1/client/release" || r.URL.Path == "/v1/client/download" || r.URL.Path == "/v1/client/android/release" || r.URL.Path == "/v1/client/android/download")) || (r.Method == "POST" && (r.URL.Path == "/v1/device" || r.URL.Path == "/v1/history" || r.URL.Path == "/v1/workspace/action" || r.URL.Path == "/v1/notifications/action" || r.URL.Path == "/v1/chat/completions" || r.URL.Path == "/v1/context" || r.URL.Path == "/v1/cancel" || r.URL.Path == "/v1/voice/speech" || r.URL.Path == "/v1/voice/cancel"))) {
+		if r.URL.RawQuery != "" || !((r.Method == "GET" && (r.URL.Path == "/v1/history" || r.URL.Path == "/v1/workspace" || r.URL.Path == "/v1/notifications" || r.URL.Path == "/v1/models" || r.URL.Path == "/v1/status" || r.URL.Path == "/v1/agent/state" || r.URL.Path == "/v1/voice/status" || r.URL.Path == "/v1/client/release" || r.URL.Path == "/v1/client/download" || r.URL.Path == "/v1/client/android/release" || r.URL.Path == "/v1/client/android/download")) || (r.Method == "POST" && (r.URL.Path == "/v1/device" || r.URL.Path == "/v1/history" || r.URL.Path == "/v1/workspace/action" || r.URL.Path == "/v1/notifications/action" || r.URL.Path == "/v1/chat/completions" || r.URL.Path == "/v1/context" || r.URL.Path == "/v1/cancel" || r.URL.Path == "/v1/agent/action" || r.URL.Path == "/v1/voice/speech" || r.URL.Path == "/v1/voice/cancel"))) {
 			http.NotFound(w, r)
 			return
 		}

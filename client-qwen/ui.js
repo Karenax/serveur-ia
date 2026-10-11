@@ -118,14 +118,14 @@ for(const name of ['opencode','hermes'])$('integration-'+name).onclick=async()=>
   }catch(e){$('integration-result').textContent=e.message;}
   finally{uiIntegrationPending=false;uiIntegrationButtons();}
 };
-const uiConnectionPhases={requesting:'Envoi de la demande',queued:'En attente du moteur',waiting_model:'Calcul en cours',thinking:'Réflexion en cours',answering:'Rédaction de la réponse',complete:'Réponse terminée',interrupted:'Réponse interrompue'};
+const uiConnectionPhases={requesting:'Envoi de la demande',queued:'En attente du moteur',waiting_model:'Calcul en cours',thinking:'Réflexion en cours',answering:'Rédaction de la réponse',working:'Préparation de la réponse',tool:'Utilisation des outils',approval:'Accord nécessaire',stopping:'Arrêt en cours',complete:'Réponse terminée',interrupted:'Réponse interrompue'};
 const uiConnectionEvents={endpoint_selected:'Adresse sélectionnée',wireguard_started:'Nouveau tunnel WireGuard',connection_probe:'Vérification de connexion',connection_failed:'Échec de connexion',server_response:'Réponse du serveur',generation_complete:'Génération terminée',generation_interrupted:'Flux interrompu'};
 function uiConnectionStatus(state=uiLastConnection){
   uiLastConnection=state;const phase=busy?(replyProgress.phase||state.stream?.phase||'requesting'):null;
   uiIntegrationButtons();
   uiLoadedModel(state.connected?(state.model||config.model):'',state.code);
   const https=state.transport==='https';
-  let label=phase?uiConnectionPhases[phase]:state.checking?(https?'Vérification HTTPS':'Vérification WireGuard'):connected?'Connecté au serveur IA':'Connexion indisponible';
+  let label=phase?(uiConnectionPhases[phase]||'Préparation de la réponse'):state.checking?(https?'Vérification HTTPS':'Vérification WireGuard'):connected?'Connecté au serveur IA':'Connexion indisponible';
   const elapsed=busy?Math.max(0,Math.round((Date.now()-(replyProgress.started||Date.now()))/1000)):0;
   const silence=busy?Math.max(0,Math.round((Date.now()-(replyProgress.lastEvent||Date.now()))/1000)):0;
   if(busy)label+=' · '+elapsed+' s';if(busy&&silence>=45)label='Flux silencieux · '+silence+' s';

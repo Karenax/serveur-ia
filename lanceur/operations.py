@@ -1,5 +1,6 @@
 """Local operations; encrypted portable backups and opt-in startup."""
 import base64
+from contextlib import contextmanager
 import hashlib
 import json
 import os
@@ -12,8 +13,8 @@ import time
 from cryptography.fernet import Fernet, InvalidToken
 from core import ROOT, HOME, PYTHON, HIDDEN, read_json, write_json
 
-VERSION = '3.5.21'
-FILES = ['reglages.json', 'reglages-par-defaut.json', 'derniers-reglages-valides.json', 'base-strata.json', 'acces-distants.json', 'wireguard.json', 'comptes.json', 'exploitation.json', 'voix.json']
+VERSION = '3.5.22'
+FILES = ['reglages.json', 'reglages-par-defaut.json', 'derniers-reglages-valides.json', 'base-strata.json', 'acces-distants.json', 'wireguard.json', 'comptes.json', 'exploitation.json', 'voix.json', 'hermes-integration.json']
 
 def cipher(password, salt):
     if not isinstance(password, str) or not 12 <= len(password) <= 1024:
@@ -36,10 +37,152 @@ class Operations:
         self.attempts = [t for t in read_json(controller.home/'relances.json', []) if time.time()-t<3600]
         self.desired = False
         self.last_error = ''
+        self.hermes_lock = threading.RLock()
+        self.hermes_pause = None
         from backups import BackupManager
         from restoration import RestoreManager
         self.backups = BackupManager(controller)
         self.restorations = RestoreManager(controller)
+
+    @contextmanager
+    def _hermes_quiesce_lock(self, restoring):
+        if restoring:
+            # Active model calls may still need the controller while stopping.
+            with self.hermes_lock: yield
+            return
+        token = self.hermes_pause
+        if token is not None and token['thread'] != threading.get_ident():
+            raise ValueError('Une sauvegarde ou restauration Hermes est déjà en cours.')
+        # Legacy synchronous commands already own the controller lock. Follow
+        # their order, but never retain it while waiting for restore admission.
+        with self.controller.lock:
+            if not self.hermes_lock.acquire(blocking=False):
+                raise ValueError('Une sauvegarde ou restauration Hermes est déjà en cours.')
+            try: yield
+            finally: self.hermes_lock.release()
+
+    def hermes_quiesce(self, restoring=False):
+        """Freeze profile writers before snapshots; close the facade for restore."""
+        with self._hermes_quiesce_lock(restoring):
+            if self.hermes_pause is not None:
+                if self.hermes_pause['thread'] != threading.get_ident():
+                    raise ValueError('Une sauvegarde ou restauration Hermes est déjà en cours.')
+                self.hermes_pause['depth'] += 1
+                return self.hermes_pause
+            facade = getattr(self.controller, 'hermes', None)
+            if facade is None: return None
+            facade.lock.acquire()
+            accounts_lock = getattr(facade.accounts, 'lock', None)
+            token = {'facade': facade, 'started': bool(facade.started), 'depth': 1, 'thread': threading.get_ident(),
+                     'restoring': restoring, 'admission_paused': getattr(facade.conversations, 'admission_paused', False),
+                     'accounts_lock': accounts_lock, 'accounts_acquired': False, 'snapshot_locks': []}
+            try:
+                with facade.conversations.lock:
+                    if facade.conversations.active and not restoring:
+                        raise ValueError('Attendez la fin des conversations avant de sauvegarder Hermes.')
+                    facade.conversations.admission_paused = True
+                if not restoring:
+                    c = self.controller
+                    # Preserve the Fred lock order: revocation holds remote's
+                    # lock before updating Workspace jobs.
+                    for lock in (c.lock, c.wireguard.lock, c.remote.lock, c.remote.accounts.lock):
+                        lock.acquire(); token['snapshot_locks'].append(lock)
+                    # Native project mirroring writes files outside Hermes runs.
+                    # Keep its lock before Workspace's lock to follow its own order.
+                    projects = getattr(facade, 'projects', None)
+                    for lock in ([projects.lock] if projects else []) + [c.remote.workspace.lock]:
+                        lock.acquire(); token['snapshot_locks'].append(lock)
+                    if c.remote.workspace.running:
+                        raise ValueError('Attendez la fin des tâches avant de sauvegarder Hermes.')
+                # The native supervisor takes service -> accounts while
+                # rebuilding its profiles, so a snapshot follows that order.
+                service_lock = getattr(facade.service, 'lock', None)
+                if service_lock:
+                    service_lock.acquire(); token['snapshot_locks'].append(service_lock)
+                if restoring:
+                    facade.close()
+                    deadline = time.monotonic() + 40
+                    while True:
+                        with facade.conversations.lock: active = bool(facade.conversations.active)
+                        if not active: break
+                        if time.monotonic() >= deadline:
+                            raise ValueError('Les conversations Hermes ne sont pas encore arrêtées ; restauration refusée.')
+                        time.sleep(.05)
+                    # A run may still be binding its native project while it
+                    # unwinds; only freeze project writers after it has exited.
+                    projects = getattr(facade, 'projects', None)
+                    if projects:
+                        projects.lock.acquire(); token['snapshot_locks'].append(projects.lock)
+                if accounts_lock:
+                    accounts_lock.acquire(); token['accounts_acquired'] = True
+                if not restoring: facade.service.close()
+                self.hermes_pause = token
+                return token
+            except BaseException:
+                if restoring:
+                    # The restore coordinator rebuilds the closed facade even
+                    # when preparation fails before a journal is applied.
+                    self.hermes_pause = token
+                    raise
+                facade.conversations.admission_paused = token['admission_paused']
+                if token['accounts_acquired']: accounts_lock.release()
+                for lock in reversed(token['snapshot_locks']): lock.release()
+                facade.lock.release()
+                raise
+
+    def hermes_resume(self, token, restored=False):
+        with self.hermes_lock:
+            if token is not None and not token.get('released'):
+                token['depth'] -= 1
+                if token['depth'] > 0: return
+            try:
+                if restored:
+                    c = self.controller
+                    callback = getattr(c, 'recreate_hermes', None)
+                    start = bool(token and token['started'])
+                    if callback:
+                        callback(start=start)
+                    else:
+                        from hermes_fred import HermesFred, configured
+                        config = configured(c.home)
+                        facade = HermesFred(c.remote, c.remote_backend, port=config.get('port', 8643),
+                                            private_port=config.get('private_port', 8768)) if config else None
+                        c.hermes = c.remote.hermes = c.remote.workspace.hermes = facade
+                        if facade and start: facade.start()
+                elif token is not None:
+                    facade = token['facade']
+                    try:
+                        if token['started']: facade.service.start()
+                    finally:
+                        facade.conversations.admission_paused = token['admission_paused']
+            finally:
+                if token is not None:
+                    if not token.get('released'):
+                        if token['accounts_acquired']: token['accounts_lock'].release()
+                        for lock in reversed(token['snapshot_locks']): lock.release()
+                        token['facade'].lock.release()
+                self.hermes_pause = None
+
+    def hermes_release_closed(self, token):
+        """A failed restore stays closed but recovery may run on another thread."""
+        with self.hermes_lock:
+            if token is not None and not token.get('released'):
+                if token['accounts_acquired']: token['accounts_lock'].release()
+                for lock in reversed(token['snapshot_locks']): lock.release()
+                token['facade'].lock.release()
+                token['released'] = True
+            self.hermes_pause = None
+
+    @contextmanager
+    def hermes_snapshot(self):
+        token = self.hermes_quiesce()
+        try: yield
+        finally: self.hermes_resume(token)
+
+    def hermes_export(self, owners):
+        from hermes_backup import HermesBackup
+        root = self.controller.home / 'hermes-fred'
+        return HermesBackup(root).export(owners) if root.exists() else None
 
     def settings(self):
         return read_json(self.path, {'autoload': False, 'restart': False})
@@ -134,7 +277,7 @@ class Operations:
 
     def backup(self, password):
         c = self.controller
-        with c.lock, c.wireguard.lock, c.remote.lock, c.remote.workspace.lock:
+        with self.hermes_snapshot(), c.lock, c.wireguard.lock, c.remote.lock, c.remote.workspace.lock:
             content = {name:read_json(c.home/name) for name in FILES if (c.home/name).exists()}
             registered = registered_profile_ids(content)
             if c.wireguard.vault_path.exists(): content['vault'] = c.wireguard.vault()
@@ -159,6 +302,8 @@ class Operations:
                                 f.seek(-16-size, 2); profiles[exe.stem]=json.loads(f.read(size))
             content['profiles']=profiles
             content['workspace']=c.remote.workspace.backup()
+            hermes = self.hermes_export(registered)
+            if hermes is not None: content['hermes'] = hermes
             web_key=c.home/'recherche-web.dpapi'
             if web_key.exists():content['web_key']=base64.b64encode(protect(web_key.read_bytes(),decrypt=True)).decode()
             salt=secrets.token_bytes(16)
@@ -189,7 +334,7 @@ class Operations:
         try: package=json.loads(cipher(data.get('password'),blob[11:27]).decrypt(blob[27:]))
         except (InvalidToken, ValueError): raise ValueError('Sauvegarde invalide ou phrase incorrecte.')
         files=package.get('files',{})
-        if package.get('version') != 1 or not isinstance(files,dict) or set(files)-set(FILES+['vault','profiles','signing_seed','workspace','web_key']):
+        if package.get('version') != 1 or not isinstance(files,dict) or set(files)-set(FILES+['vault','profiles','signing_seed','workspace','web_key','hermes']):
             raise ValueError('Contenu de sauvegarde invalide.')
         from core import validate
         for name in ('reglages.json','reglages-par-defaut.json'):
@@ -223,6 +368,9 @@ class Operations:
             from profiles import validate_access,match,public_key
             access=validate_access(files['acces-distants.json']) if 'acces-distants.json' in files else {'clients':[]}
             records={record['id']:record for record in access['clients']+access.get('deleted_clients',[])}
+            from hermes_backup import HermesBackup
+            hermes_backup = HermesBackup(c.home / 'hermes-fred')
+            if 'hermes' in files: hermes_backup.validate(files['hermes'], set(records))
             workspace_raw=c.remote.workspace.validate_backup(files['workspace'],set(records)) if 'workspace' in files else None
             web_raw=base64.b64decode(files['web_key'],validate=True) if 'web_key' in files else None
             if web_raw is not None and not 1<=len(web_raw)<=500:raise ValueError('Clé de recherche sauvegardée invalide.')
@@ -245,6 +393,8 @@ class Operations:
             targets=[c.home/name for name in FILES]+[c.wireguard.vault_path,c.wireguard.directory/'profils-restaures.dpapi',c.wireguard.directory/'signature.dpapi',c.home/'recherche-web.dpapi']
             originals={path:path.read_bytes() if path.exists() else None for path in targets}
             original_workspace=c.remote.workspace.backup()
+            original_owners=registered_profile_ids({name:read_json(c.home/name) for name in FILES if (c.home/name).exists()})
+            original_hermes=self.hermes_export(original_owners)
             old_desired=self.desired;self.desired=False
             try:
                 for name in FILES:
@@ -256,12 +406,16 @@ class Operations:
                 (c.wireguard.directory/'profils-restaures.dpapi').write_bytes(protect(json.dumps(files.get('profiles',{})).encode()))
                 if seed is not None:(c.wireguard.directory/'signature.dpapi').write_bytes(protect(seed))
                 if workspace_raw is not None:c.remote.workspace.restore(workspace_raw)
+                if 'hermes' in files or original_hermes is not None:
+                    hermes_backup.restore(files.get('hermes', {'version': 1, 'files': {}}), set(records))
                 if web_raw is not None:(c.home/'recherche-web.dpapi').write_bytes(protect(web_raw))
                 elif 'workspace' in files:(c.home/'recherche-web.dpapi').unlink(missing_ok=True)
                 c.base=read_json(c.base_path)
                 with c.remote.accounts.lock:c.remote.accounts.sessions.clear();c.remote.accounts.failures.clear()
             except Exception:
                 c.remote.workspace.restore(base64.b64decode(original_workspace))
+                if original_hermes is not None or 'hermes' in files:
+                    hermes_backup.restore(original_hermes or {'version': 1, 'files': {}}, original_owners)
                 for path,raw in originals.items():
                     if raw is None:path.unlink(missing_ok=True)
                     else:path.write_bytes(raw)

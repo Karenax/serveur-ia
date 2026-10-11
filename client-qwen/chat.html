@@ -27,12 +27,12 @@
     const storage='qwen-chat-'+config.storage;
     let messages=[],busy=false,connected=false,controller=null,requestId=null,loggedIn=false,historySyncPending=false,serverHistoryReady=false,historySaving=0;
     try{localStorage.removeItem(storage);localStorage.removeItem(storage+'-library');}catch{}
-    let networkBanner=false,modelsPending=null,lastConnectionUpdate=0,replyProgress={};
+    let networkBanner=false,modelsPending=null,lastConnectionUpdate=0,replyProgress={},agentApproval=null,agentDecisionPending=false,agentRecoveryPending=false,cancelPending=false;
     const connectionCodes=new Set(['wireguard_unreachable','tunnel_request_failed','connection_error','gateway_unavailable','access_denied','access_revoked','access_suspended','access_expired','remote_disabled','model_unloaded','no_models']);
     function connectionFailure(e){if(!connectionCodes.has(e?.code))return;connected=false;lastConnectionUpdate=Date.now();$('connection').textContent='● Connexion indisponible';$('connection').title=e.message||'';$('connection').classList.remove('online');buttons();}
     function error(value){if($('retry-without-thinking'))$('retry-without-thinking').hidden=value?.code!=='thinking_without_answer';const text=typeof value==='string'?value:value?.message;if(value?.code==='thinking_without_answer')$('retry-without-thinking').closest('details').open=true;networkBanner=connectionCodes.has(value?.code);if(networkBanner)connectionFailure(value);$('error').hidden=!text;$('error').textContent=text||'';}
     let saveTimer=null,historyWrites=Promise.resolve(),historyRevision="",historyReady=false,historyBlocked=false,endpointDirty=false,deletedConversation=null,conversationActionPending=false;
-    function conversationLocked(){return busy||Boolean(window.voiceBusy)||Boolean(window.conversationBusy)||Boolean(window.chatAttachmentLoading)||historySyncPending||conversationActionPending||!historyReady||historyBlocked;}
+    function conversationLocked(){return busy||agentRecoveryPending||Boolean(window.voiceBusy)||Boolean(window.conversationBusy)||Boolean(window.chatAttachmentLoading)||historySyncPending||conversationActionPending||!historyReady||historyBlocked;}
     function save(){
       const c=library.find(c=>c.id===currentId);if(c)c.messages=messages;
       if(!historyReady||historyBlocked)return;clearTimeout(saveTimer);saveTimer=setTimeout(()=>flushHistory().catch(()=>{}),400);
@@ -86,8 +86,8 @@
     }
     function render(){$('messages').querySelectorAll('.message').forEach(m=>m.remove());$('empty').hidden=messages.length>0;messages.forEach(draw);}
     function buttons(){for(const id of ['conversations','rename-conversation','archive-conversation','delete-conversation','undo-delete','import-conversations','retry'])$(id).disabled=conversationLocked();$('send').disabled=conversationLocked()||!connected;$('send').hidden=busy;$('cancel').hidden=!busy;$('new').disabled=conversationLocked();$('thinking').disabled=busy||!connected||Boolean(window.conversationBusy);if(typeof attachmentButtons==='function')attachmentButtons();$('prompt').readOnly=busy||Boolean(window.voiceBusy)||Boolean(window.conversationBusy)||historySyncPending||conversationActionPending;}
-    async function syncServerHistory(){
-      if(historyBlocked||busy||conversationActionPending||serverHistoryReady||historySyncPending)return;
+    async function syncServerHistory(force=false){
+      if(historyBlocked||(busy&&!force)||conversationActionPending||serverHistoryReady||historySyncPending)return;
       historySyncPending=true;buttons();drawLibrary();
       try{
         if(saveTimer)await flushHistory();else await historyWrites.catch(()=>{});
@@ -107,20 +107,61 @@
         try{
           const d=await api('/v1/models'),ids=Array.isArray(d.data)?d.data.filter(m=>m&&typeof m.id==='string'&&m.id.trim()).map(m=>m.id):[];
           if(!ids.length)throw Object.assign(new Error('Aucun modèle accessible.'),{code:'no_models'});
-          const state=await api('/v1/status');if(state.protocol>3)throw new Error('Mettre à jour Accès serveur Fred pour ce serveur.');
+          const state=await api('/v1/status');if(state.protocol>4)throw new Error('Mettre à jour Accès serveur Fred pour ce serveur.');
           if(!ids.includes(config.model))config.model=ids[0];attachmentCapabilities(d.data.find(m=>m.id===config.model)?.capabilities||{});thinkingCapabilities(d.data.find(m=>m.id===config.model)?.capabilities||{});connected=true;lastConnectionUpdate=Date.now();
           uiLoadedModel(config.model);$('model').textContent=config.model+(state.version?' · serveur '+state.version+' · client '+config.version:'');
           $('connection').textContent='● Connecté au serveur IA';$('connection').title='';$('connection').classList.add('online');
-          if(networkBanner)error('');await syncServerHistory();return true;
+          if(networkBanner)error('');await syncServerHistory();await agentRecoverTurns();return true;
         }catch(e){connected=false;config.model='';uiLoadedModel('',e.code);$('model').textContent='Aucun modèle accessible';$('connection').textContent='● Serveur indisponible';$('connection').title=e.message||'';$('connection').classList.remove('online');error(e);if(['model_unloaded','no_models'].includes(e.code))await syncServerHistory();return false;}
         finally{buttons();modelsPending=null;contextRefresh();}
       })();return modelsPending;
+    }
+    const agentApprovalPane=document.createElement('section');agentApprovalPane.id='agent-approval';agentApprovalPane.className='settings-card';agentApprovalPane.hidden=true;agentApprovalPane.setAttribute('aria-label','Action à confirmer');$('error').after(agentApprovalPane);
+    const agentApprovalTitle=document.createElement('strong');agentApprovalTitle.textContent='Votre accord est nécessaire';const agentApprovalText=document.createElement('p'),agentApprovalNotice=document.createElement('p');agentApprovalNotice.setAttribute('role','status');
+    const agentApprove=document.createElement('button'),agentDeny=document.createElement('button');agentApprove.type=agentDeny.type='button';agentApprove.id='agent-approve';agentDeny.id='agent-deny';agentApprove.className='secondary primary';agentDeny.className='secondary';agentApprove.textContent='Autoriser cette action';agentDeny.textContent='Refuser';agentApprovalPane.append(agentApprovalTitle,agentApprovalText,agentApprove,agentDeny,agentApprovalNotice);
+    function agentClearApproval(){agentApproval=null;agentApprovalPane.hidden=true;agentApprovalNotice.textContent='';}
+    function agentShowApproval(value){if(!busy||cancelPending||!value||typeof value.request_id!=='string'||typeof value.description!=='string')return;agentApproval={request_id:value.request_id,conversation_id:currentId,expires_epoch:value.expires_epoch};agentApprovalText.textContent=value.description;agentApprovalNotice.textContent='Cette autorisation vaut uniquement pour cette action.';agentApprovalPane.hidden=false;agentApprove.disabled=agentDeny.disabled=agentDecisionPending;replyProgress.phase='approval';$('queue-state').textContent='En attente de votre accord';}
+    async function agentDecide(decision){if(!agentApproval||agentDecisionPending||cancelPending)return;const action=agentApproval;if(action.expires_epoch&&Date.now()/1000>=action.expires_epoch){agentClearApproval();error('Cette demande d’accord a expiré.');return;}agentDecisionPending=true;agentApprove.disabled=agentDeny.disabled=true;try{await api('/v1/agent/action',{action:'approval',request_id:action.request_id,conversation_id:action.conversation_id,decision},{'X-Qwen-Request':requestId});if(agentApproval===action)agentClearApproval();$('queue-state').textContent=decision==='once'?'Action autorisée · reprise en cours':'Action refusée · reprise en cours';}catch(e){if(agentApproval===action)agentApprovalNotice.textContent=e.message;}finally{agentDecisionPending=false;agentApprove.disabled=agentDeny.disabled=false;}}
+    agentApprove.onclick=()=>agentDecide('once');agentDeny.onclick=()=>agentDecide('deny');
+    function agentFinal(value,answer,view){if(!value||typeof value.text!=='string'||value.status!=='completed')return false;const previous=answer.content;answer.content=value.text;if(value.text.startsWith(previous))window.conversationDelta?.(value.text.slice(previous.length));answer.reasoning_content=typeof value.reasoning_content==='string'?value.reasoning_content:'';delete answer.interrupted;renderMarkdown(view.content,answer.content);view.reasoning.textContent=answer.reasoning_content;view.details.hidden=!answer.reasoning_content;if(Array.isArray(value.sources)&&value.sources.length)workspaceShowSources(value.sources);replyProgress.phase='complete';return true;}
+    const agentActiveStatuses=new Set(['starting','running','waiting_for_approval']);
+    async function agentReconcile(answer,view,turn=requestId,conversation=currentId,initial=null){
+      if(!turn)return false;let value=initial;
+      while(true){
+        if(cancelPending||controller?.signal.aborted)throw new DOMException('Réponse arrêtée.','AbortError');
+        if(!value)value=await api('/v1/agent/action',{action:'reconcile',request_id:turn,conversation_id:conversation},{'X-Qwen-Request':turn});
+        if(value.request_id!==turn||value.conversation_id!==conversation)return false;
+        if(agentFinal(value,answer,view))return true;
+        if(!agentActiveStatuses.has(value.status)||!busy||requestId!==turn||currentId!==conversation)return false;
+        replyProgress.lastEvent=Date.now();replyProgress.agentStatus=value.status;
+        if(value.status==='waiting_for_approval'&&value.approval)agentShowApproval(value.approval);
+        else{agentClearApproval();replyProgress.phase='working';$('queue-state').textContent='Reprise de la réponse en cours';}
+        await new Promise(resolve=>setTimeout(resolve,1500));value=null;
+      }
+    }
+    async function agentRecoverTurns(){
+      if(agentRecoveryPending||busy||!connected||historyBlocked||historySyncPending)return;agentRecoveryPending=true;buttons();let recovered=false;
+      try{for(const c of library){
+        const last=c.messages.at(-1);if(!last?.turn_id||last.role==='assistant'&&!last.interrupted&&last.content&&c.id!==currentId)continue;
+        const value=await api('/v1/agent/action',{action:'reconcile',request_id:last.turn_id,conversation_id:c.id},{'X-Qwen-Request':last.turn_id});if(value.request_id!==last.turn_id||value.conversation_id!==c.id)continue;
+        if(c.id===currentId&&agentActiveStatuses.has(value.status)){
+          const answer=last.role==='assistant'?last:{role:'assistant',content:'',reasoning_content:'',turn_id:last.turn_id};if(last.role!=='assistant')c.messages.push(answer);
+          messages=c.messages;busy=true;requestId=last.turn_id;controller=new AbortController();cancelPending=false;replyProgress={phase:'working',started:Date.now(),lastEvent:Date.now()};render();drawLibrary();buttons();save();
+          const article=$('messages').querySelector('.message:last-child'),view={article,content:article.querySelector('.content'),details:article.querySelector('details'),reasoning:article.querySelector('.reasoning')};
+          try{await flushHistory();if(await agentReconcile(answer,view,last.turn_id,c.id,value))recovered=true;else answer.interrupted=true;}
+          catch(e){answer.interrupted=true;error(e.name==='AbortError'?'Réponse arrêtée.':e);}
+          finally{agentClearApproval();controller=null;cancelPending=false;$('queue-state').textContent='';save();try{await flushHistory();serverHistoryReady=false;await syncServerHistory(true);}catch(e){error(e);}busy=false;render();drawLibrary();buttons();}break;
+        }
+        if(value.status!=='completed'||typeof value.text!=='string')continue;const reasoning=typeof value.reasoning_content==='string'?value.reasoning_content:'';if(last.role==='assistant'&&!last.interrupted&&last.content===value.text&&(last.reasoning_content||'')===reasoning)continue;const answer={role:'assistant',content:value.text,reasoning_content:reasoning,turn_id:last.turn_id};if(last.role==='assistant')c.messages[c.messages.length-1]=answer;else c.messages.push(answer);recovered=true;
+      }if(recovered){messages=library.find(c=>c.id===currentId).messages;render();save();await flushHistory();}}
+      catch(e){if(e.code!=='agent_run_unknown')$('history-status').textContent='Reprise de la réponse en attente · '+e.message;}
+      finally{agentRecoveryPending=false;buttons();}
     }
     function delta(event,answer,view){
       replyProgress.lastEvent=Date.now();const queued=event.split(/\r?\n/).find(line=>line.startsWith(': qwen-queue '));if(queued){const q=JSON.parse(queued.slice(13));replyProgress.phase=q.position?'queued':'waiting_model';$('queue-state').textContent=q.position?`En attente · position ${q.position}`:'Génération en cours';return;}
       const data=event.split(/\r?\n/).filter(line=>line.startsWith('data:')).map(line=>line.slice(5).trimStart()).join('\n');
       if(data==='[DONE]'){replyProgress.phase='complete';return true;}if(!data)return false;
-      const value=JSON.parse(data);if(value.workspace_sources){workspaceShowSources(value.workspace_sources);return;}if(value.queue){$('queue-state').textContent=value.queue.position?`En attente · position ${value.queue.position}`:'Génération en cours';return;}if(value.error)throw Object.assign(new Error(value.error.message||'La génération a échoué.'),{code:value.error.code});
+      const value=JSON.parse(data);if(Array.isArray(value.workspace_sources)){workspaceShowSources(value.workspace_sources);return;}if(value.hermes_answer){const final=value.hermes_answer;if(typeof final.text==='string'){const previous=answer.content;answer.content=final.text;if(final.final===true&&final.text.startsWith(previous))window.conversationDelta?.(final.text.slice(previous.length));answer.reasoning_content=typeof final.reasoning_content==='string'?final.reasoning_content:'';queueMarkdown(view.content,answer.content);view.reasoning.textContent=answer.reasoning_content;view.details.hidden=!answer.reasoning_content;save();}return;}if(value.hermes_status){const status=value.hermes_status;replyProgress.phase=status.phase||'working';$('queue-state').textContent=typeof status.message==='string'?status.message:'Préparation de la réponse';if(status.phase!=='approval')agentClearApproval();return;}if(value.hermes_approval){agentShowApproval(value.hermes_approval);return;}if(value.hermes_run){const run=value.hermes_run;if(run.request_id===answer.turn_id){replyProgress.agentStatus=run.status;if(['completed','cancelled','failed'].includes(run.status))agentClearApproval();}return;}if(value.queue){$('queue-state').textContent=value.queue.position?`En attente · position ${value.queue.position}`:'Génération en cours';return;}if(value.error)throw Object.assign(new Error(value.error.message||'La génération a échoué.'),{code:value.error.code});
       replyProgress.lastEvent=Date.now();const choice=value.choices?.[0]||{},d=choice.delta||{};if(choice.finish_reason)replyProgress.finish=choice.finish_reason;
       if(typeof d.content==='string'&&d.content){answer.content+=d.content;replyProgress.phase='answering';window.conversationDelta?.(d.content);}
       const reason=d.reasoning_content??d.reasoning;if(typeof reason==='string'&&reason){answer.reasoning_content+=reason;replyProgress.phase='thinking';}
@@ -130,15 +171,15 @@
     $('composer').addEventListener('submit',async event=>{
       event.preventDefault();const text=$('prompt').value.trim();if((!text&&!chatAttachments.length)||attachmentLoading||busy||historyBlocked||historySyncPending||conversationActionPending||Boolean(window.voiceBusy)||(conversationLocked()&&!window.conversationSubmitting)||!connected)return;
       if(chatAttachments.some(a=>a.kind==='image')&&!chatCapabilities.images){error('Le modèle chargé ne prend pas en charge les images.');return;}
-      const userMessage={role:'user',content:text,...(chatAttachments.length?{attachments:structuredClone(chatAttachments)}:{})};
+      const turn=crypto.randomUUID().replaceAll('-','');const userMessage={role:'user',content:text,turn_id:turn,...(chatAttachments.length?{attachments:structuredClone(chatAttachments)}:{})};
       const candidate=structuredClone(library);candidate.find(c=>c.id===currentId).messages=[...messages,userMessage];
       if(new TextEncoder().encode(JSON.stringify({conversations:candidate,currentId})).length>8*1024*1024){error('Historique trop volumineux. Exportez puis supprimez des conversations.');return;}
       error('');const current=library.find(c=>c.id===currentId);if(!messages.length&&/^Conversation|^Nouvelle conversation/.test(current?.title||'')){current.title=(text||chatAttachments[0]?.name||'Pièce jointe').slice(0,70);drawLibrary();}messages.push(userMessage);chatAttachments=[];attachmentRender();$('prompt').value='';render();save();
       const history=messages.map(m=>({role:m.role,content:chatRequestContent(m),...(m.reasoning_content?{reasoning_content:m.reasoning_content}:{})}));
-      const answer={role:'assistant',content:'',reasoning_content:''};messages.push(answer);const view=draw(answer);chatScrollLatest();window.conversationOnReplyStart?.(answer);
-      replyProgress={phase:'requesting',started:Date.now(),lastEvent:Date.now()};busy=true;drawLibrary();controller=new AbortController();requestId=crypto.randomUUID().replaceAll('-','');buttons();
+      const answer={role:'assistant',content:'',reasoning_content:'',turn_id:turn};messages.push(answer);const view=draw(answer);chatScrollLatest();window.conversationOnReplyStart?.(answer);
+      replyProgress={phase:'requesting',started:Date.now(),lastEvent:Date.now()};busy=true;drawLibrary();controller=new AbortController();requestId=turn;cancelPending=false;agentClearApproval();buttons();
       try{
-        const response=await fetch('/v1/chat/completions',{method:'POST',headers:{Authorization:'Bearer '+config.key,'Content-Type':'application/json','X-Qwen-Request':requestId},signal:controller.signal,body:JSON.stringify({...workspaceFields(),model:config.model,messages:history,stream:true,reasoning_effort:thinkingEffort()})});
+        await flushHistory();const response=await fetch('/v1/chat/completions',{method:'POST',headers:{Authorization:'Bearer '+config.key,'Content-Type':'application/json','X-Qwen-Request':requestId},signal:controller.signal,body:JSON.stringify({...workspaceFields(),conversation_id:currentId,turn_id:requestId,history_revision:historyRevision,model:config.model,messages:history,stream:true,reasoning_effort:thinkingEffort()})});
         if(!response.ok){let detail;try{detail=await response.json();}catch{}throw Object.assign(new Error(detail?.error?.message||'Le serveur a refusé la requête ('+response.status+').'),{code:detail?.error?.code});}
         if(!response.headers.get('content-type')?.includes('text/event-stream')){
           const value=await response.json(),m=value.choices?.[0]?.message;if(value.error||!m)throw new Error(value.error?.message||'Réponse du serveur invalide.');answer.content=m.content||'';answer.reasoning_content=m.reasoning_content||'';renderMarkdown(view.content,answer.content);view.reasoning.textContent=answer.reasoning_content;view.details.hidden=!answer.reasoning_content;
@@ -147,11 +188,11 @@
           while(true){const {value,done}=await reader.read();pending+=done?decoder.decode():decoder.decode(value,{stream:true});const frames=pending.split(/\r?\n\r?\n/);pending=frames.pop();for(const frame of frames)completed=delta(frame,answer,view)||completed;if(done){if(pending.trim())completed=delta(pending,answer,view)||completed;if(!completed)throw new Error("Connexion interrompue : cette réponse est incomplète.");break;}}
         }
         if(!answer.content&&answer.reasoning_content)throw Object.assign(new Error('Le modèle a terminé sa réflexion sans réponse finale. Réessayez sans réflexion approfondie.'),{code:'thinking_without_answer'});if(replyProgress.finish==='length')throw new Error('Le modèle a atteint sa capacité de contexte : la réponse peut être incomplète.');
-      }catch(e){answer.interrupted=true;if(e.name==='TypeError')e.code='connection_error';error(e.name==='AbortError'?'Réponse interrompue.':e);}
-      finally{window.conversationOnReplyEnd?.(answer);$('queue-state').textContent='';if(!answer.content&&!answer.reasoning_content){messages.pop();view.article.remove();}busy=false;controller=null;save();render();drawLibrary();buttons();$('prompt').focus();models();}
+      }catch(e){let recovered=false;if(e.name!=='AbortError'&&!cancelPending)try{recovered=await agentReconcile(answer,view);}catch{}if(!recovered){answer.interrupted=true;if(e.name==='TypeError')e.code='connection_error';error(e.name==='AbortError'?'Réponse arrêtée.':e);}}
+      finally{window.conversationOnReplyEnd?.(answer);agentClearApproval();$('queue-state').textContent='';if(!answer.content&&!answer.reasoning_content){messages.pop();view.article.remove();}controller=null;cancelPending=false;save();try{await flushHistory();serverHistoryReady=false;await syncServerHistory(true);}catch(e){error(e);}busy=false;render();drawLibrary();buttons();$('prompt').focus();models();}
     });
     $('prompt').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();$('composer').requestSubmit();}});
-    $('cancel').onclick=()=>{const oldController=controller,oldId=requestId;oldController?.abort();if(oldId)fetch('/v1/cancel',{method:'POST',headers:{Authorization:'Bearer '+config.key,'Content-Type':'application/json','X-Qwen-Request':oldId},body:'{}',signal:AbortSignal.timeout(5000)}).catch(()=>{});};
+    $('cancel').onclick=async()=>{if(cancelPending||!busy)return;const oldController=controller,oldId=requestId;cancelPending=true;agentClearApproval();replyProgress.phase='stopping';$('queue-state').textContent='Arrêt en cours…';$('cancel').disabled=true;try{await api('/v1/cancel',{}, {'X-Qwen-Request':oldId});if(requestId===oldId)oldController?.abort();}catch(e){cancelPending=false;error(e);$('queue-state').textContent='Arrêt à confirmer · connexion au serveur nécessaire';}finally{$('cancel').disabled=false;}};
     $('new').onclick=()=>{if(conversationLocked())return;if(library.length>=200){error('Limite de 200 conversations atteinte. Exportez votre historique.');return;}save();currentId=crypto.randomUUID();messages=[];chatAttachments=[];attachmentRender();library.unshift({id:currentId,title:'Nouvelle conversation',messages});$('conversation-filter').value='active';save();drawLibrary();render();showView('chat');error('');$('prompt').focus();};
     async function api(path,body,headers={}){try{const r=await fetch(path,{method:body?'POST':'GET',headers:{Authorization:'Bearer '+config.key,'Content-Type':'application/json',...headers},body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(['/v1/models','/client/integrations/apply'].includes(path)?90000:['/v1/workspace/action','/client/history/sync'].includes(path)?65000:35000)});const value=await r.json();if(!r.ok){const e=new Error(value.error?.message||'Action refusée');e.status=r.status;e.code=value.error?.code;throw e;}return value;}catch(e){if(path.startsWith('/v1/')&&['TypeError','TimeoutError'].includes(e.name)){e.code='connection_error';e.message='Le serveur ne répond pas. Vérifier la connexion puis réessayer.';}connectionFailure(e);throw e;}}
     async function clientState(){try{const state=await api('/client/state');loggedIn=true;if(typeof uiApplyPreferences==='function')uiApplyPreferences(state.preferences);if(state.history&&historyReady&&!historySaving&&!historySyncPending){$('history-status').textContent=state.history.message;if(state.history.needs_merge)serverHistoryReady=false;}$('account-status').textContent='EXE personnel · connexion automatique';$('update-status').textContent=state.update.message||'';$('client-version').textContent='Accès serveur Fred '+state.version;$('update-apply').disabled=state.update.busy||!state.update.available;$('update-check').disabled=state.update.busy;$('local-api').textContent=state.local_api;$('local-api-key').value=state.key;if(!endpointDirty&&document.activeElement!==$('endpoint'))$('endpoint').value=state.endpoint;const c=state.connection;if(c?.connection_required&&!$('connection-choice').open)$('connection-choice').showModal();if(typeof uiConnectionSettings==='function')uiConnectionSettings(state);if(c){if(typeof uiConnectionStatus==='function')uiConnectionStatus(c);if(!c.connected&&c.checked_at*1000>lastConnectionUpdate)connectionFailure({code:c.code,message:c.error});$('connection-diagnostic').textContent=(c.connected?'Serveur IA accessible.':c.error||'Connexion en cours…')+'\nAdresse utilisée : '+c.endpoint+' ('+(c.automatic?'automatique':'manuelle')+')\nAdresse Internet : '+state.internet_endpoint+(c.resolved_endpoint?'\nAdresse résolue : '+c.resolved_endpoint:'')+(c.last_handshake_time_sec?'\nDernier échange WireGuard : '+new Date(c.last_handshake_time_sec*1000).toLocaleString():'');}}catch(e){error(e);}}

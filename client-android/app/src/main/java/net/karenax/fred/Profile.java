@@ -10,7 +10,7 @@ final class Profile {
     static final String HTTPS="https://ia.karenax.net";
     static JSONObject validate(JSONObject value) throws JSONException {
         if(!"wireguard://10.77.0.1:8766".equals(value.optString("url"))||!"wireguard".equals(value.optString("transport")))throw new IllegalArgumentException("Profil personnel Fred attendu.");
-        int protocol=value.optInt("protocol",1);if(protocol<1||protocol>3)throw new IllegalArgumentException("Version du profil incompatible.");
+        int protocol=value.optInt("protocol",1);if(protocol<1||protocol>4)throw new IllegalArgumentException("Version du profil incompatible.");
         if(!value.optString("token").matches("qwen_[0-9a-f]{16}_[A-Za-z0-9_-]{43}"))throw new IllegalArgumentException("Accès serveur invalide.");
         JSONObject wg=value.optJSONObject("wireguard");if(wg==null)throw new IllegalArgumentException("Profil WireGuard absent.");
         for(String field:new String[]{"private_key","server_public_key","preshared_key"}){String encoded=wg.optString(field);if(!encoded.matches("[A-Za-z0-9+/]{43}="))throw new IllegalArgumentException("Clé WireGuard invalide.");byte[] raw=Base64.decode(encoded,Base64.NO_WRAP);if(raw.length!=32)throw new IllegalArgumentException("Clé WireGuard invalide.");}

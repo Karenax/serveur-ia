@@ -22,21 +22,21 @@ async function correctorRun(mode){
   if(busy||historySyncPending||!connected)return;const source=$('corrector-text').value.trim();if(!source){$('corrector-status').textContent='Saisissez le texte à retravailler.';$('corrector-text').focus();return;}
   if(library.length>=200){error('Exportez puis supprimez une conversation pour enregistrer ce résultat.');return;}
   try{await uiPersistPreferences();await flushHistory();}catch(e){error(e);return;}
-  const instruction=correctorModes[mode];currentId=crypto.randomUUID();correctorAnswer={role:'assistant',content:'',reasoning_content:''};
-  messages=[{role:'user',content:instruction.label+' :\n\n'+source},correctorAnswer];library.unshift({id:currentId,title:'Correcteur · '+instruction.label+' · '+source.slice(0,40),messages});
-  error('');correctorRunning=true;busy=true;replyProgress={phase:'requesting',started:Date.now(),lastEvent:Date.now()};controller=new AbortController();requestId=crypto.randomUUID().replaceAll('-','');buttons();save();
+  const instruction=correctorModes[mode],turn=crypto.randomUUID().replaceAll('-','');currentId=crypto.randomUUID();correctorAnswer={role:'assistant',content:'',reasoning_content:'',turn_id:turn};
+  messages=[{role:'user',content:instruction.label+' :\n\n'+source,turn_id:turn},correctorAnswer];library.unshift({id:currentId,title:'Correcteur · '+instruction.label+' · '+source.slice(0,40),messages});
+  error('');correctorRunning=true;busy=true;replyProgress={phase:'requesting',started:Date.now(),lastEvent:Date.now()};controller=new AbortController();requestId=turn;cancelPending=false;agentClearApproval();buttons();save();
   $('corrector-result-card').hidden=false;correctorResultDisplay();renderMarkdown($('corrector-result'),'');$('corrector-status').textContent=instruction.label+' · en cours…';
   const details=wsElement('details'),reasoning=wsElement('div');details.hidden=true;
   const view={content:$('corrector-result'),details,reasoning};
   try{
-    const response=await fetch('/v1/chat/completions',{method:'POST',headers:{Authorization:'Bearer '+config.key,'Content-Type':'application/json','X-Qwen-Request':requestId},signal:controller.signal,body:JSON.stringify({model:config.model,messages:[{role:'system',content:instruction.instruction},{role:'user',content:source}],stream:true,chat_template_kwargs:{enable_thinking:false}})});
+    await flushHistory();const response=await fetch('/v1/chat/completions',{method:'POST',headers:{Authorization:'Bearer '+config.key,'Content-Type':'application/json','X-Qwen-Request':requestId},signal:controller.signal,body:JSON.stringify({conversation_id:currentId,turn_id:requestId,history_revision:historyRevision,model:config.model,messages:[{role:'system',content:instruction.instruction},{role:'user',content:messages[0].content}],stream:true,chat_template_kwargs:{enable_thinking:false}})});
     if(!response.ok){let value;try{value=await response.json();}catch{}throw Object.assign(new Error(value?.error?.message||'Le serveur a refusé la correction.'),{code:value?.error?.code});}
     const reader=response.body.getReader(),decoder=new TextDecoder();let pending='',complete=false;
     while(true){const {value,done}=await reader.read();pending+=done?decoder.decode():decoder.decode(value,{stream:true});const frames=pending.split(/\r?\n\r?\n/);pending=frames.pop();for(const frame of frames)complete=delta(frame,correctorAnswer,view)||complete;if(done){if(pending.trim())complete=delta(pending,correctorAnswer,view)||complete;if(!complete)throw Object.assign(new Error('Connexion interrompue pendant la correction. Le résultat partiel est conservé.'),{code:'connection_error'});break;}}
     if(!correctorAnswer.content.trim())throw new Error('Le modèle n’a pas renvoyé de texte corrigé. Réessayez.');
     $('corrector-status').textContent=instruction.label+' · terminé. Résultat enregistré dans vos conversations.';
-  }catch(e){correctorAnswer.interrupted=true;if(e.name==='TypeError')e.code='connection_error';$('corrector-status').textContent=e.name==='AbortError'?'Correction arrêtée. Le texte reçu est conservé.':e.message;if(e.name!=='AbortError')error(e);}
-  finally{correctorRunning=false;correctorResultDisplay();busy=false;controller=null;renderMarkdown($('corrector-result'),correctorAnswer.content);save();render();drawLibrary();buttons();$('queue-state').textContent='';models();}
+  }catch(e){let recovered=false;if(e.name!=='AbortError'&&!cancelPending)try{recovered=await agentReconcile(correctorAnswer,view);}catch{}if(recovered)$('corrector-status').textContent=instruction.label+' · terminé. Résultat récupéré du serveur.';else{correctorAnswer.interrupted=true;if(e.name==='TypeError')e.code='connection_error';$('corrector-status').textContent=e.name==='AbortError'?'Correction arrêtée. Le texte reçu est conservé.':e.message;if(e.name!=='AbortError')error(e);}}
+  finally{agentClearApproval();correctorRunning=false;correctorResultDisplay();controller=null;cancelPending=false;renderMarkdown($('corrector-result'),correctorAnswer.content);save();try{await flushHistory();serverHistoryReady=false;await syncServerHistory(true);}catch(e){error(e);}busy=false;render();drawLibrary();buttons();$('queue-state').textContent='';models();}
 }
 for(const [id,mode] of [['corrector-correct','correct'],['corrector-pro','professional'],['corrector-friendly','friendly']])$(id).onclick=()=>correctorRun(mode);
 buttons();

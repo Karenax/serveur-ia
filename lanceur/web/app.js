@@ -136,9 +136,14 @@ function renderClients(value,force=false){
   $('remote-clients').replaceChildren(...value.clients.map(client=>{
     const card=element('article',null,'client-card'),header=element('div',null,'client-heading');
     const title=element('h3',client.name);
-    const state=client.revoked?'Accès révoqué':client.suspended?'Accès suspendu':'Accès autorisé';
+    const state=client.revoked?'Accès révoqué':client.suspended?'Accès suspendu':client.hermes_pending?'Création à reprendre':'Accès autorisé';
     header.append(title,element('span',state,'client-badge'+(client.suspended||client.revoked?' warning':'')));card.append(header);
     card.append(clientStorageInfo(client.storage));
+    if(client.hermes){
+      const ready=client.hermes.ready&&!client.hermes_pending;
+      card.append(element('p',ready?'Assistant Hermes prêt · projets et conversations associés':client.hermes.error||'Assistant Hermes à préparer','muted'));
+      if(!ready&&!client.revoked&&!client.suspended){const retry=element('button','Reprendre la création Hermes','button secondary');retry.onclick=()=>remoteAction('/api/remote/hermes-retry',{id:client.id});card.append(retry);}
+    }
     const management=element('div',null,'key-row'),rename=element('button','Renommer','button secondary'),remove=element('button','Supprimer','button stop');
     const editor=element('form',null,'client-name-editor'),name=element('input');editor.hidden=true;name.id='name-'+client.id;name.value=client.name;name.maxLength=80;name.required=true;
     editor.append(labelled('Nom du client',name,'Ce nom sera repris dans le nom de l’EXE téléchargé.'));
@@ -151,6 +156,7 @@ function renderClients(value,force=false){
     remove.onclick=()=>{deletion.hidden=!deletion.hidden;editor.hidden=true;};management.append(rename,remove);card.append(management,editor,deletion);
     card.append(element('p',(client.address?'Adresse privée : '+client.address.replace('/32','')+' · ':'')+(client.expires_epoch?'Expire le '+new Date(client.expires_epoch*1000).toLocaleString():'Accès sans expiration'),'muted'));
     if(client.revoked){card.append(element('p','Cet accès ne peut plus se connecter. Ajoutez un nouveau client pour créer un nouvel accès.','muted'));return card;}
+    if(client.hermes_pending)return card;
     const downloadRow=element('div',null,'client-download');const link=element('a','Télécharger l’EXE personnel','button primary');link.href='/api/remote/client/'+client.id;downloadRow.append(link,element('small','Connexion automatique avec cet EXE. Conservez-le comme une clé d’accès personnelle.'));card.append(downloadRow);
     const policy=element('details',null,'client-policy');policy.append(element('summary','Limites et suspension de l’accès'));
     const policyFields=element('div',null,'fields'),duration=element('input');duration.id='duration-'+client.id;duration.type='number';duration.min=0;duration.max=3650;duration.placeholder='Ne pas changer';
@@ -168,7 +174,7 @@ async function remoteRefresh(force=false){
   if(remoteBusy)return;
   try{
     const value=await request('/api/remote');
-    $('remote-status').textContent=(value.enabled?'Accès clients activé. ':'Accès clients désactivé. ')+value.connection.message;
+    $('remote-status').textContent=(value.enabled?'Accès clients activé. ':'Accès clients désactivé. ')+value.connection.message+(value.hermes?' · Hermes '+(value.hermes.available?'disponible':'indisponible'):'');
     $('remote-save').disabled=false;
     if(!remoteDirty){$('remote-host').value=value.connection.public_host;$('remote-port').value=value.connection.listen_port;}
     $('remote-url').value=value.connection.public_host?value.connection.public_host+':'+value.connection.listen_port+' / UDP':'';

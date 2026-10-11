@@ -42,7 +42,7 @@ def validate(value):
         for message in messages:
             try:validate_message(message)
             except ValueError as error:raise HistoryError(str(error)) from error
-            if not isinstance(message, dict) or set(message) - {'role', 'content', 'reasoning_content', 'interrupted', 'attachments'}:
+            if not isinstance(message, dict) or set(message) - {'role', 'content', 'reasoning_content', 'interrupted', 'attachments', 'turn_id'}:
                 raise HistoryError('Message invalide.')
             if message.get('role') not in ('user', 'assistant') or not isinstance(message.get('content'), str):
                 raise HistoryError('Message texte attendu.')

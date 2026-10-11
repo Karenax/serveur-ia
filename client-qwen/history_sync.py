@@ -12,6 +12,35 @@ def fingerprints(history):
     return {row['id']:hashlib.sha256(json.dumps(row,sort_keys=True,ensure_ascii=False).encode()).hexdigest()
             for row in history['conversations']}
 
+def authoritative_turns(local, server):
+    """Replace a cached partial turn by its server result without copying the chat.
+
+    A matching turn id authorizes only the assistant result. User messages and
+    conversation scope must still agree; unrelated simultaneous edits keep the
+    existing conflict-copy behavior.
+    """
+    if any(local.get(k) != server.get(k) for k in ('id', 'project_id', 'document_id', 'archived')):
+        return None
+    left, right = local['messages'], server['messages']
+    if len(left) > len(right): return None
+    changed = False
+    for index, message in enumerate(left):
+        target = right[index]
+        if message == target: continue
+        same_turn = message.get('turn_id') and message.get('turn_id') == target.get('turn_id')
+        if same_turn and message['role'] == target['role'] == 'assistant' and not target.get('interrupted'):
+            changed = True; continue
+        normalized = {k:v for k,v in message.items() if not ((k=='reasoning_content' and not v) or (k=='interrupted' and not v))}
+        other = {k:v for k,v in target.items() if not ((k=='reasoning_content' and not v) or (k=='interrupted' and not v))}
+        if normalized != other: return None
+    for index in range(len(left),len(right)):
+        message=right[index]
+        if message['role']!='assistant' or not message.get('turn_id') or index==0 or right[index-1].get('turn_id')!=message['turn_id'] or right[index-1]['role']!='user':
+            return None
+        changed=True
+    if not changed:return None
+    return {**copy.deepcopy(local), 'messages':copy.deepcopy(right)}
+
 def merge(local,server,base):
     """Keep independent edits; conflicting messages become a separate conversation."""
     left={r['id']:r for r in local['conversations']};right={r['id']:r for r in server['conversations']}
@@ -28,6 +57,9 @@ def merge(local,server,base):
             if r is not None:rows.append(copy.deepcopy(r))
         elif r is None:rows.append(copy.deepcopy(l))
         else:
+            reconciled=authoritative_turns(l,r)
+            if reconciled is not None:
+                rows.append(reconciled);continue
             rows.append(copy.deepcopy(r));branch=copy.deepcopy(l);branch['id']=secrets.token_hex(16)
             branch['title']=branch['title'][:103]+' (copie locale)';branch.pop('server_revision',None)
             rows.append(branch);conflicts+=1

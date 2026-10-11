@@ -55,6 +55,14 @@ class Controller:
         self.wireguard = WireGuardAccess(self.remote,self.home)
         self.gateway = None
         self.operations = Operations(self)
+        self.hermes = None
+        from hermes_fred import configured
+        agent_config = configured(self.home)
+        if agent_config:
+            from hermes_fred import HermesFred
+            self.hermes=HermesFred(self.remote,self.remote_backend,port=agent_config.get('port',8643),private_port=agent_config.get('private_port',8768))
+            self.remote.hermes=self.hermes
+            self.remote.workspace.hermes=self.hermes
 
     def remote_backend(self):
         run = self.current_run()
@@ -383,6 +391,11 @@ def serve(port=8765, controller=None):
                     raise ValueError('Requête trop volumineuse.')
                 data = json.loads(self.rfile.read(length) or b'{}')
                 if not isinstance(data,dict):raise ValueError('Objet JSON attendu.')
+                # Restoration coordinates its own locks and may wait for an
+                # active agent to release the provider. Keep the controller
+                # available while that worker shuts down.
+                if path == '/api/restore':
+                    return self.respond(200, controller.operations.restore(data))
                 with controller.lock:
                     if getattr(controller.remote,'maintenance',False) and path not in ('/api/backups/verify','/api/backups/recover'):
                         raise ValueError('Serveur en maintenance ; action suspendue.')
@@ -436,8 +449,6 @@ def serve(port=8765, controller=None):
                     elif path == '/api/backups/recover':
                         if data.get('confirm') is not True:raise ValueError('Confirmer le retour à l’état précédent.')
                         result = controller.operations.restorations.recover_now()
-                    elif path == '/api/restore':
-                        result = controller.operations.restore(data)
                     elif path == '/api/remote/policy':
                         result = controller.wireguard.policy(data)
                     elif path == '/api/devices/configure':
@@ -465,6 +476,17 @@ def serve(port=8765, controller=None):
                         result = controller.wireguard.configure(data)
                     elif path == '/api/remote/create-client':
                         result = controller.wireguard.create_client(data.get('name'), controller.remote_backend()[1])
+                    elif path == '/api/remote/hermes-retry':
+                        if not controller.hermes:raise ValueError('Hermes n’est pas activé.')
+                        client=next((c for c in controller.remote.metadata()['clients'] if c['id']==data.get('id')),None)
+                        if not client:raise ValueError('Accès inconnu.')
+                        if client.get('hermes_pending'):
+                            if client.get('creation_platform')=='android':
+                                result=controller.wireguard.create_android(client['name'],controller.remote_backend()[1],client.get('device_owner',''),client.get('device_kind') if client.get('device_kind') in ('phone','tablet') else 'phone',resume=client['id'])
+                            else:result=controller.wireguard.create_client(client['name'],controller.remote_backend()[1],resume=client['id'])
+                        else:
+                            controller.hermes.ensure(client['id'],client['name'])
+                            result={'message':'Assistant Hermes prêt.'}
                     elif path == '/api/remote/revoke':
                         result = controller.wireguard.revoke(data.get('id'))
                     elif path == '/api/remote/rename':
@@ -492,6 +514,13 @@ if __name__ == '__main__':
     parser.add_argument('--preserve-model-state',action='store_true')
     args = parser.parse_args()
     controller = Controller()
+    if controller.hermes:
+        def start_agents():
+            try:controller.hermes.start()
+            except (OSError,ValueError,RuntimeError):
+                controller.last_error='Hermes indisponible ; reprise depuis la console nécessaire.'
+                controller.hermes.error=controller.last_error
+        threading.Thread(target=start_agents,daemon=True,name='fred-hermes-startup').start()
     controller.client_storage.start()
     controller.remote.workspace.knowledge.start()
     if controller.voice.settings()['enabled']:controller.voice.start()

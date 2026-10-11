@@ -140,10 +140,10 @@ class WireGuardAccess:
                     'local_routes':network_routes(settings['listen_port']),
                     'wireguard':{'private_key':private,'server_public_key':self.settings()['public_key'],
                                  'preshared_key':psk,'address':address,'endpoint':f"{host}:{settings['listen_port']}"}}
-    def create_client(self,name,model):
+    def create_client(self,name,model,resume=None):
         with self.lock:
             self.vault();private_directory(self.home/'clients')
-            result=self.store.executable(name,model,self.new_peer)
+            result=self.store.executable(name,model,self.new_peer,resume=resume)
             if self.engine and self.engine.running():
                 try:self.engine.update(self.peers())
                 except ValueError:
@@ -151,13 +151,13 @@ class WireGuardAccess:
                     raise
             return {**result,'message':'EXE personnel prêt. Remettez-le à son destinataire : aucun login requis.'}
 
-    def create_android(self, name, model, owner='', kind='phone'):
+    def create_android(self, name, model, owner='', kind='phone', resume=None):
         """Issue a portable JSON profile without requiring a Windows release."""
         from devices import fields
         fields({'name':name, 'owner':owner, 'kind':kind})
         with self.lock:
             self.vault()
-            access=self.store.issue(name)
+            access=self.store.issue(name,resume=resume,platform='android')
             target=self.directory/'profils-restaures.dpapi'
             temporary=None
             try:

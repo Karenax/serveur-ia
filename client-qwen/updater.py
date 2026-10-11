@@ -13,7 +13,8 @@ import tempfile
 import time
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 
-VERSION='3.5.21'
+VERSION='3.5.22'
+AGENT_PROTOCOL=4
 
 def client_filename(number,name):
     version(number)
@@ -30,7 +31,7 @@ def recipient_name(profile,path,release):
 def verify(release, pinned):
     if not isinstance(release,dict) or type(release.get('bytes')) is not int or not 1<=release['bytes']<=256*1024*1024:
         raise ValueError('Taille de mise à jour invalide.')
-    if type(release.get('protocol')) is not int or release['protocol']!=3:raise ValueError('Version incompatible.')
+    if type(release.get('protocol')) is not int or release['protocol'] not in (3,4):raise ValueError('Version incompatible.')
     version(release.get('version'))
     if not isinstance(release.get('sha256'),str) or not re.fullmatch(r'[0-9a-f]{64}',release['sha256']):raise ValueError('Empreinte de mise à jour invalide.')
     canonical=json.dumps({k:release[k] for k in ('version','protocol','sha256','bytes')},sort_keys=True,separators=(',',':')).encode()

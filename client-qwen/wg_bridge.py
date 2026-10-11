@@ -78,7 +78,7 @@ def connection_candidates(profile,addresses=None):
 def validate_profile(profile):
     if not isinstance(profile,dict):raise ValueError('Profil client invalide.')
     if profile.get('url')!='wireguard://10.77.0.1:8766':raise ValueError('Adresse API privée invalide.')
-    if profile.get('protocol', 1) not in (1, 2, 3):
+    if profile.get('protocol', 1) not in (1, 2, 3, 4):
         raise ValueError('Ce profil nécessite une version plus récente d’Accès serveur Fred.')
     if profile.get('transport') != 'wireguard':
         raise ValueError('Cet accès doit utiliser WireGuard.')

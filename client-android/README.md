@@ -7,7 +7,7 @@ Les appareils Android limités aux applications 32 bits ne sont pas pris en char
 ## Installer et ouvrir
 
 Le fichier à installer est `dist/Acces-serveur-Fred-Android.apk`, version
-**1.0.5** (`versionCode=6`). Installer le nouvel APK par-dessus l’application
+**1.0.6** (`versionCode=7`). Installer le nouvel APK par-dessus l’application
 existante pour conserver le profil et les conversations.
 Transférer cet APK sur l’appareil puis l’ouvrir et autoriser son installation
 depuis l’application utilisée pour ouvrir le fichier.
@@ -271,5 +271,26 @@ leur concordance avant d’exposer les routes authentifiées
 nouvelle compilation Release suffit ensuite à la proposer aux appareils.
 
 **Première installation :** les versions 1.0.4 et précédentes n’ont pas cette
-fonction. Installer une fois manuellement l’APK 1.0.5 par-dessus l’application
+fonction. Installer une fois manuellement l’APK 1.0.6 par-dessus l’application
 existante ; les versions suivantes pourront être téléchargées depuis Fred.
+
+## Conversations Hermes 1.0.6
+
+Toutes les conversations, y compris le correcteur, passent par Hermes sur
+le serveur, avec un profil par accès Fred et une session par discussion.
+La création d’un nouvel accès prépare son profil automatiquement.
+La progression affiche les recherches et outils séparément de la réponse.
+Quand une action exige un accord, Fred décrit son effet : **Autoriser cette
+action** ne vaut que pour cette action ; **Refuser** empêche son exécution.
+
+Chaque envoi possède un identifiant durable. Après une coupure, Fred retrouve
+la réponse finalisée sur le serveur sans exécuter une seconde fois la demande.
+Un accord encore en attente est retrouvé après la réouverture de Fred, dans
+la même conversation et le même projet.
+**Arrêter** attend la confirmation serveur. L’historique chiffré, les profils
+importés et les mises à jour automatiques APK sont conservés.
+
+Le transport annonce le protocole conversationnel 4 ; les profils existants
+au format 3 restent importables. Le modèle Qwen continue de calculer les
+réponses sur le serveur. Aucun agent ni secret Hermes n’est installé sur
+l’appareil. Une panne Hermes est signalée explicitement.

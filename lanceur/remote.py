@@ -78,6 +78,7 @@ class AccessStore:
         self.maintenance = False
         self.on_access_changed = None
         self.storage = None
+        self.hermes = None
         self.scheduler = Scheduler()
         self.accounts = Accounts(home)
         self.workspace = Workspace(home)
@@ -128,7 +129,9 @@ class AccessStore:
             archived = [self._public_device(c, revoked) for c in data.get('deleted_clients', [])]
             if self.storage:
                 for client in clients+archived:client['storage']=self.storage.client_status(client['id'])
-        return {**{k:v for k,v in data.items() if k!='deleted_clients'}, 'clients': clients, 'archived_clients': archived, 'maintenance':self.maintenance, 'active': self.active, 'queue': self.scheduler.snapshot(), 'last_connections': dict(self.seen), 'accounts':self.accounts.metadata()}
+            if self.hermes:
+                for client in clients+archived:client['hermes']=self.hermes.public(client['id'])
+        return {**{k:v for k,v in data.items() if k!='deleted_clients'}, 'clients': clients, 'archived_clients': archived, 'maintenance':self.maintenance, 'active': self.active, 'queue': self.scheduler.snapshot(), 'last_connections': dict(self.seen), 'accounts':self.accounts.metadata(), **({'hermes':self.hermes.status()} if self.hermes else {})}
 
     def configure(self, values):
         if not isinstance(values.get('enabled'), bool):
@@ -146,20 +149,41 @@ class AccessStore:
         self._access_changed()
         return self.metadata()
 
-    def issue(self, name):
+    def issue(self, name, resume=None, platform='windows'):
         if not isinstance(name, str) or not 1 <= len(name.strip()) <= 80 or any(ord(c)<32 or ord(c)==127 for c in name):
             raise ValueError('Nom du client attendu, entre 1 et 80 caractères.')
-        identity = secrets.token_hex(8)
+        identity = resume or secrets.token_hex(8)
         token = 'qwen_' + identity + '_' + secrets.token_urlsafe(32)
         client = {'id': identity, 'name': name.strip(), 'created': dt.datetime.now().astimezone().isoformat(),
                   'revoked': False, 'hash': hashlib.sha256(token.encode()).hexdigest()}
         with self.lock:
             data = read_json(self.path)
-            if len(data['clients']) >= 100:
+            if resume:
+                previous=next((c for c in data['clients'] if c['id']==resume),None)
+                if not previous or not previous.get('hermes_pending') or previous.get('revoked') or previous.get('suspended') or self.revocations.contains(resume):
+                    raise ValueError('Seule une création Hermes incomplète peut être reprise.')
+                previous['hash']=client['hash'];client=previous
+            elif len(data['clients']) >= 100:
                 raise ValueError('Maximum de 100 accès enregistrés.')
-            data['clients'].append(client)
+            else:data['clients'].append(client)
+            client['creation_platform']=platform
+            if self.hermes:client['hermes_pending']=True
             write_json(self.path, data)
             self.audit('client_created', identity)
+        if self.hermes:
+            with self.lock:
+                pending=read_json(self.path)
+                next(c for c in pending['clients'] if c['id']==identity)['hermes_pending']=True
+                write_json(self.path,pending)
+            try:
+                self.hermes.ensure(identity,client['name'])
+                with self.lock:
+                    pending=read_json(self.path)
+                    next(c for c in pending['clients'] if c['id']==identity).pop('hermes_pending',None)
+                    write_json(self.path,pending)
+            except Exception:
+                self.audit('hermes_provisioning_failed',identity)
+                raise ValueError('Création Hermes incomplète ; reprenez cette fiche dans la console.') from None
         return {'id': identity, 'name': client['name'], 'token': token, 'url': data['url']}
 
     def device(self, values):
@@ -234,7 +258,7 @@ class AccessStore:
             self.audit('client_deleted',identity)
         return {'message':'Client supprimé et accès désactivé. Ses conversations et fichiers sont conservés sur le serveur.'}
 
-    def executable(self, name, model, profile_factory=None):
+    def executable(self, name, model, profile_factory=None, resume=None):
         data = self.metadata()
         if not data['url']:
             raise ValueError('Configurer WireGuard avant de générer un client.')
@@ -246,7 +270,7 @@ class AccessStore:
         from releases import status
         release=status(self.home)
         if not release['verified']:raise ValueError('La version cliente doit être signée et vérifiée avant distribution.')
-        access = self.issue(name)
+        access = self.issue(name,resume=resume)
         directory = self.home / 'clients'
         directory.mkdir(parents=True, exist_ok=True)
         target = directory / (access['id'] + '.exe')
@@ -335,6 +359,7 @@ class AccessStore:
             if record['revoked'] or revoked:return 'access_revoked','Accès client révoqué sur le serveur.'
             if record.get('suspended'):return 'access_suspended','Compte client suspendu sur le serveur.'
             if record.get('expires_epoch') and record['expires_epoch']<=time.time():return 'access_expired','Accès client expiré.'
+            if record.get('hermes_pending'):return 'agent_provisioning','Création de l’assistant en cours ; reprendre la fiche dans la console serveur.'
         return 'access_denied','Accès client invalide.'
 
     def authenticate(self, token):
@@ -347,7 +372,7 @@ class AccessStore:
             try:revoked = self.revocations.snapshot()['revocations']
             except (ValueError, OSError):return None
             for client in data['clients']:
-                if client['id'] not in revoked and not client['revoked'] and not client.get('suspended', False) and (not client.get('expires_epoch') or client['expires_epoch'] > time.time()) and hmac.compare_digest(client['hash'], digest):
+                if client['id'] not in revoked and not client['revoked'] and not client.get('suspended', False) and not client.get('hermes_pending') and (not client.get('expires_epoch') or client['expires_epoch'] > time.time()) and hmac.compare_digest(client['hash'], digest):
                     now = time.time()
                     self.seen[client['id']] = now
                     if now-self.seen_saved_at >= 30:
@@ -401,6 +426,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
     def valid_owner(owner):
         return store.valid_owner(owner)
     def generate(owner,messages,cancel):
+        if store.hermes:return store.hermes.generate(owner,messages,cancel)
         item=None;connection=None;deadline=time.monotonic()+900
         try:
             while item is None:
@@ -488,6 +514,9 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
             return True
 
         def do_GET(self):
+            if self.path == '/v1/agent/state':
+                if not self.authorized():return
+                return self.respond(200,store.hermes.status(self.identity) if store.hermes else {'enabled':False,'available':False,'runs':[]})
             if self.path in ('/v1/client/android/release', '/v1/client/android/download'):
                 if not self.authorized(): return
                 from android_releases import status as android_status
@@ -541,7 +570,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 return
             if self.path == '/v1/status':
                 if not self.authorized(): return
-                return self.respond(200, {'version': VERSION, 'protocol': 3, 'queue': scheduler.snapshot(self.identity)})
+                return self.respond(200, {'version': VERSION, 'protocol': 3, 'agent_protocol':4, 'queue': scheduler.snapshot(self.identity)})
             if urlsplit(self.path).path != '/v1/models' or urlsplit(self.path).query:
                 return self.respond(404, {'error': {'message': 'Route non disponible.'}})
             if not self.authorized():
@@ -555,6 +584,19 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
             self.respond(200, {'object': 'list', 'data': [{'id': model, 'object': 'model', 'owned_by': 'local', 'capabilities': capabilities(live)}]})
 
         def do_POST(self):
+            if self.path == '/v1/agent/action':
+                if not self.authorized():return
+                try:
+                    if not store.hermes:raise ValueError('Les agents ne sont pas activés sur ce serveur.')
+                    if self.headers.get('Transfer-Encoding') or not self.headers.get('Content-Type','').startswith('application/json'):raise ValueError('JSON attendu.')
+                    length=int(self.headers.get('Content-Length','0'))
+                    if not 1<=length<=8192:raise ValueError('Action agent limitée à 8 Ko.')
+                    value=json.loads(self.rfile.read(length))
+                    if store.authenticate(self.access_token)!=self.identity:raise Denied('Accès désactivé.')
+                    return self.respond(200,store.hermes.action(self.identity,value))
+                except Conflict as error:return self.respond(409,{'error':{'message':str(error)}})
+                except Denied as error:return self.respond(403,{'error':{'message':str(error)}})
+                except (ValueError,OSError,TypeError):return self.respond(400,{'error':{'message':'Cette demande agent ne peut pas être traitée.'}})
             if self.path in ('/v1/voice/speech','/v1/voice/cancel'):
                 if not self.authorized():return
                 frames=None;sent=False
@@ -639,6 +681,9 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 except (ValueError,OSError,TypeError,ImportError) as error:return self.respond(400,{'error':{'message':str(error)}})
             if self.path == '/v1/cancel':
                 if not self.authorized(): return
+                if store.hermes:
+                    try:return self.respond(200,store.hermes.cancel(self.identity,self.headers.get('X-Qwen-Request') or None))
+                    except ValueError as error:return self.respond(400,{'error':{'message':str(error)}})
                 scheduler.cancel(self.identity,self.headers.get('X-Qwen-Request') or None)
                 return self.respond(200, {'cancelled': True})
             if self.path not in ('/v1/chat/completions','/v1/context'):
@@ -654,9 +699,15 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 upstream_port, model, key = backend()
                 raw=json.loads(self.rfile.read(length))
                 if not isinstance(raw,dict):raise ValueError('Requête invalide.')
+                conversation=raw.pop('conversation_id',None)
+                turn=raw.pop('turn_id',None)
+                raw.pop('history_revision',None)
+                if isinstance(raw.get('messages'),list):
+                    for message in raw['messages']:
+                        if isinstance(message,dict):message.pop('turn_id',None)
                 project=raw.pop('project_id',None);raw.pop('assistant_id',None);document=raw.pop('document_id',None)
                 data = chat_request(raw, model);sources=[]
-                if project or document or getattr(store.workspace,'knowledge',None):
+                if not (store.hermes and self.path=='/v1/chat/completions') and (project or document or getattr(store.workspace,'knowledge',None)):
                     data['messages'],sources=store.workspace.context(self.identity,data['messages'],project,document)
             except (OSError, ValueError, TypeError, KeyError) as error:
                 return self.respond(400, {'error': {'message': str(error)}})
@@ -667,6 +718,36 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 return self.respond(400,{'error':{'code':'image_not_supported','message':'Le modèle chargé ne dispose pas de la vision. Choisissez un modèle avec prise en charge des images.'}})
             live_model=live.get('model')
             if isinstance(live_model,str) and live_model:data['model']=live_model
+            if store.hermes and self.path=='/v1/chat/completions':
+                request=self.headers.get('X-Qwen-Request') or turn or secrets.token_hex(16)
+                if turn and turn!=request:return self.respond(400,{'error':{'message':'Identité d’envoi incohérente.'}})
+                if not conversation:return self.respond(409,{'error':{'code':'client_update_required','message':'Mettez à jour le client pour utiliser votre assistant Hermes.'}})
+                stream=None;sent=False
+                try:
+                    stream=store.hermes.stream(self.identity,data,request,conversation,project,document)
+                    answer=[];reasoning=[];final_sources=[]
+                    for block in stream:
+                        if store.authenticate(self.access_token)!=self.identity:raise Denied('Accès désactivé.')
+                        if data.get('stream'):
+                            if not sent:
+                                self.send_response(200);self.send_header('Content-Type','text/event-stream');self.send_header('Cache-Control','no-store');self.send_header('Connection','close');self.end_headers();sent=True
+                            self.wfile.write(block);self.wfile.flush()
+                        elif block.strip()!=b'data: [DONE]':
+                            event=json.loads(block[6:])
+                            if event.get('workspace_sources'):final_sources=event['workspace_sources']
+                            for choice in event.get('choices',[]):
+                                delta=choice.get('delta',{});answer.append(delta.get('content',''));reasoning.append(delta.get('reasoning_content',''))
+                    if not data.get('stream'):self.respond(200,{'id':'chatcmpl-'+request,'object':'chat.completion','choices':[{'index':0,'message':{'role':'assistant','content':''.join(answer),'reasoning_content':''.join(reasoning)},'finish_reason':'stop'}],'workspace_sources':final_sources})
+                except BlockingIOError as error:
+                    if not sent:self.respond(429,{'error':{'message':str(error)}})
+                except (OSError,ValueError,TypeError,RuntimeError) as error:
+                    if sent:
+                        try:self.wfile.write(('data: '+json.dumps({'error':{'message':'L’assistant a été interrompu. Reconnectez-vous pour retrouver son état.'}})+'\n\n').encode());self.wfile.flush()
+                        except OSError:pass
+                    else:self.respond(503,{'error':{'code':'agent_unavailable','message':'Votre assistant est indisponible. Vérifiez son état dans la console serveur.'}})
+                finally:
+                    if stream:stream.close()
+                return
             if self.path == '/v1/context':
                 # Use the backend tokenizer without starting an inference or joining its queue.
                 effort=data.get('reasoning_effort','none')
@@ -697,7 +778,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                     tokens=result.get('input_tokens')
                     if props_response.status!=200 or counted.status!=200 or type(capacity) is not int or capacity<=0 or type(tokens) is not int or tokens<0:
                         raise ValueError('Comptage du contexte indisponible.')
-                    return self.respond(200,{'tokens':tokens,'capacity':capacity,'estimated':has_images,'model':data['model']})
+                    return self.respond(200,{'tokens':tokens,'capacity':capacity,'estimated':has_images or bool(store.hermes),'model':data['model'],**({'scope':'visible_history','agent_context':True} if store.hermes else {})})
                 except (OSError,ValueError,http.client.HTTPException):
                     return self.respond(503,{'error':{'message':'Comptage du contexte indisponible.'}})
                 finally:counter.close()

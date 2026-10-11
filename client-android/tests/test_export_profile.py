@@ -93,7 +93,7 @@ class ExportProfileTests(unittest.TestCase):
 
     def test_invalid_profile_is_rejected_before_output_directory(self):
         for change in ({'token': 'CREDENTIAL_MUST_NOT_APPEAR_IN_ERRORS'}, {'transport': 'https'},
-                       {'protocol': True}, {'protocol': 4}, {'wireguard': {}},
+                       {'protocol': True}, {'protocol': 5}, {'wireguard': {}},
                        {'url': 'http://127.0.0.1:8766'}):
             with self.subTest(change=list(change)):
                 self.source.write_bytes(pack({**self.profile, **change}))
@@ -133,7 +133,7 @@ class ExportProfileTests(unittest.TestCase):
         self.assertEqual(stdout.getvalue(), '')
 
     def test_all_supported_protocol_versions_export(self):
-        for protocol in (1, 2, 3):
+        for protocol in (1, 2, 3, 4):
             self.source.write_bytes(pack({**self.profile, 'protocol': protocol}))
             self.assertEqual(exporter.read_exe_profile(self.source)['protocol'], protocol)
 

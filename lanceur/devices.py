@@ -25,10 +25,14 @@ def text(value, label, limit=80):
 def fields(values, declaration=False):
     if not isinstance(values, dict):
         raise ValueError('Fiche appareil invalide.')
-    allowed = {'kind', 'version', 'transport'} if declaration else {'id', 'name', 'owner', 'kind', 'version'}
+    allowed = {'kind', 'version', 'transport', 'agent_protocol'} if declaration else {'id', 'name', 'owner', 'kind', 'version'}
     if set(values) - allowed:
         raise ValueError('Champ de fiche appareil non admis.')
     result = {}
+    if 'agent_protocol' in values:
+        if type(values['agent_protocol']) is not int or values['agent_protocol'] not in (3,4):
+            raise ValueError('Protocole agent invalide.')
+        result['agent_protocol'] = values['agent_protocol']
     if 'kind' in values:
         if not isinstance(values['kind'], str) or values['kind'] not in KINDS:
             raise ValueError('Type attendu : PC, téléphone, tablette ou non renseigné.')

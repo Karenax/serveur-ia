@@ -28,7 +28,7 @@ def allowed_paths(home):
     from operations import FILES
     return set(FILES + ['wireguard-prive/secrets.dpapi', 'wireguard-prive/profils-restaures.dpapi',
                        'wireguard-prive/signature.dpapi', 'recherche-web.dpapi',
-                       'espaces-prives/espaces.sqlite3', 'sauvegardes/catalogue.json','appareils-activite.json'])
+                       'espaces-prives/espaces.sqlite3', 'sauvegardes/catalogue.json','appareils-activite.json', 'hermes-fred'])
 
 
 def recover(home):
@@ -45,11 +45,20 @@ def recover(home):
         if not isinstance(originals, dict) or set(originals) - allowed_paths(home):raise ValueError('Chemins de retour invalides.')
         decoded = {name: base64.b64decode(raw, validate=True) if raw is not None else None for name,raw in originals.items()}
         for name, raw in decoded.items():
+            if name == 'hermes-fred': continue
             path = home / name
             if name == 'espaces-prives/espaces.sqlite3':
                 for suffix in ('-wal','-shm'):Path(str(path)+suffix).unlink(missing_ok=True)
             if raw is None:path.unlink(missing_ok=True)
             else:atomic(path, raw)
+        if 'hermes-fred' in decoded:
+            from hermes_backup import HermesBackup
+            from operations import registered_profile_ids
+            access_raw = decoded.get('acces-distants.json')
+            files = {'acces-distants.json': json.loads(access_raw)} if access_raw else {}
+            owners = registered_profile_ids(files)
+            package = json.loads(decoded['hermes-fred']) if decoded['hermes-fred'] is not None else {'version': 1, 'files': {}}
+            HermesBackup(home / 'hermes-fred').restore(package, owners)
         journal.update(state='recovered',phase='rollback',active=False,finished=time.time(),
                        message='Restauration interrompue : état antérieur récupéré, accès distant désactivé.')
         access=read_json(home/'acces-distants.json')
@@ -68,12 +77,21 @@ def validate_package(controller, package):
     if not isinstance(package,dict) or package.get('version')!=1 or not isinstance(package.get('files'),dict):
         raise ValueError('Contenu de sauvegarde invalide.')
     files=package['files']
-    if set(files)-set(FILES+['vault','profiles','signing_seed','workspace','web_key']):raise ValueError('Contenu de sauvegarde invalide.')
+    if set(files)-set(FILES+['vault','profiles','signing_seed','workspace','web_key','hermes']):raise ValueError('Contenu de sauvegarde invalide.')
     for name in ('reglages.json','reglages-par-defaut.json','derniers-reglages-valides.json'):
         if name in files:validate(files[name])
     for name in ('base-strata.json','exploitation.json'):
         if name in files and not isinstance(files[name],dict):raise ValueError('Configuration invalide.')
     if 'voix.json' in files and (not isinstance(files['voix.json'],dict) or set(files['voix.json'])!={'enabled'} or type(files['voix.json']['enabled']) is not bool):raise ValueError('Configuration vocale invalide.')
+    if 'hermes-integration.json' in files:
+        config = files['hermes-integration.json']
+        if (not isinstance(config, dict) or type(config.get('enabled')) is not bool or
+                set(config) - {'enabled', 'port', 'private_port', 'version'} or
+                any(type(config.get(key, default)) is not int or not 1 <= config.get(key, default) <= 65535
+                    for key,default in [('port',8643),('private_port',8768)]) or
+                config.get('port',8643) == config.get('private_port',8768) or
+                ('version' in config and config['version'] != 1)):
+            raise ValueError('Configuration Hermes sauvegardée invalide.')
     accounts=files.get('comptes.json',[])
     if not isinstance(accounts,list):raise ValueError('Comptes invalides.')
     for account in accounts:
@@ -93,6 +111,9 @@ def validate_package(controller, package):
         elif type(settings.get('listen_port')) is not int or not 1<=settings['listen_port']<=65535:raise ValueError('Port WireGuard invalide.')
     access=validate_access(files['acces-distants.json']) if 'acces-distants.json' in files else {'clients':[]}
     records={r['id']:r for r in access['clients']+access.get('deleted_clients',[])}
+    if 'hermes' in files:
+        from hermes_backup import HermesBackup
+        HermesBackup(controller.home / 'hermes-fred').validate(files['hermes'], set(records))
     if 'workspace' in files:controller.remote.workspace.validate_backup(files['workspace'],set(records))
     profiles=files.get('profiles',{})
     if not isinstance(profiles,dict):raise ValueError('Profils invalides.')
@@ -216,7 +237,9 @@ class RestoreManager:
             journal=c.home/'securite'/'restauration.json'
             staging=c.home/'securite'/'retour-restauration.dpapi'
             private_directory(journal.parent)
+            hermes_token = None
             try:
+                hermes_token = c.operations.hermes_quiesce(restoring=True)
                 for record in c.remote.metadata()['clients']:
                     c.remote.scheduler.cancel(record['id'])
                 workspace.shutdown()
@@ -228,8 +251,11 @@ class RestoreManager:
                     raise ValueError('Le modèle et les accès doivent être arrêtés avant restauration.')
                 with c.lock,c.wireguard.lock,c.remote.lock,workspace.lock:
                     original_workspace=base64.b64decode(workspace.backup())
-                    originals={name:base64.b64encode((c.home/name).read_bytes()).decode() if (c.home/name).is_file() else None for name in allowed_paths(c.home)}
+                    originals={name:base64.b64encode((c.home/name).read_bytes()).decode() if (c.home/name).is_file() else None for name in allowed_paths(c.home) if name != 'hermes-fred'}
                     originals['espaces-prives/espaces.sqlite3']=base64.b64encode(original_workspace).decode()
+                    from operations import registered_profile_ids
+                    original_hermes = c.operations.hermes_export(registered_profile_ids({'acces-distants.json': current_access}))
+                    originals['hermes-fred'] = base64.b64encode(json.dumps(original_hermes).encode()).decode() if original_hermes is not None else None
                     atomic(staging,protect(json.dumps(originals).encode()))
                     self.job.update(state='applying',phase='restore',message='Restauration des données ; accès fermés.')
                     write_json(journal,self.job)
@@ -274,8 +300,15 @@ class RestoreManager:
                 c.operations.desired=False
                 raise
             finally:
+                hermes_token = hermes_token or c.operations.hermes_pause
                 if self.job.get('state')!='applying':c.remote.maintenance=False;workspace.maintenance=False
                 if generation_callback and not self.job.get('state')=='applying':workspace.start(generation_callback,valid_callback)
+                if self.job.get('state') != 'applying':
+                    c.operations.hermes_resume(hermes_token, restored=bool(hermes_token and hermes_token['restoring']) or self.job.get('state') in ('completed', 'recovered'))
+                else:
+                    # Retain the closed facade and admission block until durable recovery succeeds.
+                    self.hermes_token = hermes_token
+                    c.operations.hermes_release_closed(hermes_token)
 
     def recover_now(self):
         c=self.controller
@@ -288,5 +321,7 @@ class RestoreManager:
                     c.remote.activity=read_json(c.remote.activity_path,{})
                     c.remote.maintenance=False;c.remote.workspace.maintenance=False
                     if self.callbacks and self.callbacks[0]:c.remote.workspace.start(*self.callbacks)
+                    c.operations.hermes_resume(getattr(self, 'hermes_token', None), restored=True)
+                    self.hermes_token = None
                 return self.status()
         finally:self.lock.release()

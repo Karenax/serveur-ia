@@ -1,0 +1,79 @@
+{
+  "date": "2026-10-11",
+  "windows": {
+    "version": "3.5.22",
+    "sha256": "a45da215e239bf759ca7a6b8eafc5f17c51c54ed3d9f7f5c9c55f2825172689a",
+    "verified": true,
+    "personal_packages_refreshed": 1
+  },
+  "android": {
+    "sha256": "5d1ea7ae54cb5838c358138e433fd3533317c8f514a30b6ac344c2224f7eef10",
+    "bytes": 18899220,
+    "version": "1.0.6",
+    "version_code": 7,
+    "package": "net.karenax.fred"
+  },
+  "hermes": {
+    "available": true,
+    "profiles_ready": 1,
+    "source_commit": "1cb26bf248e150f715ce8a487fdef2a2bef6b541"
+  },
+  "checks": {
+    "model_loaded": true,
+    "model_processes_preserved": true,
+    "model_name_preserved": true,
+    "access_registry_preserved": true,
+    "model_settings_preserved": true,
+    "windows_personal_packages_refreshed": true,
+    "android_update_available": true,
+    "native_profiles_ready": true,
+    "private_interfaces_loopback": true,
+    "personal_gateway_authenticated": true,
+    "legacy_update_key_matches": true,
+    "personal_token_preserved": true,
+    "personal_tunnel_preserved": true,
+    "personal_base_release_matches": true,
+    "personal_version_current": true,
+    "final_server_reloaded": true,
+    "encrypted_backup_verified": true,
+    "native_profiles_in_backup": true,
+    "gateway_ready_after_backup": true,
+    "model_preserved_after_backup": true,
+    "access_and_settings_preserved_after_backup": true,
+    "backup_schedule_preserved": true,
+    "authenticated_android_download_verified": true
+  },
+  "backup": {
+    "format_version": 2,
+    "sha256": "a194d4474eb9f25a982785558cb2e84756848a28a61f46133027446a0c7e2634",
+    "bytes": 1206931,
+    "hermes_profiles": 1,
+    "hermes_files": 8,
+    "verified": true,
+    "production_restore_performed": false
+  },
+  "projects": {
+    "active_accesses_checked": 1,
+    "fred_projects": 0,
+    "native_projects": 0,
+    "production_counts_match": true,
+    "native_binding_verified_with_synthetic_project": true
+  },
+  "tests": {
+    "hermes_suite": {
+      "passed": 59,
+      "seconds": 83.958
+    },
+    "backup_restoration_regressions": {
+      "passed": 39,
+      "seconds": 105.2
+    },
+    "remote_workspace_devices_regressions": {
+      "passed": 73
+    },
+    "native_qwen_checks": {
+      "passed": 10
+    },
+    "clients": "see clients-build-20261011.json"
+  }
+}

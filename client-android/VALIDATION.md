@@ -1,9 +1,25 @@
-# Validation Android — 10 octobre 2026
+# Validation Android — 11 octobre 2026
+
+## Version 1.0.6 — conversations Hermes
+
+APK Release **1.0.6**, code **7**, construit avec le même certificat depuis
+1.0.0. Le protocole conversationnel 4, les demandes d’accord, la récupération
+des réponses après coupure et le parcours existant de mise à jour sont
+intégrés. La compilation, l’analyse Android, les 13 tests de distribution,
+la signature v2/v3 et l’alignement 16 Ko sont validés.
+
+Les parcours d’interface téléphone et tablette ont été vérifiés avec des
+serveurs synthétiques isolés, y compris accord/refus, reprise et arrêt.
+Les empreintes finales et limites des essais sont dans le
+[rapport clients Hermes](../preuves/hermes-fred/CLIENTS.md) et ses
+[métadonnées de build](../preuves/hermes-fred/clients-build-20261011.json).
+Les paquets sont préparés dans un staging ; aucun appareil utilisateur n’a
+été installé ou mis à jour pendant ces essais.
 
 Les tests utilisent des profils, historiques et serveurs synthétiques isolés.
 Aucun compte réel, pair actif ou coffre du serveur utilisateur n’a été modifié.
 
-## Version actuelle 1.0.2 — lots 6 et 8
+## Historique de la version 1.0.2 — lots 6 et 8
 
 APK signé **1.0.2**, code **3**, **8 505 669 octets**, SHA-256
 `cf400128ca9714a84b57016daa3b4c339411dd7d86b2aaea2eff88a19abc6dd3`.

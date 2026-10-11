@@ -11,14 +11,19 @@ $fixtureInstrumentation = Join-Path $projectRoot 'toolchain\android-tests\update
 New-Item -ItemType Directory -Force -Path $fixtureRoot,$fixtureDist,$fixtureInstrumentation | Out-Null
 @'
 from pathlib import Path
-import shutil, sys
+import shutil, sys, re
 root=Path(sys.argv[1]); source=root/'client-android'; target=root/'toolchain/android-tests/update-future-project'
 for name in ('settings.gradle','build.gradle','gradle.properties'):
     shutil.copy2(source/name,target/name)
 shutil.copytree(source/'app/src/main',target/'app/src/main',dirs_exist_ok=True)
 shutil.copytree(source/'app/src/release',target/'app/src/release',dirs_exist_ok=True)
 gradle=(source/'app/build.gradle').read_text(encoding='utf-8')
-gradle=gradle.replace('versionCode 6','versionCode 7').replace("versionName '1.0.5'", "versionName '1.0.6'")
+code=int(re.search(r'versionCode\s+(\d+)',gradle).group(1))
+version=re.search(r"versionName\s+'([^']+)'",gradle).group(1)
+parts=[int(value) for value in version.split('.')];parts[-1]+=1
+future='.'.join(map(str,parts))
+gradle=re.sub(r'versionCode\s+\d+',f'versionCode {code+1}',gradle,count=1)
+gradle=re.sub(r"versionName\s+'[^']+'",f"versionName '{future}'",gradle,count=1)
 (target/'app/build.gradle').write_text(gradle,encoding='utf-8')
 '@ | & $fixturePython - $projectRoot
 if ($LASTEXITCODE -ne 0) { throw 'Preparation fixture impossible.' }
@@ -28,7 +33,10 @@ Invoke-FredAndroidSigning -ProjectRoot $projectRoot -PythonExecutable $fixturePy
     -UnsignedApk (Join-Path $fixtureRoot 'app\build\outputs\apk\release\app-release-unsigned.apk') `
     -AlignedApk (Join-Path $fixtureDist 'aligned.apk') -SignedApk (Join-Path $fixtureDist 'Acces-serveur-Fred-Android.apk')
 $fixtureApk = Join-Path $fixtureDist 'Acces-serveur-Fred-Android.apk'
-$manifest = @{package='net.karenax.fred';version='1.0.6';version_code=7;bytes=(Get-Item -LiteralPath $fixtureApk).Length;sha256=(Get-FileHash -LiteralPath $fixtureApk).Hash.ToLowerInvariant()}
+$fixtureGradle = Get-Content -LiteralPath (Join-Path $fixtureRoot 'app\build.gradle') -Raw
+$fixtureVersion = [regex]::Match($fixtureGradle, "versionName\s+'([^']+)'").Groups[1].Value
+$fixtureCode = [int][regex]::Match($fixtureGradle, 'versionCode\s+(\d+)').Groups[1].Value
+$manifest = @{package='net.karenax.fred';version=$fixtureVersion;version_code=$fixtureCode;bytes=(Get-Item -LiteralPath $fixtureApk).Length;sha256=(Get-FileHash -LiteralPath $fixtureApk).Hash.ToLowerInvariant()}
 [System.IO.File]::WriteAllText((Join-Path $fixtureDist 'release.json'),($manifest|ConvertTo-Json),[System.Text.UTF8Encoding]::new($false))
 # Reuse the test DEX with a manifest targeting the signed Release application.
 $testManifest = '<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="net.karenax.fred.updatetest"><uses-sdk android:minSdkVersion="26" android:targetSdkVersion="36"/><application android:label="Fred update fixture"/><instrumentation android:name="net.karenax.fred.UpdateFlowInstrumentation" android:targetPackage="net.karenax.fred"/></manifest>'

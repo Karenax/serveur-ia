@@ -21,7 +21,7 @@ from tkinter import messagebox
 import urllib.error
 import urllib.request
 import time
-from updater import VERSION
+from updater import VERSION, AGENT_PROTOCOL
 from product import APP_NAME, LOCAL_API_PORT, LOCAL_API_LAST_PORT
 import history_store
 from urllib.parse import urlsplit
@@ -167,7 +167,7 @@ class Remote:
             opener=self.https_opener if https else self.opener
         # Capture the URL and its matching secret together; a reconnect may replace the bridge.
         request = urllib.request.Request(url + path, data=data,
-            headers={**headers, 'User-Agent':'AccesServeurFred/'+VERSION+' (Windows; '+('HTTPS' if https else 'WireGuard')+')', 'Content-Type': 'application/json','X-Qwen-Session':self.session,**({'X-Qwen-Request':request_id} if request_id else {})})
+            headers={**headers, 'User-Agent':'AccesServeurFred/'+VERSION+' (Windows; '+('HTTPS' if https else 'WireGuard')+')', 'Content-Type': 'application/json','X-Qwen-Session':self.session,'X-Fred-Agent-Protocol':str(AGENT_PROTOCOL),**({'X-Qwen-Request':request_id} if request_id else {})})
         try:
             response=opener.open(request, timeout=900 if path=="/v1/chat/completions" else 120 if path=="/v1/client/download" else 60 if path in ("/v1/workspace/action","/v1/history") else 3 if path=="/v1/device" else 30)
             self.last_contact=time.time();self.event('server_response',route=path,status=getattr(response,'status',200))
@@ -235,7 +235,7 @@ class Remote:
                     if time.time()-getattr(self,'device_reported_at',0)>=60:
                         self.device_reported_at=time.time()
                         try:
-                            declaration={'kind':'pc','version':VERSION,'transport':'https' if self.endpoint==HTTPS_ENDPOINT else 'wireguard'}
+                            declaration={'kind':'pc','version':VERSION,'transport':'https' if self.endpoint==HTTPS_ENDPOINT else 'wireguard','agent_protocol':AGENT_PROTOCOL}
                             with self.open('/v1/device',json.dumps(declaration).encode()) as response:response.read(2048)
                         except urllib.error.HTTPError as error:
                             if error.code in (401,403):raise
@@ -365,7 +365,7 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
                 try:
                     return self.reply(200,drafts.read())
                 except (OSError,ValueError):return self.reply(500,{'error':{'message':'Brouillon local illisible : le fichier est conservé.'}})
-            if self.path not in ('/v1/models', '/v1/status','/v1/workspace','/v1/notifications','/v1/voice/status'):
+            if self.path not in ('/v1/models', '/v1/status','/v1/workspace','/v1/notifications','/v1/voice/status','/v1/agent/state'):
                 return self.reply(404, {'error': {'message': 'Route non disponible.'}})
             if not self.authorized():
                 return
@@ -378,7 +378,7 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
             self.forward()
 
         def do_POST(self):
-            if self.path not in ('/v1/chat/completions','/v1/context', '/v1/cancel','/v1/workspace/action','/v1/notifications/action','/v1/voice/speech','/v1/voice/cancel','/client/conversation','/client/draft','/client/endpoint','/client/preferences','/client/update/check','/client/update/apply','/client/history','/client/history/sync','/client/history/restore-ack','/client/history/flush','/client/history/recover','/client/integrations/apply','/client/voice'):
+            if self.path not in ('/v1/chat/completions','/v1/context', '/v1/cancel','/v1/workspace/action','/v1/notifications/action','/v1/agent/action','/v1/voice/speech','/v1/voice/cancel','/client/conversation','/client/draft','/client/endpoint','/client/preferences','/client/update/check','/client/update/apply','/client/history','/client/history/sync','/client/history/restore-ack','/client/history/flush','/client/history/recover','/client/integrations/apply','/client/voice'):
                 return self.reply(404, {'error': {'message': 'Route non disponible.'}})
             if not self.authorized():
                 return
@@ -475,6 +475,11 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
                                 elif line.startswith(b'data: ') and not done:
                                     try:
                                         event=json.loads(line[6:]);choice=(event.get('choices') or [{}])[0];delta=choice.get('delta') or {}
+                                        status=event.get('hermes_status')
+                                        if isinstance(status,dict):remote.stream['phase']=status.get('phase','working')
+                                        if isinstance(event.get('hermes_approval'),dict):remote.stream['phase']='approval'
+                                        final=event.get('hermes_answer')
+                                        if isinstance(final,dict) and isinstance(final.get('text'),str):remote.stream['answer_chars']=len(final['text'])
                                         reason=delta.get('reasoning_content',delta.get('reasoning',''));content=delta.get('content','')
                                         if isinstance(reason,str) and reason:remote.stream['reasoning_chars']+=len(reason);remote.stream['phase']='thinking'
                                         if isinstance(content,str) and content:remote.stream['answer_chars']+=len(content);remote.stream['phase']='answering'

@@ -218,7 +218,7 @@ class BackupManager:
 
     def _capture(self):
         c = self.controller
-        with c.lock, c.wireguard.lock, c.remote.lock, c.remote.accounts.lock, c.remote.workspace.lock:
+        with c.operations.hermes_snapshot(), c.lock, c.wireguard.lock, c.remote.lock, c.remote.accounts.lock, c.remote.workspace.lock:
             files = {name: _read_json_checked(self.home / name) for name in FILES if (self.home / name).exists()}
             registered = registered_profile_ids(files)
             if c.wireguard.vault_path.exists(): files['vault'] = c.wireguard.vault()
@@ -244,6 +244,8 @@ class BackupManager:
                             stream.seek(-16 - size, 2); profiles[path.stem] = json.loads(stream.read(size))
             files['profiles'] = profiles
             files['workspace'] = c.remote.workspace.backup()
+            hermes = c.operations.hermes_export(registered)
+            if hermes is not None: files['hermes'] = hermes
             web_key = self.home / 'recherche-web.dpapi'
             if web_key.exists(): files['web_key'] = base64.b64encode(protect(web_key.read_bytes(), decrypt=True)).decode()
             extras = {name: _read_json_checked(self.home / name) for name in EXTRA_FILES if name not in FILES and (self.home / name).exists()}
@@ -281,6 +283,9 @@ class BackupManager:
                 raise ValueError('Programmation sauvegardée invalide.')
         files = package['files']
         counts = {'profiles': len(files.get('profiles', {})), 'accounts': len(files.get('comptes.json', []))}
+        if 'hermes' in files:
+            counts['hermes_files'] = len(files['hermes']['files'])
+            counts['hermes_profiles'] = len({name.split('/')[1] for name in files['hermes']['files'] if name.startswith('profiles/')})
         if 'workspace' in files:
             access = files.get('acces-distants.json', {})
             owners = {r['id'] for r in access.get('clients', []) + access.get('deleted_clients', [])}
@@ -335,7 +340,7 @@ class BackupManager:
         else: package = document; extras = {}; security = {}
         if not isinstance(package, dict) or package.get('version') != 1 or not isinstance(package.get('files'), dict):
             raise ValueError('Contenu de sauvegarde invalide.')
-        if set(package['files']) - set(FILES + ['vault', 'profiles', 'signing_seed', 'workspace', 'web_key']):
+        if set(package['files']) - set(FILES + ['vault', 'profiles', 'signing_seed', 'workspace', 'web_key', 'hermes']):
             raise ValueError('Fichier de sauvegarde inconnu.')
         if version == 2 and document.get('manifest') != _manifest(package, extras, security):
             raise ValueError('Manifeste de sauvegarde endommagé.')

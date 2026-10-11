@@ -56,6 +56,7 @@
 **/audit.json
 /lanceur/*.json
 /lanceur/donnees-clients/
+/lanceur/hermes-fred/
 !/lanceur/base-strata.json
 !/lanceur/reglages-par-defaut.json
 !/lanceur/derniers-reglages-valides.json

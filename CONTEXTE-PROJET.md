@@ -4,13 +4,16 @@ Mise à jour : 11 octobre 2026.
 
 ## Objectif actuel
 
-L’utilisateur a autorisé le développement complet des cinq premiers lots du plan global, avec preuves : **lots 0, 1, 2, 3 et 4**. Le plan commence à 0. Il a choisi « Sauvegarde sur le serveur pour commencer » ; aucune destination NAS n’est activée. Il a ensuite demandé les **lots 6 et 8 en parallèle** et l’explication du lot 9, désormais livrés. **Whisper Small multilingue local** est livré sur Windows et Android. Dernière demande : intégrer la conversation vocale complète **uniquement dans Windows**, après la fin de l’autre chat Codex intégrant EG2 et la mémoire. Cette attente a été respectée : « Évaluer le dépôt Talorys » était terminé avant toute modification de cette intégration. La conversation Windows est livrée en 3.5.21 ; Android reste en 1.0.3/code 4 avec la dictée manuelle.
+Dernière demande du 11 octobre : intégration complète de Hermes pour toutes les conversations Windows/Android et création automatique de profils à chaque accès client. Hermes est activé et les clients signés Windows 3.5.22 / Android 1.0.6 code 7 sont publiés. Les essais natifs avec le Qwen local et le contrôle authentifié du client existant passent ; une sauvegarde chiffrée réelle incluant Hermes est créée et vérifiée. La suite finale Hermes compte 59 tests réussis, avec 39 régressions sauvegarde/restauration et 73 régressions accès/espaces/appareils. Un profil par accès, une session par conversation et un projet natif Hermes par projet Fred ; les documents et recherches EG2 restent soumis aux droits Fred. Guide : [HERMES-FRED.md](lanceur/HERMES-FRED.md). Preuves : [validation](preuves/hermes-fred/VALIDATION.md). Les outils système sans isolation ne sont pas activés.
 
-Ces cinq premiers lots sont **achevés, validés et en service** : 191 tests de régression réussis, 32 scénarios de console, essais Android natifs sur émulateurs téléphone et tablette. Les empreintes des sources sont identiques avant/après cette suite complète. Les lots **6 et 8 sont achevés, validés et en service** : **246 tests de régression réussis en 354,218 s**, 27 scénarios navigateur sans exception JavaScript et essais Android téléphone/tablette sur émulateurs. Les binaires Windows et Android publiés correspondent aux sources vérifiées ; modèle, données, accès et programmation des sauvegardes ont été préservés. La refonte du tableau de bord du lot 5, les outils du lot 9 et l’intégration complète du lot 10 restent planifiés. La conversation du lot 7 est livrée dans Windows ; son extension Android est différée. Le socle minimal d’événements nécessaire aux notifications est intégré, sans déclarer le lot 5 complet.
+L’utilisateur a autorisé le développement complet des cinq premiers lots du plan global, avec preuves : **lots 0, 1, 2, 3 et 4**. Le plan commence à 0. Il a choisi « Sauvegarde sur le serveur pour commencer » ; aucune destination NAS n’est activée. Il a ensuite demandé les **lots 6 et 8 en parallèle** et l’explication du lot 9, désormais livrés. **Whisper Small multilingue local** est livré sur Windows et Android. Demande précédente : intégrer la conversation vocale complète **uniquement dans Windows**, après la fin de l’autre chat Codex intégrant EG2 et la mémoire. Cette attente a été respectée : « Évaluer le dépôt Talorys » était terminé avant toute modification de cette intégration. La conversation Windows est livrée en 3.5.21 ; Android conserve la dictée manuelle ; les mises à jour automatiques puis Hermes portent la version actuelle à 1.0.6/code 7.
+
+Ces cinq premiers lots sont **achevés, validés et en service** : 191 tests de régression réussis, 32 scénarios de console, essais Android natifs sur émulateurs téléphone et tablette. Les empreintes des sources sont identiques avant/après cette suite complète. Les lots **6 et 8 sont achevés, validés et en service** : **246 tests de régression réussis en 354,218 s**, 27 scénarios navigateur sans exception JavaScript et essais Android téléphone/tablette sur émulateurs. Les binaires Windows et Android publiés correspondent aux sources vérifiées ; modèle, données, accès et programmation des sauvegardes ont été préservés. La refonte du tableau de bord du lot 5 et les extensions des lots 9/10 restent planifiées. Hermes fournit désormais les outils Fred contrôlés. La conversation du lot 7 est livrée dans Windows ; son extension Android est différée. Le socle minimal d’événements nécessaire aux notifications est intégré, sans déclarer le lot 5 complet.
 
 ## Documents de référence
 
 - `PLAN-GLOBAL-SERVEUR-FRED.md` : périmètre complet, lots 0 à 10, dépendances, livrables et validations ; référence principale pour la suite.
+- `PLAN-INTEGRATION-HERMES-FRED.md` : architecture et lots H0 à H6 pour les conversations traitées par Hermes et le provisionnement automatique de profils ; code implanté, validation native réelle réussie et clients publiés.
 - `PLAN-SAUVEGARDES-APPAREILS.md` : détail complémentaire des deux premières fonctions, désormais rattaché au plan global.
 - `client-android/README.md` et `client-android/VALIDATION.md` : installation, fonctionnement et résultats de la livraison Android actuelle.
 - `lanceur/SAUVEGARDES-APPAREILS.md` : fonctionnement des nouveaux écrans, programmation et restauration.
@@ -60,7 +63,9 @@ La console expose sa boîte administrative. Windows et Android exposent une boî
 
 À la livraison des lots 6/8, versions publiées et vérifiées : **serveur/Windows 3.5.18**, **Android 1.0.2, code 3**. EXE et APK signés avec les clés existantes, ressources incorporées identiques aux sources finales, mise à jour Android 1.0.1 → 1.0.2 conservant profil et conversation sur les deux émulateurs. Les versions précédentes sont conservées sous `toolchain/releases-staging/*-before-lots6-8/`.
 
-## Lot 9 expliqué, sans implantation
+## Lot 9 : plan initial et outils Hermes livrés
+
+Hermes fournit désormais les recherches, la lecture de sources et le calcul dans le périmètre Fred. Les actions externes et outils système libres restent différés. Le plan initial ci-dessous décrit leur future ouverture.
 
 Ce lot permettra à l’assistant d’utiliser des fonctions serveur précises : rechercher des documents, lire une page publique ou préparer un brouillon. Pour modifier quelque chose, il présentera d’abord la cible, le contenu proposé et l’effet attendu ; l’utilisateur autorisé devra valider cette proposition avant son exécution. Exemple : « Mets le budget à 2 500 € » prépare la modification visible du document Budget ; le clic sur « Valider la modification » autorise seulement cette révision. Si quelqu’un modifie le document entre-temps, une nouvelle proposition est nécessaire. L’accord expirera, ne pourra pas être rejoué et n’ouvrira aucun accès général au terminal. Les connecteurs de messagerie/calendrier restent des extensions séparées à demander explicitement.
 
@@ -72,7 +77,7 @@ L’intégration garde l’audio de dictée sur l’appareil et transmet le text
 
 ## Android déjà livré
 
-- APK signé : `client-android/dist/Acces-serveur-Fred-Android.apk`, package `net.karenax.fred`, version **1.0.3**, code 4, Android 8+ ARM64/x86_64, téléphone et tablette.
+- APK signé : `client-android/dist/Acces-serveur-Fred-Android.apk`, package `net.karenax.fred`, version **1.0.6**, code 7, Android 8+ ARM64/x86_64, téléphone et tablette.
 - Import `.fred-android` ou EXE personnel ; choix explicite HTTPS/WireGuard ; moteur WireGuard intégré.
 - Profil, historique et préférences chiffrés localement avec Android Keystore ; synchronisation avec le serveur.
 - Compilation et tests sur émulateurs Android 16 téléphone/tablette réussis ; tunnel réel et données synthétiques, transport HTTPS public vérifié sans accès réel. Voir le rapport pour la portée exacte. Validation sur appareil physique encore nécessaire.
@@ -82,7 +87,7 @@ L’intégration garde l’audio de dictée sur l’appareil et transmet le text
 
 ## Livraison et exploitation actuelles
 
-- Serveur et client Windows **3.5.21** ; APK Android **1.0.3**, code 4 inchangé. Manifeste Windows signé vérifié ; clés de signature conservées. Dernière livraison : `preuves/conversation-windows-20261011/VALIDATION.md`.
+- Serveur et client Windows **3.5.22** ; APK Android **1.0.6**, code 7. Manifeste Windows Ed25519 et signature APK vérifiés ; clés existantes conservées. Dernière livraison : `preuves/hermes-fred/VALIDATION.md`.
 - Console rechargée avec `Start-Interface-Qwen.ps1 -SansNavigateur -PreserverEtatModele`. Les processus Strata 8200 et 14628 et leurs dates de création sont inchangés ; le modèle reste chargé.
 - Archives initiales chiffrées créées et vérifiées sur les données actuelles. État réel et empreintes de cette livraison : `preuves/lots-6-8/production-validation.json`. L’état historique des lots 0–4 reste conservé dans leur propre rapport. Aucune restauration exécutée sur les données de production.
 - Phrase forte privée : `lanceur/sauvegardes/phrase-recuperation.txt`, dossier Windows protégé. Ne jamais recopier sa valeur dans ce contexte, Git, journaux ou messages. Secret automatique distinct protégé par DPAPI.
@@ -169,7 +174,7 @@ La demande de terminer les **lots 6 et 8 en parallèle**, avec preuves, compilat
 
 ## Conversation Windows livrée le 11 octobre 2026
 
-- Dernière autorisation : conversation complète Windows seulement, après la fin du chat « Évaluer le dépôt Talorys » intégrant EG2/mémoire. Attente respectée avant le début de l’implantation. Android conserve son APK 1.0.3/code 4 ; aucune recompilation Android.
+- Autorisation précédente : conversation complète Windows seulement, après la fin du chat « Évaluer le dépôt Talorys » intégrant EG2/mémoire. Attente respectée avant le début de l’implantation. Android conserve son APK 1.0.3/code 4 ; aucune recompilation Android.
 - Serveur/client Windows **3.5.21** : manifeste Ed25519 vérifié et binaire publié. Client : microphone/DSP Windows pour l’écho et le bruit, Zipformer FR INT8 Sherpa-ONNX 1.13.8, Silero VAD, Smart Turn v3.2 CPU. Six modèles optionnels publics, environ 138 Mo, révisions et SHA-256 fixés. Modèles installés et vérifiés sur ce PC ; installation/réparation depuis les autres clients Windows.
 - Serveur : Pocket TTS 3.3.0 français, voix Estelle, CPU quatre threads, un traitement simultané, cache public hors ligne. Aucun clonage. Attribution Kyutai et licence CC-BY-4.0 des poids conservées. Environnement dédié `toolchain/voice-server-python`, distinct de Strata et d’EG2 ; compilation client dans `toolchain/conversation-client-python`.
 - Conversation : bouton explicite, fin de tour vers 550 ms de silence si Smart Turn valide, borne de quatre secondes si hésitation ; envoi automatique via le chat existant, lecture progressive, reprise de parole qui coupe l’audio et annule uniquement la demande courante. Raccrocher/arrière-plan ferme le microphone. Tour limité à trente secondes ; session quinze minutes. Dictée Small manuelle toujours disponible séparément.

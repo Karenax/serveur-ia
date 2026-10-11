@@ -1,5 +1,6 @@
 """Bounded chat attachments; image sources never reference host paths or URLs."""
 import base64
+import re
 
 MAX_FILE = 2 * 1024 * 1024
 FILE_TYPES = ['txt', 'md', 'pdf', 'docx']
@@ -40,12 +41,14 @@ def validate_parts(content, role):
         raise ValueError('Texte ou image intégrée attendus.')
 
 def validate_message(message):
-    if not isinstance(message, dict) or set(message) - {'role', 'content', 'reasoning_content', 'interrupted', 'attachments'}:
+    if not isinstance(message, dict) or set(message) - {'role', 'content', 'reasoning_content', 'interrupted', 'attachments', 'turn_id'}:
         raise ValueError('Message invalide.')
     if message.get('role') not in ('user', 'assistant') or not isinstance(message.get('content'), str):
         raise ValueError('Message texte attendu.')
     if not isinstance(message.get('reasoning_content', ''), str) or type(message.get('interrupted', False)) is not bool:
         raise ValueError('État du message invalide.')
+    if 'turn_id' in message and (not isinstance(message['turn_id'], str) or not re.fullmatch(r'[A-Za-z0-9_-]{1,128}', message['turn_id'])):
+        raise ValueError('Identifiant du tour invalide.')
     items = message.get('attachments', [])
     if not isinstance(items, list) or len(items) > 4 or (items and message['role'] != 'user'):
         raise ValueError('Maximum quatre pièces jointes par message utilisateur.')
