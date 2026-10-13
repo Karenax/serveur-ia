@@ -1,0 +1,39 @@
+{
+  "profiles": [
+    {
+      "profile": "flash-production",
+      "requests": 14,
+      "sky_tps": 29.0,
+      "fibonacci_code_tps": 33.7,
+      "document_prompt_ms": {
+        "64": 7709.25,
+        "256": 17929.05,
+        "1024": 61253.8
+      },
+      "document_prompt_tps": {
+        "64": 200.4,
+        "256": 332.54999999999995,
+        "1024": 385.7
+      },
+      "sustained_tps": null,
+      "sustained_seconds": 0,
+      "sustained_requests": 0,
+      "sustained_individual_tps": [],
+      "exact_pass": 8,
+      "exact_count": 8,
+      "strict_json_pass": 8,
+      "max_temperature_c": 79.0,
+      "thermal_samples": 4,
+      "thermal_sample_count": 172,
+      "no_prompt_reuse": true
+    }
+  ],
+  "state": {
+    "phase": "interrompu-thermique",
+    "profile": "flash-production",
+    "outcomes": [],
+    "error": "Limitation thermique observée à 79 C ; client de benchmark arrêté pendant la seconde lecture du grand dossier, production non arrêtée."
+  },
+  "production_restored": false,
+  "deployment_performed": false
+}

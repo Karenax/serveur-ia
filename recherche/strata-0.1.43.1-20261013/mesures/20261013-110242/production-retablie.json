@@ -1,0 +1,41 @@
+{
+  "health": {
+    "status": "ok",
+    "max_context": 262144,
+    "model": "qwen3.8-flash-next-iq4-xs",
+    "images": false,
+    "api_key": false,
+    "loaded": true,
+    "service": "strata"
+  },
+  "engine": {
+    "model": "qwen3.8-flash-next-iq4-xs",
+    "max_context": 262144,
+    "images": false,
+    "version": "0.1.35",
+    "context": 262144,
+    "kv": "fp16",
+    "kv_resident": 0,
+    "expert_slots": 3793,
+    "expert_cache_mib": 9630,
+    "expert_slots_primary": 2327,
+    "expert_cache_primary_mib": 5908,
+    "spec": 5,
+    "mtp_max": 3,
+    "lookup": 3,
+    "vram_free_mib": 1852,
+    "cvec": 0,
+    "arena_mib": 52769,
+    "pool_workers": 15,
+    "pcie_frac": "0.00",
+    "spec_min_p": "0.50",
+    "conversation_cache_mib": 0,
+    "conversation_cache_slots": 4,
+    "conversation_cache_min_free_mib": 2560,
+    "engine": "0.1.35"
+  },
+  "inference_pass": true,
+  "answer": "{\n  \"resultat\": 301\n}",
+  "files_unchanged": true,
+  "test_port_closed": true
+}

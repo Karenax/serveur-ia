@@ -1,13 +1,13 @@
 """Private Hermes provider and MCP ingress; only model calls reserve the GPU."""
 from __future__ import annotations
 import http.client
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from http.server import BaseHTTPRequestHandler
 import json
-import re
 import socket
 import threading
 import time
 from core import health
+from http_boundary import BoundedHTTPServer, json_body
 
 
 class HermesPrivateServer:
@@ -16,6 +16,15 @@ class HermesPrivateServer:
         self.accounts = self.conversations = self.tools = None
         self.models = None
         outer = self
+
+        def bound(owner, *, run=None, request=None):
+            context = outer.conversations.context(owner) if owner and outer.conversations else None
+            if not context or not outer.conversations.valid(owner, context): return None
+            if request and request != context['request_id']: return None
+            if request and not run: return context
+            if not run: return None
+            context.get('remote_ready', threading.Event()).wait(2)
+            return context if context.get('remote') == run and outer.conversations.valid(owner, context) else None
 
         class Handler(BaseHTTPRequestHandler):
             def log_message(self, *args): pass
@@ -37,13 +46,7 @@ class HermesPrivateServer:
                 return outer.accounts.authenticate_private(token, kind) if outer.accounts else None
 
             def body(self, maximum=10 * 1024 * 1024):
-                if self.headers.get('Transfer-Encoding') or not self.headers.get('Content-Type', '').startswith('application/json'):
-                    raise ValueError('JSON attendu.')
-                length = int(self.headers.get('Content-Length', '0'))
-                if not 1 <= length <= maximum: raise ValueError('Requête trop volumineuse.')
-                result = json.loads(self.rfile.read(length))
-                if not isinstance(result, dict): raise ValueError('Objet JSON attendu.')
-                return result
+                return json_body(self, maximum)
 
             def do_GET(self):
                 owner = self.authorized('inference')
@@ -65,8 +68,9 @@ class HermesPrivateServer:
                     try:
                         value=self.body(4096)
                         selection=context.get('model_selection',{})
-                        if set(value)!={'model_id'} or value['model_id']!=selection.get('id'):
+                        if set(value)!={'model_id','request_id'} or value['model_id']!=selection.get('id') or not bound(owner,request=value['request_id']):
                             raise ValueError('Modèle fournisseur non autorisé.')
+                        outer.conversations.storage.check(owner)
                         credential=outer.models.credential(owner,selection)
                         if not outer.conversations.valid(owner,context):raise ValueError('Demande désactivée.')
                         return self.respond(200,credential)
@@ -75,7 +79,13 @@ class HermesPrivateServer:
                     owner = self.authorized('tool')
                     if not owner: return self.respond(401, {'error': 'Outil non autorisé.'})
                     try:
-                        result = outer.tools.dispatch(owner, outer.conversations.context(owner), self.body(2 * 1024 * 1024))
+                        message = self.body(2 * 1024 * 1024)
+                        context = outer.conversations.context(owner)
+                        if message.get('method') == 'tools/call':
+                            params = message.get('params', {})
+                            meta = params.get('_meta', {}) if isinstance(params,dict) else None
+                            context = bound(owner,run=meta.get('fred_run_id') or self.headers.get('X-Fred-Run'),request=self.headers.get('X-Fred-Request')) if isinstance(meta,dict) else None
+                        result = outer.tools.dispatch(owner, context, message)
                         if result is None:
                             try:
                                 self.send_response(202); self.send_header('Content-Length', '0'); self.end_headers()
@@ -85,7 +95,7 @@ class HermesPrivateServer:
                     return
                 if self.path != '/v1/chat/completions': return self.respond(404, {'error': {'message': 'Route privée non disponible.'}})
                 owner = self.authorized('inference')
-                context = outer.conversations.context(owner) if owner and outer.conversations else None
+                context = bound(owner,run=self.headers.get('X-Fred-Run'),request=self.headers.get('X-Fred-Request'))
                 if not context or not outer.conversations.valid(owner, context):
                     return self.respond(401, {'error': {'message': 'Aucune demande agent autorisée.'}})
                 if outer.models and not context.get('model_selection',{}).get('local'):
@@ -94,6 +104,7 @@ class HermesPrivateServer:
                 sent = False
                 try:
                     data = self.body()
+                    outer.conversations.storage.check(owner)
                     messages = data.get('messages')
                     if not isinstance(messages, list) or not 1 <= len(messages) <= 2000: raise ValueError('Messages invalides.')
                     # Every destination/model/auth choice belongs to Fred; this
@@ -168,7 +179,7 @@ class HermesPrivateServer:
                             if item['cancelled'] or not outer.conversations.valid(owner, context): raise PermissionError('Demande désactivée.')
                             self.wfile.write(block); self.wfile.flush(); outer.store.scheduler.progress(item)
                     item['succeeded'] = response.status == 200 and not item.get('backend_error')
-                except (ValueError, OSError, TypeError, http.client.HTTPException) as error:
+                except (ValueError, OSError, TypeError, http.client.HTTPException):
                     if not sent:
                         try: self.respond(503, {'error': {'message': 'Le fournisseur local n’a pas pu terminer la génération.'}})
                         except OSError: pass
@@ -182,7 +193,7 @@ class HermesPrivateServer:
                     if connection: connection.close()
                     if item: outer.store.scheduler.finish(item)
 
-        self.server = ThreadingHTTPServer(('127.0.0.1', port), Handler)
+        self.server = BoundedHTTPServer(('127.0.0.1', port), Handler)
         self.server.daemon_threads = True
         self.url = 'http://127.0.0.1:' + str(self.server.server_port)
         self.thread = None

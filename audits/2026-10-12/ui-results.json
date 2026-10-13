@@ -1,0 +1,328 @@
+{
+  "syntax": [
+    {
+      "source": "client-android/app/src/main/assets/android-chat.html",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-android/app/src/main/assets/android-chat.html",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-android/app/src/main/assets/android-chat.html",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-android/app/src/main/assets/android-chat.html",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-android/app/src/main/assets/android-chat.html",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-android/app/src/main/assets/android-chat.html",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-android/app/src/main/assets/android-chat.html",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-android/app/src/main/assets/android-chat.html",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-android/app/src/main/assets/android-chat.html",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-android/app/src/main/assets/android-chat.html",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-android/app/src/main/assets/android-chat.html",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-android/mobile-ui/android.js",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-android/mobile-ui/client-state.js",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-android/mobile-ui/corrector-response.js",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-android/scripts/Test-Assets.cjs",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-android/tests/inspect_close.mjs",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-android/tests/inspect_keyboard.mjs",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-android/tests/inspect_lots6_8.mjs",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-android/tests/inspect_model_picker.mjs",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-android/tests/inspect_webview.mjs",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-android/tests/verify_transport.mjs",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-qwen/attachments.js",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-qwen/chat.html",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-qwen/conversation.js",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-qwen/corrector.js",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-qwen/markdown.js",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-qwen/selection.js",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-qwen/test_conversation_ui.cjs",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-qwen/test_direct_corrector_ui.cjs",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-qwen/test_hermes_ui.cjs",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-qwen/test_model_selector_ui.cjs",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-qwen/test_thinking_ui.cjs",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-qwen/thinking.js",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-qwen/ui-syntax-check.js",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-qwen/ui.js",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-qwen/voice.js",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "client-qwen/workspace.html",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "lanceur/test_client_update.js",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "lanceur/test_connection_settings.js",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "lanceur/test_markdown.js",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "lanceur/web/app.js",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "lanceur/web/interface.js",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "lanceur/web/maintenance.js",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "lanceur/web/notifications.js",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "lanceur/web/tests/client_storage_ui.mjs",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "lanceur/web/tests/conversation_ui.mjs",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "lanceur/web/tests/conversation_ui_body.mjs",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "lanceur/web/tests/hermes_models_ui.cjs",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "lanceur/web/tests/knowledge_ui.mjs",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "lanceur/web/tests/lots6_8_client_ui.mjs",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "lanceur/web/tests/maintenance_backend_ui.mjs",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "lanceur/web/tests/maintenance_ui.mjs",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "lanceur/web/tests/notifications_ui.mjs",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "lanceur/web/tests/voice_android_install.mjs",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "lanceur/web/tests/voice_android_ui.mjs",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "lanceur/web/tests/voice_ui.mjs",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "lanceur/web/voice.js",
+      "exit": 0,
+      "error": ""
+    },
+    {
+      "source": "lanceur/web/workspace.js",
+      "exit": 0,
+      "error": ""
+    }
+  ],
+  "tests": [
+    {
+      "test": "client-qwen/test_conversation_ui.cjs",
+      "exit": 0
+    },
+    {
+      "test": "client-qwen/test_direct_corrector_ui.cjs",
+      "exit": 0
+    },
+    {
+      "test": "client-qwen/test_hermes_ui.cjs",
+      "exit": 0
+    },
+    {
+      "test": "client-qwen/test_model_selector_ui.cjs",
+      "exit": 0
+    },
+    {
+      "test": "client-qwen/test_thinking_ui.cjs",
+      "exit": 0
+    },
+    {
+      "test": "lanceur/test_client_update.js",
+      "exit": 0
+    },
+    {
+      "test": "lanceur/test_connection_settings.js",
+      "exit": 0
+    },
+    {
+      "test": "lanceur/test_markdown.js",
+      "exit": 0
+    }
+  ]
+}

@@ -11,8 +11,8 @@ const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 async function until(work,label){for(let i=0;i<400;i++){if(await work())return;await sleep(25);}throw new Error('Timeout: '+label);}
 
 async function main(){
-  const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
-  const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe'});
+  const {chromium,options}=require('./browser_test_support.cjs');
+  const browser=await chromium.launch(options);
   const state={history:null,revision:'1',preferences:{},native:{phase:'idle',installed:true,session:'',speech_id:0,partial:'',turns:[]},calls:[],chats:[],runs:new Map(),syncDelay:0,syncActive:0,acks:[],stops:0,cancels:[],voiceCancels:[],speech:[],timers:new Set(),holdChat:false,longVoice:false,pendingChat:null};
   const json=(res,value,status=200)=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8'});res.end(JSON.stringify(value));};
   const event=(res,value)=>{if(!res.destroyed&&!res.writableEnded)res.write('data: '+JSON.stringify(value)+'\n\n');};

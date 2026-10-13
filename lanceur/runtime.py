@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import json
+import os
 from pathlib import Path
 import subprocess
 import time
@@ -30,7 +31,9 @@ def supervise(config_path, run_dir, floor=6, mock=False):
         command = [str(PYTHON), '-u', '-m', 'serve.server', '--engine', 'mock' if mock else 'strata',
                    '--config', str(Path(config_path).resolve()), '--host', cfg['host'], '--port', str(cfg['port'])]
         with (run_dir / 'server.stdout.log').open('wb') as stdout, (run_dir / 'server.stderr.log').open('wb') as stderr:
-            server = subprocess.Popen(command, cwd=cfg['cwd'], stdout=stdout, stderr=stderr, creationflags=HIDDEN)
+            server_env = os.environ.copy()
+            server_env.update(cfg.get('server_env', {}))
+            server = subprocess.Popen(command, cwd=cfg['cwd'], env=server_env, stdout=stdout, stderr=stderr, creationflags=HIDDEN)
         state['server'] = process_identity(psutil.Process(server.pid))
         save()
         deadline = time.monotonic() + 90 * 60

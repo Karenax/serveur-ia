@@ -1,0 +1,37 @@
+{
+  "endpoint": "192.168.1.41:51820",
+  "checks": [
+    {
+      "route": "/v1/models",
+      "status": 200,
+      "bytes": 2302
+    },
+    {
+      "route": "/v1/status",
+      "status": 200,
+      "bytes": 221
+    },
+    {
+      "route": "/v1/device",
+      "status": 200,
+      "bytes": 157
+    },
+    {
+      "route": "/v1/workspace",
+      "status": 200,
+      "bytes": 364
+    },
+    {
+      "route": "/v1/history",
+      "status": 200,
+      "bytes": 55538
+    }
+  ],
+  "diagnostic": {
+    "handshake": true,
+    "last_handshake_time_sec": 1791886076,
+    "resolved_endpoint": "192.168.1.41:51820",
+    "rx_bytes": 126092,
+    "tx_bytes": 11716
+  }
+}

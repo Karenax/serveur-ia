@@ -1,0 +1,180 @@
+{
+  "before": {
+    "models": [
+      {
+        "pid": 11836,
+        "created": 1791817764.058309
+      },
+      {
+        "pid": 17608,
+        "created": 1791817764.079432
+      }
+    ],
+    "files": {
+      "acces-distants.json": "1d357907389d2056a608c5e98b47d2fa31f519521af1f18e8f3666eb36e16037",
+      "wireguard.json": "6cbd6b81bd61645cce770ac2a7e03cdb99f86b800c95d4f05e0a425e3a6aa7dd",
+      "reglages.json": "63d67efcbd295491ce77dc49198426e1290d6dfeabc0119befe3e1b172ee1762",
+      "wireguard-prive/secrets.dpapi": "0bf5ae5faca3ad22177ce07af1d8587441ad569f0595a46a3c8c4d4184600a93",
+      "wireguard-prive/signature.dpapi": "240cd390a95972957889009bfabb7e54942f33d7f99d9ebb9a211ab1f9754a4a"
+    },
+    "users": {
+      "client_histories": {
+        "count": 1,
+        "sha256": "c2eba0dc20bbea8f6c7383de022a0b7a3313f309e1b7f31f6dc6e11b8ac4dbda"
+      },
+      "projects": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "documents": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "memories": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "conversations": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "policies": {
+        "count": 1,
+        "sha256": "aa7aff0b13d59517f121a32e8db4de83ac93d7e112cf407376be53b5b5f7dc46"
+      },
+      "jobs": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "personal_memories": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "knowledge_exclusions": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    },
+    "backups": {
+      "enabled": true,
+      "time": "03:00",
+      "frequency": "daily",
+      "weekday": 0,
+      "destination": "D:\\Serveur IA\\lanceur\\sauvegardes",
+      "secondary_destination": "",
+      "retention": {
+        "daily": 7,
+        "weekly": 4,
+        "monthly": 6
+      },
+      "secret_configured": true
+    }
+  },
+  "backup_before": {
+    "id": "6e2007943bf67b1e08ab5ba0",
+    "file": "D:\\Serveur IA\\lanceur\\sauvegardes\\fred-20261012-214705-6e2007943bf67b1e08ab5ba0.qwenbackup",
+    "size": 2421863,
+    "sha256": "57a3516dee68524ef3a087a375a84ea033485fa6a43865630cf73a491081dcbc",
+    "version": 2,
+    "verified": true
+  },
+  "contains_secret_values": false,
+  "windows_release": {
+    "version": "3.5.28",
+    "sha256": "42e99e3de8df3471eae55e48401e17408654182937a99e335a88cbee09516cd8",
+    "bytes": 93456890
+  },
+  "android_release": {
+    "version": "1.0.11",
+    "version_code": 12,
+    "package": "net.karenax.fred",
+    "bytes": 18903316,
+    "sha256": "0c96ca451df572407d897723e5b6af0619b73c28fdfc49601c2fa7c6562e62bb"
+  },
+  "personal_clients": 1,
+  "passed": true,
+  "after": {
+    "models": [
+      {
+        "pid": 11836,
+        "created": 1791817764.058309
+      },
+      {
+        "pid": 17608,
+        "created": 1791817764.079432
+      }
+    ],
+    "files": {
+      "acces-distants.json": "1d357907389d2056a608c5e98b47d2fa31f519521af1f18e8f3666eb36e16037",
+      "wireguard.json": "6cbd6b81bd61645cce770ac2a7e03cdb99f86b800c95d4f05e0a425e3a6aa7dd",
+      "reglages.json": "63d67efcbd295491ce77dc49198426e1290d6dfeabc0119befe3e1b172ee1762",
+      "wireguard-prive/secrets.dpapi": "0bf5ae5faca3ad22177ce07af1d8587441ad569f0595a46a3c8c4d4184600a93",
+      "wireguard-prive/signature.dpapi": "240cd390a95972957889009bfabb7e54942f33d7f99d9ebb9a211ab1f9754a4a"
+    },
+    "users": {
+      "client_histories": {
+        "count": 1,
+        "sha256": "c2eba0dc20bbea8f6c7383de022a0b7a3313f309e1b7f31f6dc6e11b8ac4dbda"
+      },
+      "projects": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "documents": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "memories": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "conversations": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "policies": {
+        "count": 1,
+        "sha256": "aa7aff0b13d59517f121a32e8db4de83ac93d7e112cf407376be53b5b5f7dc46"
+      },
+      "jobs": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "personal_memories": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "knowledge_exclusions": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    },
+    "backups": {
+      "enabled": true,
+      "time": "03:00",
+      "frequency": "daily",
+      "weekday": 0,
+      "destination": "D:\\Serveur IA\\lanceur\\sauvegardes",
+      "secondary_destination": "",
+      "retention": {
+        "daily": 7,
+        "weekly": 4,
+        "monthly": 6
+      },
+      "secret_configured": true
+    }
+  },
+  "server_version": "3.5.28",
+  "hermes_available": true,
+  "client_storage_ready": 2,
+  "knowledge_status": "pret",
+  "backup_after": {
+    "id": "83c485ca633f0f59fc74a893",
+    "file": "D:\\Serveur IA\\lanceur\\sauvegardes\\fred-20261012-220231-83c485ca633f0f59fc74a893.qwenbackup",
+    "size": 2334483,
+    "sha256": "d0699a3a236a715a01e35fd0ca08c2e093cb603a07e0f7fbcfee65b424d8ee0d",
+    "version": 2,
+    "verified": true
+  },
+  "canonical_histories_valid": 1
+}

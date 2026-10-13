@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-52e990d493384be089ad0c40",
+  "object": "chat.completion",
+  "created": 1791876011,
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Voici la fonction Python demandée, suivie de l'exemple pour `n=8`.\n\n```python\ndef fibonacci(n):\n    \"\"\"\n    Retourne une liste contenant les n premiers nombres de Fibonacci.\n    \"\"\"\n    if n <= 0:\n        return []\n    elif n == 1:\n        return [0]\n    \n    fib_sequence = [0, 1]\n    for i in range(2, n):\n        next_value = fib_sequence[i-1] + fib_sequence[i-2]\n        fib_sequence.append(next_value)\n    \n    return fib_sequence\n\n# Exemple pour n=8\nresult = fibonacci(8)\nprint(result)\n```\n\n**Sortie pour `n=8` :**\n```\n[0, 1, 1, 2, 3, 5, 8, 13]\n```"
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 57,
+    "completion_tokens": 192,
+    "total_tokens": 249,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 57,
+    "prompt_ms": 2105.6,
+    "prompt_per_token_ms": 36.94,
+    "prompt_per_second": 27.1,
+    "predicted_n": 192,
+    "predicted_ms": 5860.8,
+    "predicted_per_token_ms": 30.525,
+    "predicted_per_second": 32.8,
+    "draft_n": 140,
+    "draft_n_accepted": 118
+  }
+}

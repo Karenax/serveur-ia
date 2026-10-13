@@ -7,13 +7,12 @@ import os
 from pathlib import Path
 import secrets
 import socket
-import subprocess
 import threading
 import time
 from cryptography.fernet import Fernet, InvalidToken
-from core import ROOT, HOME, PYTHON, HIDDEN, read_json, write_json
+from core import ROOT, read_json, write_json
 
-VERSION = '3.5.27'
+VERSION = '3.5.28'
 FILES = ['reglages.json', 'reglages-par-defaut.json', 'derniers-reglages-valides.json', 'base-strata.json', 'acces-distants.json', 'wireguard.json', 'comptes.json', 'exploitation.json', 'voix.json', 'hermes-integration.json', 'hermes-models.json']
 
 def cipher(password, salt):
@@ -323,16 +322,18 @@ class Operations:
     def restore(self, data):
         return self.restorations.restore_sync(data, guided=False)
 
-    def _restore_legacy(self, data):
+    def _restore_legacy(self, data, *, package=None):
         c=self.controller
         if c.processes() or c.supervisor(c.current_run()) or c.remote.metadata()['enabled']:
             raise ValueError('Arrêter le modèle et désactiver WireGuard avant la restauration.')
-        path=Path(data.get('file',''))
-        if path.stat().st_size>400*1024*1024:raise ValueError('Sauvegarde trop volumineuse.')
-        blob=path.read_bytes()
-        if not blob.startswith(b'QWENBACKUP1'): raise ValueError('Format de sauvegarde invalide.')
-        try: package=json.loads(cipher(data.get('password'),blob[11:27]).decrypt(blob[27:]))
-        except (InvalidToken, ValueError): raise ValueError('Sauvegarde invalide ou phrase incorrecte.')
+        if package is None:
+            path=Path(data.get('file',''))
+            if path.stat().st_size>400*1024*1024:raise ValueError('Sauvegarde trop volumineuse.')
+            blob=path.read_bytes()
+            if not blob.startswith(b'QWENBACKUP1'): raise ValueError('Format de sauvegarde invalide.')
+            try: package=json.loads(cipher(data.get('password'),blob[11:27]).decrypt(blob[27:]))
+            except (InvalidToken, ValueError): raise ValueError('Sauvegarde invalide ou phrase incorrecte.')
+            del blob
         files=package.get('files',{})
         if package.get('version') != 1 or not isinstance(files,dict) or set(files)-set(FILES+['vault','profiles','signing_seed','workspace','web_key','hermes']):
             raise ValueError('Contenu de sauvegarde invalide.')
@@ -363,7 +364,6 @@ class Operations:
                 elif type(values.get('listen_port')) is not int or not 1<=values['listen_port']<=65535:raise ValueError('Port WireGuard invalide.')
             import sys
             sys.path.insert(0,str(ROOT/'client-qwen'))
-            from wg_bridge import validate_profile
             if not isinstance(files.get('profiles',{}),dict):raise ValueError('Profils invalides.')
             from profiles import validate_access,match,public_key
             access=validate_access(files['acces-distants.json']) if 'acces-distants.json' in files else {'clients':[]}

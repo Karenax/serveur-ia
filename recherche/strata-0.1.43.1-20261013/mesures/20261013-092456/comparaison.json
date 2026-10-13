@@ -1,0 +1,217 @@
+{
+  "profiles": [
+    {
+      "profile": "flash-production",
+      "source_folder": "D:\\Serveur IA\\recherche\\strata-0.1.43.1-20261013\\mesures\\20261013-092456\\flash-production",
+      "requests": 15,
+      "sky_tps": 30.1,
+      "fibonacci_code_tps": 33.7,
+      "document_prompt_ms": {
+        "64": 7696.049999999999,
+        "256": 17952.85,
+        "1024": 58534.15
+      },
+      "document_prompt_tps": {
+        "64": 200.75,
+        "256": 332.04999999999995,
+        "1024": 403.65
+      },
+      "sustained_tps": null,
+      "sustained_seconds": 0,
+      "sustained_requests": 0,
+      "sustained_individual_tps": [],
+      "exact_pass": 9,
+      "exact_count": 9,
+      "strict_json_pass": 9,
+      "max_temperature_c": 79.0,
+      "thermal_samples": 1,
+      "thermal_sample_count": 224,
+      "no_prompt_reuse": true
+    },
+    {
+      "profile": "strata-mtp-batch",
+      "source_folder": "D:\\Serveur IA\\recherche\\strata-0.1.43.1-20261013\\mesures\\20261013-092456\\strata-mtp-batch",
+      "requests": 15,
+      "sky_tps": 35.2,
+      "fibonacci_code_tps": 38.9,
+      "document_prompt_ms": {
+        "64": 7842.5,
+        "256": 17795.15,
+        "1024": 56795.25
+      },
+      "document_prompt_tps": {
+        "64": 197.0,
+        "256": 335.15,
+        "1024": 416.0
+      },
+      "sustained_tps": null,
+      "sustained_seconds": 0,
+      "sustained_requests": 0,
+      "sustained_individual_tps": [],
+      "exact_pass": 9,
+      "exact_count": 9,
+      "strict_json_pass": 9,
+      "max_temperature_c": 78.0,
+      "thermal_samples": 0,
+      "thermal_sample_count": 216,
+      "no_prompt_reuse": true,
+      "median_decode_ratio": 1.1543026706231452,
+      "min_document_prefill_ratio": 0.9731610337972169,
+      "baseline_thermal_valid": false,
+      "speed_and_exact_checks_met": true,
+      "thresholds_met": false
+    },
+    {
+      "profile": "27b-mtp2-4096",
+      "source_folder": "D:\\Serveur IA\\recherche\\strata-0.1.43.1-20261013\\mesures\\20261013-110242\\27b-mtp2-4096",
+      "requests": 13,
+      "sky_tps": 30.763477117401877,
+      "fibonacci_code_tps": 35.78903165827566,
+      "document_prompt_ms": {
+        "64": null,
+        "256": null,
+        "1024": null
+      },
+      "document_prompt_tps": {
+        "64": null,
+        "256": null,
+        "1024": null
+      },
+      "sustained_tps": 27.726241220762574,
+      "sustained_seconds": 77.26847124099731,
+      "sustained_requests": 4,
+      "sustained_individual_tps": [
+        28.10917294726989,
+        28.664247202262896,
+        28.07496245729213,
+        25.995078638165143
+      ],
+      "exact_pass": 3,
+      "exact_count": 3,
+      "strict_json_pass": 3,
+      "max_temperature_c": 79.0,
+      "thermal_samples": 5,
+      "thermal_sample_count": 124,
+      "no_prompt_reuse": true
+    },
+    {
+      "profile": "27b-sans-mtp-4096",
+      "source_folder": "D:\\Serveur IA\\recherche\\strata-0.1.43.1-20261013\\mesures\\20261013-092456\\27b-sans-mtp-4096",
+      "requests": 9,
+      "sky_tps": 18.538160621893496,
+      "fibonacci_code_tps": 18.537611734710246,
+      "document_prompt_ms": {
+        "64": null,
+        "256": null,
+        "1024": null
+      },
+      "document_prompt_tps": {
+        "64": null,
+        "256": null,
+        "1024": null
+      },
+      "sustained_tps": null,
+      "sustained_seconds": 0,
+      "sustained_requests": 0,
+      "sustained_individual_tps": [],
+      "exact_pass": 3,
+      "exact_count": 3,
+      "strict_json_pass": 3,
+      "max_temperature_c": 64.0,
+      "thermal_samples": 0,
+      "thermal_sample_count": 90,
+      "no_prompt_reuse": true
+    },
+    {
+      "profile": "27b-mtp2-32768",
+      "source_folder": "D:\\Serveur IA\\recherche\\strata-0.1.43.1-20261013\\mesures\\20261013-092456\\27b-mtp2-32768",
+      "requests": 14,
+      "sky_tps": 30.63622795227813,
+      "fibonacci_code_tps": 35.66281937103653,
+      "document_prompt_ms": {
+        "64": 6437.5915,
+        "256": 24888.212,
+        "1024": 115044.123
+      },
+      "document_prompt_tps": {
+        "64": 239.99664843946198,
+        "256": 239.55117298213395,
+        "1024": 205.37337661307566
+      },
+      "sustained_tps": null,
+      "sustained_seconds": 0,
+      "sustained_requests": 0,
+      "sustained_individual_tps": [],
+      "exact_pass": 8,
+      "exact_count": 8,
+      "strict_json_pass": 8,
+      "max_temperature_c": 80.0,
+      "thermal_samples": 27,
+      "thermal_sample_count": 226,
+      "no_prompt_reuse": true
+    }
+  ],
+  "state": {
+    "phase": "production-retablie",
+    "profile": null,
+    "outcomes": [
+      {
+        "profile": "flash-production",
+        "error": "Limitation thermique ou 80 C observés ; profil interrompu."
+      },
+      {
+        "profile": "strata-reference",
+        "error": "Le serveur de test a quitté pendant le chargement."
+      },
+      {
+        "profile": "strata-mtp-batch",
+        "requests": 15,
+        "quality_pass": true
+      },
+      {
+        "profile": "27b-mtp2-32768",
+        "error": "Limitation thermique ou 80 C observés ; profil interrompu."
+      },
+      {
+        "profile": "27b-mtp2-4096",
+        "error": "Refroidissement sous 55 C non atteint en 5 minutes."
+      },
+      {
+        "profile": "27b-sans-mtp-4096",
+        "requests": 9,
+        "quality_pass": true
+      }
+    ],
+    "cooling_between_requests": true,
+    "profile_error": "Refroidissement sous 55 C non atteint en 5 minutes.",
+    "recovery_pid": 22812
+  },
+  "production_restored": true,
+  "deployment_performed": false,
+  "supplement_run": "D:\\Serveur IA\\recherche\\strata-0.1.43.1-20261013\\mesures\\20261013-110242",
+  "supplement_state": {
+    "phase": "production-retablie",
+    "profile": null,
+    "outcomes": [
+      {
+        "profile": "27b-mtp2-4096",
+        "error": "Limitation thermique ou 80 C observés ; profil interrompu."
+      }
+    ],
+    "cooling_between_requests": true,
+    "mtp_only": true,
+    "profile_error": "Limitation thermique ou 80 C observés ; profil interrompu.",
+    "recovery_pid": 12248
+  },
+  "console_recovery": {
+    "console_reconnected": true,
+    "previous_pid": 20528,
+    "new_pid": 25708,
+    "engine_pid_unchanged": 11084,
+    "preserve_model_state": true,
+    "autoload_and_restart_settings": {
+      "autoload": true,
+      "restart": true
+    }
+  }
+}

@@ -1,0 +1,164 @@
+[
+  {
+    "case": "r1-ciel",
+    "uuid": "GPU-486d5352-582e-2880-78bf-3dec4688e142",
+    "samples": 6,
+    "max_temperature_c": 61.0,
+    "min_sm_mhz": 1328.0,
+    "median_sm_mhz": 1328.0,
+    "thermal_samples": 0
+  },
+  {
+    "case": "r1-ciel",
+    "uuid": "GPU-a39f1b57-5a26-b53d-e943-44ef8042a438",
+    "samples": 6,
+    "max_temperature_c": 64.0,
+    "min_sm_mhz": 1328.0,
+    "median_sm_mhz": 1328.0,
+    "thermal_samples": 0
+  },
+  {
+    "case": "r1-fibonacci-code",
+    "uuid": "GPU-486d5352-582e-2880-78bf-3dec4688e142",
+    "samples": 7,
+    "max_temperature_c": 61.0,
+    "min_sm_mhz": 1316.0,
+    "median_sm_mhz": 1328.0,
+    "thermal_samples": 0
+  },
+  {
+    "case": "r1-fibonacci-code",
+    "uuid": "GPU-a39f1b57-5a26-b53d-e943-44ef8042a438",
+    "samples": 7,
+    "max_temperature_c": 64.0,
+    "min_sm_mhz": 1316.0,
+    "median_sm_mhz": 1328.0,
+    "thermal_samples": 0
+  },
+  {
+    "case": "r1-calcul",
+    "uuid": "GPU-486d5352-582e-2880-78bf-3dec4688e142",
+    "samples": 1,
+    "max_temperature_c": 57.0,
+    "min_sm_mhz": 1328.0,
+    "median_sm_mhz": 1328.0,
+    "thermal_samples": 0
+  },
+  {
+    "case": "r1-calcul",
+    "uuid": "GPU-a39f1b57-5a26-b53d-e943-44ef8042a438",
+    "samples": 1,
+    "max_temperature_c": 60.0,
+    "min_sm_mhz": 1328.0,
+    "median_sm_mhz": 1328.0,
+    "thermal_samples": 0
+  },
+  {
+    "case": "r2-ciel",
+    "uuid": "GPU-486d5352-582e-2880-78bf-3dec4688e142",
+    "samples": 7,
+    "max_temperature_c": 61.0,
+    "min_sm_mhz": 1328.0,
+    "median_sm_mhz": 1328.0,
+    "thermal_samples": 0
+  },
+  {
+    "case": "r2-ciel",
+    "uuid": "GPU-a39f1b57-5a26-b53d-e943-44ef8042a438",
+    "samples": 7,
+    "max_temperature_c": 64.0,
+    "min_sm_mhz": 1328.0,
+    "median_sm_mhz": 1328.0,
+    "thermal_samples": 0
+  },
+  {
+    "case": "r2-fibonacci-code",
+    "uuid": "GPU-486d5352-582e-2880-78bf-3dec4688e142",
+    "samples": 7,
+    "max_temperature_c": 61.0,
+    "min_sm_mhz": 1189.0,
+    "median_sm_mhz": 1328.0,
+    "thermal_samples": 0
+  },
+  {
+    "case": "r2-fibonacci-code",
+    "uuid": "GPU-a39f1b57-5a26-b53d-e943-44ef8042a438",
+    "samples": 7,
+    "max_temperature_c": 64.0,
+    "min_sm_mhz": 1189.0,
+    "median_sm_mhz": 1328.0,
+    "thermal_samples": 0
+  },
+  {
+    "case": "r2-calcul",
+    "uuid": "GPU-486d5352-582e-2880-78bf-3dec4688e142",
+    "samples": 2,
+    "max_temperature_c": 57.0,
+    "min_sm_mhz": 1328.0,
+    "median_sm_mhz": 1328.0,
+    "thermal_samples": 0
+  },
+  {
+    "case": "r2-calcul",
+    "uuid": "GPU-a39f1b57-5a26-b53d-e943-44ef8042a438",
+    "samples": 2,
+    "max_temperature_c": 60.0,
+    "min_sm_mhz": 1328.0,
+    "median_sm_mhz": 1328.0,
+    "thermal_samples": 0
+  },
+  {
+    "case": "r3-ciel",
+    "uuid": "GPU-486d5352-582e-2880-78bf-3dec4688e142",
+    "samples": 7,
+    "max_temperature_c": 60.0,
+    "min_sm_mhz": 1316.0,
+    "median_sm_mhz": 1328.0,
+    "thermal_samples": 0
+  },
+  {
+    "case": "r3-ciel",
+    "uuid": "GPU-a39f1b57-5a26-b53d-e943-44ef8042a438",
+    "samples": 7,
+    "max_temperature_c": 64.0,
+    "min_sm_mhz": 1328.0,
+    "median_sm_mhz": 1328.0,
+    "thermal_samples": 0
+  },
+  {
+    "case": "r3-fibonacci-code",
+    "uuid": "GPU-486d5352-582e-2880-78bf-3dec4688e142",
+    "samples": 7,
+    "max_temperature_c": 60.0,
+    "min_sm_mhz": 1328.0,
+    "median_sm_mhz": 1328.0,
+    "thermal_samples": 0
+  },
+  {
+    "case": "r3-fibonacci-code",
+    "uuid": "GPU-a39f1b57-5a26-b53d-e943-44ef8042a438",
+    "samples": 7,
+    "max_temperature_c": 64.0,
+    "min_sm_mhz": 1328.0,
+    "median_sm_mhz": 1328.0,
+    "thermal_samples": 0
+  },
+  {
+    "case": "r3-calcul",
+    "uuid": "GPU-486d5352-582e-2880-78bf-3dec4688e142",
+    "samples": 1,
+    "max_temperature_c": 55.0,
+    "min_sm_mhz": 1328.0,
+    "median_sm_mhz": 1328.0,
+    "thermal_samples": 0
+  },
+  {
+    "case": "r3-calcul",
+    "uuid": "GPU-a39f1b57-5a26-b53d-e943-44ef8042a438",
+    "samples": 1,
+    "max_temperature_c": 59.0,
+    "min_sm_mhz": 1328.0,
+    "median_sm_mhz": 1328.0,
+    "thermal_samples": 0
+  }
+]

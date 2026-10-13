@@ -77,9 +77,13 @@ class ModelsTests(unittest.TestCase):
             request or secrets.token_hex(16),conversation,None,None,False)[1]
     def clear(self):self.manager.active.clear();self.store.active=0
     def post(self, value, owner=None, token=None, path='/v1/provider/credential'):
+        context=self.manager.context(owner or self.a)
+        value=dict(value)
+        if context and path=='/v1/provider/credential':value.setdefault('request_id',context['request_id'])
         token=token or self.accounts.credentials(owner or self.a)['inference_key']
         request=urllib.request.Request(self.private.url+path,json.dumps(value).encode(),headers={
-            'Authorization':'Bearer '+token,'Content-Type':'application/json'})
+            'Authorization':'Bearer '+token,'Content-Type':'application/json',
+            **({'X-Fred-Request':context['request_id']} if context else {})})
         try:
             with urllib.request.urlopen(request,timeout=5) as response:return response.status,json.loads(response.read())
         except urllib.error.HTTPError as response:return response.code,json.loads(response.read())
@@ -212,12 +216,13 @@ class ModelsTests(unittest.TestCase):
         env['FRED_INFERENCE_KEY']=self.accounts.credentials(self.a)['inference_key']
         env['FRED_PROVIDER_URL']=self.private.url+'/v1/provider/credential'
         helper=Path(__file__).with_name('hermes_model_key.py')
-        result=subprocess.run([str(runtime['python']),str(helper),selected],env=env,
+        request_id=self.manager.context(self.a)['request_id']
+        result=subprocess.run([str(runtime['python']),str(helper),selected,request_id],env=env,
             capture_output=True,timeout=15,creationflags=HIDDEN)
         self.assertEqual(result.returncode,0);self.assertEqual(result.stderr,b'')
         self.assertEqual(json.loads(result.stdout),{'access_token':self.source.key,'expires_in':1})
         self.manager.context(self.a)['cancelled'].set()
-        result=subprocess.run([str(runtime['python']),str(helper),selected],env=env,
+        result=subprocess.run([str(runtime['python']),str(helper),selected,request_id],env=env,
             capture_output=True,timeout=15,creationflags=HIDDEN)
         self.assertNotEqual(result.returncode,0);self.assertEqual(result.stdout,b'');self.assertEqual(result.stderr,b'')
     def test_profile_migration_keeps_identity_and_binds_all_auxiliary_tasks_to_main(self):
@@ -366,7 +371,7 @@ class ModelsTests(unittest.TestCase):
 class CloudFixture:
     """Actual HTTP chat/Responses endpoints; no external provider traffic."""
     def __init__(self):
-        self.calls=[]
+        self.calls=[];self.use_fred_tool=False
         fixture=self
         class Handler(BaseHTTPRequestHandler):
             def log_message(self,*args):pass
@@ -392,15 +397,23 @@ class CloudFixture:
                         for event in events:self.wfile.write(('event: '+event['type']+'\ndata: '+json.dumps(event)+'\n\n').encode())
                     else:self.reply(response)
                 elif self.path.endswith('/chat/completions'):
+                    tool=None
+                    if fixture.use_fred_tool and not any(m.get('role')=='tool' for m in data['messages']):
+                        tool=next((t['function']['name'] for t in data.get('tools',[]) if t['function']['name'].endswith('fred_workspace_info')),None)
+                        if not tool and any(t['function']['name']=='tool_call' for t in data.get('tools',[])):tool='tool_call'
+                    arguments={'calls':[{'name':'mcp__fred__fred_workspace_info','arguments':{}}]} if tool=='tool_call' else {}
+                    message={'role':'assistant','content':None,'tool_calls':[{'id':'call_fred','type':'function','function':{'name':tool,'arguments':json.dumps(arguments)}}]} if tool else {'role':'assistant','content':'Native cloud reply'}
+                    finish='tool_calls' if tool else 'stop'
                     if data.get('stream'):
                         self.send_response(200);self.send_header('Content-Type','text/event-stream');self.end_headers()
                         event={'id':'chat_fixture','object':'chat.completion.chunk','created':int(time.time()),'model':model,
-                            'choices':[{'index':0,'delta':{'role':'assistant','content':'Native cloud reply'},'finish_reason':None}]}
+                            'choices':[{'index':0,'delta':message,'finish_reason':None}]}
+                        if tool:message['tool_calls'][0]['index']=0
                         self.wfile.write(('data: '+json.dumps(event)+'\n\n').encode())
-                        event['choices']=[{'index':0,'delta':{},'finish_reason':'stop'}]
+                        event['choices']=[{'index':0,'delta':{},'finish_reason':finish}]
                         self.wfile.write(('data: '+json.dumps(event)+'\n\ndata: [DONE]\n\n').encode())
                     else:self.reply({'id':'chat_fixture','object':'chat.completion','created':int(time.time()),'model':model,
-                        'choices':[{'index':0,'message':{'role':'assistant','content':'Native cloud reply'},'finish_reason':'stop'}],
+                        'choices':[{'index':0,'message':message,'finish_reason':finish}],
                         'usage':{'prompt_tokens':2,'completion_tokens':3,'total_tokens':5}})
                 else:self.send_error(404)
         self.server=ThreadingHTTPServer(('127.0.0.1',0),Handler)
@@ -451,6 +464,26 @@ class NativeCloudTests(unittest.TestCase):
         self.assertEqual(self.facade.conversations.reconcile(self.owner,request,'native-max')['status'],'completed')
         self.assertTrue(self.cloud.calls)
         self.assertEqual(self.cloud.calls[0][2].get('reasoning_effort'),'max')
+    def test_actual_native_history_keeps_image_content_at_provider_boundary(self):
+        self.facade.start()
+        model=self.facade.model_catalog(self.owner)['data'][1]['id']
+        image='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a9WQAAAAASUVORK5CYII='
+        history=[{'role':'user','content':[{'type':'text','text':'Image précédente'},{'type':'image_url','image_url':{'url':image}}]},
+            {'role':'assistant','content':'Description'}, {'role':'user','content':'Relis cette image.'}]
+        list(self.facade.stream(self.owner,{'model':model,'messages':history},secrets.token_hex(16),'native-image'))
+        parts=[p for _,_,body in self.cloud.calls for m in body['messages'] if isinstance(m.get('content'),list) for p in m['content']]
+        self.assertTrue(any(p.get('type')=='image_url' and p['image_url']['url'].startswith('data:image/') for p in parts),
+            [(m['role'], type(m.get('content')).__name__, str(m.get('content',''))[:150]) for _,_,body in self.cloud.calls for m in body['messages']])
+
+    def test_actual_native_mcp_transport_carries_admitted_run_identity(self):
+        self.facade.start();self.cloud.use_fred_tool=True
+        model=self.facade.model_catalog(self.owner)['data'][1]['id']
+        list(self.facade.stream(self.owner,{'model':model,'messages':[{'role':'user','content':'Lis les informations de mon espace.'}]},secrets.token_hex(16),'native-mcp'))
+        replies=[m['content'] for _,_,body in self.cloud.calls for m in body['messages'] if m.get('role')=='tool']
+        self.assertTrue(replies, [[t['function']['name'] for t in body.get('tools',[])] for _,_,body in self.cloud.calls])
+        self.assertTrue(any('documents' in text and 'personal' in text for text in replies),replies)
+        self.assertFalse(any('Accès désactivé' in text or 'Outil non autorisé' in text for text in replies),replies)
+
     def test_native_key_cmd_and_auxiliary_main_cover_chat_and_responses_without_qwen(self):
         # Real installed SDK clients, provider resolver, key_cmd and Fred broker.
         # Only the network/model endpoint is synthetic.

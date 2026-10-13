@@ -3,12 +3,9 @@ from pathlib import Path
 import json
 import struct
 import sys
-import shutil
 
 root=Path(__file__).resolve().parent.parent
 sys.path.insert(0,str(root/'lanceur'))
-from core import read_json
-from wireguard_access import network_routes
 from wg_bridge import validate_profile
 
 def read_exe_profile(path):

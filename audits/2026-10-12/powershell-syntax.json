@@ -1,0 +1,25 @@
+{
+  "Files": 86,
+  "Errors": [
+    {
+      "File": "Install-EG2.ps1",
+      "Line": 8,
+      "Message": "Unexpected token 'environnement' in expression or statement."
+    },
+    {
+      "File": "Install-EG2.ps1",
+      "Line": 15,
+      "Message": "The string is missing the terminator: '."
+    },
+    {
+      "File": "Install-EG2.ps1",
+      "Line": 8,
+      "Message": "Missing closing '}' in statement block or type definition."
+    },
+    {
+      "File": "Install-EG2.ps1",
+      "Line": 6,
+      "Message": "Missing closing '}' in statement block or type definition."
+    }
+  ]
+}

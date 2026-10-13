@@ -10,9 +10,9 @@ const html=read('chat.html').replace('__UI_CSS__',read('ui.css')).replace('__CON
 [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].forEach((match,index)=>new vm.Script(match[1],{filename:'windows-inline-'+index+'.js'}));
 
 async function main(){
-  const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
-  const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe'});
-  const state={history:null,revision:'1',preferences:{},requests:[],pending:null,approval:false,disconnectApproval:false,runs:new Map()};
+  const {chromium,options}=require('./browser_test_support.cjs');
+  const browser=await chromium.launch(options);
+  const state={history:null,revision:'1',preferences:{},requests:[],pending:null,approval:false,disconnectApproval:false,historyFull:false,runs:new Map()};
   const json=(res,value,status=200)=>{res.writeHead(status,{'Content-Type':'application/json'});res.end(JSON.stringify(value));};
   const server=http.createServer(async(req,res)=>{
     let raw='';for await(const chunk of req)raw+=chunk;const body=JSON.parse(raw||'{}');
@@ -42,7 +42,7 @@ async function main(){
       const event=value=>res.write('data: '+JSON.stringify(value)+'\n\n');
       event({hermes_status:{phase:'tool',message:'Recherche dans vos documents'}});
       event({hermes_answer:{text:'',reasoning_content:''}});
-      const finish=text=>{state.runs.set(body.turn_id,{request_id:body.turn_id,conversation_id:body.conversation_id,status:'completed',text,reasoning_content:'',sources:[]});if(res.destroyed||res.writableEnded)return;event({hermes_answer:{text,reasoning_content:'',final:true}});event({choices:[{delta:{},finish_reason:'stop'}]});event({hermes_run:{request_id:body.turn_id,conversation_id:body.conversation_id,status:'completed'}});res.end('data: [DONE]\n\n');};
+      const finish=text=>{state.runs.set(body.turn_id,{request_id:body.turn_id,conversation_id:body.conversation_id,status:'completed',text,reasoning_content:'',sources:[],...(state.historyFull?{history_error:'Historique plein.'}:{})});if(res.destroyed||res.writableEnded)return;event({hermes_answer:{text,reasoning_content:'',final:true}});event({choices:[{delta:{},finish_reason:'stop'}]});event({hermes_run:{request_id:body.turn_id,conversation_id:body.conversation_id,status:'completed',...(state.historyFull?{history_error:'Historique plein.'}:{})}});res.end('data: [DONE]\n\n');};
       if(state.approval){const approval={request_id:'receipt_'+body.turn_id,description:'Modifier le document <script>alert(1)</script>',expires_epoch:Date.now()/1000+60};state.pending={...body,approval,finish};state.runs.set(body.turn_id,{request_id:body.turn_id,conversation_id:body.conversation_id,status:'waiting_for_approval',text:'',approval});event({hermes_approval:approval});setTimeout(()=>{if(res.destroyed)return;event({hermes_status:{phase:'approval',message:'Votre accord est toujours attendu.'}});if(state.disconnectApproval)res.end();},50);return;}
       setTimeout(()=>finish('Voici uniquement la réponse finale.'),50);return;
     }
@@ -70,6 +70,14 @@ async function main(){
     state.approval=false;await page.evaluate(()=>showView('corrector'));await page.fill('#corrector-text','Je veut un texte correct.');await page.click('#corrector-correct');await page.waitForFunction(()=>document.getElementById('corrector-status').textContent.includes('terminé'));await page.waitForFunction(()=>!busy&&!historySyncPending);
     const correction=state.requests.filter(request=>request.path==='/v1/chat/completions').at(-1);const row=state.history.conversations.find(c=>c.id===state.history.currentId);
     assert.deepEqual(correction.body.text_transform,{mode:'correct',text:'Je veut un texte correct.'});assert.equal(row.messages[0].content,'Corriger :\n\nJe veut un texte correct.');assert.equal(row.messages[1].turn_id,undefined);assert.deepEqual(errors,[]);
+    await page.evaluate(()=>showView('chat'));await page.click('#new');state.historyFull=true;
+    await page.fill('#prompt','Une réponse à exporter.');await page.click('#send');await page.waitForSelector('#send:not([disabled])');
+    await page.waitForSelector('#agent-history-recovery:not([hidden])');
+    assert((await page.textContent('#agent-history-recovery')).includes('30 jours'));
+    assert.equal(state.history.conversations.find(c=>c.id===state.history.currentId).messages.length,1,'The valid saved history must retain the user and keep the overflowing answer separately');
+    const download=page.waitForEvent('download');await page.click('#agent-history-recovery button');
+    const exported=await download;assert(exported.suggestedFilename().startsWith('reponse-fred-'));assert.equal(fs.readFileSync(await exported.path(),'utf8'),'Voici uniquement la réponse finale.');
+    await page.reload();await page.waitForSelector('#agent-history-recovery:not([hidden])');assert.equal(await page.locator('.message.assistant').count(),0);assert.deepEqual(errors,[]);
     console.log('Windows Hermes UI verified: final-only voice, stable turns, opaque approvals across heartbeat/disconnect/reload, once/refusal, corrector and shared scripts.');
     await page.close();
   }finally{await browser.close();await new Promise(resolve=>server.close(resolve));}

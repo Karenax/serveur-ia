@@ -7,7 +7,6 @@ No profile-wide active project is changed by a conversation.
 from __future__ import annotations
 
 import json
-from pathlib import Path
 import re
 import subprocess
 import threading

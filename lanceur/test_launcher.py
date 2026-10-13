@@ -29,10 +29,10 @@ class LaunchTests(unittest.TestCase):
 
     def test_default_profile_and_unchanged_native_options(self):
         s = validate(self.settings, True)
-        self.assertEqual((s['context'], s['workers'], s['history_slots']), (262144, 15, 1))
+        self.assertEqual((s['context'], s['workers'], s['history_slots']), (262144, 15, 8))
         self.assertEqual(s['model_name'], 'qwen3.8-flash-next-iq4-xs')
         self.assertTrue(s['mtp_enabled'])
-        self.assertFalse(s['history_enabled'])
+        self.assertTrue(s['history_enabled'])
         cfg = build_config(self.base, s)
         for flag in ['--resident-cpu-experts', '--mmap-experts', '--no-prefill-borrow']:
             self.assertIn(flag, cfg['args'])

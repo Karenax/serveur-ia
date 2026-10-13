@@ -1,0 +1,9 @@
+Voici une explication précise et accessible du phénomène, basée sur la physique de la lumière et de l'atmosphère.
+
+### 1. Pourquoi le ciel est bleu en journée
+
+Le phénomène principal en jeu est la **diffusion de Rayleigh**.
+
+*   **La lumière blanche du Soleil** : La lumière que nous voyons du Soleil est composée de toutes les couleurs du spectre visible (rouge, orange, jaune, vert, bleu, violet). Chaque couleur correspond à une longueur d’onde différente. Le bleu a une longueur d’onde plus courte que le rouge.
+*   **L’interaction avec l’atmosphère** : Lorsque la lumière solaire entre dans l’atmosphère terrestre, elle rencontre des molécules d’air (principalement de l’azote et de l’oxygène). Ces molécules sont beaucoup plus petites que la longueur d’onde de la lumière visible.
+*   **La diffusion préférentielle** : Selon la loi de Rayleigh, la quantité de lumière diffusée est inversement proportionnelle à la puissance de la quatrième de la longueur d’onde ($I \propto 1/\lambda^4$). Cela signifie que les ondes courtes (ble

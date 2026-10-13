@@ -3,9 +3,8 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import hmac
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from http.server import BaseHTTPRequestHandler
 import json
-import mimetypes
 from pathlib import Path
 import secrets
 import socket
@@ -15,10 +14,11 @@ import time
 from urllib.parse import urlsplit, quote, parse_qs
 import psutil
 from core import ROOT, HOME, BASE_PATH, PYTHON, HIDDEN, read_json, write_json, defaults_from_config, validate, build_config, health, matching_servers, process_identity, same_process, stop_processes, available_port, tail, arg
-from operations import Operations, VERSION
+from operations import Operations, VERSION as VERSION
 from releases import status as release_status, repackage, rollback, download_name
 from remote import AccessStore, GATEWAY_PORT, serve_gateway
 from wireguard_access import WireGuardAccess,firewall
+from http_boundary import BoundedHTTPServer, json_body
 
 class Controller:
     def __init__(self, home=HOME, include_legacy=True):
@@ -269,6 +269,7 @@ def serve(port=8765, controller=None):
             pass
 
         def own_host(self):
+            port = self.server.server_address[1]
             return self.headers.get('Host', '') in (f'127.0.0.1:{port}', f'localhost:{port}')
 
         def respond(self, status, content, content_type='application/json; charset=utf-8'):
@@ -387,6 +388,7 @@ def serve(port=8765, controller=None):
             self.respond(404, {'error': 'Page introuvable.'})
 
         def do_POST(self):
+            port = self.server.server_address[1]
             path = urlsplit(self.path).path
             origin = self.headers.get('Origin', '')
             if not self.own_host() or (origin and origin not in (f'http://127.0.0.1:{port}', f'http://localhost:{port}')):
@@ -398,11 +400,7 @@ def serve(port=8765, controller=None):
             try:
                 if getattr(controller.remote,'maintenance',False) and path not in ('/api/backups/verify','/api/backups/recover'):
                     raise ValueError('Serveur en maintenance ; action suspendue.')
-                length = int(self.headers.get('Content-Length', '0'))
-                if not 0 <= length <= 65536:
-                    raise ValueError('Requête trop volumineuse.')
-                data = json.loads(self.rfile.read(length) or b'{}')
-                if not isinstance(data,dict):raise ValueError('Objet JSON attendu.')
+                data = json_body(self, 65536, allow_empty=True)
                 # Restoration coordinates its own locks and may wait for an
                 # active agent to release the provider. Keep the controller
                 # available while that worker shuts down.
@@ -519,7 +517,7 @@ def serve(port=8765, controller=None):
                 self.respond(200, result)
             except (ValueError, OSError, RuntimeError, psutil.Error) as error:
                 self.respond(400, {'error': str(error)})
-    httpd = ThreadingHTTPServer(('127.0.0.1', port), Handler)
+    httpd = BoundedHTTPServer(('127.0.0.1', port), Handler, capacity=24)
     httpd.daemon_threads = True
     return httpd
 

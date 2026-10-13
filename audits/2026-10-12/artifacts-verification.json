@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "windows_compiled_workers_passed": true,
+  "shared_assets_exact": true,
+  "personal_data_absent": true,
+  "artifacts": {
+    "Acc\u00e8s serveur Fred.exe": {
+      "bytes": 93456890,
+      "sha256": "42e99e3de8df3471eae55e48401e17408654182937a99e335a88cbee09516cd8"
+    },
+    "Acces-serveur-Fred-Android.apk": {
+      "bytes": 18903316,
+      "sha256": "0c96ca451df572407d897723e5b6af0619b73c28fdfc49601c2fa7c6562e62bb"
+    }
+  }
+}

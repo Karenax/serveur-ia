@@ -1,0 +1,14 @@
+{
+  "phase": "production-retablie",
+  "profile": null,
+  "outcomes": [
+    {
+      "profile": "27b-mtp2-4096",
+      "error": "Limitation thermique ou 80 C observés ; profil interrompu."
+    }
+  ],
+  "cooling_between_requests": true,
+  "mtp_only": true,
+  "profile_error": "Limitation thermique ou 80 C observés ; profil interrompu.",
+  "recovery_pid": 12248
+}

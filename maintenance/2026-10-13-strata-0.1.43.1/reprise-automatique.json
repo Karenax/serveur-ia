@@ -1,0 +1,9 @@
+{
+  "console_restarted": true,
+  "engine_pid_preserved": 11340,
+  "restart_attempts_reset": true,
+  "operations": {
+    "autoload": true,
+    "restart": true
+  }
+}

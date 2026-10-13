@@ -50,8 +50,10 @@ class PrivateInferenceTests(unittest.TestCase):
         self.manager.close(); self.private.close(); self.model.shutdown(); self.model.server_close()
         self.store.workspace.shutdown(); self.store.voice.close(); self.tmp.cleanup()
     def post(self, path, value, token):
+        context = self.manager.context(self.a if token in ('key-A','tool-A') else self.b)
         request = urllib.request.Request(self.private.url + path, json.dumps(value).encode(),
-                                        headers={'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'})
+                                        headers={'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json',
+                                                 **({'X-Fred-Request': context['request_id']} if context else {})})
         try:
             with urllib.request.urlopen(request, timeout=5) as response: return response.status, response.read()
         except urllib.error.HTTPError as response: return response.code, response.read()

@@ -1,0 +1,6 @@
+{
+  "phase": "interrompu-thermique",
+  "profile": "flash-production",
+  "outcomes": [],
+  "error": "Limitation thermique observée à 79 C ; client de benchmark arrêté pendant la seconde lecture du grand dossier, production non arrêtée."
+}

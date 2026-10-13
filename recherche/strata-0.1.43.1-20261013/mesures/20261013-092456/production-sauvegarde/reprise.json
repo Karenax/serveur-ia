@@ -1,0 +1,27 @@
+{
+  "config_path": "D:\\Serveur IA\\lanceur\\sessions\\20261012-170923-558208\\strata.json",
+  "files": [
+    {
+      "path": "D:\\Serveur IA\\lanceur\\reglages.json",
+      "sha256": "63d67efcbd295491ce77dc49198426e1290d6dfeabc0119befe3e1b172ee1762"
+    },
+    {
+      "path": "D:\\Serveur IA\\lanceur\\base-strata.json",
+      "sha256": "52cb471684adb8f233bb912a6e681cc56bc7a0c64e40ab83065e28e46248cfe6"
+    },
+    {
+      "path": "D:\\Serveur IA\\strata-iq4-p100-hybride.json",
+      "sha256": "52cb471684adb8f233bb912a6e681cc56bc7a0c64e40ab83065e28e46248cfe6"
+    },
+    {
+      "path": "D:\\Serveur IA\\strata-build-p100\\strata.exe",
+      "sha256": "9b07c8c1e2367d217e17199f137f6c8d33f5832ab02df594b68652ba5c9488d0"
+    },
+    {
+      "path": "D:\\Serveur IA\\lanceur\\sessions\\20261012-170923-558208\\strata.json",
+      "sha256": "a32d6a5cfaea786b36d605becd9caef6be1fe41b4688c02e9f36de03b5e08185"
+    }
+  ],
+  "session": "D:\\Serveur IA\\lanceur\\sessions\\20261012-170923-558208",
+  "floor": 6
+}

@@ -31,6 +31,16 @@ final class UpdateChecks {
             rejects(()->AndroidUpdates.validateApk(context,fixture,release));
             fixture.delete();rejects(()->AndroidUpdates.validateApk(context,fixture,release));
         }finally{fixture.delete();}
+        File cache=new File(context.getCacheDir(),"update-cache-test");if(!cache.mkdirs()&&!cache.isDirectory())throw new IOException();
+        File ready=new File(cache,"a".repeat(64)+".apk"),old=new File(cache,"b".repeat(64)+".apk"),partial=new File(cache,"download-fixture.part"),operator=new File(cache,"notes.txt");
+        try{
+            for(File file:new File[]{ready,old,partial,operator})try(FileOutputStream out=new FileOutputStream(file)){out.write(1);}
+            AndroidUpdates.cleanCache(cache,ready);
+            if(!ready.isFile()||old.exists()||partial.exists()||!operator.isFile())throw new AssertionError("Cache must retain only the ready APK and unrelated files");
+            AndroidUpdates.cleanCache(cache,null);
+            if(ready.exists()||!operator.isFile())throw new AssertionError("Installed APK must leave the managed cache");
+        }finally{ready.delete();old.delete();partial.delete();operator.delete();cache.delete();}
         log.append("PASS Android update manifest bounds, integrity, package identity, signature mismatch, same-version and downgrade rejection\n");
+        log.append("PASS Android update cache retention and unrelated-file preservation\n");
     }
 }

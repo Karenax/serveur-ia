@@ -20,12 +20,12 @@ import time
 
 from wg_crypto import private_directory, protect
 
-MAX_FILE = 32 * 1024 * 1024
-MAX_TOTAL = 64 * 1024 * 1024
+MAX_FILE = 144 * 1024 * 1024
+MAX_TOTAL = 144 * 1024 * 1024
 MAX_FILES = 8192
 ROOT_FILES = frozenset({'config.yaml', '.no-bundled-skills', 'SOUL.md', 'profile.yaml',
                         'active_profile', 'integration.sqlite3', 'accounts.sqlite3', 'secrets.dpapi',
-                        'registry.sqlite3', 'integration.json', 'gateway-config.json', 'fred-integration.db'})
+                        'registry.sqlite3', 'integration.json', 'gateway-config.json', 'fred-integration.db', 'runs_idempotency.db'})
 PROFILE_FILES = frozenset({'config.yaml', '.no-bundled-skills', 'profile.yaml',
                            'SOUL.md', 'AGENTS.md', 'state.db', 'projects.db'})
 PROFILE_DIRS = frozenset({'memories', 'sessions', 'skills', 'plans', 'workspace'})
@@ -112,6 +112,7 @@ def _snapshot(path):
                 raise ValueError('Base Hermes endommagée ; sauvegarde refusée.')
             if path.name == 'fred-integration.db': _rewrap(destination, decrypt=True)
             destination.commit()
+            destination.execute('VACUUM')
             raw = destination.serialize()
             # A standalone snapshot must not depend on a WAL sidecar.
             return raw[:18] + b'\x01\x01' + raw[20:]
@@ -196,7 +197,7 @@ class HermesBackup:
                 if kind == 'dpapi': raw = protect(raw, decrypt=True)
             total += len(raw)
             if len(raw) > MAX_FILE or total > MAX_TOTAL or len(files) >= MAX_FILES:
-                raise ValueError('Limite de sauvegarde Hermes atteinte (64 Mo).')
+                raise ValueError('Limite de sauvegarde Hermes atteinte (144 Mo).')
             files[name] = {'kind': kind, 'sha256': hashlib.sha256(raw).hexdigest(),
                            'bytes': len(raw), 'data': base64.b64encode(raw).decode('ascii')}
         return {'version': 1, 'files': files}

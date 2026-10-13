@@ -208,7 +208,8 @@ class WireGuardAccess:
             raw_record=next(c for c in read_json(self.store.path)['clients'] if c['id']==identity)
             from profiles import match
             match(raw_record,profile,self.settings()['public_key'],self.vault()['peers'].get(identity))
-            profile={**profile,'client_name':record['name']}
+            profile={**profile,'client_name':record['name'],
+                     'local_routes':network_routes(self.settings().get('listen_port',UDP_PORT))}
             raw=json.dumps(profile,ensure_ascii=False,indent=2).encode('utf-8')
             if len(raw)>65536:raise ValueError('Profil Android trop volumineux.')
             return raw

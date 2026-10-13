@@ -71,5 +71,5 @@ async function check(browser,platform){
   }catch(error){console.error(JSON.stringify({platform,lastCalls:state.calls.slice(-8),ui:await page.evaluate(()=>({busy,historySyncPending,historySaving,correctorRunning,requestId,status:document.getElementById('corrector-status').textContent})),errors},null,2));throw error;}
   finally{await page.close();server.closeAllConnections?.();await new Promise(resolve=>server.close(resolve));}
 }
-async function main(){const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe'});try{for(const platform of ['windows','android'])await check(browser,platform);console.log(JSON.stringify({passed:true,checks:results},null,2));}finally{await browser.close();}}
+async function main(){const {chromium,options}=require('./browser_test_support.cjs');const browser=await chromium.launch(options);try{for(const platform of ['windows','android'])await check(browser,platform);console.log(JSON.stringify({passed:true,checks:results},null,2));}finally{await browser.close();}}
 main().catch(error=>{console.error(error);process.exitCode=1;});

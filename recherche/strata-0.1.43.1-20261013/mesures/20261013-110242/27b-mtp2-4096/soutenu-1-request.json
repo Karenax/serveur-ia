@@ -1,0 +1,18 @@
+{
+  "model": "huihui-27b",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Mesure indépendante soutenu-1.\nDécris en français le trajet de l’eau, de la pluie à la rivière puis à la mer. Développe une explication détaillée et continue."
+    }
+  ],
+  "max_tokens": 512,
+  "temperature": 0,
+  "seed": 42,
+  "cache_prompt": false,
+  "stream": false,
+  "chat_template_kwargs": {
+    "enable_thinking": false
+  },
+  "reasoning_effort": "none"
+}

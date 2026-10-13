@@ -1,0 +1,38 @@
+{
+  "choices": [
+    {
+      "finish_reason": "length",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Voici une explication précise et accessible du phénomène, basée sur la physique de la lumière et de l'atmosphère.\n\n### 1. Pourquoi le ciel est bleu en journée\n\nLe phénomène principal en jeu est la **diffusion de Rayleigh**.\n\n*   **La lumière blanche du Soleil** : La lumière que nous voyons du Soleil est composée de toutes les couleurs du spectre visible (rouge, orange, jaune, vert, bleu, violet). Chaque couleur correspond à une longueur d’onde différente. Le bleu a une longueur d’onde plus courte que le rouge.\n*   **L’interaction avec l’atmosphère** : Lorsque la lumière solaire entre dans l’atmosphère terrestre, elle rencontre des molécules d’air (principalement de l’azote et de l’oxygène). Ces molécules sont beaucoup plus petites que la longueur d’onde de la lumière visible.\n*   **La diffusion préférentielle** : Selon la loi de Rayleigh, la quantité de lumière diffusée est inversement proportionnelle à la puissance de la longueur d’onde. Autrement dit, **les ondes courtes (bleu et violet) sont beaucoup plus diffusées que les ondes"
+      }
+    }
+  ],
+  "created": 1791882429,
+  "model": "huihui-27b",
+  "system_fingerprint": "b1-0ae77ef",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 256,
+    "prompt_tokens": 49,
+    "total_tokens": 305,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-qR91eEjenrQ0xPWDLTzxshzxwniY6KtB",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 49,
+    "prompt_ms": 748.008,
+    "prompt_per_token_ms": 15.265469387755102,
+    "prompt_per_second": 65.50732077731789,
+    "predicted_n": 256,
+    "predicted_ms": 8289.05,
+    "predicted_per_token_ms": 32.50607843137254,
+    "predicted_per_second": 30.763477117401877,
+    "draft_n": 208,
+    "draft_n_accepted": 150
+  }
+}

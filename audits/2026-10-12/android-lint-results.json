@@ -1,0 +1,60 @@
+[
+  {
+    "id": "UnusedAttribute",
+    "severity": "Warning",
+    "message": "Attribute `enableOnBackInvokedCallback` is only used in API level 33 and higher (current min is 26)",
+    "location": [
+      {
+        "file": "D:\\Serveur IA\\client-android\\app\\src\\main\\AndroidManifest.xml",
+        "line": "8",
+        "column": "137"
+      }
+    ]
+  },
+  {
+    "id": "SetJavaScriptEnabled",
+    "severity": "Warning",
+    "message": "Using `setJavaScriptEnabled` can introduce XSS vulnerabilities into your application, review carefully",
+    "location": [
+      {
+        "file": "D:\\Serveur IA\\client-android\\app\\src\\main\\java\\net\\karenax\\fred\\MainActivity.java",
+        "line": "29",
+        "column": "106"
+      }
+    ]
+  },
+  {
+    "id": "ObsoleteSdkInt",
+    "severity": "Warning",
+    "message": "This folder configuration (`v26`) is unnecessary; `minSdkVersion` is 26. Merge all the resources in this folder into `mipmap-anydpi`.",
+    "location": [
+      {
+        "file": "D:\\Serveur IA\\client-android\\app\\src\\main\\res\\mipmap-anydpi-v26"
+      }
+    ]
+  },
+  {
+    "id": "UsableSpace",
+    "severity": "Warning",
+    "message": "Consider also using `StorageManager#getAllocatableBytes` and `allocateBytes` which will consider clearable cached data",
+    "location": [
+      {
+        "file": "D:\\Serveur IA\\client-android\\app\\src\\main\\java\\net\\karenax\\fred\\LocalVoice.java",
+        "line": "81",
+        "column": "34"
+      }
+    ]
+  },
+  {
+    "id": "MonochromeLauncherIcon",
+    "severity": "Warning",
+    "message": "The application adaptive icon is missing a monochrome tag",
+    "location": [
+      {
+        "file": "D:\\Serveur IA\\client-android\\app\\src\\main\\res\\mipmap-anydpi-v26\\ic_launcher.xml",
+        "line": "1",
+        "column": "1"
+      }
+    ]
+  }
+]

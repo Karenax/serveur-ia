@@ -1,0 +1,18 @@
+{
+  "pid": 11220,
+  "created_at": 1791877475.8969753,
+  "command": [
+    "D:\\Serveur IA\\recherche\\strata-0.1.41-test-20261008\\.venv\\Scripts\\python.exe",
+    "-u",
+    "-m",
+    "serve.server",
+    "--engine",
+    "strata",
+    "--config",
+    "D:\\Serveur IA\\recherche\\strata-0.1.43.1-20261013\\mesures\\20261013-092456\\config-reference.json",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "8081"
+  ]
+}

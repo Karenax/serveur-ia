@@ -10,10 +10,10 @@ from urllib.parse import urlsplit
 def main():
     try:
         model=sys.argv[1]
-        if len(sys.argv)!=2 or not re.fullmatch(r'fred-model-[a-f0-9]{24}',model):raise ValueError()
+        if len(sys.argv)!=3 or not re.fullmatch(r'fred-model-[a-f0-9]{24}',model) or not re.fullmatch(r'[a-f0-9]{32}',sys.argv[2]):raise ValueError()
         url=os.environ['FRED_PROVIDER_URL']; parsed=urlsplit(url)
         if parsed.scheme!='http' or parsed.hostname not in {'127.0.0.1','::1'} or not parsed.port or parsed.username or parsed.password or parsed.query or parsed.fragment or parsed.path!='/v1/provider/credential':raise ValueError()
-        request=urllib.request.Request(url,json.dumps({'model_id':model}).encode(),
+        request=urllib.request.Request(url,json.dumps({'model_id':model,'request_id':sys.argv[2]}).encode(),
             {'Authorization':'Bearer '+os.environ['FRED_INFERENCE_KEY'],'Content-Type':'application/json'})
         with urllib.request.urlopen(request,timeout=13) as response:value=json.loads(response.read(65536))
         if not isinstance(value.get('access_token'),str) or not value['access_token']:raise ValueError()

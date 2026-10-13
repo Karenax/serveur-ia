@@ -1,0 +1,13 @@
+# Configuration du serveur en IP fixe 192.168.1.41
+
+Configuration demandée après correction de la consigne : carte Marvell `E0-4F-43-E6-50-12`, adresse `192.168.1.41`, masque `255.255.255.0`, passerelle et DNS `192.168.1.1`. Les réglages sont persistants et DHCP est désactivé pour IPv4. L’utilisateur adapte la redirection de port de la box à cette adresse ; les profils clients conservent `.41`.
+
+**État effectif :** le script relancé en administrateur a réussi le 13 octobre 2026 à 12 h 51 (Europe/Paris). Windows confirme `.41/24`, origine `Manual`, état `Preferred`, DHCP IPv4 `Disabled` et présence de l’adresse dans `PersistentStore`. Passerelle et DNS : `192.168.1.1`. `resultat.json` confirme le succès ; `verification.json` confirme la route `.41` dans l’EXE personnel, WireGuard et HTTPS Cloudflare avec cinq modèles, ainsi que la conservation des clés et des processus Qwen chargés.
+
+Le script `Configurer-IP-Fixe.ps1` prépare le plan sans modifier le réseau lorsqu’il est lancé sans argument. `-Appliquer` demande l’élévation Windows, vérifie à nouveau que l’adresse est libre, sauvegarde les anciens paramètres, applique l’IP puis contrôle la détection de conflit, la persistance et l’accès à la passerelle. Un échec après changement déclenche le retour aux paramètres précédents. Il conserve les DNS et cible uniquement la carte réseau identifiée par sa MAC.
+
+La configuration persistante utilise la commande documentée par [Microsoft : netsh interface ipv4 set address](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/netsh-interface).
+
+Lors de la demande initiale de retour à `.40`, Windows a confirmé un conflit avec l’équipement `espressif`, MAC `D4-D4-DA-6A-B6-70`. Le script a rétabli la configuration DHCP précédente. Cette tentative a été abandonnée à la demande de l’utilisateur ; `.40` reste attribuée à cet équipement et `.41` devient l’adresse fixe du serveur. L’ancien résultat est conservé dans `tentative-ip40.json`.
+
+Le [registre des constructeurs de Wireshark](https://www.wireshark.org/download/automated/data/manuf) associe le préfixe MAC `D4:D4:DA` à **Espressif Inc.** La box indique le nom `espressif`, une connexion via `lan4` et l’état en ligne. L’équipement répond au ping ; aucun service accessible n’a été trouvé sur les 24 ports TCP testés, dont HTTP, ESPHome, MQTT et Tuya. Cela confirme le fabricant de l’interface réseau, mais ne permet pas de déterminer l’objet ou son modèle. Espressif fournit des puces pour des [équipements connectés](https://www.espressif.com/en/products/hardware) ; une prise, un relais, un capteur ou une passerelle reste une hypothèse, sans identification précise. Les résultats locaux sont dans `appareil-identification.json`.

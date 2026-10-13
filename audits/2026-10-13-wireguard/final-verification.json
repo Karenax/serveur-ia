@@ -1,0 +1,19 @@
+{
+  "https": {
+    "connected": true,
+    "reachable": true,
+    "code": "ready",
+    "model_count": 5
+  },
+  "wireguard": {
+    "connected": true,
+    "handshake": true,
+    "endpoint": "192.168.1.41:51820",
+    "model_count": 5
+  },
+  "history": {
+    "status": 200,
+    "bytes": 55538
+  },
+  "compiled_client_self_test": 0
+}

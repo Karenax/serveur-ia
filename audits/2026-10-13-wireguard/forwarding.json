@@ -1,0 +1,28 @@
+{
+  "utc": "2026-10-13T10:05:01.395217+00:00",
+  "before": {
+    "status": 500,
+    "data": {
+      "faultcode": "s:Client",
+      "faultstring": "UPnPError",
+      "errorCode": "714",
+      "errorDescription": "NoSuchEntryInArray"
+    }
+  },
+  "add": {
+    "status": 200,
+    "data": {
+      "AddPortMappingResponse": ""
+    }
+  },
+  "after": {
+    "status": 200,
+    "data": {
+      "NewInternalPort": "51820",
+      "NewInternalClient": "192.168.1.41",
+      "NewEnabled": "1",
+      "NewPortMappingDescription": "Fred WireGuard",
+      "NewLeaseDuration": "604800"
+    }
+  }
+}

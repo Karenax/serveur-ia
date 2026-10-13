@@ -1,12 +1,10 @@
 """Deploy the verified local build without stopping inference processes."""
 import json
-from pathlib import Path
 import subprocess
 import sys
 import time
 import urllib.request
-import psutil
-from core import ROOT, HOME, HIDDEN, read_json, same_process, write_json
+from core import ROOT, HOME, HIDDEN, read_json, same_process
 from operations import Operations, VERSION
 from releases import status, repackage
 

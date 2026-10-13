@@ -1,0 +1,23 @@
+{
+  "ip": "192.168.1.40",
+  "open_tcp_ports": [],
+  "router_host": [
+    {
+      "type": "pc",
+      "name": "espressif",
+      "ip": "192.168.1.40",
+      "mac": "d4:d4:da:6a:b6:70",
+      "iface": "lan4",
+      "probe": "81",
+      "alive": "68174",
+      "status": "online"
+    }
+  ],
+  "additional_open_tcp_ports": [],
+  "vendor_registry": {
+    "source": "https://www.wireshark.org/download/automated/data/manuf",
+    "oui": "D4:D4:DA",
+    "organization": "Espressif Inc."
+  },
+  "conclusion": "Module reseau Espressif confirme ; objet et modele precis non identifies par les services disponibles."
+}

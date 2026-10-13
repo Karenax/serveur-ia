@@ -1,5 +1,4 @@
 """Password accounts bound to issued devices, with expiring in-memory sessions."""
-import base64
 import hashlib
 import hmac
 import re
@@ -13,7 +12,15 @@ class Accounts:
         self.path=home/'comptes.json'
         self.lock=threading.RLock()
         self.sessions={};self.failures={}
-        self.dummy=hashlib.scrypt(b'dummy',salt=bytes(16),n=16384,r=8,p=1).hex()
+        self._dummy=None
+
+    @property
+    def dummy(self):
+        # This compatibility layer no longer authenticates the current clients.
+        # Retain its timing protection only when a legacy login actually uses it.
+        with self.lock:
+            if self._dummy is None:self._dummy=hashlib.scrypt(b'dummy',salt=bytes(16),n=16384,r=8,p=1).hex()
+            return self._dummy
 
     def metadata(self):
         with self.lock:

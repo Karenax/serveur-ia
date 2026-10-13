@@ -7,7 +7,6 @@ through the authenticated private broker while their own run is active.
 from __future__ import annotations
 import hashlib
 import json
-import os
 from pathlib import Path
 import re
 import subprocess
@@ -448,7 +447,7 @@ class HermesModels:
         if self.on_changed:self.on_changed()
         return self.admin()
 
-    def profile_config(self, owner):
+    def profile_config(self, owner, request_id=None):
         if not self.allowed(owner):return {}
         runtime=self.source.runtime if isinstance(self.source,NativeModelSource) else None
         if not runtime:
@@ -459,7 +458,7 @@ class HermesModels:
         for row in self.refresh():
             if not self.usable(row) or not self.exposed(row['id']):continue
             providers[row['id']]={'name':row['id'],'base_url':row['base_url'],'transport':row['api_mode'],
-                'default_model':row['native_model'],'key_cmd':subprocess.list2cmdline(command+[row['id']]),
+                'default_model':row['native_model'],'key_cmd':subprocess.list2cmdline(command+[row['id']]+([request_id] if request_id else [])),
                 'models':{row['native_model']:row['capabilities']},
                 'capabilities':{'vision':row['capabilities']['vision']}}
             if row['capabilities']['context_length']:providers[row['id']]['context_length']=row['capabilities']['context_length']

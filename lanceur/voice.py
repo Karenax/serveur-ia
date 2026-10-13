@@ -1,6 +1,5 @@
 """Authenticated, bounded CPU speech service, isolated from Qwen and EG2."""
 import json
-import os
 from pathlib import Path
 import queue
 import re

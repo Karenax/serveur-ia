@@ -31,6 +31,8 @@ $correctorData = (Join-Path $PSScriptRoot 'corrector.js') + ';.'
 $markdownVendor = (Join-Path $PSScriptRoot 'vendor') + ';vendor'
 & $python -m PyInstaller --noconfirm --onefile --windowed --collect-all webview --collect-all pythonnet --collect-all clr_loader --name "Accès serveur Fred" --icon (Join-Path $PSScriptRoot "fred.ico") --version-file (Join-Path $PSScriptRoot "product-version.txt") --add-data $voiceData --add-data $voiceJsData --add-data $conversationJsData --add-data $workspaceData --add-data $uiCssData --add-data $uiJsData --add-data $attachmentsData --add-data $selectionData --add-data $thinkingData --add-data $markdownData --add-data $correctorData --add-data $markdownVendor --add-data ((Join-Path $PSScriptRoot 'chat.html') + ';.') --add-data ((Join-Path $PSScriptRoot 'LICENSE.txt') + ';.') --add-data ((Join-Path $PSScriptRoot 'THIRD-PARTY.txt') + ';.') --add-binary ($WireGuardBinary + ';.') --distpath $DistributionDirectory --workpath (Join-Path $PSScriptRoot 'build') --specpath $PSScriptRoot (Join-Path $PSScriptRoot 'client.py')
 if ($LASTEXITCODE -ne 0) { throw 'La compilation du client a echoue.' }
+& $python (Join-Path $root 'maintenance\build_manifest.py') --artifact (Join-Path $DistributionDirectory 'Accès serveur Fred.exe') --output (Join-Path $DistributionDirectory 'build-manifest.json')
+if ($LASTEXITCODE -ne 0) { throw 'Inventaire de compilation Windows impossible.' }
 if (!$SkipManifest) {
     if ($DistributionDirectory -ne [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot 'dist'))) { throw 'La signature du manifeste nécessite le dossier de distribution par défaut ; utiliser -SkipManifest pour une compilation isolée.' }
     & $python (Join-Path $root 'lanceur\releases.py')

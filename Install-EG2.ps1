@@ -5,7 +5,7 @@ $eg2Env = Join-Path $eg2Root 'toolchain\eg2-python'
 $eg2Python = Join-Path $eg2Env 'Scripts\python.exe'
 if (!(Test-Path -LiteralPath $eg2Python)) {
     & $eg2BasePython -m venv $eg2Env
-    if ($LASTEXITCODE -ne 0) { throw 'Création de l’environnement EG2 impossible.' }
+    if ($LASTEXITCODE -ne 0) { throw "Création de l'environnement EG2 impossible." }
 }
 & $eg2Python -m pip install -r (Join-Path $eg2Root 'lanceur\requirements-eg2.txt')
 if ($LASTEXITCODE -ne 0) { throw 'Installation des dépendances EG2 impossible.' }

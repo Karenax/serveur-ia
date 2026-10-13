@@ -1,0 +1,6 @@
+{
+  "format": "acces-serveur-fred-connection",
+  "version": 1,
+  "protocol": "UDP",
+  "endpoint": "192.168.1.41:51820"
+}

@@ -1,0 +1,35 @@
+{
+  "phase": "production-retablie",
+  "profile": null,
+  "outcomes": [
+    {
+      "profile": "flash-production",
+      "error": "Limitation thermique ou 80 C observés ; profil interrompu."
+    },
+    {
+      "profile": "strata-reference",
+      "error": "Le serveur de test a quitté pendant le chargement."
+    },
+    {
+      "profile": "strata-mtp-batch",
+      "requests": 15,
+      "quality_pass": true
+    },
+    {
+      "profile": "27b-mtp2-32768",
+      "error": "Limitation thermique ou 80 C observés ; profil interrompu."
+    },
+    {
+      "profile": "27b-mtp2-4096",
+      "error": "Refroidissement sous 55 C non atteint en 5 minutes."
+    },
+    {
+      "profile": "27b-sans-mtp-4096",
+      "requests": 9,
+      "quality_pass": true
+    }
+  ],
+  "cooling_between_requests": true,
+  "profile_error": "Refroidissement sous 55 C non atteint en 5 minutes.",
+  "recovery_pid": 22812
+}

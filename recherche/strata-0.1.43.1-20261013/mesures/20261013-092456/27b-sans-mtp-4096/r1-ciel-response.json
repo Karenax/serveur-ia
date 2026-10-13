@@ -1,0 +1,36 @@
+{
+  "choices": [
+    {
+      "finish_reason": "length",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Voici une explication précise et accessible de ces deux phénomènes, qui reposent tous deux sur un même principe physique : la **diffusion de la lumière**.\n\n### 1. Pourquoi le ciel est bleu en journée\n\nLa lumière du Soleil semble blanche, mais elle est en réalité composée de toutes les couleurs de l’arc-en-ciel (rouge, orange, jaune, vert, bleu, violet). Chaque couleur correspond à une longueur d’onde différente :\n*   Le **violet et le bleu** ont des **longueurs d’onde courtes**.\n*   Le **rouge et l’orange** ont des **longueurs d’onde longues**.\n\nQuand la lumière du Soleil entre dans l’atmosphère terrestre, elle rencontre des molécules d’air (principalement de l’azote et de l’oxygène). Ces molécules sont beaucoup plus petites que la longueur d’onde de la lumière visible.\n\nC’est là qu’intervient la **diffusion de Rayleigh** :\n*   Les molécules d’air diffusent (éparpillent) beaucoup plus efficacement les lumières à **courte longueur d’onde** (bleu et violet) que les"
+      }
+    }
+  ],
+  "created": 1791880760,
+  "model": "huihui-27b",
+  "system_fingerprint": "b1-0ae77ef",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 256,
+    "prompt_tokens": 49,
+    "total_tokens": 305,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-bwGTsjs8wBTEZy83JTCm69R7u2Z0MEFs",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 49,
+    "prompt_ms": 717.597,
+    "prompt_per_token_ms": 14.644836734693877,
+    "prompt_per_second": 68.28345157518775,
+    "predicted_n": 256,
+    "predicted_ms": 13763.295,
+    "predicted_per_token_ms": 53.97370588235294,
+    "predicted_per_second": 18.527540098501124
+  }
+}

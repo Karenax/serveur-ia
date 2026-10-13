@@ -4,7 +4,8 @@ import atexit
 from pathlib import Path
 import threading
 import time
-from core import read_json, write_json
+import sqlite3
+from core import read_json
 from hermes_accounts import HermesAccounts
 from hermes_service import HermesService
 from hermes_inference import HermesPrivateServer
@@ -104,13 +105,25 @@ class HermesFred:
                     self.accounts.materialize(owner,self.service.port,selection=selected)
 
     def watch(self):
+        next_prune = 0
+        next_storage_check = 0
         while not self.halt.wait(.5):
+            if self.store.workspace.maintenance: continue
             with self.conversations.lock: contexts = list(self.conversations.active.items())
             for owner, context in contexts:
                 if not self.conversations.valid(owner,context) or time.monotonic() - context['created'] > self.conversations.timeout:
                     self.conversations.cancel(owner, context['request_id'])
                 pending = context.get('approval')
                 if pending and pending['expires_epoch'] < time.time(): self.conversations.cancel(owner, context['request_id'])
+            if contexts and time.monotonic() >= next_storage_check:
+                next_storage_check = time.monotonic() + 5
+                for owner,context in contexts:
+                    try: self.conversations.storage.check(owner)
+                    except (OSError,ValueError,sqlite3.Error): self.conversations.cancel(owner,context['request_id'])
+            if not contexts and not self.conversations.admission_paused and time.monotonic() >= next_prune:
+                next_prune = time.monotonic() + 60
+                try: self.conversations.prune()
+                except (OSError,ValueError,sqlite3.Error): self.error = 'Nettoyage du journal Hermes en attente.'
 
     def cancel(self, owner, request=None): return self.conversations.cancel(owner, request)
     def status(self, owner=None):

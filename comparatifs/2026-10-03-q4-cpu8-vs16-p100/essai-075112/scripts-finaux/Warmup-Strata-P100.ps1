@@ -1,4 +1,4 @@
-param([Parameter(Mandatory=$true)][int]$ServerPid, [ValidateSet(8,16)][int]$CpuCores = 16)
+﻿param([Parameter(Mandatory=$true)][int]$ServerPid, [ValidateSet(8,16)][int]$CpuCores = 16)
 $ErrorActionPreference = 'Stop'
 $marker = Join-Path $PSScriptRoot 'strata-data\cuda-debug.flag'
 $watch = [Diagnostics.Stopwatch]::StartNew()

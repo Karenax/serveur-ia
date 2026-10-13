@@ -1,0 +1,105 @@
+{
+  "tracked_files": 2624,
+  "tracked_bytes": 43779866,
+  "groups": {
+    "(racine)": {
+      "files": 200,
+      "bytes": 2778791
+    },
+    "analyses": {
+      "files": 46,
+      "bytes": 296823
+    },
+    "client-android": {
+      "files": 114,
+      "bytes": 4493465
+    },
+    "client-qwen": {
+      "files": 118,
+      "bytes": 1447608
+    },
+    "client-voice": {
+      "files": 31,
+      "bytes": 80906
+    },
+    "comparatifs": {
+      "files": 705,
+      "bytes": 13175121
+    },
+    "contribution-strata-p100": {
+      "files": 3,
+      "bytes": 94731
+    },
+    "dependances": {
+      "files": 6,
+      "bytes": 226257
+    },
+    "lanceur": {
+      "files": 175,
+      "bytes": 1688016
+    },
+    "preuves": {
+      "files": 303,
+      "bytes": 11103735
+    },
+    "recherche": {
+      "files": 918,
+      "bytes": 8386269
+    },
+    "resultats-premiere-config": {
+      "files": 5,
+      "bytes": 8144
+    }
+  },
+  "secret_candidates": [],
+  "dependencies": [
+    {
+      "directory": "Strata-src",
+      "available": true,
+      "head_matches": true,
+      "patch_matches": true,
+      "live_patch_bytes": 126404,
+      "stored_patch_bytes": 126404
+    },
+    {
+      "directory": "cafe-llama-src",
+      "available": true,
+      "head_matches": true,
+      "patch_matches": true,
+      "live_patch_bytes": 5153,
+      "stored_patch_bytes": 5153
+    },
+    {
+      "directory": "llama-p100-src",
+      "available": true,
+      "head_matches": true,
+      "patch_matches": true,
+      "live_patch_bytes": 0,
+      "stored_patch_bytes": 0
+    },
+    {
+      "directory": "ik-llama-src",
+      "available": true,
+      "head_matches": true,
+      "patch_matches": true,
+      "live_patch_bytes": 0,
+      "stored_patch_bytes": 0
+    },
+    {
+      "directory": "recherche/strata-0.1.39-20261004-185410/source-adaptee",
+      "available": true,
+      "head_matches": true,
+      "patch_matches": true,
+      "live_patch_bytes": 86245,
+      "stored_patch_bytes": 86245
+    },
+    {
+      "directory": "recherche/strata-0.1.39-20261004-185410/source-officielle",
+      "available": true,
+      "head_matches": true,
+      "patch_matches": true,
+      "live_patch_bytes": 0,
+      "stored_patch_bytes": 0
+    }
+  ]
+}

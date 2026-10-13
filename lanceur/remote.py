@@ -4,7 +4,8 @@ import datetime as dt
 import hashlib
 import hmac
 import http.client
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from http.server import BaseHTTPRequestHandler
+from http_boundary import BoundedHTTPServer, json_body
 import json
 import os
 from pathlib import Path
@@ -14,7 +15,6 @@ import socket
 import select
 import shutil
 import struct
-import subprocess
 import threading
 import time
 from devices import Revocations, fields as device_fields
@@ -24,38 +24,15 @@ from accounts import Accounts
 from operations import VERSION
 from workspace import Workspace, Conflict, Denied
 from urllib.parse import urlsplit
-from core import HOME, ROOT, PYTHON, HIDDEN, read_json, write_json, health
+from core import HOME, ROOT, PYTHON as PYTHON, HIDDEN as HIDDEN, read_json, write_json, health
 
 GATEWAY_PORT = 8766
 
-class GatewayHTTPServer(ThreadingHTTPServer):
+class GatewayHTTPServer(BoundedHTTPServer):
     def server_close(self):
         if getattr(self,'workspace',None):self.workspace.shutdown()
         if getattr(self,'voice',None):self.voice.close()
         super().server_close()
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.workers = threading.BoundedSemaphore(32)
-
-    def process_request(self, request, address):
-        if not self.workers.acquire(blocking=False):
-            try:
-                request.sendall(b'HTTP/1.0 503 Service Unavailable\r\nContent-Length: 0\r\nConnection: close\r\n\r\n')
-            finally:
-                self.shutdown_request(request)
-            return
-        try:
-            super().process_request(request, address)
-        except Exception:
-            self.workers.release()
-            raise
-
-    def process_request_thread(self, request, address):
-        try:
-            super().process_request_thread(request, address)
-        finally:
-            self.workers.release()
-
 def secure_url(value):
     if not isinstance(value, str):
         raise ValueError('Adresse privée WireGuard attendue.')
@@ -213,7 +190,7 @@ class AccessStore:
             write_json(self.activity_path, self.activity)
             write_json(self.home/'connexions.json', self.seen)
             self.seen_saved_at = now
-            if self.storage:self.storage.changed()
+            if self.storage:self.storage.changed(identity or None)
             return {'id': identity, 'server_epoch': now, 'declared': declaration}
 
     def valid_owner(self, identity):
@@ -601,10 +578,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 if not self.authorized():return
                 try:
                     if not store.hermes:raise ValueError('Les agents ne sont pas activés sur ce serveur.')
-                    if self.headers.get('Transfer-Encoding') or not self.headers.get('Content-Type','').startswith('application/json'):raise ValueError('JSON attendu.')
-                    length=int(self.headers.get('Content-Length','0'))
-                    if not 1<=length<=8192:raise ValueError('Action agent limitée à 8 Ko.')
-                    value=json.loads(self.rfile.read(length))
+                    value = json_body(self, 8192)
                     if store.authenticate(self.access_token)!=self.identity:raise Denied('Accès désactivé.')
                     return self.respond(200,store.hermes.action(self.identity,value))
                 except Conflict as error:return self.respond(409,{'error':{'message':str(error)}})
@@ -614,10 +588,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 if not self.authorized():return
                 frames=None;sent=False
                 try:
-                    if self.headers.get('Transfer-Encoding') or not self.headers.get('Content-Type','').startswith('application/json'):raise ValueError('JSON attendu.')
-                    length=int(self.headers.get('Content-Length','0'))
-                    if not 1<=length<=8192:raise ValueError('Requête vocale limitée à 8 Ko.')
-                    value=json.loads(self.rfile.read(length))
+                    value = json_body(self, 8192)
                     if self.path.endswith('/cancel'):
                         if not isinstance(value,dict) or set(value)!={'request_id'} or not isinstance(value['request_id'],str):raise ValueError('Annulation vocale invalide.')
                         return self.respond(200,store.voice.cancel(self.identity,value['request_id']))
@@ -636,11 +607,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
             if self.path == '/v1/notifications/action':
                 if not self.authorized(): return
                 try:
-                    if self.headers.get('Transfer-Encoding') or not self.headers.get('Content-Type', '').startswith('application/json'):
-                        raise ValueError('JSON attendu.')
-                    length = int(self.headers.get('Content-Length', '0'))
-                    if not 1 <= length <= 65536: raise ValueError('Notifications : requête limitée à 64 Ko.')
-                    value = json.loads(self.rfile.read(length))
+                    value = json_body(self, 65536)
                     with store.lock:
                         if store.authenticate(self.access_token) != self.identity: raise Denied('Accès désactivé.')
                         result = store.notifications.action(self.identity, value)
@@ -651,11 +618,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
             if self.path == '/v1/device':
                 if not self.authorized():return
                 try:
-                    if self.headers.get('Transfer-Encoding') or not self.headers.get('Content-Type', '').startswith('application/json'):
-                        raise ValueError('JSON attendu.')
-                    length = int(self.headers.get('Content-Length', '0'))
-                    if not 1 <= length <= 2048: raise ValueError('Déclaration appareil limitée à 2 Ko.')
-                    value = json.loads(self.rfile.read(length))
+                    value = json_body(self, 2048)
                     with store.lock:
                         if store.authenticate(self.access_token) != self.identity: raise Denied('Accès désactivé.')
                         result = store.heartbeat(self.identity, value)
@@ -665,10 +628,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
             if self.path=='/v1/history':
                 if not self.authorized():return
                 try:
-                    if self.headers.get('Transfer-Encoding') or not self.headers.get('Content-Type','').startswith('application/json'):raise ValueError('JSON attendu.')
-                    length=int(self.headers.get('Content-Length','0'))
-                    if not 1<=length<=10*1024*1024:raise ValueError('Historique limité à 9 Mo.')
-                    value=json.loads(self.rfile.read(length))
+                    value = json_body(self, 10*1024*1024)
                     with store.lock:
                         if store.authenticate(self.access_token)!=self.identity:raise Denied('Accès désactivé.')
                         result=store.workspace.history_write(self.identity,value)
@@ -679,10 +639,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
             if self.path=='/v1/workspace/action':
                 if not self.authorized():return
                 try:
-                    if self.headers.get('Transfer-Encoding') or not self.headers.get('Content-Type','').startswith('application/json'):raise ValueError('JSON attendu.')
-                    length=int(self.headers.get('Content-Length','0'))
-                    if not 1<=length<=8*1024*1024:raise ValueError('Requête limitée à 8 Mo.')
-                    value=json.loads(self.rfile.read(length))
+                    value = json_body(self, 8*1024*1024)
                     prepared=store.workspace.prepare_upload(self.identity,value)
                     # Serialize access validation and mutations with suspension/revocation.
                     with store.lock:
@@ -695,13 +652,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
             if self.path == '/v1/cancel':
                 if not self.authorized(): return
                 try:
-                    if self.headers.get('Transfer-Encoding'):raise ValueError('Corps JSON attendu.')
-                    length=int(self.headers.get('Content-Length','0'))
-                    if not 0<=length<=4096:raise ValueError('Requête d’annulation trop volumineuse.')
-                    value={}
-                    if length:
-                        if not self.headers.get('Content-Type','').startswith('application/json'):raise ValueError('Corps JSON attendu.')
-                        value=json.loads(self.rfile.read(length))
+                    value = json_body(self, 4096, allow_empty=True)
                     if not isinstance(value,dict) or set(value)-{'text_transform'}:raise ValueError('Requête d’annulation invalide.')
                     direct='text_transform' in value
                     if direct and value['text_transform'] is not True:raise ValueError('Annulation de transformation invalide.')
@@ -728,12 +679,8 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
             if self.headers.get('Transfer-Encoding') or not self.headers.get('Content-Type', '').startswith('application/json'):
                 return self.respond(415, {'error': {'message': 'Corps JSON attendu.'}})
             try:
-                length = int(self.headers.get('Content-Length', '0'))
-                if not 1 <= length <= 10 * 1024 * 1024:
-                    raise ValueError('Requête trop volumineuse (maximum 2 Mo).')
+                raw = json_body(self, 10 * 1024 * 1024)
                 upstream_port, model, key = backend()
-                raw=json.loads(self.rfile.read(length))
-                if not isinstance(raw,dict):raise ValueError('Requête invalide.')
                 conversation=raw.pop('conversation_id',None)
                 turn=raw.pop('turn_id',None)
                 raw.pop('history_revision',None)
@@ -805,7 +752,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                     if not data.get('stream'):self.respond(200,{'id':'chatcmpl-'+request,'object':'chat.completion','choices':[{'index':0,'message':{'role':'assistant','content':''.join(answer),'reasoning_content':''.join(reasoning)},'finish_reason':'stop'}],'workspace_sources':final_sources})
                 except BlockingIOError as error:
                     if not sent:self.respond(429,{'error':{'message':str(error)}})
-                except (OSError,ValueError,TypeError,RuntimeError) as error:
+                except (OSError,ValueError,TypeError,RuntimeError):
                     if sent:
                         try:self.wfile.write(('data: '+json.dumps({'error':{'message':'L’assistant a été interrompu. Reconnectez-vous pour retrouver son état.'}})+'\n\n').encode());self.wfile.flush()
                         except OSError:pass

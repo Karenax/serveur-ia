@@ -4,7 +4,7 @@ from html.parser import HTMLParser
 import json
 import subprocess
 import urllib.request
-from core import HOME,ROOT,PYTHON,HIDDEN,read_json,same_process
+from core import HOME,ROOT,HIDDEN,read_json,same_process
 from remote import AccessStore
 from wireguard_access import WireGuardAccess
 

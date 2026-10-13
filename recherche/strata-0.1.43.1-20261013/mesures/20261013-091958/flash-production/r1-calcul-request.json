@@ -1,0 +1,18 @@
+{
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Mesure indépendante r1-calcul.\nRéponds uniquement avec un objet JSON valide contenant ces clés : produit pour 17 multiplié par 23, somme pour 125 plus 375, capitale pour la capitale de la France."
+    }
+  ],
+  "max_tokens": 128,
+  "temperature": 0,
+  "seed": 42,
+  "cache_prompt": false,
+  "stream": false,
+  "chat_template_kwargs": {
+    "enable_thinking": false
+  },
+  "reasoning_effort": "none"
+}

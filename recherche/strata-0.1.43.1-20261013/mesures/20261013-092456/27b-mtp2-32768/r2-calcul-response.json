@@ -1,0 +1,38 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"produit\": 391,\n  \"somme\": 500,\n  \"capitale\": \"Paris\"\n}"
+      }
+    }
+  ],
+  "created": 1791879637,
+  "model": "huihui-27b",
+  "system_fingerprint": "b1-0ae77ef",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 35,
+    "prompt_tokens": 67,
+    "total_tokens": 102,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-ZdrpEWhq6L346QFNnKLvrpwL5zFEfKt5",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 67,
+    "prompt_ms": 775.298,
+    "prompt_per_token_ms": 11.571611940298508,
+    "prompt_per_second": 86.41838364087099,
+    "predicted_n": 35,
+    "predicted_ms": 969.589,
+    "predicted_per_token_ms": 28.517323529411765,
+    "predicted_per_second": 35.06640442496769,
+    "draft_n": 24,
+    "draft_n_accepted": 22
+  }
+}

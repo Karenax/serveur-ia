@@ -4,7 +4,6 @@ import hashlib
 import http.client
 import json
 import math
-from pathlib import Path
 import re
 import sqlite3
 import threading
@@ -55,6 +54,7 @@ class Knowledge:
         self.error = ''; self.limited = False; self.last_sync = None; self.pending = 0
         self.next_sync = 0; self.dirty = threading.Event(); self.dirty.set()
         self.restart_requested=False
+        self.indexed_revision = None
         with self.db() as db:
             db.executescript('''
                 CREATE TABLE IF NOT EXISTS entries(id TEXT PRIMARY KEY, owner TEXT NOT NULL,
@@ -94,6 +94,7 @@ class Knowledge:
 
     def reset(self):
         with self.db() as db: db.execute('DELETE FROM entries')
+        self.indexed_revision = None
         self.changed()
 
     def source_records(self):
@@ -135,15 +136,17 @@ class Knowledge:
 
     def synchronize(self, encode=True):
         if self.workspace.maintenance: return 0
-        current = {item['id']: item for item in self.source_records()}
+        revision = self.workspace.source_revision
+        current = {item['id']: item for item in self.source_records()} if revision != self.indexed_revision else None
         if self.halt.is_set():return 0
         with self.db() as db:
-            old = {r[0] for r in db.execute('SELECT id FROM entries')}
-            db.executemany('DELETE FROM entries WHERE id=?', [(id,) for id in old - current.keys()])
-            for id in current:
-                item = current[id]
-                db.execute('INSERT INTO entries VALUES(?,?,?,?,?,?,?,NULL) ON CONFLICT(id) DO UPDATE SET data=excluded.data',
-                    (id, item['owner'], item['scope'], item['kind'], item['object'], json.dumps(item, ensure_ascii=False), MODEL_VERSION))
+            if current is not None:
+                old = {r[0] for r in db.execute('SELECT id FROM entries')}
+                db.executemany('DELETE FROM entries WHERE id=?', [(id,) for id in old - current.keys()])
+                for id,item in current.items():
+                    db.execute('INSERT INTO entries VALUES(?,?,?,?,?,?,?,NULL) ON CONFLICT(id) DO UPDATE SET data=excluded.data WHERE data!=excluded.data',
+                        (id, item['owner'], item['scope'], item['kind'], item['object'], json.dumps(item, ensure_ascii=False), MODEL_VERSION))
+                self.indexed_revision = revision
             db.execute('UPDATE entries SET vector=NULL,version=? WHERE version!=?', (MODEL_VERSION, MODEL_VERSION))
             rows = db.execute('SELECT id,data FROM entries WHERE vector IS NULL LIMIT 4').fetchall()
             self.pending = db.execute('SELECT COUNT(*) FROM entries WHERE vector IS NULL').fetchone()[0]

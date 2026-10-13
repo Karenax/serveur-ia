@@ -1,0 +1,7 @@
+{
+  "read_bytes": 65431142400,
+  "total_expert_bytes": 65431142400,
+  "elapsed_seconds": 117.13790410000365,
+  "checksum_u64": 18329824709329490576,
+  "note": "Read-only sequential page warming; checksum is not a model SHA256."
+}

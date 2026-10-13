@@ -1,9 +1,9 @@
 {
   "format": 1,
   "entrypoint": "android-chat.html",
-  "sha256": "8ad3023804e748defbb8f85df8bd8c10d7e0ff7bdb96cf215348a1bc3b28eb8a",
+  "sha256": "5c8b9c2b3c2e5ca002bdce5d8b24de5943cb03c74f90baef33e47fb9332daac9",
   "shared_sources": {
-    "chat.html": "1e6565bd1994953d5882a0f23501a689896912fee2bd93df92d11b06ca69c61f",
+    "chat.html": "02740fcda6849c0bb2c30f587f276967ac779dc93495ebdcfa4bd1bc02a76409",
     "workspace.html": "d8d10bed02b1a17383e7d2243958aca97ebfa7c1c2fdcdcf1dcf076db7f77009",
     "ui.css": "d2d73bf570866ff287cccf28fe91053e18d60777cdc34921f8887a514371dfa0",
     "ui.js": "a29dfe033cd5279698ebe0ebf7097326ef4d37c103cefe206de954aabe638a5f",

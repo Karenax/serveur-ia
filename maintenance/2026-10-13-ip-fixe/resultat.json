@@ -1,0 +1,17 @@
+﻿{
+    "time":  "2026-10-13T12:51:43.5397289+02:00",
+    "details":  {
+                    "persistent":  true,
+                    "backup":  "D:\\Serveur IA\\maintenance\\2026-10-13-ip-fixe\\avant-20261013-125140.json",
+                    "prefix":  24,
+                    "gateway":  "192.168.1.1",
+                    "mac":  "E0-4F-43-E6-50-12",
+                    "dhcp":  "Disabled",
+                    "address":  "192.168.1.41",
+                    "interface":  "Ethernet 5",
+                    "dns":  [
+                                "192.168.1.1"
+                            ]
+                },
+    "state":  "succeeded"
+}

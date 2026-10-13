@@ -363,8 +363,12 @@ class BackupManager:
         path = self.resolve(data)
         # Bind the validated plaintext and public fingerprint to the same immutable bytes.
         with path.open('rb') as stream:
-            if os.fstat(stream.fileno()).st_size > MAX_ARCHIVE: raise ValueError('Sauvegarde trop volumineuse.')
-            blob = stream.read(MAX_ARCHIVE + 1)
+            size = os.fstat(stream.fileno()).st_size
+            if size > MAX_ARCHIVE: raise ValueError('Sauvegarde trop volumineuse.')
+            # BufferedReader allocates the requested size before shrinking it:
+            # reading the 400 MiB limit inflated even a small archive's RSS.
+            blob = stream.read(size + 1)
+            if len(blob) != size: raise ValueError('Sauvegarde modifiée pendant sa lecture ; réessayez.')
         if len(blob) > MAX_ARCHIVE: raise ValueError('Sauvegarde trop volumineuse.')
         result = self._decode(blob, self.resolve_password(data))
         result['summary'].update(file=str(path.resolve()), size=len(blob), sha256=hashlib.sha256(blob).hexdigest())
@@ -452,20 +456,24 @@ class BackupManager:
         self._phase('encrypt', 'Chiffrement de l’archive portable.')
         blob = HEADER + salt + key.encrypt(raw)
         if len(blob) > MAX_ARCHIVE: raise ValueError('Sauvegarde trop volumineuse.')
+        blob_size = len(blob)
+        digest = hashlib.sha256(blob).hexdigest()
         identity = secrets.token_hex(12)
         target = destination / ('fred-' + dt.datetime.fromtimestamp(timestamp).strftime('%Y%m%d-%H%M%S') + '-' + identity + '.qwenbackup')
         temporary = target.with_suffix('.verification.tmp')
         try:
             _atomic_bytes(temporary, blob)
+            # Verification decrypts a fresh immutable archive. Release the
+            # original plaintext and ciphertext before that second traversal.
+            del blob, raw, document, package, extras, security
             self._phase('verify', 'Vérification du chiffrement, du manifeste et de la base SQLite.')
             self._decode(temporary.read_bytes(), password, key=key)
-            digest = hashlib.sha256(blob).hexdigest()
             if _hash_file(temporary) != digest: raise ValueError('Archive modifiée pendant sa vérification.')
             os.replace(temporary, target)
         finally: temporary.unlink(missing_ok=True)
         record = {'id': identity, 'file': str(target.resolve()), 'timestamp': timestamp, 'created_at': created,
                   'kind': kind, 'protected': bool(protected or kind in ('rollback', 'pre_restore')), 'version': 2,
-                  'size': len(blob), 'sha256': digest, 'verified': True, 'summary': summary,
+                  'size': blob_size, 'sha256': digest, 'verified': True, 'summary': summary,
                   'secondary': {'status': 'disabled', 'file': '', 'attempts': 0, 'error': ''}}
         with self.lock:
             secondary = self.data['config']['secondary_destination']
@@ -544,7 +552,7 @@ class BackupManager:
                 raise ValueError('Seconde copie endommagée.')
             os.replace(temporary, target)
             secondary.update(status='copied', file=str(target.resolve()), error='', next_retry=0)
-        except Exception as error:
+        except Exception:
             secondary.update(status='error', error='Seconde copie non réalisée. La sauvegarde locale reste valide.',
                              next_retry=time.time() + min(3600, 60 * 2 ** min(secondary['attempts'], 6)))
         finally:
@@ -604,7 +612,7 @@ class BackupManager:
                     self._save()
                 self.start({'password': password, 'kind': 'automatic'})
                 return True
-            except Exception as error:
+            except Exception:
                 with self.lock:
                     self.data['last_error'] = 'Sauvegarde automatique indisponible : vérifier la phrase protégée et la destination.'
                     self.data['retry_due'] = now + 300

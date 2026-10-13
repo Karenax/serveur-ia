@@ -339,4 +339,5 @@ def install():
 
 
 def gateway_bootstrap(codex_patch):
-    return codex_patch + PATCH_SOURCE + "\n_fred_install_codex_headers()\n_fred_install_web_bridge()\nimport runpy\nrunpy.run_module('hermes_cli.main',run_name='__main__',alter_sys=True)\n"
+    from hermes_run_binding import PATCH_SOURCE as binding_patch
+    return codex_patch + binding_patch + PATCH_SOURCE + "\n_fred_install_codex_headers()\n_fred_install_run_binding()\n_fred_install_web_bridge()\nimport runpy\nrunpy.run_module('hermes_cli.main',run_name='__main__',alter_sys=True)\n"

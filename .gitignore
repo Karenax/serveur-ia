@@ -9,6 +9,11 @@
 /llama-cpu-b11344/
 /unsloth-legacy/
 /unsloth-portable/
+# Distributions Strata telechargees : conserver references, mesures et scripts.
+/dependances/strata-0.1.43.1/source/
+/dependances/strata-0.1.43.1/tokenizer/
+/dependances/strata-0.1.43.1/cuda12/
+/recherche/strata-0.1.43.1-20261013/source/
 /*-build*/
 **/source-officielle/
 **/source-adaptee/
@@ -18,6 +23,8 @@
 **/.venv/
 **/__pycache__/
 **/.pytest_cache/
+**/.coverage*
+/audits/2026-10-12/ui/*.js
 **/CMakeFiles/
 **/Testing/
 /client-qwen/wireguard-tools/

@@ -1,0 +1,28 @@
+{
+ "version": "0.1.43.1",
+ "source": "release",
+ "archs": [
+  60,
+  61,
+  70,
+  75,
+  80,
+  86,
+  89
+ ],
+ "vision_archs": [
+  60,
+  61,
+  70,
+  75,
+  80,
+  86,
+  89
+ ],
+ "ptx": true,
+ "cuda": "12.9",
+ "toolkit": 12,
+ "experimental": true,
+ "vision": "gpu",
+ "portable": true
+}

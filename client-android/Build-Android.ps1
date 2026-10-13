@@ -78,6 +78,8 @@ if ($Configuration -eq 'Release') {
     Move-Item -LiteralPath ($manifestPath + '.tmp') -Destination $manifestPath -Force
 }
 Write-Host "APK pret : $apk"
+& $pythonExecutable (Join-Path $projectRoot 'maintenance\build_manifest.py') --artifact $apk --output (Join-Path $distribution 'build-manifest.json')
+if ($LASTEXITCODE -ne 0) { throw 'Inventaire de compilation Android impossible.' }
 Write-Host "SHA-256 : $digest"
 if ($Configuration -eq 'Release') {
     Write-Host 'Signature locale privee. Conserver toolchain\android-signing pour les mises a jour.'

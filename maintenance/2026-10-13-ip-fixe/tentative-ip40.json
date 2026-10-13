@@ -1,0 +1,8 @@
+{
+  "time": "2026-10-13T12:40:59.4434528+02:00",
+  "details": {
+    "message": "Conflit IPv4 detecte par Windows.",
+    "rollback": "restored"
+  },
+  "state": "failed"
+}

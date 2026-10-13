@@ -141,7 +141,7 @@ Fichiers du lanceur :
 
 Version 2.0.0 : consulter CHANGEMENTS-V2.txt. Le nouvel onglet Exploitation regroupe démarrage Windows, surveillance, sauvegarde, diagnostic et mises à jour. Le démarrage à la connexion Windows, le chargement automatique et la relance sont maintenant activés ; ces options restent modifiables dans la console.
 
-Version actuelle : Accès serveur Fred 3.2.1. Aucun compte ni login client.
+Version publiée après audit : Accès serveur Fred 3.5.28 (Android 1.0.11/code 12). Vérification de publication : audits/2026-10-12/VALIDATION-CORRECTIONS.md. Aucun compte ni login client.
 Clients & accès sert à générer, télécharger, suspendre et révoquer les EXE personnels.
 Voir client-qwen/LISEZ-MOI.txt et lanceur/AUDIT-FRED.txt pour les fonctions actuelles.
 

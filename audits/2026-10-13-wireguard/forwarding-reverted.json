@@ -1,0 +1,28 @@
+{
+  "reason": "Confirmed local-network issue; revert temporary diagnostic mapping",
+  "before": {
+    "status": 200,
+    "data": {
+      "NewInternalPort": "51820",
+      "NewInternalClient": "192.168.1.41",
+      "NewEnabled": "1",
+      "NewPortMappingDescription": "Fred WireGuard",
+      "NewLeaseDuration": "604530"
+    }
+  },
+  "delete": {
+    "status": 200,
+    "data": {
+      "DeletePortMappingResponse": ""
+    }
+  },
+  "after": {
+    "status": 500,
+    "data": {
+      "faultcode": "s:Client",
+      "faultstring": "UPnPError",
+      "errorCode": "714",
+      "errorDescription": "NoSuchEntryInArray"
+    }
+  }
+}

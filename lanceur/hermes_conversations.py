@@ -16,6 +16,8 @@ import sqlite3
 import threading
 import time
 from workspace import Conflict, Denied
+from history_store import validate as validate_history, HistoryError
+from hermes_storage import HermesStorage, JOURNAL_DAYS, RECOVERY_DAYS
 
 TERMINAL = {'completed', 'failed', 'cancelled', 'interrupted'}
 IDENTITY = re.compile(r'[A-Za-z0-9_-]{1,80}\Z')
@@ -41,6 +43,9 @@ CREATE TABLE IF NOT EXISTS agent_runs(
 CREATE TABLE IF NOT EXISTS agent_cancellations(
  owner TEXT NOT NULL, request TEXT NOT NULL, created REAL NOT NULL,
  PRIMARY KEY(owner,request));
+CREATE TABLE IF NOT EXISTS agent_sessions(
+ owner TEXT NOT NULL, session TEXT NOT NULL, updated REAL NOT NULL,
+ PRIMARY KEY(owner,session));
 '''
 
 
@@ -57,6 +62,15 @@ def text_content(value):
 def visible_messages(messages):
     return [{'role': m['role'], 'content': text_content(m.get('content'))}
             for m in messages if m.get('role') in ('user', 'assistant')]
+
+
+def native_messages(messages):
+    return [{'role': m['role'], 'content': copy.deepcopy(m.get('content', ''))}
+            for m in messages if m.get('role') in ('user', 'assistant')]
+
+
+def transcript_digest(messages):
+    return 'sha256:' + hashlib.sha256(encoded(messages).encode()).hexdigest()
 
 
 def frame(value):
@@ -77,13 +91,45 @@ class HermesConversations:
         self.max_runs, self.timeout = max_runs, timeout
         self.closed = False
         self.admission_paused = False
+        self.storage = HermesStorage(store.workspace)
         with self.db() as db:
             db.executescript(SCHEMA)
             if 'model' not in {r['name'] for r in db.execute('PRAGMA table_info(agent_runs)')}:
                 db.execute("ALTER TABLE agent_runs ADD COLUMN model TEXT NOT NULL DEFAULT ''")
+            if 'projection_error' not in {r['name'] for r in db.execute('PRAGMA table_info(agent_runs)')}:
+                db.execute("ALTER TABLE agent_runs ADD COLUMN projection_error TEXT NOT NULL DEFAULT ''")
             # Side effects cannot be replayed on restart. Native Hermes also marks
             # shutdown turns interrupted; preserve the Fred result independently.
             db.execute("UPDATE agent_runs SET state='interrupted',updated=? WHERE state NOT IN ('completed','failed','cancelled','interrupted')", (time.time(),))
+            # These were redundant transcripts; fingerprints and native sessions
+            # retain continuity, canonical histories retain user-owned content.
+            db.execute("UPDATE agent_runs SET messages='',input='' WHERE messages!='' OR input!=''")
+            for row in db.execute("SELECT owner,conversation,visible FROM agent_conversations WHERE visible NOT LIKE 'sha256:%'").fetchall():
+                db.execute('UPDATE agent_conversations SET visible=? WHERE owner=? AND conversation=?',
+                    ('sha256:'+hashlib.sha256(row['visible'].encode()).hexdigest(),row['owner'],row['conversation']))
+            for table in ('agent_conversations','agent_runs'):
+                db.execute('INSERT OR IGNORE INTO agent_sessions SELECT owner,session,MAX(updated) FROM '+table+' GROUP BY owner,session')
+        store.workspace.hermes_storage = self.storage
+        self.prune()
+
+    def prune(self, now=None):
+        now = time.time() if now is None else now
+        with self.lock:
+            if self.active or self.admission_paused: return
+            with self.db() as db:
+                db.execute("DELETE FROM agent_runs WHERE state IN ('completed','failed','cancelled','interrupted') AND updated<? AND (projection_error='' OR updated<?)",
+                           (now - JOURNAL_DAYS * 86400, now - RECOVERY_DAYS * 86400))
+                db.execute('DELETE FROM agent_cancellations WHERE created<?', (now - 86400,))
+                expired = db.execute('SELECT owner,session FROM agent_sessions WHERE updated<?', (now - RECOVERY_DAYS * 86400,)).fetchall()
+            if expired and self.service.status().get('available'):
+                for row in expired[:8]:
+                    if not self.valid(row['owner']): continue
+                    result = self.service.request(row['owner'], 'DELETE', '/api/sessions/' + row['session'], timeout=5)
+                    if not result.get('deleted'): continue
+                    with self.db() as db:
+                        db.execute('DELETE FROM agent_sessions WHERE owner=? AND session=?', (row['owner'],row['session']))
+                        db.execute('DELETE FROM agent_conversations WHERE owner=? AND session=?', (row['owner'],row['session']))
+            self.storage.compact()
 
     @contextlib.contextmanager
     def db(self):
@@ -95,7 +141,7 @@ class HermesConversations:
 
     def valid(self, owner, context=None):
         return (not self.closed and self.store.valid_owner(owner)
-                and (context is None or (not context['cancelled'].is_set()
+                and (context is None or (self.active.get(owner) is context and not context['cancelled'].is_set()
                      and (not self.models or self.models.valid(owner,context.get('model_selection',{'local':True}))))))
 
     @contextlib.contextmanager
@@ -128,6 +174,7 @@ class HermesConversations:
         value = {'request_id': request, 'conversation_id': conversation, 'status': row['state'],
                  'text': row['output'], 'reasoning_content': row['reasoning'], 'sources': json.loads(row['sources'])}
         if row['model']:value['model']=row['model']
+        if row['projection_error']: value['history_error'] = row['projection_error']
         context = self.context(owner)
         pending = context.get('approval') if context and context['request_id'] == request else None
         if pending and pending['expires_epoch'] > time.time():
@@ -135,7 +182,7 @@ class HermesConversations:
         return value
 
     def _update(self, owner, request, **values):
-        allowed = {'remote', 'state', 'output', 'reasoning', 'sources'}
+        allowed = {'remote', 'state', 'output', 'reasoning', 'sources', 'projection_error'}
         if set(values) - allowed: raise ValueError('État de réponse invalide.')
         values['updated'] = time.time()
         with self.db() as db:
@@ -211,6 +258,9 @@ class HermesConversations:
         messages = data['messages']
         if not messages or messages[-1].get('role') != 'user': raise ValueError('Le dernier message doit être une demande utilisateur.')
         public = visible_messages(messages)
+        native = native_messages(messages)
+        if len(public) >= 1000:
+            raise ValueError('Cette conversation atteint sa limite de messages. Exportez-la et commencez une nouvelle conversation.')
         if not public or not public[-1]['content'] and not isinstance(messages[-1].get('content'), list): raise ValueError('Message utilisateur vide.')
         selection=self.models.select(owner,data.get('model')) if self.models else {'id':'fred-qwen','local':True,'native_model':'fred-qwen'}
         from hermes_reasoning import request_reasoning
@@ -234,38 +284,47 @@ class HermesConversations:
             self.accounts.ensure(owner, port=self.service.port)
             # A newly discovered model can appear after the profile was created.
             # Refresh its named native route before resolving this turn.
-            if self.models:self.accounts.materialize(owner,self.service.port,selection=selection)
+            if self.models:
+                selection['_fred_request_id'] = request
+                self.accounts.materialize(owner,self.service.port,selection=selection)
             from server_state import generation
             epoch = generation(self.store.home)['id']
             scope = encoded({'project': project, 'document': document,
                              'model':selection['id'],
+                             'transcript_version': 2,
                              'system': [m['content'] for m in messages if m['role'] == 'system']})
             previous = db.execute('SELECT * FROM agent_conversations WHERE owner=? AND conversation=?', (owner, conversation)).fetchone()
             continuation = (previous and previous['scope'] == scope and previous['generation'] == epoch
-                            and json.loads(previous['visible']) == public[:-1])
-            session = previous['session'] if continuation else 'fred-' + secrets.token_hex(16)
-            context = {'request_id': request, 'conversation_id': conversation, 'project': project,
-                       'document': document, 'project_id': project, 'document_id': document,
-                       'cancelled': threading.Event(), 'sources': [], 'background': background,
-                       'remote': '', 'remote_ready': threading.Event(), 'created': time.monotonic(), 'model_calls': 0, 'tokens': 0,
-                       'inference_phase': '', 'reasoning_content': ''}
-            context['model_selection']=selection
-            context['reasoning_request']=reasoning_request
-            context['cancel'] = context['cancelled']
-            db.execute('INSERT INTO agent_runs(owner,request,conversation,session,fingerprint,state,input,messages,created,updated,model) VALUES(?,?,?,?,?,?,?,?,?,?,?)',
-                       (owner, request, conversation, session, fingerprint, 'starting', encoded(public[-1]), encoded(public), time.time(), time.time(),selection['id'] if self.models else ''))
-            db.execute('INSERT INTO agent_conversations VALUES(?,?,?,?,?,?,?) ON CONFLICT(owner,conversation) DO UPDATE SET session=excluded.session,scope=excluded.scope,generation=excluded.generation,updated=excluded.updated',
-                       (owner, conversation, session, scope, encoded(public[:-1]), epoch, time.time()))
-            db.commit()
-            self.active[owner] = context
-            with self.store.lock: self.store.active += 1
+                            and previous['visible'] == transcript_digest(native[:-1]))
+            self.storage.reserve(owner, len(encoded(native[-1:] if continuation else native).encode()))
+            try:
+                session = previous['session'] if continuation else 'fred-' + secrets.token_hex(16)
+                context = {'request_id': request, 'conversation_id': conversation, 'project': project,
+                           'document': document, 'project_id': project, 'document_id': document,
+                           'cancelled': threading.Event(), 'sources': [], 'background': background,
+                           'remote': '', 'remote_ready': threading.Event(), 'created': time.monotonic(), 'model_calls': 0, 'tokens': 0,
+                           'inference_phase': '', 'reasoning_content': ''}
+                context['model_selection']=selection
+                context['reasoning_request']=reasoning_request
+                context['cancel'] = context['cancelled']
+                db.execute('INSERT INTO agent_runs(owner,request,conversation,session,fingerprint,state,input,messages,created,updated,model) VALUES(?,?,?,?,?,?,?,?,?,?,?)',
+                           (owner, request, conversation, session, fingerprint, 'starting', '', '', time.time(), time.time(),selection['id'] if self.models else ''))
+                db.execute('INSERT INTO agent_conversations VALUES(?,?,?,?,?,?,?) ON CONFLICT(owner,conversation) DO UPDATE SET session=excluded.session,scope=excluded.scope,generation=excluded.generation,updated=excluded.updated',
+                           (owner, conversation, session, scope, transcript_digest(native[:-1]), epoch, time.time()))
+                db.execute('INSERT OR REPLACE INTO agent_sessions VALUES(?,?,?)', (owner,session,time.time()))
+                db.commit()
+                self.active[owner] = context
+                with self.store.lock: self.store.active += 1
+            except BaseException:
+                self.storage.release(owner)
+                raise
         body = {'session_id': session, 'input': [{'role': 'user', 'content': messages[-1]['content']}],
                 'instructions': '\n'.join(m['content'] for m in messages if m['role'] == 'system'),
                 'model_options': reasoning_request['model_options']}
         if self.models:
             body['model']=selection['native_model']
             if not selection['local']:body['provider']=selection['native_provider']
-        if not continuation: body['conversation_history'] = public[:-1]
+        if not continuation: body['conversation_history'] = native[:-1]
         # Preserve the current EG2 retrieval while allowing the agent to search
         # again. Documents are explicit untrusted turn data, never a new global
         # persona or permissions supplied by a source.
@@ -282,17 +341,19 @@ class HermesConversations:
                 body['input'][0]['content'] = original + context_text if isinstance(original, str) else [*original, {'type': 'text', 'text': context_text}]
             context['body'] = body
             context['visible'] = public
+            context['native'] = native
             return {'state': 'starting', 'request': request}, context
         except BaseException:
             with self.lock: self.active.pop(owner, None)
             with self.store.lock: self.store.active -= 1
             self._update(owner, request, state='failed')
+            self.storage.release(owner)
             raise
 
     def _project(self, owner, context, output, reasoning):
         """Commit only the matching conversation and preserve client attachments."""
         request, conversation = context['request_id'], context['conversation_id']
-        with self.store.workspace.db() as db:
+        with self.store.workspace.db(owner) as db:
             row = db.execute('SELECT history,revision FROM client_histories WHERE owner=?', (owner,)).fetchone()
             if not row: return
             history = json.loads(row['history'])
@@ -319,16 +380,20 @@ class HermesConversations:
                 messages[user_index + 1] = answer
             else: messages.append(answer)
             raw = json.dumps(history, ensure_ascii=False)
-            self.store.workspace.quota(db, owner, max(0, len(raw.encode()) - len(row['history'].encode())))
+            try:
+                validate_history(history)
+                self.store.workspace.quota(db, owner, max(0, len(raw.encode()) - len(row['history'].encode())))
+            except (HistoryError, ValueError):
+                context['history_error'] = 'Historique plein. La réponse est conservée sur le serveur pendant 30 jours ; exportez-la et libérez de la place avant de la reprendre.'
+                self._update(owner, request, projection_error=context['history_error'])
+                return
             db.execute('UPDATE client_histories SET history=?,revision=revision+1,updated=? WHERE owner=?', (raw, time.time(), owner))
-            if self.store.workspace.knowledge: self.store.workspace.knowledge.changed()
-            if self.store.storage: self.store.storage.changed()
             return row['revision'] + 1
 
     def merge_completed(self, owner, history):
         """An older local partial reply cannot overwrite an accepted server final."""
         with self.db() as db:
-            rows = db.execute("SELECT request,conversation,output,reasoning,model FROM agent_runs WHERE owner=? AND state='completed' ORDER BY updated DESC LIMIT 200", (owner,)).fetchall()
+            rows = db.execute("SELECT request,conversation,output,reasoning,model FROM agent_runs WHERE owner=? AND state='completed' AND projection_error='' ORDER BY updated DESC LIMIT 200", (owner,)).fetchall()
         by_conversation = {c['id']: c for c in history['conversations']}
         for row in rows:
             conversation = by_conversation.get(row['conversation'])
@@ -389,7 +454,7 @@ class HermesConversations:
             if record['state'] != 'completed': raise Conflict('Cette demande est terminée sans réponse ; commencez un nouvel envoi.')
             if json.loads(record['sources']): yield frame({'workspace_sources': json.loads(record['sources'])})
             yield frame({'choices': [{'delta': {'content': record['output'], 'reasoning_content': record['reasoning']}}]})
-            yield frame({'hermes_run': {'request_id': request, 'conversation_id': conversation, 'status': 'completed'}})
+            yield frame({'hermes_run': {'request_id': request, 'conversation_id': conversation, 'status': 'completed', 'history_error': record.get('projection_error', '')}})
             yield frame({'choices': [{'delta': {}, 'finish_reason': 'stop'}]})
             yield b'data: [DONE]\n\n'
             return
@@ -463,10 +528,15 @@ class HermesConversations:
             with self.store.lock:
                 if not self.valid(owner, context): raise Denied('Accès désactivé avant enregistrement.')
                 self._update(owner, request, state='completed', output=output, reasoning=reasoning, sources=encoded(context['sources']))
+                self.storage.release(owner)
                 with self.db() as db:
                     db.execute('UPDATE agent_conversations SET visible=?,updated=? WHERE owner=? AND conversation=?',
-                               (encoded([*context['visible'], {'role': 'assistant', 'content': output}]), time.time(), owner, conversation))
-                revision = self._project(owner, context, output, reasoning)
+                               (transcript_digest([*context['native'], {'role': 'assistant', 'content': output}]), time.time(), owner, conversation))
+                try: revision = self._project(owner, context, output, reasoning)
+                except (OSError,sqlite3.Error):
+                    context['history_error'] = 'Enregistrement de l’historique indisponible. La réponse reste récupérable sur le serveur pendant 30 jours ; exportez-la avant de réessayer.'
+                    self._update(owner,request,projection_error=context['history_error'])
+                    revision = None
             complete = True
             if context['sources']: yield frame({'workspace_sources': context['sources']})
             if reasoning: yield frame({'choices': [{'delta': {'reasoning_content': reasoning}}]})
@@ -475,7 +545,7 @@ class HermesConversations:
             for offset in range(0, len(output), 256):
                 if not self.valid(owner, context): raise Denied('Accès désactivé pendant livraison.')
                 yield frame({'choices': [{'delta': {'content': output[offset:offset + 256]}}]})
-            yield frame({'hermes_run': {'request_id': request, 'conversation_id': conversation, 'status': 'completed', 'history_revision': revision}})
+            yield frame({'hermes_run': {'request_id': request, 'conversation_id': conversation, 'status': 'completed', 'history_revision': revision, 'history_error': context.get('history_error', '')}})
             yield frame({'choices': [{'delta': {}, 'finish_reason': 'stop'}], 'usage': terminal.get('usage', {})})
             yield b'data: [DONE]\n\n'
         finally:
@@ -489,6 +559,7 @@ class HermesConversations:
             with self.lock:
                 if self.active.get(owner) is context: self.active.pop(owner, None)
             with self.store.lock: self.store.active -= 1
+            self.storage.release(owner)
 
     def generate(self, owner, messages, cancel, project=None):
         request = secrets.token_hex(16)

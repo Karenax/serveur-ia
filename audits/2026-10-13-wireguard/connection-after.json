@@ -1,0 +1,21 @@
+{
+  "endpoint": "84.103.164.10:51820",
+  "checks": [
+    {
+      "route": "/v1/models",
+      "status": 503,
+      "error": {
+        "code": "wireguard_unreachable",
+        "message": "Aucune réponse du serveur WireGuard. Vérifier l’adresse, le port UDP, le pare-feu et l’accès client."
+      }
+    }
+  ],
+  "diagnostic": {
+    "handshake": false,
+    "last_handshake_time_sec": 0,
+    "resolved_endpoint": "84.103.164.10:51820",
+    "rx_bytes": 0,
+    "tx_bytes": 592
+  },
+  "elapsed_seconds": 20.016
+}

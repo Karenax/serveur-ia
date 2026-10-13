@@ -233,7 +233,7 @@ class RestoreManager:
                 trusted_registry=bool(files.get('wireguard.json',{}).get('public_key') and files['wireguard.json']['public_key']==c.wireguard.settings().get('public_key') and any(r['id'] in archived_records and r['hash']==archived_records[r['id']]['hash'] for r in current_records))
             with c.lock:
                 c.remote.maintenance=True;c.remote.workspace.maintenance=True
-                desired=c.operations.desired;c.operations.desired=False
+                c.operations.desired=False
             workspace=c.remote.workspace
             generation_callback,valid_callback=workspace.generation,workspace.valid
             self.callbacks=(generation_callback,valid_callback)
@@ -260,15 +260,12 @@ class RestoreManager:
                     original_hermes = c.operations.hermes_export(registered_profile_ids({'acces-distants.json': current_access}))
                     originals['hermes-fred'] = base64.b64encode(json.dumps(original_hermes).encode()).decode() if original_hermes is not None else None
                     atomic(staging,protect(json.dumps(originals).encode()))
+                    del originals, original_workspace, original_hermes
                     self.job.update(state='applying',phase='restore',message='Restauration des données ; accès fermés.')
                     write_json(journal,self.job)
-                    # Reuse the validated compatibility path and its portable return archive.
-                    from operations import cipher
-                    salt=secrets.token_bytes(16)
-                    legacy=c.home/'securite'/'archive-restauration.qwenbackup'
-                    atomic(legacy,b'QWENBACKUP1'+salt+cipher(password,salt).encrypt(json.dumps(inspected['package']).encode()))
-                    try:result=c.operations._restore_legacy({'file':str(legacy),'password':password})
-                    finally:legacy.unlink(missing_ok=True)
+                    # Reuse validation and the portable return archive without
+                    # re-encoding/encrypting/decrypting the accepted package.
+                    result=c.operations._restore_legacy({'password':password}, package=inspected['package'])
                     extras=inspected.get('extras',{})
                     # Only explicitly supported configuration; never restore journals or DPAPI automation credentials.
                     for name,value in extras.items():

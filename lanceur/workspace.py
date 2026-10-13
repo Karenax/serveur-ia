@@ -132,6 +132,17 @@ def migrate_workspace(db):
         db.execute("INSERT OR REPLACE INTO settings VALUES('history_reset_id',?)",(HISTORY_RESET_ID,))
 
 
+def initialize_database(db):
+    """Current schema for canonical workspaces and standalone client exports."""
+    db.executescript(SCHEMA)
+    if 'archived' not in {r[1] for r in db.execute('PRAGMA table_info(conversations)')}:
+        db.execute('ALTER TABLE conversations ADD COLUMN archived INTEGER NOT NULL DEFAULT 0')
+    migrate_workspace(db)
+    migrate_documents(db)
+    from notifications import migrate
+    migrate(db)
+
+
 def text(value, maximum, label, empty=False):
     if not isinstance(value,str) or len(value)>maximum or (not empty and not value.strip()) or '\x00' in value:
         raise ValueError(label+' invalide.')
@@ -266,6 +277,10 @@ class Workspace:
         self.worker_restart=None;self.worker_joining=None
         self.maintenance=False
         self.knowledge=None
+        self.hermes_storage=None
+        self.full_revision = 0
+        self.owner_revisions = {}
+        self.source_revision = 0
         self.storage_changed=None
         from server_state import generation, installation_id
         generation(self.home)
@@ -273,13 +288,7 @@ class Workspace:
         self.instance=secrets.token_hex(16)
         self.extract_slots=threading.BoundedSemaphore(2)
         with self.db() as db:
-            db.executescript(SCHEMA)
-            if 'archived' not in {r['name'] for r in db.execute('PRAGMA table_info(conversations)')}:
-                db.execute('ALTER TABLE conversations ADD COLUMN archived INTEGER NOT NULL DEFAULT 0')
-            migrate_workspace(db)
-            migrate_documents(db)
-            from notifications import migrate
-            migrate(db)
+            initialize_database(db)
             # Never replay a running action silently after a process interruption.
             lease=db.execute("SELECT value FROM settings WHERE key='worker'").fetchone()
             if not self.lease_live(lease):
@@ -288,13 +297,27 @@ class Workspace:
                 for job in interrupted:self.event(db,job['owner'],'job_failed',job['id'])
 
     @contextlib.contextmanager
-    def db(self):
+    def db(self, owner=None):
         with self.lock:
             db=sqlite3.connect(self.path,timeout=20);db.row_factory=sqlite3.Row
             db.execute('PRAGMA foreign_keys=ON');db.execute('PRAGMA journal_mode=WAL')
+            source_changes = set()
+            export_changes = set()
+            def authorize(action, table, column, database, trigger):
+                if action in (sqlite3.SQLITE_INSERT,sqlite3.SQLITE_UPDATE,sqlite3.SQLITE_DELETE):
+                    if table in ('projects','documents','chunks','memories','conversations','client_histories','personal_memories','knowledge_exclusions'):source_changes.add(table)
+                    if table in ('projects','documents','chunks','memories','conversations','client_histories','personal_memories','knowledge_exclusions','policies','jobs','events','document_index','document_sources','notifications','notification_preferences','notification_subscriptions','notification_deliveries'):export_changes.add(table)
+                return sqlite3.SQLITE_OK
+            db.set_authorizer(authorize)
             try:
                 with db:yield db
-                if db.total_changes and self.storage_changed:self.storage_changed()
+                if db.total_changes and export_changes:
+                    if owner: self.owner_revisions[owner] = self.owner_revisions.get(owner,0) + 1
+                    else: self.full_revision += 1
+                    if source_changes:
+                        self.source_revision += 1
+                        if self.knowledge:self.knowledge.changed()
+                    if self.storage_changed:self.storage_changed(owner)
             finally:db.close()
 
     def own(self,db,table,id,owner):
@@ -312,7 +335,6 @@ class Workspace:
         db.execute('DELETE FROM events WHERE id NOT IN (SELECT id FROM events ORDER BY id DESC LIMIT 2000)')
         from notifications import publish_workspace_event
         publish_workspace_event(db,owner,action,id)
-        if self.knowledge:self.knowledge.changed()
 
     def usage(self,db,owner=None):
         where=' WHERE owner=?' if owner else '';args=(owner,) if owner else ()
@@ -321,7 +343,9 @@ class Workspace:
             total+=db.execute('SELECT COALESCE(SUM('+expression+'),0) FROM '+table+where,args).fetchone()[0]
         from notifications import usage
         total+=db.execute('SELECT COALESCE(SUM(length(CAST(text AS BLOB))),0) FROM personal_memories'+where,args).fetchone()[0]
-        return total+usage(db,owner)
+        total += usage(db,owner)
+        if self.hermes_storage: total += self.hermes_storage.usage(owner)
+        return total
 
     def quota(self,db,owner,extra):
         if self.usage(db,owner)+extra>self.policy(db,owner)['storage_mb']*1024*1024:raise ValueError('Limite de stockage de cet accès atteinte.')
@@ -354,7 +378,7 @@ class Workspace:
         if getattr(self,'hermes',None):history=self.hermes.merge_completed(owner,history);validate(history)
         if type(revision) is not int or revision<0:raise ValueError('Révision d’historique invalide.')
         raw=json.dumps(history,ensure_ascii=False)
-        with self.db() as db:
+        with self.db(owner) as db:
             if self.maintenance:raise Denied('Serveur en maintenance ; copie locale conservée.')
             from server_state import generation
             current_generation=generation(self.home)
@@ -368,7 +392,6 @@ class Workspace:
             retained={c['id'] for c in history['conversations']}
             for excluded in db.execute('SELECT conversation FROM knowledge_exclusions WHERE owner=?',(owner,)).fetchall():
                 if excluded[0] not in retained:db.execute('DELETE FROM knowledge_exclusions WHERE owner=? AND conversation=?',(owner,excluded[0]))
-            if self.knowledge:self.knowledge.changed()
             return {'saved':True,'revision':current+1}
 
     def index_status(self,db,owner,project=None):
@@ -528,7 +551,7 @@ class Workspace:
             if not content.strip():raise ValueError('Aucun texte lisible dans ce fichier. Les PDF scannés nécessitent un modèle avec vision et une image.')
             if len(content)>50000:raise ValueError('Fichier trop long : maximum 50 000 caractères extraits. Utilisez les documents du projet pour les fichiers longs.')
             return {'text':content,'name':v['title']}
-        with self.db() as db:
+        with self.db(owner) as db:
             if self.maintenance:raise Denied('Serveur en maintenance.')
             if action=='project_create':
                 title=text(v.get('title'),120,'Nom');limits=self.policy(db,owner)
@@ -619,7 +642,7 @@ class Workspace:
             elif action in ('memory_save','memory_delete'):
                 m=self.own(db,'memories',v.get('id'),owner)
                 if action=='memory_save':
-                    content=text(v.get('text'),2000,'Mémoire');self.quota(db,owner,len(content.encode()));db.execute('UPDATE memories SET text=?,updated=? WHERE id=?',(content,now,m['id']))
+                    content=text(v.get('text'),2000,'Mémoire');self.quota(db,owner,max(0,len(content.encode())-len(m['text'].encode())));db.execute('UPDATE memories SET text=?,updated=? WHERE id=?',(content,now,m['id']))
                 else:db.execute('DELETE FROM memories WHERE id=?',(m['id'],))
                 result={'saved':True}
             elif action=='conversation_save':

@@ -50,10 +50,17 @@ class ClientStorage:
         self.dirty = threading.Event(); self.dirty.set()
         self.halt = threading.Event(); self.thread = None
         self.states = {}; self.error = ''; self.last_sync = None
+        self.observed = {}
+        self.pending_owners = None
+        self.verified_at = {}
         self.workspace.storage_changed = self.changed
         atexit.register(self.close)
 
-    def changed(self): self.dirty.set()
+    def changed(self, owner=None):
+        with self.lock:
+            if owner is None: self.pending_owners = None
+            elif self.pending_owners is not None: self.pending_owners.add(owner)
+            self.dirty.set()
 
     def directory(self, identity):
         if not isinstance(identity, str) or not re.fullmatch('[0-9a-f]{16}', identity):
@@ -91,8 +98,8 @@ class ClientStorage:
         while not self.halt.wait(.5):
             if self.workspace.maintenance: continue
             if self.dirty.is_set() or time.monotonic() >= next_sync:
-                self.dirty.clear(); next_sync = time.monotonic() + 15
-                try: self.synchronize()
+                next_sync = time.monotonic() + 15
+                try: self.synchronize(incremental=True)
                 except (OSError, ValueError, sqlite3.Error):
                     with self.lock: self.error = 'Dossiers clients en attente : vérifier les droits et l’espace disque.'
                     self.halt.wait(2)
@@ -120,7 +127,7 @@ class ClientStorage:
             profile = {**profile, 'client_name': record['name']}
         return profile
 
-    def snapshot(self):
+    def snapshot(self, *, incremental=False, pending=None):
         # Same lock order as backup/restoration: access registry, then workspace.
         with self.store.lock, self.workspace.db() as db:
             registry = read_json(self.store.path)
@@ -132,30 +139,39 @@ class ClientStorage:
             saved = json.loads(protect(path.read_bytes(), decrypt=True)) if path.is_file() else {}
             if not isinstance(saved, dict): raise ValueError('Registre des profils illisible.')
             result = []
+            reset_id = db.execute("SELECT value FROM settings WHERE key='history_reset_id'").fetchone()[0]
             for client, archived in records:
+                identity = client['id']
+                metadata = self.store._public_device(client, revoked)
+                metadata['archived'] = archived
+                metadata.pop('storage', None)
+                profile_file = self.store.home/'clients'/(identity+'.exe')
+                profile_stamp = profile_file.stat().st_mtime_ns if profile_file.is_file() else 0
+                token = (self.workspace.full_revision,self.workspace.owner_revisions.get(identity,0),
+                         epoch,reset_id,checksum(encoded(metadata)),profile_stamp,path.stat().st_mtime_ns if path.is_file() else 0)
+                if (incremental and pending is not None and identity not in pending and self.observed.get(identity)==token
+                        and time.monotonic()-self.verified_at.get(identity,0)<300):
+                    continue
                 self.directory(client['id'])
                 rows = {table: [dict(r) for r in db.execute('SELECT * FROM ' + table + ' WHERE owner=? ORDER BY rowid', (client['id'],))] for table in TABLES}
                 job_ids = {row['id'] for row in rows['jobs']}
                 settings = [dict(r) for r in db.execute('SELECT * FROM settings ORDER BY key')
                     if r['key'] == 'history_reset_id' or (r['key'].startswith('job_attempt:') and r['key'][12:] in job_ids)]
-                metadata = self.store._public_device(client, revoked)
-                metadata['archived'] = archived
-                metadata.pop('storage', None)
                 result.append({'client': metadata, 'rows': rows, 'settings': settings,
-                    'generation': epoch, 'profile': self.profile(client, saved)})
+                    'generation': epoch, 'profile': self.profile(client, saved), '_revision':token})
             return result
 
     @staticmethod
     def database(snapshot):
-        from workspace import SCHEMA
+        from workspace import initialize_database
         db = sqlite3.connect(':memory:')
         try:
-            db.executescript(SCHEMA)
+            initialize_database(db)
             for table in TABLES:
                 for row in snapshot['rows'][table]:
                     names = list(row)
                     db.execute('INSERT INTO ' + table + '(' + ','.join(names) + ') VALUES(' + ','.join('?' for _ in names) + ')', list(row.values()))
-            for row in snapshot['settings']: db.execute('INSERT INTO settings VALUES(?,?)', (row['key'], row['value']))
+            for row in snapshot['settings']: db.execute('INSERT OR REPLACE INTO settings VALUES(?,?)', (row['key'], row['value']))
             db.commit()
             return db.serialize()
         finally: db.close()
@@ -196,7 +212,7 @@ class ClientStorage:
 
     def publish(self, snapshot):
         identity = snapshot['client']['id']; directory = self.directory(identity)
-        normalized = {**snapshot, 'rows': {table: [{k: ('sha256:' + checksum(v)) if isinstance(v, bytes) else v for k, v in row.items()} for row in rows] for table, rows in snapshot['rows'].items()}}
+        normalized = {**{k:v for k,v in snapshot.items() if k!='_revision'}, 'rows': {table: [{k: ('sha256:' + checksum(v)) if isinstance(v, bytes) else v for k, v in row.items()} for row in rows] for table, rows in snapshot['rows'].items()}}
         signature = checksum(encoded(normalized))
         previous = read_json(directory / 'dossier.json', {})
         if previous.get('signature') == signature:
@@ -243,7 +259,6 @@ class ClientStorage:
     def client_status(self, identity):
         with self.lock:
             result = dict(self.states.get(identity) or self.summary(identity, {}))
-            if self.error: result.update(status='error', error=self.error)
             return result
 
     def status(self):
@@ -252,14 +267,27 @@ class ClientStorage:
                 'clients': dict(self.states), 'last_sync': self.last_sync, 'error': self.error,
                 'mode': 'synchronized_files', 'automatic': bool(self.thread and self.thread.is_alive())}
 
-    def synchronize(self):
+    def synchronize(self, *, incremental=False):
         with self.gate:
             if self.workspace.maintenance: raise ValueError('Serveur en maintenance.')
-            snapshots = self.snapshot()
+            with self.lock:
+                pending = None if self.pending_owners is None else set(self.pending_owners)
+                self.pending_owners = set(); self.dirty.clear()
+            snapshots = self.snapshot(incremental=incremental,pending=pending)
+            failed = False
             for snapshot in snapshots:
                 if self.workspace.maintenance: return self.status()
-                if not self.publish(snapshot): return self.status()
+                identity = snapshot['client']['id']
+                try:
+                    if not self.publish(snapshot): return self.status()
+                    self.observed[identity] = snapshot['_revision']
+                    self.verified_at[identity] = time.monotonic()
+                except (OSError,ValueError,sqlite3.Error) as error:
+                    if not incremental: raise
+                    failed = True
+                    message = 'Schéma du dossier client incompatible ; synchronisation à reprendre.' if isinstance(error,sqlite3.Error) else 'Dossier client en attente : vérifier les droits et le stockage.'
+                    with self.lock:self.states[identity] = {**self.summary(identity,{}),'status':'error','error':message}
+                    self.changed(identity)
             with self.lock:
-                self.states = {s['client']['id']: self.states[s['client']['id']] for s in snapshots}
-                self.last_sync = time.time(); self.error = ''
+                self.last_sync = time.time(); self.error = 'Certains dossiers clients attendent une synchronisation.' if failed else ''
             return self.status()

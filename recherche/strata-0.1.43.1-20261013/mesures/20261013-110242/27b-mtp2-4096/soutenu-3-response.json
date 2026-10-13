@@ -1,0 +1,38 @@
+{
+  "choices": [
+    {
+      "finish_reason": "length",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Le voyage de l’eau, de la goutte de pluie jusqu’aux vastes étendues marines, est un processus continu et fascinant qui illustre le cycle hydrologique terrestre. Ce trajet commence lorsque la vapeur d’eau, condensée dans l’atmosphère, se transforme en précipitations. Sous forme de pluie, l’eau tombe sur la surface du sol, marquant le début de son périple vers les cours d’eau.\n\nDès son contact avec le sol, l’eau suit deux voies principales : l’infiltration et le ruissellement. Une partie de l’eau s’infiltre dans le sol, rechargeant les nappes phréatiques et alimentant les sources souterraines, tandis que l’autre partie, lorsque le sol est saturé ou imperméable, s’écoule en surface. Ce ruissellement superficiel est guidé par la gravité et le relief du terrain. L’eau s’accumule d’abord dans les petites dépressions, formant des ruisseaux minuscules qui convergent progressivement vers des canaux plus larges.\n\nAu fur et à mesure que ces petits ruisseaux se rejoignent, ils forment des rivières. Le trajet de l’eau dans la rivière est dynamique : elle transporte avec elle des sédiments, des nutriments et de la matière organique, érodant les berges et façonnant le paysage. La vitesse de l’écoulement varie selon la pente du terrain, la saison et les apports d’eau provenant de l’infiltration souterraine ou de nouvelles précipitations. Les rivières agissent comme des artères naturelles, collectant l’eau de bassins versants entiers et la canalisant vers des points de convergence plus grands.\n\nEnfin, la rivière atteint son embouchure, où elle se jette dans la mer. À ce stade, l’eau douce de la rivière se mélange à l’eau salée de l’océan, créant des estuaires riches en biodiversité. L’eau apporte ainsi une quantité significative de nutriments et de sédiments aux écosystèmes marins, jouant un rôle crucial dans la productivité biologique des zones côtières. Une fois dans la mer, l’eau continue son cycle : elle est évaporée par le soleil, formant à nouveau de la vapeur d"
+      }
+    }
+  ],
+  "created": 1791882624,
+  "model": "huihui-27b",
+  "system_fingerprint": "b1-0ae77ef",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 512,
+    "prompt_tokens": 54,
+    "total_tokens": 566,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-Dgo8htosSBbdh7GWBbS4D037Yn4ZJPz7",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 54,
+    "prompt_ms": 758.998,
+    "prompt_per_token_ms": 14.05551851851852,
+    "prompt_per_second": 71.14643253341904,
+    "predicted_n": 512,
+    "predicted_ms": 18201.271,
+    "predicted_per_token_ms": 35.61892563600783,
+    "predicted_per_second": 28.07496245729213,
+    "draft_n": 462,
+    "draft_n_accepted": 280
+  }
+}

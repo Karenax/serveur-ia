@@ -2,7 +2,6 @@
 import hashlib
 import json
 from pathlib import Path
-import psutil
 import sys
 sys.path.insert(0,str(Path(__file__).resolve().parent.parent/'client-qwen'))
 from core import HOME,ROOT,BASE_PATH,matching_servers,process_identity,same_process,write_json,read_json

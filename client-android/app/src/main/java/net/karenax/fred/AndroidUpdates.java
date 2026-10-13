@@ -51,6 +51,7 @@ final class AndroidUpdates implements AutoCloseable {
         long code=release.getLong("version_code");
         if(code<=BuildConfig.VERSION_CODE){
             synchronized(this){readyFile=null;readyRelease=null;}
+            cleanCache(new File(context.getFilesDir(),"updates"),null);
             setState("current","Fred Android "+BuildConfig.VERSION_NAME+" est à jour.",0,0);return;
         }
         File directory=new File(context.getFilesDir(),"updates");
@@ -88,6 +89,7 @@ final class AndroidUpdates implements AutoCloseable {
     private synchronized boolean isClosed(){return closed;}
     private synchronized void markReady(File file,JSONObject release){
         if(closed)return;readyRelease=Json.copy(release);readyFile=file;
+        cleanCache(file.getParentFile(),file);
         setState("ready","Fred Android "+release.optString("version")+" est prêt à installer.",file.length(),file.length());
     }
     synchronized File installationFile()throws Exception {
@@ -99,6 +101,17 @@ final class AndroidUpdates implements AutoCloseable {
         Intent intent=new Intent(Intent.ACTION_VIEW).setDataAndType(uri,"application/vnd.android.package-archive")
                 .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         intent.setClipData(ClipData.newRawUri("Mise à jour Fred",uri));return intent;
+    }
+    static void cleanCache(File directory,File retained){
+        try{
+            if(directory==null||!directory.isDirectory()||java.nio.file.Files.isSymbolicLink(directory.toPath()))return;
+            File[] files=directory.listFiles();if(files==null)return;
+            for(File file:files){
+                if(!file.isFile()||!file.getCanonicalFile().getParentFile().equals(directory.getCanonicalFile()))continue;
+                if(retained!=null&&file.getCanonicalFile().equals(retained.getCanonicalFile()))continue;
+                if(file.getName().matches("[0-9a-f]{64}\\.apk")||file.getName().matches("download-[A-Za-z0-9_-]+\\.part"))file.delete();
+            }
+        }catch(IOException ignored){/* A later successful check retries managed cache cleanup. */}
     }
     static void validateManifest(JSONObject release)throws Exception {
         Object code=release.opt("version_code"),bytes=release.opt("bytes");

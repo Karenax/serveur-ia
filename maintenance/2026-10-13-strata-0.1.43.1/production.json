@@ -1,0 +1,26 @@
+{
+  "version": "0.1.43.1",
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "loaded": true,
+  "answer": "301",
+  "engine_pid": 11340,
+  "engine_path": "D:\\Serveur IA\\dependances\\strata-0.1.43.1\\engine-cuda12\\strata.exe",
+  "engine_sha256": "6ce44b68442b8d2330ee8634abb4e364e17185d2474816627ec74aaa34d2a0b1",
+  "session": "D:\\Serveur IA\\lanceur\\sessions\\20261013-114149-197238",
+  "ready_seconds": 236.3,
+  "defaults_and_last_valid_match": true,
+  "operations": {
+    "autoload": true,
+    "restart": true
+  },
+  "health": {
+    "status": "ok",
+    "max_context": 262144,
+    "model": "qwen3.8-flash-next-iq4-xs",
+    "images": false,
+    "api_key": false,
+    "loaded": true,
+    "service": "strata"
+  },
+  "launcher_tests": "8 passed"
+}

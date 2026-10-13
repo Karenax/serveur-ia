@@ -1,0 +1,18 @@
+{
+  "model": "qwen3.8-flash-next-iq4-xs-test-01431",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Réponds uniquement avec un objet JSON contenant la clé resultat et le nombre 42."
+    }
+  ],
+  "max_tokens": 64,
+  "temperature": 0,
+  "seed": 42,
+  "cache_prompt": false,
+  "stream": false,
+  "chat_template_kwargs": {
+    "enable_thinking": false
+  },
+  "reasoning_effort": "none"
+}

@@ -1,0 +1,63 @@
+{
+  "desired_fixed_ip": "192.168.1.41",
+  "windows_result": {
+    "time": "2026-10-13T12:51:43.5397289+02:00",
+    "details": {
+      "persistent": true,
+      "backup": "D:\\Serveur IA\\maintenance\\2026-10-13-ip-fixe\\avant-20261013-125140.json",
+      "prefix": 24,
+      "gateway": "192.168.1.1",
+      "mac": "E0-4F-43-E6-50-12",
+      "dhcp": "Disabled",
+      "address": "192.168.1.41",
+      "interface": "Ethernet 5",
+      "dns": [
+        "192.168.1.1"
+      ]
+    },
+    "state": "succeeded"
+  },
+  "profiles": [
+    {
+      "id": "0402a094eeb03bdc",
+      "local_routes": [
+        {
+          "endpoint": "192.168.1.41:51820",
+          "network": "192.168.1.0/24"
+        }
+      ]
+    }
+  ],
+  "wireguard": {
+    "connected": true,
+    "handshake": true,
+    "endpoint": "192.168.1.41:51820",
+    "model_count": 5
+  },
+  "https": {
+    "connected": true,
+    "code": "ready",
+    "model_count": 5
+  },
+  "model_and_keys_preserved": true,
+  "after": {
+    "model_processes": [
+      {
+        "pid": 17428,
+        "created": 1791884512.3525467
+      },
+      {
+        "pid": 23660,
+        "created": 1791884512.3757713
+      }
+    ],
+    "preserved_file_sha256": {
+      "acces-distants.json": "1d357907389d2056a608c5e98b47d2fa31f519521af1f18e8f3666eb36e16037",
+      "wireguard.json": "6cbd6b81bd61645cce770ac2a7e03cdb99f86b800c95d4f05e0a425e3a6aa7dd",
+      "reglages.json": "9120a2d2682b95dbdcd9097bcb7bb2c1ef50c20c1bd9931b309ffe212ccf6ac8",
+      "wireguard-prive/secrets.dpapi": "0bf5ae5faca3ad22177ce07af1d8587441ad569f0595a46a3c8c4d4184600a93",
+      "wireguard-prive/signature.dpapi": "240cd390a95972957889009bfabb7e54942f33d7f99d9ebb9a211ab1f9754a4a"
+    },
+    "model_loaded": true
+  }
+}

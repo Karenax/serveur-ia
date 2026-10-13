@@ -1,0 +1,16 @@
+{
+  "client_storage": {
+    "automatic": true,
+    "has_error": false,
+    "error": "",
+    "clients_materialized": 2,
+    "last_sync": 1791830532.8385015
+  },
+  "backups": {
+    "last_error": "",
+    "last_success": "2026-10-12T03:00:34+02:00",
+    "catalog_count": 16
+  },
+  "hermes_integration_db_bytes": 184320,
+  "project_conversations_count": 0
+}

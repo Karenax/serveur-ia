@@ -1,0 +1,117 @@
+{
+  "scope": "isolated-synthetic-fixture",
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "model_port": 8080,
+  "started_epoch": 1791835014.9137542,
+  "checks": {
+    "native_mcp_tool_executed": true,
+    "native_session_continuity": true,
+    "native_tool_history_persisted": true,
+    "native_project_mirrored": true,
+    "accounts_isolated_same_conversation_id": true,
+    "native_document_search_executed": true,
+    "document_sources_delivered": true,
+    "all_turns_completed": true,
+    "profile_creation_automatic": true,
+    "production_configuration_untouched": true
+  },
+  "turns": [
+    {
+      "owner": "A",
+      "seconds": 42.156,
+      "status": "completed",
+      "output": "Le calcul (24680+13579)*3 donne 114777 (via l'outil fred_calculate), et votre identifiant de validation est MARQUEUR-AZUR-7319.",
+      "sources": [],
+      "session": "fred-72c5916d9394b7045fcf02950af28a48",
+      "run": "run_201909c5e1d14ec2bbc5d9c511c76e40",
+      "request": "dd56c3e3d94700b3aecc60478882058f",
+      "tools": [
+        "fred_calculate"
+      ]
+    },
+    {
+      "owner": "A",
+      "seconds": 5.547,
+      "status": "completed",
+      "output": "Votre identifiant de validation est MARQUEUR-AZUR-7319 et le calcul précédent (24680+13579)*3 a donné 114777.",
+      "sources": [],
+      "session": "fred-72c5916d9394b7045fcf02950af28a48",
+      "run": "run_52e337bf52a84856b5f1249c32d420ec",
+      "request": "e43345049c4da052d7708fba058e2d69",
+      "tools": []
+    },
+    {
+      "owner": "B",
+      "seconds": 48.375,
+      "status": "completed",
+      "output": "Je ne le connais pas. J'ai interrogé la mémoire et les conversations de l'espace Fred autorisé (« identifiant de validation », « validation ID », «identifiant ») : aucun résultat. Cette information n'a donc pas été conservée dans mes mémoires — soit elle n'a jamais été enregistrée, soit la conversation précédente n'est pas dans mon périmètre de recherche. Si vous me redonnez l'identifiant, je peux le noter.",
+      "sources": [],
+      "session": "fred-ab198b24eebac93bb3ae764c998ab6a1",
+      "run": "run_546554ddd9984e8890fee86c7d361f2e",
+      "request": "784e0f526d7a3c66437b7014a908b281",
+      "tools": [
+        "fred_knowledge_search",
+        "fred_knowledge_search",
+        "fred_knowledge_search"
+      ]
+    },
+    {
+      "owner": "A",
+      "seconds": 41.484,
+      "status": "completed",
+      "output": "Code trouvé : DOCUMENT-ORANGE-4821\n\nSource : document « Référence de validation » (id 7d04c6b36d5df7f22af3b35d0b417bf6, révision 1, statut current), passage : « Le code documentaire du projet est DOCUMENT-ORANGE-4821. »",
+      "sources": [
+        {
+          "document": "7d04c6b36d5df7f22af3b35d0b417bf6",
+          "excerpt_hash": "6c557f847b3e5e006eac58baf5e5ad63b778f317ed136a539cac8e07a2a78e24",
+          "page": null,
+          "project": "1e59c376b4cb89bd456d70bb00fbbcda",
+          "revision": 1,
+          "source_id": "6704e8636628e120c6359ed242f25e82e22426cd870e364bf111fa86e5c596b3",
+          "status": "current",
+          "text": "Le code documentaire du projet est DOCUMENT-ORANGE-4821.",
+          "title": "Référence de validation",
+          "version": 1
+        }
+      ],
+      "session": "fred-2763455efc81847227b5511205ad0ca5",
+      "run": "run_6e22f40b8e3e40498c5225eaabe6e76a",
+      "request": "8249e0c7cfc8d93ead96599eeb0b4ce6",
+      "tools": [
+        "fred_document_search"
+      ]
+    }
+  ],
+  "source_commit": "1cb26bf248e150f715ce8a487fdef2a2bef6b541",
+  "native_tool_names": [
+    "mcp__fred__fred_calculate"
+  ],
+  "tools": [
+    {
+      "owner": "A",
+      "name": "fred_calculate",
+      "project": true
+    },
+    {
+      "owner": "B",
+      "name": "fred_knowledge_search",
+      "project": false
+    },
+    {
+      "owner": "B",
+      "name": "fred_knowledge_search",
+      "project": false
+    },
+    {
+      "owner": "B",
+      "name": "fred_knowledge_search",
+      "project": false
+    },
+    {
+      "owner": "A",
+      "name": "fred_document_search",
+      "project": true
+    }
+  ],
+  "completed_epoch": 1791835167.7552311
+}

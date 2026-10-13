@@ -93,7 +93,8 @@ class ImprovementsTests(unittest.TestCase):
             source=dist/'Accès serveur Fred.exe';source.write_bytes(b'new executable fixture')
             identity=secrets.token_hex(8);key=base64.b64encode(bytes(range(32))).decode()
             personal={'transport':'wireguard','url':'wireguard://10.77.0.1:8766','token':'qwen_'+identity+'_'+secrets.token_urlsafe(32),
-                      'wireguard':{'private_key':key,'server_public_key':key,'preshared_key':key,'address':'10.77.0.2/32','endpoint':'127.0.0.1:51820'}}
+                      'wireguard':{'private_key':key,'server_public_key':key,'preshared_key':key,'address':'10.77.0.2/32','endpoint':'127.0.0.1:51820'},
+                      'local_routes':[{'endpoint':'192.168.1.40:51820','network':'192.168.1.0/24'}]}
             encoded=json.dumps(personal).encode()
             clients=home/'clients';clients.mkdir();target=clients/(identity+'.exe')
             original=b'old fixture'+encoded+struct.pack('<I',len(encoded))+b'QWENPROFILE1'
@@ -102,11 +103,20 @@ class ImprovementsTests(unittest.TestCase):
             import hashlib
             record={'id':identity,'revoked':False,'hash':hashlib.sha256(personal['token'].encode()).hexdigest(),'address':personal['wireguard']['address'],'wireguard_public_key':public_key(key)}
             write_json(home/'acces-distants.json',{'enabled':False,'url':'wireguard://10.77.0.1:8766','clients':[record]})
-            with patch('releases.ROOT',root):
+            routes=[{'endpoint':'192.168.1.41:51820','network':'192.168.1.0/24'}]
+            with patch('releases.ROOT',root),patch('wireguard_access.network_routes',return_value=routes) as route_scan:
                 releases.manifest(home);self.assertEqual(releases.repackage(home)['count'],1)
                 self.assertEqual(releases.profile(target)['wireguard'],personal['wireguard'])
                 self.assertEqual(releases.profile(target)['token'],personal['token'])
+                self.assertEqual(releases.profile(target)['local_routes'],routes)
+                route_scan.assert_called_once_with(51820)
                 self.assertEqual(releases.repackage(home)['count'],0)
+                routes=[{'endpoint':'192.168.1.42:51820','network':'192.168.1.0/24'}]
+                route_scan.return_value=routes
+                self.assertEqual(releases.repackage(home)['count'],1)
+                self.assertEqual(releases.profile(target)['local_routes'],routes)
+                self.assertEqual(releases.profile(target)['wireguard'],personal['wireguard'])
+                self.assertEqual(releases.profile(target)['token'],personal['token'])
                 releases.rollback(home);self.assertEqual(target.read_bytes(),original)
                 source.write_bytes(b'tampered')
                 with self.assertRaises(ValueError):releases.repackage(home)

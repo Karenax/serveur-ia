@@ -141,6 +141,13 @@ class DeviceTests(unittest.TestCase):
         self.assertNotIn(a['token'].encode(),encrypted)
         self.assertNotIn(a['wireguard']['private_key'].encode(),encrypted)
         self.assertNotIn('token',first);self.assertNotIn('wireguard',first)
+        routes=[{'endpoint':'192.168.1.41:51820','network':'192.168.1.0/24'}]
+        with patch('wireguard_access.network_routes',return_value=routes):
+            updated=json.loads(self.wireguard.android_profile(first['id']))
+        self.assertEqual(updated['local_routes'],routes)
+        self.assertEqual(updated['wireguard'],a['wireguard'])
+        self.assertEqual(updated['token'],a['token'])
+        self.assertEqual((self.wireguard.directory/'profils-restaures.dpapi').read_bytes(),encrypted)
         self.store.rename(first['id'],'Nouveau nom')
         self.assertEqual(json.loads(self.wireguard.android_profile(first['id']))['client_name'],'Nouveau nom')
         self.assertTrue(next(c for c in self.store.metadata()['clients'] if c['id']==first['id'])['has_android_profile'])

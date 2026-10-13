@@ -1,0 +1,2 @@
+client-qwen\local_voice.py:71: unused variable 'unused' (100% confidence)
+lanceur\app.py:8: unused import 'mimetypes' (90% confidence)

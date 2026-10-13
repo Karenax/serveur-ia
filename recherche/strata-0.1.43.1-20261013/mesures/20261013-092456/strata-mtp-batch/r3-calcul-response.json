@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-1681d6a405664cd5afbc7357",
+  "object": "chat.completion",
+  "created": 1791878608,
+  "model": "qwen3.8-flash-next-iq4-xs-test-01431",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"produit\": 391,\n  \"somme\": 500,\n  \"capitale\": \"Paris\"\n}"
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 67,
+    "completion_tokens": 35,
+    "total_tokens": 102,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 67,
+    "prompt_ms": 2713.0,
+    "prompt_per_token_ms": 40.493,
+    "prompt_per_second": 24.7,
+    "predicted_n": 35,
+    "predicted_ms": 860.3,
+    "predicted_per_token_ms": 24.58,
+    "predicted_per_second": 40.7,
+    "draft_n": 24,
+    "draft_n_accepted": 24
+  }
+}

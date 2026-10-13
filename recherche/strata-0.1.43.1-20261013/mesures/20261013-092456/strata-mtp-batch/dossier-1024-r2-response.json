@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-94f5ad4de83d47e8993504ed",
+  "object": "chat.completion",
+  "created": 1791879049,
+  "model": "qwen3.8-flash-next-iq4-xs-test-01431",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"code\": \"LUMIERE-7429\"\n}"
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 23627,
+    "completion_tokens": 20,
+    "total_tokens": 23647,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 23627,
+    "prompt_ms": 56841.7,
+    "prompt_per_token_ms": 2.406,
+    "prompt_per_second": 415.7,
+    "predicted_n": 20,
+    "predicted_ms": 519.4,
+    "predicted_per_token_ms": 25.97,
+    "predicted_per_second": 38.5,
+    "draft_n": 14,
+    "draft_n_accepted": 14
+  }
+}

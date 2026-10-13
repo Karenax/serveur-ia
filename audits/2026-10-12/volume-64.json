@@ -1,0 +1,9 @@
+{
+  "original_mib": 64,
+  "documents": 32,
+  "sha256_match": true,
+  "archive_bytes": 119906279,
+  "backup_seconds": 5.11,
+  "restore_seconds": 14.687,
+  "rss_increase_bytes": 908161024
+}

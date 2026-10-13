@@ -1,0 +1,46 @@
+{
+  "invalid_history_count": {
+    "before_messages": 1000,
+    "after_messages": 1001,
+    "client_validation_error": "Titre ou messages invalides.",
+    "run_state": "completed"
+  },
+  "unbounded_runs_backup_failure": {
+    "runs": 6,
+    "request_bytes_each": 2097152,
+    "canonical_used_bytes": 0,
+    "integration_db_bytes": 39923712,
+    "backup_error": "Fichier Hermes trop volumineux ou non régulier."
+  },
+  "invalid_history_size": {
+    "before_bytes": 8388839,
+    "after_bytes": 9961813,
+    "client_validation_error": "Historique limité à 9 Mo. Exporter puis supprimer des conversations."
+  },
+  "memory_quota_unchanged_edit": {
+    "unchanged_memory_bytes": 1500,
+    "available_quota_bytes": 1000,
+    "actual_storage_delta_bytes": 0,
+    "error": "Limite de stockage de cet accès atteinte."
+  },
+  "client_storage_schema_mismatch": {
+    "export_before_project_conversation": "success",
+    "project_conversation_saved": true,
+    "export_after_project_conversation_error": "table conversations has no column named archived"
+  },
+  "past_image_removed_from_native_history": {
+    "fred_history_image_parts": 1,
+    "native_history_image_parts": 0,
+    "native_first_user_content": "Décris cette image",
+    "previous_image_transmitted": false
+  },
+  "late_mcp_uses_next_turn_scope": {
+    "http_status": 200,
+    "is_error": false,
+    "old_turn_cancelled": true,
+    "intended_project": "6b5018b92ca3f904ac84ee0b62860770",
+    "returned_project": "a8ce893108d884d5fa934ab23c53f7ae",
+    "returned_title": "Nouveau projet",
+    "current_project": "a8ce893108d884d5fa934ab23c53f7ae"
+  }
+}

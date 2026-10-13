@@ -1,0 +1,22 @@
+[
+  {
+    "uuid": "GPU-a39f1b57-5a26-b53d-e943-44ef8042a438",
+    "temperature_c": 54.0,
+    "sm_mhz": 1189.0,
+    "mem_mhz": 715.0,
+    "power_w": 35.72,
+    "throttle_mask": 0,
+    "utilization": 0.0,
+    "vram_mib": 10204.0
+  },
+  {
+    "uuid": "GPU-486d5352-582e-2880-78bf-3dec4688e142",
+    "temperature_c": 55.0,
+    "sm_mhz": 1189.0,
+    "mem_mhz": 715.0,
+    "power_w": 36.49,
+    "throttle_mask": 0,
+    "utilization": 0.0,
+    "vram_mib": 10204.0
+  }
+]

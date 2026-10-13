@@ -1,0 +1,38 @@
+{
+  "choices": [
+    {
+      "finish_reason": "length",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Voici la fonction Python `fibonacci(n)` qui retourne les `n` premiers nombres de la suite de Fibonacci, suivie d'un exemple pour `n=8`.\n\n```python\ndef fibonacci(n):\n    \"\"\"\n    Retourne une liste contenant les n premiers nombres de Fibonacci.\n    La suite commence par 0 et 1.\n    \"\"\"\n    if n <= 0:\n        return []\n    elif n == 1:\n        return [0]\n    \n    fib_sequence = [0, 1]\n    for i in range(2, n):\n        next_fib = fib_sequence[i - 1] + fib_sequence[i - 2]\n        fib_sequence.append(next_fib)\n    \n    return fib_sequence\n\n# Exemple pour n=8\nn = 8\nresultat = fibonacci(n)\nprint(f\"Les {n} premiers nombres de Fibonacci sont : {resultat}\")\n```\n\n**Sortie pour `n=8` :**\n```\nLes 8 premiers nombres de Fibonacci sont : [0, 1, 1, 2, 3, 5, 8, 13]\n```\n\n### Explication :"
+      }
+    }
+  ],
+  "created": 1791882356,
+  "model": "huihui-27b",
+  "system_fingerprint": "b1-0ae77ef",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 256,
+    "prompt_tokens": 57,
+    "total_tokens": 313,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-BXuDkNNrrJVNq8nmFz0dHIH71OoO0rT8",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 57,
+    "prompt_ms": 751.563,
+    "prompt_per_token_ms": 13.185315789473684,
+    "prompt_per_second": 75.84194538581596,
+    "predicted_n": 256,
+    "predicted_ms": 7118.967,
+    "predicted_per_token_ms": 27.917517647058823,
+    "predicted_per_second": 35.8198036316224,
+    "draft_n": 178,
+    "draft_n_accepted": 165
+  }
+}

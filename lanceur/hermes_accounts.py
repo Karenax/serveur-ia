@@ -168,6 +168,11 @@ class HermesAccounts:
                                             'curator', 'title_generation', 'memory_query_rewrite')}
         config['auxiliary']['title_generation'].update(enabled=False, model_upgrade_enabled=False)
         config['auxiliary']['refine'] = {'enabled': False}
+        if selection:
+            # The auxiliary main route is explicit, so native Hermes' auto mode
+            # otherwise replaces images with a lossy auxiliary description.
+            config['agent']['image_input_mode'] = 'native' if selection.get('capabilities',{}).get('images') else 'text'
+            config['model']['supports_vision'] = selection.get('capabilities',{}).get('images') is True
         if selection and not selection.get('local'):
             # Some native auxiliary entry points do not receive main_runtime.
             # An explicit named route keeps them on this account's selected
@@ -179,7 +184,7 @@ class HermesAccounts:
             config['mcp_servers'] = {'fred': {'url': self.mcp_url,
                 'headers': {'Authorization': 'Bearer ${FRED_TOOL_KEY}'}, 'connect_timeout': 10,
                 'request_timeout': 60}}
-        if owner and self.models:config.update(self.models.profile_config(owner))
+        if owner and self.models:config.update(self.models.profile_config(owner,request_id=selection.get('_fred_request_id') if selection else None))
         return config
 
     def _write_env(self, directory, values):

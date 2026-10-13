@@ -1,6 +1,6 @@
 # Conversations Fred avec Hermes
 
-Les clients Windows 3.5.27 et Android 1.0.10/code 11 envoient leurs demandes à Fred. Le serveur confie chaque conversation à Hermes avec le modèle sélectionné et les outils autorisés. Le modèle Qwen local reste disponible ; les fournisseurs connectés dans Hermes sur le serveur peuvent être partagés entre les comptes Fred. Les tâches rédactionnelles gardent le modèle serveur par défaut. Les trois actions du correcteur — Corriger, Reformuler professionnel et Reformuler amical — utilisent directement Qwen.
+Les clients Windows 3.5.28 et Android 1.0.11/code 12 envoient leurs demandes à Fred. Le serveur confie chaque conversation à Hermes avec le modèle sélectionné et les outils autorisés. Le modèle Qwen local reste disponible ; les fournisseurs connectés dans Hermes sur le serveur peuvent être partagés entre les comptes Fred. Les tâches rédactionnelles gardent le modèle serveur par défaut. Les trois actions du correcteur — Corriger, Reformuler professionnel et Reformuler amical — utilisent directement Qwen.
 
 Le correcteur utilise la route authentifiée `/v1/chat/completions` avec
 `text_transform: {mode, text}`. Le serveur impose la consigne du mode choisi
@@ -15,7 +15,7 @@ La création d’un accès Fred crée automatiquement le profil natif `fred-<ide
 
 Chaque projet Fred possède un projet natif Hermes dans le profil du compte. Le nom, les consignes et l’archivage sont synchronisés ; le renommage conserve l’identité native. Le dossier `workspace/projects/<identifiant-projet>/` contient un catalogue des documents. Leur contenu demeure dans l’espace Fred et est lu par MCP avec les droits du compte et du projet. L’association d’une session à son projet passe par les API officielles Hermes et son dossier de travail, sans changer le projet actif de toutes les conversations.
 
-Chaque conversation utilise une session indépendante. Une continuation conserve les appels d’outils et leur résultat. Un changement de modèle, de projet, une modification de l’historique ou une restauration ouvre une nouvelle session avec l’historique visible accepté.
+Chaque conversation utilise une session indépendante. Une continuation conserve les appels d’outils et leur résultat. Un changement de modèle, de projet, une modification de l’historique ou une restauration ouvre une nouvelle session avec le transcript multimodal accepté, y compris les images antérieures.
 
 ## Choix du modèle et abonnements
 
@@ -66,3 +66,11 @@ Quatre conversations Hermes au maximum peuvent avancer en parallèle, avec une s
 La validation native se lance explicitement avec `Strata-src\.venv\Scripts\python.exe lanceur\validate_hermes_native.py`. Elle crée des comptes et projets synthétiques dans un dossier temporaire, utilise le Qwen déjà chargé et préserve les données de production. Elle vérifie de vrais appels MCP, la continuité de session, l’isolation entre comptes, les projets natifs et la création automatique d’un profil. Les preuves se trouvent dans `preuves/hermes-fred/`.
 
 Les binaires signés sont distribués par les mécanismes Fred existants. Android peut télécharger la mise à jour depuis l’application ; la confirmation d’installation reste demandée par Android.
+
+## Limites et conservation après l’audit du 12 octobre
+
+L’historique client reste limité à 1 000 messages par conversation et 9 Mio pour la bibliothèque. Le serveur refuse une demande qui ne laisse pas de place pour un nouveau message. Une réponse qui dépasse le contrat ou ne peut être projetée n’écrase pas l’historique valide : le client affiche une zone d’export et permet de récupérer le texte complet à la reconnexion pendant 30 jours. Libérer de la place ou commencer une nouvelle conversation permet de continuer. Les conversations canoniques ne sont pas tronquées.
+
+Le journal Fred conserve les identités et réponses terminées pendant 24 heures ; les réponses en attente de récupération restent 30 jours. Il ne conserve plus une copie complète de l’entrée et du transcript à chaque tour. Les sessions natives inactives suivies par Fred sont supprimées après 30 jours : l’historique canonique reste disponible pour reconstruire une session. Les données Hermes et une réservation par demande entrent dans les quotas de stockage du compte et la limite globale de 128 Mio ; un dépassement bloque l’admission ou arrête la demande active. Les bases du journal sont compactées au repos. Les sauvegardes incluent aussi le journal natif d’idempotence, avec une capacité Hermes maximale de 144 Mio pour couvrir la limite globale et les métadonnées.
+
+Chaque appel MCP et chaque appel d’inférence privé porte l’identité du tour admis. Une clé de profil seule ne permet plus à un appel retardé de rejoindre la conversation suivante. Le helper des fournisseurs externes est également lié à l’identité Fred du message.

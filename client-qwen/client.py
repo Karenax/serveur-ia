@@ -7,7 +7,8 @@ from ctypes import wintypes
 import hashlib
 import hmac
 import io
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from http.server import BaseHTTPRequestHandler
+from fred_http import BoundedHTTPServer, json_body
 import json
 import os
 from pathlib import Path
@@ -24,8 +25,7 @@ import time
 from updater import VERSION, AGENT_PROTOCOL
 from product import APP_NAME, LOCAL_API_PORT, LOCAL_API_LAST_PORT
 import history_store
-from urllib.parse import urlsplit
-from wg_bridge import Bridge,validate_profile,validate_endpoint,connection_candidates
+from wg_bridge import Bridge,validate_profile,connection_candidates
 from connection_settings import parse as parse_connection_settings, validate_connection_endpoint, HTTPS_ENDPOINT
 import app_integrations
 
@@ -320,7 +320,6 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
             self.wfile.write(data)
 
         def authorized(self):
-            port = self.server.server_address[1]
             if not self.local_request():
                 self.reply(403, {'error': {'message': 'Utiliser une application API locale avec la clé affichée.'}})
                 return False
@@ -398,13 +397,10 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
             if not self.authorized():
                 return
             try:
-                if self.headers.get('Transfer-Encoding') or not self.headers.get('Content-Type', '').startswith('application/json'):
-                    raise ValueError('Corps JSON attendu.')
-                length = int(self.headers.get('Content-Length', '0'))
-                if not 1 <= length <= (10*1024*1024 if self.path.startswith('/client/history') or self.path in ('/v1/chat/completions','/v1/context') else 8*1024*1024 if self.path=='/v1/workspace/action' else 2*1024*1024):
-                    raise ValueError('Requête trop volumineuse (maximum 2 Mo).')
-                body = self.rfile.read(length)
-                streaming = bool(json.loads(body).get('stream'))
+                maximum = 10*1024*1024 if self.path.startswith('/client/history') or self.path in ('/v1/chat/completions','/v1/context') else 8*1024*1024 if self.path=='/v1/workspace/action' else 2*1024*1024
+                values = json_body(self, maximum)
+                body = json.dumps(values, ensure_ascii=False).encode('utf-8')
+                streaming = bool(values.get('stream'))
             except (OSError, ValueError, AttributeError) as error:
                 return self.reply(400, {'error': {'message': str(error)}})
             if self.path.startswith('/client/'):
@@ -528,28 +524,15 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
     server.daemon_threads = True
     return server
 
-class LocalHTTPServer(ThreadingHTTPServer):
+class LocalHTTPServer(BoundedHTTPServer):
     """Bounded workers also cover stalled or unauthorized loopback connections."""
     def __init__(self,*args,**kwargs):
-        super().__init__(*args,**kwargs)
-        self.workers=threading.BoundedSemaphore(24)
+        super().__init__(*args,capacity=24,**kwargs)
 
     def server_close(self):
         if hasattr(self, "conversation"):self.conversation.close()
         if hasattr(self, "voice"):self.voice.close()
         super().server_close()
-
-    def process_request(self,request,address):
-        if not self.workers.acquire(blocking=False):
-            try:request.sendall(b'HTTP/1.0 503 Service Unavailable\r\nContent-Length: 0\r\nConnection: close\r\n\r\n')
-            finally:self.shutdown_request(request)
-            return
-        try:super().process_request(request,address)
-        except Exception:self.workers.release();raise
-
-    def process_request_thread(self,request,address):
-        try:super().process_request_thread(request,address)
-        finally:self.workers.release()
 
 def read_profile():
     if getattr(sys, 'frozen', False):

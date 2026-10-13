@@ -1,0 +1,7 @@
+{
+  "binary_sha256": "b669ff30f0fc63b867d55bb22058658851bb5b55a81b2a1d30033ca797d17944",
+  "model": "D:\\modèle\\huihui-ai\\Huihui-Qwen3.8-27B-abliterated-GGUF\\Huihui-Qwen3.8-27B-abliterated-UD-DW-Q4_K_M.gguf",
+  "model_size": 16551316384,
+  "context": 32768,
+  "mtp": true
+}

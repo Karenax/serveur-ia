@@ -1,19 +1,17 @@
 """Locally built releases with SHA-256 integrity and personal-client rollback."""
 import hashlib
 import json
-import re
 from pathlib import Path
 import shutil
 import struct
-import subprocess
 import time
 import threading
 import tempfile
-from signing import sign,verify,public
+from signing import sign,public
 from core import HOME
 _LOCK=threading.RLock()
 _CACHE={}
-from core import ROOT, HIDDEN, read_json, write_json
+from core import ROOT, read_json, write_json
 from operations import VERSION
 from profiles import match,validate_access
 from file_lock import locked
@@ -78,6 +76,8 @@ def _repackage(home):
         from wg_crypto import protect
         restored=json.loads(protect(saved.read_bytes(),decrypt=True))
     settings=read_json(home/'wireguard.json',{})
+    from wireguard_access import network_routes, UDP_PORT
+    routes=network_routes(settings.get('listen_port',UDP_PORT))
     vault={};vault_path=home/'wireguard-prive/secrets.dpapi'
     if vault_path.exists():
         from wg_crypto import protect
@@ -89,7 +89,7 @@ def _repackage(home):
         values=profile(target) if target.exists() else restored.get(record['id'])
         if values is None:continue
         match(record,values,settings.get('public_key') or None,vault.get('peers',{}).get(record['id']))
-        values.update(version=VERSION,protocol=3,update_public_key=public(home),client_name=record.get('name',values.get('client_name','Client')))
+        values.update(version=VERSION,protocol=3,update_public_key=public(home),client_name=record.get('name',values.get('client_name','Client')),local_routes=routes)
         selected.append((target,values))
     stage=Path(tempfile.mkdtemp(prefix='preparation-',dir=directory));prepared=[];committed=[]
     original_versions=read_json(home/'versions-clients.json',{})
