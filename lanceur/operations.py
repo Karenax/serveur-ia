@@ -12,7 +12,7 @@ import time
 from cryptography.fernet import Fernet, InvalidToken
 from core import ROOT, read_json, write_json
 
-VERSION = '3.5.28'
+VERSION = '3.5.29'
 FILES = ['reglages.json', 'reglages-par-defaut.json', 'derniers-reglages-valides.json', 'base-strata.json', 'acces-distants.json', 'wireguard.json', 'comptes.json', 'exploitation.json', 'voix.json', 'hermes-integration.json', 'hermes-models.json']
 
 def cipher(password, salt):

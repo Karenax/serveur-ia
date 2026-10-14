@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "version": "3.5.29",
+  "sha256": "da5ee53f9a4c93266ec52fece7ec32e503bfe1792cd516da6f114a6c5fa68946",
+  "bytes": 94408776,
+  "compiled_self_test": true,
+  "ui_assets_exact": true,
+  "opencode_visibility_bundled": true
+}

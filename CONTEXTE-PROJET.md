@@ -1,14 +1,16 @@
 # Contexte de reprise — serveur Fred
 
-Mise à jour : 13 octobre 2026.
+Mise à jour : 14 octobre 2026.
 
-État recoupé avec les services actifs, Windows, les réglages et les manifestes : [vérification du contexte](maintenance/2026-10-13-contexte/verification.json). Le modèle est chargé, Hermes et EG2 sont prêts, les dossiers clients sont synchronisés et la livraison Windows est vérifiée.
+État réseau et moteurs recoupé le 13 octobre : [vérification du contexte](maintenance/2026-10-13-contexte/verification.json). La [publication du 14 octobre](maintenance/2026-10-14-opencode/production-corrections.json) confirme Windows/serveur 3.5.29, Qwen toujours chargé avec les mêmes processus, Hermes disponible, données, clés et programmation des sauvegardes conservées. Les connexions réelles WireGuard sur `.41` et HTTPS passent avec cinq modèles accessibles.
 
 ## Travaux livrés
 
 L’utilisateur a demandé une revue approfondie du projet, puis toutes les corrections et améliorations identifiées. L’audit de référence examine le commit `ffe85204729db298ac83848e727e2b9aa10f5548`. Les corrections sont développées sur `codex/audit-corrections-20261012` : export des conversations de projet, limites de l’historique Hermes et export de récupération, stockage/quota/rétention Hermes, identité des tours MCP/inférence, anciennes images, quota différentiel des mémoires et syntaxe PowerShell.
 
-La livraison Windows/serveur 3.5.28 et Android 1.0.11/code 12 est publiée et en service. Le rapport final de correction, les tests et la preuve de mise en service se trouvent dans [audits/2026-10-12](audits/2026-10-12/). Vérifier VALIDATION-CORRECTIONS.md et production-corrections.json pour confirmer la publication effective.
+L’audit a été livré en Windows/serveur 3.5.28 et Android 1.0.11/code 12. Le rapport final de correction, les tests et la preuve de mise en service se trouvent dans [audits/2026-10-12](audits/2026-10-12/). Le correctif Windows/serveur **3.5.29** du 14 octobre est désormais publié ; Android reste en **1.0.11/code 12**.
+
+Le 14 octobre, l’ajout OpenCode 2 a été corrigé après le signalement « fournisseur présent mais aucun modèle ». OpenCode 2 masque par défaut les modèles personnalisés sans date de publication ; Fred active maintenant uniquement le modèle ajouté dans les préférences du sélecteur Desktop. Si OpenCode est ouvert, Fred demande de le fermer et de refaire l’ajout pour ne pas écraser son cache. La configuration JSONC prioritaire est également choisie lorsque JSON et JSONC coexistent. Sur le client : mettre Fred à jour en **3.5.29**, fermer OpenCode, refaire **Ajouter à OpenCode 2**, puis rouvrir OpenCode. Le nouvel EXE, les préférences, la règle du sélecteur et une requête OpenCode ont été vérifiés avec **2.0.22 et 2.0.29**, en environnement temporaire ; 28 tests Python et cinq suites d’interface passent. Voir [la validation et les limites](maintenance/2026-10-14-opencode/README.md). Le poste client distant reste à actualiser par son utilisateur.
 
 Le 13 octobre, la connexion WireGuard sur le réseau local a été réparée : les anciens profils indiquaient `192.168.1.40`, tandis que l’adresse du serveur est `192.168.1.41`, désormais configurée en IP fixe dans Windows. La préparation des EXE et le téléchargement des profils Android actualisent désormais les routes locales, sans changer les clés. L’EXE personnel disponible dans la console a été régénéré. Pour un client déjà installé, utiliser `192.168.1.41:51820` dans les réglages WireGuard ou récupérer l’EXE corrigé. WireGuard et HTTPS ont été vérifiés avec le client réel ; 40 tests passent. Preuves : [audits/2026-10-13-wireguard](audits/2026-10-13-wireguard/).
 
@@ -38,6 +40,7 @@ Le partage des fournisseurs existants suit `hermes-models.json`. Les secrets res
 - [Audit initial](audits/2026-10-12/RAPPORT-AUDIT.md) et [validation des corrections](audits/2026-10-12/VALIDATION-CORRECTIONS.md).
 - [Réparation WireGuard](audits/2026-10-13-wireguard/VALIDATION.md), [IP fixe](maintenance/2026-10-13-ip-fixe/README.md) et [vérification actuelle](maintenance/2026-10-13-contexte/verification.json).
 - [Strata 0.1.43.1 en production](maintenance/2026-10-13-strata-0.1.43.1/README.md).
+- [Correctif OpenCode 2 et livraison Windows 3.5.29](maintenance/2026-10-14-opencode/README.md).
 - [Reconstruction et tests](RECONSTRUIRE-FRED.md), [références des moteurs](dependances/README.md), [index des archives](ARCHIVES-ET-PREUVES.md).
 - [Plan global](PLAN-GLOBAL-SERVEUR-FRED.md), [guide Hermes](lanceur/HERMES-FRED.md), [sauvegardes/appareils](lanceur/SAUVEGARDES-APPAREILS.md), [EG2](lanceur/MEMOIRE-EG2.md), [Android](client-android/README.md).
 - [Historique des décisions et livraisons](HISTORIQUE-PROJET-AVANT-AUDIT-20261012.md). Les longues étapes historiques ont été conservées dans ce fichier.

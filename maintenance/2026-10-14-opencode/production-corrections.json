@@ -1,0 +1,178 @@
+{
+  "before": {
+    "models": [
+      {
+        "pid": 17428,
+        "created": 1791884512.3525467
+      },
+      {
+        "pid": 23660,
+        "created": 1791884512.3757713
+      }
+    ],
+    "files": {
+      "acces-distants.json": "1d357907389d2056a608c5e98b47d2fa31f519521af1f18e8f3666eb36e16037",
+      "wireguard.json": "6cbd6b81bd61645cce770ac2a7e03cdb99f86b800c95d4f05e0a425e3a6aa7dd",
+      "reglages.json": "9120a2d2682b95dbdcd9097bcb7bb2c1ef50c20c1bd9931b309ffe212ccf6ac8",
+      "wireguard-prive/secrets.dpapi": "0bf5ae5faca3ad22177ce07af1d8587441ad569f0595a46a3c8c4d4184600a93",
+      "wireguard-prive/signature.dpapi": "240cd390a95972957889009bfabb7e54942f33d7f99d9ebb9a211ab1f9754a4a"
+    },
+    "users": {
+      "client_histories": {
+        "count": 1,
+        "sha256": "7592d26ee9286466df39c95e7cb735cb6204396cfce35d3b479e8e4d04dd5ced"
+      },
+      "projects": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "documents": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "memories": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "conversations": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "policies": {
+        "count": 1,
+        "sha256": "aa7aff0b13d59517f121a32e8db4de83ac93d7e112cf407376be53b5b5f7dc46"
+      },
+      "jobs": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "personal_memories": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "knowledge_exclusions": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    },
+    "backups": {
+      "enabled": true,
+      "time": "03:00",
+      "frequency": "daily",
+      "weekday": 0,
+      "destination": "D:\\Serveur IA\\lanceur\\sauvegardes",
+      "secondary_destination": "",
+      "retention": {
+        "daily": 7,
+        "weekly": 4,
+        "monthly": 6
+      },
+      "secret_configured": true
+    }
+  },
+  "backup_before": {
+    "id": "0e702f3a7ca54e2c2d46e975",
+    "file": "D:\\Serveur IA\\lanceur\\sauvegardes\\fred-20261014-183310-0e702f3a7ca54e2c2d46e975.qwenbackup",
+    "size": 2677695,
+    "sha256": "b525511c665a2d7c564daaaa9fdfd10769337811e4d3f432ca9f1e9194a9cbd1",
+    "version": 2,
+    "verified": true
+  },
+  "contains_secret_values": false,
+  "windows_release": {
+    "version": "3.5.29",
+    "sha256": "da5ee53f9a4c93266ec52fece7ec32e503bfe1792cd516da6f114a6c5fa68946",
+    "bytes": 94408776
+  },
+  "personal_clients_prepared": 1,
+  "passed": true,
+  "after": {
+    "models": [
+      {
+        "pid": 17428,
+        "created": 1791884512.3525467
+      },
+      {
+        "pid": 23660,
+        "created": 1791884512.3757713
+      }
+    ],
+    "files": {
+      "acces-distants.json": "1d357907389d2056a608c5e98b47d2fa31f519521af1f18e8f3666eb36e16037",
+      "wireguard.json": "6cbd6b81bd61645cce770ac2a7e03cdb99f86b800c95d4f05e0a425e3a6aa7dd",
+      "reglages.json": "9120a2d2682b95dbdcd9097bcb7bb2c1ef50c20c1bd9931b309ffe212ccf6ac8",
+      "wireguard-prive/secrets.dpapi": "0bf5ae5faca3ad22177ce07af1d8587441ad569f0595a46a3c8c4d4184600a93",
+      "wireguard-prive/signature.dpapi": "240cd390a95972957889009bfabb7e54942f33d7f99d9ebb9a211ab1f9754a4a"
+    },
+    "users": {
+      "client_histories": {
+        "count": 1,
+        "sha256": "7592d26ee9286466df39c95e7cb735cb6204396cfce35d3b479e8e4d04dd5ced"
+      },
+      "projects": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "documents": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "memories": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "conversations": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "policies": {
+        "count": 1,
+        "sha256": "aa7aff0b13d59517f121a32e8db4de83ac93d7e112cf407376be53b5b5f7dc46"
+      },
+      "jobs": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "personal_memories": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "knowledge_exclusions": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    },
+    "backups": {
+      "enabled": true,
+      "time": "03:00",
+      "frequency": "daily",
+      "weekday": 0,
+      "destination": "D:\\Serveur IA\\lanceur\\sauvegardes",
+      "secondary_destination": "",
+      "retention": {
+        "daily": 7,
+        "weekly": 4,
+        "monthly": 6
+      },
+      "secret_configured": true
+    }
+  },
+  "server_version": "3.5.29",
+  "hermes_available": true,
+  "model_processes_preserved": true,
+  "keys_and_user_data_preserved": true,
+  "backup_schedule_preserved": true,
+  "personal_client_self_test": true,
+  "client_transports": {
+    "wireguard": {
+      "connected": true,
+      "models": 5,
+      "transport": "wireguard"
+    },
+    "https": {
+      "connected": true,
+      "models": 5,
+      "transport": "https"
+    }
+  }
+}

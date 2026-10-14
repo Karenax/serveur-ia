@@ -49,6 +49,7 @@ class IntegrationTests(unittest.TestCase):
         self.assertEqual(entry['package'],'@opencode/ai/providers/openai-compatible')
         self.assertEqual(entry['settings'],{'baseURL':URL,'apiKey':KEY})
         self.assertTrue(entry['models'][MODEL]['capabilities']['tools'])
+        self.assertIs(entry['models'][MODEL]['disabled'],False)
         before=path.read_bytes();again=self.install('opencode')
         self.assertEqual(before,path.read_bytes());self.assertIsNone(again['backup'])
         changed=self.install('opencode',url='http://127.0.0.1:8088/v1',model='Second')
@@ -156,6 +157,33 @@ display:
         self.apps['opencode']['installed']=False
         with self.assertRaises(ValueError):self.install('opencode')
         self.assertFalse(Path(self.apps['opencode']['config_path']).exists())
+
+    def test_opencode_jsonc_overrides_json_without_changing_the_lower_priority_file(self):
+        directory=self.home/'.config/opencode';directory.mkdir(parents=True)
+        lower=directory/'opencode.json';higher=directory/'opencode.jsonc'
+        lower.write_text('{"model":"other/original","providers":{"other":{"name":"Keep me"}}}',encoding='utf-8')
+        old=integrations.opencode_text('{\n// keep my note\n}', 'http://127.0.0.1:8088/v1','old-key-'+'y'*40,MODEL)
+        higher.write_text(old,encoding='utf-8');lower_before=lower.read_bytes();higher_before=higher.read_bytes()
+        apps=integrations.detect(self.home,{},lambda _:None)
+        self.assertEqual(apps['opencode']['config_path'],str(higher))
+        result=integrations.install('opencode',URL,KEY,MODEL,apps)
+        self.assertEqual(lower.read_bytes(),lower_before)
+        self.assertEqual(Path(result['backup']).read_bytes(),higher_before)
+        self.assertIn('// keep my note',higher.read_text())
+        value,_=integrations.jsonc(higher.read_text())
+        self.assertEqual(value['providers'][PROVIDER]['settings'],{'baseURL':URL,'apiKey':KEY})
+        self.assertIsNone(integrations.install('opencode',URL,KEY,MODEL,apps)['backup'])
+
+    def test_opencode_explicit_config_wins_over_jsonc_and_new_config_stays_json(self):
+        found=integrations.detect(self.home,{},lambda _:None)
+        self.assertEqual(found['opencode']['config_path'],str(self.home/'.config/opencode/opencode.json'))
+        directory=self.home/'custom';directory.mkdir()
+        (directory/'opencode.json').write_text('{}');(directory/'opencode.jsonc').write_text('{}')
+        env={'OPENCODE_CONFIG_DIR':str(directory)}
+        self.assertEqual(integrations.detect(self.home,env,lambda _:None)['opencode']['config_path'],str(directory/'opencode.jsonc'))
+        explicit=self.home/'explicit.json';explicit.write_text('{}')
+        env['OPENCODE_CONFIG']=str(explicit)
+        self.assertEqual(integrations.detect(self.home,env,lambda _:None)['opencode']['config_path'],str(explicit))
 
 
 if __name__=='__main__':unittest.main()

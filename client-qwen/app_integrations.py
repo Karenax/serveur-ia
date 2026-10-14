@@ -10,6 +10,7 @@ import time
 from urllib.parse import urlsplit
 
 import yaml
+import opencode_visibility
 from file_lock import locked
 from history_store import atomic
 
@@ -25,8 +26,9 @@ def detect(home=None,environ=None,which=None):
     local=Path(env.get('LOCALAPPDATA',str(home/'AppData/Local')))
     xdg=Path(env.get('XDG_CONFIG_HOME',str(home/'.config')))
     directory=Path(env.get('OPENCODE_CONFIG_DIR',str(xdg/'opencode')))
-    paths=[directory/'opencode.json',directory/'opencode.jsonc']
-    opencode=Path(env['OPENCODE_CONFIG']) if env.get('OPENCODE_CONFIG') else next((p for p in paths if p.is_file()),paths[0])
+    # OpenCode merges JSON before JSONC; edit the source with the last word.
+    paths=[directory/'opencode.jsonc',directory/'opencode.json']
+    opencode=Path(env['OPENCODE_CONFIG']) if env.get('OPENCODE_CONFIG') else next((p for p in paths if p.is_file()),directory/'opencode.json')
     hermes_default=local/'hermes' if (local/'hermes/bin/hermes.exe').is_file() else home/'.hermes'
     hermes_home=Path(env['HERMES_HOME']) if env.get('HERMES_HOME') else next((p for p in (local/'hermes',home/'.hermes') if (p/'config.yaml').is_file()),hermes_default)
     hermes=hermes_home/'config.yaml'
@@ -35,8 +37,16 @@ def detect(home=None,environ=None,which=None):
         'hermes':[local/'hermes/bin/hermes.exe',home/'.hermes/bin/hermes.exe'],
     }
     configs={'opencode':opencode,'hermes':hermes}
-    return {name:{'installed':bool(configs[name].is_file() or any(p.is_file() for p in binaries[name]) or which(name) or (name=='opencode' and which('opencode2'))),
+    result={name:{'installed':bool(configs[name].is_file() or any(p.is_file() for p in binaries[name]) or which(name) or (name=='opencode' and which('opencode2'))),
                   'config_path':str(configs[name].expanduser().absolute())} for name in configs}
+    # The Electron distribution is OpenCode 2; the v1 desktop uses another store.
+    desktop=binaries['opencode'][0]
+    if desktop.is_file():
+        roaming=Path(env.get('APPDATA',str(home/'AppData/Roaming')))/'ai.opencode.desktop'
+        database=roaming/'drafts.sqlite'
+        result['opencode']['desktop']={'executable':str(desktop),'state_path':str(database if database.is_file() else roaming/'opencode.global.dat'),
+                                      'format':'sqlite' if database.is_file() else 'legacy'}
+    return result
 
 
 def _pairs(values):
@@ -115,6 +125,7 @@ def opencode_text(text,base_url,key,model):
     if not isinstance(details,dict):raise ValueError('Paramètres du modèle OpenCode invalides.')
     details['name']=model
     if v2:
+        details['disabled']=False
         capabilities=details.setdefault('capabilities',{})
         if not isinstance(capabilities,dict):raise ValueError('Capacités du modèle OpenCode invalides.')
         capabilities.update(tools=True)
@@ -258,5 +269,14 @@ def install(app,base_url,key,model,apps=None):
             payload=updated.encode('utf-8')
             if raw.startswith(b'\xef\xbb\xbf'):payload=b'\xef\xbb\xbf'+payload
             atomic(path,payload)
-        return {'app':app,'model':model,'provider':PROVIDER,'config_path':str(path),'backup':str(backup) if backup else None,
-                'message':f'Modèle {model} ajouté à '+('OpenCode. Sélectionnez Serveur Fred dans /models.' if app=='opencode' else 'Hermes. Sélectionnez Serveur Fred dans le choix du modèle.')+' Gardez le client Fred ouvert. Relancez l’application si le modèle n’apparaît pas.'}
+    visibility=opencode_visibility.enable(apps[app].get('desktop'),PROVIDER,model) if app=='opencode' else None
+    message=f'Modèle {model} ajouté à Hermes. Sélectionnez Serveur Fred dans le choix du modèle.'
+    if app=='opencode':
+        message=f'Configuration du modèle {model} enregistrée pour OpenCode. '
+        if visibility['status']=='enabled':message+='Modèle activé dans le sélecteur. Ouvrez OpenCode et sélectionnez Serveur Fred dans /models.'
+        elif visibility['status']=='close_required':message+='Pour afficher le modèle dans OpenCode 2, fermez complètement OpenCode puis cliquez à nouveau sur Ajouter à OpenCode 2.'
+        else:message+='Dans OpenCode 2, ouvrez Paramètres > Modèles et activez ce modèle sous Serveur Fred. Relancez OpenCode si la liste est vide.'
+    backups=[str(backup)] if backup else []
+    if visibility and visibility.get('backup'):backups.append(visibility['backup'])
+    return {'app':app,'model':model,'provider':PROVIDER,'config_path':str(path),'backup':str(backup) if backup else None,
+            'backups':backups,'visibility':visibility,'message':message+' Gardez le client Fred ouvert.'}

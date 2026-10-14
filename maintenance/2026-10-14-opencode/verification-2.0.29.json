@@ -1,0 +1,28 @@
+{
+  "previous_binary_wrong_config_reproduced": true,
+  "picker_visibility": {
+    "before": false,
+    "after": true,
+    "source": "https://raw.githubusercontent.com/anomalyco/opencode/dev/packages/app/src/providers/models/models.tsx",
+    "source_sha256": "a321eb3be380ebcc253c29d18e534cdec95675ea7eaf1cdd889496005e40c236"
+  },
+  "passed": true,
+  "selected_config": "opencode.jsonc",
+  "comments_preserved": true,
+  "exact_backup": true,
+  "lower_priority_config_unchanged": true,
+  "model_visible": true,
+  "api_url_and_key_effective": true,
+  "opencode_chat_request_passed": true,
+  "chat_requests": 1,
+  "real_user_config_untouched": true,
+  "opencode_version": "opencode v2.0.29",
+  "client_binary": {
+    "sha256": "da5ee53f9a4c93266ec52fece7ec32e503bfe1792cd516da6f114a6c5fa68946",
+    "bytes": 94408776
+  },
+  "baseline_binary": {
+    "sha256": "42e99e3de8df3471eae55e48401e17408654182937a99e335a88cbee09516cd8",
+    "bytes": 93456890
+  }
+}

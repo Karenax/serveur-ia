@@ -114,7 +114,8 @@ for(const name of ['opencode','hermes'])$('integration-'+name).onclick=async()=>
   try{
     const result=await api('/client/integrations/apply',{app:name,model:conversationModel()});
     $('integration-result').textContent=result.message;
-    if(result.backup){$('integration-backup-path').textContent=result.backup;$('integration-backup').hidden=false;}
+    const backups=result.backups||(result.backup?[result.backup]:[]);
+    if(backups.length){$('integration-backup-path').textContent=backups.join(' ; ');$('integration-backup').hidden=false;}
   }catch(e){$('integration-result').textContent=e.message;}
   finally{uiIntegrationPending=false;uiIntegrationButtons();}
 };
