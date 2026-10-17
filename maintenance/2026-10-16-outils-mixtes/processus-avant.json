@@ -1,0 +1,25 @@
+{
+  "session": {
+    "directory": "D:\\Serveur IA\\lanceur\\sessions\\20261016-181554-029483",
+    "worker": {
+      "pid": 12324,
+      "created": 1792167354.2710807
+    }
+  },
+  "server": {
+    "pid": 19744,
+    "created": 1792167354.5550628
+  },
+  "engines": [
+    {
+      "pid": 13664,
+      "created": 1792167355.524743,
+      "name": "strata-vision.exe"
+    },
+    {
+      "pid": 27564,
+      "created": 1792167449.5632396,
+      "name": "strata.exe"
+    }
+  ]
+}

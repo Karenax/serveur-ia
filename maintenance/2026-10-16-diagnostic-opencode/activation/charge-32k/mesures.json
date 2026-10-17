@@ -1,0 +1,6401 @@
+{
+  "started_at_utc": "2026-10-16T15:50:01.399881+00:00",
+  "calls": [
+    {
+      "label": "A0_cold",
+      "wall_seconds": 95.094,
+      "usage": {
+        "prompt_tokens": 33082,
+        "completion_tokens": 4,
+        "total_tokens": 33086,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "content": "dossier reçu",
+      "request_metrics": {
+        "projection": null,
+        "time": 1792165801.57567,
+        "duration_s": 94.9,
+        "finish": "stop",
+        "prompt_tokens": 33082,
+        "reused": 0,
+        "output_tokens": 4,
+        "prompt_total": 33082,
+        "prompt_read": 33082,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 4,
+        "prompt_ms": 94673.5,
+        "decode_ms": 246.6,
+        "decode_tok_s": 16.2,
+        "hit_rate": 0.258,
+        "pcie_share": 0.0,
+        "ram_blobs": 2755,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 6,
+        "drafts_accepted": 2
+      },
+      "cache_before": {
+        "enabled": true,
+        "budget_mib": 30720,
+        "slots": 4,
+        "parked": 3,
+        "bytes": 2092093408,
+        "evictions": 0,
+        "parks": 6,
+        "restores": 3,
+        "last_event": "restored",
+        "last_tokens": 8167,
+        "last_at": 1792165797.7224166,
+        "requests": 8,
+        "requests_reused": 4,
+        "reused_tokens": 32831,
+        "prompt_tokens": 57451,
+        "last_reused": 8167,
+        "last_prompt": 8196
+      },
+      "cache_after": {
+        "enabled": true,
+        "budget_mib": 30720,
+        "slots": 4,
+        "parked": 4,
+        "bytes": 2907608592,
+        "evictions": 0,
+        "parks": 7,
+        "restores": 3,
+        "last_event": "parked",
+        "last_tokens": 8202,
+        "last_at": 1792165847.7997248,
+        "requests": 9,
+        "requests_reused": 4,
+        "reused_tokens": 32831,
+        "prompt_tokens": 90533,
+        "last_reused": 0,
+        "last_prompt": 33082
+      },
+      "memory_samples": [
+        {
+          "time": 1792165802.0797887,
+          "available_ram_bytes": 62374731776,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59004608512,
+              "private": 61877338112
+            }
+          ]
+        },
+        {
+          "time": 1792165803.0971935,
+          "available_ram_bytes": 62225977344,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59004608512,
+              "private": 61877338112
+            }
+          ]
+        },
+        {
+          "time": 1792165804.1324706,
+          "available_ram_bytes": 62240350208,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59004608512,
+              "private": 61877338112
+            }
+          ]
+        },
+        {
+          "time": 1792165805.1481524,
+          "available_ram_bytes": 62239776768,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59004608512,
+              "private": 61877338112
+            }
+          ]
+        },
+        {
+          "time": 1792165806.1742172,
+          "available_ram_bytes": 62237720576,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59004944384,
+              "private": 61877784576
+            }
+          ]
+        },
+        {
+          "time": 1792165807.1875918,
+          "available_ram_bytes": 62239039488,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59004944384,
+              "private": 61877784576
+            }
+          ]
+        },
+        {
+          "time": 1792165808.2157993,
+          "available_ram_bytes": 62245253120,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59004944384,
+              "private": 61877784576
+            }
+          ]
+        },
+        {
+          "time": 1792165809.2401848,
+          "available_ram_bytes": 62249287680,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59004944384,
+              "private": 61877784576
+            }
+          ]
+        },
+        {
+          "time": 1792165810.260075,
+          "available_ram_bytes": 62236762112,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59005644800,
+              "private": 61878566912
+            }
+          ]
+        },
+        {
+          "time": 1792165811.286869,
+          "available_ram_bytes": 62239408128,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59005644800,
+              "private": 61878566912
+            }
+          ]
+        },
+        {
+          "time": 1792165812.3125553,
+          "available_ram_bytes": 62238142464,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59005644800,
+              "private": 61878566912
+            }
+          ]
+        },
+        {
+          "time": 1792165813.339724,
+          "available_ram_bytes": 62217687040,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59005644800,
+              "private": 61878566912
+            }
+          ]
+        },
+        {
+          "time": 1792165814.3622494,
+          "available_ram_bytes": 62203625472,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59005644800,
+              "private": 61878566912
+            }
+          ]
+        },
+        {
+          "time": 1792165815.3885689,
+          "available_ram_bytes": 62217760768,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59006976000,
+              "private": 61878956032
+            }
+          ]
+        },
+        {
+          "time": 1792165816.4153998,
+          "available_ram_bytes": 62206631936,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59006976000,
+              "private": 61878956032
+            }
+          ]
+        },
+        {
+          "time": 1792165817.4407156,
+          "available_ram_bytes": 62208548864,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59006976000,
+              "private": 61878956032
+            }
+          ]
+        },
+        {
+          "time": 1792165818.4696548,
+          "available_ram_bytes": 62227914752,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59006976000,
+              "private": 61878956032
+            }
+          ]
+        },
+        {
+          "time": 1792165819.4878473,
+          "available_ram_bytes": 62225514496,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59008000000,
+              "private": 61878956032
+            }
+          ]
+        },
+        {
+          "time": 1792165820.5107007,
+          "available_ram_bytes": 62223204352,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59008000000,
+              "private": 61878956032
+            }
+          ]
+        },
+        {
+          "time": 1792165821.5240102,
+          "available_ram_bytes": 62226132992,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59008000000,
+              "private": 61878956032
+            }
+          ]
+        },
+        {
+          "time": 1792165822.5402534,
+          "available_ram_bytes": 62228004864,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59008000000,
+              "private": 61878956032
+            }
+          ]
+        },
+        {
+          "time": 1792165823.55193,
+          "available_ram_bytes": 62194900992,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59007918080,
+              "private": 61878845440
+            }
+          ]
+        },
+        {
+          "time": 1792165824.5760927,
+          "available_ram_bytes": 62225395712,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59008913408,
+              "private": 61878956032
+            }
+          ]
+        },
+        {
+          "time": 1792165825.600066,
+          "available_ram_bytes": 62225944576,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59008913408,
+              "private": 61878956032
+            }
+          ]
+        },
+        {
+          "time": 1792165826.6260562,
+          "available_ram_bytes": 62227099648,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59008913408,
+              "private": 61878956032
+            }
+          ]
+        },
+        {
+          "time": 1792165827.6533823,
+          "available_ram_bytes": 62227382272,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59008913408,
+              "private": 61878956032
+            }
+          ]
+        },
+        {
+          "time": 1792165828.681397,
+          "available_ram_bytes": 62226083840,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59009851392,
+              "private": 61878956032
+            }
+          ]
+        },
+        {
+          "time": 1792165829.7036994,
+          "available_ram_bytes": 62228877312,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59009851392,
+              "private": 61878956032
+            }
+          ]
+        },
+        {
+          "time": 1792165830.7315538,
+          "available_ram_bytes": 62225637376,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59009851392,
+              "private": 61878956032
+            }
+          ]
+        },
+        {
+          "time": 1792165831.7616477,
+          "available_ram_bytes": 62225526784,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59009851392,
+              "private": 61878956032
+            }
+          ]
+        },
+        {
+          "time": 1792165832.7810917,
+          "available_ram_bytes": 62222340096,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59013406720,
+              "private": 61881917440
+            }
+          ]
+        },
+        {
+          "time": 1792165833.799998,
+          "available_ram_bytes": 62226522112,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59010719744,
+              "private": 61878956032
+            }
+          ]
+        },
+        {
+          "time": 1792165834.8145437,
+          "available_ram_bytes": 62178631680,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59010719744,
+              "private": 61878956032
+            }
+          ]
+        },
+        {
+          "time": 1792165835.8342004,
+          "available_ram_bytes": 62207688704,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59010719744,
+              "private": 61878956032
+            }
+          ]
+        },
+        {
+          "time": 1792165836.8595998,
+          "available_ram_bytes": 62205837312,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59010719744,
+              "private": 61878956032
+            }
+          ]
+        },
+        {
+          "time": 1792165837.8835654,
+          "available_ram_bytes": 62207090688,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59011604480,
+              "private": 61878956032
+            }
+          ]
+        },
+        {
+          "time": 1792165838.9046855,
+          "available_ram_bytes": 62208544768,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59011608576,
+              "private": 61878956032
+            }
+          ]
+        },
+        {
+          "time": 1792165839.9217992,
+          "available_ram_bytes": 62219276288,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59011608576,
+              "private": 61878956032
+            }
+          ]
+        },
+        {
+          "time": 1792165840.9428098,
+          "available_ram_bytes": 62195683328,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59011608576,
+              "private": 61878956032
+            }
+          ]
+        },
+        {
+          "time": 1792165841.9663947,
+          "available_ram_bytes": 62193913856,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59011608576,
+              "private": 61878956032
+            }
+          ]
+        },
+        {
+          "time": 1792165842.9871788,
+          "available_ram_bytes": 62163632128,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59012427776,
+              "private": 61878956032
+            }
+          ]
+        },
+        {
+          "time": 1792165844.0017664,
+          "available_ram_bytes": 62138806272,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59012427776,
+              "private": 61878956032
+            }
+          ]
+        },
+        {
+          "time": 1792165845.0303273,
+          "available_ram_bytes": 62196064256,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59012427776,
+              "private": 61878956032
+            }
+          ]
+        },
+        {
+          "time": 1792165846.0456064,
+          "available_ram_bytes": 62193098752,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59012427776,
+              "private": 61878956032
+            }
+          ]
+        },
+        {
+          "time": 1792165847.072287,
+          "available_ram_bytes": 62178721792,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59012427776,
+              "private": 61878956032
+            }
+          ]
+        },
+        {
+          "time": 1792165848.0981245,
+          "available_ram_bytes": 62113964032,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59013292032,
+              "private": 61878968320
+            }
+          ]
+        },
+        {
+          "time": 1792165849.1231215,
+          "available_ram_bytes": 62136188928,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59013292032,
+              "private": 61878968320
+            }
+          ]
+        },
+        {
+          "time": 1792165850.1376445,
+          "available_ram_bytes": 62167576576,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59013292032,
+              "private": 61878968320
+            }
+          ]
+        },
+        {
+          "time": 1792165851.1710663,
+          "available_ram_bytes": 62152310784,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59013292032,
+              "private": 61878968320
+            }
+          ]
+        },
+        {
+          "time": 1792165852.1953433,
+          "available_ram_bytes": 62169071616,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59013292032,
+              "private": 61878968320
+            }
+          ]
+        },
+        {
+          "time": 1792165853.2139838,
+          "available_ram_bytes": 62140358656,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59014119424,
+              "private": 61878968320
+            }
+          ]
+        },
+        {
+          "time": 1792165854.2409682,
+          "available_ram_bytes": 62137470976,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59014119424,
+              "private": 61878968320
+            }
+          ]
+        },
+        {
+          "time": 1792165855.26474,
+          "available_ram_bytes": 62139064320,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59014119424,
+              "private": 61878968320
+            }
+          ]
+        },
+        {
+          "time": 1792165856.2929392,
+          "available_ram_bytes": 62143082496,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59014119424,
+              "private": 61878968320
+            }
+          ]
+        },
+        {
+          "time": 1792165857.3061848,
+          "available_ram_bytes": 62144131072,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59014119424,
+              "private": 61878968320
+            }
+          ]
+        },
+        {
+          "time": 1792165858.3281965,
+          "available_ram_bytes": 62195945472,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59014119424,
+              "private": 61878968320
+            }
+          ]
+        },
+        {
+          "time": 1792165859.3709319,
+          "available_ram_bytes": 62129938432,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59014901760,
+              "private": 61878968320
+            }
+          ]
+        },
+        {
+          "time": 1792165860.3862755,
+          "available_ram_bytes": 62120009728,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59014901760,
+              "private": 61878968320
+            }
+          ]
+        },
+        {
+          "time": 1792165861.4095347,
+          "available_ram_bytes": 62132555776,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59014901760,
+              "private": 61878968320
+            }
+          ]
+        },
+        {
+          "time": 1792165862.425747,
+          "available_ram_bytes": 62135091200,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59014901760,
+              "private": 61878968320
+            }
+          ]
+        },
+        {
+          "time": 1792165863.4522762,
+          "available_ram_bytes": 62113243136,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59014901760,
+              "private": 61878968320
+            }
+          ]
+        },
+        {
+          "time": 1792165864.4800906,
+          "available_ram_bytes": 62156582912,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59014909952,
+              "private": 61878976512
+            }
+          ]
+        },
+        {
+          "time": 1792165865.4997842,
+          "available_ram_bytes": 62157287424,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59015733248,
+              "private": 61878976512
+            }
+          ]
+        },
+        {
+          "time": 1792165866.528678,
+          "available_ram_bytes": 62157398016,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59015733248,
+              "private": 61878976512
+            }
+          ]
+        },
+        {
+          "time": 1792165867.554001,
+          "available_ram_bytes": 62156369920,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59015733248,
+              "private": 61878976512
+            }
+          ]
+        },
+        {
+          "time": 1792165868.5776398,
+          "available_ram_bytes": 62154158080,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59015733248,
+              "private": 61878976512
+            }
+          ]
+        },
+        {
+          "time": 1792165869.5912244,
+          "available_ram_bytes": 62152720384,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59015733248,
+              "private": 61878976512
+            }
+          ]
+        },
+        {
+          "time": 1792165870.6082287,
+          "available_ram_bytes": 62152253440,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59015692288,
+              "private": 61878919168
+            }
+          ]
+        },
+        {
+          "time": 1792165871.6345646,
+          "available_ram_bytes": 62151901184,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59015692288,
+              "private": 61878919168
+            }
+          ]
+        },
+        {
+          "time": 1792165872.656067,
+          "available_ram_bytes": 62149685248,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59016495104,
+              "private": 61878976512
+            }
+          ]
+        },
+        {
+          "time": 1792165873.6792002,
+          "available_ram_bytes": 62097907712,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59016495104,
+              "private": 61878976512
+            }
+          ]
+        },
+        {
+          "time": 1792165874.6944559,
+          "available_ram_bytes": 62098833408,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59016495104,
+              "private": 61878976512
+            }
+          ]
+        },
+        {
+          "time": 1792165875.7091625,
+          "available_ram_bytes": 62098436096,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59016495104,
+              "private": 61878976512
+            }
+          ]
+        },
+        {
+          "time": 1792165876.7277699,
+          "available_ram_bytes": 62086234112,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59016495104,
+              "private": 61878976512
+            }
+          ]
+        },
+        {
+          "time": 1792165877.7618835,
+          "available_ram_bytes": 62028378112,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59016495104,
+              "private": 61878976512
+            }
+          ]
+        },
+        {
+          "time": 1792165878.7888873,
+          "available_ram_bytes": 62062415872,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59016454144,
+              "private": 61878919168
+            }
+          ]
+        },
+        {
+          "time": 1792165879.8044667,
+          "available_ram_bytes": 62059651072,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59016613888,
+              "private": 61878976512
+            }
+          ]
+        },
+        {
+          "time": 1792165880.8197846,
+          "available_ram_bytes": 62072487936,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59016613888,
+              "private": 61878976512
+            }
+          ]
+        },
+        {
+          "time": 1792165881.832162,
+          "available_ram_bytes": 62086090752,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59016613888,
+              "private": 61878976512
+            }
+          ]
+        },
+        {
+          "time": 1792165882.8577917,
+          "available_ram_bytes": 62085255168,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59016613888,
+              "private": 61878976512
+            }
+          ]
+        },
+        {
+          "time": 1792165883.8768797,
+          "available_ram_bytes": 62087680000,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59016613888,
+              "private": 61878976512
+            }
+          ]
+        },
+        {
+          "time": 1792165884.9047863,
+          "available_ram_bytes": 62092636160,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59016613888,
+              "private": 61878976512
+            }
+          ]
+        },
+        {
+          "time": 1792165885.9298134,
+          "available_ram_bytes": 62088400896,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59016572928,
+              "private": 61878919168
+            }
+          ]
+        },
+        {
+          "time": 1792165886.9474719,
+          "available_ram_bytes": 62115647488,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59016572928,
+              "private": 61878919168
+            }
+          ]
+        },
+        {
+          "time": 1792165887.9660535,
+          "available_ram_bytes": 62117560320,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59016572928,
+              "private": 61878919168
+            }
+          ]
+        },
+        {
+          "time": 1792165888.981871,
+          "available_ram_bytes": 62102634496,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59016572928,
+              "private": 61878919168
+            }
+          ]
+        },
+        {
+          "time": 1792165890.0166535,
+          "available_ram_bytes": 62107738112,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59016572928,
+              "private": 61878919168
+            }
+          ]
+        },
+        {
+          "time": 1792165891.0408583,
+          "available_ram_bytes": 62102585344,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59016572928,
+              "private": 61878919168
+            }
+          ]
+        },
+        {
+          "time": 1792165892.0638967,
+          "available_ram_bytes": 62091214848,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59016572928,
+              "private": 61878919168
+            }
+          ]
+        },
+        {
+          "time": 1792165893.098493,
+          "available_ram_bytes": 62107983872,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59016572928,
+              "private": 61878919168
+            }
+          ]
+        },
+        {
+          "time": 1792165894.121542,
+          "available_ram_bytes": 62101417984,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59016531968,
+              "private": 61878865920
+            }
+          ]
+        },
+        {
+          "time": 1792165895.1353698,
+          "available_ram_bytes": 62082150400,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59016531968,
+              "private": 61878865920
+            }
+          ]
+        },
+        {
+          "time": 1792165896.1486647,
+          "available_ram_bytes": 61985591296,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59134218240,
+              "private": 61996765184
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "A1_live_reference",
+      "wall_seconds": 1.86,
+      "usage": {
+        "prompt_tokens": 33116,
+        "completion_tokens": 4,
+        "total_tokens": 33120,
+        "prompt_tokens_details": {
+          "cached_tokens": 33087
+        }
+      },
+      "content": "Imprimerie",
+      "request_metrics": {
+        "projection": null,
+        "time": 1792165896.56095,
+        "duration_s": 1.8,
+        "finish": "stop",
+        "prompt_tokens": 33116,
+        "reused": 33087,
+        "output_tokens": 4,
+        "prompt_total": 33116,
+        "prompt_read": 29,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 4,
+        "prompt_ms": 1662.8,
+        "decode_ms": 157.9,
+        "decode_tok_s": 25.3,
+        "hit_rate": 0.268,
+        "pcie_share": 0.0,
+        "ram_blobs": 1752,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 3,
+        "drafts_accepted": 2
+      },
+      "cache_before": {
+        "enabled": true,
+        "budget_mib": 30720,
+        "slots": 4,
+        "parked": 4,
+        "bytes": 2907608592,
+        "evictions": 0,
+        "parks": 7,
+        "restores": 3,
+        "last_event": "parked",
+        "last_tokens": 8202,
+        "last_at": 1792165847.7997248,
+        "requests": 9,
+        "requests_reused": 4,
+        "reused_tokens": 32831,
+        "prompt_tokens": 90533,
+        "last_reused": 0,
+        "last_prompt": 33082
+      },
+      "cache_after": {
+        "enabled": true,
+        "budget_mib": 30720,
+        "slots": 4,
+        "parked": 4,
+        "bytes": 2907608592,
+        "evictions": 0,
+        "parks": 7,
+        "restores": 3,
+        "last_event": "parked",
+        "last_tokens": 8202,
+        "last_at": 1792165847.7997248,
+        "requests": 10,
+        "requests_reused": 5,
+        "reused_tokens": 65918,
+        "prompt_tokens": 123649,
+        "last_reused": 33087,
+        "last_prompt": 33116
+      },
+      "memory_samples": [
+        {
+          "time": 1792165896.5367377,
+          "available_ram_bytes": 61981544448,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59134599168,
+              "private": 61996765184
+            }
+          ]
+        },
+        {
+          "time": 1792165897.5562663,
+          "available_ram_bytes": 62033256448,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59134599168,
+              "private": 61996765184
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "B0_cold",
+      "wall_seconds": 121.797,
+      "usage": {
+        "prompt_tokens": 31962,
+        "completion_tokens": 4,
+        "total_tokens": 31966,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "content": "dossier reçu",
+      "request_metrics": {
+        "projection": null,
+        "time": 1792165898.4674466,
+        "duration_s": 121.8,
+        "finish": "stop",
+        "prompt_tokens": 31962,
+        "reused": 0,
+        "output_tokens": 4,
+        "prompt_total": 31962,
+        "prompt_read": 31962,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 4,
+        "prompt_ms": 121495.6,
+        "decode_ms": 244.8,
+        "decode_tok_s": 16.3,
+        "hit_rate": 0.264,
+        "pcie_share": 0.0,
+        "ram_blobs": 2750,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 6,
+        "drafts_accepted": 2
+      },
+      "cache_before": {
+        "enabled": true,
+        "budget_mib": 30720,
+        "slots": 4,
+        "parked": 4,
+        "bytes": 2907608592,
+        "evictions": 0,
+        "parks": 7,
+        "restores": 3,
+        "last_event": "parked",
+        "last_tokens": 8202,
+        "last_at": 1792165847.7997248,
+        "requests": 10,
+        "requests_reused": 5,
+        "reused_tokens": 65918,
+        "prompt_tokens": 123649,
+        "last_reused": 33087,
+        "last_prompt": 33116
+      },
+      "cache_after": {
+        "enabled": true,
+        "budget_mib": 30720,
+        "slots": 4,
+        "parked": 4,
+        "bytes": 3958368696,
+        "evictions": 1,
+        "parks": 8,
+        "restores": 3,
+        "last_event": "parked",
+        "last_tokens": 33120,
+        "last_at": 1792165964.6818042,
+        "requests": 11,
+        "requests_reused": 5,
+        "reused_tokens": 65918,
+        "prompt_tokens": 155611,
+        "last_reused": 0,
+        "last_prompt": 31962
+      },
+      "memory_samples": [
+        {
+          "time": 1792165898.4210353,
+          "available_ram_bytes": 61944840192,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 59252592640,
+              "private": 62114664448
+            }
+          ]
+        },
+        {
+          "time": 1792165899.4654222,
+          "available_ram_bytes": 61114068992,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60067995648,
+              "private": 62931722240
+            }
+          ]
+        },
+        {
+          "time": 1792165900.4922707,
+          "available_ram_bytes": 61114740736,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60067995648,
+              "private": 62931722240
+            }
+          ]
+        },
+        {
+          "time": 1792165901.5048556,
+          "available_ram_bytes": 61121101824,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60067995648,
+              "private": 62931722240
+            }
+          ]
+        },
+        {
+          "time": 1792165902.5183287,
+          "available_ram_bytes": 61120569344,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60067995648,
+              "private": 62931722240
+            }
+          ]
+        },
+        {
+          "time": 1792165903.5376694,
+          "available_ram_bytes": 61100568576,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60067995648,
+              "private": 62931722240
+            }
+          ]
+        },
+        {
+          "time": 1792165904.565843,
+          "available_ram_bytes": 61064900608,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60068712448,
+              "private": 62932557824
+            }
+          ]
+        },
+        {
+          "time": 1792165905.581597,
+          "available_ram_bytes": 61025165312,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60068712448,
+              "private": 62932557824
+            }
+          ]
+        },
+        {
+          "time": 1792165906.596428,
+          "available_ram_bytes": 61030367232,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60068712448,
+              "private": 62932557824
+            }
+          ]
+        },
+        {
+          "time": 1792165907.617298,
+          "available_ram_bytes": 61028265984,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60068712448,
+              "private": 62932557824
+            }
+          ]
+        },
+        {
+          "time": 1792165908.6297915,
+          "available_ram_bytes": 61035859968,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60068712448,
+              "private": 62932557824
+            }
+          ]
+        },
+        {
+          "time": 1792165909.6454344,
+          "available_ram_bytes": 61032300544,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069150720,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165910.676042,
+          "available_ram_bytes": 60994678784,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069150720,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165911.702937,
+          "available_ram_bytes": 60974927872,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069150720,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165912.7203953,
+          "available_ram_bytes": 60958130176,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069150720,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165913.7430043,
+          "available_ram_bytes": 60910465024,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069150720,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165914.7564795,
+          "available_ram_bytes": 60972068864,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069150720,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165915.7739694,
+          "available_ram_bytes": 60966338560,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069109760,
+              "private": 62932893696
+            }
+          ]
+        },
+        {
+          "time": 1792165916.7972593,
+          "available_ram_bytes": 60973604864,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069150720,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165917.8217256,
+          "available_ram_bytes": 60986503168,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069150720,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165918.8389518,
+          "available_ram_bytes": 60993794048,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069150720,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165919.8572485,
+          "available_ram_bytes": 60981538816,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069150720,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165920.875953,
+          "available_ram_bytes": 60981948416,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069150720,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165921.8950295,
+          "available_ram_bytes": 60980748288,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069109760,
+              "private": 62932897792
+            }
+          ]
+        },
+        {
+          "time": 1792165922.9141784,
+          "available_ram_bytes": 60993159168,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069150720,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165923.9394503,
+          "available_ram_bytes": 60979453952,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069150720,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165924.9634864,
+          "available_ram_bytes": 60980068352,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069150720,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165925.9899416,
+          "available_ram_bytes": 60982013952,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069150720,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165927.01567,
+          "available_ram_bytes": 60989087744,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069150720,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165928.0304275,
+          "available_ram_bytes": 60989915136,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069109760,
+              "private": 62932893696
+            }
+          ]
+        },
+        {
+          "time": 1792165929.049091,
+          "available_ram_bytes": 60992274432,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069175296,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165930.0679235,
+          "available_ram_bytes": 60981542912,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069175296,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165931.0954382,
+          "available_ram_bytes": 60992466944,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069175296,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165932.1162689,
+          "available_ram_bytes": 60986646528,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069175296,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165933.143306,
+          "available_ram_bytes": 60996243456,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069175296,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165934.1686234,
+          "available_ram_bytes": 60990230528,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069175296,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165935.1947598,
+          "available_ram_bytes": 60983062528,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069175296,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165936.2072563,
+          "available_ram_bytes": 60994531328,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069134336,
+              "private": 62932893696
+            }
+          ]
+        },
+        {
+          "time": 1792165937.2371497,
+          "available_ram_bytes": 60976693248,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165938.255328,
+          "available_ram_bytes": 60984086528,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165939.2793508,
+          "available_ram_bytes": 60972318720,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165940.3055964,
+          "available_ram_bytes": 60988391424,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165941.326058,
+          "available_ram_bytes": 60971950080,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165942.347297,
+          "available_ram_bytes": 60987183104,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165943.3625531,
+          "available_ram_bytes": 60979015680,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069097472,
+              "private": 62932840448
+            }
+          ]
+        },
+        {
+          "time": 1792165944.3874564,
+          "available_ram_bytes": 60988440576,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165945.4107366,
+          "available_ram_bytes": 60984823808,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165946.4248073,
+          "available_ram_bytes": 61009874944,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165947.4416647,
+          "available_ram_bytes": 61005467648,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165948.46582,
+          "available_ram_bytes": 61014388736,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165949.4869106,
+          "available_ram_bytes": 60998238208,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165950.5100062,
+          "available_ram_bytes": 61000933376,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069138432,
+              "private": 62932893696
+            }
+          ]
+        },
+        {
+          "time": 1792165951.5329041,
+          "available_ram_bytes": 60996046848,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165952.5538824,
+          "available_ram_bytes": 61005049856,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165953.575916,
+          "available_ram_bytes": 60994834432,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165954.5908997,
+          "available_ram_bytes": 61007437824,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165955.6101422,
+          "available_ram_bytes": 61001322496,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165956.6276264,
+          "available_ram_bytes": 61007790080,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165957.654097,
+          "available_ram_bytes": 60997550080,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165958.6752975,
+          "available_ram_bytes": 61006946304,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069138432,
+              "private": 62932893696
+            }
+          ]
+        },
+        {
+          "time": 1792165959.6921587,
+          "available_ram_bytes": 60996370432,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165960.7148416,
+          "available_ram_bytes": 61002870784,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165961.7343955,
+          "available_ram_bytes": 60989984768,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165962.7537882,
+          "available_ram_bytes": 61002051584,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165963.774421,
+          "available_ram_bytes": 60949479424,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165964.7894351,
+          "available_ram_bytes": 60992499712,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165965.8136647,
+          "available_ram_bytes": 60991610880,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165966.82751,
+          "available_ram_bytes": 61000929280,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069097472,
+              "private": 62932840448
+            }
+          ]
+        },
+        {
+          "time": 1792165967.8427923,
+          "available_ram_bytes": 60997971968,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165968.8563788,
+          "available_ram_bytes": 61008048128,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165969.8704145,
+          "available_ram_bytes": 60998512640,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165970.8951056,
+          "available_ram_bytes": 61007654912,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165971.9156013,
+          "available_ram_bytes": 61004308480,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165972.937777,
+          "available_ram_bytes": 61005946880,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165973.962496,
+          "available_ram_bytes": 60960587776,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165974.9888158,
+          "available_ram_bytes": 61038825472,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165976.015263,
+          "available_ram_bytes": 61040553984,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165977.0305815,
+          "available_ram_bytes": 61036429312,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165978.047219,
+          "available_ram_bytes": 61046087680,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165979.0739608,
+          "available_ram_bytes": 61035429888,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165980.0939422,
+          "available_ram_bytes": 61030723584,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165981.1152182,
+          "available_ram_bytes": 61030854656,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165982.1378007,
+          "available_ram_bytes": 61026738176,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069179392,
+              "private": 62932951040
+            }
+          ]
+        },
+        {
+          "time": 1792165983.151055,
+          "available_ram_bytes": 61028028416,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069183488,
+              "private": 62932955136
+            }
+          ]
+        },
+        {
+          "time": 1792165984.1790712,
+          "available_ram_bytes": 60983828480,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069183488,
+              "private": 62932955136
+            }
+          ]
+        },
+        {
+          "time": 1792165985.201607,
+          "available_ram_bytes": 61028749312,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069183488,
+              "private": 62932955136
+            }
+          ]
+        },
+        {
+          "time": 1792165986.2230902,
+          "available_ram_bytes": 61023952896,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069183488,
+              "private": 62932955136
+            }
+          ]
+        },
+        {
+          "time": 1792165987.2397225,
+          "available_ram_bytes": 61037514752,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069183488,
+              "private": 62932955136
+            }
+          ]
+        },
+        {
+          "time": 1792165988.2540672,
+          "available_ram_bytes": 61025705984,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069183488,
+              "private": 62932955136
+            }
+          ]
+        },
+        {
+          "time": 1792165989.2747703,
+          "available_ram_bytes": 61022318592,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069183488,
+              "private": 62932955136
+            }
+          ]
+        },
+        {
+          "time": 1792165990.285915,
+          "available_ram_bytes": 61027835904,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069101568,
+              "private": 62932844544
+            }
+          ]
+        },
+        {
+          "time": 1792165991.310195,
+          "available_ram_bytes": 61027061760,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069183488,
+              "private": 62932955136
+            }
+          ]
+        },
+        {
+          "time": 1792165992.3333821,
+          "available_ram_bytes": 61019131904,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069183488,
+              "private": 62932955136
+            }
+          ]
+        },
+        {
+          "time": 1792165993.350005,
+          "available_ram_bytes": 61019697152,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069183488,
+              "private": 62932955136
+            }
+          ]
+        },
+        {
+          "time": 1792165994.36746,
+          "available_ram_bytes": 61027315712,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069183488,
+              "private": 62932955136
+            }
+          ]
+        },
+        {
+          "time": 1792165995.3938947,
+          "available_ram_bytes": 61024202752,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069183488,
+              "private": 62932955136
+            }
+          ]
+        },
+        {
+          "time": 1792165996.4162967,
+          "available_ram_bytes": 61024616448,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069183488,
+              "private": 62932955136
+            }
+          ]
+        },
+        {
+          "time": 1792165997.430944,
+          "available_ram_bytes": 61007269888,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069183488,
+              "private": 62932955136
+            }
+          ]
+        },
+        {
+          "time": 1792165998.4456756,
+          "available_ram_bytes": 61023551488,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069376000,
+              "private": 62933344256
+            }
+          ]
+        },
+        {
+          "time": 1792165999.4615479,
+          "available_ram_bytes": 61001723904,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069376000,
+              "private": 62933344256
+            }
+          ]
+        },
+        {
+          "time": 1792166000.4797819,
+          "available_ram_bytes": 61024702464,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069376000,
+              "private": 62933344256
+            }
+          ]
+        },
+        {
+          "time": 1792166001.492744,
+          "available_ram_bytes": 61009702912,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069376000,
+              "private": 62933344256
+            }
+          ]
+        },
+        {
+          "time": 1792166002.5069187,
+          "available_ram_bytes": 61023080448,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069376000,
+              "private": 62933344256
+            }
+          ]
+        },
+        {
+          "time": 1792166003.5509276,
+          "available_ram_bytes": 60988497920,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069376000,
+              "private": 62933344256
+            }
+          ]
+        },
+        {
+          "time": 1792166004.5808606,
+          "available_ram_bytes": 61030817792,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069376000,
+              "private": 62933344256
+            }
+          ]
+        },
+        {
+          "time": 1792166005.593371,
+          "available_ram_bytes": 61035634688,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069376000,
+              "private": 62933344256
+            }
+          ]
+        },
+        {
+          "time": 1792166006.6198838,
+          "available_ram_bytes": 61038202880,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069629952,
+              "private": 62933344256
+            }
+          ]
+        },
+        {
+          "time": 1792166007.647698,
+          "available_ram_bytes": 61030424576,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069629952,
+              "private": 62933344256
+            }
+          ]
+        },
+        {
+          "time": 1792166008.6625717,
+          "available_ram_bytes": 61037785088,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069629952,
+              "private": 62933344256
+            }
+          ]
+        },
+        {
+          "time": 1792166009.6848452,
+          "available_ram_bytes": 61028237312,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069629952,
+              "private": 62933344256
+            }
+          ]
+        },
+        {
+          "time": 1792166010.6985216,
+          "available_ram_bytes": 61037674496,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069629952,
+              "private": 62933344256
+            }
+          ]
+        },
+        {
+          "time": 1792166011.722265,
+          "available_ram_bytes": 61021605888,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069588992,
+              "private": 62933286912
+            }
+          ]
+        },
+        {
+          "time": 1792166012.735955,
+          "available_ram_bytes": 61032058880,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069588992,
+              "private": 62933286912
+            }
+          ]
+        },
+        {
+          "time": 1792166013.7478418,
+          "available_ram_bytes": 60976209920,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069548032,
+              "private": 62933233664
+            }
+          ]
+        },
+        {
+          "time": 1792166014.7647753,
+          "available_ram_bytes": 61020946432,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069588992,
+              "private": 62933286912
+            }
+          ]
+        },
+        {
+          "time": 1792166015.7870011,
+          "available_ram_bytes": 61022879744,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069588992,
+              "private": 62933286912
+            }
+          ]
+        },
+        {
+          "time": 1792166016.80185,
+          "available_ram_bytes": 61041983488,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069588992,
+              "private": 62933286912
+            }
+          ]
+        },
+        {
+          "time": 1792166017.8174994,
+          "available_ram_bytes": 61033431040,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069588992,
+              "private": 62933286912
+            }
+          ]
+        },
+        {
+          "time": 1792166018.8358743,
+          "available_ram_bytes": 61046874112,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60069588992,
+              "private": 62933286912
+            }
+          ]
+        },
+        {
+          "time": 1792166019.8557234,
+          "available_ram_bytes": 60918173696,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60187234304,
+              "private": 63051132928
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "C0_cold",
+      "wall_seconds": 136.844,
+      "usage": {
+        "prompt_tokens": 32522,
+        "completion_tokens": 4,
+        "total_tokens": 32526,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "content": "dossier reçu",
+      "request_metrics": {
+        "projection": null,
+        "time": 1792166020.3132951,
+        "duration_s": 136.8,
+        "finish": "stop",
+        "prompt_tokens": 32522,
+        "reused": 0,
+        "output_tokens": 4,
+        "prompt_total": 32522,
+        "prompt_read": 32522,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 4,
+        "prompt_ms": 136567.1,
+        "decode_ms": 240.0,
+        "decode_tok_s": 16.7,
+        "hit_rate": 0.268,
+        "pcie_share": 0.0,
+        "ram_blobs": 2745,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 6,
+        "drafts_accepted": 2
+      },
+      "cache_before": {
+        "enabled": true,
+        "budget_mib": 30720,
+        "slots": 4,
+        "parked": 4,
+        "bytes": 3958368696,
+        "evictions": 1,
+        "parks": 8,
+        "restores": 3,
+        "last_event": "parked",
+        "last_tokens": 33120,
+        "last_at": 1792165964.6818042,
+        "requests": 11,
+        "requests_reused": 5,
+        "reused_tokens": 65918,
+        "prompt_tokens": 155611,
+        "last_reused": 0,
+        "last_prompt": 31962
+      },
+      "cache_after": {
+        "enabled": true,
+        "budget_mib": 30720,
+        "slots": 4,
+        "parked": 4,
+        "bytes": 4505607112,
+        "evictions": 2,
+        "parks": 9,
+        "restores": 3,
+        "last_event": "parked",
+        "last_tokens": 31967,
+        "last_at": 1792166097.4053059,
+        "requests": 12,
+        "requests_reused": 5,
+        "reused_tokens": 65918,
+        "prompt_tokens": 188133,
+        "last_reused": 0,
+        "last_prompt": 32522
+      },
+      "memory_samples": [
+        {
+          "time": 1792166020.290295,
+          "available_ram_bytes": 60915466240,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60187500544,
+              "private": 63051132928
+            }
+          ]
+        },
+        {
+          "time": 1792166021.3091438,
+          "available_ram_bytes": 60484751360,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617789440,
+              "private": 63482183680
+            }
+          ]
+        },
+        {
+          "time": 1792166022.3301506,
+          "available_ram_bytes": 60482256896,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617789440,
+              "private": 63482183680
+            }
+          ]
+        },
+        {
+          "time": 1792166023.3590808,
+          "available_ram_bytes": 60479614976,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617789440,
+              "private": 63482183680
+            }
+          ]
+        },
+        {
+          "time": 1792166024.3866224,
+          "available_ram_bytes": 60480180224,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617789440,
+              "private": 63482183680
+            }
+          ]
+        },
+        {
+          "time": 1792166025.3998976,
+          "available_ram_bytes": 60462497792,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617789440,
+              "private": 63482183680
+            }
+          ]
+        },
+        {
+          "time": 1792166026.418,
+          "available_ram_bytes": 60474019840,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617830400,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166027.4540021,
+          "available_ram_bytes": 60476731392,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617830400,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166028.4756978,
+          "available_ram_bytes": 60494237696,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617830400,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166029.4978704,
+          "available_ram_bytes": 60343541760,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617830400,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166030.5233812,
+          "available_ram_bytes": 60359450624,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617830400,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166031.5369394,
+          "available_ram_bytes": 60342284288,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617830400,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166032.555466,
+          "available_ram_bytes": 60405272576,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617789440,
+              "private": 63482183680
+            }
+          ]
+        },
+        {
+          "time": 1792166033.5727837,
+          "available_ram_bytes": 60383322112,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617830400,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166034.5937233,
+          "available_ram_bytes": 60400627712,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617830400,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166035.6156561,
+          "available_ram_bytes": 60367474688,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617830400,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166036.6328602,
+          "available_ram_bytes": 60406517760,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617830400,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166037.660361,
+          "available_ram_bytes": 60406472704,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617830400,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166038.6756377,
+          "available_ram_bytes": 60413755392,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617830400,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166039.7025676,
+          "available_ram_bytes": 60415725568,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617793536,
+              "private": 63482187776
+            }
+          ]
+        },
+        {
+          "time": 1792166040.7301667,
+          "available_ram_bytes": 60429611008,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617871360,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166041.7536933,
+          "available_ram_bytes": 60435865600,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617871360,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166042.7816334,
+          "available_ram_bytes": 60445982720,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617871360,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166043.7953246,
+          "available_ram_bytes": 60407533568,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617871360,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166044.8195732,
+          "available_ram_bytes": 60437295104,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617871360,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166045.8386226,
+          "available_ram_bytes": 60439433216,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617871360,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166046.8642712,
+          "available_ram_bytes": 60424908800,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617830400,
+              "private": 63482183680
+            }
+          ]
+        },
+        {
+          "time": 1792166047.8875852,
+          "available_ram_bytes": 60436594688,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617908224,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166048.8997312,
+          "available_ram_bytes": 60447641600,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617908224,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166049.9212677,
+          "available_ram_bytes": 60436389888,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617908224,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166050.9504285,
+          "available_ram_bytes": 60447047680,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617908224,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166051.969207,
+          "available_ram_bytes": 60437889024,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617908224,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166052.9963398,
+          "available_ram_bytes": 60446724096,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617908224,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166054.0176256,
+          "available_ram_bytes": 60438929408,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617867264,
+              "private": 63482183680
+            }
+          ]
+        },
+        {
+          "time": 1792166055.0411115,
+          "available_ram_bytes": 60441006080,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617867264,
+              "private": 63482183680
+            }
+          ]
+        },
+        {
+          "time": 1792166056.061838,
+          "available_ram_bytes": 60436172800,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166057.082569,
+          "available_ram_bytes": 60445941760,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166058.1011715,
+          "available_ram_bytes": 60440014848,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166059.12699,
+          "available_ram_bytes": 60459409408,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166060.1503775,
+          "available_ram_bytes": 60441067520,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166061.1700032,
+          "available_ram_bytes": 60452433920,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166062.1922605,
+          "available_ram_bytes": 60455092224,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166063.2126904,
+          "available_ram_bytes": 60459966464,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166064.2271314,
+          "available_ram_bytes": 60397674496,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166065.243909,
+          "available_ram_bytes": 60450459648,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166066.2606013,
+          "available_ram_bytes": 60449959936,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166067.2784328,
+          "available_ram_bytes": 60451524608,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166068.300262,
+          "available_ram_bytes": 60451147776,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166069.3197281,
+          "available_ram_bytes": 60449816576,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166070.3334432,
+          "available_ram_bytes": 60451389440,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617875456,
+              "private": 63482187776
+            }
+          ]
+        },
+        {
+          "time": 1792166071.3590329,
+          "available_ram_bytes": 60449767424,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166072.3840852,
+          "available_ram_bytes": 60451434496,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166073.406301,
+          "available_ram_bytes": 60451811328,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166074.4301226,
+          "available_ram_bytes": 60450877440,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166075.449836,
+          "available_ram_bytes": 60448702464,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166076.472247,
+          "available_ram_bytes": 60457820160,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166077.5045364,
+          "available_ram_bytes": 60459663360,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166078.5289724,
+          "available_ram_bytes": 60456955904,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166079.5554245,
+          "available_ram_bytes": 60441260032,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166080.5711493,
+          "available_ram_bytes": 60457771008,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166081.5866356,
+          "available_ram_bytes": 60459528192,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166082.5995314,
+          "available_ram_bytes": 60458237952,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166083.6170924,
+          "available_ram_bytes": 60413992960,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166084.6301398,
+          "available_ram_bytes": 60458778624,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166085.6554186,
+          "available_ram_bytes": 60438892544,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166086.6799946,
+          "available_ram_bytes": 60456243200,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166087.7050233,
+          "available_ram_bytes": 60458246144,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166088.7252564,
+          "available_ram_bytes": 60354568192,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166089.7516642,
+          "available_ram_bytes": 60272308224,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166090.772642,
+          "available_ram_bytes": 60267421696,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166091.7958612,
+          "available_ram_bytes": 60272926720,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166092.8214836,
+          "available_ram_bytes": 60263718912,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166093.8371842,
+          "available_ram_bytes": 60266733568,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166094.8536348,
+          "available_ram_bytes": 60310208512,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166095.8813398,
+          "available_ram_bytes": 60325928960,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166096.9061344,
+          "available_ram_bytes": 60337983488,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166097.9271638,
+          "available_ram_bytes": 60333514752,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166098.9439535,
+          "available_ram_bytes": 60336504832,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166099.96024,
+          "available_ram_bytes": 60330602496,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166100.9744883,
+          "available_ram_bytes": 60335673344,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166101.9962533,
+          "available_ram_bytes": 60332584960,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166103.0233228,
+          "available_ram_bytes": 60335005696,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166104.0361872,
+          "available_ram_bytes": 60342915072,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617875456,
+              "private": 63482183680
+            }
+          ]
+        },
+        {
+          "time": 1792166105.0625162,
+          "available_ram_bytes": 60345229312,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166106.0794857,
+          "available_ram_bytes": 60340957184,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166107.1068306,
+          "available_ram_bytes": 60349706240,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166108.1336033,
+          "available_ram_bytes": 60340273152,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166109.1503086,
+          "available_ram_bytes": 60348813312,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166110.1775806,
+          "available_ram_bytes": 60339052544,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166111.1957023,
+          "available_ram_bytes": 60346925056,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166112.2092526,
+          "available_ram_bytes": 60341493760,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617875456,
+              "private": 63482183680
+            }
+          ]
+        },
+        {
+          "time": 1792166113.2262876,
+          "available_ram_bytes": 60349214720,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166114.2551486,
+          "available_ram_bytes": 60338524160,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166115.2754939,
+          "available_ram_bytes": 60330975232,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166116.295568,
+          "available_ram_bytes": 60331376640,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166117.3184543,
+          "available_ram_bytes": 60331462656,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166118.3358011,
+          "available_ram_bytes": 60332687360,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166119.3635416,
+          "available_ram_bytes": 60349976576,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166120.3891556,
+          "available_ram_bytes": 60366938112,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166121.410366,
+          "available_ram_bytes": 60362850304,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617875456,
+              "private": 63482187776
+            }
+          ]
+        },
+        {
+          "time": 1792166122.430883,
+          "available_ram_bytes": 60363419648,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166123.456535,
+          "available_ram_bytes": 60341952512,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166124.4786851,
+          "available_ram_bytes": 60358930432,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166125.4926007,
+          "available_ram_bytes": 60358705152,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166126.5056634,
+          "available_ram_bytes": 60358852608,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166127.5252194,
+          "available_ram_bytes": 60358643712,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166128.548273,
+          "available_ram_bytes": 60358397952,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166129.579809,
+          "available_ram_bytes": 60359430144,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617875456,
+              "private": 63482183680
+            }
+          ]
+        },
+        {
+          "time": 1792166130.6031125,
+          "available_ram_bytes": 60356190208,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166131.6302593,
+          "available_ram_bytes": 60344246272,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166132.6627295,
+          "available_ram_bytes": 60361015296,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166133.6914735,
+          "available_ram_bytes": 60314058752,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166134.7145362,
+          "available_ram_bytes": 60355182592,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166135.7417977,
+          "available_ram_bytes": 60337180672,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166136.7676766,
+          "available_ram_bytes": 60353970176,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166137.7977164,
+          "available_ram_bytes": 60359774208,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166138.828112,
+          "available_ram_bytes": 60351459328,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617875456,
+              "private": 63482183680
+            }
+          ]
+        },
+        {
+          "time": 1792166139.843744,
+          "available_ram_bytes": 60351512576,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166140.8617816,
+          "available_ram_bytes": 60349943808,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166141.8886385,
+          "available_ram_bytes": 60352970752,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166142.9117215,
+          "available_ram_bytes": 60348788736,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166143.9399786,
+          "available_ram_bytes": 60354039808,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166144.95591,
+          "available_ram_bytes": 60350976000,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166145.9745903,
+          "available_ram_bytes": 60353282048,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617916416,
+              "private": 63482241024
+            }
+          ]
+        },
+        {
+          "time": 1792166146.9868956,
+          "available_ram_bytes": 60361285632,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617875456,
+              "private": 63482183680
+            }
+          ]
+        },
+        {
+          "time": 1792166148.0038419,
+          "available_ram_bytes": 60349616128,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617875456,
+              "private": 63482183680
+            }
+          ]
+        },
+        {
+          "time": 1792166149.022155,
+          "available_ram_bytes": 60348731392,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617875456,
+              "private": 63482183680
+            }
+          ]
+        },
+        {
+          "time": 1792166150.0441043,
+          "available_ram_bytes": 60356509696,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617875456,
+              "private": 63482183680
+            }
+          ]
+        },
+        {
+          "time": 1792166151.0686045,
+          "available_ram_bytes": 60354576384,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617875456,
+              "private": 63482183680
+            }
+          ]
+        },
+        {
+          "time": 1792166152.0925303,
+          "available_ram_bytes": 60364767232,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617875456,
+              "private": 63482183680
+            }
+          ]
+        },
+        {
+          "time": 1792166153.1117623,
+          "available_ram_bytes": 60363599872,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617875456,
+              "private": 63482183680
+            }
+          ]
+        },
+        {
+          "time": 1792166154.1331906,
+          "available_ram_bytes": 60360617984,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617875456,
+              "private": 63482183680
+            }
+          ]
+        },
+        {
+          "time": 1792166155.159372,
+          "available_ram_bytes": 60360253440,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617875456,
+              "private": 63482183680
+            }
+          ]
+        },
+        {
+          "time": 1792166156.184723,
+          "available_ram_bytes": 60360667136,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60617834496,
+              "private": 63482130432
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "A1_restored_after_B_C",
+      "wall_seconds": 1.172,
+      "usage": {
+        "prompt_tokens": 33116,
+        "completion_tokens": 4,
+        "total_tokens": 33120,
+        "prompt_tokens_details": {
+          "cached_tokens": 33109
+        }
+      },
+      "content": "Imprimerie",
+      "request_metrics": {
+        "projection": null,
+        "time": 1792166157.20573,
+        "duration_s": 1.1,
+        "finish": "stop",
+        "prompt_tokens": 33116,
+        "reused": 33109,
+        "output_tokens": 4,
+        "prompt_total": 33116,
+        "prompt_read": 7,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 4,
+        "prompt_ms": 964.7,
+        "decode_ms": 156.9,
+        "decode_tok_s": 25.5,
+        "hit_rate": 0.268,
+        "pcie_share": 0.0,
+        "ram_blobs": 1752,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 3,
+        "drafts_accepted": 2
+      },
+      "cache_before": {
+        "enabled": true,
+        "budget_mib": 30720,
+        "slots": 4,
+        "parked": 4,
+        "bytes": 4505607112,
+        "evictions": 2,
+        "parks": 9,
+        "restores": 3,
+        "last_event": "parked",
+        "last_tokens": 31967,
+        "last_at": 1792166097.4053059,
+        "requests": 12,
+        "requests_reused": 5,
+        "reused_tokens": 65918,
+        "prompt_tokens": 188133,
+        "last_reused": 0,
+        "last_prompt": 32522
+      },
+      "cache_after": {
+        "enabled": true,
+        "budget_mib": 30720,
+        "slots": 4,
+        "parked": 4,
+        "bytes": 5302893696,
+        "evictions": 2,
+        "parks": 10,
+        "restores": 4,
+        "last_event": "restored",
+        "last_tokens": 33109,
+        "last_at": 1792166158.3725004,
+        "requests": 13,
+        "requests_reused": 6,
+        "reused_tokens": 99027,
+        "prompt_tokens": 221249,
+        "last_reused": 33109,
+        "last_prompt": 33116
+      },
+      "memory_samples": [
+        {
+          "time": 1792166157.180437,
+          "available_ram_bytes": 60241887232,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 60735770624,
+              "private": 63600029696
+            }
+          ]
+        },
+        {
+          "time": 1792166158.212547,
+          "available_ram_bytes": 59330461696,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 61653356544,
+              "private": 64519192576
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "B1_restored",
+      "wall_seconds": 1.968,
+      "usage": {
+        "prompt_tokens": 31996,
+        "completion_tokens": 2,
+        "total_tokens": 31998,
+        "prompt_tokens_details": {
+          "cached_tokens": 31967
+        }
+      },
+      "content": "Navigation",
+      "request_metrics": {
+        "projection": null,
+        "time": 1792166158.433739,
+        "duration_s": 1.9,
+        "finish": "stop",
+        "prompt_tokens": 31996,
+        "reused": 31967,
+        "output_tokens": 2,
+        "prompt_total": 31996,
+        "prompt_read": 29,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 2,
+        "prompt_ms": 1806.7,
+        "decode_ms": 109.4,
+        "decode_tok_s": 18.3,
+        "hit_rate": 0.251,
+        "pcie_share": 0.0,
+        "ram_blobs": 1236,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 2,
+        "drafts_accepted": 2
+      },
+      "cache_before": {
+        "enabled": true,
+        "budget_mib": 30720,
+        "slots": 4,
+        "parked": 4,
+        "bytes": 5302893696,
+        "evictions": 2,
+        "parks": 10,
+        "restores": 4,
+        "last_event": "restored",
+        "last_tokens": 33109,
+        "last_at": 1792166158.3725004,
+        "requests": 13,
+        "requests_reused": 6,
+        "reused_tokens": 99027,
+        "prompt_tokens": 221249,
+        "last_reused": 33109,
+        "last_prompt": 33116
+      },
+      "cache_after": {
+        "enabled": true,
+        "budget_mib": 30720,
+        "slots": 4,
+        "parked": 4,
+        "bytes": 5421608960,
+        "evictions": 2,
+        "parks": 11,
+        "restores": 5,
+        "last_event": "restored",
+        "last_tokens": 31967,
+        "last_at": 1792166160.3832781,
+        "requests": 14,
+        "requests_reused": 7,
+        "reused_tokens": 130994,
+        "prompt_tokens": 253245,
+        "last_reused": 31967,
+        "last_prompt": 31996
+      },
+      "memory_samples": [
+        {
+          "time": 1792166158.3905869,
+          "available_ram_bytes": 59325505536,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 61653491712,
+              "private": 64519192576
+            }
+          ]
+        },
+        {
+          "time": 1792166159.4111776,
+          "available_ram_bytes": 59316678656,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 61654671360,
+              "private": 64520310784
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "C1_restored",
+      "wall_seconds": 2.047,
+      "usage": {
+        "prompt_tokens": 32556,
+        "completion_tokens": 5,
+        "total_tokens": 32561,
+        "prompt_tokens_details": {
+          "cached_tokens": 32527
+        }
+      },
+      "content": "Rubrique botanique",
+      "request_metrics": {
+        "projection": null,
+        "time": 1792166160.4295242,
+        "duration_s": 2.0,
+        "finish": "stop",
+        "prompt_tokens": 32556,
+        "reused": 32527,
+        "output_tokens": 5,
+        "prompt_total": 32556,
+        "prompt_read": 29,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 5,
+        "prompt_ms": 1837.1,
+        "decode_ms": 178.2,
+        "decode_tok_s": 28.1,
+        "hit_rate": 0.275,
+        "pcie_share": 0.0,
+        "ram_blobs": 1876,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 4,
+        "drafts_accepted": 4
+      },
+      "cache_before": {
+        "enabled": true,
+        "budget_mib": 30720,
+        "slots": 4,
+        "parked": 4,
+        "bytes": 5421608960,
+        "evictions": 2,
+        "parks": 11,
+        "restores": 5,
+        "last_event": "restored",
+        "last_tokens": 31967,
+        "last_at": 1792166160.3832781,
+        "requests": 14,
+        "requests_reused": 7,
+        "reused_tokens": 130994,
+        "prompt_tokens": 253245,
+        "last_reused": 31967,
+        "last_prompt": 31996
+      },
+      "cache_after": {
+        "enabled": true,
+        "budget_mib": 30720,
+        "slots": 4,
+        "parked": 4,
+        "bytes": 6074702600,
+        "evictions": 2,
+        "parks": 12,
+        "restores": 6,
+        "last_event": "restored",
+        "last_tokens": 32527,
+        "last_at": 1792166162.4923973,
+        "requests": 15,
+        "requests_reused": 8,
+        "reused_tokens": 163521,
+        "prompt_tokens": 285801,
+        "last_reused": 32527,
+        "last_prompt": 32556
+      },
+      "memory_samples": [
+        {
+          "time": 1792166160.4075253,
+          "available_ram_bytes": 59194490880,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 61772550144,
+              "private": 64638214144
+            }
+          ]
+        },
+        {
+          "time": 1792166161.4593468,
+          "available_ram_bytes": 59152035840,
+          "engine_memory": [
+            {
+              "pid": 19836,
+              "rss": 61774925824,
+              "private": 65174962176
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "workload": "Three synthetic conversations, approximately 32k tokens each",
+  "metrics_before": {
+    "engine": {
+      "model": "qwen3.8-flash-next-iq4-xs",
+      "max_context": 262144,
+      "images": true,
+      "version": "0.1.43.1",
+      "logit_bias": 1,
+      "context": 262144,
+      "kv": "fp16",
+      "kv_resident": 0,
+      "expert_slots": 3786,
+      "expert_cache_mib": 9612,
+      "expert_slots_primary": 2323,
+      "expert_cache_primary_mib": 5898,
+      "spec": 5,
+      "mtp_max": 3,
+      "lookup": 3,
+      "vram_free_mib": 2233,
+      "cvec": 0,
+      "arena_mib": 52787,
+      "pool_workers": 15,
+      "pcie_frac": "0.00",
+      "spec_min_p": "0.50",
+      "conversation_cache_mib": 30720,
+      "conversation_cache_slots": 4,
+      "conversation_cache_min_free_mib": 6144,
+      "conversation_cache_min_tokens": 0,
+      "tail_role_token": -1,
+      "vram_elastic": 0,
+      "engine": "0.1.43.1"
+    },
+    "live": {
+      "state": "idle",
+      "queued": 0,
+      "phase": null,
+      "prompt_tokens": null,
+      "prompt_read": null,
+      "prompt_total": null,
+      "generated": null,
+      "max_tokens": null,
+      "elapsed_s": null,
+      "tok_s": null,
+      "tok_s_mean": null,
+      "prefill_tok_s_mean": null,
+      "tok_s_window_s": null
+    },
+    "requests": [
+      {
+        "projection": null,
+        "time": 1792165795.7434893,
+        "duration_s": 2.0,
+        "finish": "stop",
+        "prompt_tokens": 8196,
+        "reused": 8167,
+        "output_tokens": 5,
+        "prompt_total": 8196,
+        "prompt_read": 29,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 5,
+        "prompt_ms": 1756.6,
+        "decode_ms": 208.2,
+        "decode_tok_s": 24.0,
+        "hit_rate": 0.266,
+        "pcie_share": 0.0,
+        "ram_blobs": 1901,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 4,
+        "drafts_accepted": 4
+      },
+      {
+        "projection": null,
+        "time": 1792165793.6900368,
+        "duration_s": 2.0,
+        "finish": "stop",
+        "prompt_tokens": 8057,
+        "reused": 8028,
+        "output_tokens": 2,
+        "prompt_total": 8057,
+        "prompt_read": 29,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 2,
+        "prompt_ms": 1753.7,
+        "decode_ms": 226.6,
+        "decode_tok_s": 8.8,
+        "hit_rate": 0.251,
+        "pcie_share": 0.0,
+        "ram_blobs": 1233,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 2,
+        "drafts_accepted": 2
+      },
+      {
+        "projection": null,
+        "time": 1792165792.6472573,
+        "duration_s": 1.0,
+        "finish": "stop",
+        "prompt_tokens": 8336,
+        "reused": 8329,
+        "output_tokens": 4,
+        "prompt_total": 8336,
+        "prompt_read": 7,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 4,
+        "prompt_ms": 797.0,
+        "decode_ms": 175.9,
+        "decode_tok_s": 22.7,
+        "hit_rate": 0.251,
+        "pcie_share": 0.0,
+        "ram_blobs": 1972,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 4,
+        "drafts_accepted": 2
+      },
+      {
+        "projection": null,
+        "time": 1792165769.8777862,
+        "duration_s": 22.7,
+        "finish": "stop",
+        "prompt_tokens": 8162,
+        "reused": 0,
+        "output_tokens": 4,
+        "prompt_total": 8162,
+        "prompt_read": 8162,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 4,
+        "prompt_ms": 22437.6,
+        "decode_ms": 237.9,
+        "decode_tok_s": 16.8,
+        "hit_rate": 0.256,
+        "pcie_share": 0.0,
+        "ram_blobs": 2793,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 6,
+        "drafts_accepted": 2
+      },
+      {
+        "projection": null,
+        "time": 1792165747.0573442,
+        "duration_s": 22.7,
+        "finish": "stop",
+        "prompt_tokens": 8022,
+        "reused": 0,
+        "output_tokens": 5,
+        "prompt_total": 8022,
+        "prompt_read": 8022,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 5,
+        "prompt_ms": 22438.2,
+        "decode_ms": 302.5,
+        "decode_tok_s": 16.5,
+        "hit_rate": 0.237,
+        "pcie_share": 0.0,
+        "ram_blobs": 3678,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 8,
+        "drafts_accepted": 2
+      },
+      {
+        "projection": null,
+        "time": 1792165745.0664375,
+        "duration_s": 1.9,
+        "finish": "stop",
+        "prompt_tokens": 8336,
+        "reused": 8307,
+        "output_tokens": 4,
+        "prompt_total": 8336,
+        "prompt_read": 29,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 4,
+        "prompt_ms": 1752.5,
+        "decode_ms": 178.3,
+        "decode_tok_s": 22.4,
+        "hit_rate": 0.251,
+        "pcie_share": 0.0,
+        "ram_blobs": 1972,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 4,
+        "drafts_accepted": 2
+      },
+      {
+        "projection": null,
+        "time": 1792165715.8509638,
+        "duration_s": 29.2,
+        "finish": "stop",
+        "prompt_tokens": 8302,
+        "reused": 0,
+        "output_tokens": 4,
+        "prompt_total": 8302,
+        "prompt_read": 8302,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 4,
+        "prompt_ms": 28774.8,
+        "decode_ms": 384.8,
+        "decode_tok_s": 10.4,
+        "hit_rate": 0.259,
+        "pcie_share": 0.0,
+        "ram_blobs": 2610,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 5,
+        "drafts_accepted": 2
+      },
+      {
+        "projection": null,
+        "time": 1792165710.3998194,
+        "duration_s": 5.1,
+        "finish": "length",
+        "prompt_tokens": 40,
+        "reused": 0,
+        "output_tokens": 1,
+        "prompt_total": 40,
+        "prompt_read": 40,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 1,
+        "prompt_ms": 4645.5,
+        "decode_ms": 487.7,
+        "decode_tok_s": 2.1,
+        "hit_rate": 0.394,
+        "pcie_share": 0.0,
+        "ram_blobs": 291,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 0,
+        "drafts_accepted": 0
+      }
+    ],
+    "conversation_cache": {
+      "enabled": true,
+      "budget_mib": 30720,
+      "slots": 4,
+      "parked": 3,
+      "bytes": 2092093408,
+      "evictions": 0,
+      "parks": 6,
+      "restores": 3,
+      "last_event": "restored",
+      "last_tokens": 8167,
+      "last_at": 1792165797.7224166,
+      "requests": 8,
+      "requests_reused": 4,
+      "reused_tokens": 32831,
+      "prompt_tokens": 57451,
+      "last_reused": 8167,
+      "last_prompt": 8196
+    },
+    "requests_kept": 8,
+    "totals": {
+      "since": 1792165708.5464475,
+      "requests": 8,
+      "prompt_tokens": 57451,
+      "reused": 32831,
+      "output_tokens": 29,
+      "prompt_ms": 84355.90000000001,
+      "decode_ms": 2201.9,
+      "drafts_offered": 33,
+      "drafts_accepted": 16
+    },
+    "hardware": {
+      "gpu_util": 4,
+      "gpu_mem_used": 2503733248,
+      "gpu_mem_total": 5368709120,
+      "gpu_temp": 39,
+      "gpu_power": 5.375,
+      "gpu_power_limit": 75.0,
+      "gpu_pcie_gen": 3,
+      "gpu_pcie_gen_max": 3,
+      "gpu_pcie_width": 16,
+      "gpu_pcie_rx_mb": 1.953125,
+      "gpu_pcie_tx_mb": 0.0,
+      "cpu": 1.5,
+      "ram_used": 74819969024,
+      "ram_total": 137284874240,
+      "disk_read_mb": 0.03255695855973611,
+      "disk_write_mb": 1.1910420673103461,
+      "tok_s": 0.0,
+      "tok_s_mean": 0,
+      "prefill_tok_s_mean": 0.0
+    },
+    "hardware_static": {
+      "gpu_name": "Quadro P2200",
+      "gpu_count": 1,
+      "gpu_note": null,
+      "cpu_name": "AMD Ryzen Threadripper PRO 3955WX 16-Cores",
+      "cores": 16,
+      "threads": 32,
+      "psutil": true
+    },
+    "history": {
+      "gpu_util": [
+        4,
+        4,
+        6,
+        12,
+        4,
+        4,
+        15,
+        19,
+        4,
+        4,
+        4,
+        12,
+        4,
+        4,
+        5,
+        6,
+        5,
+        4,
+        10,
+        4,
+        3,
+        14,
+        4,
+        4,
+        4,
+        10,
+        4,
+        4,
+        4,
+        11,
+        5,
+        4,
+        20,
+        14,
+        4,
+        4,
+        8,
+        11,
+        12,
+        4,
+        3,
+        16,
+        10,
+        6,
+        3,
+        4,
+        9,
+        4,
+        4,
+        4,
+        6,
+        3,
+        4,
+        9,
+        4,
+        6,
+        11,
+        4,
+        9,
+        4
+      ],
+      "gpu_mem_used": [
+        2459955200,
+        2449469440,
+        2456678400,
+        2462052352,
+        2460741632,
+        2456940544,
+        2461790208,
+        2465132544,
+        2464739328,
+        2463952896,
+        2505043968,
+        2507468800,
+        2494885888,
+        2450190336,
+        2450190336,
+        2460676096,
+        2461593600,
+        2457464832,
+        2461003776,
+        2460741632,
+        2450386944,
+        2459561984,
+        2459561984,
+        2459561984,
+        2449207296,
+        2459693056,
+        2459561984,
+        2449076224,
+        2444881920,
+        2459693056,
+        2459561984,
+        2456285184,
+        2504912896,
+        2494296064,
+        2455498752,
+        2449469440,
+        2459758592,
+        2460217344,
+        2461462528,
+        2461462528,
+        2449993728,
+        2460479488,
+        2460413952,
+        2459824128,
+        2449469440,
+        2449469440,
+        2459758592,
+        2459430912,
+        2449076224,
+        2459365376,
+        2459430912,
+        2448945152,
+        2444750848,
+        2459365376,
+        2503667712,
+        2487611392,
+        2504781824,
+        2503995392,
+        2503733248,
+        2503733248
+      ],
+      "gpu_temp": [
+        38,
+        39,
+        38,
+        38,
+        39,
+        38,
+        39,
+        38,
+        38,
+        39,
+        39,
+        38,
+        39,
+        38,
+        38,
+        38,
+        39,
+        38,
+        39,
+        38,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        38,
+        38,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39
+      ],
+      "gpu_power": [
+        5.87,
+        5.49,
+        5.29,
+        6.35,
+        5.77,
+        5.48,
+        6.54,
+        6.43,
+        6.14,
+        5.38,
+        5.86,
+        6.05,
+        5.96,
+        5.76,
+        5.48,
+        5.96,
+        6.07,
+        5.29,
+        5.68,
+        5.78,
+        5.58,
+        5.68,
+        6.07,
+        6.55,
+        5.97,
+        5.2,
+        6.07,
+        5.87,
+        5.19,
+        6.26,
+        5.66,
+        5.38,
+        5.28,
+        5.76,
+        5.28,
+        5.77,
+        6.26,
+        6.16,
+        6.36,
+        6.17,
+        5.19,
+        5.68,
+        6.07,
+        5.58,
+        5.29,
+        5.77,
+        6.46,
+        5.58,
+        6.26,
+        6.07,
+        6.06,
+        6.34,
+        5.86,
+        5.76,
+        5.66,
+        5.47,
+        5.28,
+        5.18,
+        5.28,
+        5.38
+      ],
+      "gpu_pcie_rx_mb": [
+        78.12,
+        1.95,
+        1.95,
+        0.98,
+        0.98,
+        1.95,
+        1.95,
+        2.93,
+        0.98,
+        1.95,
+        1.95,
+        2.93,
+        0.98,
+        1.95,
+        28.32,
+        4.88,
+        0.0,
+        1.95,
+        49.8,
+        0.98,
+        1.95,
+        3.91,
+        0.98,
+        0.0,
+        0.98,
+        3.91,
+        1.95,
+        40.04,
+        1.95,
+        0.98,
+        0.98,
+        1.95,
+        1.95,
+        1.95,
+        1.95,
+        2.93,
+        4.88,
+        3.91,
+        0.98,
+        31.25,
+        1.95,
+        0.98,
+        1.95,
+        1.95,
+        1.95,
+        0.0,
+        1.95,
+        1.95,
+        0.0,
+        1.95,
+        0.98,
+        0.0,
+        1.95,
+        82.03,
+        0.98,
+        3.91,
+        1.95,
+        121.09,
+        1.95,
+        1.95
+      ],
+      "cpu": [
+        100.0,
+        100.0,
+        91.4,
+        100.0,
+        100.0,
+        100.0,
+        42.2,
+        20.9,
+        25.8,
+        13.1,
+        51.8,
+        100.0,
+        100.0,
+        100.0,
+        90.9,
+        100.0,
+        100.0,
+        100.0,
+        90.1,
+        100.0,
+        100.0,
+        100.0,
+        90.6,
+        100.0,
+        100.0,
+        100.0,
+        90.2,
+        100.0,
+        100.0,
+        100.0,
+        53.8,
+        39.3,
+        100.0,
+        100.0,
+        100.0,
+        91.8,
+        100.0,
+        100.0,
+        100.0,
+        90.7,
+        100.0,
+        100.0,
+        100.0,
+        89.3,
+        100.0,
+        100.0,
+        100.0,
+        88.9,
+        100.0,
+        100.0,
+        100.0,
+        81.5,
+        17.4,
+        20.6,
+        12.1,
+        15.5,
+        11.3,
+        16.8,
+        5.8,
+        1.5
+      ],
+      "ram_used": [
+        91026022400,
+        89938427904,
+        89046974464,
+        87956520960,
+        86830043136,
+        85608095744,
+        84599382016,
+        83499573248,
+        82454192128,
+        81440505856,
+        81055330304,
+        79808364544,
+        78434177024,
+        76971823104,
+        75494383616,
+        75382337536,
+        75195916288,
+        75097735168,
+        75037241344,
+        74927042560,
+        74716930048,
+        74501087232,
+        74447368192,
+        74275049472,
+        74039709696,
+        73983426560,
+        73864224768,
+        73840259072,
+        73865457664,
+        73843146752,
+        73961037824,
+        74303987712,
+        74317897728,
+        74322382848,
+        74344128512,
+        74315923456,
+        74313281536,
+        74317864960,
+        74317324288,
+        74301591552,
+        74297769984,
+        74331721728,
+        74326040576,
+        74313129984,
+        74307928064,
+        74313199616,
+        74304393216,
+        74302078976,
+        74287943680,
+        74297307136,
+        74301579264,
+        74418769920,
+        74641653760,
+        74665934848,
+        74779602944,
+        74774622208,
+        74900525056,
+        74824986624,
+        74814705664,
+        74819969024
+      ],
+      "disk_read_mb": [
+        0.03,
+        0.03,
+        7.49,
+        0.15,
+        0.03,
+        0.04,
+        0.29,
+        0.09,
+        3.26,
+        0.09,
+        1.47,
+        0.2,
+        0.03,
+        0.08,
+        0.04,
+        0.33,
+        0.56,
+        0.11,
+        0.06,
+        0.03,
+        0.03,
+        0.03,
+        5.31,
+        0.06,
+        0.03,
+        0.08,
+        0.06,
+        0.04,
+        0.04,
+        0.04,
+        0.06,
+        1.16,
+        0.08,
+        0.03,
+        0.04,
+        0.09,
+        0.03,
+        0.08,
+        0.15,
+        0.12,
+        0.03,
+        0.03,
+        0.03,
+        0.15,
+        0.11,
+        0.03,
+        0.03,
+        0.03,
+        0.04,
+        0.24,
+        0.04,
+        0.04,
+        0.08,
+        0.04,
+        0.08,
+        0.76,
+        0.06,
+        0.69,
+        0.04,
+        0.03
+      ],
+      "tok_s": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "prefill_tok_s_mean": [
+        228.2,
+        228.2,
+        273.3,
+        273.3,
+        273.3,
+        273.3,
+        305.9,
+        294.5,
+        null,
+        19.7,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        238.4,
+        238.4,
+        238.4,
+        238.4,
+        312.6,
+        312.6,
+        312.6,
+        312.6,
+        350.5,
+        350.5,
+        350.5,
+        350.5,
+        367.1,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        238.4,
+        238.4,
+        238.4,
+        238.4,
+        311.5,
+        311.5,
+        311.5,
+        311.5,
+        349.9,
+        349.9,
+        349.9,
+        349.9,
+        373.2,
+        null,
+        null,
+        19.4,
+        null,
+        19.4,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "time": 1792165801.4059868
+  },
+  "run_directory": "D:\\Serveur IA\\lanceur\\sessions\\20261016-173522-401684",
+  "ready_at_utc": "2026-10-16T15:50:01.405986+00:00",
+  "reference_and_restored_content_identical": true,
+  "metrics_after": {
+    "engine": {
+      "model": "qwen3.8-flash-next-iq4-xs",
+      "max_context": 262144,
+      "images": true,
+      "version": "0.1.43.1",
+      "logit_bias": 1,
+      "context": 262144,
+      "kv": "fp16",
+      "kv_resident": 0,
+      "expert_slots": 3786,
+      "expert_cache_mib": 9612,
+      "expert_slots_primary": 2323,
+      "expert_cache_primary_mib": 5898,
+      "spec": 5,
+      "mtp_max": 3,
+      "lookup": 3,
+      "vram_free_mib": 2233,
+      "cvec": 0,
+      "arena_mib": 52787,
+      "pool_workers": 15,
+      "pcie_frac": "0.00",
+      "spec_min_p": "0.50",
+      "conversation_cache_mib": 30720,
+      "conversation_cache_slots": 4,
+      "conversation_cache_min_free_mib": 6144,
+      "conversation_cache_min_tokens": 0,
+      "tail_role_token": -1,
+      "vram_elastic": 0,
+      "engine": "0.1.43.1"
+    },
+    "live": {
+      "state": "idle",
+      "queued": 0,
+      "phase": null,
+      "prompt_tokens": null,
+      "prompt_read": null,
+      "prompt_total": null,
+      "generated": null,
+      "max_tokens": null,
+      "elapsed_s": null,
+      "tok_s": null,
+      "tok_s_mean": null,
+      "prefill_tok_s_mean": null,
+      "tok_s_window_s": null
+    },
+    "requests": [
+      {
+        "projection": null,
+        "time": 1792166160.4295242,
+        "duration_s": 2.0,
+        "finish": "stop",
+        "prompt_tokens": 32556,
+        "reused": 32527,
+        "output_tokens": 5,
+        "prompt_total": 32556,
+        "prompt_read": 29,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 5,
+        "prompt_ms": 1837.1,
+        "decode_ms": 178.2,
+        "decode_tok_s": 28.1,
+        "hit_rate": 0.275,
+        "pcie_share": 0.0,
+        "ram_blobs": 1876,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 4,
+        "drafts_accepted": 4
+      },
+      {
+        "projection": null,
+        "time": 1792166158.433739,
+        "duration_s": 1.9,
+        "finish": "stop",
+        "prompt_tokens": 31996,
+        "reused": 31967,
+        "output_tokens": 2,
+        "prompt_total": 31996,
+        "prompt_read": 29,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 2,
+        "prompt_ms": 1806.7,
+        "decode_ms": 109.4,
+        "decode_tok_s": 18.3,
+        "hit_rate": 0.251,
+        "pcie_share": 0.0,
+        "ram_blobs": 1236,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 2,
+        "drafts_accepted": 2
+      },
+      {
+        "projection": null,
+        "time": 1792166157.20573,
+        "duration_s": 1.1,
+        "finish": "stop",
+        "prompt_tokens": 33116,
+        "reused": 33109,
+        "output_tokens": 4,
+        "prompt_total": 33116,
+        "prompt_read": 7,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 4,
+        "prompt_ms": 964.7,
+        "decode_ms": 156.9,
+        "decode_tok_s": 25.5,
+        "hit_rate": 0.268,
+        "pcie_share": 0.0,
+        "ram_blobs": 1752,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 3,
+        "drafts_accepted": 2
+      },
+      {
+        "projection": null,
+        "time": 1792166020.3132951,
+        "duration_s": 136.8,
+        "finish": "stop",
+        "prompt_tokens": 32522,
+        "reused": 0,
+        "output_tokens": 4,
+        "prompt_total": 32522,
+        "prompt_read": 32522,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 4,
+        "prompt_ms": 136567.1,
+        "decode_ms": 240.0,
+        "decode_tok_s": 16.7,
+        "hit_rate": 0.268,
+        "pcie_share": 0.0,
+        "ram_blobs": 2745,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 6,
+        "drafts_accepted": 2
+      },
+      {
+        "projection": null,
+        "time": 1792165898.4674466,
+        "duration_s": 121.8,
+        "finish": "stop",
+        "prompt_tokens": 31962,
+        "reused": 0,
+        "output_tokens": 4,
+        "prompt_total": 31962,
+        "prompt_read": 31962,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 4,
+        "prompt_ms": 121495.6,
+        "decode_ms": 244.8,
+        "decode_tok_s": 16.3,
+        "hit_rate": 0.264,
+        "pcie_share": 0.0,
+        "ram_blobs": 2750,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 6,
+        "drafts_accepted": 2
+      },
+      {
+        "projection": null,
+        "time": 1792165896.56095,
+        "duration_s": 1.8,
+        "finish": "stop",
+        "prompt_tokens": 33116,
+        "reused": 33087,
+        "output_tokens": 4,
+        "prompt_total": 33116,
+        "prompt_read": 29,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 4,
+        "prompt_ms": 1662.8,
+        "decode_ms": 157.9,
+        "decode_tok_s": 25.3,
+        "hit_rate": 0.268,
+        "pcie_share": 0.0,
+        "ram_blobs": 1752,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 3,
+        "drafts_accepted": 2
+      },
+      {
+        "projection": null,
+        "time": 1792165801.57567,
+        "duration_s": 94.9,
+        "finish": "stop",
+        "prompt_tokens": 33082,
+        "reused": 0,
+        "output_tokens": 4,
+        "prompt_total": 33082,
+        "prompt_read": 33082,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 4,
+        "prompt_ms": 94673.5,
+        "decode_ms": 246.6,
+        "decode_tok_s": 16.2,
+        "hit_rate": 0.258,
+        "pcie_share": 0.0,
+        "ram_blobs": 2755,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 6,
+        "drafts_accepted": 2
+      },
+      {
+        "projection": null,
+        "time": 1792165795.7434893,
+        "duration_s": 2.0,
+        "finish": "stop",
+        "prompt_tokens": 8196,
+        "reused": 8167,
+        "output_tokens": 5,
+        "prompt_total": 8196,
+        "prompt_read": 29,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 5,
+        "prompt_ms": 1756.6,
+        "decode_ms": 208.2,
+        "decode_tok_s": 24.0,
+        "hit_rate": 0.266,
+        "pcie_share": 0.0,
+        "ram_blobs": 1901,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 4,
+        "drafts_accepted": 4
+      },
+      {
+        "projection": null,
+        "time": 1792165793.6900368,
+        "duration_s": 2.0,
+        "finish": "stop",
+        "prompt_tokens": 8057,
+        "reused": 8028,
+        "output_tokens": 2,
+        "prompt_total": 8057,
+        "prompt_read": 29,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 2,
+        "prompt_ms": 1753.7,
+        "decode_ms": 226.6,
+        "decode_tok_s": 8.8,
+        "hit_rate": 0.251,
+        "pcie_share": 0.0,
+        "ram_blobs": 1233,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 2,
+        "drafts_accepted": 2
+      },
+      {
+        "projection": null,
+        "time": 1792165792.6472573,
+        "duration_s": 1.0,
+        "finish": "stop",
+        "prompt_tokens": 8336,
+        "reused": 8329,
+        "output_tokens": 4,
+        "prompt_total": 8336,
+        "prompt_read": 7,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 4,
+        "prompt_ms": 797.0,
+        "decode_ms": 175.9,
+        "decode_tok_s": 22.7,
+        "hit_rate": 0.251,
+        "pcie_share": 0.0,
+        "ram_blobs": 1972,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 4,
+        "drafts_accepted": 2
+      },
+      {
+        "projection": null,
+        "time": 1792165769.8777862,
+        "duration_s": 22.7,
+        "finish": "stop",
+        "prompt_tokens": 8162,
+        "reused": 0,
+        "output_tokens": 4,
+        "prompt_total": 8162,
+        "prompt_read": 8162,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 4,
+        "prompt_ms": 22437.6,
+        "decode_ms": 237.9,
+        "decode_tok_s": 16.8,
+        "hit_rate": 0.256,
+        "pcie_share": 0.0,
+        "ram_blobs": 2793,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 6,
+        "drafts_accepted": 2
+      },
+      {
+        "projection": null,
+        "time": 1792165747.0573442,
+        "duration_s": 22.7,
+        "finish": "stop",
+        "prompt_tokens": 8022,
+        "reused": 0,
+        "output_tokens": 5,
+        "prompt_total": 8022,
+        "prompt_read": 8022,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 5,
+        "prompt_ms": 22438.2,
+        "decode_ms": 302.5,
+        "decode_tok_s": 16.5,
+        "hit_rate": 0.237,
+        "pcie_share": 0.0,
+        "ram_blobs": 3678,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 8,
+        "drafts_accepted": 2
+      }
+    ],
+    "conversation_cache": {
+      "enabled": true,
+      "budget_mib": 30720,
+      "slots": 4,
+      "parked": 4,
+      "bytes": 6074702600,
+      "evictions": 2,
+      "parks": 12,
+      "restores": 6,
+      "last_event": "restored",
+      "last_tokens": 32527,
+      "last_at": 1792166162.4923973,
+      "requests": 15,
+      "requests_reused": 8,
+      "reused_tokens": 163521,
+      "prompt_tokens": 285801,
+      "last_reused": 32527,
+      "last_prompt": 32556
+    },
+    "requests_kept": 15,
+    "totals": {
+      "since": 1792165708.5464475,
+      "requests": 15,
+      "prompt_tokens": 285801,
+      "reused": 163521,
+      "output_tokens": 56,
+      "prompt_ms": 443363.4,
+      "decode_ms": 3535.7000000000003,
+      "drafts_offered": 63,
+      "drafts_accepted": 32
+    },
+    "hardware": {
+      "gpu_util": 3,
+      "gpu_mem_used": 2553311232,
+      "gpu_mem_total": 5368709120,
+      "gpu_temp": 41,
+      "gpu_power": 7.698,
+      "gpu_power_limit": 75.0,
+      "gpu_pcie_gen": 3,
+      "gpu_pcie_gen_max": 3,
+      "gpu_pcie_width": 16,
+      "gpu_pcie_rx_mb": 6.8359375,
+      "gpu_pcie_tx_mb": 0.9765625,
+      "cpu": 27.7,
+      "ram_used": 78282039296,
+      "ram_total": 137284874240,
+      "disk_read_mb": 0.281033375493105,
+      "disk_write_mb": 0.9135843814261386,
+      "tok_s": 0.0,
+      "tok_s_mean": 0,
+      "prefill_tok_s_mean": 18.2
+    },
+    "hardware_static": {
+      "gpu_name": "Quadro P2200",
+      "gpu_count": 1,
+      "gpu_note": null,
+      "cpu_name": "AMD Ryzen Threadripper PRO 3955WX 16-Cores",
+      "cores": 16,
+      "threads": 32,
+      "psutil": true
+    },
+    "history": {
+      "gpu_util": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        4,
+        4,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        3,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        3,
+        3,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        3,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        2,
+        1,
+        2,
+        2,
+        6,
+        1,
+        3
+      ],
+      "gpu_mem_used": [
+        2458447872,
+        2458644480,
+        2458447872,
+        2458447872,
+        2458644480,
+        2458644480,
+        2458644480,
+        2458644480,
+        2458644480,
+        2458447872,
+        2458644480,
+        2458644480,
+        2458644480,
+        2458644480,
+        2458644480,
+        2458644480,
+        2458644480,
+        2459496448,
+        2458447872,
+        2458447872,
+        2458447872,
+        2458447872,
+        2458447872,
+        2458447872,
+        2458447872,
+        2458578944,
+        2459430912,
+        2458447872,
+        2458447872,
+        2458447872,
+        2458447872,
+        2458447872,
+        2458644480,
+        2458644480,
+        2458644480,
+        2458644480,
+        2458447872,
+        2458447872,
+        2458447872,
+        2458644480,
+        2458644480,
+        2458644480,
+        2458644480,
+        2458644480,
+        2458644480,
+        2458447872,
+        2458447872,
+        2458447872,
+        2458644480,
+        2458644480,
+        2458644480,
+        2458644480,
+        2458447872,
+        2458382336,
+        2458382336,
+        2458382336,
+        2458578944,
+        2458578944,
+        2467885056,
+        2553311232
+      ],
+      "gpu_temp": [
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        41,
+        40,
+        41,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        41,
+        40,
+        40,
+        40,
+        41,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        41,
+        40,
+        41,
+        41,
+        40,
+        41
+      ],
+      "gpu_power": [
+        5.28,
+        5.96,
+        5.76,
+        5.76,
+        5.47,
+        5.76,
+        5.18,
+        6.25,
+        5.19,
+        5.38,
+        6.15,
+        5.38,
+        5.67,
+        5.87,
+        5.76,
+        5.38,
+        5.67,
+        5.47,
+        5.96,
+        5.18,
+        5.76,
+        5.67,
+        5.38,
+        5.76,
+        5.86,
+        5.57,
+        5.38,
+        5.76,
+        5.47,
+        6.15,
+        5.09,
+        5.28,
+        5.67,
+        5.18,
+        5.38,
+        5.86,
+        5.86,
+        5.47,
+        5.76,
+        5.76,
+        5.76,
+        5.86,
+        5.38,
+        5.38,
+        5.96,
+        5.86,
+        5.86,
+        5.86,
+        5.38,
+        5.86,
+        5.38,
+        5.67,
+        5.96,
+        5.38,
+        5.66,
+        5.18,
+        6.24,
+        5.86,
+        6.05,
+        7.7
+      ],
+      "gpu_pcie_rx_mb": [
+        0.0,
+        0.0,
+        3.91,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        3.91,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        26.37,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.98,
+        0.0,
+        14.65,
+        0.0,
+        0.0,
+        23.44,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        79.1,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        31.25,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        3.91,
+        0.0,
+        18.55,
+        6.84
+      ],
+      "cpu": [
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        86.3,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        99.5,
+        86.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        99.8,
+        84.4,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        99.9,
+        82.5,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        99.8,
+        84.1,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        84.1,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        80.6,
+        16.7,
+        16.1,
+        10.6,
+        15.7,
+        27.7
+      ],
+      "ram_used": [
+        77006860288,
+        76959715328,
+        76976283648,
+        76948131840,
+        76962308096,
+        76963856384,
+        76944961536,
+        76938596352,
+        76943917056,
+        76934676480,
+        76949377024,
+        76949344256,
+        76948258816,
+        76966719488,
+        76949606400,
+        76984160256,
+        76949835776,
+        76943020032,
+        76940247040,
+        76945518592,
+        76928294912,
+        76917489664,
+        76922023936,
+        76920676352,
+        76945428480,
+        76925878272,
+        76920782848,
+        76923899904,
+        76917624832,
+        76919791616,
+        76924821504,
+        76915490816,
+        76926844928,
+        76920238080,
+        76930498560,
+        76929708032,
+        76930789376,
+        76924633088,
+        76929511424,
+        76934352896,
+        76925132800,
+        76935516160,
+        76935225344,
+        76936314880,
+        76936740864,
+        76922859520,
+        76954767360,
+        76935340032,
+        76929536000,
+        76931510272,
+        76928339968,
+        76919283712,
+        76924329984,
+        76928380928,
+        77043322880,
+        78077112320,
+        78310531072,
+        77966610432,
+        78097981440,
+        78282039296
+      ],
+      "disk_read_mb": [
+        0.06,
+        0.11,
+        0.03,
+        0.03,
+        0.03,
+        0.03,
+        1.13,
+        0.09,
+        0.17,
+        0.07,
+        0.03,
+        0.06,
+        0.05,
+        0.03,
+        0.04,
+        0.03,
+        0.03,
+        0.03,
+        0.12,
+        0.03,
+        0.08,
+        0.03,
+        0.4,
+        0.09,
+        0.06,
+        0.03,
+        0.03,
+        0.03,
+        0.03,
+        0.03,
+        0.03,
+        0.03,
+        0.04,
+        0.03,
+        0.06,
+        0.03,
+        0.03,
+        0.03,
+        0.04,
+        0.03,
+        0.03,
+        0.03,
+        0.03,
+        0.03,
+        0.03,
+        0.09,
+        0.04,
+        0.04,
+        0.03,
+        0.04,
+        0.04,
+        0.03,
+        0.04,
+        0.03,
+        0.04,
+        0.04,
+        0.23,
+        0.23,
+        0.09,
+        0.28
+      ],
+      "tok_s": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "prefill_tok_s_mean": [
+        244.3,
+        244.3,
+        244.3,
+        244.3,
+        244.3,
+        244.3,
+        244.3,
+        244.2,
+        244.2,
+        244.2,
+        244.2,
+        244.2,
+        244.2,
+        244.2,
+        244.2,
+        243.2,
+        243.2,
+        243.2,
+        243.2,
+        243.2,
+        243.2,
+        243.2,
+        243.2,
+        242.3,
+        242.3,
+        242.3,
+        242.3,
+        242.3,
+        242.3,
+        242.3,
+        242.3,
+        241.6,
+        241.6,
+        241.6,
+        241.6,
+        241.6,
+        241.6,
+        241.6,
+        241.6,
+        240.9,
+        240.9,
+        240.9,
+        240.9,
+        240.9,
+        240.9,
+        240.9,
+        240.9,
+        240.3,
+        240.3,
+        240.3,
+        240.3,
+        240.3,
+        240.3,
+        240.3,
+        239.1,
+        null,
+        null,
+        null,
+        null,
+        18.2
+      ]
+    },
+    "time": 1792166162.5155897
+  },
+  "passed": true,
+  "finished_at_utc": "2026-10-16T15:56:02.516592+00:00"
+}

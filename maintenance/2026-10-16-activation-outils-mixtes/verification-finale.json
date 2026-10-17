@@ -1,0 +1,101 @@
+{
+  "passed": true,
+  "observed_utc": "2026-10-16T17:17:07.442654+00:00",
+  "parser_sha256": "b2597332905133ed0ef885d11e4c5bef7f6eb4b1615b3476162cb6105f4226b6",
+  "new_session": {
+    "directory": "D:\\Serveur IA\\lanceur\\sessions\\20261016-191036-149585",
+    "worker": {
+      "pid": 25332,
+      "created": 1792170636.5668702
+    }
+  },
+  "new_server": {
+    "pid": 8828,
+    "created": 1792170636.7911508
+  },
+  "console_unchanged": true,
+  "persistent_settings_and_access_unchanged": true,
+  "health": {
+    "status": "ok",
+    "max_context": 262144,
+    "model": "qwen3.8-flash-next-iq4-xs",
+    "images": true,
+    "api_key": false,
+    "loaded": true,
+    "service": "strata"
+  },
+  "engine": {
+    "model": "qwen3.8-flash-next-iq4-xs",
+    "max_context": 262144,
+    "images": true,
+    "version": "0.1.43.1",
+    "logit_bias": 1,
+    "context": 262144,
+    "kv": "fp16",
+    "kv_resident": 0,
+    "expert_slots": 3786,
+    "expert_cache_mib": 9612,
+    "expert_slots_primary": 2323,
+    "expert_cache_primary_mib": 5898,
+    "spec": 5,
+    "mtp_max": 3,
+    "lookup": 3,
+    "vram_free_mib": 2233,
+    "cvec": 0,
+    "arena_mib": 52787,
+    "pool_workers": 15,
+    "pcie_frac": "0.00",
+    "spec_min_p": "0.50",
+    "conversation_cache_mib": 30720,
+    "conversation_cache_slots": 20,
+    "conversation_cache_min_free_mib": 6144,
+    "conversation_cache_min_tokens": 0,
+    "tail_role_token": -1,
+    "vram_elastic": 0,
+    "engine": "0.1.43.1"
+  },
+  "cache": {
+    "enabled": true,
+    "budget_mib": 30720,
+    "slots": 20,
+    "parked": 5,
+    "bytes": 2130208408,
+    "evictions": 0,
+    "parks": 8,
+    "restores": 3,
+    "last_event": "parked",
+    "last_tokens": 345,
+    "last_at": 1792170956.057238,
+    "requests": 10,
+    "requests_reused": 4,
+    "reused_tokens": 11861,
+    "prompt_tokens": 21449,
+    "last_reused": 0,
+    "last_prompt": 314
+  },
+  "live": {
+    "state": "idle",
+    "queued": 0,
+    "phase": null,
+    "prompt_tokens": null,
+    "prompt_read": null,
+    "prompt_total": null,
+    "generated": null,
+    "max_tokens": null,
+    "elapsed_s": null,
+    "tok_s": null,
+    "tok_s_mean": null,
+    "prefill_tok_s_mean": null,
+    "tok_s_window_s": null
+  },
+  "ram_available_gib": 56.14,
+  "hermes_available": true,
+  "wireguard_running": true,
+  "gateway_available": true,
+  "ready_seconds": 260.0,
+  "startup_memory_reclaim": {
+    "status": "reclaimed",
+    "pid": 19128,
+    "method": "EmptyWorkingSet"
+  }
+}

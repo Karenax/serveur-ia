@@ -1,0 +1,11 @@
+{
+  "result": {
+    "status": "reclaimed",
+    "pid": 19836,
+    "method": "EmptyWorkingSet"
+  },
+  "available_before_gib": 17.36,
+  "available_after_gib": 64.02,
+  "at": 1792165479.3783278,
+  "one_shot_during_loading": true
+}

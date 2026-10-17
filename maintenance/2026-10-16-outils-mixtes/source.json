@@ -1,0 +1,10 @@
+{
+  "source": "D:\\Serveur IA\\dependances\\strata-0.1.43.1\\source\\serve\\frontend.py",
+  "sha256_before": "5b4b041aa11e2a2aceef8094961eeac50e3407677673ce6cb9495501c998f6bb",
+  "sha256_after": "b2597332905133ed0ef885d11e4c5bef7f6eb4b1615b3476162cb6105f4226b6",
+  "deployed": true,
+  "server_restarted": true,
+  "engine_restarted": true,
+  "depends_on": "2026-10-16-outils-booleens",
+  "activation_report": "maintenance\\2026-10-16-activation-outils-mixtes\\verification-finale.json"
+}

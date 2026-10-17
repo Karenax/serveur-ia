@@ -1,6 +1,12 @@
 # Moteurs tiers
 
+Le [correctif des arguments XML/JSON mixtes et des champs obligatoires](../maintenance/2026-10-16-outils-mixtes/README.md), d'abord préparé sans interruption, a ensuite été [activé par un redémarrage demandé par l'utilisateur](../maintenance/2026-10-16-activation-outils-mixtes/README.md). Les 367 tests couvrent les cas fautifs et les essais réels après relance passent. Les patchs doivent être repris dans l'ordre : booléens, puis formats mixtes.
+
+Le 16 octobre 2026, un [correctif local du parseur serveur Strata](../maintenance/2026-10-16-outils-booleens/README.md) a été installé : normalisation de `True`/`False` uniquement pour les arguments déclarés booléens, formats XML/JSON et streaming. Le binaire CUDA reste celui de la distribution officielle. Patch, sauvegarde de la source et empreintes sont conservés dans le dossier de maintenance ; 355 tests et des appels d'outils réels passent. Vérifier ce correctif lors d'une prochaine mise à jour des sources tierces. Le cache actif conserve désormais jusqu'à 20 conversations sauvegardées, dans un budget global de 30 Gio.
+
 Depuis le 13 octobre 2026, le moteur de production Flash-Next est la distribution officielle CUDA 12 de Strata **0.1.43.1**, installée dans `strata-0.1.43.1/` avec sa source serveur, ses bibliothèques CUDA 12.9, son tokenizer et le profil experts testé. Les modèles restent dans `strata-data/`. La preuve de déploiement et la sauvegarde précédente sont dans `maintenance/2026-10-13-strata-0.1.43.1/`. L'ancien moteur P100 personnalisé reste disponible.
+
+Depuis l'essai du 14 octobre, l'encodeur visuel P2200 utilise une compilation locale séparée dans `strata-0.1.43.1/vision-p2200-cuda12.4/` : CUDA 12.4.131, `61-real`, sources et empreinte dans son `BUILD.json`. L'encodeur officiel échouait à initialiser CUDA avec le pilote du poste et continuait sur CPU. Le moteur texte officiel reste inchangé. Le projecteur vérifié est dans `strata-data/vision/`. Voir [recette, preuves, mesures RAM/VRAM et retour arrière](../maintenance/2026-10-14-vision/README.md).
 
 `moteurs.json` référence les six dépôts historiques et leurs modifications ; il ne décrit pas la distribution officielle actuellement chargée. Pour celle-ci, suivre [le guide de mise en service](../maintenance/2026-10-13-strata-0.1.43.1/README.md) et l’empreinte de `production.json`. La vérification du contexte du 13 octobre confirme que le processus actif exécute ce binaire.
 

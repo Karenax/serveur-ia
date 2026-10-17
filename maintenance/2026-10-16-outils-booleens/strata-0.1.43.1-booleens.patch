@@ -1,0 +1,187 @@
+--- a/serve/frontend.py
++++ b/serve/frontend.py
+@@ -725,6 +725,42 @@
+ _JSON_FENCE = re.compile(r"```[ \t]*(?:json)?[ \t]*\r?\n\s*", re.I)
+ 
+ 
++def _boolean_only_schema(schema: dict) -> bool:
++    """A boolean (possibly nullable), never a union that also accepts strings."""
++    kind = schema.get("type")
++    if kind == "boolean":
++        return True
++    if isinstance(kind, list):
++        return "boolean" in kind and all(t in ("boolean", "null") for t in kind)
++    variants = schema.get("anyOf") or schema.get("oneOf")
++    if isinstance(variants, list) and variants and all(isinstance(s, dict) for s in variants):
++        return any(_boolean_only_schema(s) for s in variants) and all(
++            _boolean_only_schema(s) or s.get("type") == "null" for s in variants)
++    return False
++
++
++def _normalize_tool_value(value, schema: dict):
++    """Repair only literal true/false strings where the declared type is boolean.
++
++    Qwen sometimes emits Python's True/False in XML, or quotes those literals in
++    JSON. Do not infer booleans from numbers, yes/no, arbitrary text or untyped
++    fields; string-valued tool arguments must remain byte-for-byte intact.
++    """
++    if not isinstance(schema, dict):
++        return value
++    if isinstance(value, str) and _boolean_only_schema(schema):
++        literal = value.strip().lower()
++        if literal in ("true", "false"):
++            return literal == "true"
++    if isinstance(value, dict):
++        props = schema.get("properties") or {}
++        if isinstance(props, dict):
++            return {k: _normalize_tool_value(v, props.get(k) or {}) for k, v in value.items()}
++    if isinstance(value, list) and isinstance(schema.get("items"), dict):
++        return [_normalize_tool_value(v, schema["items"]) for v in value]
++    return value
++
++
+ def json_tool_call(body: str, schemas: dict) -> ToolCall | None:
+     """`{"name": N, "arguments": {...}}` (or "parameters", or the arguments as a JSON string) of a declared tool -> its
+     call; anything else -> None.  #2037: the object may sit in a Markdown fence (```json ... ```)."""
+@@ -747,7 +783,8 @@
+             return None
+     if args is None:
+         args = {}
+-    return ToolCall(name=obj["name"], arguments=args) if isinstance(args, dict) else None
++    schema = (schemas[obj["name"]].get("parameters") or {})
++    return ToolCall(name=obj["name"], arguments=_normalize_tool_value(args, schema)) if isinstance(args, dict) else None
+ 
+ 
+ def parse_tool_call(body: str, schema: dict | None = None) -> ToolCall:
+@@ -780,6 +817,7 @@
+                 args[pname] = json.loads(value)
+             except ValueError:
+                 args[pname] = value
++            args[pname] = _normalize_tool_value(args[pname], props.get(pname) or {})
+     return ToolCall(name=name, arguments=args)
+ 
+ 
+@@ -961,6 +999,8 @@
+         self.sfirst = True
+         self.sval_started = False
+         self.sdeclared = {}
++        self.sprops = {}
++        self.sparam = ""
+ 
+     def _scan(self) -> list[Event]:
+         """Advance the streaming view of the call body in self.buf (see stream_tools)."""
+@@ -980,6 +1020,7 @@
+                 self.scall = ToolCall(name=name, arguments={})
+                 props = ((self.schemas.get(name) or {}).get("parameters") or {}).get("properties") or {}
+                 self.sdeclared = {k: (v or {}).get("type") for k, v in props.items()}
++                self.sprops = props
+                 out.append(Event("tool_start", call=self.scall))
+                 args("{")
+                 self.sp += b + 1
+@@ -992,6 +1033,7 @@
+                     if b < 0:
+                         return out
+                     pname = stripped[11:b]
++                    self.sparam = pname
+                     args(("" if self.sfirst else ",") + json.dumps(pname) + ":")
+                     self.sfirst = False
+                     self.sp += b + 1
+@@ -1044,6 +1086,7 @@
+                     v = json.loads(value)
+                 except ValueError:
+                     v = value
++                v = _normalize_tool_value(v, self.sprops.get(self.sparam) or {})
+                 args(json.dumps(v, ensure_ascii=False))
+                 self.sp += end + len(PARAM_END)
+                 self.ss = "between"
+--- /dev/null
++++ b/serve/test_tool_boolean_types.py
+@@ -0,0 +1,88 @@
++"""Boolean tool arguments: model spelling errors must not reach clients as strings."""
++import json
++import unittest
++
++from serve.frontend import OutputParser, json_tool_call, parse_tool_call
++
++
++SCHEMA = {"name": "subagent", "parameters": {"type": "object", "properties": {
++    "background": {"type": "boolean"}, "prompt": {"type": "string"}}}}
++
++
++def xml(value, name="background"):
++    return f"<function=subagent>\n<parameter={name}>\n{value}\n</parameter>\n</function>"
++
++
++class BooleanArguments(unittest.TestCase):
++    def test_xml_spelling_and_quotes(self):
++        for literal, expected in [('True', True), ('False', False), ('true', True), ('false', False),
++                                  ('"True"', True), ('"False"', False), ('"true"', True), ('"false"', False)]:
++            with self.subTest(literal=literal):
++                value = parse_tool_call(xml(literal), SCHEMA).arguments['background']
++                self.assertIs(value, expected)
++
++    def test_string_and_unknown_fields_are_preserved(self):
++        for literal in ('True', 'False', 'true', 'false', '"True"', ' True ', 'print(True)'):
++            self.assertEqual(parse_tool_call(xml(literal, 'prompt'), SCHEMA).arguments['prompt'], literal)
++        self.assertEqual(parse_tool_call(xml('True', 'unknown'), SCHEMA).arguments['unknown'], 'True')
++
++    def test_no_truthiness_guessing(self):
++        for literal in ('yes', 'no', '1', '0', 'null', 'some True text'):
++            value = parse_tool_call(xml(literal), SCHEMA).arguments['background']
++            self.assertNotIsInstance(value, bool)
++
++    def test_json_nested_fields(self):
++        schema = {"name": "subagent", "parameters": {"properties": {
++            "background": {"type": "boolean"}, "prompt": {"type": "string"},
++            "options": {"type": "object", "properties": {"enabled": {"type": "boolean"}}},
++            "flags": {"type": "array", "items": {"type": "boolean"}}}}}
++        raw = json.dumps({"name": "subagent", "arguments": {"background": "True", "prompt": "True",
++                         "options": {"enabled": "False", "unknown": "True"}, "flags": ["True", "False"]}})
++        call = json_tool_call(raw, {'subagent': schema})
++        self.assertEqual(call.arguments, {'background': True, 'prompt': 'True',
++            'options': {'enabled': False, 'unknown': 'True'}, 'flags': [True, False]})
++
++    def test_nullable_boolean_and_string_union(self):
++        for kind, normalize in [({'type': ['boolean', 'null']}, True),
++                                ({'anyOf': [{'type': 'boolean'}, {'type': 'null'}]}, True),
++                                ({'oneOf': [{'type': 'boolean'}, {'type': 'null'}]}, True),
++                                ({'type': ['boolean', 'string']}, False),
++                                ({'anyOf': [{'type': 'boolean'}, {'type': 'string'}]}, False)]:
++            schema = {'name': 'subagent', 'parameters': {'properties': {'background': kind}}}
++            value = parse_tool_call(xml('"True"'), schema).arguments['background']
++            self.assertEqual(value, True if normalize else 'True')
++
++    def test_streamed_json_matches_final_call_at_all_chunk_boundaries(self):
++        for literal, expected in [('True', True), ('False', False), ('"True"', True), ('"False"', False)]:
++            raw = '<tool_call>\n' + xml(literal) + '\n</tool_call>'
++            for width in (1, 2, 7, len(raw)):
++                for stream in (False, True):
++                    with self.subTest(literal=literal, width=width, stream=stream):
++                        parser = OutputParser(thinking=False, tools=[SCHEMA], stream_tools=stream)
++                        events = []
++                        for i in range(0, len(raw), width):
++                            events += parser.feed(raw[i:i + width])
++                        events += parser.finish('stop')
++                        calls = [e.call for e in events if e.kind == 'tool_call']
++                        self.assertEqual(len(calls), 1)
++                        self.assertIs(calls[0].arguments['background'], expected)
++                        if stream:
++                            args = json.loads(''.join(e.text for e in events if e.kind == 'tool_args'))
++                            self.assertIs(args['background'], expected)
++
++    def test_http_openai_and_anthropic_stream_and_nonstream(self):
++        from serve.test_server import UnfinishedToolCall
++        helper = UnfinishedToolCall('test_parser')
++        helper.PROPS = {'background': {'type': 'boolean'}, 'prompt': {'type': 'string'}}
++        raw = '</think>\n\n<tool_call>\n<function=write>\n<parameter=background>\nTrue\n</parameter>\n' \
++              '<parameter=prompt>\nTrue\n</parameter>\n</function>\n</tool_call>'
++        answers = helper.answers(raw)
++        for (protocol, stream), (_, args) in answers.items():
++            with self.subTest(protocol=protocol, stream=stream):
++                values = [args] if stream else args
++                decoded = [json.loads(x) if isinstance(x, str) else x for x in values]
++                self.assertEqual(decoded, [{'background': True, 'prompt': 'True'}])
++
++
++if __name__ == '__main__':
++    unittest.main()

@@ -1,0 +1,300 @@
+--- a/serve/frontend.py
++++ b/serve/frontend.py
+@@ -595,6 +595,33 @@
+ FUNC_END = "</function>"
+ 
+ 
++def _hybrid_function_end(text: str, pos: int) -> int:
++    """A JSON object inside <function=...>; delimiters in JSON strings are data."""
++    raw = text[pos:].lstrip()
++    start = len(text) - len(raw)
++    fence = re.match(r"```[ \t]*(?:json)?[ \t]*\r?\n\s*", raw, re.I)
++    if fence:
++        start += fence.end()
++    # Do not try to decode a long, incomplete object on every token.
++    if FUNC_END not in text[start:]:
++        return -1
++    try:
++        obj, consumed = json.JSONDecoder().raw_decode(text[start:])
++    except ValueError:
++        return -1
++    if not isinstance(obj, dict):
++        return -1
++    end = start + consumed
++    tail = text[end:].lstrip()
++    if fence:
++        if not tail.startswith("```"):
++            return -1
++        tail = tail[3:].lstrip()
++    if not tail.startswith(FUNC_END):
++        return -1
++    return len(text) - len(tail) + len(FUNC_END)
++
++
+ def param_end(text: str, final: bool = False) -> int:
+     """Where a parameter value in `text` ends: the first `</parameter>` followed (after whitespace) by the next
+     `<parameter=` or `</function>` - the same text inside a value (a file that documents the call format, #210) is
+@@ -640,6 +667,12 @@
+             if s.startswith(CALL_END):
+                 return pos + len(FUNC_END) + len(rest) - len(s)
+             return -1 if CALL_END.startswith(s) else text.find(CALL_END, pos)
++        elif s.startswith(("{", "```")):
++            end = _hybrid_function_end(text, pos)
++            if end < 0:
++                return -1
++            tail = text[end:].lstrip()
++            return len(text) - len(tail) if tail.startswith(CALL_END) else -1
+         elif not s or "<parameter=".startswith(s) or FUNC_END.startswith(s):
+             return -1
+         else:
+@@ -718,6 +751,8 @@
+             pos = gt + 1 + end + len(PARAM_END)
+         elif s.startswith(FUNC_END):
+             return pos + len(FUNC_END)
++        elif s.startswith(("{", "```")):
++            return _hybrid_function_end(text, pos)
+         else:
+             return -1
+ 
+@@ -784,7 +819,21 @@
+     if args is None:
+         args = {}
+     schema = (schemas[obj["name"]].get("parameters") or {})
+-    return ToolCall(name=obj["name"], arguments=_normalize_tool_value(args, schema)) if isinstance(args, dict) else None
++    if not isinstance(args, dict):
++        return None
++    call = ToolCall(name=obj["name"], arguments=_normalize_tool_value(args, schema))
++    _validate_required_arguments(call, schemas[obj["name"]])
++    return call
++
++
++def _validate_required_arguments(call: ToolCall, schema: dict | None):
++    required = ((schema or {}).get("parameters") or {}).get("required") or []
++    if not isinstance(required, list):
++        return
++    missing = [key for key in required if isinstance(key, str) and key not in call.arguments]
++    if missing:
++        raise ValueError(f"invalid arguments generated for tool {call.name!r}: missing required fields: " +
++                         ", ".join(missing))
+ 
+ 
+ def parse_tool_call(body: str, schema: dict | None = None) -> ToolCall:
+@@ -796,7 +845,21 @@
+         raise ValueError("malformed tool call: " + body[:80])
+     name = body[len("<function="):body.index(">")].strip()      # `<function= capture>`: the model's stray space
+     rest = body[body.index(">") + 1:]
+-    props = ((schema or {}).get("parameters") or {}).get("properties") or {}
++    parameters = (schema or {}).get("parameters") or {}
++    props = parameters.get("properties") or {}
++    if rest.lstrip().startswith(("{", "```")):
++        end = _hybrid_function_end(body, body.index(">") + 1)
++        if end < 0 or body[end:].strip():
++            raise ValueError("malformed JSON arguments for tool " + name)
++        payload = rest[:len(rest) - len(FUNC_END)].strip()
++        fence = _JSON_FENCE.match(payload)
++        if fence:
++            payload = payload[fence.end():].rstrip()
++            payload = payload[:-3].rstrip()
++        args = json.loads(payload)
++        if not isinstance(args, dict):
++            raise ValueError("tool arguments must be a JSON object")
++        return ToolCall(name=name, arguments=_normalize_tool_value(args, parameters))
+     args = {}
+     while "<parameter=" in rest:
+         rest = rest[rest.index("<parameter=") + len("<parameter="):]
+@@ -982,6 +1045,7 @@
+         out = []
+         for raw, call in self.pending:
+             if call is not None and deliver:
++                _validate_required_arguments(call, self.schemas.get(call.name))
+                 out.append(Event("tool_call", call=call))
+                 self.rescued += 1
+             elif call is None or not deliver:
+@@ -1016,7 +1080,13 @@
+                 b = rest.find(">", a + 10) if a >= 0 else -1
+                 if b < 0:
+                     return out
+-                name = rest[a + 10:b]
++                name = rest[a + 10:b].strip()
++                # Required fields must be checked before any tool invocation is
++                # exposed. Hybrid JSON is also held whole, never streamed as {}.
++                schema = self.schemas.get(name) or {}
++                after = rest[b + 1:].lstrip()
++                if not after or after.startswith(("{", "`")) or (schema.get("parameters") or {}).get("required"):
++                    return out
+                 self.scall = ToolCall(name=name, arguments={})
+                 props = ((self.schemas.get(name) or {}).get("parameters") or {}).get("properties") or {}
+                 self.sdeclared = {k: (v or {}).get("type") for k, v in props.items()}
+@@ -1387,6 +1457,7 @@
+             return [Event("content", self._track(body if bare else CALL_START + body + CALL_END))]
+         if self.scall is not None:
+             call.id = self.scall.id
++        _validate_required_arguments(call, self.schemas.get(call.name))
+         self._reset_scan()
+         self.state, self.lead = "content", True
+         return [Event("tool_call", call=call)]
+--- /dev/null
++++ b/serve/test_tool_hybrid_arguments.py
+@@ -0,0 +1,162 @@
++"""Recover JSON arguments inside XML function envelopes, never a phantom {}."""
++import copy
++import json
++import unittest
++import urllib.error
++import urllib.request
++
++from serve.frontend import OutputParser, parse_tool_call
++
++SCHEMA = {'name': 'subagent', 'parameters': {'type': 'object', 'properties': {
++    'agent': {'type': 'string'}, 'description': {'type': 'string'},
++    'prompt': {'type': 'string'}, 'background': {'type': 'boolean'}},
++    'required': ['agent', 'description', 'prompt']}}
++ARGS = {'agent': 'explore', 'description': 'Analyser le frontend',
++        'prompt': 'Lecture seule : texte <parameter=x> et </function> puis </tool_call>.',
++        'background': 'True'}
++EXPECTED = {**ARGS, 'background': True}
++
++
++def body(args=ARGS, fenced=False):
++    payload = json.dumps(args, ensure_ascii=False)
++    if fenced:
++        payload = '```json\n' + payload + '\n```'
++    return '<function=subagent>\n' + payload + '\n</function>'
++
++
++def parse(raw, width=1, stream=True, schema=SCHEMA, thinking=False, recover=False):
++    parser = OutputParser(thinking=thinking, tools=[schema], stream_tools=stream, recover=recover)
++    events = []
++    for i in range(0, len(raw), width):
++        events += parser.feed(raw[i:i + width])
++    return events + parser.finish('stop')
++
++
++class HybridArguments(unittest.TestCase):
++    def test_direct_decode_preserves_json_and_literal_xml_in_strings(self):
++        for fenced in (False, True):
++            self.assertEqual(parse_tool_call(body(fenced=fenced), SCHEMA).arguments, EXPECTED)
++
++    def test_mixed_call_all_fragment_boundaries_and_stream_modes(self):
++        for fenced in (False, True):
++            raw = '<tool_call>\n' + body(fenced=fenced) + '\n</tool_call>'
++            for width in (1, 2, 7, len(raw)):
++                for stream in (False, True):
++                    with self.subTest(fenced=fenced, width=width, stream=stream):
++                        events = parse(raw, width, stream)
++                        self.assertEqual([e.call.arguments for e in events if e.kind == 'tool_call'], [EXPECTED])
++                        self.assertFalse([e for e in events if e.kind in ('tool_start', 'tool_args')])
++                        self.assertEqual(''.join(e.text for e in events if e.kind == 'content'), '')
++
++    def test_hybrid_without_required_schema_also_never_streams_empty_object(self):
++        schema = copy.deepcopy(SCHEMA)
++        schema['parameters'].pop('required')
++        events = parse('<tool_call>' + body() + '</tool_call>', schema=schema)
++        self.assertEqual([e.call.arguments for e in events if e.kind == 'tool_call'], [EXPECTED])
++        self.assertFalse([e for e in events if e.kind in ('tool_start', 'tool_args')])
++
++    def test_required_xml_is_validated_before_any_tool_event(self):
++        raw = '<tool_call><function=subagent>\n'
++        raw += ''.join(f'<parameter={k}>\n{v}\n</parameter>\n' for k, v in
++                       [('agent', 'explore'), ('description', 'Test'), ('prompt', 'Lecture seule')])
++        raw += '</function></tool_call>'
++        events = parse(raw)
++        self.assertEqual([e.call.arguments for e in events if e.kind == 'tool_call'],
++                         [{'agent': 'explore', 'description': 'Test', 'prompt': 'Lecture seule'}])
++        self.assertFalse([e for e in events if e.kind in ('tool_start', 'tool_args')])
++
++    def test_empty_or_partial_required_call_is_an_explicit_error_before_emission(self):
++        for inner in ('<function=subagent></function>', body({}), body({'agent': 'explore'}),
++                      '<function=subagent><parameter=agent>explore</parameter></function>'):
++            for recover in (False, True):
++                parser = OutputParser(thinking=False, tools=[SCHEMA], stream_tools=True, recover=recover)
++                events = []
++                with self.assertRaisesRegex(ValueError, 'missing required fields'):
++                    for char in '<tool_call>' + inner + '</tool_call>':
++                        events += parser.feed(char)
++                    events += parser.finish('stop')
++                self.assertFalse([e for e in events if e.kind in ('tool_start', 'tool_args', 'tool_call')])
++
++    def test_json_recovery_checks_required_fields(self):
++        raw = '<tool_call>' + json.dumps({'name': 'subagent', 'arguments': {}}) + '</tool_call>'
++        with self.assertRaisesRegex(ValueError, 'agent, description, prompt'):
++            parse(raw, recover=True)
++
++    def test_no_argument_tool_remains_valid(self):
++        schema = {'name': 'subagent', 'parameters': {'type': 'object', 'properties': {}}}
++        events = parse('<tool_call><function=subagent></function></tool_call>', schema=schema)
++        self.assertEqual([e.call.arguments for e in events if e.kind == 'tool_call'], [{}])
++
++    def test_cut_hybrid_never_becomes_a_call(self):
++        raw = '<tool_call><function=subagent>{"agent":"explore"'
++        self.assertFalse([e for e in parse(raw) if e.kind in ('tool_start', 'tool_args', 'tool_call')])
++
++    def test_bare_and_multiple_mixed_calls(self):
++        bare = body() + '\n'
++        self.assertEqual([e.call.arguments for e in parse(bare, recover=True) if e.kind == 'tool_call'], [EXPECTED])
++        batch = '<tool_call>' + body() + '\n' + body() + '</tool_call>'
++        self.assertEqual([e.call.arguments for e in parse(batch, recover=True) if e.kind == 'tool_call'],
++                         [EXPECTED, EXPECTED])
++
++    def test_mixed_call_in_reasoning_and_quoted_example(self):
++        raw = '<tool_call>' + body() + '</tool_call>\n</think>\n'
++        self.assertEqual([e.call.arguments for e in parse(raw, thinking=True) if e.kind == 'tool_call'], [EXPECTED])
++        quoted = '```\n<tool_call>' + body({}) + '</tool_call>\n```\n</think>\nTexte'
++        self.assertFalse([e for e in parse(quoted, thinking=True) if e.kind == 'tool_call'])
++
++    def test_http_openai_anthropic_and_streaming(self):
++        from serve.test_server import UnfinishedToolCall
++        helper = UnfinishedToolCall('test_parser')
++        helper.PROPS = SCHEMA['parameters']['properties']
++        raw = '</think>\n<tool_call>' + body().replace('function=subagent', 'function=write') + '</tool_call>'
++        for (api, stream), (finish, args) in helper.answers(raw, max_tokens=1000).items():
++            with self.subTest(api=api, stream=stream):
++                items = [args] if stream else args
++                self.assertEqual([json.loads(v) if isinstance(v, str) else v for v in items], [EXPECTED])
++                self.assertEqual(finish, 'tool_calls' if api == 'openai' else 'tool_use')
++
++    def test_http_missing_required_fields_is_error_not_empty_invocation(self):
++        from pathlib import Path
++        from serve.server import ByteTokenizer, MockEngine, Service, serve
++        from serve.frontend import ChatTemplate
++        from serve.test_server import CTX
++        tok = ByteTokenizer()
++        script = '</think>\n<tool_call><function=subagent>{}</function></tool_call>'
++        service = Service(MockEngine(tok, script, max_context=CTX), tok,
++                          ChatTemplate(Path(__file__).parent / 'chat_template.jinja'))
++        httpd = serve(service, port=0)
++        try:
++            for api, path in [('openai', '/v1/chat/completions'), ('anthropic', '/v1/messages')]:
++                tools = ([{'type': 'function', 'function': SCHEMA}] if api == 'openai' else
++                         [{'name': 'subagent', 'input_schema': SCHEMA['parameters']}])
++                for stream in (False, True):
++                    with self.subTest(api=api, stream=stream):
++                        payload = {'model': 'test', 'max_tokens': 500, 'stream': stream, 'tools': tools,
++                                   'messages': [{'role': 'user', 'content': 'Test'}]}
++                        req = urllib.request.Request(f'http://127.0.0.1:{httpd.server_port}' + path,
++                            data=json.dumps(payload).encode(), headers={'Content-Type': 'application/json',
++                            'anthropic-version': '2023-06-01'})
++                        if not stream:
++                            with self.assertRaises(urllib.error.HTTPError) as caught:
++                                urllib.request.urlopen(req, timeout=15)
++                            self.assertEqual(caught.exception.code, 400)
++                            message = json.load(caught.exception)['error']['message']
++                            caught.exception.close()
++                            self.assertIn('missing required fields: agent, description, prompt', message)
++                        else:
++                            with urllib.request.urlopen(req, timeout=15) as response:
++                                raw = response.read().decode()
++                            events = [json.loads(line[6:]) for line in raw.splitlines()
++                                      if line.startswith('data: {')]
++                            errors = [e for e in events if 'error' in e]
++                            self.assertTrue(errors, raw)
++                            self.assertIn('missing required fields', errors[0]['error']['message'])
++                            self.assertNotIn('"tool_calls"', raw)
++                            self.assertNotIn('"tool_use"', raw)
++        finally:
++            httpd.shutdown()
++            httpd.server_close()
++
++
++if __name__ == '__main__':
++    unittest.main()

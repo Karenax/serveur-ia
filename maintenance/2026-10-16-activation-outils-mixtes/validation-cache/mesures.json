@@ -1,0 +1,2119 @@
+{
+  "started_at_utc": "2026-10-16T17:08:30.042869+00:00",
+  "calls": [
+    {
+      "label": "A0_cold",
+      "wall_seconds": 14.406,
+      "usage": {
+        "prompt_tokens": 2992,
+        "completion_tokens": 4,
+        "total_tokens": 2996,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "content": "dossier reçu",
+      "request_metrics": {
+        "projection": null,
+        "time": 1792170896.9345102,
+        "duration_s": 14.3,
+        "finish": "stop",
+        "prompt_tokens": 2992,
+        "reused": 0,
+        "output_tokens": 4,
+        "prompt_total": 2992,
+        "prompt_read": 2992,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 4,
+        "prompt_ms": 13921.9,
+        "decode_ms": 371.5,
+        "decode_tok_s": 10.8,
+        "hit_rate": 0.251,
+        "pcie_share": 0.0,
+        "ram_blobs": 2845,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 6,
+        "drafts_accepted": 2
+      },
+      "cache_before": {
+        "enabled": true,
+        "budget_mib": 30720,
+        "slots": 20,
+        "parked": 0,
+        "bytes": 0,
+        "evictions": 0,
+        "parks": 0,
+        "restores": 0,
+        "last_event": null,
+        "last_tokens": null,
+        "last_at": null,
+        "requests": 1,
+        "requests_reused": 0,
+        "reused_tokens": 0,
+        "prompt_tokens": 40,
+        "last_reused": 0,
+        "last_prompt": 40
+      },
+      "cache_after": {
+        "enabled": true,
+        "budget_mib": 30720,
+        "slots": 20,
+        "parked": 1,
+        "bytes": 238000848,
+        "evictions": 0,
+        "parks": 1,
+        "restores": 0,
+        "last_event": "parked",
+        "last_tokens": 40,
+        "last_at": 1792170911.269621,
+        "requests": 2,
+        "requests_reused": 0,
+        "reused_tokens": 0,
+        "prompt_tokens": 3032,
+        "last_reused": 0,
+        "last_prompt": 2992
+      },
+      "memory_samples": [
+        {
+          "time": 1792170897.7633235,
+          "available_ram_bytes": 61817769984,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 22091423744,
+              "private": 59165720576
+            }
+          ]
+        },
+        {
+          "time": 1792170898.7792838,
+          "available_ram_bytes": 56331833344,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 24973033472,
+              "private": 59165720576
+            }
+          ]
+        },
+        {
+          "time": 1792170899.8003922,
+          "available_ram_bytes": 53634097152,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 27706130432,
+              "private": 59165720576
+            }
+          ]
+        },
+        {
+          "time": 1792170900.8275392,
+          "available_ram_bytes": 52997484544,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 32081461248,
+              "private": 59165720576
+            }
+          ]
+        },
+        {
+          "time": 1792170901.8430793,
+          "available_ram_bytes": 54190690304,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 37229154304,
+              "private": 59165720576
+            }
+          ]
+        },
+        {
+          "time": 1792170902.8595276,
+          "available_ram_bytes": 55131295744,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 41827835904,
+              "private": 59166666752
+            }
+          ]
+        },
+        {
+          "time": 1792170903.8796647,
+          "available_ram_bytes": 56244760576,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 47462494208,
+              "private": 59166666752
+            }
+          ]
+        },
+        {
+          "time": 1792170904.9084907,
+          "available_ram_bytes": 57365352448,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 52930322432,
+              "private": 59166666752
+            }
+          ]
+        },
+        {
+          "time": 1792170905.931369,
+          "available_ram_bytes": 58449043456,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 57192128512,
+              "private": 59166666752
+            }
+          ]
+        },
+        {
+          "time": 1792170906.9629889,
+          "available_ram_bytes": 59647799296,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 57192194048,
+              "private": 59166613504
+            }
+          ]
+        },
+        {
+          "time": 1792170907.9933689,
+          "available_ram_bytes": 60959096832,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 57192222720,
+              "private": 59166613504
+            }
+          ]
+        },
+        {
+          "time": 1792170909.0083916,
+          "available_ram_bytes": 62100492288,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 57192251392,
+              "private": 59166613504
+            }
+          ]
+        },
+        {
+          "time": 1792170910.0257008,
+          "available_ram_bytes": 62100017152,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 57192280064,
+              "private": 59166613504
+            }
+          ]
+        },
+        {
+          "time": 1792170911.0476089,
+          "available_ram_bytes": 61965000704,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 57320521728,
+              "private": 59293069312
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "A1_live_reference",
+      "wall_seconds": 1.859,
+      "usage": {
+        "prompt_tokens": 3026,
+        "completion_tokens": 4,
+        "total_tokens": 3030,
+        "prompt_tokens_details": {
+          "cached_tokens": 2997
+        }
+      },
+      "content": "Imprimerie",
+      "request_metrics": {
+        "projection": null,
+        "time": 1792170911.3288593,
+        "duration_s": 1.8,
+        "finish": "stop",
+        "prompt_tokens": 3026,
+        "reused": 2997,
+        "output_tokens": 4,
+        "prompt_total": 3026,
+        "prompt_read": 29,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 4,
+        "prompt_ms": 1671.5,
+        "decode_ms": 168.8,
+        "decode_tok_s": 23.7,
+        "hit_rate": 0.248,
+        "pcie_share": 0.0,
+        "ram_blobs": 1981,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 4,
+        "drafts_accepted": 2
+      },
+      "cache_before": {
+        "enabled": true,
+        "budget_mib": 30720,
+        "slots": 20,
+        "parked": 1,
+        "bytes": 238000848,
+        "evictions": 0,
+        "parks": 1,
+        "restores": 0,
+        "last_event": "parked",
+        "last_tokens": 40,
+        "last_at": 1792170911.269621,
+        "requests": 2,
+        "requests_reused": 0,
+        "reused_tokens": 0,
+        "prompt_tokens": 3032,
+        "last_reused": 0,
+        "last_prompt": 2992
+      },
+      "cache_after": {
+        "enabled": true,
+        "budget_mib": 30720,
+        "slots": 20,
+        "parked": 1,
+        "bytes": 238000848,
+        "evictions": 0,
+        "parks": 1,
+        "restores": 0,
+        "last_event": "parked",
+        "last_tokens": 40,
+        "last_at": 1792170911.269621,
+        "requests": 3,
+        "requests_reused": 1,
+        "reused_tokens": 2997,
+        "prompt_tokens": 6058,
+        "last_reused": 2997,
+        "last_prompt": 3026
+      },
+      "memory_samples": [
+        {
+          "time": 1792170911.3068447,
+          "available_ram_bytes": 61968371712,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 57329704960,
+              "private": 59300700160
+            }
+          ]
+        },
+        {
+          "time": 1792170912.3227844,
+          "available_ram_bytes": 61942706176,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 57330757632,
+              "private": 59300700160
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "B0_cold",
+      "wall_seconds": 12.61,
+      "usage": {
+        "prompt_tokens": 2892,
+        "completion_tokens": 5,
+        "total_tokens": 2897,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "content": "dossier reçu.",
+      "request_metrics": {
+        "projection": null,
+        "time": 1792170913.2583992,
+        "duration_s": 12.6,
+        "finish": "stop",
+        "prompt_tokens": 2892,
+        "reused": 0,
+        "output_tokens": 5,
+        "prompt_total": 2892,
+        "prompt_read": 2892,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 5,
+        "prompt_ms": 12279.3,
+        "decode_ms": 308.7,
+        "decode_tok_s": 16.2,
+        "hit_rate": 0.233,
+        "pcie_share": 0.0,
+        "ram_blobs": 3744,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 8,
+        "drafts_accepted": 2
+      },
+      "cache_before": {
+        "enabled": true,
+        "budget_mib": 30720,
+        "slots": 20,
+        "parked": 1,
+        "bytes": 238000848,
+        "evictions": 0,
+        "parks": 1,
+        "restores": 0,
+        "last_event": "parked",
+        "last_tokens": 40,
+        "last_at": 1792170911.269621,
+        "requests": 3,
+        "requests_reused": 1,
+        "reused_tokens": 2997,
+        "prompt_tokens": 6058,
+        "last_reused": 2997,
+        "last_prompt": 3026
+      },
+      "cache_after": {
+        "enabled": true,
+        "budget_mib": 30720,
+        "slots": 20,
+        "parked": 2,
+        "bytes": 678754168,
+        "evictions": 0,
+        "parks": 2,
+        "restores": 0,
+        "last_event": "parked",
+        "last_tokens": 3030,
+        "last_at": 1792170925.8814056,
+        "requests": 4,
+        "requests_reused": 1,
+        "reused_tokens": 2997,
+        "prompt_tokens": 8950,
+        "last_reused": 0,
+        "last_prompt": 2892
+      },
+      "memory_samples": [
+        {
+          "time": 1792170913.239295,
+          "available_ram_bytes": 61833420800,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 57449848832,
+              "private": 59419361280
+            }
+          ]
+        },
+        {
+          "time": 1792170914.2769043,
+          "available_ram_bytes": 61631905792,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 57655902208,
+              "private": 59625238528
+            }
+          ]
+        },
+        {
+          "time": 1792170915.2911363,
+          "available_ram_bytes": 61625016320,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 57655930880,
+              "private": 59625238528
+            }
+          ]
+        },
+        {
+          "time": 1792170916.321249,
+          "available_ram_bytes": 61636964352,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 57655959552,
+              "private": 59625238528
+            }
+          ]
+        },
+        {
+          "time": 1792170917.345117,
+          "available_ram_bytes": 61627068416,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 57655988224,
+              "private": 59625238528
+            }
+          ]
+        },
+        {
+          "time": 1792170918.3692427,
+          "available_ram_bytes": 61630361600,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 57656307712,
+              "private": 59625627648
+            }
+          ]
+        },
+        {
+          "time": 1792170919.390514,
+          "available_ram_bytes": 61620756480,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 57656373248,
+              "private": 59625627648
+            }
+          ]
+        },
+        {
+          "time": 1792170920.4106026,
+          "available_ram_bytes": 61650370560,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 57656426496,
+              "private": 59625627648
+            }
+          ]
+        },
+        {
+          "time": 1792170921.429842,
+          "available_ram_bytes": 61662568448,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 57656451072,
+              "private": 59625627648
+            }
+          ]
+        },
+        {
+          "time": 1792170922.4531844,
+          "available_ram_bytes": 61669736448,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 57656451072,
+              "private": 59625574400
+            }
+          ]
+        },
+        {
+          "time": 1792170923.4824164,
+          "available_ram_bytes": 61653045248,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 57656479744,
+              "private": 59625574400
+            }
+          ]
+        },
+        {
+          "time": 1792170924.4975033,
+          "available_ram_bytes": 61650268160,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 57656508416,
+              "private": 59625574400
+            }
+          ]
+        },
+        {
+          "time": 1792170925.5222723,
+          "available_ram_bytes": 61533573120,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 57774239744,
+              "private": 59743477760
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "C0_cold",
+      "wall_seconds": 12.578,
+      "usage": {
+        "prompt_tokens": 2942,
+        "completion_tokens": 4,
+        "total_tokens": 2946,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "content": "dossier reçu",
+      "request_metrics": {
+        "projection": null,
+        "time": 1792170925.9386902,
+        "duration_s": 12.6,
+        "finish": "stop",
+        "prompt_tokens": 2942,
+        "reused": 0,
+        "output_tokens": 4,
+        "prompt_total": 2942,
+        "prompt_read": 2942,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 4,
+        "prompt_ms": 12321.8,
+        "decode_ms": 235.9,
+        "decode_tok_s": 17.0,
+        "hit_rate": 0.247,
+        "pcie_share": 0.0,
+        "ram_blobs": 2862,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 6,
+        "drafts_accepted": 2
+      },
+      "cache_before": {
+        "enabled": true,
+        "budget_mib": 30720,
+        "slots": 20,
+        "parked": 2,
+        "bytes": 678754168,
+        "evictions": 0,
+        "parks": 2,
+        "restores": 0,
+        "last_event": "parked",
+        "last_tokens": 3030,
+        "last_at": 1792170925.8814056,
+        "requests": 4,
+        "requests_reused": 1,
+        "reused_tokens": 2997,
+        "prompt_tokens": 8950,
+        "last_reused": 0,
+        "last_prompt": 2892
+      },
+      "cache_after": {
+        "enabled": true,
+        "budget_mib": 30720,
+        "slots": 20,
+        "parked": 3,
+        "bytes": 997332152,
+        "evictions": 0,
+        "parks": 3,
+        "restores": 0,
+        "last_event": "parked",
+        "last_tokens": 2898,
+        "last_at": 1792170938.5337431,
+        "requests": 5,
+        "requests_reused": 1,
+        "reused_tokens": 2997,
+        "prompt_tokens": 11892,
+        "last_reused": 0,
+        "last_prompt": 2942
+      },
+      "memory_samples": [
+        {
+          "time": 1792170925.9226894,
+          "available_ram_bytes": 61522358272,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 57774600192,
+              "private": 59743477760
+            }
+          ]
+        },
+        {
+          "time": 1792170926.9465134,
+          "available_ram_bytes": 61333946368,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 57975599104,
+              "private": 59944361984
+            }
+          ]
+        },
+        {
+          "time": 1792170927.9624248,
+          "available_ram_bytes": 61342793728,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 57975623680,
+              "private": 59944361984
+            }
+          ]
+        },
+        {
+          "time": 1792170928.9797807,
+          "available_ram_bytes": 61338284032,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 57975652352,
+              "private": 59944361984
+            }
+          ]
+        },
+        {
+          "time": 1792170930.0018983,
+          "available_ram_bytes": 61337550848,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 57975681024,
+              "private": 59944361984
+            }
+          ]
+        },
+        {
+          "time": 1792170931.0162513,
+          "available_ram_bytes": 61343617024,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 57976438784,
+              "private": 59945013248
+            }
+          ]
+        },
+        {
+          "time": 1792170932.0332804,
+          "available_ram_bytes": 61336977408,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 57976496128,
+              "private": 59945013248
+            }
+          ]
+        },
+        {
+          "time": 1792170933.0531473,
+          "available_ram_bytes": 61336952832,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 57976545280,
+              "private": 59945013248
+            }
+          ]
+        },
+        {
+          "time": 1792170934.0791595,
+          "available_ram_bytes": 61334904832,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 57976573952,
+              "private": 59945013248
+            }
+          ]
+        },
+        {
+          "time": 1792170935.0954998,
+          "available_ram_bytes": 61335453696,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 57976557568,
+              "private": 59944960000
+            }
+          ]
+        },
+        {
+          "time": 1792170936.1277142,
+          "available_ram_bytes": 61286404096,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 57976586240,
+              "private": 59944960000
+            }
+          ]
+        },
+        {
+          "time": 1792170937.1490095,
+          "available_ram_bytes": 61333827584,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 57976619008,
+              "private": 59944960000
+            }
+          ]
+        },
+        {
+          "time": 1792170938.161056,
+          "available_ram_bytes": 61221052416,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 58094395392,
+              "private": 60062863360
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "A1_restored_after_B_C",
+      "wall_seconds": 0.89,
+      "usage": {
+        "prompt_tokens": 3026,
+        "completion_tokens": 4,
+        "total_tokens": 3030,
+        "prompt_tokens_details": {
+          "cached_tokens": 3019
+        }
+      },
+      "content": "Imprimerie",
+      "request_metrics": {
+        "projection": null,
+        "time": 1792170938.5738616,
+        "duration_s": 0.9,
+        "finish": "stop",
+        "prompt_tokens": 3026,
+        "reused": 3019,
+        "output_tokens": 4,
+        "prompt_total": 3026,
+        "prompt_read": 7,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 4,
+        "prompt_ms": 704.6,
+        "decode_ms": 169.9,
+        "decode_tok_s": 23.5,
+        "hit_rate": 0.248,
+        "pcie_share": 0.0,
+        "ram_blobs": 1981,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 4,
+        "drafts_accepted": 2
+      },
+      "cache_before": {
+        "enabled": true,
+        "budget_mib": 30720,
+        "slots": 20,
+        "parked": 3,
+        "bytes": 997332152,
+        "evictions": 0,
+        "parks": 3,
+        "restores": 0,
+        "last_event": "parked",
+        "last_tokens": 2898,
+        "last_at": 1792170938.5337431,
+        "requests": 5,
+        "requests_reused": 1,
+        "reused_tokens": 2997,
+        "prompt_tokens": 11892,
+        "last_reused": 0,
+        "last_prompt": 2942
+      },
+      "cache_after": {
+        "enabled": true,
+        "budget_mib": 30720,
+        "slots": 20,
+        "parked": 3,
+        "bytes": 961894192,
+        "evictions": 0,
+        "parks": 4,
+        "restores": 1,
+        "last_event": "restored",
+        "last_tokens": 3019,
+        "last_at": 1792170939.4619668,
+        "requests": 6,
+        "requests_reused": 2,
+        "reused_tokens": 6016,
+        "prompt_tokens": 14918,
+        "last_reused": 3019,
+        "last_prompt": 3026
+      },
+      "memory_samples": [
+        {
+          "time": 1792170938.5698586,
+          "available_ram_bytes": 61222502400,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 58094678016,
+              "private": 60062863360
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "B1_restored",
+      "wall_seconds": 1.875,
+      "usage": {
+        "prompt_tokens": 2927,
+        "completion_tokens": 2,
+        "total_tokens": 2929,
+        "prompt_tokens_details": {
+          "cached_tokens": 2898
+        }
+      },
+      "content": "Navigation",
+      "request_metrics": {
+        "projection": null,
+        "time": 1792170939.5386624,
+        "duration_s": 1.9,
+        "finish": "stop",
+        "prompt_tokens": 2927,
+        "reused": 2898,
+        "output_tokens": 2,
+        "prompt_total": 2927,
+        "prompt_read": 29,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 2,
+        "prompt_ms": 1743.1,
+        "decode_ms": 106.2,
+        "decode_tok_s": 18.8,
+        "hit_rate": 0.253,
+        "pcie_share": 0.0,
+        "ram_blobs": 1233,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 2,
+        "drafts_accepted": 2
+      },
+      "cache_before": {
+        "enabled": true,
+        "budget_mib": 30720,
+        "slots": 20,
+        "parked": 3,
+        "bytes": 961894192,
+        "evictions": 0,
+        "parks": 4,
+        "restores": 1,
+        "last_event": "restored",
+        "last_tokens": 3019,
+        "last_at": 1792170939.4619668,
+        "requests": 6,
+        "requests_reused": 2,
+        "reused_tokens": 6016,
+        "prompt_tokens": 14918,
+        "last_reused": 3019,
+        "last_prompt": 3026
+      },
+      "cache_after": {
+        "enabled": true,
+        "budget_mib": 30720,
+        "slots": 20,
+        "parked": 3,
+        "bytes": 1080352408,
+        "evictions": 0,
+        "parks": 5,
+        "restores": 2,
+        "last_event": "restored",
+        "last_tokens": 2898,
+        "last_at": 1792170941.401024,
+        "requests": 7,
+        "requests_reused": 3,
+        "reused_tokens": 8914,
+        "prompt_tokens": 17845,
+        "last_reused": 2898,
+        "last_prompt": 2927
+      },
+      "memory_samples": [
+        {
+          "time": 1792170939.5213745,
+          "available_ram_bytes": 61129535488,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 58179022848,
+              "private": 60147331072
+            }
+          ]
+        },
+        {
+          "time": 1792170940.5592842,
+          "available_ram_bytes": 61130735616,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 58179878912,
+              "private": 60148072448
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "C1_restored",
+      "wall_seconds": 1.921,
+      "usage": {
+        "prompt_tokens": 2976,
+        "completion_tokens": 5,
+        "total_tokens": 2981,
+        "prompt_tokens_details": {
+          "cached_tokens": 2947
+        }
+      },
+      "content": "Rubrique botanique",
+      "request_metrics": {
+        "projection": null,
+        "time": 1792170941.441369,
+        "duration_s": 1.9,
+        "finish": "stop",
+        "prompt_tokens": 2976,
+        "reused": 2947,
+        "output_tokens": 5,
+        "prompt_total": 2976,
+        "prompt_read": 29,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 5,
+        "prompt_ms": 1749.5,
+        "decode_ms": 166.5,
+        "decode_tok_s": 30.0,
+        "hit_rate": 0.263,
+        "pcie_share": 0.0,
+        "ram_blobs": 1902,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 4,
+        "drafts_accepted": 4
+      },
+      "cache_before": {
+        "enabled": true,
+        "budget_mib": 30720,
+        "slots": 20,
+        "parked": 3,
+        "bytes": 1080352408,
+        "evictions": 0,
+        "parks": 5,
+        "restores": 2,
+        "last_event": "restored",
+        "last_tokens": 2898,
+        "last_at": 1792170941.401024,
+        "requests": 7,
+        "requests_reused": 3,
+        "reused_tokens": 8914,
+        "prompt_tokens": 17845,
+        "last_reused": 2898,
+        "last_prompt": 2927
+      },
+      "cache_after": {
+        "enabled": true,
+        "budget_mib": 30720,
+        "slots": 20,
+        "parked": 3,
+        "bytes": 1362136352,
+        "evictions": 0,
+        "parks": 6,
+        "restores": 3,
+        "last_event": "restored",
+        "last_tokens": 2947,
+        "last_at": 1792170943.387704,
+        "requests": 8,
+        "requests_reused": 4,
+        "reused_tokens": 11861,
+        "prompt_tokens": 20821,
+        "last_reused": 2947,
+        "last_prompt": 2976
+      },
+      "memory_samples": [
+        {
+          "time": 1792170941.4373703,
+          "available_ram_bytes": 61013336064,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 58297937920,
+              "private": 60265984000
+            }
+          ]
+        },
+        {
+          "time": 1792170942.4588177,
+          "available_ram_bytes": 61017907200,
+          "engine_memory": [
+            {
+              "pid": 19128,
+              "rss": 58299895808,
+              "private": 60430163968
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "purpose": "Integration after activation of hybrid JSON/XML and required-field fix",
+  "metrics_before": {
+    "engine": {
+      "model": "qwen3.8-flash-next-iq4-xs",
+      "max_context": 262144,
+      "images": true,
+      "version": "0.1.43.1",
+      "logit_bias": 1,
+      "context": 262144,
+      "kv": "fp16",
+      "kv_resident": 0,
+      "expert_slots": 3786,
+      "expert_cache_mib": 9612,
+      "expert_slots_primary": 2323,
+      "expert_cache_primary_mib": 5898,
+      "spec": 5,
+      "mtp_max": 3,
+      "lookup": 3,
+      "vram_free_mib": 2233,
+      "cvec": 0,
+      "arena_mib": 52787,
+      "pool_workers": 15,
+      "pcie_frac": "0.00",
+      "spec_min_p": "0.50",
+      "conversation_cache_mib": 30720,
+      "conversation_cache_slots": 20,
+      "conversation_cache_min_free_mib": 6144,
+      "conversation_cache_min_tokens": 0,
+      "tail_role_token": -1,
+      "vram_elastic": 0,
+      "engine": "0.1.43.1"
+    },
+    "live": {
+      "state": "idle",
+      "queued": 0,
+      "phase": null,
+      "prompt_tokens": null,
+      "prompt_read": null,
+      "prompt_total": null,
+      "generated": null,
+      "max_tokens": null,
+      "elapsed_s": null,
+      "tok_s": null,
+      "tok_s_mean": null,
+      "prefill_tok_s_mean": null,
+      "tok_s_window_s": null
+    },
+    "requests": [
+      {
+        "projection": null,
+        "time": 1792170892.6236603,
+        "duration_s": 4.1,
+        "finish": "length",
+        "prompt_tokens": 40,
+        "reused": 0,
+        "output_tokens": 1,
+        "prompt_total": 40,
+        "prompt_read": 40,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 1,
+        "prompt_ms": 3949.2,
+        "decode_ms": 140.3,
+        "decode_tok_s": 7.1,
+        "hit_rate": 0.394,
+        "pcie_share": 0.0,
+        "ram_blobs": 291,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 0,
+        "drafts_accepted": 0
+      }
+    ],
+    "conversation_cache": {
+      "enabled": true,
+      "budget_mib": 30720,
+      "slots": 20,
+      "parked": 0,
+      "bytes": 0,
+      "evictions": 0,
+      "parks": 0,
+      "restores": 0,
+      "last_event": null,
+      "last_tokens": null,
+      "last_at": null,
+      "requests": 1,
+      "requests_reused": 0,
+      "reused_tokens": 0,
+      "prompt_tokens": 40,
+      "last_reused": 0,
+      "last_prompt": 40
+    },
+    "requests_kept": 1,
+    "totals": {
+      "since": 1792170889.5663204,
+      "requests": 1,
+      "prompt_tokens": 40,
+      "reused": 0,
+      "output_tokens": 1,
+      "prompt_ms": 3949.2,
+      "decode_ms": 140.3,
+      "drafts_offered": 0,
+      "drafts_accepted": 0
+    },
+    "hardware": {
+      "gpu_util": 4,
+      "gpu_mem_used": 2527592448,
+      "gpu_mem_total": 5368709120,
+      "gpu_temp": 40,
+      "gpu_power": 5.762,
+      "gpu_power_limit": 75.0,
+      "gpu_pcie_gen": 3,
+      "gpu_pcie_gen_max": 3,
+      "gpu_pcie_width": 16,
+      "gpu_pcie_rx_mb": 0.0,
+      "gpu_pcie_tx_mb": 0.0,
+      "cpu": 21.5,
+      "ram_used": 75644514304,
+      "ram_total": 137284874240,
+      "disk_read_mb": 1.032263120375693,
+      "disk_write_mb": 2.3855126527410007,
+      "tok_s": 0.0,
+      "tok_s_mean": 0,
+      "prefill_tok_s_mean": 10.4
+    },
+    "hardware_static": {
+      "gpu_name": "Quadro P2200",
+      "gpu_count": 1,
+      "gpu_note": null,
+      "cpu_name": "AMD Ryzen Threadripper PRO 3955WX 16-Cores",
+      "cores": 16,
+      "threads": 32,
+      "psutil": true
+    },
+    "history": {
+      "gpu_util": [
+        4,
+        11,
+        9,
+        4,
+        4,
+        11,
+        4
+      ],
+      "gpu_mem_used": [
+        2523594752,
+        2527920128,
+        2527395840,
+        2527395840,
+        2523594752,
+        2528182272,
+        2527592448
+      ],
+      "gpu_temp": [
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40
+      ],
+      "gpu_power": [
+        6.05,
+        6.44,
+        5.96,
+        5.96,
+        6.05,
+        5.47,
+        5.76
+      ],
+      "gpu_pcie_rx_mb": [
+        0.98,
+        12.7,
+        0.0,
+        0.0,
+        0.98,
+        4.88,
+        0.0
+      ],
+      "cpu": [
+        0.0,
+        8.6,
+        7.2,
+        12.1,
+        37.6,
+        26.8,
+        21.5
+      ],
+      "ram_used": [
+        75299725312,
+        75311816704,
+        75330473984,
+        75511664640,
+        77666844672,
+        76450533376,
+        75644514304
+      ],
+      "disk_read_mb": [
+        null,
+        0.05,
+        0.0,
+        4.21,
+        0.25,
+        0.04,
+        1.03
+      ],
+      "tok_s": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "prefill_tok_s_mean": [
+        0.0,
+        0.0,
+        0.0,
+        null,
+        null,
+        null,
+        10.4
+      ]
+    },
+    "time": 1792170896.8172376
+  },
+  "run_directory": "D:\\Serveur IA\\lanceur\\sessions\\20261016-191036-149585",
+  "ready_at_utc": "2026-10-16T17:14:56.826369+00:00",
+  "reference_and_restored_content_identical": true,
+  "metrics_after": {
+    "engine": {
+      "model": "qwen3.8-flash-next-iq4-xs",
+      "max_context": 262144,
+      "images": true,
+      "version": "0.1.43.1",
+      "logit_bias": 1,
+      "context": 262144,
+      "kv": "fp16",
+      "kv_resident": 0,
+      "expert_slots": 3786,
+      "expert_cache_mib": 9612,
+      "expert_slots_primary": 2323,
+      "expert_cache_primary_mib": 5898,
+      "spec": 5,
+      "mtp_max": 3,
+      "lookup": 3,
+      "vram_free_mib": 2233,
+      "cvec": 0,
+      "arena_mib": 52787,
+      "pool_workers": 15,
+      "pcie_frac": "0.00",
+      "spec_min_p": "0.50",
+      "conversation_cache_mib": 30720,
+      "conversation_cache_slots": 20,
+      "conversation_cache_min_free_mib": 6144,
+      "conversation_cache_min_tokens": 0,
+      "tail_role_token": -1,
+      "vram_elastic": 0,
+      "engine": "0.1.43.1"
+    },
+    "live": {
+      "state": "idle",
+      "queued": 0,
+      "phase": null,
+      "prompt_tokens": null,
+      "prompt_read": null,
+      "prompt_total": null,
+      "generated": null,
+      "max_tokens": null,
+      "elapsed_s": null,
+      "tok_s": null,
+      "tok_s_mean": null,
+      "prefill_tok_s_mean": null,
+      "tok_s_window_s": null
+    },
+    "requests": [
+      {
+        "projection": null,
+        "time": 1792170941.441369,
+        "duration_s": 1.9,
+        "finish": "stop",
+        "prompt_tokens": 2976,
+        "reused": 2947,
+        "output_tokens": 5,
+        "prompt_total": 2976,
+        "prompt_read": 29,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 5,
+        "prompt_ms": 1749.5,
+        "decode_ms": 166.5,
+        "decode_tok_s": 30.0,
+        "hit_rate": 0.263,
+        "pcie_share": 0.0,
+        "ram_blobs": 1902,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 4,
+        "drafts_accepted": 4
+      },
+      {
+        "projection": null,
+        "time": 1792170939.5386624,
+        "duration_s": 1.9,
+        "finish": "stop",
+        "prompt_tokens": 2927,
+        "reused": 2898,
+        "output_tokens": 2,
+        "prompt_total": 2927,
+        "prompt_read": 29,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 2,
+        "prompt_ms": 1743.1,
+        "decode_ms": 106.2,
+        "decode_tok_s": 18.8,
+        "hit_rate": 0.253,
+        "pcie_share": 0.0,
+        "ram_blobs": 1233,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 2,
+        "drafts_accepted": 2
+      },
+      {
+        "projection": null,
+        "time": 1792170938.5738616,
+        "duration_s": 0.9,
+        "finish": "stop",
+        "prompt_tokens": 3026,
+        "reused": 3019,
+        "output_tokens": 4,
+        "prompt_total": 3026,
+        "prompt_read": 7,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 4,
+        "prompt_ms": 704.6,
+        "decode_ms": 169.9,
+        "decode_tok_s": 23.5,
+        "hit_rate": 0.248,
+        "pcie_share": 0.0,
+        "ram_blobs": 1981,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 4,
+        "drafts_accepted": 2
+      },
+      {
+        "projection": null,
+        "time": 1792170925.9386902,
+        "duration_s": 12.6,
+        "finish": "stop",
+        "prompt_tokens": 2942,
+        "reused": 0,
+        "output_tokens": 4,
+        "prompt_total": 2942,
+        "prompt_read": 2942,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 4,
+        "prompt_ms": 12321.8,
+        "decode_ms": 235.9,
+        "decode_tok_s": 17.0,
+        "hit_rate": 0.247,
+        "pcie_share": 0.0,
+        "ram_blobs": 2862,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 6,
+        "drafts_accepted": 2
+      },
+      {
+        "projection": null,
+        "time": 1792170913.2583992,
+        "duration_s": 12.6,
+        "finish": "stop",
+        "prompt_tokens": 2892,
+        "reused": 0,
+        "output_tokens": 5,
+        "prompt_total": 2892,
+        "prompt_read": 2892,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 5,
+        "prompt_ms": 12279.3,
+        "decode_ms": 308.7,
+        "decode_tok_s": 16.2,
+        "hit_rate": 0.233,
+        "pcie_share": 0.0,
+        "ram_blobs": 3744,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 8,
+        "drafts_accepted": 2
+      },
+      {
+        "projection": null,
+        "time": 1792170911.3288593,
+        "duration_s": 1.8,
+        "finish": "stop",
+        "prompt_tokens": 3026,
+        "reused": 2997,
+        "output_tokens": 4,
+        "prompt_total": 3026,
+        "prompt_read": 29,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 4,
+        "prompt_ms": 1671.5,
+        "decode_ms": 168.8,
+        "decode_tok_s": 23.7,
+        "hit_rate": 0.248,
+        "pcie_share": 0.0,
+        "ram_blobs": 1981,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 4,
+        "drafts_accepted": 2
+      },
+      {
+        "projection": null,
+        "time": 1792170896.9345102,
+        "duration_s": 14.3,
+        "finish": "stop",
+        "prompt_tokens": 2992,
+        "reused": 0,
+        "output_tokens": 4,
+        "prompt_total": 2992,
+        "prompt_read": 2992,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 4,
+        "prompt_ms": 13921.9,
+        "decode_ms": 371.5,
+        "decode_tok_s": 10.8,
+        "hit_rate": 0.251,
+        "pcie_share": 0.0,
+        "ram_blobs": 2845,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 6,
+        "drafts_accepted": 2
+      },
+      {
+        "projection": null,
+        "time": 1792170892.6236603,
+        "duration_s": 4.1,
+        "finish": "length",
+        "prompt_tokens": 40,
+        "reused": 0,
+        "output_tokens": 1,
+        "prompt_total": 40,
+        "prompt_read": 40,
+        "reasoning_recoveries": 0,
+        "reasoning_repeat_coverage": 0.0,
+        "engine_generated": 1,
+        "prompt_ms": 3949.2,
+        "decode_ms": 140.3,
+        "decode_tok_s": 7.1,
+        "hit_rate": 0.394,
+        "pcie_share": 0.0,
+        "ram_blobs": 291,
+        "file_blobs": 0,
+        "file_mb": 0,
+        "drafts_offered": 0,
+        "drafts_accepted": 0
+      }
+    ],
+    "conversation_cache": {
+      "enabled": true,
+      "budget_mib": 30720,
+      "slots": 20,
+      "parked": 3,
+      "bytes": 1362136352,
+      "evictions": 0,
+      "parks": 6,
+      "restores": 3,
+      "last_event": "restored",
+      "last_tokens": 2947,
+      "last_at": 1792170943.387704,
+      "requests": 8,
+      "requests_reused": 4,
+      "reused_tokens": 11861,
+      "prompt_tokens": 20821,
+      "last_reused": 2947,
+      "last_prompt": 2976
+    },
+    "requests_kept": 8,
+    "totals": {
+      "since": 1792170889.5663204,
+      "requests": 8,
+      "prompt_tokens": 20821,
+      "reused": 11861,
+      "output_tokens": 29,
+      "prompt_ms": 48340.899999999994,
+      "decode_ms": 1667.8000000000002,
+      "drafts_offered": 34,
+      "drafts_accepted": 16
+    },
+    "hardware": {
+      "gpu_util": 3,
+      "gpu_mem_used": 2520186880,
+      "gpu_mem_total": 5368709120,
+      "gpu_temp": 39,
+      "gpu_power": 5.277,
+      "gpu_power_limit": 75.0,
+      "gpu_pcie_gen": 3,
+      "gpu_pcie_gen_max": 3,
+      "gpu_pcie_width": 16,
+      "gpu_pcie_rx_mb": 1.953125,
+      "gpu_pcie_tx_mb": 0.0,
+      "cpu": 11.6,
+      "ram_used": 76266844160,
+      "ram_total": 137284874240,
+      "disk_read_mb": 0.03647885533341839,
+      "disk_write_mb": 0.37573220993420936,
+      "tok_s": 0.0,
+      "tok_s_mean": 0,
+      "prefill_tok_s_mean": null
+    },
+    "hardware_static": {
+      "gpu_name": "Quadro P2200",
+      "gpu_count": 1,
+      "gpu_note": null,
+      "cpu_name": "AMD Ryzen Threadripper PRO 3955WX 16-Cores",
+      "cores": 16,
+      "threads": 32,
+      "psutil": true
+    },
+    "history": {
+      "gpu_util": [
+        4,
+        11,
+        9,
+        4,
+        4,
+        11,
+        4,
+        7,
+        4,
+        10,
+        4,
+        4,
+        4,
+        7,
+        3,
+        3,
+        12,
+        4,
+        4,
+        4,
+        9,
+        11,
+        8,
+        3,
+        4,
+        4,
+        9,
+        3,
+        4,
+        10,
+        4,
+        7,
+        4,
+        4,
+        3,
+        8,
+        4,
+        4,
+        4,
+        8,
+        4,
+        4,
+        8,
+        9,
+        5,
+        4,
+        8,
+        4,
+        4,
+        3
+      ],
+      "gpu_mem_used": [
+        2523594752,
+        2527920128,
+        2527395840,
+        2527395840,
+        2523594752,
+        2528182272,
+        2527592448,
+        2528706560,
+        2522152960,
+        2529361920,
+        2528051200,
+        2524250112,
+        2521300992,
+        2528182272,
+        2528051200,
+        2515927040,
+        2528444416,
+        2528051200,
+        2529492992,
+        2525233152,
+        2528837632,
+        2529296384,
+        2530607104,
+        2527199232,
+        2525298688,
+        2520973312,
+        2525888512,
+        2525888512,
+        2526216192,
+        2527657984,
+        2527068160,
+        2525691904,
+        2525691904,
+        2525691904,
+        2515468288,
+        2525691904,
+        2525822976,
+        2525822976,
+        2521890816,
+        2525298688,
+        2525429760,
+        2521366528,
+        2525298688,
+        2525429760,
+        2524774400,
+        2523267072,
+        2524119040,
+        2524250112,
+        2524381184,
+        2520186880
+      ],
+      "gpu_temp": [
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        39,
+        39,
+        40,
+        40,
+        40,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39
+      ],
+      "gpu_power": [
+        6.05,
+        6.44,
+        5.96,
+        5.96,
+        6.05,
+        5.47,
+        5.76,
+        5.66,
+        6.34,
+        6.73,
+        5.86,
+        6.05,
+        5.95,
+        6.26,
+        6.26,
+        5.48,
+        6.25,
+        5.77,
+        5.57,
+        5.96,
+        5.67,
+        5.57,
+        6.25,
+        5.57,
+        5.76,
+        5.66,
+        6.74,
+        5.87,
+        6.17,
+        6.26,
+        6.06,
+        5.96,
+        5.86,
+        5.66,
+        5.47,
+        5.96,
+        5.47,
+        6.25,
+        5.97,
+        5.97,
+        5.49,
+        6.26,
+        5.38,
+        5.86,
+        5.57,
+        6.15,
+        5.66,
+        6.25,
+        5.96,
+        5.28
+      ],
+      "gpu_pcie_rx_mb": [
+        0.98,
+        12.7,
+        0.0,
+        0.0,
+        0.98,
+        4.88,
+        0.0,
+        1.95,
+        1.95,
+        2.93,
+        0.0,
+        1.95,
+        0.0,
+        1.95,
+        0.0,
+        1.95,
+        1.95,
+        1.95,
+        1.95,
+        1.95,
+        0.98,
+        5.86,
+        0.0,
+        1.95,
+        0.98,
+        0.0,
+        0.98,
+        1.95,
+        2.93,
+        0.98,
+        0.0,
+        1.95,
+        1.95,
+        1.95,
+        1.95,
+        1.95,
+        1.95,
+        0.0,
+        0.98,
+        2.93,
+        5.86,
+        0.0,
+        1.95,
+        0.98,
+        1.95,
+        0.0,
+        4.88,
+        0.98,
+        1.95,
+        1.95
+      ],
+      "cpu": [
+        0.0,
+        8.6,
+        7.2,
+        12.1,
+        37.6,
+        26.8,
+        21.5,
+        35.8,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        93.3,
+        98.7,
+        100.0,
+        100.0,
+        88.2,
+        40.5,
+        31.0,
+        20.0,
+        17.3,
+        12.6,
+        19.0,
+        100.0,
+        100.0,
+        100.0,
+        91.0,
+        100.0,
+        100.0,
+        100.0,
+        74.0,
+        34.9,
+        26.5,
+        14.7,
+        49.2,
+        100.0,
+        100.0,
+        100.0,
+        91.9,
+        100.0,
+        100.0,
+        100.0,
+        58.0,
+        29.7,
+        28.8,
+        10.1,
+        17.9,
+        19.8,
+        15.7,
+        11.6
+      ],
+      "ram_used": [
+        75299725312,
+        75311816704,
+        75330473984,
+        75511664640,
+        77666844672,
+        76450533376,
+        75644514304,
+        76492955648,
+        79701073920,
+        82516893696,
+        84698296320,
+        83470143488,
+        82397417472,
+        81253376000,
+        80101707776,
+        78898847744,
+        77646454784,
+        76290330624,
+        75183513600,
+        75183493120,
+        75318251520,
+        75342262272,
+        75659010048,
+        75663720448,
+        75658444800,
+        75655634944,
+        75655204864,
+        75652218880,
+        75627900928,
+        75617660928,
+        75620769792,
+        75634266112,
+        75640995840,
+        75752419328,
+        75953647616,
+        75951284224,
+        75950305280,
+        75947614208,
+        75981467648,
+        75949830144,
+        75968643072,
+        75949035520,
+        75942391808,
+        75999444992,
+        75951022080,
+        76063776768,
+        76147204096,
+        76154372096,
+        76271566848,
+        76266844160
+      ],
+      "disk_read_mb": [
+        null,
+        0.05,
+        0.0,
+        4.21,
+        0.25,
+        0.04,
+        1.03,
+        9.04,
+        1.83,
+        0.12,
+        0.09,
+        0.08,
+        0.05,
+        0.02,
+        0.09,
+        0.03,
+        0.26,
+        9.82,
+        0.09,
+        0.06,
+        0.87,
+        1.12,
+        0.87,
+        0.04,
+        0.06,
+        0.04,
+        0.03,
+        0.05,
+        0.2,
+        0.04,
+        0.04,
+        0.49,
+        0.04,
+        0.04,
+        0.62,
+        0.04,
+        0.04,
+        0.04,
+        3.59,
+        0.12,
+        0.06,
+        0.04,
+        0.09,
+        0.12,
+        0.24,
+        0.07,
+        0.08,
+        0.04,
+        0.19,
+        0.04
+      ],
+      "tok_s": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        7.52,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "prefill_tok_s_mean": [
+        0.0,
+        0.0,
+        0.0,
+        null,
+        null,
+        null,
+        10.4,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        205.7,
+        205.7,
+        205.7,
+        205.7,
+        0.0,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        241.4,
+        241.4,
+        241.4,
+        247.0,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        242.0,
+        242.0,
+        242.0,
+        250.3,
+        null,
+        null,
+        0.0,
+        null
+      ]
+    },
+    "time": 1792170943.3918157
+  },
+  "passed": true,
+  "finished_at_utc": "2026-10-16T17:15:43.391815+00:00"
+}

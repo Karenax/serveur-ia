@@ -46,7 +46,12 @@
     "--ple-gguf",
     "C:/Temp/Strata-ngram-recherche/iq4-xs-ple-iq4_nl.gguf",
     "--conversation-cache-mib",
-    "0"
+    "30720",
+    "--vision",
+    "--conversation-cache-slots",
+    "20",
+    "--conversation-cache-min-free-mib",
+    "6144"
   ],
   "env": {
     "CUDA_VISIBLE_DEVICES": "GPU-a39f1b57-5a26-b53d-e943-44ef8042a438,GPU-486d5352-582e-2880-78bf-3dec4688e142",
@@ -77,5 +82,14 @@
   "min_free_vram_mib": 14000,
   "server_env": {
     "STRATA_ENGINE_READY_S": "3600"
+  },
+  "vision": {
+    "exe": "D:\\Serveur IA\\dependances\\strata-0.1.43.1\\vision-p2200-cuda12.4\\strata-vision.exe",
+    "mmproj": "D:\\Serveur IA\\strata-data\\vision\\mmproj-Qwen3.8-Flash-Next-BF16.gguf",
+    "model": "D:/Serveur IA/strata-data/model-q4/Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
+    "gpu": true,
+    "threads": 4,
+    "max_tokens": 1024,
+    "cuda_device": "GPU-97ca6406-8625-b829-b053-191c238ff046"
   }
 }
