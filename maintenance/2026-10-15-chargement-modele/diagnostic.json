@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-15T22:20:10.0542582+02:00",
+  "total_ram_gib": 127.86,
+  "available_ram_gib": 43.61,
+  "engine_pid": 23172,
+  "engine_working_set_gib": 63.65,
+  "engine_private_commit_gib": 53.49,
+  "run": {
+    "status": "chargement",
+    "started": "2026-10-15T21:45:40.998517+02:00",
+    "started_epoch": 1792093540.9985175,
+    "supervisor": {
+      "pid": 17044,
+      "created": 1792093540.7581284
+    },
+    "config_path": "D:\\Serveur IA\\lanceur\\sessions\\20261015-214540-503961\\strata.json",
+    "host": "127.0.0.1",
+    "port": 8080,
+    "model": "qwen3.8-flash-next-iq4-xs",
+    "min_free_ram_gib": 6.0,
+    "server": {
+      "pid": 17376,
+      "created": 1792093541.1330218
+    },
+    "available_ram_gib": 43.76
+  },
+  "observations": [
+    "Un seul moteur texte Strata actif, encodeur visuel separe sur P2200.",
+    "Copie resident-cpu-experts de 51.55 Gio depuis GGUF sur HDD D:.",
+    "Jalons observes : couche 8 en 588 s, 16 en 1082 s, 24 en 1414 s.",
+    "Lecture HDD mesuree a 13.8 Mo/s, file disque 7 ; GPU texte inactifs pendant cette copie.",
+    "Pages sources mappees et destination privee coexistent pendant la copie.",
+    "Fichier echange mesure : 0 Mio utilise, pic 1 Mio.",
+    "Absence de preuve de fuite memoire ; niveau final apres chargement non encore mesure.",
+    "Aucune modification de configuration, purge memoire ou interruption du chargement."
+  ],
+  "estimation": "Ordre de grandeur 45 a 60 minutes au total, estimation non garantie, precedent a froid environ 50 minutes."
+}

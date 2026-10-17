@@ -10,6 +10,7 @@ import time
 import urllib.request
 import psutil
 from core import ROOT, PYTHON, HIDDEN, read_json, write_json, health, process_identity, stop_processes
+from startup_memory import reclaim_loader
 
 def supervise(config_path, run_dir, floor=6, mock=False):
     cfg = read_json(config_path)
@@ -38,11 +39,17 @@ def supervise(config_path, run_dir, floor=6, mock=False):
         save()
         deadline = time.monotonic() + 90 * 60
         low_since = None
+        reclaim_attempted = False
         while time.monotonic() < deadline:
             if server.poll() is not None:
                 raise RuntimeError('Le serveur a quitté pendant le chargement ; consulter son journal.')
             free = psutil.virtual_memory().available / 2**30
             state['available_ram_gib'] = round(free, 2)
+            if not reclaim_attempted and free < floor + 16 and '--resident-cpu-experts' in cfg.get('args', []):
+                reclaim_attempted = True
+                state['startup_memory_reclaim'] = reclaim_loader(cfg, state['server'])
+                free = psutil.virtual_memory().available / 2**30
+                state['available_ram_gib'] = round(free, 2)
             if free < floor:
                 if low_since is None:
                     low_since = time.monotonic()

@@ -94,7 +94,62 @@ async function request(path,data){
 let toastTimer;function toast(message,error=false){$('toast').textContent=message;$('toast').className='toast show'+(error?' error':'');clearTimeout(toastTimer);toastTimer=setTimeout(()=>{$('toast').className='toast';},error?10000:4500);}
 async function action(work){if(actionBusy)return;actionBusy=true;updateButtons();try{await work();}catch(error){toast(error.message,true);}finally{actionBusy=false;await refresh();}}
 function updateButtons(){$('start').disabled=actionBusy||!!liveState.running;$('stop').disabled=actionBusy||!liveState.running;for(const id of ['save','set-default'])$(id).disabled=actionBusy;}
+function modelLoadProgress(s){
+  const visible=['chargement','validation_cuda','erreur'].includes(s.status);
+  const elapsed=Number.isFinite(s.elapsed_seconds)?Math.max(0,s.elapsed_seconds):null;
+  const result={visible,step:0,phase:'Lecture des fichiers du modèle',percent:null,detail:'Préparation des poids et de l’encodeur visuel.',elapsed,status:s.status};
+  let totalGiB=null;
+  const format=n=>Number(n).toLocaleString('fr-FR',{maximumFractionDigits:2});
+  for(const line of (s.logs||'').split(/\r?\n/)){
+    let match;
+    if(/engine started:|weights loaded|native projection matrices|mapping the experts/.test(line)){
+      Object.assign(result,{step:0,phase:'Lecture des fichiers du modèle',percent:null,detail:'Chargement des poids depuis le disque.'});
+    }
+    if(/expert cache auto:|filling the GPU|pre-filled \d+ of|layer split:.*expert cache/.test(line)){
+      Object.assign(result,{step:1,phase:'Préparation des cartes graphiques',percent:null,detail:'Chargement du cache des experts sur les GPU.'});
+    }
+    if((match=line.match(/allocating ([\d.]+) GiB .*resident cache complement/))){
+      totalGiB=Number(match[1]);
+      Object.assign(result,{step:2,phase:'Copie des experts en RAM',percent:0,detail:`0 / ${format(totalGiB)} Go copiés depuis le disque.`});
+    }
+    if((match=line.match(/copied cache complement through layer (\d+)\/(\d+) \(([\d.]+) GiB,/))){
+      const layer=Number(match[1]),layers=Number(match[2]),copied=Number(match[3]);
+      const percent=totalGiB>0?copied/totalGiB*100:layers>0?layer/layers*100:null;
+      Object.assign(result,{step:2,phase:'Copie des experts en RAM',percent:percent===null?null:Math.min(100,Math.max(0,percent)),
+        detail:`${format(copied)}${totalGiB>0?' / '+format(totalGiB):''} Go copiés · couche ${layer} / ${layers}.`});
+    }
+    if(/resident cache complement ready:|resident RAM mode:|capturing the .*window|listening|model ready/.test(line)){
+      Object.assign(result,{step:3,phase:'Finalisation du chargement',percent:null,detail:'Initialisation du moteur et préparation de la validation.'});
+    }
+  }
+  if(s.status==='validation_cuda')Object.assign(result,{step:3,phase:'Validation du modèle',percent:null,detail:'Le modèle est chargé. Vérification du calcul sur les GPU.'});
+  if(s.status==='pret')Object.assign(result,{step:4,phase:'Modèle prêt',percent:100,detail:'Chargement terminé. Le serveur peut répondre aux demandes.'});
+  if(s.status==='erreur')Object.assign(result,{phase:'Chargement interrompu',detail:s.error||'Consultez les journaux pour connaître la cause.'});
+  return result;
+}
+function renderModelLoadProgress(s){
+  const view=modelLoadProgress(s),box=$('model-load-progress');box.hidden=!view.visible;
+  if(!view.visible)return;
+  const failed=view.status==='erreur',ready=view.status==='pret',bar=$('model-load-meter');
+  box.classList.toggle('is-error',failed);box.classList.toggle('is-ready',ready);
+  $('model-load-title').textContent=view.phase;
+  $('model-load-percent').textContent=view.percent===null?'':Math.floor(view.percent)+' %';
+  $('model-load-detail').textContent=view.detail;
+  $('model-load-time').textContent=view.elapsed===null?'':`${ready?'Chargé en':'Temps écoulé :'} ${Math.floor(view.elapsed/60)} min ${Math.floor(view.elapsed%60)} s`;
+  $('model-load-hint').textContent=failed?'':view.step===2?'Progression mesurée, actualisée à chaque bloc chargé.':ready?'':'Le moteur ne fournit pas de pourcentage pour cette étape.';
+  bar.classList.toggle('indeterminate',view.percent===null&&!failed);
+  bar.setAttribute('aria-label',view.phase);
+  if(view.percent===null)bar.removeAttribute('aria-valuenow');else bar.setAttribute('aria-valuenow',String(Math.floor(view.percent)));
+  bar.setAttribute('aria-valuetext',view.phase+(view.percent===null?'':` : ${Math.floor(view.percent)} %`));
+  bar.querySelector('i').style.width=view.percent===null?'':view.percent+'%';
+  box.querySelectorAll('[data-load-step]').forEach(node=>{
+    const step=Number(node.dataset.loadStep);node.classList.toggle('complete',step<view.step);
+    node.classList.toggle('current',step===view.step&&!failed);
+    if(step===view.step&&!failed)node.setAttribute('aria-current','step');else node.removeAttribute('aria-current');
+  });
+}
 function renderState(s){
+  renderModelLoadProgress(s);
   liveState=s;$('queue-status').textContent=`Demandes : ${s.queue?.active||0} active · ${s.queue?.waiting||0} en attente · ${s.queue?.completed||0} terminées · ${s.queue?.tokens_per_second??"—"} tokens/s`;$('ops-status').textContent=`Version ${s.operations?.version||'—'} · ${s.operations?.error||'Surveillance disponible'}`;const names={pret:'Prêt',chargement:'Chargement',validation_cuda:'Validation CUDA',arrete:'Arrêté',erreur:'Erreur'};const name=names[s.status]||s.status;
   $('server-state').textContent=name;$('status-badge').className='badge'+(s.status==='pret'?'':s.status==='erreur'?' error':s.running?' loading':' off');$('status-badge').querySelector('span').textContent=name;
   const duration=s.elapsed_seconds==null?'':`${Math.floor(s.elapsed_seconds/60)} min ${Math.floor(s.elapsed_seconds%60)} s`;
