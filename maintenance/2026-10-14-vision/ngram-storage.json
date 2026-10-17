@@ -1,0 +1,14 @@
+{
+  "verified": true,
+  "table_path": "C:/Temp/Strata-ngram-recherche/iq4-xs-ple-iq4_nl.gguf",
+  "table_bytes": 28800138464,
+  "active_io": "direct",
+  "volume": "C:",
+  "disk": "KINGSTON SA400S37240G",
+  "media_type": "SSD",
+  "parent_directories_are_links": false,
+  "expert_volume": "D:",
+  "expert_disk": "ST5000DM000-1FK178",
+  "expert_media_type": "HDD",
+  "final_available_ram_gib": 53.81
+}

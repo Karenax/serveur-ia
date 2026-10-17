@@ -1,0 +1,51 @@
+{
+  "model_health": {
+    "status": "ok",
+    "max_context": 262144,
+    "model": "qwen3.8-flash-next-iq4-xs",
+    "images": false,
+    "api_key": false,
+    "loaded": true,
+    "service": "strata"
+  },
+  "queue_active": 0,
+  "model_processes": [
+    {
+      "pid": 17428,
+      "created": 1791884512.3525467
+    },
+    {
+      "pid": 23660,
+      "created": 1791884512.3757713
+    }
+  ],
+  "protected_files": {
+    "acces-distants.json": "1d357907389d2056a608c5e98b47d2fa31f519521af1f18e8f3666eb36e16037",
+    "wireguard.json": "6cbd6b81bd61645cce770ac2a7e03cdb99f86b800c95d4f05e0a425e3a6aa7dd",
+    "reglages.json": "9120a2d2682b95dbdcd9097bcb7bb2c1ef50c20c1bd9931b309ffe212ccf6ac8",
+    "wireguard-prive/secrets.dpapi": "0bf5ae5faca3ad22177ce07af1d8587441ad569f0595a46a3c8c4d4184600a93",
+    "wireguard-prive/signature.dpapi": "240cd390a95972957889009bfabb7e54942f33d7f99d9ebb9a211ab1f9754a4a"
+  },
+  "backup_schedule": {
+    "enabled": true,
+    "time": "03:00",
+    "frequency": "daily",
+    "weekday": 0,
+    "destination": "D:\\Serveur IA\\lanceur\\sauvegardes",
+    "secondary_destination": "",
+    "retention": {
+      "daily": 7,
+      "weekly": 4,
+      "monthly": 6
+    },
+    "secret_configured": true
+  },
+  "configuration_hashes": {
+    "lanceur/base-strata.json": "4ada9c42da8ac460cfbf0bdcd3c87f75bd47e9df97da2af2f971afdc608e422e",
+    "strata-iq4-p100-hybride.json": "4ada9c42da8ac460cfbf0bdcd3c87f75bd47e9df97da2af2f971afdc608e422e",
+    "lanceur/reglages.json": "9120a2d2682b95dbdcd9097bcb7bb2c1ef50c20c1bd9931b309ffe212ccf6ac8",
+    "lanceur/reglages-par-defaut.json": "9120a2d2682b95dbdcd9097bcb7bb2c1ef50c20c1bd9931b309ffe212ccf6ac8",
+    "lanceur/derniers-reglages-valides.json": "91cc42dc648f6fb6fd0505c9e30e6267a7676db967e6f3280d41c08be8365ec9",
+    "lanceur/exploitation.json": "2a56a8b1a5612be6e1fd6d4e5e9f098302abeeb22ad7fb0a2f91de249c448e1b"
+  }
+}

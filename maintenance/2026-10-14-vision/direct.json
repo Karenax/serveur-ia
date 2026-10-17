@@ -1,0 +1,81 @@
+{
+  "health": {
+    "status": "ok",
+    "max_context": 262144,
+    "model": "qwen3.8-flash-next-iq4-xs",
+    "images": true,
+    "api_key": false,
+    "loaded": true,
+    "service": "strata"
+  },
+  "seconds": 14.484,
+  "answer": "Le code est **VISION 47**. La forme rouge est un **cercle** et la forme bleue est un **carré**.",
+  "usage": {
+    "prompt_tokens": 284,
+    "completion_tokens": 32,
+    "total_tokens": 316,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 284,
+    "prompt_ms": 7101.8,
+    "prompt_per_token_ms": 25.006,
+    "prompt_per_second": 40.0,
+    "predicted_n": 32,
+    "predicted_ms": 2871.2,
+    "predicted_per_token_ms": 89.725,
+    "predicted_per_second": 11.1,
+    "draft_n": 23,
+    "draft_n_accepted": 19
+  },
+  "before": {
+    "available_ram_mib": 57153,
+    "gpus": [
+      {
+        "index": 0,
+        "name": "Quadro P2200",
+        "used_mib": 2024,
+        "total_mib": 5120
+      },
+      {
+        "index": 1,
+        "name": "Tesla P100-PCIE-16GB",
+        "used_mib": 14240,
+        "total_mib": 16384
+      },
+      {
+        "index": 2,
+        "name": "Tesla P100-PCIE-16GB",
+        "used_mib": 14114,
+        "total_mib": 16384
+      }
+    ]
+  },
+  "after": {
+    "available_ram_mib": 50933,
+    "gpus": [
+      {
+        "index": 0,
+        "name": "Quadro P2200",
+        "used_mib": 2089,
+        "total_mib": 5120
+      },
+      {
+        "index": 1,
+        "name": "Tesla P100-PCIE-16GB",
+        "used_mib": 14324,
+        "total_mib": 16384
+      },
+      {
+        "index": 2,
+        "name": "Tesla P100-PCIE-16GB",
+        "used_mib": 14204,
+        "total_mib": 16384
+      }
+    ]
+  },
+  "passed": true
+}

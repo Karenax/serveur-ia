@@ -1,0 +1,46 @@
+{
+  "passed": true,
+  "protected_files": {
+    "acces-distants.json": "1d357907389d2056a608c5e98b47d2fa31f519521af1f18e8f3666eb36e16037",
+    "wireguard.json": "6cbd6b81bd61645cce770ac2a7e03cdb99f86b800c95d4f05e0a425e3a6aa7dd",
+    "reglages.json": "9120a2d2682b95dbdcd9097bcb7bb2c1ef50c20c1bd9931b309ffe212ccf6ac8",
+    "wireguard-prive/secrets.dpapi": "0bf5ae5faca3ad22177ce07af1d8587441ad569f0595a46a3c8c4d4184600a93",
+    "wireguard-prive/signature.dpapi": "240cd390a95972957889009bfabb7e54942f33d7f99d9ebb9a211ab1f9754a4a"
+  },
+  "backup_schedule_preserved": true,
+  "health": {
+    "status": "ok",
+    "max_context": 262144,
+    "model": "qwen3.8-flash-next-iq4-xs",
+    "images": true,
+    "api_key": false,
+    "loaded": true,
+    "service": "strata"
+  },
+  "memory": {
+    "available_ram_mib": 55724,
+    "gpus": [
+      {
+        "index": 0,
+        "name": "Quadro P2200",
+        "used_mib": 2055,
+        "total_mib": 5120
+      },
+      {
+        "index": 1,
+        "name": "Tesla P100-PCIE-16GB",
+        "used_mib": 14376,
+        "total_mib": 16384
+      },
+      {
+        "index": 2,
+        "name": "Tesla P100-PCIE-16GB",
+        "used_mib": 14256,
+        "total_mib": 16384
+      }
+    ]
+  },
+  "text_engine_sha256": "6ce44b68442b8d2330ee8634abb4e364e17185d2474816627ec74aaa34d2a0b1",
+  "startup_status": "pret",
+  "ready_seconds": 2985.3
+}

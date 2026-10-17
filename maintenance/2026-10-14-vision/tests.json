@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "suites": [
+    {
+      "module": "test_startup_memory",
+      "tests": 6,
+      "passed": true
+    },
+    {
+      "module": "test_launcher",
+      "tests": 8,
+      "passed": true
+    }
+  ],
+  "actual_windows_reclaim_evidence": "working-set-trim.json",
+  "normal_ram_guard_preserved": true
+}

@@ -1,0 +1,34 @@
+{
+  "passed": true,
+  "transport": "https",
+  "model_count": 5,
+  "local_model": {
+    "id": "fred-qwen",
+    "name": "qwen3.8-flash-next-iq4-xs",
+    "label": "Qwen local",
+    "provider": "Qwen local",
+    "available": true,
+    "capabilities": {
+      "images": true,
+      "files": [
+        "txt",
+        "md",
+        "pdf",
+        "docx"
+      ],
+      "thinking": true,
+      "reasoning_efforts": [
+        "none",
+        "low",
+        "medium",
+        "high"
+      ],
+      "max_file_bytes": 2097152,
+      "vision": true,
+      "context_length": 262144,
+      "reasoning_mode": "effort"
+    },
+    "object": "model",
+    "owned_by": "fred"
+  }
+}

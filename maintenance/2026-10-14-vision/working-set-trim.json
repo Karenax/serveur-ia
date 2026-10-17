@@ -1,0 +1,18 @@
+{
+  "action": "one-time Windows EmptyWorkingSet on the verified trial engine only",
+  "pid": 29604,
+  "created": 1792003483.647143,
+  "before": {
+    "available_gib": 21.924,
+    "engine_rss_gib": 85.269,
+    "engine_uss_gib": 42.655,
+    "engine_private_commit_gib": 53.487
+  },
+  "after": {
+    "available_gib": 64.695,
+    "engine_rss_gib": 0.213,
+    "engine_uss_gib": 0.062,
+    "engine_private_commit_gib": 53.487
+  },
+  "passed": true
+}

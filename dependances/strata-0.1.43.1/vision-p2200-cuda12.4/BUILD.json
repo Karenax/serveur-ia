@@ -1,0 +1,10 @@
+{
+  "strata_version": "0.1.43.1",
+  "cuda": "12.4.131",
+  "architectures": [
+    "61-real"
+  ],
+  "llama_cpp_commit": "3cf03257f219afbe7334045ff7c6a06ac68c627d",
+  "recipe": "maintenance/2026-10-14-vision/build_encoder.cmd",
+  "sha256": "03a607fe313e7327a00cee9a89d4e1806f18d5c76d5add8c44d054311db64031"
+}

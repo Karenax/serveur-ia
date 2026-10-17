@@ -1,0 +1,26 @@
+{
+  "seconds": 3.0,
+  "answer": "323",
+  "usage": {
+    "prompt_tokens": 34,
+    "completion_tokens": 4,
+    "total_tokens": 38,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 34,
+    "prompt_ms": 2340.8,
+    "prompt_per_token_ms": 68.847,
+    "prompt_per_second": 14.5,
+    "predicted_n": 4,
+    "predicted_ms": 612.0,
+    "predicted_per_token_ms": 153.0,
+    "predicted_per_second": 6.5,
+    "draft_n": 4,
+    "draft_n_accepted": 3
+  },
+  "passed": true
+}
