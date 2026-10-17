@@ -1,0 +1,27 @@
+[
+  {
+    "path": "D:\\Serveur IA\\__pycache__",
+    "bytes": 106611.0,
+    "deleted": true
+  },
+  {
+    "path": "D:\\Serveur IA\\.ruff_cache",
+    "bytes": 21058.0,
+    "deleted": true
+  },
+  {
+    "path": "D:\\Serveur IA\\lanceur\\__pycache__",
+    "bytes": 2652128.0,
+    "deleted": true
+  },
+  {
+    "path": "D:\\Serveur IA\\client-qwen\\__pycache__",
+    "bytes": 491436.0,
+    "deleted": true
+  },
+  {
+    "path": "D:\\Serveur IA\\client-voice\\__pycache__",
+    "bytes": 59210.0,
+    "deleted": true
+  }
+]

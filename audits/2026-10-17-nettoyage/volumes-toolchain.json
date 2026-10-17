@@ -1,0 +1,62 @@
+[
+  {
+    "Dossier": "android-avd",
+    "Mo": 15366.4
+  },
+  {
+    "Dossier": "android-sdk",
+    "Mo": 8296.2
+  },
+  {
+    "Dossier": "android-studio-extraction",
+    "Mo": 3419.7
+  },
+  {
+    "Dossier": "android-studio",
+    "Mo": 3419.5
+  },
+  {
+    "Dossier": "releases-staging",
+    "Mo": 2283.1
+  },
+  {
+    "Dossier": "android-downloads",
+    "Mo": 2050.7
+  },
+  {
+    "Dossier": "eg2-model",
+    "Mo": 1455.1
+  },
+  {
+    "Dossier": "msvc",
+    "Mo": 1193.5
+  },
+  {
+    "Dossier": "eg2-python",
+    "Mo": 1045.1
+  },
+  {
+    "Dossier": "downloads",
+    "Mo": 1019.5
+  },
+  {
+    "Dossier": "voice-server-python",
+    "Mo": 858.4
+  },
+  {
+    "Dossier": "unpacked",
+    "Mo": 763.5
+  },
+  {
+    "Dossier": "cuda-12.4",
+    "Mo": 763.3
+  },
+  {
+    "Dossier": "voice-models",
+    "Mo": 465.0
+  },
+  {
+    "Dossier": "vision-trial-20261014",
+    "Mo": 461.6
+  }
+]

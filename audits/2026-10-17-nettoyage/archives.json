@@ -1,0 +1,871 @@
+[
+  {
+    "path": "D:\\Serveur IA\\cudart.zip",
+    "bytes": 391443627,
+    "sha256": "8C79A9B226DE4B3CACFD1F83D24F962D0773BE79F1E7B75C6AF4DED7E32AE1D6",
+    "extracted_directory": "llama-b11344",
+    "entries": [
+      {
+        "entry": "cublas64_12.dll",
+        "identical": true
+      },
+      {
+        "entry": "cublasLt64_12.dll",
+        "identical": true
+      },
+      {
+        "entry": "cudart64_12.dll",
+        "identical": true
+      }
+    ],
+    "deleted": true
+  },
+  {
+    "path": "D:\\Serveur IA\\llama-cpu.zip",
+    "bytes": 19274137,
+    "sha256": "E604411CE3D01DE6E5BA28241D7565F74EEC83D3844E4CE8317B084D451E46CE",
+    "extracted_directory": "llama-cpu-b11344",
+    "entries": [
+      {
+        "entry": "ggml-base.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-alderlake.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-cannonlake.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-cascadelake.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-cooperlake.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-haswell.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-icelake.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-ivybridge.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-piledriver.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-sandybridge.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-sapphirerapids.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-skylakex.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-sse42.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-x64.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-zen4.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-rpc-server.exe",
+        "identical": true
+      },
+      {
+        "entry": "ggml-rpc.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml.dll",
+        "identical": true
+      },
+      {
+        "entry": "libomp.dll",
+        "identical": true
+      },
+      {
+        "entry": "LICENSE-LLVM-OpenMP",
+        "identical": true
+      },
+      {
+        "entry": "llama-batched-bench-impl.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-batched-bench.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-bench-impl.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-bench.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-cli-impl.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-cli.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-common.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-completion-impl.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-completion.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-fit-params-impl.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-fit-params.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-gemma3-cli.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-gguf-split.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-imatrix.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-llava-cli.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-minicpmv-cli.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-mtmd-cli.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-mtmd-debug.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-perplexity-impl.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-perplexity.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-quantize-impl.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-quantize.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-qwen2vl-cli.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-results.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-server-impl.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-server.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-tokenize.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-tts.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama.exe",
+        "identical": true
+      },
+      {
+        "entry": "mtmd.dll",
+        "identical": true
+      }
+    ],
+    "deleted": true
+  },
+  {
+    "path": "D:\\Serveur IA\\llama-cuda.zip",
+    "bytes": 263287671,
+    "sha256": "9E4297FE6255D0E64311E73078C55113FC2CD092CFEC00B4CE8E79BFB5ECB254",
+    "extracted_directory": "llama-b11344",
+    "entries": [
+      {
+        "entry": "ggml-cuda.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-base.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-ivybridge.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-results.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-perplexity-impl.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-gemma3-cli.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-gguf-split.exe",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-cannonlake.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-rpc.dll",
+        "identical": true
+      },
+      {
+        "entry": "mtmd.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-fit-params.exe",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-skylakex.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-sapphirerapids.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-piledriver.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-cooperlake.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-cascadelake.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-server-impl.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-batched-bench.exe",
+        "identical": true
+      },
+      {
+        "entry": "libomp.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-x64.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-bench-impl.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-qwen2vl-cli.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-llava-cli.exe",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-haswell.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-rpc-server.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-mtmd-debug.exe",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-icelake.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-batched-bench-impl.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-cli-impl.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-mtmd-cli.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-minicpmv-cli.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-fit-params-impl.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-completion-impl.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-alderlake.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-perplexity.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-cli.exe",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-sandybridge.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-common.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-zen4.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-tokenize.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-bench.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-completion.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-tts.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-quantize-impl.dll",
+        "identical": true
+      },
+      {
+        "entry": "LICENSE-LLVM-OpenMP",
+        "identical": true
+      },
+      {
+        "entry": "llama-quantize.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-server.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-imatrix.exe",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-sse42.dll",
+        "identical": true
+      }
+    ],
+    "deleted": true
+  },
+  {
+    "path": "D:\\Serveur IA\\unsloth-legacy.zip",
+    "bytes": 36992931,
+    "sha256": "E6DFF187FFED460E685E367F565D53FA93015FFDF2C76356A51E7179E47C0924",
+    "extracted_directory": "unsloth-legacy",
+    "entries": [
+      {
+        "entry": "BUILD_INFO.txt",
+        "identical": true
+      },
+      {
+        "entry": "ggml-base.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-alderlake.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-cannonlake.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-cascadelake.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-haswell.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-icelake.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-sandybridge.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-skylakex.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-sse42.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-x64.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cuda.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-rpc-server.exe",
+        "identical": true
+      },
+      {
+        "entry": "ggml-rpc.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-batched-bench-impl.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-batched-bench.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-bench-impl.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-bench.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-cli-impl.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-cli.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-common.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-completion-impl.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-completion.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-diffusion-cli.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-diffusion-gemma-visual-server.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-fit-params-impl.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-fit-params.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-gemma3-cli.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-gguf-split.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-imatrix.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-llava-cli.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-minicpmv-cli.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-mtmd-cli.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-mtmd-debug.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-perplexity-impl.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-perplexity.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-quantize-impl.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-quantize.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-qwen2vl-cli.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-results.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-server-impl.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-server.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-tokenize.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-tts.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama.exe",
+        "identical": true
+      },
+      {
+        "entry": "mtmd.dll",
+        "identical": true
+      },
+      {
+        "entry": "THIRD_PARTY_LICENSES.txt",
+        "identical": true
+      },
+      {
+        "entry": "UNSLOTH_PREBUILT_INFO.json",
+        "identical": true
+      }
+    ],
+    "deleted": true
+  },
+  {
+    "path": "D:\\Serveur IA\\unsloth-portable.zip",
+    "bytes": 355294808,
+    "sha256": "9D063546008A4E8622A2FA42F279DDD40DD012428A0F0490A934968CB0A27162",
+    "extracted_directory": "unsloth-portable",
+    "entries": [
+      {
+        "entry": "BUILD_INFO.txt",
+        "identical": true
+      },
+      {
+        "entry": "ggml-base.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-alderlake.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-cannonlake.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-cascadelake.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-haswell.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-icelake.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-sandybridge.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-skylakex.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-sse42.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cpu-x64.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-cuda.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml-rpc-server.exe",
+        "identical": true
+      },
+      {
+        "entry": "ggml-rpc.dll",
+        "identical": true
+      },
+      {
+        "entry": "ggml.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-batched-bench-impl.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-batched-bench.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-bench-impl.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-bench.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-cli-impl.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-cli.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-common.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-completion-impl.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-completion.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-diffusion-cli.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-diffusion-gemma-visual-server.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-fit-params-impl.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-fit-params.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-gemma3-cli.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-gguf-split.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-imatrix.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-llava-cli.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-minicpmv-cli.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-mtmd-cli.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-mtmd-debug.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-perplexity-impl.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-perplexity.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-quantize-impl.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-quantize.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-qwen2vl-cli.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-results.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-server-impl.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama-server.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-tokenize.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama-tts.exe",
+        "identical": true
+      },
+      {
+        "entry": "llama.dll",
+        "identical": true
+      },
+      {
+        "entry": "llama.exe",
+        "identical": true
+      },
+      {
+        "entry": "mtmd.dll",
+        "identical": true
+      },
+      {
+        "entry": "THIRD_PARTY_LICENSES.txt",
+        "identical": true
+      },
+      {
+        "entry": "UNSLOTH_PREBUILT_INFO.json",
+        "identical": true
+      }
+    ],
+    "deleted": true
+  }
+]
