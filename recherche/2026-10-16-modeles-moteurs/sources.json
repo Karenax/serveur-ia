@@ -1,0 +1,180 @@
+{
+  "checked_at_utc": "2026-10-16T08:10:00.261772+00:00",
+  "scope": "Public model cards, releases, model-file metadata, documentation, selected source files; no new benchmark or deployment.",
+  "sources": [
+    {
+      "name": "Strata releases",
+      "url": "https://api.github.com/repos/Niko1221/Strata/releases?per_page=3",
+      "local_cache_file": "strata-releases.json",
+      "sha256": "e1cacde312d16fd2958cbc1743650c36e03809c15219584f59368e651fe5fcb7"
+    },
+    {
+      "name": "Strata head",
+      "url": "https://api.github.com/repos/Niko1221/Strata/commits?per_page=10",
+      "local_cache_file": "strata-commits.json",
+      "sha256": "7be9658fb33b5c42e0c27f5496a3d281e2b38c32e24719e1b2899bd64391317b"
+    },
+    {
+      "name": "Strata quantifications",
+      "url": "https://github.com/Niko1221/Strata/blob/v0.1.44.1/docs/QUANTS.md",
+      "local_cache_file": "strata-quants.md",
+      "sha256": "e3cf37fcc4f98fbf89f868d186e13c403338bd71e9f5b9efbea8e000c7a60b46"
+    },
+    {
+      "name": "Strata older GPUs",
+      "url": "https://github.com/Niko1221/Strata/blob/v0.1.44.1/docs/OLDER_GPUS.md",
+      "local_cache_file": "strata-older.md",
+      "sha256": "bfe9ac5db28a0f5c36b9e2e6bab201fcb4b7c506258a81a6f466f207d76a3c3b"
+    },
+    {
+      "name": "Strata setup",
+      "url": "https://github.com/Niko1221/Strata/blob/v0.1.44.1/setup.py",
+      "local_cache_file": "new-setup.py",
+      "sha256": "7d585f1bb29245642ba5b9d08c9d3e1d74937a8d8d327dfe713bf97ee79e6499"
+    },
+    {
+      "name": "Strata NVFP4",
+      "url": "https://github.com/Niko1221/Strata/blob/v0.1.44.1/docs/NVFP4.md",
+      "local_cache_file": "strata-nvfp4.md",
+      "sha256": "a5485f8650d037c0b6e6895268bc990b1d26c27ee769011425f30c14251ce503"
+    },
+    {
+      "name": "Strata memory loader",
+      "url": "https://github.com/Niko1221/Strata/blob/v0.1.44.1/src/core/expert_source.cpp",
+      "local_cache_file": "new-src--core--expert_source.cpp",
+      "sha256": "fd954ca9ceb2df430d965c522e1093f8a718135f54eabd78c3df2e570ced9a6a"
+    },
+    {
+      "name": "Swift",
+      "url": "https://huggingface.co/ukisai/Swift1.5-Qwen3.8-Flash-Next",
+      "local_cache_file": "swift.md",
+      "sha256": "637e58f5ff9cc0dd8d87eff31d0a893573e6eb4a520e1bd9fdf4cfa8d63d8430"
+    },
+    {
+      "name": "Gemma QAT",
+      "url": "https://huggingface.co/google/gemma-4-26B-A4B-it-qat-q4_0-gguf",
+      "local_cache_file": "gemma-qat.md",
+      "sha256": "49182c7d4dcb50d63943c851219a284aeaea55bcb03e301ebfa1c4b57dbeb93d"
+    },
+    {
+      "name": "Bolt GGUF",
+      "url": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-24GB-GGUF",
+      "local_cache_file": "nvidia--NVIDIA-Nemotron-3.5-Bolt-74B-A9B-24GB-GGUF.md",
+      "sha256": "8855bf83b36353bf8fa77ddf6c8530df75b70f7a0a5eb437669d0f5498a68cdf"
+    },
+    {
+      "name": "Mistral",
+      "url": "https://huggingface.co/mistralai/Mistral-Small-4-119B-2603",
+      "local_cache_file": "mistral.md",
+      "sha256": "bbe7934f0ec087b32292459146ae4d62dd211f1e1c2ddea49337150be1ebd08d"
+    },
+    {
+      "name": "PXA latest",
+      "url": "https://api.github.com/repos/poisonxa16/pxa/releases/latest",
+      "local_cache_file": "pxa-latest.json",
+      "sha256": "5758fe63676d1a2944d45b9496860da0a8951e6c54bccab576f6db2622d0c417"
+    },
+    {
+      "name": "PXA release notes",
+      "url": "https://github.com/poisonxa16/pxa/blob/main/RELEASE-NOTES-v3.1.md",
+      "local_cache_file": "pxa-release.md",
+      "sha256": "62d1982dfcf258a84452a275b9b899fdf8dd973fcc4726f9e05dcb84d8084078"
+    },
+    {
+      "name": "PXA code and licence split",
+      "url": "https://github.com/poisonxa16/pxa",
+      "local_cache_file": "pxa-readme.md",
+      "sha256": "42ab8a88eb729224ce2eabe22aafe95ade071aa0bada43de0461a8ad7bfc854b"
+    },
+    {
+      "name": "Kmic P100",
+      "url": "https://github.com/Kmic-68/llama.cpp/tree/p100-optimizations/p100-docs",
+      "local_cache_file": "kmic-readme.md",
+      "sha256": "5bed3cc69385f4cc3ad2af9f921221f790aea649b01ac298440760a87d733054"
+    },
+    {
+      "name": "Kmic branch",
+      "url": "https://api.github.com/repos/Kmic-68/llama.cpp/branches/p100-optimizations",
+      "local_cache_file": "kmic-branch.json",
+      "sha256": "fe7c323b9ae3f71af08be0bf821a47113b245088c910845a38edc3f28669c228"
+    },
+    {
+      "name": "qr0n patches",
+      "url": "https://github.com/qr0n/p100-llama-cpp",
+      "local_cache_file": "qr0n-readme.md",
+      "sha256": "ff90044fcf3d57d0c78ef6499af8eb4ac1971d02d080068928f9d3b464716516"
+    },
+    {
+      "name": "P100 workload",
+      "url": "https://github.com/4claps/houston-p100-cluster/blob/main/GPU-SCALING.md",
+      "local_cache_file": "4claps-scaling.md",
+      "sha256": "a0e82d9c709d1eaabd8029dc6065d3766bde82994c19271c03e040cb851688a2"
+    },
+    {
+      "name": "ik Pascal",
+      "url": "https://github.com/ikawrakow/ik_llama.cpp/blob/main/docs/pascal-volta.md",
+      "local_cache_file": "ik-pascal.md",
+      "sha256": "c3a5b982d970eed4e393a4c35b176ecae5292bd31c4f0159bdfedd6208e40cdf"
+    },
+    {
+      "name": "ik head",
+      "url": "https://api.github.com/repos/ikawrakow/ik_llama.cpp/commits?per_page=3",
+      "local_cache_file": "ikawrakow--ik_llama.cpp-commits.json",
+      "sha256": "0f1a090d69db7733b67b0190aeaea3477fdf15690c138a55bc25256c266f794e"
+    },
+    {
+      "name": "Cafe head",
+      "url": "https://api.github.com/repos/kozmic-labs/cafe-llama.cpp/commits?per_page=3",
+      "local_cache_file": "kozmic-labs--cafe-llama.cpp-commits.json",
+      "sha256": "94802e91ef122e5574c2949da9e083e1f6b22b5090233b2cba31cf4806d7ea95"
+    },
+    {
+      "name": "V100 fork",
+      "url": "https://github.com/jmnargi/Strata-V100",
+      "local_cache_file": "strata-v100.md",
+      "sha256": "59dc9455957dc8512eb3d7cb167a161fb69ce5f2bb263911af3351e466bebadb"
+    },
+    {
+      "name": "DualGPU",
+      "url": "https://github.com/Hardin22/Strata-DualGPU",
+      "local_cache_file": "strata-dual.md",
+      "sha256": "8d3d1891753968368132bd0176ade3fd05fa9d5507c55861b2d0058656655bdb"
+    },
+    {
+      "name": "eddoursul",
+      "url": "https://github.com/eddoursul/Strata/blob/custom/docs/COMPARISON.md",
+      "local_cache_file": "eddoursul--Strata.md",
+      "sha256": "c619fdaef478be3c40b13ff6f9a29c02a2f73628833d3557fc0140c874979b3c"
+    },
+    {
+      "name": "Unbiased",
+      "url": "https://github.com/robertkarl/UnbiasedStrata",
+      "local_cache_file": "unbiased-readme.md",
+      "sha256": "417649a626f149eaaf4a172f042534017e2fb9e4aac8204044f21ad067863a3b"
+    },
+    {
+      "name": "Infernix",
+      "url": "https://github.com/Wallawalla47/Infernix",
+      "local_cache_file": "infernix.md",
+      "sha256": "693495b649f5b135aed507fb005d4f98b73a7fa2ba1208a9c432031120ae6474"
+    },
+    {
+      "name": "Basalt",
+      "url": "https://github.com/jesdga95/basalt",
+      "local_cache_file": "basalt.md",
+      "sha256": "05e570af951ebc6a0827c110cf6c00d8549ab458ad7cd85834b715071509f125"
+    },
+    {
+      "name": "NVFP4 fork head",
+      "url": "https://api.github.com/repos/sergqwer/strata-nvfp4/commits?per_page=3",
+      "local_cache_file": "sergqwer--strata-nvfp4-commits.json",
+      "sha256": "4dbea6b012cfb93b10787c4f675bf0d3dadf2723392fd07446605fb2fa769e8b"
+    },
+    {
+      "name": "GLM fork",
+      "url": "https://github.com/lighttransport/Strata/tree/glm53f",
+      "local_cache_file": "lighttransport--Strata.md",
+      "sha256": "abc0ad5551523814d5ac49c0ff393838422445e104a766248fabee8978be92e8"
+    }
+  ]
+}

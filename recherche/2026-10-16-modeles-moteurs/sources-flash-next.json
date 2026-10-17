@@ -1,0 +1,58 @@
+[
+  {
+    "repository": "AnonimousA/Qwen3.8-Flash-Next-REAP-320-GGUF",
+    "url": "https://huggingface.co/AnonimousA/Qwen3.8-Flash-Next-REAP-320-GGUF",
+    "revision": "4bc31ecafb96b8beac328285dfc37e9a0d2e0a51",
+    "last_modified": "2026-09-09T13:50:32Z",
+    "consulted": "2026-10-16"
+  },
+  {
+    "repository": "Dyluhn/Qwen3.8-Flash-Next-Uncensored-CED-Projector",
+    "url": "https://huggingface.co/Dyluhn/Qwen3.8-Flash-Next-Uncensored-CED-Projector",
+    "revision": "9369cbec938fd43a08b3494009921ac806ff90ee",
+    "last_modified": "2026-09-24T13:38:21Z",
+    "consulted": "2026-10-16"
+  },
+  {
+    "repository": "Dyluhn/Qwen3.8-Flash-Next-Uncensored-R9V-IQ4_XS",
+    "url": "https://huggingface.co/Dyluhn/Qwen3.8-Flash-Next-Uncensored-R9V-IQ4_XS",
+    "revision": "02829d67fb9b022e1024cefeceb2008658fb521d",
+    "last_modified": "2026-09-24T13:38:50Z",
+    "consulted": "2026-10-16"
+  },
+  {
+    "repository": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF",
+    "url": "https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF",
+    "revision": "5348543e0147355ac9cbcb031184a3546350988e",
+    "last_modified": "2026-09-29T09:34:15Z",
+    "consulted": "2026-10-16"
+  },
+  {
+    "repository": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF",
+    "url": "https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF",
+    "revision": "ed59f92082b1e93c0e96d60a8b11aab089b52f09",
+    "last_modified": "2026-09-29T10:28:23Z",
+    "consulted": "2026-10-16"
+  },
+  {
+    "repository": "orcarouter/Qwen3.8-Flash-Next-Uncensored-GGUF",
+    "url": "https://huggingface.co/orcarouter/Qwen3.8-Flash-Next-Uncensored-GGUF",
+    "revision": "d27c0a15447dd92ae7c90919352c6810496945b1",
+    "last_modified": "2026-10-12T03:49:53Z",
+    "consulted": "2026-10-16"
+  },
+  {
+    "repository": "orcarouter/Qwen3.8-Flash-Next-Uncensored",
+    "url": "https://huggingface.co/orcarouter/Qwen3.8-Flash-Next-Uncensored",
+    "revision": "d9dbbb7f49cad93a0e656ea69200f6b58600714a",
+    "last_modified": "2026-10-12T03:49:37Z",
+    "consulted": "2026-10-16"
+  },
+  {
+    "repository": "sh0wie/Qwen3.8-Flash-Next-REAP-288-GGUF",
+    "url": "https://huggingface.co/sh0wie/Qwen3.8-Flash-Next-REAP-288-GGUF",
+    "revision": "2af8d948a587a3360e761e5acad66aac467bdc77",
+    "last_modified": "2026-08-29T16:10:45Z",
+    "consulted": "2026-10-16"
+  }
+]

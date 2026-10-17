@@ -1,0 +1,17 @@
+{
+  "read_only_research": true,
+  "model_server_identities_preserved": true,
+  "model_health": {
+    "status": "ok",
+    "max_context": 262144,
+    "model": "qwen3.8-flash-next-iq4-xs",
+    "images": true,
+    "api_key": false,
+    "loaded": true,
+    "service": "strata"
+  },
+  "generations_sent": 0,
+  "weights_downloaded": false,
+  "production_services_restarted": false,
+  "source_count": 29
+}

@@ -1,0 +1,1117 @@
+{
+  "messages": 214,
+  "times": [
+    {
+      "created": 1792173622247,
+      "streamed": 1792173646755,
+      "completed": 1792173646861
+    },
+    {
+      "created": 1792173646882,
+      "streamed": 1792173674829,
+      "completed": 1792173674939
+    },
+    {
+      "created": 1792173674959,
+      "streamed": 1792173707526,
+      "completed": 1792173707635
+    },
+    {
+      "created": 1792173707656,
+      "streamed": 1792173736363,
+      "completed": 1792173736467
+    },
+    {
+      "created": 1792173736487,
+      "streamed": 1792173770611,
+      "completed": 1792173770719
+    },
+    {
+      "created": 1792173770740,
+      "streamed": 1792173799821,
+      "completed": 1792173799930
+    },
+    {
+      "created": 1792173799949,
+      "streamed": 1792173828005,
+      "completed": 1792173828116
+    },
+    {
+      "created": 1792173828136,
+      "streamed": 1792173855966,
+      "completed": 1792173856068
+    },
+    {
+      "created": 1792173856089,
+      "streamed": 1792173887451,
+      "completed": 1792173887558
+    },
+    {
+      "created": 1792173887578,
+      "streamed": 1792174000825,
+      "completed": 1792174000932
+    },
+    {
+      "created": 1792174000952,
+      "streamed": 1792174012417,
+      "completed": 1792174012526
+    },
+    {
+      "created": 1792174012546,
+      "streamed": 1792174023960,
+      "completed": 1792174024058
+    },
+    {
+      "created": 1792174024077,
+      "streamed": 1792174035857,
+      "completed": 1792174035970
+    },
+    {
+      "created": 1792174035991,
+      "streamed": 1792174047371,
+      "completed": 1792174047476
+    },
+    {
+      "created": 1792174047496,
+      "streamed": 1792174059582,
+      "completed": 1792174059682
+    },
+    {
+      "created": 1792174059702,
+      "streamed": 1792174071480,
+      "completed": 1792174071583
+    },
+    {
+      "created": 1792174071603,
+      "streamed": 1792174082983,
+      "completed": 1792174083084
+    },
+    {
+      "created": 1792174083105,
+      "streamed": 1792174094622,
+      "completed": 1792174094725
+    },
+    {
+      "created": 1792174094746,
+      "streamed": 1792174106042,
+      "completed": 1792174106145
+    },
+    {
+      "created": 1792174106165,
+      "streamed": 1792174117817,
+      "completed": 1792174117920
+    },
+    {
+      "created": 1792174117941,
+      "streamed": 1792174129337,
+      "completed": 1792174129437
+    },
+    {
+      "created": 1792174129458,
+      "streamed": 1792174140993,
+      "completed": 1792174141095
+    },
+    {
+      "created": 1792174141117,
+      "streamed": 1792174153105,
+      "completed": 1792174153209
+    },
+    {
+      "created": 1792174153232,
+      "streamed": 1792174164841,
+      "completed": 1792174164940
+    },
+    {
+      "created": 1792174164960,
+      "streamed": 1792174176678,
+      "completed": 1792174176776
+    },
+    {
+      "created": 1792174176797,
+      "streamed": 1792174188573,
+      "completed": 1792174188680
+    },
+    {
+      "created": 1792174188703,
+      "streamed": 1792174200426,
+      "completed": 1792174200531
+    },
+    {
+      "created": 1792174200552,
+      "streamed": 1792174212117,
+      "completed": 1792174212220
+    },
+    {
+      "created": 1792174212240,
+      "streamed": 1792174223966,
+      "completed": 1792174224067
+    },
+    {
+      "created": 1792174224088,
+      "streamed": 1792174235919,
+      "completed": 1792174236019
+    },
+    {
+      "created": 1792174236042,
+      "streamed": 1792174247810,
+      "completed": 1792174247915
+    },
+    {
+      "created": 1792174247940,
+      "streamed": 1792174259748,
+      "completed": 1792174259851
+    },
+    {
+      "created": 1792174259871,
+      "streamed": 1792174271781,
+      "completed": 1792174271879
+    },
+    {
+      "created": 1792174271900,
+      "streamed": 1792174283488,
+      "completed": 1792174283590
+    },
+    {
+      "created": 1792174283611,
+      "streamed": 1792174295316,
+      "completed": 1792174295417
+    },
+    {
+      "created": 1792174295439,
+      "streamed": 1792174307172,
+      "completed": 1792174307279
+    },
+    {
+      "created": 1792174307301,
+      "streamed": 1792174319046,
+      "completed": 1792174319149
+    },
+    {
+      "created": 1792174319174,
+      "streamed": 1792174330953,
+      "completed": 1792174331057
+    },
+    {
+      "created": 1792174331079,
+      "streamed": 1792174342937,
+      "completed": 1792174343040
+    },
+    {
+      "created": 1792174343063,
+      "streamed": 1792174355043,
+      "completed": 1792174355145
+    },
+    {
+      "created": 1792174355168,
+      "streamed": 1792174366758,
+      "completed": 1792174366865
+    },
+    {
+      "created": 1792174366887,
+      "streamed": 1792174378560,
+      "completed": 1792174378663
+    },
+    {
+      "created": 1792174378686,
+      "streamed": 1792174390332,
+      "completed": 1792174390436
+    },
+    {
+      "created": 1792174390457,
+      "streamed": 1792174402241,
+      "completed": 1792174402350
+    },
+    {
+      "created": 1792174402374,
+      "streamed": 1792174413974,
+      "completed": 1792174414074
+    },
+    {
+      "created": 1792174414096,
+      "streamed": 1792174426054,
+      "completed": 1792174426152
+    },
+    {
+      "created": 1792174426175,
+      "streamed": 1792174437763,
+      "completed": 1792174437869
+    },
+    {
+      "created": 1792174437892,
+      "streamed": 1792174449565,
+      "completed": 1792174449665
+    },
+    {
+      "created": 1792174449689,
+      "streamed": 1792174461544,
+      "completed": 1792174461651
+    },
+    {
+      "created": 1792174461674,
+      "streamed": 1792174473577,
+      "completed": 1792174473681
+    },
+    {
+      "created": 1792174473704,
+      "streamed": 1792174485370,
+      "completed": 1792174485471
+    },
+    {
+      "created": 1792174485493,
+      "streamed": 1792174497163,
+      "completed": 1792174497264
+    },
+    {
+      "created": 1792174497286,
+      "streamed": 1792174508985,
+      "completed": 1792174509093
+    },
+    {
+      "created": 1792174509119,
+      "streamed": 1792174520930,
+      "completed": 1792174521034
+    },
+    {
+      "created": 1792174521057,
+      "streamed": 1792174532745,
+      "completed": 1792174532848
+    },
+    {
+      "created": 1792174532870,
+      "streamed": 1792174544839,
+      "completed": 1792174544940
+    },
+    {
+      "created": 1792174544962,
+      "streamed": 1792174556815,
+      "completed": 1792174556919
+    },
+    {
+      "created": 1792174556943,
+      "streamed": 1792174568694,
+      "completed": 1792174568798
+    },
+    {
+      "created": 1792174568824,
+      "streamed": 1792174580566,
+      "completed": 1792174580672
+    },
+    {
+      "created": 1792174580696,
+      "streamed": 1792174592315,
+      "completed": 1792174592418
+    },
+    {
+      "created": 1792174592441,
+      "streamed": 1792174604264,
+      "completed": 1792174604365
+    },
+    {
+      "created": 1792174604388,
+      "streamed": 1792174616457,
+      "completed": 1792174616562
+    },
+    {
+      "created": 1792174616585,
+      "streamed": 1792174628730,
+      "completed": 1792174628833
+    },
+    {
+      "created": 1792174628858,
+      "streamed": 1792174640740,
+      "completed": 1792174640926
+    },
+    {
+      "created": 1792174640949,
+      "streamed": 1792174652976,
+      "completed": 1792174653079
+    },
+    {
+      "created": 1792174653104,
+      "streamed": 1792174664728,
+      "completed": 1792174664831
+    },
+    {
+      "created": 1792174664854,
+      "streamed": 1792174676622,
+      "completed": 1792174676721
+    },
+    {
+      "created": 1792174676744,
+      "streamed": 1792174688553,
+      "completed": 1792174688657
+    },
+    {
+      "created": 1792174688682,
+      "streamed": 1792174700694,
+      "completed": 1792174700796
+    },
+    {
+      "created": 1792174700819,
+      "streamed": 1792174713028,
+      "completed": 1792174713128
+    },
+    {
+      "created": 1792174713151,
+      "streamed": 1792174725048,
+      "completed": 1792174725151
+    },
+    {
+      "created": 1792174725176,
+      "streamed": 1792174737106,
+      "completed": 1792174737204
+    },
+    {
+      "created": 1792174737229,
+      "streamed": 1792174749333,
+      "completed": 1792174749441
+    },
+    {
+      "created": 1792174749466,
+      "streamed": 1792174761370,
+      "completed": 1792174761475
+    },
+    {
+      "created": 1792174761499,
+      "streamed": 1792174773409,
+      "completed": 1792174773516
+    },
+    {
+      "created": 1792174773542,
+      "streamed": 1792174785657,
+      "completed": 1792174785761
+    },
+    {
+      "created": 1792174785786,
+      "streamed": 1792174797839,
+      "completed": 1792174797941
+    },
+    {
+      "created": 1792174797966,
+      "streamed": 1792174810040,
+      "completed": 1792174810143
+    },
+    {
+      "created": 1792174810168,
+      "streamed": 1792174822018,
+      "completed": 1792174822122
+    },
+    {
+      "created": 1792174822148,
+      "streamed": 1792174834719,
+      "completed": 1792174834825
+    },
+    {
+      "created": 1792174834849,
+      "streamed": 1792174847208,
+      "completed": 1792174847306
+    },
+    {
+      "created": 1792174847330,
+      "streamed": 1792174859389,
+      "completed": 1792174859496
+    },
+    {
+      "created": 1792174859520,
+      "streamed": 1792174871673,
+      "completed": 1792174871777
+    },
+    {
+      "created": 1792174871802,
+      "streamed": 1792174883611,
+      "completed": 1792174883718
+    },
+    {
+      "created": 1792174883744,
+      "streamed": 1792174895760,
+      "completed": 1792174895863
+    },
+    {
+      "created": 1792174895890,
+      "streamed": 1792174908115,
+      "completed": 1792174908230
+    },
+    {
+      "created": 1792174908258,
+      "streamed": 1792174920190,
+      "completed": 1792174920290
+    },
+    {
+      "created": 1792174920316,
+      "streamed": 1792174932278,
+      "completed": 1792174932379
+    },
+    {
+      "created": 1792174932404,
+      "streamed": 1792174944822,
+      "completed": 1792174944931
+    },
+    {
+      "created": 1792174944957,
+      "streamed": 1792174957109,
+      "completed": 1792174957213
+    },
+    {
+      "created": 1792174957239,
+      "streamed": 1792174969084,
+      "completed": 1792174969188
+    },
+    {
+      "created": 1792174969220,
+      "streamed": 1792174981467,
+      "completed": 1792174981567
+    },
+    {
+      "created": 1792174981593,
+      "streamed": 1792174993569,
+      "completed": 1792174993671
+    },
+    {
+      "created": 1792174993698,
+      "streamed": 1792175005642,
+      "completed": 1792175005745
+    },
+    {
+      "created": 1792175005771,
+      "streamed": 1792175017954,
+      "completed": 1792175018055
+    },
+    {
+      "created": 1792175018081,
+      "streamed": 1792175030428,
+      "completed": 1792175030534
+    },
+    {
+      "created": 1792175030560,
+      "streamed": 1792175042743,
+      "completed": 1792175042846
+    },
+    {
+      "created": 1792175042874,
+      "streamed": 1792175054817,
+      "completed": 1792175054924
+    },
+    {
+      "created": 1792175054951,
+      "streamed": 1792175067116,
+      "completed": 1792175067216
+    },
+    {
+      "created": 1792175067241,
+      "streamed": 1792175079360,
+      "completed": 1792175079463
+    },
+    {
+      "created": 1792175079491,
+      "streamed": 1792175091866,
+      "completed": 1792175091968
+    },
+    {
+      "created": 1792175091994,
+      "streamed": 1792175104079,
+      "completed": 1792175104183
+    },
+    {
+      "created": 1792175104209,
+      "streamed": 1792175116229,
+      "completed": 1792175116329
+    },
+    {
+      "created": 1792175116356,
+      "streamed": 1792175128521,
+      "completed": 1792175128624
+    },
+    {
+      "created": 1792175128653,
+      "streamed": 1792175140804,
+      "completed": 1792175140899
+    },
+    {
+      "created": 1792175140926,
+      "streamed": 1792175153534,
+      "completed": 1792175153638
+    },
+    {
+      "created": 1792175153665,
+      "streamed": 1792175165966,
+      "completed": 1792175166068
+    },
+    {
+      "created": 1792175166094,
+      "streamed": 1792175178123,
+      "completed": 1792175178222
+    },
+    {
+      "created": 1792175178249,
+      "streamed": 1792175190694,
+      "completed": 1792175190798
+    },
+    {
+      "created": 1792175190824,
+      "streamed": 1792175202946,
+      "completed": 1792175203046
+    },
+    {
+      "created": 1792175203073,
+      "streamed": 1792175215314,
+      "completed": 1792175215417
+    },
+    {
+      "created": 1792175215449,
+      "streamed": 1792175227418,
+      "completed": 1792175227520
+    },
+    {
+      "created": 1792175227547,
+      "streamed": 1792175240093,
+      "completed": 1792175240195
+    },
+    {
+      "created": 1792175240222,
+      "streamed": 1792175252360,
+      "completed": 1792175252469
+    },
+    {
+      "created": 1792175252496,
+      "streamed": 1792175264776,
+      "completed": 1792175264879
+    },
+    {
+      "created": 1792175264907,
+      "streamed": 1792175276964,
+      "completed": 1792175277063
+    },
+    {
+      "created": 1792175277090,
+      "streamed": 1792175289340,
+      "completed": 1792175289440
+    },
+    {
+      "created": 1792175289469,
+      "streamed": 1792175301881,
+      "completed": 1792175301984
+    },
+    {
+      "created": 1792175302011,
+      "streamed": 1792175314868,
+      "completed": 1792175314968
+    },
+    {
+      "created": 1792175314995,
+      "streamed": 1792175327391,
+      "completed": 1792175327492
+    },
+    {
+      "created": 1792175327520,
+      "streamed": 1792175339844,
+      "completed": 1792175339944
+    },
+    {
+      "created": 1792175339972,
+      "streamed": 1792175352133,
+      "completed": 1792175352235
+    },
+    {
+      "created": 1792175352262,
+      "streamed": 1792175364327,
+      "completed": 1792175364429
+    },
+    {
+      "created": 1792175364458,
+      "streamed": 1792175376898,
+      "completed": 1792175376997
+    },
+    {
+      "created": 1792175377024,
+      "streamed": 1792175389404,
+      "completed": 1792175389511
+    },
+    {
+      "created": 1792175389540,
+      "streamed": 1792175401720,
+      "completed": 1792175401820
+    },
+    {
+      "created": 1792175401847,
+      "streamed": 1792175414014,
+      "completed": 1792175414116
+    },
+    {
+      "created": 1792175414144,
+      "streamed": 1792175426336,
+      "completed": 1792175426437
+    },
+    {
+      "created": 1792175426465,
+      "streamed": 1792175438863,
+      "completed": 1792175438966
+    },
+    {
+      "created": 1792175438995,
+      "streamed": 1792175451513,
+      "completed": 1792175451620
+    },
+    {
+      "created": 1792175451649,
+      "streamed": 1792175463912,
+      "completed": 1792175464018
+    },
+    {
+      "created": 1792175464053,
+      "streamed": 1792175476285,
+      "completed": 1792175476387
+    },
+    {
+      "created": 1792175476415,
+      "streamed": 1792175488773,
+      "completed": 1792175488875
+    },
+    {
+      "created": 1792175488906,
+      "streamed": 1792175501142,
+      "completed": 1792175501246
+    },
+    {
+      "created": 1792175501274,
+      "streamed": 1792175513562,
+      "completed": 1792175513667
+    },
+    {
+      "created": 1792175513696,
+      "streamed": 1792175526405,
+      "completed": 1792175526502
+    },
+    {
+      "created": 1792175526531,
+      "streamed": 1792175538874,
+      "completed": 1792175538979
+    },
+    {
+      "created": 1792175539011,
+      "streamed": 1792175551580,
+      "completed": 1792175551696
+    },
+    {
+      "created": 1792175551730,
+      "streamed": 1792175563939,
+      "completed": 1792175564040
+    },
+    {
+      "created": 1792175564069,
+      "streamed": 1792175576574,
+      "completed": 1792175576679
+    },
+    {
+      "created": 1792175576709,
+      "streamed": 1792175589133,
+      "completed": 1792175589237
+    },
+    {
+      "created": 1792175589269,
+      "streamed": 1792175601637,
+      "completed": 1792175601741
+    },
+    {
+      "created": 1792175601770,
+      "streamed": 1792175614003,
+      "completed": 1792175614106
+    },
+    {
+      "created": 1792175614134,
+      "streamed": 1792175626609,
+      "completed": 1792175626712
+    },
+    {
+      "created": 1792175626742,
+      "streamed": 1792175639176,
+      "completed": 1792175639279
+    },
+    {
+      "created": 1792175639312,
+      "streamed": 1792175652006,
+      "completed": 1792175652115
+    },
+    {
+      "created": 1792175652145,
+      "streamed": 1792175664745,
+      "completed": 1792175664847
+    },
+    {
+      "created": 1792175664876,
+      "streamed": 1792175677510,
+      "completed": 1792175677610
+    },
+    {
+      "created": 1792175677639,
+      "streamed": 1792175690223,
+      "completed": 1792175690323
+    },
+    {
+      "created": 1792175690353,
+      "streamed": 1792175702951,
+      "completed": 1792175703052
+    },
+    {
+      "created": 1792175703082,
+      "streamed": 1792175715439,
+      "completed": 1792175715539
+    },
+    {
+      "created": 1792175715568,
+      "streamed": 1792175728039,
+      "completed": 1792175728148
+    },
+    {
+      "created": 1792175728178,
+      "streamed": 1792175740486,
+      "completed": 1792175740587
+    },
+    {
+      "created": 1792175740619,
+      "streamed": 1792175753096,
+      "completed": 1792175753202
+    },
+    {
+      "created": 1792175753232,
+      "streamed": 1792175766055,
+      "completed": 1792175766155
+    },
+    {
+      "created": 1792175766184,
+      "streamed": 1792175778652,
+      "completed": 1792175778756
+    },
+    {
+      "created": 1792175778787,
+      "streamed": 1792175791244,
+      "completed": 1792175791348
+    },
+    {
+      "created": 1792175791379,
+      "streamed": 1792175803651,
+      "completed": 1792175803750
+    },
+    {
+      "created": 1792175803779,
+      "streamed": 1792175816671,
+      "completed": 1792175816770
+    },
+    {
+      "created": 1792175816802,
+      "streamed": 1792175829076,
+      "completed": 1792175829180
+    },
+    {
+      "created": 1792175829213,
+      "streamed": 1792175842068,
+      "completed": 1792175842165
+    },
+    {
+      "created": 1792175842195,
+      "streamed": 1792175854579,
+      "completed": 1792175854683
+    },
+    {
+      "created": 1792175854713,
+      "streamed": 1792175867194,
+      "completed": 1792175867299
+    },
+    {
+      "created": 1792175867330,
+      "streamed": 1792175879636,
+      "completed": 1792175879738
+    },
+    {
+      "created": 1792175879770,
+      "streamed": 1792175892334,
+      "completed": 1792175892434
+    },
+    {
+      "created": 1792175892465,
+      "streamed": 1792175905074,
+      "completed": 1792175905174
+    },
+    {
+      "created": 1792175905206,
+      "streamed": 1792175917775,
+      "completed": 1792175917874
+    },
+    {
+      "created": 1792175917907,
+      "streamed": 1792175931005,
+      "completed": 1792175931107
+    },
+    {
+      "created": 1792175931139,
+      "streamed": 1792175943852,
+      "completed": 1792175943952
+    },
+    {
+      "created": 1792175943984,
+      "streamed": 1792175956402,
+      "completed": 1792175956504
+    },
+    {
+      "created": 1792175956535,
+      "streamed": 1792175969034,
+      "completed": 1792175969142
+    },
+    {
+      "created": 1792175969174,
+      "streamed": 1792175981506,
+      "completed": 1792175981606
+    },
+    {
+      "created": 1792175981636,
+      "streamed": 1792175994406,
+      "completed": 1792175994515
+    },
+    {
+      "created": 1792175994545,
+      "streamed": 1792176007621,
+      "completed": 1792176007722
+    },
+    {
+      "created": 1792176007751,
+      "streamed": 1792176020565,
+      "completed": 1792176020666
+    },
+    {
+      "created": 1792176020698,
+      "streamed": 1792176033636,
+      "completed": 1792176033735
+    },
+    {
+      "created": 1792176033766,
+      "streamed": 1792176046268,
+      "completed": 1792176046371
+    },
+    {
+      "created": 1792176046403,
+      "streamed": 1792176058911,
+      "completed": 1792176059016
+    },
+    {
+      "created": 1792176059052,
+      "streamed": 1792176071810,
+      "completed": 1792176071908
+    },
+    {
+      "created": 1792176071938,
+      "streamed": 1792176084417,
+      "completed": 1792176084519
+    },
+    {
+      "created": 1792176084551,
+      "streamed": 1792176097019,
+      "completed": 1792176097120
+    },
+    {
+      "created": 1792176097152,
+      "streamed": 1792176109896,
+      "completed": 1792176110001
+    },
+    {
+      "created": 1792176110032,
+      "streamed": 1792176122621,
+      "completed": 1792176122720
+    },
+    {
+      "created": 1792176122751,
+      "streamed": 1792176135605,
+      "completed": 1792176135704
+    },
+    {
+      "created": 1792176135736,
+      "streamed": 1792176148393,
+      "completed": 1792176148496
+    },
+    {
+      "created": 1792176148531,
+      "streamed": 1792176161097,
+      "completed": 1792176161205
+    },
+    {
+      "created": 1792176161236,
+      "streamed": 1792176173695,
+      "completed": 1792176173797
+    },
+    {
+      "created": 1792176173827,
+      "streamed": 1792176186549,
+      "completed": 1792176186649
+    },
+    {
+      "created": 1792176186682,
+      "streamed": 1792176199355,
+      "completed": 1792176199460
+    },
+    {
+      "created": 1792176199496,
+      "streamed": 1792176212219,
+      "completed": 1792176212320
+    },
+    {
+      "created": 1792176212352,
+      "streamed": 1792176225334,
+      "completed": 1792176225440
+    },
+    {
+      "created": 1792176225471,
+      "streamed": 1792176238187,
+      "completed": 1792176238296
+    },
+    {
+      "created": 1792176238329,
+      "streamed": 1792176251143,
+      "completed": 1792176251248
+    },
+    {
+      "created": 1792176251282,
+      "streamed": 1792176264246,
+      "completed": 1792176264351
+    },
+    {
+      "created": 1792176264384,
+      "streamed": 1792176276944,
+      "completed": 1792176277042
+    },
+    {
+      "created": 1792176277074,
+      "streamed": 1792176289791,
+      "completed": 1792176289893
+    },
+    {
+      "created": 1792176289927,
+      "streamed": 1792176302621,
+      "completed": 1792176302734
+    },
+    {
+      "created": 1792176302766,
+      "streamed": 1792176315342,
+      "completed": 1792176315445
+    },
+    {
+      "created": 1792176315478,
+      "streamed": 1792176328084,
+      "completed": 1792176328187
+    },
+    {
+      "created": 1792176328223,
+      "streamed": 1792176341002,
+      "completed": 1792176341103
+    },
+    {
+      "created": 1792176341137,
+      "streamed": 1792176354325,
+      "completed": 1792176354426
+    },
+    {
+      "created": 1792176354460,
+      "streamed": 1792176367126,
+      "completed": 1792176367225
+    },
+    {
+      "created": 1792176367257,
+      "streamed": 1792176380020,
+      "completed": 1792176380121
+    },
+    {
+      "created": 1792176380154,
+      "streamed": 1792176392864,
+      "completed": 1792176392968
+    },
+    {
+      "created": 1792176393003,
+      "streamed": 1792176405644,
+      "completed": 1792176405747
+    },
+    {
+      "created": 1792176405780,
+      "streamed": 1792176418450,
+      "completed": 1792176418564
+    },
+    {
+      "created": 1792176418608,
+      "streamed": 1792176431981,
+      "completed": 1792176432092
+    },
+    {
+      "created": 1792176432125,
+      "streamed": 1792176445028,
+      "completed": 1792176445129
+    },
+    {
+      "created": 1792176445163,
+      "streamed": 1792176458361,
+      "completed": 1792176458464
+    },
+    {
+      "created": 1792176458497,
+      "streamed": 1792176471356,
+      "completed": 1792176471460
+    },
+    {
+      "created": 1792176471494,
+      "streamed": 1792176484389,
+      "completed": 1792176484492
+    },
+    {
+      "created": 1792176484525,
+      "streamed": 1792176497434,
+      "completed": 1792176497539
+    },
+    {
+      "created": 1792176497572,
+      "streamed": 1792176510352,
+      "completed": 1792176510456
+    },
+    {
+      "created": 1792176510488,
+      "streamed": 1792176523877,
+      "completed": 1792176523985
+    }
+  ],
+  "samples": [
+    [
+      {
+        "input": {
+          "include": "*.css",
+          "path": "D:\\Agent\\web\\src",
+          "pattern": "^\\.input\\b"
+        },
+        "status": "completed",
+        "result": "[{'type': 'text', 'text': 'No matches found'}]"
+      },
+      {
+        "input": {
+          "include": "*.css",
+          "path": "D:\\Agent\\web\\src",
+          "pattern": "^\\.badge\\b"
+        },
+        "status": "completed",
+        "result": "[{'type': 'text', 'text': 'Found 7 matches\\nD:\\\\Agent\\\\web\\\\src\\\\styles.css:\\n  Line 1421: .badge {\\r\\n\\n  Line 1645: .badge {\\r\\n\\n  Line 1649: .badge.active {\\r\\n\\n  Line 1653: .badge.closed,\\r\\n\\n  Line 1654: .badge.archived {\\r\\n\\n  Line 1658: .badge.draft,\\r\\n\\n  Line 1659: .badge.warning {\\r\\n'}]"
+      }
+    ],
+    [
+      {
+        "input": {
+          "include": "*.css",
+          "path": "D:\\Agent\\web\\src",
+          "pattern": "^\\.input\\b|\\.input\\s*\\{|\\.input,"
+        },
+        "status": "completed",
+        "result": "[{'type': 'text', 'text': 'Found 14 matches\\nD:\\\\Agent\\\\web\\\\src\\\\components\\\\project-documents.css:\\n  Line 3: .project-documents select.input{min-width:0;width:100%;max-width:100%;text-overflow:ellipsis}\\r\\n\\n\\nD:\\\\Agent\\\\web\\\\src\\\\minipilot.css:\\n  Line 130: .mp-toolbar .input {\\r\\n\\n\\nD:\\\\Agent\\\\web\\\\src\\\\components\\\\project-reviews.css:\\n  Line 10: .review-sheet .input { width: 100%; min-width: 0; box-sizing: border-box; }\\r\\n\\n\\nD:\\\\Agent\\\\"
+      },
+      {
+        "input": {
+          "include": "*.css",
+          "path": "D:\\Agent\\web\\src",
+          "pattern": "^\\.badge\\b"
+        },
+        "status": "completed",
+        "result": "[{'type': 'text', 'text': 'Found 7 matches\\nD:\\\\Agent\\\\web\\\\src\\\\styles.css:\\n  Line 1421: .badge {\\r\\n\\n  Line 1645: .badge {\\r\\n\\n  Line 1649: .badge.active {\\r\\n\\n  Line 1653: .badge.closed,\\r\\n\\n  Line 1654: .badge.archived {\\r\\n\\n  Line 1658: .badge.draft,\\r\\n\\n  Line 1659: .badge.warning {\\r\\n'}]"
+      }
+    ]
+  ]
+}

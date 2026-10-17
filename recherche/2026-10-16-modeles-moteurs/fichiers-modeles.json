@@ -1,0 +1,160 @@
+[
+  {
+    "repository": "google/gemma-4-26B-A4B-it-qat-q4_0-gguf",
+    "revision": "d1c082be9cf3c8a514acf63b8761f4b41935842e",
+    "weights_downloaded": false,
+    "files": [
+      {
+        "file": "gemma-4-26B-it-mmproj.gguf",
+        "bytes": 1194828160
+      },
+      {
+        "file": "gemma-4-26B_q4_0-it.gguf",
+        "bytes": 14439363584
+      }
+    ]
+  },
+  {
+    "repository": "nvidia/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-24GB-GGUF",
+    "revision": "e0fecb69cb3e5e4c5e8a056fa2aec98c78e91246",
+    "weights_downloaded": false,
+    "files": [
+      {
+        "file": "NVIDIA-Nemotron-3.5-Bolt-74B-A9B-24GB.gguf",
+        "bytes": 22018326528
+      },
+      {
+        "file": "mmproj-NVIDIA-Nemotron-3.5-Bolt-74B-A9B-24GB.gguf",
+        "bytes": 1733692736
+      }
+    ]
+  },
+  {
+    "repository": "ukisai/Swift-1.5-Qwen3.8-Flash-Next-GSQ-RCO-GGUF",
+    "revision": "99bb8f7f95c7aa7b24a36a7786a4f657b30f5d3d",
+    "weights_downloaded": false,
+    "files": [
+      {
+        "file": "Swift-Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S-00001-of-00002.gguf",
+        "bytes": 44900816736
+      },
+      {
+        "file": "Swift-Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S-00002-of-00002.gguf",
+        "bytes": 38842920384
+      },
+      {
+        "file": "mmproj-Swift-Qwen3.8-Flash-Next-BF16.gguf",
+        "bytes": 907543520
+      }
+    ]
+  },
+  {
+    "repository": "unsloth/Qwen3.6-35B-A3B-GGUF",
+    "revision": "a483e9e6cbd595906af30beda3187c2663a1118c",
+    "weights_downloaded": false,
+    "files": [
+      {
+        "file": "Qwen3.6-35B-A3B-UD-IQ3_S.gguf",
+        "bytes": 13676723168
+      },
+      {
+        "file": "Qwen3.6-35B-A3B-UD-Q4_K_M.gguf",
+        "bytes": 22134528992
+      },
+      {
+        "file": "Qwen3.6-35B-A3B-UD-Q4_K_XL.gguf",
+        "bytes": 22360456160
+      },
+      {
+        "file": "Qwen3.6-35B-A3B-UD-Q5_K_M.gguf",
+        "bytes": 26456194016
+      },
+      {
+        "file": "mmproj-BF16.gguf",
+        "bytes": 902822624
+      },
+      {
+        "file": "mmproj-F16.gguf",
+        "bytes": 899283680
+      },
+      {
+        "file": "mmproj-F32.gguf",
+        "bytes": 1786305248
+      }
+    ]
+  },
+  {
+    "repository": "unsloth/Qwen3.6-35B-A3B-MTP-GGUF",
+    "revision": "5bc3e238d916f48a861bac2f8a1990a0e9b7e98d",
+    "weights_downloaded": false,
+    "files": [
+      {
+        "file": "Qwen3.6-35B-A3B-UD-IQ3_S.gguf",
+        "bytes": 15346432288
+      },
+      {
+        "file": "Qwen3.6-35B-A3B-UD-Q4_K_M.gguf",
+        "bytes": 22663387424
+      },
+      {
+        "file": "Qwen3.6-35B-A3B-UD-Q4_K_XL.gguf",
+        "bytes": 22853663008
+      },
+      {
+        "file": "Qwen3.6-35B-A3B-UD-Q5_K_M.gguf",
+        "bytes": 27087812896
+      },
+      {
+        "file": "mmproj-BF16.gguf",
+        "bytes": 902822528
+      },
+      {
+        "file": "mmproj-F16.gguf",
+        "bytes": 899283584
+      },
+      {
+        "file": "mmproj-F32.gguf",
+        "bytes": 1786305152
+      }
+    ]
+  },
+  {
+    "repository": "unsloth/Qwen3.8-27B-GGUF",
+    "revision": "4ca720788d1e01f1bff70c033e0d0028fd02e502",
+    "weights_downloaded": false,
+    "files": [
+      {
+        "file": "MTP/mtp-Qwen3.8-27B-Q4_0.gguf",
+        "bytes": 1369590656
+      },
+      {
+        "file": "Qwen3.8-27B-Q4_0.gguf",
+        "bytes": 16056478688
+      },
+      {
+        "file": "Qwen3.8-27B-UD-IQ3_S.gguf",
+        "bytes": 12040883104
+      },
+      {
+        "file": "Qwen3.8-27B-UD-Q4_K_M.gguf",
+        "bytes": 16464440224
+      },
+      {
+        "file": "Qwen3.8-27B-UD-Q4_K_XL.gguf",
+        "bytes": 17559178144
+      },
+      {
+        "file": "Qwen3.8-27B-UD-Q5_K_M.gguf",
+        "bytes": 19771509664
+      },
+      {
+        "file": "mmproj-BF16.gguf",
+        "bytes": 931146432
+      },
+      {
+        "file": "mmproj-F16.gguf",
+        "bytes": 927607488
+      }
+    ]
+  }
+]
