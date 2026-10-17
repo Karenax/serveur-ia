@@ -1,0 +1,49 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "transport": "https",
+      "model": "qwen3.8-flash-next-iq4-xs",
+      "stream": false,
+      "answer": "API_OK",
+      "seconds": 1.94
+    },
+    {
+      "transport": "https",
+      "model": "qwen3.8-flash-next-iq4-xs",
+      "stream": true,
+      "answer": "API_OK",
+      "seconds": 0.94
+    },
+    {
+      "transport": "https",
+      "model": "gpt-6-luna",
+      "stream": false,
+      "answer": "API_OK",
+      "seconds": 4.44
+    },
+    {
+      "transport": "https",
+      "model": "gpt-6-luna",
+      "stream": true,
+      "answer": "API_OK",
+      "seconds": 4.67
+    },
+    {
+      "transport": "wireguard",
+      "model": "qwen3.8-flash-next-iq4-xs",
+      "stream": false,
+      "answer": "API_OK",
+      "seconds": 1.73
+    },
+    {
+      "transport": "wireguard",
+      "model": "qwen3.8-flash-next-iq4-xs",
+      "stream": true,
+      "answer": "API_OK",
+      "seconds": 0.92
+    }
+  ],
+  "contains_secret_values": false,
+  "client_tool_roundtrip": true
+}
