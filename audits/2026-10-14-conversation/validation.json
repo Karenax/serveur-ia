@@ -1,0 +1,49 @@
+{
+  "passed": true,
+  "version": "3.5.30",
+  "unique_python_tests_covered": 505,
+  "initial_server_run": {
+    "tests": 466,
+    "seconds": 835.955,
+    "passed": false,
+    "log": "server-tests.log"
+  },
+  "initial_server_failures": "Two package-version/signature guards expected the new distribution; both pass after final build/publication.",
+  "client": {
+    "tests": 19,
+    "seconds": 1.761,
+    "passed": true,
+    "log": "client-tests.log"
+  },
+  "voice": {
+    "tests": 20,
+    "seconds": 1.819,
+    "passed": true,
+    "log": "voice-tests.log"
+  },
+  "update_recheck": {
+    "tests": 10,
+    "seconds": 36.579,
+    "passed": true,
+    "log": "update-tests-recheck.log"
+  },
+  "signed_personal_client": {
+    "tests": 1,
+    "seconds": 24.363,
+    "passed": true,
+    "log": "personal-client-final.log"
+  },
+  "wireguard_recheck": {
+    "tests": 1,
+    "seconds": 6.813,
+    "passed": true,
+    "log": "wireguard-recheck.log"
+  },
+  "additional_transient_failure": "A parallel update suite saw a Windows reset on an intentionally unavailable auth route. The isolated test and full update suite passed on recheck; retained in update-tests-final.log.",
+  "ui_suites": 5,
+  "native_source_and_packaged_capture": true,
+  "real_local_qwen_and_tts": true,
+  "human_room_acoustic_validation": false,
+  "human_asr_accuracy_validation": false,
+  "no_microphone_audio_or_transcripts_saved": true
+}

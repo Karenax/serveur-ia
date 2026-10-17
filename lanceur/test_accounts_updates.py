@@ -1,6 +1,7 @@
 """Regression tests use isolated accounts, signed fixtures and fake model endpoints."""
 import base64
 import json
+import os
 from pathlib import Path
 import secrets
 import sys
@@ -114,7 +115,7 @@ class AccountsTests(unittest.TestCase):
         import shutil,struct,hashlib
         from types import SimpleNamespace
         from wg_crypto import keypair,protect
-        source=ROOT/'client-qwen/dist/Accès serveur Fred.exe'
+        source=Path(os.environ.get('FRED_TEST_CLIENT_EXE',str(ROOT/'client-qwen/dist/Accès serveur Fred.exe')))
         if not source.exists():self.skipTest('Compiler le client avant ce test.')
         with tempfile.TemporaryDirectory(dir=HOME) as folder:
             home=Path(folder);work=home/'update';work.mkdir()

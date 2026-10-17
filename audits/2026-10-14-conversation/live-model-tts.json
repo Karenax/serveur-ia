@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "hermes_called": false,
+  "cloud_called": false,
+  "turns": [
+    {
+      "question": "Bonjour Fred, tu m’entends bien ?",
+      "answer": "Oui, je t'entends parfaitement. Comment vas-tu aujourd'hui ?",
+      "first_text_seconds": 2.875,
+      "first_tts_fragment_seconds": 0.15599999998812564,
+      "audio_seconds": 3.28
+    },
+    {
+      "question": "Combien font dix-sept fois dix-neuf ?",
+      "answer": "Dix-sept fois dix-neuf, ça fait trois cent vingt-trois.",
+      "first_text_seconds": 2.937999999994645,
+      "first_tts_fragment_seconds": 0.125,
+      "audio_seconds": 2.16
+    }
+  ],
+  "tts": "real Pocket TTS CPU offline",
+  "model": "loaded production Qwen, no restart",
+  "network": "temporary authenticated gateway on loopback"
+}

@@ -13,7 +13,7 @@ async function until(work,label){for(let i=0;i<400;i++){if(await work())return;a
 async function main(){
   const {chromium,options}=require('./browser_test_support.cjs');
   const browser=await chromium.launch(options);
-  const state={history:null,revision:'1',preferences:{},native:{phase:'idle',installed:true,session:'',speech_id:0,partial:'',turns:[]},calls:[],chats:[],runs:new Map(),syncDelay:0,syncActive:0,acks:[],stops:0,cancels:[],voiceCancels:[],speech:[],timers:new Set(),holdChat:false,longVoice:false,pendingChat:null};
+  const state={history:null,revision:'1',preferences:{},native:{phase:'idle',installed:true,session:'',speech_id:0,partial:'',turns:[]},calls:[],chats:[],runs:new Map(),syncDelay:0,syncActive:0,acks:[],stops:0,cancels:[],voiceCancels:[],speech:[],timers:new Set(),holdChat:false,longVoice:false,pendingChat:null,delayedReply:false,failStop:false};
   const json=(res,value,status=200)=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8'});res.end(JSON.stringify(value));};
   const event=(res,value)=>{if(!res.destroyed&&!res.writableEnded)res.write('data: '+JSON.stringify(value)+'\n\n');};
   const later=(work,ms)=>{const timer=setTimeout(()=>{state.timers.delete(timer);work();},ms);state.timers.add(timer);};
@@ -33,10 +33,10 @@ async function main(){
     if(req.url==='/client/conversation'){
       if(body.action==='start')state.native={...state.native,phase:'listening',session:'qa-conversation',turns:[],speech_id:0};
       if(body.action==='ack'){assert.equal(body.session,state.native.session);state.acks.push(body.turn);state.native.turns=state.native.turns.filter(turn=>turn.id>body.turn);}
-      if(body.action==='stop'){assert.equal(body.session,state.native.session);state.stops++;state.native={...state.native,phase:'stopped',turns:[],partial:''};}
+      if(body.action==='stop'){assert.equal(body.session,state.native.session);if(state.failStop){state.failStop=false;return json(res,{error:{message:'Raccrochage temporairement indisponible'}},503);}state.stops++;state.native={...state.native,phase:'stopped',turns:[],partial:''};}
       return json(res,state.native);
     }
-    if(req.url==='/v1/models')return json(res,{source:'hermes',default_model:'Fred-test',data:[{id:'Fred-test',name:'Modèle local',available:true,capabilities:{images:false,thinking:true,reasoning_efforts:['none','low','medium','high']}},{id:'fred-test-cloud',name:'Modèle vocal choisi',provider:'Cloud de test',available:true,capabilities:{vision:false,thinking:true,reasoning_mode:automaticReasoning?'none':'effort',reasoning_efforts:automaticReasoning?[]:['none','xhigh','max']}}]});
+    if(req.url==='/v1/models')return json(res,{source:'hermes',default_model:'Fred-test',data:[{id:'Fred-test',provider:'Qwen local',name:'Modèle local',available:true,capabilities:{images:false,thinking:true,reasoning_efforts:['none','low','medium','high']}},{id:'fred-test-cloud',name:'Modèle vocal choisi',provider:'Cloud de test',available:true,capabilities:{vision:false,thinking:true,reasoning_mode:automaticReasoning?'none':'effort',reasoning_efforts:automaticReasoning?[]:['none','xhigh','max']}}]});
     if(req.url==='/v1/status')return json(res,{protocol:3,agent_protocol:4,version:'test'});
     if(req.url==='/v1/workspace')return json(res,{projects:[],jobs:[]});
     if(req.url==='/v1/notifications')return json(res,{items:[],unread:0});
@@ -51,16 +51,17 @@ async function main(){
       later(()=>{event(res,{id:body.request_id,done:true});if(!res.destroyed&&!res.writableEnded)res.end();},50+frames*30);return;
     }
     if(req.url==='/v1/cancel'){
-      state.cancels.push(req.headers['x-qwen-request']);const pending=state.pendingChat;
+      assert.equal(body.voice_conversation,true);state.cancels.push(req.headers['x-qwen-request']);const pending=state.pendingChat;
       if(pending&&pending.body.turn_id===req.headers['x-qwen-request']){state.runs.set(pending.body.turn_id,{request_id:pending.body.turn_id,conversation_id:pending.body.conversation_id,status:'cancelled',text:''});if(!pending.res.destroyed&&!pending.res.writableEnded)pending.res.end('data: [DONE]\n\n');state.pendingChat=null;}
       return json(res,{cancelled:true});
     }
     if(req.url==='/v1/chat/completions'){
-      assert.equal(body.model,'fred-test-cloud','Native ASR must use the conversation model selected before the call');
-      if(automaticReasoning)assert.equal(Object.hasOwn(body,'reasoning_effort'),false,'Automatic reasoning must also omit the override in native ASR turns');else assert.equal(body.reasoning_effort,'max','Native ASR must retain the exact supported effort without reducing max');
-      assert.equal(body.turn_id,req.headers['x-qwen-request']);state.chats.push(body);state.runs.set(body.turn_id,{request_id:body.turn_id,conversation_id:body.conversation_id,status:'running',text:''});
+      assert.equal(body.model,'Fred-test','Native ASR must keep the chosen local model');assert.equal(body.voice_conversation,true,'Oral requests must bypass Hermes');
+      assert.equal(body.reasoning_effort,'none','Oral replies disable thinking without changing the written-chat preference');
+      assert.equal(body.turn_id,req.headers['x-qwen-request']);state.chats.push(body);if(!body.voice_conversation)state.runs.set(body.turn_id,{request_id:body.turn_id,conversation_id:body.conversation_id,status:'running',text:''});
       res.writeHead(200,{'Content-Type':'text/event-stream; charset=utf-8'});event(res,{hermes_status:{phase:'working',message:'Hermes prépare la réponse'}});
       if(state.holdChat){state.pendingChat={body,res};return;}
+      if(state.delayedReply){event(res,{choices:[{delta:{content:'Oui. '}}]});later(()=>{event(res,{choices:[{delta:{content:'Je t’entends bien.'}}]});event(res,{choices:[{delta:{},finish_reason:'stop'}]});if(!res.destroyed&&!res.writableEnded)res.end('data: [DONE]\n\n');},1800);return;}
       later(()=>{const text=state.chats.length===1?'La livraison du projet Orion est prévue le 23 novembre.':'Le budget du projet Orion est de 4200 euros.';state.runs.set(body.turn_id,{request_id:body.turn_id,conversation_id:body.conversation_id,status:'completed',text,reasoning_content:'',sources:[]});event(res,{choices:[{delta:{content:text}}]});event(res,{hermes_run:{request_id:body.turn_id,conversation_id:body.conversation_id,status:'completed'}});event(res,{choices:[{delta:{},finish_reason:'stop'}]});if(!res.destroyed&&!res.writableEnded)res.end('data: [DONE]\n\n');},150);return;
     }
     return json(res,{});
@@ -79,7 +80,7 @@ async function main(){
         createBufferSource(){const context=this,source={connect(){},start(time){window.__audio.started++;this.timer=setTimeout(()=>{window.__audio.ended++;this.onended?.();},Math.max(0,(time-context.currentTime+this.buffer.duration)*1000));},stop(){clearTimeout(this.timer);window.__audio.stopped++;this.onended?.();}};return source;}
       };
     });
-    await page.goto('http://127.0.0.1:'+server.address().port);await page.waitForSelector('#conversation-start:not([disabled])');await page.selectOption('#conversation-model','fred-test-cloud');if(!automaticReasoning)await page.locator('.thinking-segment:has(#thinking-max)').click();await page.click('#conversation-start');await page.waitForFunction(()=>window.conversationBusy);assert.equal(await page.isDisabled('#conversation-model'),true,'Model choice stays bound during a voice session');
+    await page.goto('http://127.0.0.1:'+server.address().port);await page.waitForSelector('#conversation-start:not([disabled])');await page.selectOption('#conversation-model','fred-test-cloud');await page.click('#conversation-start');await page.waitForFunction(()=>document.getElementById('conversation-status').textContent.includes('Qwen local'));assert.equal(await page.evaluate(()=>window.conversationBusy),false);await page.selectOption('#conversation-model','Fred-test');if(!automaticReasoning)await page.locator('.thinking-segment:has(#thinking-high)').click();await page.click('#conversation-start');await page.waitForFunction(()=>window.conversationBusy);assert.equal(await page.isDisabled('#conversation-model'),true,'Model choice stays bound during a voice session');
     state.syncDelay=1200;state.native.speech_id=1;state.native.turns=[{id:1,text:'Quelle est la livraison du projet Orion ?'}];
     await page.waitForFunction(()=>historySyncPending&&messages.some(message=>message.role==='assistant'&&message.content));await sleep(350);
     snapshot=await page.evaluate(()=>({active:window.conversationBusy,busy,historySyncPending,text:messages.at(-1).content,status:document.getElementById('conversation-status').textContent}));
@@ -99,8 +100,22 @@ async function main(){
     state.holdChat=false;state.longVoice=true;const previousSources=await page.evaluate(()=>window.__audio.started);state.native.partial='';state.native.speech_id=5;state.native.turns=[{id:4,text:'Une réponse à interrompre pendant sa lecture.'}];await page.waitForFunction(previous=>window.__audio.started>previous,previousSources);const speechId=state.speech.at(-1).id;
     state.native.speech_id=6;state.native.partial='Stop.';await until(()=>state.voiceCancels.includes(speechId),'barge-in cancels the correct speech');assert(await page.evaluate(()=>window.__audio.stopped>0));await page.waitForFunction(()=>!busy&&!historySyncPending);
     await page.click('#conversation-start');await page.waitForFunction(()=>!window.conversationBusy&&!document.getElementById('prompt').readOnly);assert.equal(state.native.phase,'stopped');assert.equal(state.stops,1);assert.deepEqual(errors,[]);
-    console.log(JSON.stringify({passed:true,source:baseline?'0354e91':'working-tree',reasoning:automaticReasoning?'automatic override omitted':'exact max preserved',checks:['Hermes final + delayed sync preserves session and complete text','all three PCM frames finish without automatic cancellation','second ASR turn waits for history sync and submits exactly once','same conversation with unique turn IDs','real new speech during calculation cancels original turn','speech playback barge-in cancels correct audio and scheduled sources','hangup returns controls','selected reasoning is retained in all four native ASR requests'],chats:state.chats.length,acks:state.acks,simulation:'native ASR and PCM timing; no hardware microphone or server models'},null,2));
-  }catch(error){console.error(JSON.stringify({passed:false,source:baseline?'0354e91':'working-tree',snapshot,native:state.native,stops:state.stops,cancels:state.cancels,voiceCancels:state.voiceCancels},null,2));throw error;}
+    if(!automaticReasoning)assert.equal(await page.evaluate(()=>thinkingEffort()),'high','Written reasoning preference survives an oral call');
+
+    // A short first sentence is spoken before the next sentence or end arrives.
+    state.longVoice=false;state.delayedReply=true;state.syncDelay=0;
+    await page.click('#conversation-start');await page.waitForFunction(()=>window.conversationBusy);
+    const audioBefore=await page.evaluate(()=>window.__audio.started);
+    state.native.speech_id=1;state.native.turns=[{id:1,text:'Tu m’entends bien ?'}];
+    await page.waitForFunction(previous=>busy&&window.__audio.started>previous,audioBefore);
+    assert.equal(state.speech.at(-1).text,'Oui.');
+    await page.waitForFunction(()=>!busy&&!historySyncPending);assert.equal(await page.evaluate(()=>messages.at(-1).content),'Oui. Je t’entends bien.');
+    state.failStop=true;await page.click('#conversation-start');
+    await page.waitForFunction(()=>document.getElementById('conversation-start').textContent==='Réessayer le raccrochage'&&!document.getElementById('conversation-start').disabled);
+    assert.equal(await page.evaluate(()=>messages.at(-1).content),'Oui. Je t’entends bien.','Hangup or transport failure must not erase a completed reply');
+    await page.click('#conversation-start');await page.waitForFunction(()=>!window.conversationBusy&&!document.getElementById('prompt').readOnly);
+    console.log(JSON.stringify({passed:true,source:baseline?'0354e91':'working-tree',reasoning:'oral none, written preference preserved',checks:['direct Qwen + delayed sync preserves session and complete text','all three PCM frames finish without automatic cancellation','second ASR turn waits for history sync and submits exactly once','same conversation with unique turn IDs','real new speech during calculation cancels original turn','speech playback barge-in cancels correct audio and scheduled sources','hangup returns controls','local requests bypass Hermes; oral reasoning disabled','short first sentence is spoken before LLM completion','hangup failure keeps completed text and offers retry'],chats:state.chats.length,acks:state.acks,simulation:'native ASR and PCM timing; no hardware microphone or server models'},null,2));
+  }catch(error){console.error(JSON.stringify({passed:false,source:baseline?'0354e91':'working-tree',snapshot,current:await page.evaluate(()=>({active:window.conversationBusy,busy,button:document.getElementById('conversation-start').textContent,disabled:document.getElementById('conversation-start').disabled,status:document.getElementById('conversation-status').textContent})),recent:state.calls.slice(-12),native:state.native,stops:state.stops,cancels:state.cancels,voiceCancels:state.voiceCancels},null,2));throw error;}
   finally{for(const timer of state.timers)clearTimeout(timer);await browser.close();server.closeAllConnections?.();await new Promise(resolve=>server.close(resolve));}
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});

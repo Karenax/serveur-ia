@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "version": "3.5.30",
+  "sha256": "2d738290afb7395ddb9a0a85618033834b38bf9ad25d0a274048421b877e3cf9",
+  "embedded_files_verified": [
+    "chat.html",
+    "conversation.js",
+    "voice/fredaec.dll",
+    "voice/conversation-worker/conversation-worker.exe"
+  ],
+  "personal_profile_version_matches": true,
+  "native_capture_start_stop": true,
+  "profile": "disposable; no real access or keys"
+}

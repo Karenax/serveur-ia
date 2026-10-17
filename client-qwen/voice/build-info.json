@@ -1,17 +1,17 @@
 {
   "cpu_only": true,
   "sources": {
-    "conversation-models.json": "e1a6f67dad2f0ba35783e606e3da2962abb01799a25c68533a89905fff274459",
-    "turn_features.py": "cb937b7ce1ee4e0e28a8aa94f689d8e1c054995a53f8f74ef8d13ba533ea07f0",
-    "fred_voice.h": "2a7eebbb3ed0370d2a3d346cb66e2b80778a1ec3f7e15995e9a26c5a3e3d5001",
-    "CMakeLists.txt": "1baeb84022f196640771e3106d8895821aa9a79534c19ae4f017da54f3b5912b",
-    "fred_voice_jni.cpp": "a59e127dbde4730e9554ecff090e62cb5a670718b3a84018cad5586c621f5d19",
     "model.json": "5dde5e5c0d565557189d8e81f261cd3e1588358e0d1906fb46aa97f53bbe0690",
-    "conversation_worker.py": "717592237630ae4b476c846cd54d6aeadf8cece90830781caaf31acf3d1c293b",
+    "fred_voice.h": "2a7eebbb3ed0370d2a3d346cb66e2b80778a1ec3f7e15995e9a26c5a3e3d5001",
+    "conversation-models.json": "e1a6f67dad2f0ba35783e606e3da2962abb01799a25c68533a89905fff274459",
     "fred_voice.cpp": "71df9feaf1d5403b79fb1f9b7e7707fc94005fd13aab832c2253557364457102",
-    "aec_capture.py": "a996f714ed63d88a7c724daf16cf49fd9b09d566b7b8349a0ce091f44e330d18",
-    "fred_aec.cpp": "7d6df64657aa09e159e1feb2ac98b44d2960cec74deb6cf82e15d03b0678aa8d"
+    "fred_voice_jni.cpp": "a59e127dbde4730e9554ecff090e62cb5a670718b3a84018cad5586c621f5d19",
+    "CMakeLists.txt": "1baeb84022f196640771e3106d8895821aa9a79534c19ae4f017da54f3b5912b",
+    "fred_aec.cpp": "8a77533c5feb461f2750bbccc49cc424c86325e85cd4b7cd124059d245b685a4",
+    "conversation_worker.py": "c11d69caa0c1b19ea93d749342231af099653ddc22c63abb308f67af240cb0ae",
+    "aec_capture.py": "dd6c5b723cfaf80c5cf2b2ca90dd1e08f724ad57ce2aa5c5ad567b9737d8cfbc",
+    "turn_features.py": "cb937b7ce1ee4e0e28a8aa94f689d8e1c054995a53f8f74ef8d13ba533ea07f0"
   },
-  "version": "1.9.5",
-  "engine": "whisper.cpp"
+  "engine": "whisper.cpp",
+  "version": "1.9.5"
 }

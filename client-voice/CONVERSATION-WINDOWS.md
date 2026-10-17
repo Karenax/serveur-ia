@@ -1,10 +1,12 @@
-# Conversation vocale Windows — version 3.5.23
+# Conversation vocale Windows — version 3.5.30
 
 ## Utilisation
 
 Mettre à jour le client Windows personnel avec la mise à jour intégrée. Sur ce PC, les modèles sont déjà installés. Sur les autres PC, choisir **Installer la conversation** une fois : environ **138 Mo** téléchargés publiquement puis vérifiés par SHA-256. L’installation peut être arrêtée ; un nouvel essai recommence les fichiers. Une corruption détectée propose **Réparer la conversation**.
 
-Dans un chat connecté, terminer ou conserver son brouillon, sélectionner le projet voulu, puis cliquer **Conversation**. Parler normalement : le texte provisoire apparaît et une fin de tour déclenche automatiquement l’envoi à Fred. Avec Hermes, Fred lit la réponse finale après la génération et les outils. Reprendre la parole coupe la lecture et annule la génération de cette demande ; le prochain tour part dès que l’annulation et l’enregistrement sont terminés. **Raccrocher** ferme le microphone et rend le clavier disponible. Le passage en arrière-plan arrête également le mode. Durée maximale : quinze minutes, puis il faut relancer Conversation.
+Dans un chat connecté, terminer ou conserver son brouillon, sélectionner **Qwen local** et le projet voulu, puis cliquer **Conversation**. Parler normalement : le texte provisoire apparaît et une fin de tour déclenche automatiquement l’envoi à Fred. Le mode vocal appelle directement Qwen local, sans Hermes ni fournisseur cloud. Les phrases sont synthétisées pendant la génération. Les réponses orales sont limitées à 512 tokens, sans réflexion ; le réglage du chat écrit reste conservé. L’historique, les sources du projet et la recherche locale de mémoire gardent leur périmètre personnel. Les outils Hermes et la recherche web ne sont pas exécutés pendant un tour vocal.
+
+Reprendre la parole coupe la lecture et annule uniquement la demande vocale concernée ; le prochain tour part dès que l’annulation et l’enregistrement sont terminés. **Raccrocher** ferme le microphone et rend le clavier disponible. Si cette commande échoue, **Réessayer le raccrochage** reste accessible. Une réponse entièrement générée n’est pas effacée par une erreur de lecture ou une fermeture. Le passage en arrière-plan arrête également le mode. Durée maximale : quinze minutes, puis il faut relancer Conversation.
 
 La synchronisation automatique de l’historique après chaque réponse conserve le microphone et la lecture actifs. Un nouveau tour vocal reçu pendant cette synchronisation attend son achèvement, puis part une seule fois. La version 3.5.23 corrige l’arrêt intempestif qui affichait « Réponse interrompue avant la fin de sa première phrase » lors d’une synchronisation lente.
 
@@ -16,8 +18,8 @@ Le silence ne raccroche pas. Silero détecte la parole ; après environ 550 ms d
 
 | Client Windows | Serveur Fred |
 | --- | --- |
-| Microphone ; DSP Windows d’annulation d’écho, réduction du bruit et contrôle du niveau | Accès personnel, session, droits et gestion des appareils |
-| Sherpa-ONNX Zipformer français, texte progressif sur CPU | Chat Qwen/Strata existant, projets, documents et mémoire EG2 |
+| Microphone ; DSP Windows d’annulation d’écho, réduction du bruit et contrôle du niveau ; flux de sortie silencieux maintenu pendant l’écoute | Accès personnel, session, droits et gestion des appareils |
+| Sherpa-ONNX Zipformer français, texte progressif sur CPU | Qwen/Strata direct, projets, documents et mémoire EG2 locale |
 | Silero VAD et Smart Turn v3.2, décision de fin de tour | Pocket TTS 3.3.0 français, voix Estelle, CPU uniquement |
 | Envoi du texte et des paramètres habituels du chat | Audio de réponse PCM mono 24 kHz, transmis progressivement |
 | Lecture Web Audio, détection d’une reprise de parole, arrêt local immédiat | Annulation limitée à la demande et à l’accès concernés |
@@ -30,7 +32,9 @@ Dans **Démarrage et surveillance**, la carte **Conversation vocale Windows** pe
 
 Mesures sur ce poste : environ **249 Mio** de RAM pour le moteur Windows, en plus du client ; Pocket TTS environ **859 Mio** sur la fixture française. Les six modèles client totalisent environ 138 Mo. Le premier aperçu ASR apparaît après 0,8 s d’audio synthétique ; une phrase de 10,05 s est calculée en environ 1,4–1,5 s. La synthèse délivre son premier fragment en environ 0,17 s sur la courte fixture. Ces mesures excluent le chargement initial et la génération Qwen ; elles ne garantissent pas le délai complet ni la précision sur d’autres PC. La fixture ASR contient des erreurs grammaticales : un essai avec votre voix et vos périphériques reste nécessaire pour juger la qualité en situation.
 
-La capture réelle avec le DSP Windows et sa fermeture sont vérifiées. L’interruption est vérifiée par événements contrôlés dans le navigateur ; la qualité acoustique de l’annulation d’écho et de l’interruption avec une voix humaine dans votre pièce n’a pas encore été mesurée. Utiliser les périphériques Windows par défaut ; un casque peut améliorer la séparation entre la voix de Fred et la vôtre.
+La capture réelle avec le DSP Windows et sa fermeture sont vérifiées avec réception de trames microphone avant d’annoncer l’écoute. Le DSP nécessite un flux actif sur le périphérique de sortie : le moteur conserve donc un flux partagé silencieux, y compris avant la première réponse. Une absence de trames pendant cinq secondes ou une erreur Windows est signalée au client. L’interruption est vérifiée par événements contrôlés dans le navigateur ; la qualité acoustique de l’annulation d’écho et de l’interruption avec une voix humaine dans votre pièce n’a pas encore été mesurée. Utiliser les périphériques Windows par défaut ; un casque peut améliorer la séparation entre la voix de Fred et la vôtre.
+
+L’audit 3.5.30 a également validé le vrai Qwen et Pocket TTS sur deux questions de test, sans redémarrer le modèle : premier texte vers 2,9 s et premier fragment TTS en 0,13–0,16 s après la demande de synthèse. Ces délais séparés ne représentent pas le délai complet après votre parole. Zipformer conserve deux erreurs grammaticales sur la fixture française ; sa qualité avec votre voix reste à évaluer. Voir [l’audit et ses preuves](../audits/2026-10-14-conversation/README.md).
 
 ## Maintenance
 

@@ -92,10 +92,11 @@ def main():
                 if value.get('action')=='ack' and isinstance(value.get('turn'),int):acks.append(value['turn'])
         finally:stop.set()
     if not args.fixture:threading.Thread(target=commands,daemon=True).start()
-    started=time.monotonic();recognizer=Recognizer(args.models);emit({'phase':'listening','loading_seconds':time.monotonic()-started,'aec':True})
+    started=time.monotonic();recognizer=Recognizer(args.models)
     microphone=None
     try:
         if args.fixture:
+            emit({'phase':'listening','loading_seconds':time.monotonic()-started,'aec':False,'fixture':True})
             import wave
             with wave.open(args.fixture) as audio:
                 assert audio.getframerate()==16000 and audio.getnchannels()==1 and audio.getsampwidth()==2
@@ -110,15 +111,23 @@ def main():
                   'compute_seconds':recognizer.compute,'audio_seconds':len(pcm)/16000,**recognizer.status()});return
         if stop.is_set():return
         microphone=EchoMicrophone(args.resources);last_emit=0;last_speech=last_turn=0
+        last_audio=time.monotonic();captured=0;listening=False
         while not stop.is_set() and time.monotonic()-started<15*60:
             while acks:
                 acknowledged=acks.popleft()
                 while recognizer.turns and recognizer.turns[0]['id']<=acknowledged:recognizer.turns.popleft()
             pcm=microphone.read()
-            if not pcm:continue
-            recognizer.accept(np.frombuffer(pcm,dtype='<i2').astype(np.float32)/32768)
+            if not pcm:
+                if time.monotonic()-last_audio>5:raise OSError('Le microphone ne fournit aucun son. Vérifiez les périphériques Windows par défaut.')
+                continue
+            last_audio=time.monotonic();captured+=len(pcm)//2
+            audio=np.frombuffer(pcm,dtype='<i2').astype(np.float32)/32768
+            recognizer.accept(audio)
+            if not listening:
+                emit({'phase':'listening','loading_seconds':time.monotonic()-started,'aec':True,'captured_samples':captured})
+                listening=True
             if time.monotonic()-last_emit>.1 or recognizer.speech_id!=last_speech or recognizer.turn_id!=last_turn:
-                emit({'phase':'listening','aec':True,**recognizer.status()})
+                emit({'phase':'listening','aec':True,'captured_samples':captured,'audio_level':round(float(np.sqrt(np.mean(audio*audio))),5),**recognizer.status()})
                 last_emit=time.monotonic();last_speech=recognizer.speech_id;last_turn=recognizer.turn_id
     finally:
         if microphone:microphone.close()

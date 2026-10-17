@@ -101,6 +101,11 @@ class ConversationService:
                 process=self.process;self.process=None
             if process and process.poll() is None:
                 process.terminate();process.wait(timeout=5)
+            if process:
+                for pipe in (process.stdin,process.stdout):
+                    if pipe:
+                        try:pipe.close()
+                        except OSError:pass
             if self.cancelled.is_set():
                 with self.lock:self.value.update(phase='stopped',partial='',turns=[])
     def close(self):

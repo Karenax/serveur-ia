@@ -1,7 +1,7 @@
 {
   "name": "fred-shared-ui-tests",
   "private": true,
-  "version": "3.5.29",
+  "version": "3.5.30",
   "scripts": {"test": "node run_ui_tests.cjs"},
   "devDependencies": {"playwright": "1.62.1"},
   "engines": {"node": ">=20"}

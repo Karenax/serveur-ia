@@ -80,6 +80,7 @@ class Remote:
         self.update_state = {"message":"Cliquer sur Vérifier pour rechercher une mise à jour."}
         self.update_lock = threading.Lock()
         self.activity_lock = threading.RLock()
+        self.cancelled_requests = deque(maxlen=128)
         self.active_requests = 0
         self.applying_update = False
         self.window = None
@@ -455,6 +456,8 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
             chat_stream=streaming and self.path=='/v1/chat/completions'
             if chat_stream:remote.stream={'phase':'requesting','started':time.time(),'last_event':time.time(),'reasoning_chars':0,'answer_chars':0}
             with remote.activity_lock:
+                if self.path=='/v1/cancel' and self.headers.get('X-Qwen-Request'):
+                    remote.cancelled_requests.append(self.headers.get('X-Qwen-Request'))
                 if inference and remote.applying_update:return self.reply(409,{'error':{'message':'Mise à jour en cours. Réessayer après le redémarrage.'}})
                 if tracked:remote.active_requests+=1
             try:
@@ -470,9 +473,12 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
                     self.end_headers()
                     sent = True
                     if streaming and response.status == 200:
-                        done=False
+                        done=False;stream_error=False
                         for line in response:
                             if line.strip()==b'data: [DONE]':done=True
+                            if line.startswith(b'data: ') and line.strip()!=b'data: [DONE]':
+                                try:stream_error=stream_error or bool(json.loads(line[6:]).get('error'))
+                                except (ValueError,AttributeError):pass
                             if self.path=='/v1/voice/speech' and line.startswith(b'data: '):
                                 try:done=done or bool(json.loads(line[6:]).get('done'))
                                 except (ValueError,AttributeError):pass
@@ -498,8 +504,10 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
                                     except (ValueError,TypeError,AttributeError,IndexError):pass
                             self.wfile.write(line)
                             self.wfile.flush()
-                        if not done:raise ValueError('Flux interrompu avant la confirmation de fin.')
-                        if chat_stream:remote.stream['phase']='complete';remote.event('generation_complete',reasoning_chars=remote.stream['reasoning_chars'],answer_chars=remote.stream['answer_chars'],finish_reason=remote.stream.get('finish_reason'))
+                        if not done and not stream_error:raise ValueError('Flux interrompu avant la confirmation de fin.')
+                        if chat_stream:
+                            remote.stream['phase']='failed' if stream_error else 'complete'
+                            remote.event('generation_failed' if stream_error else 'generation_complete',reasoning_chars=remote.stream['reasoning_chars'],answer_chars=remote.stream['answer_chars'],finish_reason=remote.stream.get('finish_reason'))
                     else:
                         while True:
                             block = response.read1(65536)
@@ -507,15 +515,17 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
                                 break
                             self.wfile.write(block)
             except (OSError, ValueError, urllib.error.URLError):
-                if self.path!='/v1/voice/speech':remote.failure('connection_error','Connexion au serveur IA interrompue. Réessayer la requête.')
+                cancelled=chat_stream and self.headers.get('X-Qwen-Request') in remote.cancelled_requests
+                if self.path!='/v1/voice/speech' and not cancelled:remote.failure('connection_error','Connexion au serveur IA interrompue. Réessayer la requête.')
                 if not sent:
                     self.reply(503, {'error': {'message': 'Connexion au serveur IA indisponible.'}})
                 elif streaming:
                     try:
-                        self.wfile.write(b'\n\ndata: {"error":{"code":"connection_error","message":"Connexion interrompue : la reponse peut etre incomplete."}}\n\n');self.wfile.flush()
+                        event={'error':{'code':'request_cancelled' if cancelled else 'connection_error','message':'Réponse arrêtée.' if cancelled else 'Connexion interrompue : la réponse peut être incomplète.'}}
+                        self.wfile.write(('\n\ndata: '+json.dumps(event,ensure_ascii=False)+'\n\n').encode());self.wfile.flush()
                     except OSError:pass
             finally:
-                if chat_stream and remote.stream.get('phase')!='complete':remote.stream['phase']='interrupted';remote.event('generation_interrupted')
+                if chat_stream and remote.stream.get('phase') not in ('complete','failed'):remote.stream['phase']='interrupted';remote.event('generation_interrupted')
                 if tracked:
                     with remote.activity_lock:remote.active_requests-=1
     server = LocalHTTPServer(('127.0.0.1', port), Handler)

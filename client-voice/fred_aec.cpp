@@ -6,6 +6,7 @@
 #include <wmcodecdsp.h>
 #include <propsys.h>
 #include <mmdeviceapi.h>
+#include <audioclient.h>
 #include <vector>
 #include <algorithm>
 
@@ -31,27 +32,63 @@ struct Capture {
     IMediaObject* object=nullptr;
     Buffer* buffer=new Buffer(3200);
     bool initialized=false;
-    ~Capture(){if(object){object->FreeStreamingResources();object->Release();}buffer->Release();if(initialized)CoUninitialize();}
+    IAudioClient* render=nullptr;
+    IAudioRenderClient* silence=nullptr;
+    UINT32 render_frames=0;
+    ~Capture(){if(object){object->FreeStreamingResources();object->Release();}if(render)render->Stop();if(silence)silence->Release();if(render)render->Release();buffer->Release();if(initialized)CoUninitialize();}
+    HRESULT fill_silence(){
+        UINT32 padding=0;auto hr=render->GetCurrentPadding(&padding);
+        if(FAILED(hr)||padding>=render_frames)return hr;
+        BYTE* bytes=nullptr;const auto frames=render_frames-padding;
+        hr=silence->GetBuffer(frames,&bytes);
+        return FAILED(hr)?hr:silence->ReleaseBuffer(frames,AUDCLNT_BUFFERFLAGS_SILENT);
+    }
 };
+static thread_local HRESULT last_error=S_OK;
+extern "C" __declspec(dllexport) LONG fred_aec_last_error(){return last_error;}
+
+// Source-mode AEC produces no microphone output without an active rendering
+// stream, even while the assistant is silent. Keep a shared silent reference
+// on the same default endpoint used by the browser, without changing devices.
+static HRESULT start_reference(Capture* capture){
+    IMMDeviceEnumerator* devices=nullptr;IMMDevice* device=nullptr;
+    auto hr=CoCreateInstance(__uuidof(MMDeviceEnumerator),nullptr,CLSCTX_ALL,__uuidof(IMMDeviceEnumerator),(void**)&devices);
+    if(SUCCEEDED(hr))hr=devices->GetDefaultAudioEndpoint(eRender,eConsole,&device);
+    if(SUCCEEDED(hr))hr=device->Activate(__uuidof(IAudioClient),CLSCTX_ALL,nullptr,(void**)&capture->render);
+    WAVEFORMATEX* mix=nullptr;
+    if(SUCCEEDED(hr))hr=capture->render->GetMixFormat(&mix);
+    if(SUCCEEDED(hr))hr=capture->render->Initialize(AUDCLNT_SHAREMODE_SHARED,0,2000000,0,mix,nullptr);
+    if(mix)CoTaskMemFree(mix);
+    if(SUCCEEDED(hr))hr=capture->render->GetBufferSize(&capture->render_frames);
+    if(SUCCEEDED(hr))hr=capture->render->GetService(__uuidof(IAudioRenderClient),(void**)&capture->silence);
+    if(SUCCEEDED(hr))hr=capture->fill_silence();
+    if(SUCCEEDED(hr))hr=capture->render->Start();
+    if(device)device->Release();if(devices)devices->Release();
+    return hr;
+}
 static HRESULT property(IPropertyStore* properties,REFPROPERTYKEY key,LONG n){
     PROPVARIANT value;PropVariantInit(&value);value.vt=VT_I4;value.lVal=n;
     return properties->SetValue(key,value);
 }
 extern "C" __declspec(dllexport) void* fred_aec_open() {
+    last_error=S_OK;
     auto capture=new Capture;
     HRESULT hr=CoInitializeEx(nullptr,COINIT_MULTITHREADED);
-    if(FAILED(hr)){delete capture;return nullptr;}
+    if(FAILED(hr)){last_error=hr;delete capture;return nullptr;}
     capture->initialized=true;
     hr=CoCreateInstance(CLSID_CWMAudioAEC,nullptr,CLSCTX_INPROC_SERVER,IID_IMediaObject,(void**)&capture->object);
-    if(FAILED(hr)){delete capture;return nullptr;}
+    if(FAILED(hr)){last_error=hr;delete capture;return nullptr;}
     IPropertyStore* properties=nullptr;
     hr=capture->object->QueryInterface(IID_IPropertyStore,(void**)&properties);
     if(SUCCEEDED(hr)){
         hr=property(properties,MFPKEY_WMAAECMA_SYSTEM_MODE,SINGLE_CHANNEL_AEC);
-        // Default endpoints are resolved by the DSP in source mode.
+        if(SUCCEEDED(hr))hr=property(properties,MFPKEY_WMAAECMA_DEVICE_INDEXES,-1);
+        PROPVARIANT source;PropVariantInit(&source);source.vt=VT_BOOL;source.boolVal=VARIANT_TRUE;
+        if(SUCCEEDED(hr))hr=properties->SetValue(MFPKEY_WMAAECMA_DMO_SOURCE_MODE,source);
         properties->Release();
     }
-    if(FAILED(hr)){delete capture;return nullptr;}
+    if(SUCCEEDED(hr))hr=start_reference(capture);
+    if(FAILED(hr)){last_error=hr;delete capture;return nullptr;}
     WAVEFORMATEX wave={WAVE_FORMAT_PCM,1,16000,32000,2,16,0};
     DMO_MEDIA_TYPE format={};
     hr=MoInitMediaType(&format,sizeof(wave));
@@ -64,15 +101,16 @@ extern "C" __declspec(dllexport) void* fred_aec_open() {
         MoFreeMediaType(&format);
     }
     if(SUCCEEDED(hr))hr=capture->object->AllocateStreamingResources();
-    if(FAILED(hr)){delete capture;return nullptr;}
+    if(FAILED(hr)){last_error=hr;delete capture;return nullptr;}
     return capture;
 }
 extern "C" __declspec(dllexport) int fred_aec_read(void* handle,char* bytes,int size){
     if(!handle||!bytes||size<3200)return -1;
     auto capture=(Capture*)handle;capture->buffer->length=0;
+    auto hr=capture->fill_silence();if(FAILED(hr)){last_error=hr;return -1;}
     DMO_OUTPUT_DATA_BUFFER output={};output.pBuffer=capture->buffer;
-    DWORD status=0;auto hr=capture->object->ProcessOutput(0,1,&output,&status);
-    if(FAILED(hr))return -1;
+    DWORD status=0;hr=capture->object->ProcessOutput(0,1,&output,&status);
+    if(FAILED(hr)){last_error=hr;return -1;}
     int n=(int)capture->buffer->length;
     memcpy(bytes,capture->buffer->data.data(),n);return n;
 }

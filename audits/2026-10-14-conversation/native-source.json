@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "packaged": false,
+  "actual_microphone_frames": 16160,
+  "microphone_ready_seconds": 2.562000000005355,
+  "microphone_audio_saved": false,
+  "microphone_transcripts_saved": false,
+  "asr_fixture": {
+    "audio_seconds": 10.05,
+    "compute_seconds": 1.3360449001193047,
+    "first_partial_audio_seconds": 0.8,
+    "turns": [
+      {
+        "id": 1,
+        "text": "BONJOUR FRED JE SOUHAITE PRÉPARER UNE RÉUNION DEMAIN MATIN"
+      },
+      {
+        "id": 2,
+        "text": "AJOUTENT LES DOCUMENTS DU PROJET ET RÉSUMENT LES DÉCISIONS IMPORTANTES"
+      }
+    ]
+  },
+  "recognition_limit": "synthetic French speech; two grammar errors persist; no human accuracy claim"
+}

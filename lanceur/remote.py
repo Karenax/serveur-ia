@@ -369,7 +369,7 @@ def chat_request(value, model):
     allowed = {'model', 'messages', 'stream', 'max_tokens', 'max_completion_tokens', 'temperature',
                'top_p', 'top_k', 'min_p', 'seed', 'presence_penalty', 'frequency_penalty',
                'repetition_penalty', 'chat_template_kwargs', 'tools', 'tool_choice', 'response_format',
-               'parallel_tool_calls', 'stream_options', 'reasoning_effort'}
+               'parallel_tool_calls', 'stream_options', 'reasoning_effort', 'store'}
     if set(value) - allowed:
         raise ValueError('Paramètre non admis par cette passerelle API.')
     messages = value.get('messages')
@@ -384,6 +384,8 @@ def chat_request(value, model):
         if 'reasoning_content' in message and not isinstance(message['reasoning_content'], str):
             raise ValueError('Texte de réflexion invalide.')
     value = dict(value)
+    if 'store' in value and type(value.pop('store')) is not bool:
+        raise ValueError('Option de stockage API invalide.')
     value['model'] = model
     value['strata_mcp'] = False  # Client-side tools are permitted; no host tools execute through this gateway.
     # Strata explicitly supports -1: generate until EOS or the remaining context.
@@ -653,15 +655,15 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 if not self.authorized(): return
                 try:
                     value = json_body(self, 4096, allow_empty=True)
-                    if not isinstance(value,dict) or set(value)-{'text_transform'}:raise ValueError('Requête d’annulation invalide.')
-                    direct='text_transform' in value
-                    if direct and value['text_transform'] is not True:raise ValueError('Annulation de transformation invalide.')
+                    if not isinstance(value,dict) or set(value)-{'text_transform','voice_conversation'}:raise ValueError('Requête d’annulation invalide.')
+                    direct=bool(value)
+                    if direct and (len(value)!=1 or next(iter(value.values())) is not True):raise ValueError('Annulation directe invalide.')
                     request=self.headers.get('X-Qwen-Request') or None
                     if request is not None or direct:store.text_transforms.request_id(request)
                     # A receipt survives cancellation arriving before submit or during health checks.
                     if direct:store.text_transforms.cancel(self.identity,request)
                     with scheduler.condition:
-                        transforms=[item['id'] for item in scheduler.requests if item['owner']==self.identity and item.get('text_transform') and (request is None or item['id']==request)]
+                        transforms=[item['id'] for item in scheduler.requests if item['owner']==self.identity and (item.get('text_transform') or item.get('voice_conversation')) and (request is None or item['id']==request)]
                     for target in transforms:store.text_transforms.cancel(self.identity,target)
                     scheduler.cancel(self.identity,request)
                     manager=getattr(store.hermes,'conversations',None)
@@ -683,23 +685,44 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 upstream_port, model, key = backend()
                 conversation=raw.pop('conversation_id',None)
                 turn=raw.pop('turn_id',None)
+                external_api = bool(store.hermes) and self.path=='/v1/chat/completions' and conversation is None and turn is None
                 raw.pop('history_revision',None)
                 if isinstance(raw.get('messages'),list):
                     for message in raw['messages']:
                         if isinstance(message,dict):message.pop('turn_id',None)
                 project=raw.pop('project_id',None);raw.pop('assistant_id',None);document=raw.pop('document_id',None)
                 text_transform='text_transform' in raw
+                voice_conversation='voice_conversation' in raw
+                external_api = external_api and not text_transform and not voice_conversation
+                if voice_conversation and (raw.pop('voice_conversation') is not True or text_transform or self.path!='/v1/chat/completions'):
+                    raise ValueError('Mode de conversation vocale invalide.')
+                if voice_conversation and (turn!=self.headers.get('X-Qwen-Request') or not isinstance(conversation,str) or not 1<=len(conversation)<=128):
+                    raise ValueError('Identité de conversation vocale invalide.')
                 if text_transform and self.path!='/v1/chat/completions':raise ValueError('Transformation réservée à la route de génération.')
                 selection = None
-                if not text_transform and store.hermes and hasattr(store.hermes, 'select_model'):
+                if not text_transform and not voice_conversation and store.hermes and hasattr(store.hermes, 'select_model'):
                     selection = store.hermes.select_model(self.identity, raw.get('model'))
                 data = chat_request(transform_request(raw) if text_transform else raw, selection['id'] if selection else model);sources=[]
-                if not text_transform:
+                if external_api:
+                    # Standard OpenAI clients own their conversation and tool loop.
+                    # Preserve their output budget instead of the Fred chat's unlimited default.
+                    cap=raw.get('max_completion_tokens',raw.get('max_tokens'))
+                    if cap is not None and (type(cap) is not int or cap<=0):raise ValueError('Limite de sortie API invalide.')
+                    if cap is not None:data['max_tokens']=cap
+                if voice_conversation:
+                    if any(field in raw for field in ('tools','tool_choice','parallel_tool_calls','response_format')):
+                        raise ValueError('Les outils ne sont pas disponibles en conversation vocale directe.')
+                    data['max_tokens']=512
+                    data['reasoning_effort']='none'
+                    data['chat_template_kwargs']={'enable_thinking':False}
+                    data['messages']=[{k:v for k,v in message.items() if k!='reasoning_content'} for message in data['messages']]
+                    data['messages'].insert(0,{'role':'system','content':'Tu es Fred, un assistant en conversation orale. Réponds en français naturel, avec des phrases courtes, généralement en deux à quatre phrases. Évite les tableaux, le Markdown et les longs préambules. Si une transcription est ambiguë, demande une précision sans inventer ce qui a été dit.'})
+                if not text_transform and not voice_conversation:
                     from hermes_reasoning import request_reasoning
                     request_reasoning(data,selection.get('capabilities',{}) if selection else capabilities({}))
-                direct_request=store.text_transforms.request_id(self.headers.get('X-Qwen-Request') or secrets.token_hex(16)) if text_transform else None
-                if text_transform and store.text_transforms.cancelled(self.identity,direct_request):raise ValueError('Demande annulée.')
-                if not text_transform and not (store.hermes and self.path=='/v1/chat/completions') and (project or document or getattr(store.workspace,'knowledge',None)):
+                direct_request=store.text_transforms.request_id(self.headers.get('X-Qwen-Request') or secrets.token_hex(16)) if text_transform or voice_conversation else None
+                if direct_request and store.text_transforms.cancelled(self.identity,direct_request):raise ValueError('Demande annulée.')
+                if not external_api and not text_transform and (voice_conversation or not (store.hermes and self.path=='/v1/chat/completions')) and (project or document or getattr(store.workspace,'knowledge',None)):
                     data['messages'],sources=store.workspace.context(self.identity,data['messages'],project,document)
             except Denied as error:
                 return self.respond(403, {'error': {'code': 'model_access_denied', 'message': str(error)}})
@@ -716,7 +739,8 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
             if any(isinstance(m.get('content'),list) and any(p.get('type')=='image_url' for p in m['content']) for m in data['messages']) and not vision:
                 return self.respond(400,{'error':{'code':'image_not_supported','message':'Le modèle chargé ne dispose pas de la vision. Choisissez un modèle avec prise en charge des images.'}})
             live_model=live.get('model')
-            if selection is None and isinstance(live_model,str) and live_model:data['model']=live_model
+            if external_api and local:data['model']=live_model or model
+            if (selection is None or external_api and local) and isinstance(live_model,str) and live_model:data['model']=live_model
             if self.path == '/v1/context' and not local:
                 # A local tokenizer cannot measure another provider. Return an
                 # explicit visible-history estimate, without an inference call.
@@ -730,7 +754,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 return self.respond(200, {'tokens': (characters + 2) // 3 + 6 * len(data['messages']),
                                          'capacity': capacity, 'estimated': True, 'model': data['model'],
                                          'scope': 'visible_history', 'agent_context': True})
-            if store.hermes and not text_transform and self.path=='/v1/chat/completions':
+            if store.hermes and not external_api and not text_transform and not voice_conversation and self.path=='/v1/chat/completions':
                 request=self.headers.get('X-Qwen-Request') or turn or secrets.token_hex(16)
                 if turn and turn!=request:return self.respond(400,{'error':{'message':'Identité d’envoi incohérente.'}})
                 if not conversation:return self.respond(409,{'error':{'code':'client_update_required','message':'Mettez à jour le client pour utiliser votre assistant Hermes.'}})
@@ -796,8 +820,8 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 finally:counter.close()
             try:
                 item = scheduler.submit(self.identity,direct_request or self.headers.get('X-Qwen-Request') or None)
-                if text_transform:
-                    with scheduler.condition:item['text_transform']=True
+                if text_transform or voice_conversation:
+                    with scheduler.condition:item['voice_conversation' if voice_conversation else 'text_transform']=True
                     if store.text_transforms.cancelled(self.identity,item['id']):scheduler.cancel(self.identity,item['id'])
             except ValueError as error:
                 return self.respond(429, {'error': {'message': str(error)}})
@@ -831,9 +855,21 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 scheduler.wait(item, lambda: store.authenticate(self.access_token) == self.identity, heartbeat)
                 heartbeat(0)
                 store.audit('inference_started', self.identity)
+                if not local:
+                    from external_api import complete, response_body
+                    valid=lambda: not item['cancelled'] and store.authenticate(self.access_token)==self.identity and store.hermes.models.valid(self.identity,selection)
+                    result=complete(store.hermes.models,self.identity,selection,data,valid,
+                                    heartbeat=lambda:heartbeat(0))
+                    payload=response_body(result,data.get('stream',False))
+                    if not valid():raise ValueError('Demande annulée ou accès désactivé.')
+                    if not headers_sent:
+                        self.send_response(200);self.send_header('Content-Type','application/json; charset=utf-8')
+                        self.send_header('Connection','close');self.end_headers();headers_sent=True
+                    self.wfile.write(payload);self.wfile.flush();item['succeeded']=True
+                    return
                 # Fixed local destination. No user URL, forwarded identity or remote API key reaches Strata.
                 connection = http.client.HTTPConnection('127.0.0.1', upstream_port, timeout=120)
-                if text_transform:
+                if text_transform or voice_conversation:
                     connection.response_class=lambda *args,**kwargs:CancellableResponse(*args,valid=lambda:not item['cancelled'] and store.authenticate(self.access_token)==self.identity,**kwargs)
                 headers = {'Content-Type': 'application/json'}
                 if key:
