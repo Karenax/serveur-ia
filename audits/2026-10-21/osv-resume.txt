@@ -1,0 +1,233 @@
+{
+  "queried": 230,
+  "errors": 0,
+  "affected": [
+    {
+      "package": "PyJWT",
+      "version": "2.13.0",
+      "advisories": [
+        "GHSA-2gx3-rcp4-g85q",
+        "GHSA-42vr-xj54-vc7v",
+        "GHSA-8wjv-2p76-3863",
+        "GHSA-9j54-fg26-wv3r",
+        "GHSA-9v7f-9g4p-ffgj",
+        "GHSA-ffc3-869f-jxw9",
+        "GHSA-gvp8-978c-rx2q",
+        "GHSA-hxm8-2xgr-2p9m",
+        "GHSA-jwrc-g2q2-pq5p",
+        "GHSA-p4g4-x82p-q773",
+        "GHSA-r6x4-923q-g947",
+        "GHSA-w2cx-738m-mc7w",
+        "GHSA-w6j9-cwv2-h6wq",
+        "GHSA-x33g-cr3x-6449",
+        "PYSEC-2026-4140",
+        "PYSEC-2026-4141",
+        "PYSEC-2026-4142",
+        "PYSEC-2026-4143",
+        "PYSEC-2026-4144",
+        "PYSEC-2026-4145",
+        "PYSEC-2026-4146",
+        "PYSEC-2026-4147",
+        "PYSEC-2026-4148",
+        "PYSEC-2026-4149",
+        "PYSEC-2026-4150",
+        "PYSEC-2026-4151",
+        "PYSEC-2026-4152",
+        "PYSEC-2026-4183"
+      ]
+    },
+    {
+      "package": "aiohttp",
+      "version": "3.14.3",
+      "advisories": [
+        "GHSA-2g87-pp6c-29x5",
+        "GHSA-494j-54xm-rwp3",
+        "GHSA-5wr8-gcqf-gqf3",
+        "GHSA-6cjc-53gc-5rqm",
+        "GHSA-9xw5-w5jj-pvcg",
+        "GHSA-f9xw-jh8m-3mwq",
+        "GHSA-gx76-c99x-2c96",
+        "GHSA-pqxq-w44r-73xw"
+      ]
+    },
+    {
+      "package": "certifi",
+      "version": "2026.5.20",
+      "advisories": [
+        "GHSA-6q48-6c7w-9gw2",
+        "PYSEC-2026-4320"
+      ]
+    },
+    {
+      "package": "certifi",
+      "version": "2026.7.22",
+      "advisories": [
+        "GHSA-6q48-6c7w-9gw2",
+        "PYSEC-2026-4320"
+      ]
+    },
+    {
+      "package": "hermes-agent",
+      "version": "0.0.0",
+      "advisories": [
+        "GHSA-238w-f66p-w349",
+        "GHSA-33qv-c5qm-799v",
+        "GHSA-4pqm-j46f-795x",
+        "GHSA-99f9-j8r3-p853",
+        "GHSA-cv5c-mh6j-wvp9",
+        "GHSA-mv8x-fg99-32mf",
+        "GHSA-pgp4-xr4j-h5cg",
+        "GHSA-pmqc-57g8-c22c",
+        "GHSA-wm96-9gfh-vvgq",
+        "GHSA-xq8w-9jvx-gm3v",
+        "PYSEC-2026-2509",
+        "PYSEC-2026-2510",
+        "PYSEC-2026-2511",
+        "PYSEC-2026-2512",
+        "PYSEC-2026-2513",
+        "PYSEC-2026-2514",
+        "PYSEC-2026-2515",
+        "PYSEC-2026-3575",
+        "PYSEC-2026-3576",
+        "PYSEC-2026-3577"
+      ]
+    },
+    {
+      "package": "mcp",
+      "version": "2.0.0",
+      "advisories": [
+        "GHSA-84m7-p3x7-pcfv"
+      ]
+    },
+    {
+      "package": "multidict",
+      "version": "6.7.1",
+      "advisories": [
+        "GHSA-54p9-h82j-f925",
+        "PYSEC-2026-4244"
+      ]
+    },
+    {
+      "package": "oauthlib",
+      "version": "3.3.1",
+      "advisories": [
+        "GHSA-hj66-6f7g-4r5v",
+        "GHSA-xpv3-w29h-x7cv",
+        "PYSEC-2026-4113",
+        "PYSEC-2026-4114"
+      ]
+    },
+    {
+      "package": "pillow",
+      "version": "12.3.0",
+      "advisories": [
+        "GHSA-462x-pgg6-55fp",
+        "GHSA-58r4-6rv3-gfh8",
+        "GHSA-65qm-jvmh-6pqg",
+        "GHSA-8g5g-8vmr-9782",
+        "GHSA-c6hw-5grf-ff96",
+        "GHSA-p4wg-p73j-c528",
+        "GHSA-pchr-8j38-3x4p",
+        "GHSA-q45j-58j2-45rg",
+        "GHSA-vx6w-vv9f-6gvg"
+      ]
+    },
+    {
+      "package": "pip",
+      "version": "25.0.1",
+      "advisories": [
+        "GHSA-4xh5-x5gv-qwph",
+        "GHSA-58qw-9mgm-455v",
+        "GHSA-6vgw-5pg2-w6jp",
+        "GHSA-jp4c-xjxw-mgf9",
+        "GHSA-qwm4-qh6w-59xr",
+        "GHSA-wf93-45jw-7689",
+        "PYSEC-2026-1795",
+        "PYSEC-2026-1796",
+        "PYSEC-2026-196",
+        "PYSEC-2026-2875",
+        "PYSEC-2026-2876",
+        "PYSEC-2026-3721"
+      ]
+    },
+    {
+      "package": "pypdf",
+      "version": "6.10.0",
+      "advisories": [
+        "GHSA-23w6-3w8w-8484",
+        "GHSA-248m-82v9-q6g6",
+        "GHSA-4pxv-j86v-mhcw",
+        "GHSA-52x6-gq3r-vpf4",
+        "GHSA-55h5-xmcq-c37v",
+        "GHSA-5hgr-hg42-57jg",
+        "GHSA-5jq2-8x83-x246",
+        "GHSA-5qjq-93h5-hrgp",
+        "GHSA-5xf7-4p34-54qr",
+        "GHSA-763m-79hh-57f2",
+        "GHSA-7gw9-cf7v-778f",
+        "GHSA-cj93-chg6-vgv8",
+        "GHSA-fc8x-2rww-xw9m",
+        "GHSA-fp3f-mc75-235c",
+        "GHSA-fp3h-c4fm-7vvf",
+        "GHSA-fwg2-594c-jp42",
+        "GHSA-g867-7843-wf8q",
+        "GHSA-g9cg-prrw-2r8q",
+        "GHSA-g9xf-7f8q-9mcj",
+        "GHSA-j543-4vmf-qm7v",
+        "GHSA-jj6c-8h6c-hppx",
+        "GHSA-jm82-fx9c-mx94",
+        "GHSA-jp53-mhqp-8xcg",
+        "GHSA-jw7q-gvrg-4vj3",
+        "GHSA-m2v9-299j-rv96",
+        "GHSA-php9-fj8v-98fj",
+        "GHSA-qv6h-rv94-w285",
+        "GHSA-v247-6f48-mgcj",
+        "GHSA-w23x-9jrw-r45c",
+        "GHSA-wjqc-6w8f-h24c",
+        "GHSA-x284-j5p8-9c5p",
+        "PYSEC-2026-3004",
+        "PYSEC-2026-3007",
+        "PYSEC-2026-3009",
+        "PYSEC-2026-3010",
+        "PYSEC-2026-3011",
+        "PYSEC-2026-3016",
+        "PYSEC-2026-3018",
+        "PYSEC-2026-3020",
+        "PYSEC-2026-3021",
+        "PYSEC-2026-3022",
+        "PYSEC-2026-3025",
+        "PYSEC-2026-3026",
+        "PYSEC-2026-3610",
+        "PYSEC-2026-3611",
+        "PYSEC-2026-3612",
+        "PYSEC-2026-3613",
+        "PYSEC-2026-3655",
+        "PYSEC-2026-3656",
+        "PYSEC-2026-3910",
+        "PYSEC-2026-3911",
+        "PYSEC-2026-3912",
+        "PYSEC-2026-3913",
+        "PYSEC-2026-4153",
+        "PYSEC-2026-4154",
+        "PYSEC-2026-4155",
+        "PYSEC-2026-4156",
+        "PYSEC-2026-4157",
+        "PYSEC-2026-4158",
+        "PYSEC-2026-4159",
+        "PYSEC-2026-4160"
+      ]
+    },
+    {
+      "package": "urllib3",
+      "version": "2.7.0",
+      "advisories": [
+        "GHSA-8988-9cw3-xx77",
+        "GHSA-gh4c-6fx4-qh6g",
+        "GHSA-vxq7-64xx-v4gw",
+        "PYSEC-2026-4175",
+        "PYSEC-2026-4176",
+        "PYSEC-2026-4177"
+      ]
+    }
+  ]
+}

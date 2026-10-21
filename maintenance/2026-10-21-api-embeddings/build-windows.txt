@@ -1,0 +1,375 @@
+F icon generated in 9 Windows sizes from the console favicon.
+CMake Deprecation Warning at D:/Serveur IA/toolchain/whisper.cpp-1.9.5/CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+-- whisper.cpp version: 1.9.5-dev
+-- Warning: ccache not found - consider installing it for faster compilation or disable this warning with GGML_CCACHE=OFF
+-- CMAKE_SYSTEM_PROCESSOR: AMD64
+-- CMAKE_GENERATOR_PLATFORM: 
+-- GGML_SYSTEM_ARCH: x86
+-- Including CPU backend
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu-x64:  
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu-sse42: /arch:SSE4.2 GGML_SSE42
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu-sandybridge: /arch:AVX GGML_AVX
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu-haswell: /arch:AVX2 GGML_AVX2;GGML_FMA;GGML_F16C;__BMI2__;GGML_BMI2
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu-skylakex: /arch:AVX512 GGML_AVX512;__BMI2__;GGML_BMI2
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu-cannonlake: /arch:AVX512 GGML_AVX512;__AVX512VBMI__;__BMI2__;GGML_BMI2
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu-cascadelake: /arch:AVX512 GGML_AVX512;__AVX512VNNI__;GGML_AVX512_VNNI;__BMI2__;GGML_BMI2
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu-icelake: /arch:AVX512 GGML_AVX512;__AVX512VBMI__;__AVX512VNNI__;GGML_AVX512_VNNI;__BMI2__;GGML_BMI2
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu-alderlake: /arch:AVX2 GGML_AVX2;GGML_FMA;GGML_F16C;__AVXVNNI__;GGML_AVX_VNNI;__BMI2__;GGML_BMI2
+-- ggml version: 0.26.0
+-- ggml commit:  749b6ad
+-- Configuring done (0.4s)
+-- Generating done (0.2s)
+-- Build files have been written to: D:/Serveur IA/toolchain/voice-build-windows
+ninja: no work to do.
+245 INFO: PyInstaller: 6.22.3, contrib hooks: 2026.8
+245 INFO: Python: 3.12.14
+278 INFO: Platform: Windows-10-10.0.19045-SP0
+278 INFO: Python environment: D:\Serveur IA\toolchain\conversation-client-python
+279 INFO: wrote D:\Serveur IA\toolchain\conversation-build\conversation-worker.spec
+464 WARNING: Failed to collect submodules for 'onnxruntime.quantization' because importing 'onnxruntime.quantization' raised: ModuleNotFoundError: No module named 'onnx'
+3403 INFO: Module search paths (PYTHONPATH):
+['D:\\Serveur IA',
+ 'D:\\Serveur IA\\client-qwen\\build-tools',
+ 'C:\\Users\\karen\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python312.zip',
+ 'C:\\Users\\karen\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\DLLs',
+ 'C:\\Users\\karen\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\Lib',
+ 'C:\\Users\\karen\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python',
+ 'D:\\Serveur IA\\toolchain\\conversation-client-python',
+ 'D:\\Serveur IA\\toolchain\\conversation-client-python\\Lib\\site-packages',
+ 'D:\\Serveur IA\\client-voice']
+3996 INFO: Appending 'binaries' from .spec
+3997 INFO: Appending 'datas' from .spec
+4041 INFO: checking Analysis
+4079 INFO: Building because excludes changed
+4079 INFO: Looking for Python shared library...
+4079 INFO: Using Python shared library: C:\Users\karen\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python312.dll
+4079 INFO: Running Analysis Analysis-00.toc
+4079 INFO: Target bytecode optimization level: 0
+4079 INFO: Initializing module dependency graph...
+4081 INFO: Initializing module graph hook caches...
+4098 INFO: Analyzing modules for base_library.zip ...
+5711 INFO: Processing standard module hook 'hook-encodings.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks'
+6277 INFO: Processing standard module hook 'hook-math.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks'
+6470 INFO: Processing standard module hook 'hook-heapq.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks'
+7392 INFO: Processing standard module hook 'hook-pickle.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks'
+8534 INFO: Caching module dependency graph...
+8572 INFO: Analyzing D:\Serveur IA\client-voice\conversation_worker.py
+8618 INFO: Processing standard module hook 'hook-numpy.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks'
+8931 INFO: Processing standard module hook 'hook-platform.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks'
+9071 INFO: Processing standard module hook 'hook-sysconfig.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks'
+9291 INFO: Processing standard module hook 'hook-webbrowser.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks'
+9918 INFO: Processing standard module hook 'hook-difflib.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks'
+10118 INFO: Processing standard module hook 'hook-multiprocessing.util.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks'
+10206 INFO: Processing standard module hook 'hook-xml.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks'
+10418 INFO: Processing standard module hook 'hook-_ctypes.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks'
+11344 INFO: Processing pre-safe-import-module hook 'hook-typing_extensions.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks\\pre_safe_import_module'
+11346 INFO: SetuptoolsInfo: initializing cached setuptools info...
+12722 INFO: Processing standard module hook 'hook-onnxruntime.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\_pyinstaller_hooks_contrib\\stdhooks'
+12799 INFO: Processing pre-safe-import-module hook 'hook-tensorflow.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\_pyinstaller_hooks_contrib\\pre_safe_import_module'
+12880 INFO: Analyzing hidden import 'sherpa_onnx.__main__'
+12883 INFO: Analyzing hidden import 'sherpa_onnx.cli'
+12886 INFO: Analyzing hidden import 'onnxruntime.capi.convert_npz_to_onnx_adapter'
+12888 INFO: Analyzing hidden import 'onnxruntime.datasets'
+12889 INFO: Analyzing hidden import 'onnxruntime.tools'
+12894 INFO: Analyzing hidden import 'onnxruntime.tools.check_onnx_model_mobile_usability'
+12924 INFO: Analyzing hidden import 'onnxruntime.tools.convert_onnx_models_to_ort'
+12957 INFO: Analyzing hidden import 'onnxruntime.tools.make_dynamic_shape_fixed'
+12959 INFO: Analyzing hidden import 'onnxruntime.tools.offline_tuning'
+12965 INFO: Analyzing hidden import 'onnxruntime.tools.onnx_randomizer'
+12968 INFO: Analyzing hidden import 'onnxruntime.tools.onnxruntime_test'
+12979 INFO: Analyzing hidden import 'onnxruntime.tools.optimize_onnx_model'
+12980 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py'
+12981 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs'
+12982 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.ArgType'
+12983 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.ArgTypeAndIndex'
+13017 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.Attribute'
+13028 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.AttributeType'
+13029 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.Checkpoint'
+13033 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.DeprecatedKernelCreateInfos'
+13037 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.DeprecatedNodeIndexAndKernelDefHash'
+13040 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.DeprecatedSessionState'
+13043 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.DeprecatedSubGraphSessionState'
+13045 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.Dimension'
+13048 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.DimensionValue'
+13051 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.DimensionValueType'
+13052 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.EdgeEnd'
+13053 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.FloatProperty'
+13055 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.Graph'
+13065 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.InferenceSession'
+13069 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.IntProperty'
+13071 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.KernelTypeStrArgsEntry'
+13074 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.KernelTypeStrResolver'
+13077 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.MapType'
+13079 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.Model'
+13085 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.ModuleState'
+13090 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.Node'
+13099 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.NodeEdge'
+13103 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.NodeType'
+13104 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.NodesToOptimizeIndices'
+13110 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.OpIdKernelTypeStrArgsEntry'
+13112 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.OperatorSetId'
+13114 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.OptimizerGroup'
+13118 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.ParameterOptimizerState'
+13121 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.PropertyBag'
+13126 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.RuntimeOptimizationRecord'
+13130 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.RuntimeOptimizationRecordContainerEntry'
+13133 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.RuntimeOptimizations'
+13136 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.SequenceType'
+13138 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.Shape'
+13140 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.SparseTensor'
+13144 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.StringProperty'
+13146 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.StringStringEntry'
+13148 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.Tensor'
+13154 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.TensorDataType'
+13155 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.TensorTypeAndShape'
+13158 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.TypeInfo'
+13161 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.TypeInfoValue'
+13161 INFO: Analyzing hidden import 'onnxruntime.tools.ort_format_model.ort_flatbuffers_py.fbs.ValueInfo'
+13164 INFO: Analyzing hidden import 'onnxruntime.tools.pytorch_export_contrib_ops'
+13168 INFO: Analyzing hidden import 'onnxruntime.tools.qdq_helpers'
+13168 INFO: Analyzing hidden import 'onnxruntime.tools.qdq_helpers.optimize_qdq_model'
+13170 INFO: Analyzing hidden import 'onnxruntime.tools.reduced_build_config_parser'
+13174 INFO: Analyzing hidden import 'onnxruntime.tools.remove_initializer_from_input'
+13175 INFO: Analyzing hidden import 'onnxruntime.tools.symbolic_shape_infer'
+23331 INFO: Processing standard module hook 'hook-xml.dom.domreg.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks'
+24399 INFO: Processing pre-safe-import-module hook 'hook-packaging.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks\\pre_safe_import_module'
+24426 INFO: Analyzing hidden import 'onnxruntime.tools.update_onnx_opset'
+24428 INFO: Analyzing hidden import 'onnxruntime.transformers.affinity_helper'
+24429 INFO: Analyzing hidden import 'onnxruntime.transformers.benchmark'
+24451 INFO: Analyzing hidden import 'onnxruntime.transformers.benchmark_helper'
+24469 INFO: Analyzing hidden import 'onnxruntime.transformers.bert_perf_test'
+24483 INFO: Analyzing hidden import 'onnxruntime.transformers.bert_test_data'
+24495 INFO: Analyzing hidden import 'onnxruntime.transformers.compare_bert_results'
+24501 INFO: Analyzing hidden import 'onnxruntime.transformers.constants'
+24502 INFO: Analyzing hidden import 'onnxruntime.transformers.convert_generation'
+24652 INFO: Analyzing hidden import 'onnxruntime.transformers.convert_tf_models_to_pytorch'
+24658 INFO: Analyzing hidden import 'onnxruntime.transformers.convert_to_packing_mode'
+24670 INFO: Analyzing hidden import 'onnxruntime.transformers.dynamo_onnx_helper'
+24677 INFO: Analyzing hidden import 'onnxruntime.transformers.float16'
+24691 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_attention'
+24718 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_attention_clip'
+24726 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_attention_sam2'
+24737 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_attention_unet'
+24766 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_attention_vae'
+24773 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_bart_attention'
+24783 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_base'
+24788 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_bias_add'
+24790 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_biasgelu'
+24792 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_biassplitgelu'
+24795 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_conformer_attention'
+24800 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_constant_fold'
+24804 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_embedlayer'
+24821 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_fastgelu'
+24831 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_gelu'
+24838 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_gelu_approximation'
+24839 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_gemmfastgelu'
+24842 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_gpt_attention'
+24853 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_gpt_attention_megatron'
+24861 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_gpt_attention_no_past'
+24867 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_group_norm'
+24871 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_layernorm'
+24883 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_mha_mmdit'
+24894 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_nhwc_conv'
+24897 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_options'
+24903 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_qordered_attention'
+24913 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_qordered_gelu'
+24915 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_qordered_layernorm'
+24918 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_qordered_matmul'
+24923 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_quickgelu'
+24925 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_reshape'
+24929 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_rotary_attention'
+24963 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_shape'
+24967 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_simplified_layernorm'
+24971 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_skip_group_norm'
+24977 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_skiplayernorm'
+24983 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_transpose'
+24987 INFO: Analyzing hidden import 'onnxruntime.transformers.fusion_utils'
+24997 INFO: Analyzing hidden import 'onnxruntime.transformers.huggingface_models'
+25000 INFO: Analyzing hidden import 'onnxruntime.transformers.import_utils'
+25001 INFO: Analyzing hidden import 'onnxruntime.transformers.io_binding_helper'
+25014 INFO: Analyzing hidden import 'onnxruntime.transformers.large_model_exporter'
+25026 INFO: Analyzing hidden import 'onnxruntime.transformers.metrics'
+25031 INFO: Analyzing hidden import 'onnxruntime.transformers.onnx_exporter'
+25049 INFO: Analyzing hidden import 'onnxruntime.transformers.onnx_model'
+25092 INFO: Analyzing hidden import 'onnxruntime.transformers.onnx_model_bart'
+25098 INFO: Analyzing hidden import 'onnxruntime.transformers.onnx_model_bert'
+25120 INFO: Analyzing hidden import 'onnxruntime.transformers.onnx_model_bert_keras'
+25132 INFO: Analyzing hidden import 'onnxruntime.transformers.onnx_model_bert_tf'
+25147 INFO: Analyzing hidden import 'onnxruntime.transformers.onnx_model_clip'
+25149 INFO: Analyzing hidden import 'onnxruntime.transformers.onnx_model_conformer'
+25151 INFO: Analyzing hidden import 'onnxruntime.transformers.onnx_model_gpt2'
+25155 INFO: Analyzing hidden import 'onnxruntime.transformers.onnx_model_mmdit'
+25160 INFO: Analyzing hidden import 'onnxruntime.transformers.onnx_model_phi'
+25187 INFO: Analyzing hidden import 'onnxruntime.transformers.onnx_model_sam2'
+25191 INFO: Analyzing hidden import 'onnxruntime.transformers.onnx_model_t5'
+25212 INFO: Analyzing hidden import 'onnxruntime.transformers.onnx_model_tnlr'
+25217 INFO: Analyzing hidden import 'onnxruntime.transformers.onnx_model_unet'
+25228 INFO: Analyzing hidden import 'onnxruntime.transformers.onnx_model_vae'
+25231 INFO: Analyzing hidden import 'onnxruntime.transformers.onnx_utils'
+25232 INFO: Analyzing hidden import 'onnxruntime.transformers.optimizer'
+25250 INFO: Analyzing hidden import 'onnxruntime.transformers.past_helper'
+25253 INFO: Analyzing hidden import 'onnxruntime.transformers.profile_result_processor'
+25262 INFO: Analyzing hidden import 'onnxruntime.transformers.profiler'
+25270 INFO: Analyzing hidden import 'onnxruntime.transformers.quantize_helper'
+25660 INFO: Analyzing hidden import 'onnxruntime.transformers.shape_infer_helper'
+25664 INFO: Analyzing hidden import 'onnxruntime.transformers.shape_optimizer'
+25674 INFO: Analyzing hidden import 'onnxruntime.transformers.torch_onnx_export_helper'
+25676 INFO: Processing module hooks (post-graph stage)...
+25692 INFO: Performing binary vs. data reclassification (354 entries)
+25750 INFO: Looking for ctypes DLLs
+25798 INFO: Analyzing run-time hooks ...
+25803 INFO: Including run-time hook 'pyi_rth_inspect.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks\\rthooks'
+25805 INFO: Including run-time hook 'pyi_rth_pkgutil.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks\\rthooks'
+25807 INFO: Including run-time hook 'pyi_rth_multiprocessing.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks\\rthooks'
+25832 INFO: Creating base_library.zip...
+25851 INFO: Looking for dynamic libraries
+27491 INFO: Extra DLL search directories (AddDllDirectory): ['D:\\Serveur IA\\toolchain\\conversation-client-python\\Lib\\site-packages\\numpy.libs']
+27491 INFO: Extra DLL search directories (PATH): []
+28139 INFO: Warnings written to D:\Serveur IA\toolchain\conversation-build\conversation-worker\warn-conversation-worker.txt
+28269 INFO: Graph cross-reference written to D:\Serveur IA\toolchain\conversation-build\conversation-worker\xref-conversation-worker.html
+28332 INFO: checking PYZ
+28422 INFO: checking PKG
+28423 INFO: Bootloader D:\Serveur IA\client-qwen\build-tools\PyInstaller\bootloader\Windows-64bit-intel\run.exe
+28423 INFO: checking EXE
+28429 INFO: checking COLLECT
+28443 INFO: Removing dir D:\Serveur IA\client-qwen\voice\conversation-worker
+28629 INFO: Building COLLECT COLLECT-00.toc
+29297 INFO: Building COLLECT COLLECT-00.toc completed successfully.
+29308 INFO: Build complete! The results are available in: D:\Serveur IA\client-qwen\voice
+213 INFO: PyInstaller: 6.22.3, contrib hooks: 2026.8
+213 INFO: Python: 3.12.14
+247 INFO: Platform: Windows-10-10.0.19045-SP0
+248 INFO: Python environment: D:\Serveur IA\Strata-src\.venv
+248 INFO: wrote D:\Serveur IA\client-qwen\Acc�s serveur Fred.spec
+186 WARNING: Failed to collect submodules for 'webview.platforms.android' because importing 'webview.platforms.android' raised: ModuleNotFoundError: No module named 'android'
+3528 INFO: Module search paths (PYTHONPATH):
+['D:\\Serveur IA',
+ 'D:\\Serveur IA\\client-qwen\\build-tools',
+ 'C:\\Users\\karen\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python312.zip',
+ 'C:\\Users\\karen\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\DLLs',
+ 'C:\\Users\\karen\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\Lib',
+ 'C:\\Users\\karen\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python',
+ 'D:\\Serveur IA\\Strata-src\\.venv',
+ 'D:\\Serveur IA\\Strata-src\\.venv\\Lib\\site-packages',
+ 'C:\\Users\\karen\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\Lib\\site-packages',
+ 'D:\\Serveur IA\\client-qwen']
+4113 INFO: Appending 'binaries' from .spec
+4115 INFO: Appending 'datas' from .spec
+4167 INFO: checking Analysis
+4215 INFO: Building because D:\Serveur IA\client-qwen\wireguard-bridge.exe changed
+4215 INFO: Looking for Python shared library...
+4215 INFO: Using Python shared library: C:\Users\karen\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python312.dll
+4215 INFO: Running Analysis Analysis-00.toc
+4215 INFO: Target bytecode optimization level: 0
+4215 INFO: Initializing module dependency graph...
+4217 INFO: Initializing module graph hook caches...
+4237 INFO: Analyzing modules for base_library.zip ...
+5728 INFO: Processing standard module hook 'hook-encodings.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks'
+6188 INFO: Processing standard module hook 'hook-math.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks'
+7074 INFO: Processing standard module hook 'hook-pickle.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks'
+7880 INFO: Processing standard module hook 'hook-heapq.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks'
+8222 INFO: Caching module dependency graph...
+8262 INFO: Analyzing D:\Serveur IA\client-qwen\client.py
+8326 INFO: Processing standard module hook 'hook-_ctypes.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks'
+8549 INFO: Processing pre-find-module-path hook 'hook-tkinter.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks\\pre_find_module_path'
+8551 INFO: TclTkInfo: initializing cached Tcl/Tk info...
+8891 INFO: Processing standard module hook 'hook-_tkinter.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks'
+9077 INFO: Processing standard module hook 'hook-cryptography.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\_pyinstaller_hooks_contrib\\stdhooks'
+10359 INFO: hook-cryptography: cryptography does not seem to be using dynamically linked OpenSSL.
+10420 INFO: Processing standard module hook 'hook-psutil.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\_pyinstaller_hooks_contrib\\stdhooks'
+10672 INFO: Processing standard module hook 'hook-sqlite3.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks'
+11104 INFO: Processing standard module hook 'hook-webview.py' from 'D:\\Serveur IA\\Strata-src\\.venv\\Lib\\site-packages\\webview\\__pyinstaller'
+11181 INFO: Processing standard module hook 'hook-platform.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks'
+11241 INFO: Processing standard module hook 'hook-webbrowser.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks'
+11562 INFO: Processing standard module hook 'hook-multiprocessing.util.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks'
+11627 INFO: Processing standard module hook 'hook-xml.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks'
+12114 INFO: Processing standard module hook 'hook-jinja2.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\_pyinstaller_hooks_contrib\\stdhooks'
+12125 INFO: Processing pre-safe-import-module hook 'hook-typing_extensions.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks\\pre_safe_import_module'
+12127 INFO: SetuptoolsInfo: initializing cached setuptools info...
+13455 INFO: Processing pre-safe-import-module hook 'hook-gi.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks\\pre_safe_import_module'
+13570 INFO: Processing standard module hook 'hook-clr.py' from 'D:\\Serveur IA\\Strata-src\\.venv\\Lib\\site-packages\\pythonnet\\_pyinstaller'
+13597 INFO: Processing standard module hook 'hook-clr_loader.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\_pyinstaller_hooks_contrib\\stdhooks'
+13688 INFO: Processing standard module hook 'hook-pycparser.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\_pyinstaller_hooks_contrib\\stdhooks'
+13819 INFO: Processing standard module hook 'hook-setuptools.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks'
+13830 INFO: Processing pre-safe-import-module hook 'hook-distutils.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks\\pre_safe_import_module'
+13886 INFO: Processing standard module hook 'hook-sysconfig.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks'
+13890 INFO: Processing pre-safe-import-module hook 'hook-jaraco.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks\\pre_safe_import_module'
+13891 INFO: Setuptools: 'jaraco' appears to be a full setuptools-vendored copy - creating alias to 'setuptools._vendor.jaraco'!
+13904 INFO: Processing pre-safe-import-module hook 'hook-more_itertools.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks\\pre_safe_import_module'
+13904 INFO: Setuptools: 'more_itertools' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.more_itertools'!
+14017 INFO: Processing standard module hook 'hook-_osx_support.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks'
+14031 INFO: Processing pre-safe-import-module hook 'hook-packaging.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks\\pre_safe_import_module'
+14245 INFO: Processing standard module hook 'hook-setuptools._vendor.jaraco.text.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks'
+14247 INFO: Processing pre-safe-import-module hook 'hook-importlib_resources.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks\\pre_safe_import_module'
+14254 INFO: Processing pre-safe-import-module hook 'hook-backports.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks\\pre_safe_import_module'
+14255 INFO: Setuptools: 'backports' appears to be a full setuptools-vendored copy - creating alias to 'setuptools._vendor.backports'!
+14656 INFO: Processing pre-safe-import-module hook 'hook-tomli.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks\\pre_safe_import_module'
+14657 INFO: Setuptools: 'tomli' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.tomli'!
+15122 INFO: Processing pre-safe-import-module hook 'hook-wheel.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks\\pre_safe_import_module'
+15549 INFO: Processing standard module hook 'hook-xml.etree.cElementTree.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks'
+15846 INFO: Analyzing hidden import 'webview.__pyinstaller'
+15846 INFO: Analyzing hidden import 'webview.__pyinstaller.hook-webview'
+15864 INFO: Processing pre-safe-import-module hook 'hook-importlib_metadata.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks\\pre_safe_import_module'
+15865 INFO: Setuptools: 'importlib_metadata' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.importlib_metadata'!
+15885 INFO: Processing standard module hook 'hook-setuptools._vendor.importlib_metadata.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks'
+15905 INFO: Processing pre-safe-import-module hook 'hook-zipp.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks\\pre_safe_import_module'
+15906 INFO: Setuptools: 'zipp' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.zipp'!
+15932 INFO: Processing standard module hook 'hook-win32ctypes.core.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks'
+17389 INFO: Analyzing hidden import 'webview._version'
+17390 INFO: Analyzing hidden import 'pythonnet._pyinstaller'
+17391 INFO: Analyzing hidden import 'pythonnet._pyinstaller.hook-clr'
+17392 INFO: Processing module hooks (post-graph stage)...
+17393 WARNING: Hidden import "pycparser.lextab" not found!
+17393 WARNING: Hidden import "pycparser.yacctab" not found!
+17505 INFO: Processing standard module hook 'hook-_tkinter.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks'
+17523 INFO: Performing binary vs. data reclassification (1547 entries)
+17771 INFO: Looking for ctypes DLLs
+17848 INFO: Analyzing run-time hooks ...
+17851 INFO: Including run-time hook 'pyi_rth_inspect.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks\\rthooks'
+17853 INFO: Including run-time hook 'pyi_rth_pkgutil.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks\\rthooks'
+17855 INFO: Including run-time hook 'pyi_rth_multiprocessing.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks\\rthooks'
+17857 INFO: Including run-time hook 'pyi_rth_setuptools.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks\\rthooks'
+17858 INFO: Including run-time hook 'pyi_rth_cryptography_openssl.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\_pyinstaller_hooks_contrib\\rthooks'
+17859 INFO: Including run-time hook 'pyi_rth__tkinter.py' from 'D:\\Serveur IA\\client-qwen\\build-tools\\PyInstaller\\hooks\\rthooks'
+17901 INFO: Creating base_library.zip...
+17919 INFO: Looking for dynamic libraries
+18749 INFO: Extra DLL search directories (AddDllDirectory): []
+18749 INFO: Extra DLL search directories (PATH): []
+19980 INFO: Warnings written to D:\Serveur IA\client-qwen\build\Acc�s serveur Fred\warn-Acc�s serveur Fred.txt
+20040 INFO: Graph cross-reference written to D:\Serveur IA\client-qwen\build\Acc�s serveur Fred\xref-Acc�s serveur Fred.html
+20113 INFO: checking PYZ
+20187 INFO: checking PKG
+20217 INFO: Building because toc changed
+20217 INFO: Building PKG (CArchive) Acc�s serveur Fred.pkg
+41824 INFO: Building PKG (CArchive) Acc�s serveur Fred.pkg completed successfully.
+41858 INFO: Bootloader D:\Serveur IA\client-qwen\build-tools\PyInstaller\bootloader\Windows-64bit-intel\runw.exe
+41858 INFO: checking EXE
+41893 INFO: Building because toc changed
+41893 INFO: Building EXE from EXE-00.toc
+41899 INFO: Copying bootloader EXE to D:\Serveur IA\toolchain\releases-staging\eg2-20261021\windows\Acc�s serveur Fred.exe
+41940 INFO: Copying icon to EXE
+41980 INFO: Copying version information to EXE
+42018 INFO: Copying 0 resources to EXE
+42018 INFO: Embedding manifest in EXE
+42056 INFO: Appending PKG archive to EXE
+42124 INFO: Fixing EXE headers
+43584 INFO: Building EXE from EXE-00.toc completed successfully.
+43619 INFO: Build complete! The results are available in: D:\Serveur IA\toolchain\releases-staging\eg2-20261021\windows
+Build manifest: D:\Serveur IA\toolchain\releases-staging\eg2-20261021\windows\build-manifest.json

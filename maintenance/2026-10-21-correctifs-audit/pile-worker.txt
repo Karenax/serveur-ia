@@ -1,0 +1,150 @@
+Process 29580: "D:\Serveur IA\toolchain\hermes-security-runtime\venv\Scripts\python.exe" -c "
+def _fred_install_codex_headers():
+    from functools import wraps
+    from openai import OpenAI, AsyncOpenAI
+    from agent.codex_headers import codex_cloudflare_headers, is_official_codex_base_url
+
+    def apply(client, request):
+        if not (is_official_codex_base_url(str(client.base_url))
+                and is_official_codex_base_url(str(request.url))):
+            return
+        authorization = request.headers.get('Authorization', '')
+        scheme, _, token = authorization.partition(' ')
+        token = token.strip() if scheme.lower() == 'bearer' else ''
+        # A rotation can remove a claim as well as change it. Clear previous
+        # values before adding the headers derived from the actual bearer.
+        for name in ('ChatGPT-Account-ID', 'x-openai-internal-codex-residency'):
+            request.headers.pop(name, None)
+        request.headers.update(codex_cloudflare_headers(token, base_url=str(client.base_url)))
+
+    sync_original = OpenAI._prepare_request
+    if not getattr(sync_original, '_fred_codex_headers', False):
+        @wraps(sync_original)
+        def prepare_sync(client, request):
+            result = sync_original(client, request)
+            apply(client, request)
+            return result
+        prepare_sync._fred_codex_headers = True
+        OpenAI._prepare_request = prepare_sync
+
+    async_original = AsyncOpenAI._prepare_request
+    if not getattr(async_original, '_fred_codex_headers', False):
+        @wraps(async_original)
+        async def prepare_async(client, request):
+            result = await async_original(client, request)
+            apply(client, request)
+            return result
+        prepare_async._fred_codex_headers = True
+        AsyncOpenAI._prepare_request = prepare_async
+
+import contextlib, io, json, logging, sys
+logging.disable(logging.CRITICAL)
+payload=json.load(sys.stdin)
+with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+ from openai import OpenAI
+ _fred_install_codex_headers()
+ mode=payload['mode'];key=payload['key'];url=payload['url'];data=payload['data']
+ model=data['model']
+ if mode=='anthropic_messages':
+  from agent.anthropic_adapter import build_anthropic_client
+  from agent.auxiliary_client import AnthropicAuxiliaryClient
+  native=build_anthropic_client(key,base_url=url,timeout=900)
+  client=AnthropicAuxiliaryClient(native,model,key,url,is_oauth=key.startswith('sk-ant-oat'))
+ else:
+  client=OpenAI(api_key=key,base_url=url,timeout=900,max_retries=0)
+  if mode=='codex_responses':
+   from agent.auxiliary_client import CodexAuxiliaryClient
+   client=CodexAuxiliaryClient(client,model)
+ data['stream']=False
+ data.pop('stream_options',None);data.pop('strata_mcp',None)
+ if data.get('max_tokens')==-1:data.pop('max_tokens')
+ extra={k:data.pop(k) for k in ('top_k','min_p','repetition_penalty','chat_template_kwargs') if k in data}
+ if mode!='chat_completions':extra={}
+ if mode!='chat_completions' and 'reasoning_effort' in data:
+  effort=data.pop('reasoning_effort');extra['reasoning']={'enabled':effort!='none','effort':effort}
+ if extra:data['extra_body']=extra
+ try:
+  result=client.chat.completions.create(**data)
+  def field(obj,name,default=None):return obj.get(name,default) if isinstance(obj,dict) else getattr(obj,name,default)
+  choices=[]
+  for choice in result.choices:
+   message=choice.message
+   out={'role':'assistant','content':field(message,'content')}
+   reason=field(message,'reasoning_content') or field(message,'reasoning')
+   if reason:out['reasoning_content']=reason
+   calls=field(message,'tool_calls')
+   if calls:
+    out['tool_calls']=[{'id':field(c,'id'),'type':'function','function':{'name':field(field(c,'function'),'name'),'arguments':field(field(c,'function'),'arguments')}} for c in calls]
+   choices.append({'index':field(choice,'index',0),'message':out,'finish_reason':field(choice,'finish_reason') or ('tool_calls' if calls else 'stop')})
+  usage=field(result,'usage')
+  response={'object':'chat.completion','model':model,'choices':choices}
+  if usage:response['usage']={k:field(usage,k,0) for k in ('prompt_tokens','completion_tokens','total_tokens')}
+ finally:client.close()
+print(json.dumps(response,ensure_ascii=False))
+"
+Python v3.14.7 (C:\Users\karen\AppData\Local\hermes\tools\python-3.14.7+20260901-win32-x64\python.exe)
+
+Thread 468 (idle)
+    get_data (<frozen importlib._bootstrap_external>:950)
+    get_code (<frozen importlib._bootstrap_external>:892)
+    exec_module (<frozen importlib._bootstrap_external>:755)
+    _load_unlocked (<frozen importlib._bootstrap>:938)
+    _find_and_load_unlocked (<frozen importlib._bootstrap>:1342)
+    _find_and_load (<frozen importlib._bootstrap>:1371)
+    <module> (openai\types\responses\__init__.py:13)
+    _call_with_frames_removed (<frozen importlib._bootstrap>:491)
+    exec_module (<frozen importlib._bootstrap_external>:759)
+    _load_unlocked (<frozen importlib._bootstrap>:938)
+    _find_and_load_unlocked (<frozen importlib._bootstrap>:1342)
+    _find_and_load (<frozen importlib._bootstrap>:1371)
+    _call_with_frames_removed (<frozen importlib._bootstrap>:491)
+    _find_and_load_unlocked (<frozen importlib._bootstrap>:1314)
+    _find_and_load (<frozen importlib._bootstrap>:1371)
+    <module> (openai\types\graders\grader_inputs.py:7)
+    _call_with_frames_removed (<frozen importlib._bootstrap>:491)
+    exec_module (<frozen importlib._bootstrap_external>:759)
+    _load_unlocked (<frozen importlib._bootstrap>:938)
+    _find_and_load_unlocked (<frozen importlib._bootstrap>:1342)
+    _find_and_load (<frozen importlib._bootstrap>:1371)
+    <module> (openai\types\graders\label_model_grader.py:7)
+    _call_with_frames_removed (<frozen importlib._bootstrap>:491)
+    exec_module (<frozen importlib._bootstrap_external>:759)
+    _load_unlocked (<frozen importlib._bootstrap>:938)
+    _find_and_load_unlocked (<frozen importlib._bootstrap>:1342)
+    _find_and_load (<frozen importlib._bootstrap>:1371)
+    <module> (openai\types\graders\multi_grader.py:8)
+    _call_with_frames_removed (<frozen importlib._bootstrap>:491)
+    exec_module (<frozen importlib._bootstrap_external>:759)
+    _load_unlocked (<frozen importlib._bootstrap>:938)
+    _find_and_load_unlocked (<frozen importlib._bootstrap>:1342)
+    _find_and_load (<frozen importlib._bootstrap>:1371)
+    <module> (openai\types\graders\__init__.py:5)
+    _call_with_frames_removed (<frozen importlib._bootstrap>:491)
+    exec_module (<frozen importlib._bootstrap_external>:759)
+    _load_unlocked (<frozen importlib._bootstrap>:938)
+    _find_and_load_unlocked (<frozen importlib._bootstrap>:1342)
+    _find_and_load (<frozen importlib._bootstrap>:1371)
+    _call_with_frames_removed (<frozen importlib._bootstrap>:491)
+    _find_and_load_unlocked (<frozen importlib._bootstrap>:1314)
+    _find_and_load (<frozen importlib._bootstrap>:1371)
+    <module> (openai\types\eval_create_params.py:10)
+    _call_with_frames_removed (<frozen importlib._bootstrap>:491)
+    exec_module (<frozen importlib._bootstrap_external>:759)
+    _load_unlocked (<frozen importlib._bootstrap>:938)
+    _find_and_load_unlocked (<frozen importlib._bootstrap>:1342)
+    _find_and_load (<frozen importlib._bootstrap>:1371)
+    <module> (openai\types\__init__.py:61)
+    _call_with_frames_removed (<frozen importlib._bootstrap>:491)
+    exec_module (<frozen importlib._bootstrap_external>:759)
+    _load_unlocked (<frozen importlib._bootstrap>:938)
+    _find_and_load_unlocked (<frozen importlib._bootstrap>:1342)
+    _find_and_load (<frozen importlib._bootstrap>:1371)
+    _call_with_frames_removed (<frozen importlib._bootstrap>:491)
+    _handle_fromlist (<frozen importlib._bootstrap>:1434)
+    <module> (openai\__init__.py:9)
+    _call_with_frames_removed (<frozen importlib._bootstrap>:491)
+    exec_module (<frozen importlib._bootstrap_external>:759)
+    _load_unlocked (<frozen importlib._bootstrap>:938)
+    _find_and_load_unlocked (<frozen importlib._bootstrap>:1342)
+    _find_and_load (<frozen importlib._bootstrap>:1371)
+    <module> (<string>:44)

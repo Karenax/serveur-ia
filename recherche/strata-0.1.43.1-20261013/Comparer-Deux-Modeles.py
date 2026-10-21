@@ -1,5 +1,5 @@
 """Local comparison, thermal evidence, and restoration of the current saved session."""
-import ast, datetime, hashlib, json, os, re, socket, subprocess, sys, threading, time, urllib.request
+import datetime, hashlib, json, os, re, socket, subprocess, sys, threading, time, urllib.request
 from pathlib import Path
 import psutil
 
@@ -233,7 +233,8 @@ finally:
         health(8080,1800)
     try:
         response=post(8080,'/v1/chat/completions',dict(model=production['model_name'],messages=[dict(role='user',content='Réponds uniquement avec un objet JSON contenant la clé resultat et le résultat de 43 multiplié par 7.')],temperature=0,max_tokens=64,cache_prompt=False,chat_template_kwargs=dict(enable_thinking=False),reasoning_effort='none'))
-        text=response['choices'][0]['message']['content'].strip();match=re.fullmatch(r'```(?:json)?\s*\n(.*?)\n```',text,re.S)
+        text=response['choices'][0]['message']['content'].strip()
+        match=re.fullmatch(r'```(?:json)?\s*\n(.*?)\n```',text,re.S)
         assert json.loads(match.group(1) if match else text)['resultat']==301,text
         with socket.socket() as probe:assert probe.connect_ex(('127.0.0.1',8081))!=0
         metrics=get(8080,'/metrics')

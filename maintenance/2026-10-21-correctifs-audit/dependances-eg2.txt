@@ -1,0 +1,20 @@
+Using Python 3.12.14 environment at: toolchain\eg2-python
+Resolved 2 packages in 2ms
+Uninstalled 2 packages in 298ms
+warning: Failed to hardlink files; falling back to full copy. This may lead to degraded performance.
+         If the cache and target directories are on different filesystems, hardlinking may not be supported.
+         If this is intentional, set `export UV_LINK_MODE=copy` or use `--link-mode=copy` to suppress this warning.
+Installed 2 packages in 914ms
+ - certifi==2026.7.22
+ + certifi==2026.10.19
+ - pip==25.0.1
+ + pip==26.2.1
+Using Python 3.12.14 environment at: toolchain\eg2-python
+Resolved 1 package in 3ms
+Uninstalled 1 package in 119ms
+warning: Failed to hardlink files; falling back to full copy. This may lead to degraded performance.
+         If the cache and target directories are on different filesystems, hardlinking may not be supported.
+         If this is intentional, set `export UV_LINK_MODE=copy` or use `--link-mode=copy` to suppress this warning.
+Installed 1 package in 163ms
+ - pillow==12.3.0
+ + pillow==13.0.0

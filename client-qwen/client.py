@@ -28,6 +28,7 @@ import history_store
 from wg_bridge import Bridge,validate_profile,connection_candidates
 from connection_settings import parse as parse_connection_settings, validate_connection_endpoint, HTTPS_ENDPOINT
 import app_integrations
+import hermes_catalogue
 
 class Blob(ctypes.Structure):
     _fields_ = [('cbData', wintypes.DWORD), ('pbData', ctypes.POINTER(ctypes.c_ubyte))]
@@ -245,12 +246,14 @@ class Remote:
                             if error.code in (401,403):raise
                             error.close()
                         except (OSError,ValueError):pass
-                    models=list(dict.fromkeys(row['id'] for row in data if isinstance(row,dict) and isinstance(row.get('id'),str) and row['id'].strip() and len(row['id'])<=512))
+                    public_models=[row for row in data if isinstance(row,dict) and isinstance(row.get('id'),str) and row['id'].strip() and len(row['id'])<=512]
+                    embedding_ids={row['id'] for row in public_models if isinstance(row.get('capabilities'),dict) and row['capabilities'].get('embedding') is True}
+                    models=list(dict.fromkeys(row['id'] for row in public_models if row['id'] not in embedding_ids))
                     self.model_capabilities={row['id']:row.get('capabilities',{}) for row in data if isinstance(row,dict) and row.get('id') in models and isinstance(row.get('capabilities',{}),dict)}
                     entries=[]
                     for row in data:
-                        if not isinstance(row,dict) or row.get('id') not in models or any(entry['id']==row['id'] for entry in entries):continue
-                        entry={'id':row['id'],'object':'model','capabilities':self.model_capabilities.get(row['id'],{})}
+                        if not isinstance(row,dict) or row.get('id') not in models+list(embedding_ids) or any(entry['id']==row['id'] for entry in entries):continue
+                        entry={'id':row['id'],'object':'model','capabilities':row.get('capabilities',{}) if isinstance(row.get('capabilities'),dict) else {}}
                         for field in ('name','label','provider'):
                             if isinstance(row.get(field),str):entry[field]=row[field][:512]
                         if type(row.get('available')) is bool:entry['available']=row['available']
@@ -260,9 +263,11 @@ class Remote:
                         if isinstance(catalogue.get(field),str):self.models_catalogue[field]=catalogue[field][:512]
                     self.models=models;self.reachable=True
                     if models:
-                        available=[entry['id'] for entry in entries if entry.get('available',True)]
+                        available=[entry['id'] for entry in entries if entry['id'] in models and entry.get('available',True)]
                         if self.model not in available:self.model=catalogue.get('default_model') if catalogue.get('default_model') in available else (available or models)[0]
                         self.connected=True;self.error='';code='ready'
+                    elif any(entry['id'] in embedding_ids and entry.get('available',True) for entry in entries):
+                        self.model='';self.connected=True;self.error='';code='ready'
                     else:
                         self.model='';self.error='Serveur joint, mais aucun modèle accessible n’est annoncé par /v1/models.';code='no_models'
                 except urllib.error.HTTPError as error:
@@ -354,6 +359,11 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
             self.wfile.write(content)
 
         def do_GET(self):
+            if self.path=='/hermes/v1/models':
+                if not self.authorized():return
+                state=remote.check()
+                if not state['connected']:return self.reply(503,{'error':{'message':state['error']}})
+                return self.reply(200,hermes_catalogue.catalogue(remote.models_catalogue)[0])
             if self.path == '/client/conversation':
                 if not self.authorized():return
                 return self.reply(200,conversation.status())
@@ -393,13 +403,22 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
             self.forward()
 
         def do_POST(self):
-            if self.path not in ('/v1/chat/completions','/v1/context', '/v1/cancel','/v1/workspace/action','/v1/notifications/action','/v1/agent/action','/v1/voice/speech','/v1/voice/cancel','/client/conversation','/client/draft','/client/endpoint','/client/preferences','/client/update/check','/client/update/apply','/client/history','/client/history/sync','/client/history/restore-ack','/client/history/flush','/client/history/recover','/client/integrations/apply','/client/voice'):
+            hermes_request=self.path=='/hermes/v1/chat/completions'
+            if hermes_request:self.path='/v1/chat/completions'
+            if self.path not in ('/v1/embeddings','/v1/chat/completions','/v1/context', '/v1/cancel','/v1/workspace/action','/v1/notifications/action','/v1/agent/action','/v1/voice/speech','/v1/voice/cancel','/client/conversation','/client/draft','/client/endpoint','/client/preferences','/client/update/check','/client/update/apply','/client/history','/client/history/sync','/client/history/restore-ack','/client/history/flush','/client/history/recover','/client/integrations/apply','/client/voice'):
                 return self.reply(404, {'error': {'message': 'Route non disponible.'}})
             if not self.authorized():
                 return
             try:
-                maximum = 10*1024*1024 if self.path.startswith('/client/history') or self.path in ('/v1/chat/completions','/v1/context') else 8*1024*1024 if self.path=='/v1/workspace/action' else 2*1024*1024
+                maximum = 65536 if self.path=='/v1/embeddings' else 10*1024*1024 if self.path.startswith('/client/history') or self.path in ('/v1/chat/completions','/v1/context') else 8*1024*1024 if self.path=='/v1/workspace/action' else 2*1024*1024
                 values = json_body(self, maximum)
+                if hermes_request:
+                    state=remote.check()
+                    if not state['connected']:return self.reply(503,{'error':{'message':state['error']}})
+                    _,mapping=hermes_catalogue.catalogue(remote.models_catalogue)
+                    selected=mapping.get(values.get('model')) if isinstance(values.get('model'),str) else None
+                    if selected is None:raise ValueError('Modèle Hermes indisponible. Actualisez la liste.')
+                    values['model']=selected
                 body = json.dumps(values, ensure_ascii=False).encode('utf-8')
                 streaming = bool(values.get('stream'))
             except (OSError, ValueError, AttributeError) as error:
@@ -422,7 +441,7 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
                         if not state['connected']:raise ValueError('Connectez le client au serveur et chargez un modèle avant de l’ajouter.')
                         model=values.get('model') or state['model']
                         if model not in state['models']:raise ValueError('Ce modèle n’est plus disponible sur le serveur. Actualisez la liste.')
-                        result=app_integrations.install(values.get('app'),f'http://127.0.0.1:{self.server.server_port}/v1',key,model)
+                        result=app_integrations.install(values.get('app'),f'http://127.0.0.1:{self.server.server_port}/v1',key,model,catalogue=copy.deepcopy(remote.models_catalogue))
                     elif self.path=='/client/endpoint':
                         endpoint=values.get('endpoint') or None
                         if endpoint:endpoint=parse_connection_settings(endpoint)
@@ -451,7 +470,7 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
 
         def forward(self, body=None, streaming=False):
             sent = False
-            inference=self.path in ('/v1/chat/completions','/v1/workspace/action')
+            inference=self.path in ('/v1/embeddings','/v1/chat/completions','/v1/workspace/action')
             tracked=self.path!='/v1/cancel'
             chat_stream=streaming and self.path=='/v1/chat/completions'
             if chat_stream:remote.stream={'phase':'requesting','started':time.time(),'last_event':time.time(),'reasoning_chars':0,'answer_chars':0}

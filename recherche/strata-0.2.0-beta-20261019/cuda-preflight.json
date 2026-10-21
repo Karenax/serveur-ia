@@ -1,0 +1,17 @@
+{
+  "cudaRuntimeGetVersion": {
+    "code": 0,
+    "value": 12090,
+    "error": "no error"
+  },
+  "cudaDriverGetVersion": {
+    "code": 0,
+    "value": 12000,
+    "error": "no error"
+  },
+  "cudaGetDeviceCount": {
+    "code": 0,
+    "value": 2,
+    "error": "no error"
+  }
+}

@@ -1,0 +1,6 @@
+Using Python 3.12.14 environment at: toolchain\conversation-client-python
+Resolved 1 package in 2ms
+Would uninstall 1 package
+Would install 1 package
+ - pip==25.0.1
+ + pip==26.2.1

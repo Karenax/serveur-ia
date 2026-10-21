@@ -94,7 +94,7 @@ uiDecorateNavigation();render();uiProjectTab('documents');
 let uiLastConnection={},uiIntegrations=null,uiIntegrationsLoading=false,uiIntegrationPending=false;
 function uiIntegrationButtons(){
   const model=connected&&conversationModelAvailable()?conversationModel():'';
-  $('integration-model').textContent=model?'Modèle à ajouter : '+model:'Connectez le client au serveur et chargez un modèle pour l’ajouter.';
+  $('integration-model').textContent=model?'Modèle à ajouter : '+conversationModelLabel():'Connectez le client au serveur et chargez un modèle pour l’ajouter.';
   for(const name of ['opencode','hermes']){
     const app=uiIntegrations?.[name],button=$('integration-'+name);
     button.disabled=uiIntegrationPending||uiIntegrationsLoading||!app?.installed||!model;

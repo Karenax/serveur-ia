@@ -1,0 +1,11 @@
+{
+  "hermes_catalogue": true,
+  "hermes_model_switch": true,
+  "openai_sdk_round_trip": true,
+  "models": [
+    "fred-774e98eaebcc/modele-cloud"
+  ],
+  "desktop_formatter": true,
+  "displayed_name": "Modele Cloud",
+  "runtime_commit": "79651b71bd56efd76d06f3de1df64dde09b58ff3"
+}

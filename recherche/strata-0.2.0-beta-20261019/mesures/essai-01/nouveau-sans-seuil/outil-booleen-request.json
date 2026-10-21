@@ -1,0 +1,48 @@
+{
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Appelle bool_probe avec background=false et marker=\"True\". Aucun autre texte."
+    }
+  ],
+  "max_tokens": 160,
+  "temperature": 0,
+  "seed": 42,
+  "stream": false,
+  "cache_prompt": false,
+  "reasoning_effort": "none",
+  "chat_template_kwargs": {
+    "enable_thinking": false
+  },
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "bool_probe",
+        "description": "Report the requested values.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "background": {
+              "type": "boolean"
+            },
+            "marker": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "background",
+            "marker"
+          ]
+        }
+      }
+    }
+  ],
+  "tool_choice": {
+    "type": "function",
+    "function": {
+      "name": "bool_probe"
+    }
+  }
+}

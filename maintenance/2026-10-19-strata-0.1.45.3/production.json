@@ -1,0 +1,100 @@
+{
+  "version": "0.1.45.3",
+  "engine_exe": "D:\\Serveur IA\\dependances\\strata-0.1.45.3\\engine-cuda12\\strata.exe",
+  "engine_pid": 20192,
+  "engine_sha256": "c97c3e84228c928c46bb2727c1753cbfe76c31c3eb0a9edc7bdd3cd78871cac3",
+  "session": "D:\\Serveur IA\\lanceur\\sessions\\20261019-181749-673936",
+  "state": {
+    "status": "pret",
+    "started": "2026-10-19T18:17:50.215417+02:00",
+    "started_epoch": 1792426670.2154171,
+    "supervisor": {
+      "pid": 17876,
+      "created": 1792426669.9640992
+    },
+    "config_path": "D:\\Serveur IA\\lanceur\\sessions\\20261019-181749-673936\\strata.json",
+    "host": "127.0.0.1",
+    "port": 8080,
+    "model": "qwen3.8-flash-next-iq4-xs",
+    "min_free_ram_gib": 6.0,
+    "server": {
+      "pid": 20096,
+      "created": 1792426670.297752
+    },
+    "available_ram_gib": 64.27,
+    "startup_memory_reclaim": {
+      "status": "reclaimed",
+      "pid": 20192,
+      "method": "EmptyWorkingSet"
+    },
+    "loaded_seconds": 469.0,
+    "ready_seconds": 474.9
+  },
+  "health": {
+    "status": "ok",
+    "max_context": 262144,
+    "model": "qwen3.8-flash-next-iq4-xs",
+    "images": true,
+    "api_key": false,
+    "loaded": true,
+    "service": "strata"
+  },
+  "console": {
+    "service": "qwen-launcher"
+  },
+  "ports": {
+    "8080": true,
+    "8765": true,
+    "8766": true,
+    "8643": true,
+    "8768": true,
+    "wireguard_udp_51820": true
+  },
+  "calculation_response": "301",
+  "persistent_config_changes": {
+    "lanceur/base-strata.json": [
+      "exe",
+      "lib_dirs"
+    ],
+    "strata-iq4-p100-hybride.json": [
+      "exe",
+      "lib_dirs"
+    ],
+    "lanceur/reglages.json": [
+      "exe"
+    ],
+    "lanceur/reglages-par-defaut.json": [
+      "exe"
+    ],
+    "lanceur/derniers-reglages-valides.json": [
+      "exe"
+    ]
+  },
+  "protected_files_unchanged": {
+    "D:\\Serveur IA\\lanceur\\acces-distants.json": true,
+    "D:\\Serveur IA\\lanceur\\appareils-activite.json": true,
+    "D:\\Serveur IA\\lanceur\\audit-before-fred.json": true,
+    "D:\\Serveur IA\\lanceur\\audit-connexion.json": true,
+    "D:\\Serveur IA\\lanceur\\audit-model-processes.json": true,
+    "D:\\Serveur IA\\lanceur\\audit.json": false,
+    "D:\\Serveur IA\\lanceur\\connexions.json": true,
+    "D:\\Serveur IA\\lanceur\\exploitation.json": true,
+    "D:\\Serveur IA\\lanceur\\hermes-integration.json": true,
+    "D:\\Serveur IA\\lanceur\\hermes-models.json": true,
+    "D:\\Serveur IA\\lanceur\\native-ui-fred.json": true,
+    "D:\\Serveur IA\\lanceur\\native-ui-v31.json": true,
+    "D:\\Serveur IA\\lanceur\\native-update-fred.json": true,
+    "D:\\Serveur IA\\lanceur\\retour-client.json": true,
+    "D:\\Serveur IA\\lanceur\\validation-350-apres.json": true,
+    "D:\\Serveur IA\\lanceur\\validation-350-avant.json": true,
+    "D:\\Serveur IA\\lanceur\\verification-fred.json": true,
+    "D:\\Serveur IA\\lanceur\\verification.json": true,
+    "D:\\Serveur IA\\lanceur\\versions-clients.json": true,
+    "D:\\Serveur IA\\lanceur\\voix.json": true,
+    "D:\\Serveur IA\\lanceur\\wireguard-fw.json": true,
+    "D:\\Serveur IA\\lanceur\\wireguard.json": true,
+    "D:\\Serveur IA\\lanceur\\workspace-live-proof.json": true
+  },
+  "autoload": true,
+  "restart": true
+}

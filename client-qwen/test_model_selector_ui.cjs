@@ -14,7 +14,7 @@ async function check(browser,platform){
   let html=(platform==='android'?android:windows).replace('__CONFIG__',JSON.stringify(config)).replaceAll('__NONCE__','qa');
   if(process.env.MODEL_WIDGET_BASELINE){assert(html.includes('if(modelPickerActive()&&!forceOptions)return;'));html=html.replace('if(modelPickerActive()&&!forceOptions)return;','');}
   const entries=[{id:'fred-model-local',name:'Qwen local',provider:'Serveur',available:true,capabilities:{vision:false,context_length:4096,thinking:false,files:['txt']}},{id:'fred-model-cloud',label:'Modèle cloud',provider:'Fournisseur de test',available:true,capabilities:{vision:true,thinking:true,reasoning_efforts:['none','high']}},{id:'fred-model-offline',name:'Autre modèle',provider:'Fournisseur de test',available:false,capabilities:{vision:true}}];
-  const state={catalogue:{object:'list',source:'hermes',default_model:'fred-model-cloud',data:entries},history:null,revision:'1',preferences:{},calls:[],hold:false,pending:null,failCorrector:false,failModels:false,holdModels:true,pendingModels:null};
+  const state={catalogue:{object:'list',source:'hermes',default_model:'fred-model-cloud',data:[...entries,{id:'google/embeddinggemma-2',available:true,capabilities:{embedding:true,dimensions:768}}]},history:null,revision:'1',preferences:{},calls:[],hold:false,pending:null,failCorrector:false,failModels:false,holdModels:true,pendingModels:null};
   const json=(res,value,status=200)=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8'});res.end(JSON.stringify(value));};
   const event=(res,value)=>res.write('data: '+JSON.stringify(value)+'\n\n');
   const server=http.createServer(async(req,res)=>{
@@ -45,7 +45,7 @@ async function check(browser,platform){
     return json(res,{});
   });
   await new Promise(r=>server.listen(0,'127.0.0.1',r));const page=await browser.newPage({viewport:platform==='android'?{width:412,height:915}:{width:1440,height:1000},hasTouch:platform==='android',isMobile:platform==='android'}),errors=[];page.on('pageerror',e=>errors.push(e.message));
-  if(platform==='android')await page.addInitScript(()=>{window.AndroidClient={notificationReady(){},copyText(){return '{"ok":true}';},openSettings(){},exportFile(){return '{"ok":true}';},installUpdate(){}};});
+  if(platform==='android')await page.addInitScript(()=>{window.AndroidClient={notificationReady(){},copyText(text){window.__fredCopied=text;return '{"ok":true}';},openSettings(){},exportFile(){return '{"ok":true}';},installUpdate(){}};});
   if(process.env.DIAG_PICKER)await page.addInitScript(()=>{window.__pickerTrace=[];const note=(event,detail)=>{window.__pickerTrace.push({event,detail,focus:document.activeElement?.id});if(window.__pickerTrace.length>40)window.__pickerTrace.shift();};for(const event of ['focusin','focusout'])document.addEventListener(event,e=>note(event,e.target.id));document.addEventListener('DOMContentLoaded',()=>{const original=modelRefresh;modelRefresh=function(...args){note('modelRefresh',{args,loading:modelCatalogLoading,busy,historySyncPending,historySaving,preferencesLoaded:uiPreferencesLoaded,workspaceLoaded:ws.bootstrapDone,stack:new Error().stack?.split('\n').slice(1,7)});return original(...args);};});});
   const ready=()=>page.waitForFunction(()=>connected&&!busy&&!historySyncPending&&!historySaving&&!modelsPending&&!agentRecoveryPending&&!conversationActionPending&&!uiPreferencesPending);
   const sidebar=async()=>{if(await page.getAttribute('#ui-sidebar-toggle','aria-expanded')==='false')await page.click('#ui-sidebar-toggle');};
@@ -53,6 +53,14 @@ async function check(browser,platform){
   const open=async id=>{await sidebar();await page.locator('#conversation-list button[data-conversation-id="'+id+'"]').click();await ready();};
   try{
     await page.goto('http://127.0.0.1:'+server.address().port);await until(()=>state.pendingModels);assert.equal(await page.getAttribute('#model','aria-busy'),'true');assert.equal(await page.getAttribute('#conversation-model','aria-busy'),null,'The Android native picker closes when aria-busy changes on the select');assert.equal(await page.evaluate(()=>document.getElementById('conversation-model').selectedOptions[0]?.textContent),'Recherche des modèles…','An old profile model must not leave the initial picker visually blank');assert(await page.isDisabled('#send'));state.holdModels=false;state.pendingModels();state.pendingModels=null;await page.waitForSelector('#send:not([disabled])');await ready();assert(await page.isVisible('#conversation-model'),'The selector is usable before the first message');assert.equal(await page.inputValue('#conversation-model'),'fred-model-cloud');assert.equal(await page.evaluate(()=>chatCapabilities.images),true);assert.equal(await page.locator('#conversation-model option:disabled').count(),0,'Unavailable models must not fill the picker');
+    assert.equal(await page.locator('#conversation-model option[value="google/embeddinggemma-2"]').count(),0,'Embedding models stay out of chat choices');
+    await page.evaluate(()=>showView('api'));
+    await page.waitForSelector('#local-api');
+    await page.waitForFunction(()=>document.getElementById('local-api-key').value.length>0);
+    assert((await page.textContent('[data-view="api"]')).includes('google/embeddinggemma-2'));
+    await page.click('#toggle-api-key');assert.equal(await page.getAttribute('#local-api-key','type'),'text');
+    if(platform==='android'){await page.click('#android-copy-api-key');assert.equal(await page.evaluate(()=>window.__fredCopied),config.key);await page.click('#android-copy-api');assert.equal(await page.evaluate(()=>window.__fredCopied),'http://127.0.0.1/v1');}
+    await page.evaluate(()=>showView('chat'));
     const box=await page.locator('#conversation-model').boundingBox();assert(box.x>=0&&box.x+box.width<= (platform==='android'?412:1440),'The selector fits the viewport');
     const proof=process.env.UI_PROOF_DIRECTORY?path.resolve(process.env.UI_PROOF_DIRECTORY):path.join(root,'../preuves/model-picker-fix-20261011');fs.mkdirSync(proof,{recursive:true});await page.screenshot({path:path.join(proof,'selector-'+platform+'.png'),fullPage:true});
     const long=Array.from({length:120},(_,i)=>({id:'long-'+String(i).padStart(3,'0'),name:'Modèle '+String(i).padStart(3,'0')+' avec une description très longue',provider:'Fournisseur de test',available:true,capabilities:{vision:false}}));state.catalogue.data=[...entries,...long];await page.evaluate(()=>models());await ready();assert.equal(await page.locator('#conversation-model option').count(),122);

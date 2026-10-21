@@ -1,0 +1,12 @@
+test_detect_uses_roaming_desktop_state_and_integration_reports_remaining_action (test_opencode_visibility.VisibilityTests.test_detect_uses_roaming_desktop_state_and_integration_reports_remaining_action) ... ok
+test_existing_hidden_model_keeps_its_other_preferences (test_opencode_visibility.VisibilityTests.test_existing_hidden_model_keeps_its_other_preferences) ... ok
+test_legacy_namespace_is_ready_for_desktop_import_and_preserves_other_keys (test_opencode_visibility.VisibilityTests.test_legacy_namespace_is_ready_for_desktop_import_and_preserves_other_keys) ... ok
+test_new_model_namespace_has_the_full_desktop_shape (test_opencode_visibility.VisibilityTests.test_new_model_namespace_has_the_full_desktop_shape) ... ok
+test_open_desktop_never_changes_cached_settings (test_opencode_visibility.VisibilityTests.test_open_desktop_never_changes_cached_settings) ... ok
+test_sqlite_changes_only_target_visibility_and_keeps_exact_previous_row (test_opencode_visibility.VisibilityTests.test_sqlite_changes_only_target_visibility_and_keeps_exact_previous_row) ... ok
+test_unsupported_database_and_invalid_preferences_are_not_rewritten (test_opencode_visibility.VisibilityTests.test_unsupported_database_and_invalid_preferences_are_not_rewritten) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.278s
+
+OK

@@ -1,0 +1,10 @@
+{
+  "read_only": true,
+  "read_bytes": 21810380800,
+  "total_expert_bytes": 21810380800,
+  "from_layer": 32,
+  "elapsed_seconds": 109.08,
+  "stopped_for_memory": false,
+  "reader_working_set_trim_only": true,
+  "checksum_u64": 6889898123746664098
+}

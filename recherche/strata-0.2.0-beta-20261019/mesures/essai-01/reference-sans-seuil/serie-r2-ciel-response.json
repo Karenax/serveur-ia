@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-a3e3b61368f246e9a5a4e5bf",
+  "object": "chat.completion",
+  "created": 1792425313,
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Voici une explication précise et accessible du phénomène, structurée en deux parties comme demandé.\n\n### 1. Pourquoi le ciel est bleu en journée\n\nLe phénomène repose sur la **diffusion de Rayleigh**, un processus physique où la lumière est déviée par les molécules de l’atmosphère.\n\n- **La lumière blanche du Soleil** : Elle contient toutes les couleurs de l’arc-en-ciel (rouge, orange, jaune, vert, bleu, indigo, violet).\n- **L’atmosphère terrestre** : Elle est composée principalement d’azote et d’oxygène, dont les molécules sont beaucoup plus petites que la longueur d’onde de la lumière visible.\n- **La diffusion sélective** : La lumière bleue (et violette) a une longueur d’onde courte. Selon la loi de Rayleigh, l’intensité de la diffusion est inversement proportionnelle à la puissance quatrième de la longueur d’onde ($I \\propto 1/\\lambda^4$). Cela signifie que la lumière bleue est diffusée environ **10 fois plus** que la lumière rouge par les molécules d’air.\n- **Résultat** : Quand vous"
+      },
+      "finish_reason": "length"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 50,
+    "completion_tokens": 256,
+    "total_tokens": 306,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 50,
+    "prompt_ms": 2507.4,
+    "prompt_per_token_ms": 50.148,
+    "prompt_per_second": 19.9,
+    "predicted_n": 256,
+    "predicted_ms": 7862.4,
+    "predicted_per_token_ms": 30.712,
+    "predicted_per_second": 32.6,
+    "draft_n": 208,
+    "draft_n_accepted": 123
+  }
+}

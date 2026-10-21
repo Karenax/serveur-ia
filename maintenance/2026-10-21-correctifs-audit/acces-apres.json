@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "transports": {
+    "wireguard": {
+      "authenticated": true,
+      "models": 5,
+      "windows_version": "3.5.31",
+      "tls_verification_enabled": false
+    },
+    "https": {
+      "authenticated": true,
+      "models": 5,
+      "windows_version": "3.5.31",
+      "tls_verification_enabled": true
+    }
+  }
+}

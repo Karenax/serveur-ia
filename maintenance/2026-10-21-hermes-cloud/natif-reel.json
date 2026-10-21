@@ -1,0 +1,26 @@
+[
+  {
+    "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+    "completed": true,
+    "failed": false,
+    "final_response": "OK"
+  },
+  {
+    "model": "gpt-6.1-sol",
+    "completed": true,
+    "failed": false,
+    "final_response": "OK"
+  },
+  {
+    "model": "gpt-6-astra",
+    "completed": true,
+    "failed": false,
+    "final_response": "OK"
+  },
+  {
+    "model": "gpt-6-luna",
+    "completed": true,
+    "failed": false,
+    "final_response": "OK"
+  }
+]

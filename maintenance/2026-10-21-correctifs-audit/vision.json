@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "format": "WEBP",
+  "color_identified": true,
+  "backend_pid_preserved": true,
+  "native_decoder_loaded_before_test": false,
+  "native_decoder_loaded_after_test": true,
+  "pillow_version": "13.0.0",
+  "decoder_sha256": {
+    "_imaging.cp312-win_amd64.pyd": "7140f56d38dd6cd51512f8122386bcb914c5df2a82eb5f719c973527d9213cee"
+  }
+}

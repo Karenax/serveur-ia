@@ -1,0 +1,7 @@
+{
+  "verified": true,
+  "sha256": "021b354964cc5a8de623d4daaa59855a66e3b20cb94dbe8d36f13a0dfd57c9e6",
+  "android_certificate_sha256": "40216ff897090b49b21e3cda66169b9fb7070e42dd2b8cb9ebe0f2c441997048",
+  "windows_included": true,
+  "archive": "fred-signatures-20261021.fredkeys"
+}

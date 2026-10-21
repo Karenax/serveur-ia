@@ -127,10 +127,10 @@ class EmbeddingService:
                 except (psutil.NoSuchProcess,subprocess.TimeoutExpired):pass
             self.ready = {}; self.query_cache.clear();self.query_failures.clear();self.query_waiting.clear(); self.state = 'arrete'
 
-    def encode(self, texts, mode='document', timeout=8):
+    def encode(self, texts, mode='document', timeout=8, include_usage=False):
         if self.state != 'pret' or not self.enabled() or self.workspace.maintenance:
             raise ValueError('EG2 indisponible.')
-        key = texts[0] if mode == 'query' and len(texts) == 1 else None
+        key = texts[0] if mode == 'query' and len(texts) == 1 and not include_usage else None
         if key is not None:
             with self.lock:
                 if key in self.query_cache: return [list(self.query_cache[key])]
@@ -148,6 +148,10 @@ class EmbeddingService:
                 with self.lock:
                     self.query_cache[key] = tuple(vectors[0])
                     while len(self.query_cache) > 64: self.query_cache.popitem(last=False)
+            if include_usage:
+                tokens=result.get('prompt_tokens')
+                if type(tokens) is not int or tokens<1:raise ValueError('Comptage EG2 indisponible.')
+                return {'vectors':vectors,'prompt_tokens':tokens}
             return vectors
         except (OSError,ValueError,http.client.HTTPException):
             if key is not None:

@@ -8,6 +8,8 @@ import tempfile
 ROOT=Path(__file__).resolve().parents[1]
 listed=subprocess.check_output(['git','-C',str(ROOT),'ls-files','--cached','--others','--exclude-standard','-z',
     'lanceur','client-qwen','client-android','client-voice','maintenance','*.ps1']).decode().split('\0')
+listed.extend(['preuves/conversation-windows-20261011/finalize.py',
+               'recherche/strata-0.1.43.1-20261013/Comparer-Deux-Modeles.py'])
 python_files=[];js_files=[];powershell_files=[]
 with tempfile.TemporaryDirectory(prefix='fred-source-check-') as temporary:
     for name in sorted(set(filter(None,listed))):

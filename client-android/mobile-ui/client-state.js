@@ -1,6 +1,8 @@
 async function clientState(){
   try{
     const state=await api('/client/state');
+    $('local-api').textContent=state.local_api||'';
+    $('local-api-key').value=state.key||'';
     if(typeof androidUpdateState==='function')androidUpdateState(state.update);
     const profileRequired=state.profile_required===true;
     loggedIn=!profileRequired;

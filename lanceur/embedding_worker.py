@@ -7,7 +7,12 @@ import os
 from pathlib import Path
 import threading
 import time
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from http.server import BaseHTTPRequestHandler
+from http_boundary import BoundedHTTPServer, json_body
+
+
+class EmbeddingHTTPServer(BoundedHTTPServer):
+    request_timeout = 15
 
 
 def serve(model_path, token, port, threads, parent, parent_created):
@@ -63,10 +68,7 @@ def serve(model_path, token, port, threads, parent, parent_created):
             if self.path != '/embeddings': return self.reply(404, {'error': 'Route inconnue.'})
             if not guard.acquire(blocking=False): return self.reply(429, {'error': 'Moteur occupé.'})
             try:
-                length = int(self.headers.get('Content-Length', '0'))
-                if not 0 < length <= 65536: raise ValueError('Requête trop volumineuse.')
-                self.connection.settimeout(15)
-                data = json.loads(self.rfile.read(length))
+                data = json_body(self, 65536)
                 texts = data.get('texts'); mode = data.get('mode')
                 if mode not in ('query', 'document') or not isinstance(texts, list) or not 1 <= len(texts) <= 8:
                     raise ValueError('Lot invalide.')
@@ -76,15 +78,16 @@ def serve(model_path, token, port, threads, parent, parent_created):
                 # Titles are formatted by Fred; suppress the model's default prefix.
                 prompt = 'task: search result | query: ' if mode == 'query' else ''
                 with torch.inference_mode():
+                    tokens = int(model.tokenize([prompt+text for text in texts])['attention_mask'].sum().item())
                     vectors = model.encode(texts, prompt=prompt, batch_size=4,
                         normalize_embeddings=True, show_progress_bar=False).tolist()
                 if not all(len(v) == 768 for v in vectors): raise ValueError('Dimensions invalides.')
-                self.reply(200, {'vectors': vectors, 'seconds': time.monotonic() - start})
+                self.reply(200, {'vectors': vectors, 'seconds': time.monotonic() - start,'prompt_tokens':tokens})
             except (ValueError, TypeError, KeyError): self.reply(400, {'error': 'Requête EG2 invalide.'})
             except Exception: self.reply(503, {'error': 'Échec du calcul EG2.'})
             finally: guard.release()
 
-    server = ThreadingHTTPServer(('127.0.0.1', port), Handler)
+    server = EmbeddingHTTPServer(('127.0.0.1', port), Handler, capacity=8)
     server.daemon_threads = True
     server.serve_forever()
 

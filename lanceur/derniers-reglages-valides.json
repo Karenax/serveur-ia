@@ -3,7 +3,7 @@
   "pack": "D:/Serveur IA/strata-data/iq4-xs-local",
   "native": "D:/Serveur IA/strata-data/model-q4/Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
   "tokenizer": "D:\\Serveur IA\\dependances\\strata-0.1.43.1\\tokenizer",
-  "exe": "D:\\Serveur IA\\dependances\\strata-0.1.43.1\\engine-cuda12\\strata.exe",
+  "exe": "D:\\Serveur IA\\dependances\\strata-0.1.45.3\\engine-cuda12\\strata.exe",
   "mtp_path": "D:/Serveur IA/strata-data/mtp-local-rt",
   "expert_profile": "D:\\Serveur IA\\dependances\\strata-0.1.43.1\\expert-profile.bin",
   "context": 262144,

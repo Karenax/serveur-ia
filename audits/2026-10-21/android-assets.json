@@ -1,0 +1,9 @@
+{
+  "equal": false,
+  "actual_sha256": "5c8b9c2b3c2e5ca002bdce5d8b24de5943cb03c74f90baef33e47fb9332daac9",
+  "expected_sha256": "f29987ffdbad44a59e7900b6ec6f17925fd0984d5261d06ea948f7de2bf09c3d",
+  "shared_mismatches": [
+    "chat.html",
+    "ui.js"
+  ]
+}

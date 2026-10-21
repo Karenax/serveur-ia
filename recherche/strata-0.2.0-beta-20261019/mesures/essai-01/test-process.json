@@ -1,0 +1,15 @@
+{
+  "pid": 29040,
+  "created": 1792425355.690096,
+  "command": [
+    "D:\\Serveur IA\\Strata-src\\.venv\\Scripts\\python.exe",
+    "-u",
+    "D:\\Serveur IA\\lanceur\\runtime.py",
+    "--config",
+    "D:\\Serveur IA\\recherche\\strata-0.2.0-beta-20261019\\mesures\\essai-01\\nouveau.json",
+    "--run-dir",
+    "D:\\Serveur IA\\recherche\\strata-0.2.0-beta-20261019\\mesures\\essai-01\\test-sessions\\nouveau-sans-seuil",
+    "--floor",
+    "6"
+  ]
+}

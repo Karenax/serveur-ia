@@ -2,6 +2,9 @@
 'use strict';
 document.body.classList.add('android-client');
 const androidBridge=window.AndroidClient;
+$('android-copy-api').onclick=()=>androidBridge.copyText($('local-api').textContent);
+$('android-copy-api-key').onclick=()=>androidBridge.copyText($('local-api-key').value);
+$('toggle-api-key').onclick=()=>{const input=$('local-api-key');input.type=input.type==='password'?'text':'password';$('toggle-api-key').textContent=input.type==='password'?'Afficher la clé':'Masquer la clé';};
 function androidRequireBridge(){if(!androidBridge)throw new Error('Cette fonction est disponible dans l’application Fred Android.');return androidBridge;}
 function androidNativeResult(value){
   if(typeof value==='string'&&value.trim().startsWith('{'))value=JSON.parse(value);

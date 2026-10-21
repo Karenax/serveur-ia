@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-5f6a51830bef451cb8a0fb29",
+  "object": "chat.completion",
+  "created": 1792425900,
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"code\": \"VISION 47\",\n  \"rouge\": \"cercle\",\n  \"bleu\": \"carré\"\n}"
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 303,
+    "completion_tokens": 37,
+    "total_tokens": 340,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 303,
+    "prompt_ms": 4207.9,
+    "prompt_per_token_ms": 13.887,
+    "prompt_per_second": 72.0,
+    "predicted_n": 37,
+    "predicted_ms": 942.1,
+    "predicted_per_token_ms": 25.462,
+    "predicted_per_second": 39.3,
+    "draft_n": 26,
+    "draft_n_accepted": 24
+  }
+}

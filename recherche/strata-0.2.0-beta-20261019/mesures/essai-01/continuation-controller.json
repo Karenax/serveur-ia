@@ -1,0 +1,25 @@
+{
+  "stopped_controllers": [
+    {
+      "pid": 11480,
+      "created": 1792422886.2284613,
+      "cmd": [
+        "D:\\Serveur IA\\Strata-src\\.venv\\Scripts\\python.exe",
+        "-u",
+        "recherche\\strata-0.2.0-beta-20261019\\Campagne.py",
+        "retry"
+      ]
+    },
+    {
+      "pid": 14876,
+      "created": 1792422886.237281,
+      "cmd": [
+        "C:\\Users\\karen\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-u",
+        "recherche\\strata-0.2.0-beta-20261019\\Campagne.py",
+        "retry"
+      ]
+    }
+  ],
+  "reason": "Match the reference decode sequence: repetition 3, documents, repetitions 4 and 5."
+}

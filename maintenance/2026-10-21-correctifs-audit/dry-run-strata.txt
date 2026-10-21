@@ -1,0 +1,10 @@
+Using Python 3.12.14 environment at: Strata-src\.venv
+Resolved 3 packages in 145ms
+Would download 3 packages
+Would uninstall 2 packages
+Would install 3 packages
+ - certifi==2026.7.22
+ + certifi==2026.10.19
+ - pillow==12.3.0
+ + pillow==13.0.0
+ + pypdf==6.19.0

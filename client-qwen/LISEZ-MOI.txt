@@ -1,4 +1,13 @@
-Accès serveur Fred — version 3.5.25
+Accès serveur Fred — version 3.5.34
+
+Correctif OpenCode 2 : fermer complètement OpenCode puis refaire Ajouter à
+OpenCode 2 après la mise à jour de Fred. Les modèles Fred déjà ajoutés prennent
+leurs noms lisibles. Rouvrir OpenCode et choisir le modèle sous Serveur Fred.
+
+Correctif Hermes : après mise à jour, refaire Ajouter à Hermes puis relancer
+Hermes. Dans Modèles > Serveur Fred, activer les interrupteurs des modèles
+souhaités. Les noms sont désormais lisibles et EmbeddingGemma est réservé
+à l’API d’embeddings. Garder Fred ouvert pour utiliser les modèles distants.
 
 WireGuard utilise un emplacement permanent dans %LOCALAPPDATA%\AccesServeurFred\WireGuard.
 Windows conserve ainsi l'autorisation entre les lancements. Une première autorisation
@@ -184,3 +193,7 @@ de mise à jour au format 3 restent acceptés pour conserver les accès et
 permettre aux anciennes versions de télécharger la nouvelle application.
 Une indisponibilité de Hermes est signalée par le serveur ; les copies locales
 chiffrées et les mécanismes de mise à jour sont conservés.
+
+Embeddings pour les autres applications : Réglages > API locale, même adresse et
+clé locale ; modèle google/embeddinggemma-2, 768 dimensions, POST /v1/embeddings.
+Le calcul est réalisé sur le serveur. Voir ../maintenance/2026-10-21-api-embeddings/README.md.

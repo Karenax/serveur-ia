@@ -1,0 +1,3931 @@
+{
+  "errors": [],
+  "generated_at": "2026-10-21T11:24:55Z",
+  "metrics": {
+    ".\\client-android/scripts/Export-Profile.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 106,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\client-android/scripts/Prepare-Assets.py": {
+      "CONFIDENCE.HIGH": 10,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 10,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 118,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\client-android/scripts/Prepare-Licenses.py": {
+      "CONFIDENCE.HIGH": 2,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 2,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 148,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\client-android/scripts/Protect-Signing-Directory.py": {
+      "CONFIDENCE.HIGH": 3,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 3,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 34,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\client-qwen/Creer-Archive-Sources.py": {
+      "CONFIDENCE.HIGH": 3,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 3,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 19,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\client-qwen/Mettre-A-Jour-Clients.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 20,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\client-qwen/Verifier-Connexion.py": {
+      "CONFIDENCE.HIGH": 2,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 2,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 24,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\client-qwen/app_integrations.py": {
+      "CONFIDENCE.HIGH": 3,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 3,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 247,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\client-qwen/chat_attachments.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 60,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\client-qwen/client.py": {
+      "CONFIDENCE.HIGH": 16,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 16,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 710,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\client-qwen/connection_settings.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 33,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\client-qwen/conversation_service.py": {
+      "CONFIDENCE.HIGH": 2,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 2,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 114,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\client-qwen/draft_store.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 56,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\client-qwen/file_lock.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 27,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\client-qwen/fred_http.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 53,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\client-qwen/generate_icon.py": {
+      "CONFIDENCE.HIGH": 2,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 1,
+      "SEVERITY.MEDIUM": 1,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 51,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\client-qwen/generate_version.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 14,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\client-qwen/history_store.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 95,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\client-qwen/history_sync.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 166,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\client-qwen/local_voice.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 239,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\client-qwen/opencode_visibility.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 68,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\client-qwen/product.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 5,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\client-qwen/updater.py": {
+      "CONFIDENCE.HIGH": 5,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 5,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 176,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\client-qwen/wg_bridge.py": {
+      "CONFIDENCE.HIGH": 2,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 2,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 145,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\client-voice/aec_capture.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 27,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\client-voice/conversation_worker.py": {
+      "CONFIDENCE.HIGH": 1,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 1,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 134,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\client-voice/prepare_conversation.py": {
+      "CONFIDENCE.HIGH": 3,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 1,
+      "SEVERITY.MEDIUM": 2,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 44,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\client-voice/prepare_conversation_licenses.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 19,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\client-voice/prepare_model.py": {
+      "CONFIDENCE.HIGH": 1,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 1,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 31,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\client-voice/prepare_ui_tests.py": {
+      "CONFIDENCE.HIGH": 1,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 1,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 33,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\client-voice/turn_features.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 31,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\client-voice/update_conversation_docs.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 30,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/Appliquer-WireGuard.py": {
+      "CONFIDENCE.HIGH": 5,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 1,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 4,
+      "SEVERITY.MEDIUM": 2,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 40,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/accounts.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 68,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/android_releases.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 36,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/app.py": {
+      "CONFIDENCE.HIGH": 4,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 1,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 4,
+      "SEVERITY.MEDIUM": 1,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 526,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/backups.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 2,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 2,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 586,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/bound_workspace_revision.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 9,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/client_storage.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 2,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 2,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 265,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/core.py": {
+      "CONFIDENCE.HIGH": 1,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 1,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 1,
+      "SEVERITY.MEDIUM": 1,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 268,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/devices.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 90,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/embedding_worker.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 90,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/embeddings.py": {
+      "CONFIDENCE.HIGH": 2,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 2,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 156,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/external_api.py": {
+      "CONFIDENCE.HIGH": 2,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 2,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 107,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/extract_document.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 8,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/hermes_accounts.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 2,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 2,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 278,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/hermes_backup.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 4,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 4,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 231,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/hermes_codex_compat.py": {
+      "CONFIDENCE.HIGH": 1,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 1,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 49,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/hermes_conversations.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 3,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 3,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 515,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/hermes_fred.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 141,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/hermes_inference.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 192,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/hermes_model_key.py": {
+      "CONFIDENCE.HIGH": 1,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 1,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 20,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/hermes_models.py": {
+      "CONFIDENCE.HIGH": 2,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 2,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 409,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/hermes_projects.py": {
+      "CONFIDENCE.HIGH": 2,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 2,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 136,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/hermes_reasoning.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 49,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/hermes_run_binding.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 59,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/hermes_service.py": {
+      "CONFIDENCE.HIGH": 7,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 7,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 334,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/hermes_storage.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 1,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 1,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 94,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/hermes_tools.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 1,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 1,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 278,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/hermes_web.py": {
+      "CONFIDENCE.HIGH": 3,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 2,
+      "SEVERITY.MEDIUM": 1,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 306,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/http_boundary.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 6,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/install_eg2.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 10,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/knowledge.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 1,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 1,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 246,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/notifications.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 5,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 5,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 340,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/operations.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 401,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/profiles.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 64,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/recovery_signing.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 167,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/releases.py": {
+      "CONFIDENCE.HIGH": 1,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 1,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 159,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/remote.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 912,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/restoration.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 306,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/runtime.py": {
+      "CONFIDENCE.HIGH": 2,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 1,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 2,
+      "SEVERITY.MEDIUM": 1,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 108,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/scheduler.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 85,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/server_state.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 1,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 1,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 61,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/signing.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 30,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/startup_memory.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 56,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/text_transform.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 85,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/voice.py": {
+      "CONFIDENCE.HIGH": 2,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 2,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 110,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/voice_worker.py": {
+      "CONFIDENCE.HIGH": 1,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 1,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 97,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/wg_crypto.py": {
+      "CONFIDENCE.HIGH": 5,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 5,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 35,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/wireguard_access.py": {
+      "CONFIDENCE.HIGH": 4,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 4,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 267,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    ".\\lanceur/workspace.py": {
+      "CONFIDENCE.HIGH": 2,
+      "CONFIDENCE.LOW": 2,
+      "CONFIDENCE.MEDIUM": 7,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 2,
+      "SEVERITY.MEDIUM": 9,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 954,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "_totals": {
+      "CONFIDENCE.HIGH": 103,
+      "CONFIDENCE.LOW": 2,
+      "CONFIDENCE.MEDIUM": 33,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 92,
+      "SEVERITY.MEDIUM": 46,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 12916,
+      "nosec": 0,
+      "skipped_tests": 0
+    }
+  },
+  "results": [
+    {
+      "code": "101 def validate(html: str) -> None:\n102     assert html.count(\"__CONFIG__\") == 1\n103     assert \"__UI_CSS__\" not in html\n",
+      "col_offset": 4,
+      "end_col_offset": 40,
+      "filename": ".\\client-android/scripts/Prepare-Assets.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 102,
+      "line_range": [
+        102
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "102     assert html.count(\"__CONFIG__\") == 1\n103     assert \"__UI_CSS__\" not in html\n104     assert \"data-view=\\\"api\\\"\" not in html and \"data-view=\\\"updates\\\"\" not in html\n",
+      "col_offset": 4,
+      "end_col_offset": 35,
+      "filename": ".\\client-android/scripts/Prepare-Assets.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 103,
+      "line_range": [
+        103
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "103     assert \"__UI_CSS__\" not in html\n104     assert \"data-view=\\\"api\\\"\" not in html and \"data-view=\\\"updates\\\"\" not in html\n105     assert \"'/client/update/apply\" not in html and \"'/client/integrations\" not in html\n",
+      "col_offset": 4,
+      "end_col_offset": 82,
+      "filename": ".\\client-android/scripts/Prepare-Assets.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 104,
+      "line_range": [
+        104
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "104     assert \"data-view=\\\"api\\\"\" not in html and \"data-view=\\\"updates\\\"\" not in html\n105     assert \"'/client/update/apply\" not in html and \"'/client/integrations\" not in html\n106     assert \"android-update-install\" in html and \"'/client/update/check'\" in html\n",
+      "col_offset": 4,
+      "end_col_offset": 86,
+      "filename": ".\\client-android/scripts/Prepare-Assets.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 105,
+      "line_range": [
+        105
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "105     assert \"'/client/update/apply\" not in html and \"'/client/integrations\" not in html\n106     assert \"android-update-install\" in html and \"'/client/update/check'\" in html\n107     assert \"EXE\" not in html and \"Comme Windows\" not in html\n",
+      "col_offset": 4,
+      "end_col_offset": 80,
+      "filename": ".\\client-android/scripts/Prepare-Assets.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 106,
+      "line_range": [
+        106
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "106     assert \"android-update-install\" in html and \"'/client/update/check'\" in html\n107     assert \"EXE\" not in html and \"Comme Windows\" not in html\n108     assert 'id=\"retry\"' not in html and \"$('retry')\" not in html\n",
+      "col_offset": 4,
+      "end_col_offset": 60,
+      "filename": ".\\client-android/scripts/Prepare-Assets.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 107,
+      "line_range": [
+        107
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "107     assert \"EXE\" not in html and \"Comme Windows\" not in html\n108     assert 'id=\"retry\"' not in html and \"$('retry')\" not in html\n109     assert \"R\u00e9essayer la r\u00e9ponse\" not in html\n",
+      "col_offset": 4,
+      "end_col_offset": 64,
+      "filename": ".\\client-android/scripts/Prepare-Assets.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 108,
+      "line_range": [
+        108
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "108     assert 'id=\"retry\"' not in html and \"$('retry')\" not in html\n109     assert \"R\u00e9essayer la r\u00e9ponse\" not in html\n110     for item in (\"android-onboarding\", \"AndroidClient\", \"exportFile\", \"ws-project-list\", \"ws-document-editor\",\n",
+      "col_offset": 4,
+      "end_col_offset": 47,
+      "filename": ".\\client-android/scripts/Prepare-Assets.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 109,
+      "line_range": [
+        109
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "112                  \"/client/history/sync\", \"stream:true\", \"reader.read()\"):\n113         assert item in html, f\"Required Android feature missing: {item}\"\n114     for name in (\"token\", \"private_key\", \"session\"):\n",
+      "col_offset": 8,
+      "end_col_offset": 72,
+      "filename": ".\\client-android/scripts/Prepare-Assets.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 113,
+      "line_range": [
+        113
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "114     for name in (\"token\", \"private_key\", \"session\"):\n115         assert not re.search(rf\"config\\.{name}\\b\", html), f\"Remote secret used by UI: {name}\"\n116 \n",
+      "col_offset": 8,
+      "end_col_offset": 93,
+      "filename": ".\\client-android/scripts/Prepare-Assets.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 115,
+      "line_range": [
+        115
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "10 import re\n11 import subprocess\n12 \n",
+      "col_offset": 0,
+      "end_col_offset": 17,
+      "filename": ".\\client-android/scripts/Prepare-Licenses.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 11,
+      "line_range": [
+        11
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "17 def run_go(go: Path, arguments: list[str], cwd: Path, environment: dict) -> str:\n18     result = subprocess.run([str(go), *arguments], cwd=cwd, env=environment,\n19                             capture_output=True, text=True, encoding='utf-8',\n20                             timeout=180, creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))\n21     if result.returncode:\n",
+      "col_offset": 13,
+      "end_col_offset": 98,
+      "filename": ".\\client-android/scripts/Prepare-Licenses.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 18,
+      "line_range": [
+        18,
+        19,
+        20
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "3 from pathlib import Path\n4 import subprocess\n5 import sys\n",
+      "col_offset": 0,
+      "end_col_offset": 17,
+      "filename": ".\\client-android/scripts/Protect-Signing-Directory.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 4,
+      "line_range": [
+        4
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "25         )\n26         checked = subprocess.run(['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', command],\n27                                  env={**os.environ, 'FRED_SIGNING_ACL_DIRECTORY': str(directory)},\n28                                  capture_output=True, timeout=15,\n29                                  creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))\n30         if checked.returncode:\n",
+      "col_offset": 18,
+      "end_col_offset": 90,
+      "filename": ".\\client-android/scripts/Protect-Signing-Directory.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Starting a process with a partial executable path",
+      "line_number": 26,
+      "line_range": [
+        26,
+        27,
+        28,
+        29
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html",
+      "test_id": "B607",
+      "test_name": "start_process_with_partial_path"
+    },
+    {
+      "code": "25         )\n26         checked = subprocess.run(['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', command],\n27                                  env={**os.environ, 'FRED_SIGNING_ACL_DIRECTORY': str(directory)},\n28                                  capture_output=True, timeout=15,\n29                                  creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))\n30         if checked.returncode:\n",
+      "col_offset": 18,
+      "end_col_offset": 90,
+      "filename": ".\\client-android/scripts/Protect-Signing-Directory.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 26,
+      "line_range": [
+        26,
+        27,
+        28,
+        29
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "7 # Include newly added sources while preparing a release before its commit.\n8 import subprocess\n9 source_paths = subprocess.check_output([\n",
+      "col_offset": 0,
+      "end_col_offset": 17,
+      "filename": ".\\client-qwen/Creer-Archive-Sources.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 8,
+      "line_range": [
+        8
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "8 import subprocess\n9 source_paths = subprocess.check_output([\n10     'git', '-C', str(root), 'ls-files', '--cached', '--others', '--exclude-standard', '-z',\n11     'lanceur', 'client-qwen', 'client-android', 'client-voice', 'maintenance', 'dependances',\n12     'README.md', 'CONTEXTE-PROJET.md', 'HISTORIQUE-PROJET-AVANT-AUDIT-20261012.md',\n13     'RECONSTRUIRE-FRED.md', 'ARCHIVES-ET-PREUVES.md', 'SOURCES-WIREGUARD.txt', 'Serveur Qwen.cmd', 'Start-Interface-Qwen.ps1'\n14 ]).decode('utf-8').split('\\0')\n15 suffixes={'.py','.js','.cjs','.html','.css','.md','.txt','.ps1','.cmd','.bat','.go','.mod','.sum','.java','.gradle','.xml','.toml','.properties','.pro','.sh','.c','.cc','.cpp','.h','.hpp','.cmake','.patch','.svg','.ico'}\n",
+      "col_offset": 15,
+      "end_col_offset": 2,
+      "filename": ".\\client-qwen/Creer-Archive-Sources.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Starting a process with a partial executable path",
+      "line_number": 9,
+      "line_range": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html",
+      "test_id": "B607",
+      "test_name": "start_process_with_partial_path"
+    },
+    {
+      "code": "8 import subprocess\n9 source_paths = subprocess.check_output([\n10     'git', '-C', str(root), 'ls-files', '--cached', '--others', '--exclude-standard', '-z',\n11     'lanceur', 'client-qwen', 'client-android', 'client-voice', 'maintenance', 'dependances',\n12     'README.md', 'CONTEXTE-PROJET.md', 'HISTORIQUE-PROJET-AVANT-AUDIT-20261012.md',\n13     'RECONSTRUIRE-FRED.md', 'ARCHIVES-ET-PREUVES.md', 'SOURCES-WIREGUARD.txt', 'Serveur Qwen.cmd', 'Start-Interface-Qwen.ps1'\n14 ]).decode('utf-8').split('\\0')\n15 suffixes={'.py','.js','.cjs','.html','.css','.md','.txt','.ps1','.cmd','.bat','.go','.mod','.sum','.java','.gradle','.xml','.toml','.properties','.pro','.sh','.c','.cc','.cpp','.h','.hpp','.cmake','.patch','.svg','.ico'}\n",
+      "col_offset": 15,
+      "end_col_offset": 2,
+      "filename": ".\\client-qwen/Creer-Archive-Sources.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 9,
+      "line_range": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "14         source.seek(-16,2);footer=source.read(16)\n15         assert footer[4:]==b'QWENPROFILE1'\n16         size=struct.unpack('<I',footer[:4])[0]\n",
+      "col_offset": 8,
+      "end_col_offset": 42,
+      "filename": ".\\client-qwen/Verifier-Connexion.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 15,
+      "line_range": [
+        15
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "16         size=struct.unpack('<I',footer[:4])[0]\n17         assert 1<=size<=65536\n18         source.seek(-16-size,2);profile=json.loads(source.read(size))\n",
+      "col_offset": 8,
+      "end_col_offset": 29,
+      "filename": ".\\client-qwen/Verifier-Connexion.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 17,
+      "line_range": [
+        17
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "171     if node.flow_style:\n172         value=yaml.load(text,Loader=UniqueLoader)\n173         fragment=yaml.safe_dump({**value,section:providers},allow_unicode=True,sort_keys=False).rstrip('\\n')\n",
+      "col_offset": 14,
+      "end_col_offset": 49,
+      "filename": ".\\client-qwen/app_integrations.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 20,
+        "link": "https://cwe.mitre.org/data/definitions/20.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Use of unsafe yaml load. Allows instantiation of arbitrary objects. Consider yaml.safe_load().",
+      "line_number": 172,
+      "line_range": [
+        172
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b506_yaml_load.html",
+      "test_id": "B506",
+      "test_name": "yaml_load"
+    },
+    {
+      "code": "207     try:\n208         value=yaml.load(text,Loader=UniqueLoader) or {}\n209         node=yaml.compose(text,Loader=UniqueLoader)\n",
+      "col_offset": 14,
+      "end_col_offset": 49,
+      "filename": ".\\client-qwen/app_integrations.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 20,
+        "link": "https://cwe.mitre.org/data/definitions/20.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Use of unsafe yaml load. Allows instantiation of arbitrary objects. Consider yaml.safe_load().",
+      "line_number": 208,
+      "line_range": [
+        208
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b506_yaml_load.html",
+      "test_id": "B506",
+      "test_name": "yaml_load"
+    },
+    {
+      "code": "238     updated=_yaml_provider(text,node,section,entry,legacy,providers)\n239     try:check=yaml.load(updated,Loader=UniqueLoader)\n240     except (yaml.YAMLError,ValueError) as error:raise ValueError('Configuration Hermes non v\u00e9rifi\u00e9e : modification annul\u00e9e.') from error\n",
+      "col_offset": 14,
+      "end_col_offset": 52,
+      "filename": ".\\client-qwen/app_integrations.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 20,
+        "link": "https://cwe.mitre.org/data/definitions/20.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Use of unsafe yaml load. Allows instantiation of arbitrary objects. Consider yaml.safe_load().",
+      "line_number": 239,
+      "line_range": [
+        239
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b506_yaml_load.html",
+      "test_id": "B506",
+      "test_name": "yaml_load"
+    },
+    {
+      "code": "15 import secrets\n16 import subprocess\n17 import struct\n",
+      "col_offset": 0,
+      "end_col_offset": 17,
+      "filename": ".\\client-qwen/client.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 16,
+      "line_range": [
+        16
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "660         raw = b'Qwen client self test'\n661         assert protect(protect(raw), decrypt=True) == raw\n662         if '--with-profile' in sys.argv:\n",
+      "col_offset": 8,
+      "end_col_offset": 57,
+      "filename": ".\\client-qwen/client.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 661,
+      "line_range": [
+        661
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "663             profile=read_profile();validate_profile(profile)\n664             assert profile.get('version',VERSION)==VERSION, 'Version du profil incompatible avec le binaire.'\n665         assert (Path(getattr(sys, '_MEIPASS', Path(__file__).parent)) / 'chat.html').is_file()\n",
+      "col_offset": 12,
+      "end_col_offset": 109,
+      "filename": ".\\client-qwen/client.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 664,
+      "line_range": [
+        664
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "664             assert profile.get('version',VERSION)==VERSION, 'Version du profil incompatible avec le binaire.'\n665         assert (Path(getattr(sys, '_MEIPASS', Path(__file__).parent)) / 'chat.html').is_file()\n666         assert (Path(getattr(sys, '_MEIPASS', Path(__file__).parent)) / 'workspace.html').is_file()\n",
+      "col_offset": 8,
+      "end_col_offset": 94,
+      "filename": ".\\client-qwen/client.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 665,
+      "line_range": [
+        665
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "665         assert (Path(getattr(sys, '_MEIPASS', Path(__file__).parent)) / 'chat.html').is_file()\n666         assert (Path(getattr(sys, '_MEIPASS', Path(__file__).parent)) / 'workspace.html').is_file()\n667         assert all((Path(getattr(sys, '_MEIPASS', Path(__file__).parent)) / name).is_file() for name in ('ui.css','ui.js'))\n",
+      "col_offset": 8,
+      "end_col_offset": 99,
+      "filename": ".\\client-qwen/client.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 666,
+      "line_range": [
+        666
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "666         assert (Path(getattr(sys, '_MEIPASS', Path(__file__).parent)) / 'workspace.html').is_file()\n667         assert all((Path(getattr(sys, '_MEIPASS', Path(__file__).parent)) / name).is_file() for name in ('ui.css','ui.js'))\n668         engine=Path(getattr(sys,'_MEIPASS',Path(__file__).parent))/'wireguard-bridge.exe'\n",
+      "col_offset": 8,
+      "end_col_offset": 123,
+      "filename": ".\\client-qwen/client.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 667,
+      "line_range": [
+        667
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "668         engine=Path(getattr(sys,'_MEIPASS',Path(__file__).parent))/'wireguard-bridge.exe'\n669         assert subprocess.run([str(engine),'--self-test'],capture_output=True,timeout=10,creationflags=0x08000000).returncode==0\n670         if '--voice-self-test' in sys.argv:\n",
+      "col_offset": 8,
+      "end_col_offset": 128,
+      "filename": ".\\client-qwen/client.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 669,
+      "line_range": [
+        669
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "668         engine=Path(getattr(sys,'_MEIPASS',Path(__file__).parent))/'wireguard-bridge.exe'\n669         assert subprocess.run([str(engine),'--self-test'],capture_output=True,timeout=10,creationflags=0x08000000).returncode==0\n670         if '--voice-self-test' in sys.argv:\n",
+      "col_offset": 15,
+      "end_col_offset": 114,
+      "filename": ".\\client-qwen/client.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 669,
+      "line_range": [
+        669
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "678                 while native.status()['phase']=='loading' and time.monotonic()<deadline:time.sleep(.05)\n679                 assert native.status()['phase']=='listening',native.status()\n680                 native.feed(b'\\0'*3200);native.stop()\n",
+      "col_offset": 16,
+      "end_col_offset": 76,
+      "filename": ".\\client-qwen/client.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 679,
+      "line_range": [
+        679
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "681                 while native.status()['phase']=='finishing' and time.monotonic()<deadline:time.sleep(.05)\n682                 assert native.status()['phase']=='ready' and native.status()['text']=='',native.status()\n683             finally:native.close();voice.close()\n",
+      "col_offset": 16,
+      "end_col_offset": 104,
+      "filename": ".\\client-qwen/client.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 682,
+      "line_range": [
+        682
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "690                 while conversation.status()['phase']=='loading' and time.monotonic()<deadline:time.sleep(.1)\n691                 assert conversation.status()['phase']=='listening' and conversation.status().get('aec'),conversation.status()\n692                 time.sleep(.5);conversation.action({'action':'stop','session':status['session']})\n",
+      "col_offset": 16,
+      "end_col_offset": 125,
+      "filename": ".\\client-qwen/client.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 691,
+      "line_range": [
+        691
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "693                 while conversation.status()['phase']=='stopping' and time.monotonic()<deadline:time.sleep(.1)\n694                 assert conversation.status()['phase']=='stopped',conversation.status()\n695             finally:conversation.close()\n",
+      "col_offset": 16,
+      "end_col_offset": 86,
+      "filename": ".\\client-qwen/client.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 694,
+      "line_range": [
+        694
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "738                     if isinstance(result,str):result=json.loads(result)\n739                     assert result['login'] and result['update'] and result['chat'] and result['history'],result\n740                     assert result['projects'] and result['tasks'] and not result['assistants'],result\n",
+      "col_offset": 20,
+      "end_col_offset": 111,
+      "filename": ".\\client-qwen/client.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 739,
+      "line_range": [
+        739
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "739                     assert result['login'] and result['update'] and result['chat'] and result['history'],result\n740                     assert result['projects'] and result['tasks'] and not result['assistants'],result\n741                     assert window.text_select and result['textSelection']!='none' and result['copySelection'],result\n",
+      "col_offset": 20,
+      "end_col_offset": 101,
+      "filename": ".\\client-qwen/client.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 740,
+      "line_range": [
+        740
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "740                     assert result['projects'] and result['tasks'] and not result['assistants'],result\n741                     assert window.text_select and result['textSelection']!='none' and result['copySelection'],result\n742                     assert result['thinkingModes']>=1 and result['thinkingInline'] and not result['documentMenu'] and result['attachmentPlus'],result\n",
+      "col_offset": 20,
+      "end_col_offset": 116,
+      "filename": ".\\client-qwen/client.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 741,
+      "line_range": [
+        741
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "741                     assert window.text_select and result['textSelection']!='none' and result['copySelection'],result\n742                     assert result['thinkingModes']>=1 and result['thinkingInline'] and not result['documentMenu'] and result['attachmentPlus'],result\n743                     Path(sys.argv[sys.argv.index('--result')+1]).write_text(json.dumps({'ok':True,**result}),encoding='utf-8')\n",
+      "col_offset": 20,
+      "end_col_offset": 149,
+      "filename": ".\\client-qwen/client.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 742,
+      "line_range": [
+        742
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "7 import shutil\n8 import subprocess\n9 import threading\n",
+      "col_offset": 0,
+      "end_col_offset": 17,
+      "filename": ".\\client-qwen/conversation_service.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 8,
+      "line_range": [
+        8
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "83             command+=['--models',str(self.cache),'--resources',str(self.resources)]\n84             process=subprocess.Popen(command,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,text=True,encoding='utf-8',creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))\n85             with self.lock:\n",
+      "col_offset": 20,
+      "end_col_offset": 198,
+      "filename": ".\\client-qwen/conversation_service.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 84,
+      "line_range": [
+        84
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "5 from urllib.parse import unquote\n6 import xml.etree.ElementTree as ET\n7 from PIL import Image, ImageDraw\n",
+      "col_offset": 0,
+      "end_col_offset": 34,
+      "filename": ".\\client-qwen/generate_icon.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 20,
+        "link": "https://cwe.mitre.org/data/definitions/20.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Using xml.etree.ElementTree to parse untrusted XML data is known to be vulnerable to XML attacks. Replace xml.etree.ElementTree with the equivalent defusedxml package, or make sure defusedxml.defuse_stdlib() is called.",
+      "line_number": 6,
+      "line_range": [
+        6
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b405-import-xml-etree",
+      "test_id": "B405",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "39     if not parser.href or not parser.href.startswith(prefix):raise ValueError('SVG favicon missing.')\n40     svg=ET.fromstring(unquote(parser.href[len(prefix):]))\n41     if svg.get('viewBox')!='0 0 32 32':raise ValueError('Unexpected favicon dimensions.')\n",
+      "col_offset": 8,
+      "end_col_offset": 57,
+      "filename": ".\\client-qwen/generate_icon.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 20,
+        "link": "https://cwe.mitre.org/data/definitions/20.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Using xml.etree.ElementTree.fromstring to parse untrusted XML data is known to be vulnerable to XML attacks. Replace xml.etree.ElementTree.fromstring with its defusedxml equivalent function or make sure defusedxml.defuse_stdlib() is called",
+      "line_number": 40,
+      "line_range": [
+        40
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b313-b320-xml-bad-elementtree",
+      "test_id": "B314",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "9 import struct\n10 import subprocess\n11 import sys\n",
+      "col_offset": 0,
+      "end_col_offset": 17,
+      "filename": ".\\client-qwen/updater.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 10,
+      "line_range": [
+        10
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "85         plan_path=directory/'plan.dpapi';plan_path.write_bytes(protect(json.dumps(plan).encode()))\n86         subprocess.Popen([str(helper),'--apply-update',str(plan_path)],creationflags=0x08000000,close_fds=True)\n87         return directory\n",
+      "col_offset": 8,
+      "end_col_offset": 111,
+      "filename": ".\\client-qwen/updater.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 86,
+      "line_range": [
+        86
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "147         with staged.open('ab') as stream:stream.write(encoded+struct.pack('<I',len(encoded))+b'QWENPROFILE1')\n148         smoke=subprocess.run([str(staged),'--self-test','--with-profile'],timeout=60,creationflags=0x08000000)\n149         if smoke.returncode:raise ValueError('La nouvelle version a \u00e9chou\u00e9 au contr\u00f4le de d\u00e9marrage.')\n",
+      "col_offset": 14,
+      "end_col_offset": 110,
+      "filename": ".\\client-qwen/updater.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 148,
+      "line_range": [
+        148
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "156         acknowledgement=directory/'started.json';acknowledgement.unlink(missing_ok=True)\n157         launched=subprocess.Popen([str(installed),'--update-ack',str(acknowledgement)],creationflags=0x08000000,close_fds=True)\n158         deadline=time.monotonic()+45\n",
+      "col_offset": 17,
+      "end_col_offset": 127,
+      "filename": ".\\client-qwen/updater.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 157,
+      "line_range": [
+        157
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "181         if not running() and personal_profile(target)==trusted:\n182             subprocess.Popen([str(target)],creationflags=0x08000000,close_fds=True)\n183         raise\n",
+      "col_offset": 12,
+      "end_col_offset": 83,
+      "filename": ".\\client-qwen/updater.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 182,
+      "line_range": [
+        182
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "11 import socket\n12 import subprocess\n13 import sys\n",
+      "col_offset": 0,
+      "end_col_offset": 17,
+      "filename": ".\\client-qwen/wg_bridge.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 12,
+      "line_range": [
+        12
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "122         self.key=secrets.token_urlsafe(32)\n123         self.process=subprocess.Popen([str(executable)],stdin=subprocess.PIPE,stdout=subprocess.PIPE,\n124                                       stderr=subprocess.DEVNULL,creationflags=0x08000000)\n125         try:\n",
+      "col_offset": 21,
+      "end_col_offset": 89,
+      "filename": ".\\client-qwen/wg_bridge.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 123,
+      "line_range": [
+        123,
+        124
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "101             with wave.open(args.fixture) as audio:\n102                 assert audio.getframerate()==16000 and audio.getnchannels()==1 and audio.getsampwidth()==2\n103                 pcm=np.frombuffer(audio.readframes(audio.getnframes()),dtype='<i2').astype(np.float32)/32768\n",
+      "col_offset": 16,
+      "end_col_offset": 106,
+      "filename": ".\\client-voice/conversation_worker.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 102,
+      "line_range": [
+        102
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "11 def metadata(repo):\n12     with urllib.request.urlopen('https://huggingface.co/api/models/' + repo, timeout=30) as response:\n13         return json.load(response)\n",
+      "col_offset": 9,
+      "end_col_offset": 88,
+      "filename": ".\\client-voice/prepare_conversation.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 22,
+        "link": "https://cwe.mitre.org/data/definitions/22.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.",
+      "line_number": 12,
+      "line_range": [
+        12
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b310-urllib-urlopen",
+      "test_id": "B310",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "18     if not path.exists():\n19         with urllib.request.urlopen(url, timeout=60) as response, path.with_suffix('.part').open('wb') as output:\n20             while block := response.read(1024 * 1024):\n",
+      "col_offset": 13,
+      "end_col_offset": 52,
+      "filename": ".\\client-voice/prepare_conversation.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 22,
+        "link": "https://cwe.mitre.org/data/definitions/22.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.",
+      "line_number": 19,
+      "line_range": [
+        19
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b310-urllib-urlopen",
+      "test_id": "B310",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "38             matches = [n for n in names if n.startswith(component) and n.endswith('.onnx') and '.int8.' not in n]\n39         assert len(matches) == 1, (component, matches)\n40         records.append(download(f'https://huggingface.co/{repo}/resolve/{info[\"sha\"]}/{matches[0]}', component + '.onnx'))\n",
+      "col_offset": 8,
+      "end_col_offset": 54,
+      "filename": ".\\client-voice/prepare_conversation.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 39,
+      "line_range": [
+        39
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "14         partial = target.with_suffix('.part')\n15         with urllib.request.urlopen(spec['url'], timeout=30) as response, partial.open('wb') as output:\n16             size = 0\n",
+      "col_offset": 13,
+      "end_col_offset": 60,
+      "filename": ".\\client-voice/prepare_model.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 22,
+        "link": "https://cwe.mitre.org/data/definitions/22.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.",
+      "line_number": 15,
+      "line_range": [
+        15
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b310-urllib-urlopen",
+      "test_id": "B310",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "28 fixture=fixture.replace(\"if __name__=='__main__': main()\",extra+\"\\nif __name__=='__main__':main()\")\n29 assert 'class ConversationModel' in fixture\n30 (TESTS/'conversation_fixture.py').write_text(fixture,encoding='utf-8')\n",
+      "col_offset": 0,
+      "end_col_offset": 43,
+      "filename": ".\\client-voice/prepare_ui_tests.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 29,
+      "line_range": [
+        29
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "4 import json\n5 import subprocess\n6 import urllib.request\n",
+      "col_offset": 0,
+      "end_col_offset": 17,
+      "filename": ".\\lanceur/Appliquer-WireGuard.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 5,
+      "line_range": [
+        5
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "11 class TokenParser(HTMLParser):\n12     token=''\n13     def handle_starttag(self,tag,attributes):\n",
+      "col_offset": 10,
+      "end_col_offset": 12,
+      "filename": ".\\lanceur/Appliquer-WireGuard.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: ''",
+      "line_number": 12,
+      "line_range": [
+        12
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "29         process.terminate();process.wait(timeout=10)\n30     subprocess.run(['powershell.exe','-NoProfile','-ExecutionPolicy','Bypass','-File',\n31                     str(ROOT/'Start-Interface-Qwen.ps1'),'-SansNavigateur'],check=True,creationflags=HIDDEN)\n32     parser=TokenParser()\n",
+      "col_offset": 4,
+      "end_col_offset": 108,
+      "filename": ".\\lanceur/Appliquer-WireGuard.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Starting a process with a partial executable path",
+      "line_number": 30,
+      "line_range": [
+        30,
+        31
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html",
+      "test_id": "B607",
+      "test_name": "start_process_with_partial_path"
+    },
+    {
+      "code": "29         process.terminate();process.wait(timeout=10)\n30     subprocess.run(['powershell.exe','-NoProfile','-ExecutionPolicy','Bypass','-File',\n31                     str(ROOT/'Start-Interface-Qwen.ps1'),'-SansNavigateur'],check=True,creationflags=HIDDEN)\n32     parser=TokenParser()\n",
+      "col_offset": 4,
+      "end_col_offset": 108,
+      "filename": ".\\lanceur/Appliquer-WireGuard.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 30,
+      "line_range": [
+        30,
+        31
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "32     parser=TokenParser()\n33     parser.feed(urllib.request.urlopen('http://127.0.0.1:8765',timeout=10).read().decode())\n34     def post(path,data):\n",
+      "col_offset": 16,
+      "end_col_offset": 74,
+      "filename": ".\\lanceur/Appliquer-WireGuard.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 22,
+        "link": "https://cwe.mitre.org/data/definitions/22.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.",
+      "line_number": 33,
+      "line_range": [
+        33
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b310-urllib-urlopen",
+      "test_id": "B310",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "36                     {'Content-Type':'application/json','X-Launcher-Token':parser.token})\n37         return json.load(urllib.request.urlopen(request,timeout=30))\n38     print(post('/api/remote/activate',{})['message'])\n",
+      "col_offset": 25,
+      "end_col_offset": 67,
+      "filename": ".\\lanceur/Appliquer-WireGuard.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 22,
+        "link": "https://cwe.mitre.org/data/definitions/22.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.",
+      "line_number": 37,
+      "line_range": [
+        37
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b310-urllib-urlopen",
+      "test_id": "B310",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "10 import socket\n11 import subprocess\n12 import threading\n",
+      "col_offset": 0,
+      "end_col_offset": 17,
+      "filename": ".\\lanceur/app.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 11,
+      "line_range": [
+        11
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "148             with (directory / 'supervisor.log').open('wb') as stream:\n149                 worker = subprocess.Popen([str(PYTHON), '-u', str(HOME / 'runtime.py'),\n150                          '--config', str(config_path), '--run-dir', str(directory),\n151                          '--floor', str(s['min_free_ram_gib'])], cwd=ROOT,\n152                          stdout=stream, stderr=stream,\n153                          creationflags=HIDDEN | getattr(subprocess, 'CREATE_NEW_PROCESS_GROUP', 0))\n154             write_json(self.pointer, {'directory': str(directory), 'worker': process_identity(psutil.Process(worker.pid))})\n",
+      "col_offset": 25,
+      "end_col_offset": 99,
+      "filename": ".\\lanceur/app.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 149,
+      "line_range": [
+        149,
+        150,
+        151,
+        152,
+        153
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "187         try:\n188             output = subprocess.run(['nvidia-smi', '--query-gpu=name,uuid,memory.used,memory.total,utilization.gpu,temperature.gpu',\n189                                      '--format=csv,noheader,nounits'], capture_output=True, text=True,\n190                                      timeout=4, creationflags=HIDDEN)\n191             for line in output.stdout.splitlines():\n",
+      "col_offset": 21,
+      "end_col_offset": 69,
+      "filename": ".\\lanceur/app.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Starting a process with a partial executable path",
+      "line_number": 188,
+      "line_range": [
+        188,
+        189,
+        190
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html",
+      "test_id": "B607",
+      "test_name": "start_process_with_partial_path"
+    },
+    {
+      "code": "187         try:\n188             output = subprocess.run(['nvidia-smi', '--query-gpu=name,uuid,memory.used,memory.total,utilization.gpu,temperature.gpu',\n189                                      '--format=csv,noheader,nounits'], capture_output=True, text=True,\n190                                      timeout=4, creationflags=HIDDEN)\n191             for line in output.stdout.splitlines():\n",
+      "col_offset": 21,
+      "end_col_offset": 69,
+      "filename": ".\\lanceur/app.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 188,
+      "line_range": [
+        188,
+        189,
+        190
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "242         config_host = cfg.get('host', '127.0.0.1')\n243         local_host = '127.0.0.1' if config_host == '0.0.0.0' else config_host\n244         directory = Path(run['config_path']).parent if run.get('config_path') else None\n",
+      "col_offset": 51,
+      "end_col_offset": 60,
+      "filename": ".\\lanceur/app.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 605,
+        "link": "https://cwe.mitre.org/data/definitions/605.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible binding to all interfaces.",
+      "line_number": 243,
+      "line_range": [
+        243
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b104_hardcoded_bind_all_interfaces.html",
+      "test_id": "B104",
+      "test_name": "hardcoded_bind_all_interfaces"
+    },
+    {
+      "code": "296                 for table in ('projects', 'documents', 'memories', 'conversations', 'jobs', 'client_histories', 'policies'):\n297                     counts[table] = memory.execute('SELECT COUNT(*) FROM ' + table).fetchone()[0]\n298                 counts['document_original_bytes'] = memory.execute('SELECT COALESCE(SUM(length(original)),0) FROM documents').fetchone()[0]\n",
+      "col_offset": 51,
+      "end_col_offset": 74,
+      "filename": ".\\lanceur/backups.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 297,
+      "line_range": [
+        297
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "301                     if table in tables:\n302                         counts[table] = memory.execute('SELECT COUNT(*) FROM ' + table).fetchone()[0]\n303             finally: memory.close()\n",
+      "col_offset": 55,
+      "end_col_offset": 78,
+      "filename": ".\\lanceur/backups.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 302,
+      "line_range": [
+        302
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "155                 self.directory(client['id'])\n156                 rows = {table: [dict(r) for r in db.execute('SELECT * FROM ' + table + ' WHERE owner=? ORDER BY rowid', (client['id'],))] for table in TABLES}\n157                 job_ids = {row['id'] for row in rows['jobs']}\n",
+      "col_offset": 60,
+      "end_col_offset": 76,
+      "filename": ".\\lanceur/client_storage.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 156,
+      "line_range": [
+        156
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "172                     names = list(row)\n173                     db.execute('INSERT INTO ' + table + '(' + ','.join(names) + ') VALUES(' + ','.join('?' for _ in names) + ')', list(row.values()))\n174             for row in snapshot['settings']: db.execute('INSERT OR REPLACE INTO settings VALUES(?,?)', (row['key'], row['value']))\n",
+      "col_offset": 31,
+      "end_col_offset": 45,
+      "filename": ".\\lanceur/client_storage.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 173,
+      "line_range": [
+        173
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "9 import socket\n10 import subprocess\n11 import time\n",
+      "col_offset": 0,
+      "end_col_offset": 17,
+      "filename": ".\\lanceur/core.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 10,
+      "line_range": [
+        10
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "210 def health(host='127.0.0.1', port=8080, timeout=1):\n211     if host == '0.0.0.0':\n212         host = '127.0.0.1'\n",
+      "col_offset": 15,
+      "end_col_offset": 24,
+      "filename": ".\\lanceur/core.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 605,
+        "link": "https://cwe.mitre.org/data/definitions/605.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible binding to all interfaces.",
+      "line_number": 211,
+      "line_range": [
+        211
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b104_hardcoded_bind_all_interfaces.html",
+      "test_id": "B104",
+      "test_name": "hardcoded_bind_all_interfaces"
+    },
+    {
+      "code": "10 import socket\n11 import subprocess\n12 import threading\n",
+      "col_offset": 0,
+      "end_col_offset": 17,
+      "filename": ".\\lanceur/embeddings.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 11,
+      "line_range": [
+        11
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "80             import psutil\n81             self.process = subprocess.Popen([str(PYTHON), str(Path(__file__).with_name('embedding_worker.py')),\n82                 '--model', str(MODEL), '--port', str(self.port), '--threads', '2',\n83                 '--parent',str(os.getpid()),'--parent-created',str(psutil.Process().create_time())],\n84                 stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,\n85                 cwd=ROOT, env=env, creationflags=HIDDEN)\n86             self.started = time.monotonic(); self.state = 'chargement'; self.error = ''; self.ready = {}\n",
+      "col_offset": 27,
+      "end_col_offset": 56,
+      "filename": ".\\lanceur/embeddings.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 81,
+      "line_range": [
+        81,
+        82,
+        83,
+        84,
+        85
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "7 import json\n8 import subprocess\n9 import threading\n",
+      "col_offset": 0,
+      "end_col_offset": 17,
+      "filename": ".\\lanceur/external_api.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 8,
+      "line_range": [
+        8
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "72     try:\n73         process=subprocess.Popen([str(runtime['python']),'-c',WORKER],cwd=runtime['source'],\n74             env=child_environment(temporary.name,runtime),stdin=subprocess.PIPE,stdout=subprocess.PIPE,\n75             stderr=subprocess.DEVNULL,creationflags=HIDDEN)\n76     except BaseException:\n",
+      "col_offset": 16,
+      "end_col_offset": 59,
+      "filename": ".\\lanceur/external_api.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 73,
+      "line_range": [
+        73,
+        74,
+        75
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "133         with self._db() as db:\n134             row = db.execute(f'SELECT owner,state,config_version FROM hermes_bindings WHERE {column}=?',\n135                              (_digest(token),)).fetchone()\n",
+      "col_offset": 31,
+      "end_col_offset": 92,
+      "filename": ".\\lanceur/hermes_accounts.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 134,
+      "line_range": [
+        134
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "283         with self._db() as db:\n284             return [row['owner'] for row in db.execute('SELECT owner FROM hermes_bindings' +\n285                     (' WHERE state=\"ready\"' if ready_only else '') + ' ORDER BY owner')]\n286 \n",
+      "col_offset": 55,
+      "end_col_offset": 90,
+      "filename": ".\\lanceur/hermes_accounts.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 284,
+      "line_range": [
+        284,
+        285
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "89         if column not in columns: raise ValueError('Sch\u00e9ma des secrets Hermes incompatible.')\n90         for identity, raw in db.execute('SELECT rowid,' + column + ' FROM ' + table).fetchall():\n91             if raw is None: continue\n",
+      "col_offset": 40,
+      "end_col_offset": 55,
+      "filename": ".\\lanceur/hermes_backup.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 90,
+      "line_range": [
+        90
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "93                 raise ValueError('Secret Hermes sauvegard\u00e9 invalide.')\n94             db.execute('UPDATE ' + table + ' SET ' + column + '=? WHERE rowid=?',\n95                        (protect(raw, decrypt=decrypt), identity))\n",
+      "col_offset": 23,
+      "end_col_offset": 32,
+      "filename": ".\\lanceur/hermes_backup.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 94,
+      "line_range": [
+        94
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "133                     if 'owner' in columns:\n134                         identities = {r[0] for r in db.execute('SELECT DISTINCT owner FROM ' + table)}\n135                         if identities - owners: raise ValueError('Registre Hermes contenant un acc\u00e8s inconnu.')\n",
+      "col_offset": 63,
+      "end_col_offset": 92,
+      "filename": ".\\lanceur/hermes_backup.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 134,
+      "line_range": [
+        134
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "138                     if table in tables:\n139                         for (secret,) in db.execute('SELECT ' + column + ' FROM ' + table):\n140                             if secret is not None and (not isinstance(secret, bytes) or not 1 <= len(secret) <= 65536):\n",
+      "col_offset": 52,
+      "end_col_offset": 61,
+      "filename": ".\\lanceur/hermes_backup.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 139,
+      "line_range": [
+        139
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "54     namespace = {}\n55     exec(PATCH_SOURCE, namespace)\n56     namespace['_fred_install_codex_headers']()\n",
+      "col_offset": 4,
+      "end_col_offset": 33,
+      "filename": ".\\lanceur/hermes_codex_compat.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Use of exec detected.",
+      "line_number": 55,
+      "line_range": [
+        55
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b102_exec_used.html",
+      "test_id": "B102",
+      "test_name": "exec_used"
+    },
+    {
+      "code": "110             for table in ('agent_conversations','agent_runs'):\n111                 db.execute('INSERT OR IGNORE INTO agent_sessions SELECT owner,session,MAX(updated) FROM '+table+' GROUP BY owner,session')\n112         store.workspace.hermes_storage = self.storage\n",
+      "col_offset": 27,
+      "end_col_offset": 105,
+      "filename": ".\\lanceur/hermes_conversations.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 111,
+      "line_range": [
+        111
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "159             where = 'WHERE owner=?' if owner else ''\n160             rows = db.execute('SELECT request,conversation,state,created,updated FROM agent_runs ' + where + ' ORDER BY updated DESC LIMIT 20', (owner,) if owner else ()).fetchall()\n161         result = {'enabled': True, 'available': self.service.status().get('available', False),\n",
+      "col_offset": 30,
+      "end_col_offset": 98,
+      "filename": ".\\lanceur/hermes_conversations.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 160,
+      "line_range": [
+        160
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "188         with self.db() as db:\n189             db.execute('UPDATE agent_runs SET ' + ','.join(k + '=?' for k in values) + ' WHERE owner=? AND request=?', (*values.values(), owner, request))\n190 \n",
+      "col_offset": 23,
+      "end_col_offset": 47,
+      "filename": ".\\lanceur/hermes_conversations.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 189,
+      "line_range": [
+        189
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "17             {'Authorization':'Bearer '+os.environ['FRED_INFERENCE_KEY'],'Content-Type':'application/json'})\n18         with urllib.request.urlopen(request,timeout=13) as response:value=json.loads(response.read(65536))\n19         if not isinstance(value.get('access_token'),str) or not value['access_token']:raise ValueError()\n",
+      "col_offset": 13,
+      "end_col_offset": 55,
+      "filename": ".\\lanceur/hermes_model_key.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 22,
+        "link": "https://cwe.mitre.org/data/definitions/22.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.",
+      "line_number": 18,
+      "line_range": [
+        18
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b310-urllib-urlopen",
+      "test_id": "B310",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "11 import re\n12 import subprocess\n13 import threading\n",
+      "col_offset": 0,
+      "end_col_offset": 17,
+      "filename": ".\\lanceur/hermes_models.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 12,
+      "line_range": [
+        12
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "230         if home is None:env.pop('HERMES_HOME',None)\n231         completed = subprocess.run([str(runtime['python']), '-c', _NATIVE],\n232             input=json.dumps({'operation':operation,'follow_active':home is None, **values}).encode(),\n233             stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, cwd=runtime['source'],\n234             env=env, timeout=timeout, creationflags=HIDDEN)\n235         if completed.returncode or len(completed.stdout)>4*1024*1024:\n",
+      "col_offset": 20,
+      "end_col_offset": 59,
+      "filename": ".\\lanceur/hermes_models.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 231,
+      "line_range": [
+        231,
+        232,
+        233,
+        234
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "10 import re\n11 import subprocess\n12 import threading\n",
+      "col_offset": 0,
+      "end_col_offset": 17,
+      "filename": ".\\lanceur/hermes_projects.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 11,
+      "line_range": [
+        11
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "107         prepare_runtime(self.accounts.root, runtime)\n108         result = subprocess.run([str(runtime['python']), '-c', _NATIVE], input=json.dumps(payload).encode('utf-8'),\n109                                 capture_output=True, cwd=runtime['source'], env=child_environment(home, runtime),\n110                                 timeout=30, creationflags=HIDDEN)\n111         if result.returncode or len(result.stdout) > 1024 * 1024:\n",
+      "col_offset": 17,
+      "end_col_offset": 65,
+      "filename": ".\\lanceur/hermes_projects.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 108,
+      "line_range": [
+        108,
+        109,
+        110
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "10 import socket\n11 import subprocess\n12 import threading\n",
+      "col_offset": 0,
+      "end_col_offset": 17,
+      "filename": ".\\lanceur/hermes_service.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 11,
+      "line_range": [
+        11
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "39         raise ValueError('Installation Hermes utilisable introuvable.')\n40     version = subprocess.run(['git', '-C', str(directory), 'rev-parse', 'HEAD'], capture_output=True,\n41                              text=True, timeout=10, creationflags=HIDDEN)\n42     commit = version.stdout.strip() if version.returncode == 0 else ''\n",
+      "col_offset": 14,
+      "end_col_offset": 73,
+      "filename": ".\\lanceur/hermes_service.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Starting a process with a partial executable path",
+      "line_number": 40,
+      "line_range": [
+        40,
+        41
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html",
+      "test_id": "B607",
+      "test_name": "start_process_with_partial_path"
+    },
+    {
+      "code": "39         raise ValueError('Installation Hermes utilisable introuvable.')\n40     version = subprocess.run(['git', '-C', str(directory), 'rev-parse', 'HEAD'], capture_output=True,\n41                              text=True, timeout=10, creationflags=HIDDEN)\n42     commit = version.stdout.strip() if version.returncode == 0 else ''\n",
+      "col_offset": 14,
+      "end_col_offset": 73,
+      "filename": ".\\lanceur/hermes_service.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 40,
+      "line_range": [
+        40,
+        41
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "57         env.update(FRED_HERMES_LINK=str(link), FRED_HERMES_TARGET=str(target))\n58         result = subprocess.run(['powershell.exe', '-NoProfile', '-NonInteractive', '-Command',\n59                 \"New-Item -ItemType Junction -Path $env:FRED_HERMES_LINK -Target $env:FRED_HERMES_TARGET -ErrorAction Stop | Out-Null\"],\n60                 env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=15, creationflags=HIDDEN)\n61         if result.returncode:\n",
+      "col_offset": 17,
+      "end_col_offset": 112,
+      "filename": ".\\lanceur/hermes_service.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Starting a process with a partial executable path",
+      "line_number": 58,
+      "line_range": [
+        58,
+        59,
+        60
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html",
+      "test_id": "B607",
+      "test_name": "start_process_with_partial_path"
+    },
+    {
+      "code": "57         env.update(FRED_HERMES_LINK=str(link), FRED_HERMES_TARGET=str(target))\n58         result = subprocess.run(['powershell.exe', '-NoProfile', '-NonInteractive', '-Command',\n59                 \"New-Item -ItemType Junction -Path $env:FRED_HERMES_LINK -Target $env:FRED_HERMES_TARGET -ErrorAction Stop | Out-Null\"],\n60                 env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=15, creationflags=HIDDEN)\n61         if result.returncode:\n",
+      "col_offset": 17,
+      "end_col_offset": 112,
+      "filename": ".\\lanceur/hermes_service.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 58,
+      "line_range": [
+        58,
+        59,
+        60
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "120                    'FRED_TOOL_KEY': credentials['tool_key'], 'FRED_WEB_URL': accounts.mcp_url}.items())}\n121     result = subprocess.run([str(runtime['python']), '-c', _CREATE_PROFILE], input=json.dumps(payload).encode(),\n122                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, cwd=runtime['source'],\n123                             env=child_environment(accounts.root, runtime), timeout=60, creationflags=HIDDEN)\n124     if result.returncode:\n",
+      "col_offset": 13,
+      "end_col_offset": 108,
+      "filename": ".\\lanceur/hermes_service.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 121,
+      "line_range": [
+        121,
+        122,
+        123
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "185         with (log_dir / 'fred-gateway.log').open('ab') as log:\n186             self.process = subprocess.Popen([str(self.runtime['python']), '-c', GATEWAY_BOOTSTRAP,\n187                     'gateway', 'run', '--external-supervisor'], cwd=self.runtime['source'],\n188                     stdin=subprocess.DEVNULL, stdout=log, stderr=log,\n189                     env=child_environment(self.root, self.runtime), creationflags=HIDDEN)\n190         identity = psutil.Process(self.process.pid)\n",
+      "col_offset": 27,
+      "end_col_offset": 89,
+      "filename": ".\\lanceur/hermes_service.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 186,
+      "line_range": [
+        186,
+        187,
+        188,
+        189
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "29                 expression = '+'.join('length(CAST(' + column + ' AS BLOB))' for column in columns.split(','))\n30                 total += db.execute('SELECT COALESCE(SUM(' + expression + '),0) FROM ' + table +\n31                     (' WHERE owner=?' if owner else ''), (owner,) if owner else ()).fetchone()[0]\n",
+      "col_offset": 36,
+      "end_col_offset": 58,
+      "filename": ".\\lanceur/hermes_storage.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 30,
+      "line_range": [
+        30
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "209                 p = w.own(db, 'projects', project, owner)\n210                 rows = db.execute('SELECT id,title,kind,revision FROM documents WHERE owner=? AND project=?' +\n211                                   (' AND id=?' if document else '') + ' ORDER BY updated DESC LIMIT 500',\n212                                   (owner, project, document) if document else (owner, project)).fetchall()\n",
+      "col_offset": 34,
+      "end_col_offset": 108,
+      "filename": ".\\lanceur/hermes_tools.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 210,
+      "line_range": [
+        210,
+        211
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "12 import re\n13 import subprocess\n14 import tempfile\n",
+      "col_offset": 0,
+      "end_col_offset": 17,
+      "filename": ".\\lanceur/hermes_web.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 13,
+      "line_range": [
+        13
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "234         with tempfile.TemporaryFile() as output:\n235             process = subprocess.Popen([str(runtime['python']), '-c', _NATIVE], cwd=runtime['source'],\n236                 env=env, stdin=subprocess.PIPE, stdout=output, stderr=subprocess.DEVNULL, creationflags=HIDDEN)\n237             try:\n",
+      "col_offset": 22,
+      "end_col_offset": 111,
+      "filename": ".\\lanceur/hermes_web.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 235,
+      "line_range": [
+        235,
+        236
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "336     namespace = {}\n337     exec(PATCH_SOURCE, namespace)\n338     namespace['_fred_install_web_bridge']()\n",
+      "col_offset": 4,
+      "end_col_offset": 33,
+      "filename": ".\\lanceur/hermes_web.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Use of exec detected.",
+      "line_number": 337,
+      "line_range": [
+        337
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b102_exec_used.html",
+      "test_id": "B102",
+      "test_name": "exec_used"
+    },
+    {
+      "code": "193             table = 'memories' if kind == 'memory' else 'personal_memories'\n194             m = db.execute('SELECT * FROM ' + table + ' WHERE id=? AND owner=?', (item['object'], owner)).fetchone()\n195             if not m or (kind == 'memory' and m['project'] != scope): return None\n",
+      "col_offset": 27,
+      "end_col_offset": 43,
+      "filename": ".\\lanceur/knowledge.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 194,
+      "line_range": [
+        194
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "145     if table:\n146         source = db.execute('SELECT owner,project FROM ' + table + ' WHERE id=?', (destination['id'],)).fetchone()\n147         if source and (source['owner'] != owner or destination.get('project', source['project']) != source['project']):\n",
+      "col_offset": 28,
+      "end_col_offset": 56,
+      "filename": ".\\lanceur/notifications.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 146,
+      "line_range": [
+        146
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "186     ):\n187         size += db.execute('SELECT COALESCE(SUM(' + expression + '),0) FROM ' + table + where, args).fetchone()[0]\n188     attempt_where = ' AND j.owner=?' if owner is not None else ''\n",
+      "col_offset": 27,
+      "end_col_offset": 49,
+      "filename": ".\\lanceur/notifications.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 187,
+      "line_range": [
+        187
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "188     attempt_where = ' AND j.owner=?' if owner is not None else ''\n189     size += db.execute('SELECT COALESCE(SUM(length(CAST(s.key AS BLOB))+length(CAST(s.value AS BLOB))+80),0) '\n190                        'FROM settings s JOIN jobs j ON j.id=substr(s.key,?) WHERE substr(s.key,1,?)=?' + attempt_where,\n191                        (len(JOB_ATTEMPT_PREFIX) + 1, len(JOB_ATTEMPT_PREFIX), JOB_ATTEMPT_PREFIX) + args).fetchone()[0]\n",
+      "col_offset": 23,
+      "end_col_offset": 102,
+      "filename": ".\\lanceur/notifications.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 189,
+      "line_range": [
+        189,
+        190
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "214     for table in ('notifications', 'notification_preferences', 'notification_subscriptions', 'notification_deliveries'):\n215         if any(row[0] not in allowed for row in db.execute('SELECT DISTINCT owner FROM ' + table)):\n216             raise ValueError('Notifications sans acc\u00e8s personnel correspondant.')\n",
+      "col_offset": 59,
+      "end_col_offset": 88,
+      "filename": ".\\lanceur/notifications.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 215,
+      "line_range": [
+        215
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "233         if table:\n234             source = db.execute('SELECT owner,project FROM ' + table + ' WHERE id=?', (target['id'],)).fetchone()\n235             if source and (source['owner'] != row['owner'] or target.get('project', source['project']) != source['project']):\n",
+      "col_offset": 32,
+      "end_col_offset": 60,
+      "filename": ".\\lanceur/notifications.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 234,
+      "line_range": [
+        234
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "54     except (OSError,ValueError,KeyError,TypeError):pass\n55     except Exception:pass\n56     return {'server_version':VERSION, 'release':release,\n",
+      "col_offset": 4,
+      "end_col_offset": 25,
+      "filename": ".\\lanceur/releases.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 55,
+      "line_range": [
+        55
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "7 from pathlib import Path\n8 import subprocess\n9 import time\n",
+      "col_offset": 0,
+      "end_col_offset": 17,
+      "filename": ".\\lanceur/runtime.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 8,
+      "line_range": [
+        8
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "36             server_env.update(cfg.get('server_env', {}))\n37             server = subprocess.Popen(command, cwd=cfg['cwd'], env=server_env, stdout=stdout, stderr=stderr, creationflags=HIDDEN)\n38         state['server'] = process_identity(psutil.Process(server.pid))\n",
+      "col_offset": 21,
+      "end_col_offset": 130,
+      "filename": ".\\lanceur/runtime.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 37,
+      "line_range": [
+        37
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "71                    'max_tokens': 1, 'temperature': 0, 'seed': 42, 'chat_template_kwargs': {'enable_thinking': False}}\n72         host = '127.0.0.1' if cfg['host'] == '0.0.0.0' else cfg['host']\n73         headers = {'Content-Type': 'application/json'}\n",
+      "col_offset": 45,
+      "end_col_offset": 54,
+      "filename": ".\\lanceur/runtime.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 605,
+        "link": "https://cwe.mitre.org/data/definitions/605.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible binding to all interfaces.",
+      "line_number": 72,
+      "line_range": [
+        72
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b104_hardcoded_bind_all_interfaces.html",
+      "test_id": "B104",
+      "test_name": "hardcoded_bind_all_interfaces"
+    },
+    {
+      "code": "56     with workspace.db() as db:\n57         counts = {label: db.execute('SELECT COUNT(*) FROM ' + table).fetchone()[0]\n58                   for label, table in [('history_count', 'client_histories'), ('projects', 'projects'),\n",
+      "col_offset": 36,
+      "end_col_offset": 59,
+      "filename": ".\\lanceur/server_state.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 57,
+      "line_range": [
+        57
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "5 import re\n6 import subprocess\n7 import threading\n",
+      "col_offset": 0,
+      "end_col_offset": 17,
+      "filename": ".\\lanceur/voice.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 6,
+      "line_range": [
+        6
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "34             self.ready.clear();self.phase='loading';self.error=''\n35             self.process=subprocess.Popen([str(executable),'-X','utf8',str(ROOT/'lanceur/voice_worker.py')],\n36                 stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,\n37                 text=True,encoding='utf-8',creationflags=HIDDEN)\n38             self.thread=threading.Thread(target=self._read,args=(self.process,),daemon=True);self.thread.start()\n",
+      "col_offset": 25,
+      "end_col_offset": 64,
+      "filename": ".\\lanceur/voice.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 35,
+      "line_range": [
+        35,
+        36,
+        37
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "28     model=TTSModel.load_model(language='french')\n29     assert str(model.device)=='cpu'\n30     voice=model.get_state_for_audio_prompt('estelle')\n",
+      "col_offset": 4,
+      "end_col_offset": 35,
+      "filename": ".\\lanceur/voice_worker.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 29,
+      "line_range": [
+        29
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "6 import io\n7 import subprocess\n8 from cryptography.hazmat.primitives.asymmetric.x25519 import X25519PrivateKey\n",
+      "col_offset": 0,
+      "end_col_offset": 17,
+      "filename": ".\\lanceur/wg_crypto.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 7,
+      "line_range": [
+        7
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "33     path.mkdir(parents=True,exist_ok=True)\n34     result=subprocess.run(['whoami','/user','/fo','csv','/nh'],capture_output=True,text=True,creationflags=0x08000000,check=True)\n35     sid=next(csv.reader(io.StringIO(result.stdout)))[1]\n",
+      "col_offset": 11,
+      "end_col_offset": 129,
+      "filename": ".\\lanceur/wg_crypto.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Starting a process with a partial executable path",
+      "line_number": 34,
+      "line_range": [
+        34
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html",
+      "test_id": "B607",
+      "test_name": "start_process_with_partial_path"
+    },
+    {
+      "code": "33     path.mkdir(parents=True,exist_ok=True)\n34     result=subprocess.run(['whoami','/user','/fo','csv','/nh'],capture_output=True,text=True,creationflags=0x08000000,check=True)\n35     sid=next(csv.reader(io.StringIO(result.stdout)))[1]\n",
+      "col_offset": 11,
+      "end_col_offset": 129,
+      "filename": ".\\lanceur/wg_crypto.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 34,
+      "line_range": [
+        34
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "36     # New private directories: inheritance removed before any secret is written.\n37     result=subprocess.run(['icacls',str(path),'/inheritance:r','/grant:r',\n38                            f'*{sid}:(OI)(CI)F','*S-1-5-18:(OI)(CI)F','*S-1-5-32-544:(OI)(CI)F'],\n39                           capture_output=True,creationflags=0x08000000)\n40     if result.returncode:raise ValueError('Windows refuse de prot\u00e9ger le dossier des acc\u00e8s priv\u00e9s.')\n",
+      "col_offset": 11,
+      "end_col_offset": 71,
+      "filename": ".\\lanceur/wg_crypto.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Starting a process with a partial executable path",
+      "line_number": 37,
+      "line_range": [
+        37,
+        38,
+        39
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html",
+      "test_id": "B607",
+      "test_name": "start_process_with_partial_path"
+    },
+    {
+      "code": "36     # New private directories: inheritance removed before any secret is written.\n37     result=subprocess.run(['icacls',str(path),'/inheritance:r','/grant:r',\n38                            f'*{sid}:(OI)(CI)F','*S-1-5-18:(OI)(CI)F','*S-1-5-32-544:(OI)(CI)F'],\n39                           capture_output=True,creationflags=0x08000000)\n40     if result.returncode:raise ValueError('Windows refuse de prot\u00e9ger le dossier des acc\u00e8s priv\u00e9s.')\n",
+      "col_offset": 11,
+      "end_col_offset": 71,
+      "filename": ".\\lanceur/wg_crypto.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 37,
+      "line_range": [
+        37,
+        38,
+        39
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "12 import tempfile\n13 import subprocess\n14 import threading\n",
+      "col_offset": 0,
+      "end_col_offset": 17,
+      "filename": ".\\lanceur/wireguard_access.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 13,
+      "line_range": [
+        13
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "45         self.lock=threading.RLock();self.events=queue.Queue()\n46         self.process=subprocess.Popen([str(executable)],stdin=subprocess.PIPE,stdout=subprocess.PIPE,\n47                                       stderr=subprocess.DEVNULL,creationflags=HIDDEN)\n48         def read():\n",
+      "col_offset": 21,
+      "end_col_offset": 85,
+      "filename": ".\\lanceur/wireguard_access.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 46,
+      "line_range": [
+        46,
+        47
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "276     helper=HOME/'Autoriser-WireGuard.ps1'\n277     subprocess.Popen(['powershell.exe','-NoProfile','-ExecutionPolicy','Bypass','-File',str(helper),\n278                       '-Port',str(port),'-Program',str(ENGINE),'-ResultPath',str(Path(home)/'wireguard-fw.json')],creationflags=HIDDEN)\n279     return {'message':'V\u00e9rification de l\u2019autorisation Windows. Une validation administrateur appara\u00eet seulement si la r\u00e8gle WireGuard doit \u00eatre cr\u00e9\u00e9e ou modifi\u00e9e.'}\n",
+      "col_offset": 4,
+      "end_col_offset": 135,
+      "filename": ".\\lanceur/wireguard_access.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Starting a process with a partial executable path",
+      "line_number": 277,
+      "line_range": [
+        277,
+        278
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html",
+      "test_id": "B607",
+      "test_name": "start_process_with_partial_path"
+    },
+    {
+      "code": "276     helper=HOME/'Autoriser-WireGuard.ps1'\n277     subprocess.Popen(['powershell.exe','-NoProfile','-ExecutionPolicy','Bypass','-File',str(helper),\n278                       '-Port',str(port),'-Program',str(ENGINE),'-ResultPath',str(Path(home)/'wireguard-fw.json')],creationflags=HIDDEN)\n279     return {'message':'V\u00e9rification de l\u2019autorisation Windows. Une validation administrateur appara\u00eet seulement si la r\u00e8gle WireGuard doit \u00eatre cr\u00e9\u00e9e ou modifi\u00e9e.'}\n",
+      "col_offset": 4,
+      "end_col_offset": 135,
+      "filename": ".\\lanceur/wireguard_access.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 277,
+      "line_range": [
+        277,
+        278
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "35 HISTORY_SCHEMA='CREATE TABLE IF NOT EXISTS client_histories(owner TEXT PRIMARY KEY, history TEXT NOT NULL, revision INTEGER NOT NULL, updated REAL NOT NULL);'\n36 SCHEMA = HISTORY_SCHEMA+'''\n37 CREATE TABLE IF NOT EXISTS projects(id TEXT PRIMARY KEY, owner TEXT NOT NULL, title TEXT NOT NULL, instructions TEXT NOT NULL, archived INTEGER NOT NULL DEFAULT 0, revision INTEGER NOT NULL, updated REAL NOT NULL);\n38 CREATE TABLE IF NOT EXISTS documents(id TEXT PRIMARY KEY, owner TEXT NOT NULL, project TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE, title TEXT NOT NULL, text TEXT NOT NULL, original BLOB, kind TEXT NOT NULL, revision INTEGER NOT NULL, updated REAL NOT NULL);\n39 CREATE TABLE IF NOT EXISTS chunks(id INTEGER PRIMARY KEY, owner TEXT NOT NULL, project TEXT NOT NULL, document TEXT NOT NULL REFERENCES documents(id) ON DELETE CASCADE, page INTEGER, text TEXT NOT NULL);\n40 CREATE VIRTUAL TABLE IF NOT EXISTS search USING fts5(text, content='chunks', content_rowid='id', tokenize='unicode61');\n41 CREATE TRIGGER IF NOT EXISTS chunks_ai AFTER INSERT ON chunks BEGIN INSERT INTO search(rowid,text) VALUES(new.id,new.text); END;\n42 CREATE TRIGGER IF NOT EXISTS chunks_ad AFTER DELETE ON chunks BEGIN INSERT INTO search(search,rowid,text) VALUES('delete',old.id,old.text); END;\n43 CREATE TABLE IF NOT EXISTS memories(id TEXT PRIMARY KEY, owner TEXT NOT NULL, project TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE, text TEXT NOT NULL, updated REAL NOT NULL);\n44 CREATE TABLE IF NOT EXISTS conversations(id TEXT PRIMARY KEY, owner TEXT NOT NULL, project TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE, title TEXT NOT NULL, messages TEXT NOT NULL, revision INTEGER NOT NULL, updated REAL NOT NULL);\n45 CREATE TABLE IF NOT EXISTS policies(owner TEXT PRIMARY KEY, settings TEXT NOT NULL);\n46 CREATE TABLE IF NOT EXISTS settings(key TEXT PRIMARY KEY, value TEXT NOT NULL);\n47 CREATE TABLE IF NOT EXISTS jobs(id TEXT PRIMARY KEY, owner TEXT NOT NULL, project TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE, title TEXT NOT NULL, prompt TEXT NOT NULL, kind TEXT NOT NULL, url TEXT NOT NULL DEFAULT '', state TEXT NOT NULL, result TEXT NOT NULL DEFAULT '', error TEXT NOT NULL DEFAULT '', created REAL NOT NULL, due REAL NOT NULL, repeat_hours INTEGER NOT NULL DEFAULT 0, parent TEXT, request_key TEXT NOT NULL, UNIQUE(owner,request_key));\n48 CREATE TABLE IF NOT EXISTS events(id INTEGER PRIMARY KEY, owner TEXT NOT NULL, action TEXT NOT NULL, object TEXT NOT NULL, created REAL NOT NULL);\n49 CREATE INDEX IF NOT EXISTS project_owner ON projects(owner);\n50 CREATE INDEX IF NOT EXISTS job_queue ON jobs(state,due);\n51 PRAGMA user_version=1;\n52 '''\n53 LEGACY_SCHEMA = HISTORY_SCHEMA+'''\n",
+      "col_offset": 24,
+      "end_col_offset": 3,
+      "filename": ".\\lanceur/workspace.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 36,
+      "line_range": [
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "52 '''\n53 LEGACY_SCHEMA = HISTORY_SCHEMA+'''\n54 CREATE TABLE IF NOT EXISTS projects(id TEXT PRIMARY KEY, owner TEXT NOT NULL, title TEXT NOT NULL, instructions TEXT NOT NULL, archived INTEGER NOT NULL DEFAULT 0, revision INTEGER NOT NULL, updated REAL NOT NULL);\n55 CREATE TABLE IF NOT EXISTS documents(id TEXT PRIMARY KEY, owner TEXT NOT NULL, project TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE, title TEXT NOT NULL, text TEXT NOT NULL, original BLOB, kind TEXT NOT NULL, revision INTEGER NOT NULL, updated REAL NOT NULL);\n56 CREATE TABLE IF NOT EXISTS chunks(id INTEGER PRIMARY KEY, owner TEXT NOT NULL, project TEXT NOT NULL, document TEXT NOT NULL REFERENCES documents(id) ON DELETE CASCADE, page INTEGER, text TEXT NOT NULL);\n57 CREATE VIRTUAL TABLE IF NOT EXISTS search USING fts5(text, content='chunks', content_rowid='id', tokenize='unicode61');\n58 CREATE TRIGGER IF NOT EXISTS chunks_ai AFTER INSERT ON chunks BEGIN INSERT INTO search(rowid,text) VALUES(new.id,new.text); END;\n59 CREATE TRIGGER IF NOT EXISTS chunks_ad AFTER DELETE ON chunks BEGIN INSERT INTO search(search,rowid,text) VALUES('delete',old.id,old.text); END;\n60 CREATE TABLE IF NOT EXISTS memories(id TEXT PRIMARY KEY, owner TEXT NOT NULL, project TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE, text TEXT NOT NULL, updated REAL NOT NULL);\n61 CREATE TABLE IF NOT EXISTS conversations(id TEXT PRIMARY KEY, owner TEXT NOT NULL, project TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE, title TEXT NOT NULL, messages TEXT NOT NULL, revision INTEGER NOT NULL, updated REAL NOT NULL);\n62 CREATE TABLE IF NOT EXISTS assistants(id TEXT PRIMARY KEY, name TEXT NOT NULL, instructions TEXT NOT NULL, tools TEXT NOT NULL, enabled INTEGER NOT NULL DEFAULT 1);\n63 CREATE TABLE IF NOT EXISTS policies(owner TEXT PRIMARY KEY, settings TEXT NOT NULL);\n64 CREATE TABLE IF NOT EXISTS settings(key TEXT PRIMARY KEY, value TEXT NOT NULL);\n65 CREATE TABLE IF NOT EXISTS jobs(id TEXT PRIMARY KEY, owner TEXT NOT NULL, project TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE, title TEXT NOT NULL, prompt TEXT NOT NULL, assistant TEXT NOT NULL, kind TEXT NOT NULL, url TEXT NOT NULL DEFAULT '', state TEXT NOT NULL, result TEXT NOT NULL DEFAULT '', error TEXT NOT NULL DEFAULT '', created REAL NOT NULL, due REAL NOT NULL, repeat_hours INTEGER NOT NULL DEFAULT 0, parent TEXT, request_key TEXT NOT NULL, UNIQUE(owner,request_key));\n66 CREATE TABLE IF NOT EXISTS events(id INTEGER PRIMARY KEY, owner TEXT NOT NULL, action TEXT NOT NULL, object TEXT NOT NULL, created REAL NOT NULL);\n67 CREATE INDEX IF NOT EXISTS project_owner ON projects(owner);\n68 CREATE INDEX IF NOT EXISTS job_queue ON jobs(state,due);\n69 PRAGMA user_version=1;\n70 '''\n71 \n",
+      "col_offset": 31,
+      "end_col_offset": 3,
+      "filename": ".\\lanceur/workspace.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 53,
+      "line_range": [
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "189     \"\"\"Untrusted document parsers run outside the console process with a watchdog.\"\"\"\n190     import subprocess\n191     import psutil\n",
+      "col_offset": 4,
+      "end_col_offset": 21,
+      "filename": ".\\lanceur/workspace.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 190,
+      "line_range": [
+        190
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "193     worker=Path(__file__).with_name('extract_document.py')\n194     process=subprocess.Popen([str(PYTHON),str(worker),name],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,creationflags=HIDDEN)\n195     finished=threading.Event();exceeded=threading.Event()\n",
+      "col_offset": 12,
+      "end_col_offset": 152,
+      "filename": ".\\lanceur/workspace.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 194,
+      "line_range": [
+        194
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "324         if table not in ('projects','documents','memories','conversations','jobs'):raise ValueError('Objet invalide.')\n325         row=db.execute('SELECT * FROM '+table+' WHERE id=? AND owner=?',(identifier(id),owner)).fetchone()\n326         if row is None:raise Denied('Objet absent ou acc\u00e8s interdit.')\n",
+      "col_offset": 23,
+      "end_col_offset": 39,
+      "filename": ".\\lanceur/workspace.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 325,
+      "line_range": [
+        325
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "342         for table,expression in [('documents','length(CAST(text AS BLOB))+COALESCE(length(original),0)'),('chunks','length(CAST(text AS BLOB))'),('document_sources','length(CAST(text AS BLOB))+length(CAST(title AS BLOB))'),('conversations','length(CAST(messages AS BLOB))'),('client_histories','length(CAST(history AS BLOB))'),('memories','length(CAST(text AS BLOB))'),('jobs','length(CAST(result AS BLOB))+length(CAST(prompt AS BLOB))'),('projects','length(CAST(instructions AS BLOB))')]:\n343             total+=db.execute('SELECT COALESCE(SUM('+expression+'),0) FROM '+table+where,args).fetchone()[0]\n344         from notifications import usage\n",
+      "col_offset": 30,
+      "end_col_offset": 52,
+      "filename": ".\\lanceur/workspace.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 343,
+      "line_range": [
+        343
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "344         from notifications import usage\n345         total+=db.execute('SELECT COALESCE(SUM(length(CAST(text AS BLOB))),0) FROM personal_memories'+where,args).fetchone()[0]\n346         total += usage(db,owner)\n",
+      "col_offset": 26,
+      "end_col_offset": 101,
+      "filename": ".\\lanceur/workspace.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 345,
+      "line_range": [
+        345
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "399         args=(owner,project) if project else (owner,)\n400         row=db.execute('SELECT COUNT(*),COALESCE(SUM(chunks),0),SUM(CASE WHEN state=\\'ready\\' THEN 1 ELSE 0 END),SUM(CASE WHEN state=\\'empty\\' THEN 1 ELSE 0 END) FROM document_index WHERE '+where,args).fetchone()\n401         return {'documents':row[0],'passages':row[1],'ready':row[2] or 0,'empty':row[3] or 0,'engine':'sqlite-fts5','max_text_chars':MAX_TEXT}\n",
+      "col_offset": 23,
+      "end_col_offset": 189,
+      "filename": ".\\lanceur/workspace.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 400,
+      "line_range": [
+        400
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "447             where=' AND c.document IN ('+','.join('?' for _ in documents)+')';args.extend(documents)\n448         rows=db.execute('SELECT c.*,d.title,d.revision,bm25(search) AS rank FROM search JOIN chunks c ON c.id=search.rowid JOIN documents d ON d.id=c.document WHERE search MATCH ? AND c.owner=? AND c.project=?'+where+' ORDER BY rank LIMIT 160',args).fetchall() if words else []\n449         def relevance(row):\n",
+      "col_offset": 24,
+      "end_col_offset": 210,
+      "filename": ".\\lanceur/workspace.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 448,
+      "line_range": [
+        448
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "983             for table in ('projects','documents','chunks','memories','personal_memories','knowledge_exclusions','conversations','jobs','client_histories','document_index','document_sources'):\n984                 if any(r[0] not in owners for r in memory.execute('SELECT DISTINCT owner FROM '+table)):raise ValueError('Espaces sans acc\u00e8s personnel correspondant.')\n985             for table in ('documents','chunks','memories','conversations','jobs','document_index','document_sources'):\n",
+      "col_offset": 66,
+      "end_col_offset": 95,
+      "filename": ".\\lanceur/workspace.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 984,
+      "line_range": [
+        984
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "985             for table in ('documents','chunks','memories','conversations','jobs','document_index','document_sources'):\n986                 if memory.execute('SELECT 1 FROM '+table+' o LEFT JOIN projects p ON p.id=o.project WHERE p.id IS NULL OR o.owner!=p.owner LIMIT 1').fetchone():raise ValueError('Objets dans un autre espace personnel.')\n987             if memory.execute('SELECT 1 FROM chunks c JOIN documents d ON d.id=c.document WHERE c.owner!=d.owner OR c.project!=d.project LIMIT 1').fetchone():raise ValueError('Passages dans un autre espace personnel.')\n",
+      "col_offset": 34,
+      "end_col_offset": 50,
+      "filename": ".\\lanceur/workspace.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 986,
+      "line_range": [
+        986
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    }
+  ]
+}

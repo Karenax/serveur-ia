@@ -1,0 +1,7 @@
+test_helper_replaces_verified_exe_preserves_profile_and_keeps_previous (test_accounts_updates.AccountsTests.test_helper_replaces_verified_exe_preserves_profile_and_keeps_previous) ... ok
+test_windows_protection_and_preconfigured_exe_startup (test_remote.RemoteTests.test_windows_protection_and_preconfigured_exe_startup) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 154.804s
+
+OK

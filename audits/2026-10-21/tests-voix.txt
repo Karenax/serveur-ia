@@ -1,0 +1,25 @@
+test_cancel_only_own_speech (test_conversation.ConversationTests.test_cancel_only_own_speech) ... ok
+test_disabled_service_does_not_start_process (test_conversation.ConversationTests.test_disabled_service_does_not_start_process) ... ok
+test_missing_model_never_starts_capture (test_conversation.ConversationTests.test_missing_model_never_starts_capture) ... ok
+test_no_microphone_until_all_hashes_verified (test_conversation.ConversationTests.test_no_microphone_until_all_hashes_verified) ... ok
+test_public_download_never_replaces_good_model_with_corrupt_data (test_conversation.ConversationTests.test_public_download_never_replaces_good_model_with_corrupt_data) ... ok
+test_speech_payload_cannot_read_paths_or_urls (test_conversation.ConversationTests.test_speech_payload_cannot_read_paths_or_urls) ... ok
+test_stale_session_cannot_stop_current_capture (test_conversation.ConversationTests.test_stale_session_cannot_stop_current_capture) ... ok
+test_stop_after_worker_failure_unlocks_client (test_conversation.ConversationTests.test_stop_after_worker_failure_unlocks_client) ... ok
+test_unknown_action_fields_rejected (test_conversation.ConversationTests.test_unknown_action_fields_rejected) ... ok
+test_foreign_origin_is_rejected_even_with_local_key (test_http.LocalHTTPTests.test_foreign_origin_is_rejected_even_with_local_key) ... ok
+test_model_install_required_and_remote_never_contacted (test_http.LocalHTTPTests.test_model_install_required_and_remote_never_contacted) ... ok
+test_no_auth_cannot_open_microphone (test_http.LocalHTTPTests.test_no_auth_cannot_open_microphone) ... ok
+test_capture_failure_keeps_error_and_releases_engine (test_service.ServiceTests.test_capture_failure_keeps_error_and_releases_engine) ... ok
+test_command_cannot_inject_paths_or_models (test_service.ServiceTests.test_command_cannot_inject_paths_or_models) ... ok
+test_corrupt_download_preserves_existing_model (test_service.ServiceTests.test_corrupt_download_preserves_existing_model) ... ok
+test_corruption_cannot_be_loaded (test_service.ServiceTests.test_corruption_cannot_be_loaded) ... ok
+test_hash_checked_before_publish_and_no_network_during_dictation (test_service.ServiceTests.test_hash_checked_before_publish_and_no_network_during_dictation) ... ok
+test_reject_bad_resume (test_service.ServiceTests.test_reject_bad_resume) ... ok
+test_resume_range_and_hash (test_service.ServiceTests.test_resume_range_and_hash) ... ok
+test_stale_stop_cannot_cancel_current_session (test_service.ServiceTests.test_stale_stop_cannot_cancel_current_session) ... ok
+
+----------------------------------------------------------------------
+Ran 20 tests in 1.811s
+
+OK

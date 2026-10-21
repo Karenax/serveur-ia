@@ -18,7 +18,8 @@ from operations import Operations, VERSION as VERSION
 from releases import status as release_status, repackage, rollback, download_name
 from remote import AccessStore, GATEWAY_PORT, serve_gateway
 from wireguard_access import WireGuardAccess,firewall
-from http_boundary import BoundedHTTPServer, json_body
+from http_boundary import json_body
+from local_access import LocalUserHTTPServer
 
 class Controller:
     def __init__(self, home=HOME, include_legacy=True):
@@ -517,7 +518,7 @@ def serve(port=8765, controller=None):
                 self.respond(200, result)
             except (ValueError, OSError, RuntimeError, psutil.Error) as error:
                 self.respond(400, {'error': str(error)})
-    httpd = BoundedHTTPServer(('127.0.0.1', port), Handler, capacity=24)
+    httpd = LocalUserHTTPServer(('127.0.0.1', port), Handler, capacity=24)
     httpd.daemon_threads = True
     return httpd
 

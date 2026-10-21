@@ -1,0 +1,25 @@
+Using Python 3.14.7 environment at: C:\Users\karen\AppData\Local\hermes\installs\babc5f030aa7ab5d\environments\15ceb672901d471f9a8eabdd3cdc7055\venv
+Resolved 43 packages in 5.37s
+Would download 8 packages
+Would uninstall 10 packages
+Would install 10 packages
+ - aiohttp==3.14.3
+ + aiohttp==3.14.4
+ - certifi==2026.5.20
+ + certifi==2026.10.19
+ - mcp==2.0.0
+ + mcp==2.2.0
+ - mcp-types==2.0.0
+ + mcp-types==2.2.0
+ - multidict==6.7.1
+ + multidict==6.9.1
+ - oauthlib==3.3.1
+ + oauthlib==4.0.0
+ - pillow==12.3.0
+ + pillow==13.0.0
+ - pyjwt==2.13.0
+ + pyjwt==2.15.0
+ - urllib3==2.7.0
+ + urllib3==2.8.0
+ - yarl==1.24.5
+ + yarl==1.25.1

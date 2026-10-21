@@ -1,6 +1,6 @@
 # Reconstruire et vérifier Fred
 
-Les constructions Windows/serveur 3.5.30 et Android 1.0.11/code 12 utilisent les
+Les constructions Windows/serveur 3.5.34 et Android 1.0.13/code 14 utilisent les
 sources locales et les clés de signature existantes. Chaque construction produit
 `build-manifest.json` : empreintes des sources, empreinte du binaire, versions des
 paquets Python, Go, CMake, JDK, SDK/NDK Android et commit Hermes réellement utilisés.
@@ -10,8 +10,9 @@ Les sources modifiées avant commit sont identifiées par leurs empreintes.
 
 1. Extraire le dépôt sur Windows, avec Git, PowerShell 7 ou Windows PowerShell 5.1,
    Node.js ≥ 20 et Chrome. Le moteur de production Flash-Next est Strata officiel
-   **0.1.43.1**, avec sa source serveur, sous `dependances/strata-0.1.43.1` : suivre
-   [sa configuration de production](maintenance/2026-10-13-strata-0.1.43.1/README.md).
+   **0.1.45.3**, sous `dependances/strata-0.1.45.3/engine-cuda12`, avec le serveur
+   Python corrigé conservé sous `dependances/strata-0.1.43.1/source` : suivre
+   [sa configuration de production](maintenance/2026-10-19-strata-0.1.45.3/README.md).
    [dependances/moteurs.json](dependances/moteurs.json) conserve les références des
    dépôts historiques et de leurs patchs, décrites dans
    [dependances/README.md](dependances/README.md).
@@ -40,6 +41,14 @@ la construction réalisée ; il ne promet pas un binaire bit à bit identique su
 autre poste ou avec une autre clé.
 
 ## Exécuter les vérifications
+
+Depuis les correctifs de sécurité du 21 octobre, les cinq runtimes disposent de
+[verrous avec empreintes](dependances/verrous/README.md). Vérifier leur conformité
+avec `maintenance/verrous_runtime.py check`. Reconstruire dans des environnements
+neufs à partir des verrous ; ne pas modifier le runtime personnel Hermes. Fred
+sélectionne son runtime privé validé par le pointeur
+`toolchain/hermes-security-runtime/runtime.json`, préparé avec le script et le
+patch de `maintenance/2026-10-21-correctifs-audit/`.
 
 Depuis la racine du projet :
 

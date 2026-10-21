@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "server_windows": "3.5.33",
+  "update_verified": true,
+  "model_processes_preserved": true,
+  "keys_settings_user_data_preserved": true,
+  "backup_policy_preserved": true,
+  "hermes_available": true,
+  "eg2_ready": true
+}

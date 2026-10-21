@@ -1,0 +1,32 @@
+{
+  "passed": true,
+  "nas_sha256": "d93581ed6adc9e165a4da24f646d928cc06805f90ac5fab35ba49a55e1727d7a",
+  "nas_bytes": 2758035,
+  "restored_in_private_temporary_directory": true,
+  "no_service_started": true,
+  "data": {
+    "client_histories": {
+      "rows": 1,
+      "sha256": "55dea500856e2e1ca1724520f2f6a7142a3209734f3bef0ba80b444437f762ca"
+    },
+    "projects": {
+      "rows": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "documents": {
+      "rows": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "memories": {
+      "rows": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "conversations": {
+      "rows": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  },
+  "remote_disabled_after_restore": true,
+  "hermes_restored": true,
+  "production_model_keys_settings_preserved": true
+}

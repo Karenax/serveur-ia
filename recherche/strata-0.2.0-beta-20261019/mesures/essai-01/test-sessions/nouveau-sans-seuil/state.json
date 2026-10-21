@@ -1,0 +1,26 @@
+{
+  "status": "pret",
+  "started": "2026-10-19T17:55:55.968094+02:00",
+  "started_epoch": 1792425355.9680948,
+  "supervisor": {
+    "pid": 26912,
+    "created": 1792425355.777434
+  },
+  "config_path": "D:\\Serveur IA\\recherche\\strata-0.2.0-beta-20261019\\mesures\\essai-01\\nouveau.json",
+  "host": "127.0.0.1",
+  "port": 8081,
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "min_free_ram_gib": 6.0,
+  "server": {
+    "pid": 30168,
+    "created": 1792425356.0066967
+  },
+  "available_ram_gib": 56.44,
+  "startup_memory_reclaim": {
+    "status": "reclaimed",
+    "pid": 22876,
+    "method": "EmptyWorkingSet"
+  },
+  "loaded_seconds": 422.9,
+  "ready_seconds": 427.0
+}

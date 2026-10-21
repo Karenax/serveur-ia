@@ -1,0 +1,7 @@
+test_discovery_without_chat_and_through_hermes_catalogue (test_eg2_api.EmbeddingsAPITests.test_discovery_without_chat_and_through_hermes_catalogue) ... ok
+test_embedding_only_catalogue_keeps_api_connected_without_selecting_chat (test_model_catalogue.ModelCatalogueTests.test_embedding_only_catalogue_keeps_api_connected_without_selecting_chat) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 2.914s
+
+OK

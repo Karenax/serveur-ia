@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "server_windows": "3.5.31",
+  "android": "1.0.12",
+  "android_code": 13,
+  "model_loaded": true,
+  "vision_available": true,
+  "model_processes_preserved": true,
+  "keys_settings_user_data_preserved": true,
+  "backup_policy_preserved": true,
+  "nas_second_copy_configured": true,
+  "hermes_private_runtime_active": true,
+  "eg2_ready": true,
+  "console_owner_isolation_active": true
+}

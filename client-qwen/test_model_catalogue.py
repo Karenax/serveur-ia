@@ -13,6 +13,7 @@ from unittest.mock import patch
 
 import client
 import history_store
+import hermes_catalogue
 
 
 class ModelCatalogueTests(unittest.TestCase):
@@ -69,6 +70,37 @@ class ModelCatalogueTests(unittest.TestCase):
         self.assertEqual(failure.exception.code,401)
         self.assertEqual(json.load(failure.exception)['error']['code'],'access_revoked');failure.exception.close()
 
+    def test_hermes_catalogue_filters_and_routes_readable_alias_to_exact_model(self):
+        self.catalogue['data'].append({'id':'google/embeddinggemma-2','capabilities':{'embedding':True}})
+        url=self.loopback();opener=urllib.request.build_opener(urllib.request.ProxyHandler({}))
+        headers={'Authorization':'Bearer fixture-loopback-key','Content-Type':'application/json'}
+        with opener.open(urllib.request.Request(url+'/hermes/v1/models',headers=headers)) as response:
+            rows=json.load(response)['data']
+        self.assertEqual(len(rows),1);alias=rows[0]['id'];self.assertTrue(alias.endswith('/modele-cloud'))
+        request={'model':alias,'messages':[{'role':'user','content':'Test'}]}
+        with opener.open(urllib.request.Request(url+'/hermes/v1/chat/completions',data=json.dumps(request).encode(),headers=headers)) as response:
+            self.assertEqual(json.load(response)['choices'][0]['message']['content'],'Réponse cloud.')
+        self.assertEqual([body for route,body,_ in self.requests if route=='chat/completions'][-1]['model'],'fred-cloud')
+        for bad in ('fred-cloud','google/embeddinggemma-2',[],None):
+            request['model']=bad
+            with self.assertRaises(urllib.error.HTTPError) as error:
+                opener.open(urllib.request.Request(url+'/hermes/v1/chat/completions',data=json.dumps(request).encode(),headers=headers))
+            self.assertEqual(error.exception.code,400);error.exception.close()
+        self.catalogue['data'][1]['available']=False;request['model']=alias
+        with self.assertRaises(urllib.error.HTTPError) as error:
+            opener.open(urllib.request.Request(url+'/hermes/v1/chat/completions',data=json.dumps(request).encode(),headers=headers))
+        self.assertEqual(error.exception.code,400);error.exception.close()
+        with self.assertRaises(urllib.error.HTTPError) as error:opener.open(url+'/hermes/v1/models')
+        self.assertEqual(error.exception.code,401);error.exception.close()
+
+    def test_hermes_alias_stable_with_duplicates_and_catalogue_order(self):
+        source={'data':[{'id':'first','name':'Qwen local'},{'id':'second','name':'Qwen local'}]}
+        _,mapping=hermes_catalogue.catalogue(source)
+        _,reverse=hermes_catalogue.catalogue({'data':list(reversed(source['data']))})
+        self.assertEqual(mapping,reverse);self.assertEqual(len(mapping),2)
+        _,single=hermes_catalogue.catalogue({'data':source['data'][:1]})
+        self.assertTrue(set(single)<=set(mapping))
+
     def test_local_qwen_unloaded_does_not_disconnect_available_cloud_and_body_is_retained(self):
         self.remote.check()
         with self.assertRaises(urllib.error.HTTPError) as failure:
@@ -80,6 +112,13 @@ class ModelCatalogueTests(unittest.TestCase):
             self.assertEqual(json.load(response)['choices'][0]['message']['content'],'Réponse cloud.')
         route,actual,headers=self.requests[-1]
         self.assertEqual(actual,body);self.assertEqual(headers['X-qwen-request'],'b'*32)
+
+    def test_embedding_only_catalogue_keeps_api_connected_without_selecting_chat(self):
+        self.catalogue={'data':[{'id':'google/embeddinggemma-2','available':True,'capabilities':{'embedding':True,'dimensions':768}}]}
+        self.assertTrue(self.remote.check()['connected'])
+        self.assertEqual(self.remote.models,[])
+        self.assertEqual(self.remote.state()['model'],'')
+        self.assertEqual(self.remote.models_catalogue['data'][0]['id'],'google/embeddinggemma-2')
 
     def test_legacy_catalogue_still_connects_without_new_metadata(self):
         self.catalogue={'data':[{'id':'legacy-model'}]}

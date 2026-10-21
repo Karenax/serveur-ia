@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "local_api_panel_embedded": true,
+  "updated_wireguard_both_abis": {
+    "arm64-v8a": "9d3d3a628e11fa04ce3e5ca07745bbd83d97a647816d70a8985084a15d171673",
+    "x86_64": "f7baa8c63aea208604e8c77f433f364ed82c84dd39d78e83ec770dbaea1dba26"
+  }
+}

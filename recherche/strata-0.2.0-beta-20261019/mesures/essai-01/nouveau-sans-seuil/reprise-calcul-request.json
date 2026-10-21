@@ -1,0 +1,18 @@
+{
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Réponds uniquement avec un objet JSON contenant la clé resultat et le résultat de 43 multiplié par 7."
+    }
+  ],
+  "max_tokens": 64,
+  "temperature": 0,
+  "seed": 42,
+  "stream": false,
+  "cache_prompt": false,
+  "reasoning_effort": "none",
+  "chat_template_kwargs": {
+    "enable_thinking": false
+  }
+}

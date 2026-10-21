@@ -1,0 +1,499 @@
+[
+  {
+    "name": "chauffe-document",
+    "elapsed_s": 62.40464925765991,
+    "started_epoch": 1792425232.9504135,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 23621,
+      "prompt_ms": 61797.7,
+      "prompt_per_token_ms": 2.616,
+      "prompt_per_second": 382.2,
+      "predicted_n": 20,
+      "predicted_ms": 577.4,
+      "predicted_per_token_ms": 28.87,
+      "predicted_per_second": 34.6,
+      "draft_n": 14,
+      "draft_n_accepted": 14
+    },
+    "usage": {
+      "prompt_tokens": 23621,
+      "completion_tokens": 20,
+      "total_tokens": 23641,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "{\n  \"code\": \"LUMIERE-7429\"\n}",
+    "quality_pass": true,
+    "strict_json": true,
+    "gpu_before": [
+      {
+        "uuid": "GPU-486d5352-582e-2880-78bf-3dec4688e142",
+        "temperature_c": 49.0,
+        "sm_mhz": 1328.0,
+        "power_w": 39.85,
+        "throttle_mask": 0,
+        "utilization": 0.0,
+        "vram_mib": 14028.0
+      },
+      {
+        "uuid": "GPU-a39f1b57-5a26-b53d-e943-44ef8042a438",
+        "temperature_c": 48.0,
+        "sm_mhz": 1328.0,
+        "power_w": 39.58,
+        "throttle_mask": 0,
+        "utilization": 0.0,
+        "vram_mib": 14164.0
+      }
+    ],
+    "gpu_after": [
+      {
+        "uuid": "GPU-486d5352-582e-2880-78bf-3dec4688e142",
+        "temperature_c": 70.0,
+        "sm_mhz": 1328.0,
+        "power_w": 48.52,
+        "throttle_mask": 0,
+        "utilization": 62.0,
+        "vram_mib": 14176.0
+      },
+      {
+        "uuid": "GPU-a39f1b57-5a26-b53d-e943-44ef8042a438",
+        "temperature_c": 65.0,
+        "sm_mhz": 1328.0,
+        "power_w": 45.86,
+        "throttle_mask": 0,
+        "utilization": 45.0,
+        "vram_mib": 14302.0
+      }
+    ],
+    "thermally_valid": true,
+    "text_sha256": "f94a53ed0ab641da05d50c7b15c1779b1241243506ff4f0dd477059ce0adc983"
+  },
+  {
+    "name": "serie-r1-ciel",
+    "elapsed_s": 9.95722508430481,
+    "started_epoch": 1792425295.570861,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 50,
+      "prompt_ms": 2615.1,
+      "prompt_per_token_ms": 52.302,
+      "prompt_per_second": 19.1,
+      "predicted_n": 256,
+      "predicted_ms": 7336.3,
+      "predicted_per_token_ms": 28.657,
+      "predicted_per_second": 34.9,
+      "draft_n": 194,
+      "draft_n_accepted": 135
+    },
+    "usage": {
+      "prompt_tokens": 50,
+      "completion_tokens": 256,
+      "total_tokens": 306,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "Voici une explication précise et accessible de ce phénomène optique, souvent appelé la **diffusion de Rayleigh**.\n\n### 1. Pourquoi le ciel est bleu en journée\n\nLa lumière du soleil semble blanche, mais elle est en réalité composée de toutes les couleurs de l’arc-en-ciel (le spectre visible). Chaque couleur correspond à une longueur d’onde différente :\n- Le **rouge** a une longue longueur d’onde.\n- Le **bleu** et le **violet** ont des courtes longueurs d’onde.\n\nLorsque la lumière du soleil traverse l’atmosphère terrestre, elle entre en collision avec les molécules de gaz (principalement l’azote et l’oxygène) et les petites particules en suspension.\n\n**Le mécanisme clé : la diffusion de Rayleigh**\nLes molécules de l’atmosphère sont beaucoup plus petites que la longueur d’onde de la lumière visible. Selon les lois de la physique, ces petites particules diffusent beaucoup plus efficacement les courtes longueurs d’onde (bleu et violet) que les longues (rouge et orange).\n\n- La lumière bleue est donc **dispersée dans toutes les directions",
+    "quality_pass": true,
+    "strict_json": null,
+    "gpu_before": [
+      {
+        "uuid": "GPU-486d5352-582e-2880-78bf-3dec4688e142",
+        "temperature_c": 70.0,
+        "sm_mhz": 1328.0,
+        "power_w": 48.28,
+        "throttle_mask": 0,
+        "utilization": 22.0,
+        "vram_mib": 14176.0
+      },
+      {
+        "uuid": "GPU-a39f1b57-5a26-b53d-e943-44ef8042a438",
+        "temperature_c": 65.0,
+        "sm_mhz": 1328.0,
+        "power_w": 45.86,
+        "throttle_mask": 0,
+        "utilization": 0.0,
+        "vram_mib": 14302.0
+      }
+    ],
+    "gpu_after": [
+      {
+        "uuid": "GPU-486d5352-582e-2880-78bf-3dec4688e142",
+        "temperature_c": 69.0,
+        "sm_mhz": 1328.0,
+        "power_w": 48.04,
+        "throttle_mask": 0,
+        "utilization": 56.0,
+        "vram_mib": 14328.0
+      },
+      {
+        "uuid": "GPU-a39f1b57-5a26-b53d-e943-44ef8042a438",
+        "temperature_c": 65.0,
+        "sm_mhz": 1328.0,
+        "power_w": 46.07,
+        "throttle_mask": 0,
+        "utilization": 39.0,
+        "vram_mib": 14454.0
+      }
+    ],
+    "thermally_valid": true,
+    "text_sha256": "2252af64eeb7240ffdbc7d12cfd97eb88a746021d7b043041c8239febd0f95ca"
+  },
+  {
+    "name": "serie-r1-fibonacci-code",
+    "elapsed_s": 7.487694263458252,
+    "started_epoch": 1792425305.7460427,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 58,
+      "prompt_ms": 2550.4,
+      "prompt_per_token_ms": 43.972,
+      "prompt_per_second": 22.7,
+      "predicted_n": 192,
+      "predicted_ms": 4912.6,
+      "predicted_per_token_ms": 25.586,
+      "predicted_per_second": 39.1,
+      "draft_n": 141,
+      "draft_n_accepted": 118
+    },
+    "usage": {
+      "prompt_tokens": 58,
+      "completion_tokens": 192,
+      "total_tokens": 250,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "Voici la fonction Python demandée, suivie de l'exemple pour `n=8`.\n\n```python\ndef fibonacci(n):\n    \"\"\"\n    Retourne une liste contenant les n premiers nombres de Fibonacci.\n    \"\"\"\n    if n <= 0:\n        return []\n    elif n == 1:\n        return [0]\n    \n    fib_sequence = [0, 1]\n    for i in range(2, n):\n        next_value = fib_sequence[i-1] + fib_sequence[i-2]\n        fib_sequence.append(next_value)\n    \n    return fib_sequence\n\n# Exemple pour n=8\nresult = fibonacci(8)\nprint(result)\n```\n\n**Sortie pour `n=8` :**\n```\n[0, 1, 1, 2, 3, 5, 8, 13]\n```",
+    "quality_pass": true,
+    "strict_json": null,
+    "gpu_before": [
+      {
+        "uuid": "GPU-486d5352-582e-2880-78bf-3dec4688e142",
+        "temperature_c": 68.0,
+        "sm_mhz": 1328.0,
+        "power_w": 47.55,
+        "throttle_mask": 0,
+        "utilization": 19.0,
+        "vram_mib": 14328.0
+      },
+      {
+        "uuid": "GPU-a39f1b57-5a26-b53d-e943-44ef8042a438",
+        "temperature_c": 65.0,
+        "sm_mhz": 1328.0,
+        "power_w": 46.1,
+        "throttle_mask": 0,
+        "utilization": 0.0,
+        "vram_mib": 14454.0
+      }
+    ],
+    "gpu_after": [
+      {
+        "uuid": "GPU-486d5352-582e-2880-78bf-3dec4688e142",
+        "temperature_c": 69.0,
+        "sm_mhz": 1328.0,
+        "power_w": 48.04,
+        "throttle_mask": 0,
+        "utilization": 60.0,
+        "vram_mib": 14328.0
+      },
+      {
+        "uuid": "GPU-a39f1b57-5a26-b53d-e943-44ef8042a438",
+        "temperature_c": 65.0,
+        "sm_mhz": 1328.0,
+        "power_w": 45.86,
+        "throttle_mask": 0,
+        "utilization": 52.0,
+        "vram_mib": 14454.0
+      }
+    ],
+    "thermally_valid": true,
+    "text_sha256": "f467a6411e3e360028b7731c848db940803de0e2246c75a3dd58b0460a4cf5fa"
+  },
+  {
+    "name": "serie-r2-ciel",
+    "elapsed_s": 10.394279479980469,
+    "started_epoch": 1792425313.4408197,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 50,
+      "prompt_ms": 2507.4,
+      "prompt_per_token_ms": 50.148,
+      "prompt_per_second": 19.9,
+      "predicted_n": 256,
+      "predicted_ms": 7862.4,
+      "predicted_per_token_ms": 30.712,
+      "predicted_per_second": 32.6,
+      "draft_n": 208,
+      "draft_n_accepted": 123
+    },
+    "usage": {
+      "prompt_tokens": 50,
+      "completion_tokens": 256,
+      "total_tokens": 306,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "Voici une explication précise et accessible du phénomène, structurée en deux parties comme demandé.\n\n### 1. Pourquoi le ciel est bleu en journée\n\nLe phénomène repose sur la **diffusion de Rayleigh**, un processus physique où la lumière est déviée par les molécules de l’atmosphère.\n\n- **La lumière blanche du Soleil** : Elle contient toutes les couleurs de l’arc-en-ciel (rouge, orange, jaune, vert, bleu, indigo, violet).\n- **L’atmosphère terrestre** : Elle est composée principalement d’azote et d’oxygène, dont les molécules sont beaucoup plus petites que la longueur d’onde de la lumière visible.\n- **La diffusion sélective** : La lumière bleue (et violette) a une longueur d’onde courte. Selon la loi de Rayleigh, l’intensité de la diffusion est inversement proportionnelle à la puissance quatrième de la longueur d’onde ($I \\propto 1/\\lambda^4$). Cela signifie que la lumière bleue est diffusée environ **10 fois plus** que la lumière rouge par les molécules d’air.\n- **Résultat** : Quand vous",
+    "quality_pass": true,
+    "strict_json": null,
+    "gpu_before": [
+      {
+        "uuid": "GPU-486d5352-582e-2880-78bf-3dec4688e142",
+        "temperature_c": 68.0,
+        "sm_mhz": 1328.0,
+        "power_w": 47.79,
+        "throttle_mask": 0,
+        "utilization": 21.0,
+        "vram_mib": 14328.0
+      },
+      {
+        "uuid": "GPU-a39f1b57-5a26-b53d-e943-44ef8042a438",
+        "temperature_c": 65.0,
+        "sm_mhz": 1328.0,
+        "power_w": 45.61,
+        "throttle_mask": 0,
+        "utilization": 0.0,
+        "vram_mib": 14454.0
+      }
+    ],
+    "gpu_after": [
+      {
+        "uuid": "GPU-486d5352-582e-2880-78bf-3dec4688e142",
+        "temperature_c": 68.0,
+        "sm_mhz": 1328.0,
+        "power_w": 48.28,
+        "throttle_mask": 0,
+        "utilization": 50.0,
+        "vram_mib": 14328.0
+      },
+      {
+        "uuid": "GPU-a39f1b57-5a26-b53d-e943-44ef8042a438",
+        "temperature_c": 65.0,
+        "sm_mhz": 1328.0,
+        "power_w": 45.83,
+        "throttle_mask": 0,
+        "utilization": 17.0,
+        "vram_mib": 14454.0
+      }
+    ],
+    "thermally_valid": true,
+    "text_sha256": "f1f473d8542e753ac1de01660fc2ca5eb3e2bc8d43adfdeead4a83c0ce19c8d6"
+  },
+  {
+    "name": "serie-r2-fibonacci-code",
+    "elapsed_s": 7.5039732456207275,
+    "started_epoch": 1792425324.0573301,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 58,
+      "prompt_ms": 2553.1,
+      "prompt_per_token_ms": 44.019,
+      "prompt_per_second": 22.7,
+      "predicted_n": 192,
+      "predicted_ms": 4927.9,
+      "predicted_per_token_ms": 25.666,
+      "predicted_per_second": 39.0,
+      "draft_n": 142,
+      "draft_n_accepted": 117
+    },
+    "usage": {
+      "prompt_tokens": 58,
+      "completion_tokens": 192,
+      "total_tokens": 250,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "Voici la fonction Python demandée, suivie de l'exemple pour `n=8`.\n\n```python\ndef fibonacci(n):\n    \"\"\"\n    Retourne une liste contenant les n premiers nombres de Fibonacci.\n    \"\"\"\n    if n <= 0:\n        return []\n    elif n == 1:\n        return [0]\n    \n    fib_sequence = [0, 1]\n    for i in range(2, n):\n        next_value = fib_sequence[i-1] + fib_sequence[i-2]\n        fib_sequence.append(next_value)\n    \n    return fib_sequence\n\n# Exemple pour n=8\nresult = fibonacci(8)\nprint(result)\n```\n\n**Sortie pour `n=8` :**\n```\n[0, 1, 1, 2, 3, 5, 8, 13]\n```",
+    "quality_pass": true,
+    "strict_json": null,
+    "gpu_before": [
+      {
+        "uuid": "GPU-486d5352-582e-2880-78bf-3dec4688e142",
+        "temperature_c": 68.0,
+        "sm_mhz": 1328.0,
+        "power_w": 47.79,
+        "throttle_mask": 0,
+        "utilization": 0.0,
+        "vram_mib": 14328.0
+      },
+      {
+        "uuid": "GPU-a39f1b57-5a26-b53d-e943-44ef8042a438",
+        "temperature_c": 65.0,
+        "sm_mhz": 1328.0,
+        "power_w": 45.86,
+        "throttle_mask": 0,
+        "utilization": 17.0,
+        "vram_mib": 14454.0
+      }
+    ],
+    "gpu_after": [
+      {
+        "uuid": "GPU-486d5352-582e-2880-78bf-3dec4688e142",
+        "temperature_c": 69.0,
+        "sm_mhz": 1328.0,
+        "power_w": 48.03,
+        "throttle_mask": 0,
+        "utilization": 56.0,
+        "vram_mib": 14328.0
+      },
+      {
+        "uuid": "GPU-a39f1b57-5a26-b53d-e943-44ef8042a438",
+        "temperature_c": 64.0,
+        "sm_mhz": 1328.0,
+        "power_w": 45.86,
+        "throttle_mask": 0,
+        "utilization": 34.0,
+        "vram_mib": 14454.0
+      }
+    ],
+    "thermally_valid": true,
+    "text_sha256": "f467a6411e3e360028b7731c848db940803de0e2246c75a3dd58b0460a4cf5fa"
+  },
+  {
+    "name": "serie-r3-ciel",
+    "elapsed_s": 10.02819013595581,
+    "started_epoch": 1792425331.7784178,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 50,
+      "prompt_ms": 2505.6,
+      "prompt_per_token_ms": 50.112,
+      "prompt_per_second": 20.0,
+      "predicted_n": 256,
+      "predicted_ms": 7502.0,
+      "predicted_per_token_ms": 29.305,
+      "predicted_per_second": 34.1,
+      "draft_n": 198,
+      "draft_n_accepted": 135
+    },
+    "usage": {
+      "prompt_tokens": 50,
+      "completion_tokens": 256,
+      "total_tokens": 306,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "Voici une explication précise et accessible de ce phénomène optique, souvent appelé la **diffusion de Rayleigh**.\n\n### 1. Pourquoi le ciel est bleu en journée\n\nLa lumière du soleil semble blanche, mais elle est en réalité composée de toutes les couleurs de l’arc-en-ciel (le spectre visible). Chaque couleur correspond à une longueur d’onde différente :\n- Le **rouge** a une longue longueur d’onde.\n- Le **bleu** et le **violet** ont des courtes longueurs d’onde.\n\nLorsque la lumière du soleil traverse l’atmosphère terrestre, elle entre en collision avec les molécules de gaz (principalement l’azote et l’oxygène) et les petites particules en suspension.\n\n**Le mécanisme clé : la diffusion de Rayleigh**\nLes molécules de l’atmosphère sont beaucoup plus petites que la longueur d’onde de la lumière visible. Selon les lois de la physique, **les courtes longueurs d’onde sont diffusées beaucoup plus fortement que les longues**.\n\n- La lumière bleue (courte longueur d’onde) est donc **diffusée dans toutes les directions** par les molécules",
+    "quality_pass": true,
+    "strict_json": null,
+    "gpu_before": [
+      {
+        "uuid": "GPU-486d5352-582e-2880-78bf-3dec4688e142",
+        "temperature_c": 68.0,
+        "sm_mhz": 1328.0,
+        "power_w": 47.79,
+        "throttle_mask": 0,
+        "utilization": 3.0,
+        "vram_mib": 14328.0
+      },
+      {
+        "uuid": "GPU-a39f1b57-5a26-b53d-e943-44ef8042a438",
+        "temperature_c": 64.0,
+        "sm_mhz": 1328.0,
+        "power_w": 45.61,
+        "throttle_mask": 0,
+        "utilization": 0.0,
+        "vram_mib": 14454.0
+      }
+    ],
+    "gpu_after": [
+      {
+        "uuid": "GPU-486d5352-582e-2880-78bf-3dec4688e142",
+        "temperature_c": 68.0,
+        "sm_mhz": 1328.0,
+        "power_w": 48.04,
+        "throttle_mask": 0,
+        "utilization": 61.0,
+        "vram_mib": 14328.0
+      },
+      {
+        "uuid": "GPU-a39f1b57-5a26-b53d-e943-44ef8042a438",
+        "temperature_c": 64.0,
+        "sm_mhz": 1328.0,
+        "power_w": 45.59,
+        "throttle_mask": 0,
+        "utilization": 51.0,
+        "vram_mib": 14454.0
+      }
+    ],
+    "thermally_valid": true,
+    "text_sha256": "cca0a718814a01149bfca8f57d074b7a7e647c36d517f9942666a76b103bb3d4"
+  },
+  {
+    "name": "serie-r3-fibonacci-code",
+    "elapsed_s": 7.499755620956421,
+    "started_epoch": 1792425342.0298617,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 58,
+      "prompt_ms": 2535.8,
+      "prompt_per_token_ms": 43.721,
+      "prompt_per_second": 22.9,
+      "predicted_n": 192,
+      "predicted_ms": 4939.6,
+      "predicted_per_token_ms": 25.727,
+      "predicted_per_second": 38.9,
+      "draft_n": 141,
+      "draft_n_accepted": 118
+    },
+    "usage": {
+      "prompt_tokens": 58,
+      "completion_tokens": 192,
+      "total_tokens": 250,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "Voici la fonction Python demandée, suivie de l'exemple pour `n=8`.\n\n```python\ndef fibonacci(n):\n    \"\"\"\n    Retourne une liste contenant les n premiers nombres de Fibonacci.\n    \"\"\"\n    if n <= 0:\n        return []\n    elif n == 1:\n        return [0]\n    \n    fib_sequence = [0, 1]\n    for i in range(2, n):\n        next_value = fib_sequence[i-1] + fib_sequence[i-2]\n        fib_sequence.append(next_value)\n    \n    return fib_sequence\n\n# Exemple pour n=8\nresult = fibonacci(8)\nprint(result)\n```\n\n**Sortie pour `n=8` :**\n```\n[0, 1, 1, 2, 3, 5, 8, 13]\n```",
+    "quality_pass": true,
+    "strict_json": null,
+    "gpu_before": [
+      {
+        "uuid": "GPU-486d5352-582e-2880-78bf-3dec4688e142",
+        "temperature_c": 68.0,
+        "sm_mhz": 1328.0,
+        "power_w": 47.8,
+        "throttle_mask": 0,
+        "utilization": 19.0,
+        "vram_mib": 14328.0
+      },
+      {
+        "uuid": "GPU-a39f1b57-5a26-b53d-e943-44ef8042a438",
+        "temperature_c": 64.0,
+        "sm_mhz": 1328.0,
+        "power_w": 45.59,
+        "throttle_mask": 0,
+        "utilization": 0.0,
+        "vram_mib": 14454.0
+      }
+    ],
+    "gpu_after": [
+      {
+        "uuid": "GPU-486d5352-582e-2880-78bf-3dec4688e142",
+        "temperature_c": 69.0,
+        "sm_mhz": 1328.0,
+        "power_w": 48.03,
+        "throttle_mask": 0,
+        "utilization": 38.0,
+        "vram_mib": 14328.0
+      },
+      {
+        "uuid": "GPU-a39f1b57-5a26-b53d-e943-44ef8042a438",
+        "temperature_c": 64.0,
+        "sm_mhz": 1328.0,
+        "power_w": 45.59,
+        "throttle_mask": 0,
+        "utilization": 41.0,
+        "vram_mib": 14454.0
+      }
+    ],
+    "thermally_valid": true,
+    "text_sha256": "f467a6411e3e360028b7731c848db940803de0e2246c75a3dd58b0460a4cf5fa"
+  }
+]

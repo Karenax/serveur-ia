@@ -66,6 +66,37 @@ class IntegrationTests(unittest.TestCase):
         self.assertEqual(entry['options']['baseURL'],URL);self.assertEqual(entry['options']['timeout'],60000)
         self.assertEqual(entry['models'][MODEL]['limit'],{'context':32768})
 
+    def test_opencode_readable_names_refresh_existing_models_without_importing_catalogue(self):
+        for section in ('providers','provider'):
+            with self.subTest(section=section):
+                selected='fred-model-'+'a'*24;previous='fred-model-'+'b'*24
+                source={section:{PROVIDER:{'models':{
+                    selected:{'name':selected,'limit':{'context':64000}},
+                    previous:{'name':previous,'disabled':True},
+                    'custom':{'name':'Mon modèle'}}},'other':{'name':'Conservé'}},'model':'other/original'}
+                path=self.write('opencode',json.dumps(source))
+                catalogue={'data':[{'id':selected,'name':'gpt-6-luna','label':'GPT-6 Luna'},
+                                   {'id':previous,'name':'gpt-6-astra','label':'GPT-6 Astra'},
+                                   {'id':'not-added','name':'Autre modèle'},
+                                   {'id':'google/embeddinggemma-2','capabilities':{'embedding':True}}]}
+                result=integrations.install('opencode',URL,KEY,selected,self.apps,catalogue=catalogue)
+                value=json.loads(path.read_text(encoding='utf-8'));models=value[section][PROVIDER]['models']
+                self.assertEqual(set(models),{selected,previous,'custom'})
+                self.assertEqual(models[selected]['name'],'GPT-6 Luna')
+                self.assertEqual(models[previous]['name'],'GPT-6 Astra');self.assertTrue(models[previous]['disabled'])
+                self.assertEqual(models[selected]['limit'],{'context':64000})
+                self.assertEqual(models['custom']['name'],'Mon modèle')
+                self.assertEqual(value[section]['other'],source[section]['other']);self.assertEqual(value['model'],'other/original')
+                self.assertIn('GPT-6 Luna',result['message']);self.assertEqual(result['model'],selected)
+                self.assertIsNone(integrations.install('opencode',URL,KEY,selected,self.apps,catalogue=catalogue)['backup'])
+
+    def test_opencode_rejects_embedding_or_unavailable_selection_before_writing(self):
+        for row in ({'id':MODEL,'capabilities':{'embedding':True}},{'id':MODEL,'available':False}):
+            path=self.write('opencode','{}')
+            with self.assertRaises(ValueError):
+                integrations.install('opencode',URL,KEY,MODEL,self.apps,catalogue={'data':[row]})
+            self.assertEqual(path.read_bytes(),b'{}')
+
     def test_new_config_and_bom_are_supported(self):
         for app in self.apps:
             result=self.install(app);self.assertIsNone(result['backup'])
@@ -157,6 +188,23 @@ display:
         self.apps['opencode']['installed']=False
         with self.assertRaises(ValueError):self.install('opencode')
         self.assertFalse(Path(self.apps['opencode']['config_path']).exists())
+
+    def test_hermes_readable_catalogue_replaces_old_ids_and_embeddings(self):
+        source={'model':{'provider':'other','default':'original'},'providers':{
+            PROVIDER:{'models':{'fred-model-old':{},'google/embeddinggemma-2':{}},'timeout':123}}}
+        path=self.write('hermes',yaml.safe_dump(source))
+        catalogue={'data':[{'id':'fred-model-old','name':'GPT-6 Luna','available':True},
+                           {'id':'fred-qwen','name':'Qwen local','available':True},
+                           {'id':'gone','name':'Offline','available':False},
+                           {'id':'google/embeddinggemma-2','capabilities':{'embedding':True}}]}
+        result=integrations.install('hermes',URL,KEY,'fred-model-old',self.apps,catalogue=catalogue)
+        value=yaml.safe_load(path.read_text());entry=value['providers'][PROVIDER]
+        self.assertEqual(entry['api'],'http://127.0.0.1:8087/hermes/v1')
+        self.assertEqual({key.rsplit('/',1)[-1] for key in entry['models']},{'gpt-6-luna','qwen-local'})
+        self.assertEqual(entry['default_model'],result['model']);self.assertEqual(entry['timeout'],123)
+        self.assertEqual(value['model'],source['model']);self.assertIn('activez l’interrupteur',result['message'])
+        self.assertEqual(Path(result['backup']).read_text(),yaml.safe_dump(source))
+        self.assertIsNone(integrations.install('hermes',URL,KEY,'fred-model-old',self.apps,catalogue=catalogue)['backup'])
 
     def test_opencode_jsonc_overrides_json_without_changing_the_lower_priority_file(self):
         directory=self.home/'.config/opencode';directory.mkdir(parents=True)

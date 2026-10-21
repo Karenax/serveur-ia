@@ -1,0 +1,11 @@
+test_actual_windows_local_api_through_wireguard (test_eg2_api.EmbeddingsAPITests.test_actual_windows_local_api_through_wireguard) ... ok
+test_auth_origin_pressure_and_revocation_during_calculation (test_eg2_api.EmbeddingsAPITests.test_auth_origin_pressure_and_revocation_during_calculation) ... ok
+test_engine_failure_is_sanitized_and_slot_released (test_eg2_api.EmbeddingsAPITests.test_engine_failure_is_sanitized_and_slot_released) ... ok
+test_float_base64_usage_catalogue_and_no_chat_routing (test_eg2_api.EmbeddingsAPITests.test_float_base64_usage_catalogue_and_no_chat_routing) ... ok
+test_limits_and_unknown_fields_rejected_before_computation (test_eg2_api.EmbeddingsAPITests.test_limits_and_unknown_fields_rejected_before_computation) ... ok
+test_request_rejects_token_arrays_and_wrong_payload_types (test_eg2_api.EmbeddingsAPITests.test_request_rejects_token_arrays_and_wrong_payload_types) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 26.474s
+
+OK

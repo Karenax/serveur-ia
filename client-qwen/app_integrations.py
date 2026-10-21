@@ -11,6 +11,7 @@ from urllib.parse import urlsplit
 
 import yaml
 import opencode_visibility
+import hermes_catalogue
 from file_lock import locked
 from history_store import atomic
 
@@ -111,7 +112,7 @@ def _json_set(text,path,value):
     return text[:end]+'\n'+json.dumps(path[-1])+': '+encoded+'\n'+text[end:]
 
 
-def opencode_text(text,base_url,key,model):
+def opencode_text(text,base_url,key,model,catalogue=None):
     value,_=jsonc(text)
     v2='providers' in value or 'provider' not in value
     section='providers' if v2 else 'provider'
@@ -124,6 +125,17 @@ def opencode_text(text,base_url,key,model):
     details=models.setdefault(model,{})
     if not isinstance(details,dict):raise ValueError('Paramètres du modèle OpenCode invalides.')
     details['name']=model
+    if catalogue is not None:
+        rows={row['id']:row for row in catalogue.get('data',[]) if isinstance(row,dict)
+              and isinstance(row.get('id'),str) and not (row.get('capabilities') or {}).get('embedding')}
+        if model not in rows or not rows[model].get('available',True):
+            raise ValueError('Ce modèle de conversation n’est plus disponible. Actualisez la liste.')
+        # Refresh names of models already added; adding one model must not import
+        # every shared provider into OpenCode's configuration.
+        for identity,settings in models.items():
+            if identity in rows and isinstance(settings,dict):
+                row=rows[identity]
+                settings['name']=row.get('label') or row.get('name') or identity
     if v2:
         details['disabled']=False
         capabilities=details.setdefault('capabilities',{})
@@ -203,7 +215,7 @@ def _yaml_provider(text,node,section,entry,legacy,providers):
     return text.rstrip()+'\n'+fragment
 
 
-def hermes_text(text,base_url,key,model):
+def hermes_text(text,base_url,key,model,catalogue=None):
     try:
         value=yaml.load(text,Loader=UniqueLoader) or {}
         node=yaml.compose(text,Loader=UniqueLoader)
@@ -234,6 +246,9 @@ def hermes_text(text,base_url,key,model):
         if not isinstance(models,dict):raise ValueError('Modèles Hermes invalides.')
         models.setdefault(model,{})
         providers[PROVIDER]=entry
+    if catalogue is not None:
+        # This provider belongs to Fred: replace obsolete opaque/embedding entries.
+        entry['models']={row['id']:{} for row in catalogue['data']}
     if value.get(section)==providers:return text
     updated=_yaml_provider(text,node,section,entry,legacy,providers)
     try:check=yaml.load(updated,Loader=UniqueLoader)
@@ -243,12 +258,24 @@ def hermes_text(text,base_url,key,model):
     return updated
 
 
-def install(app,base_url,key,model,apps=None):
+def install(app,base_url,key,model,apps=None,catalogue=None):
     if app not in ('opencode','hermes'):raise ValueError('Application inconnue.')
     url=urlsplit(base_url)
     if url.scheme!='http' or url.hostname!='127.0.0.1' or not url.port or url.path!='/v1' or url.query or url.fragment or url.username:raise ValueError('API locale attendue.')
     if not isinstance(model,str) or not model.strip() or len(model)>512 or any(ord(c)<32 for c in model):raise ValueError('Modèle chargé invalide.')
     if not isinstance(key,str) or not 32<=len(key)<=256:raise ValueError('Clé API locale invalide.')
+    hermes_models=None
+    display_model=model
+    if catalogue is not None:
+        display_model=next((row.get('label') or row.get('name') or model
+                            for row in catalogue.get('data',[]) if isinstance(row,dict) and row.get('id')==model),model)
+    if app=='hermes' and catalogue is not None:
+        hermes_models,mapping=hermes_catalogue.catalogue(catalogue)
+        selected=next((alias for alias,native in mapping.items() if native==model),None)
+        if selected is None:raise ValueError('Ce modèle de conversation n’est plus disponible. Actualisez la liste.')
+        display_model=next(row.get('name') or row.get('label') or model for row in catalogue['data'] if row['id']==model)
+        model=selected
+        base_url=base_url.removesuffix('/v1')+'/hermes/v1'
     apps=detect() if apps is None else apps
     if not apps[app]['installed']:raise ValueError('OpenCode non détecté sur ce PC.' if app=='opencode' else 'Hermes non détecté sur ce PC.')
     path=Path(apps[app]['config_path'])
@@ -258,7 +285,7 @@ def install(app,base_url,key,model,apps=None):
         if len(raw)>MAX_CONFIG:raise ValueError('Configuration trop volumineuse : fichier conservé.')
         try:text=raw.decode('utf-8-sig')
         except UnicodeError as error:raise ValueError('Configuration non UTF-8 : fichier conservé.') from error
-        updated=(opencode_text if app=='opencode' else hermes_text)(text or ('{}' if app=='opencode' else ''),base_url,key,model)
+        updated=opencode_text(text or '{}',base_url,key,model,catalogue) if app=='opencode' else hermes_text(text,base_url,key,model,hermes_models)
         backup=None
         if updated!=text:
             path.parent.mkdir(parents=True,exist_ok=True)
@@ -270,9 +297,9 @@ def install(app,base_url,key,model,apps=None):
             if raw.startswith(b'\xef\xbb\xbf'):payload=b'\xef\xbb\xbf'+payload
             atomic(path,payload)
     visibility=opencode_visibility.enable(apps[app].get('desktop'),PROVIDER,model) if app=='opencode' else None
-    message=f'Modèle {model} ajouté à Hermes. Sélectionnez Serveur Fred dans le choix du modèle.'
+    message=f'Modèle {display_model} ajouté à Hermes. Relancez Hermes, puis ouvrez Modèles et activez l’interrupteur du modèle sous Serveur Fred pour le voir dans le sélecteur.'
     if app=='opencode':
-        message=f'Configuration du modèle {model} enregistrée pour OpenCode. '
+        message=f'Configuration du modèle {display_model} enregistrée pour OpenCode. '
         if visibility['status']=='enabled':message+='Modèle activé dans le sélecteur. Ouvrez OpenCode et sélectionnez Serveur Fred dans /models.'
         elif visibility['status']=='close_required':message+='Pour afficher le modèle dans OpenCode 2, fermez complètement OpenCode puis cliquez à nouveau sur Ajouter à OpenCode 2.'
         else:message+='Dans OpenCode 2, ouvrez Paramètres > Modèles et activez ce modèle sous Serveur Fred. Relancez OpenCode si la liste est vide.'

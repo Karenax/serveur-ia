@@ -1,0 +1,15 @@
+{
+  "result": {
+    "status": "chargement",
+    "worker_pid": 29760
+  },
+  "session": {
+    "directory": "D:\\Serveur IA\\lanceur\\sessions\\20261019-181749-673936",
+    "worker": {
+      "pid": 29760,
+      "created": 1792426669.94125
+    }
+  },
+  "engine_sha256": "c97c3e84228c928c46bb2727c1753cbfe76c31c3eb0a9edc7bdd3cd78871cac3",
+  "version": "0.1.45.3"
+}

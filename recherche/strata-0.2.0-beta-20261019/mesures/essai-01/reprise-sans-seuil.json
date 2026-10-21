@@ -1,0 +1,13 @@
+{
+  "user_instruction": "Continue tests; reaching 80 C is acceptable as on the old engine.",
+  "stopped_previous_controllers": [
+    {
+      "pid": 3892,
+      "created": 1792424135.1804812
+    },
+    {
+      "pid": 28096,
+      "created": 1792424135.1714857
+    }
+  ]
+}

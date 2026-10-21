@@ -1,0 +1,49 @@
+{
+  "utc": "2026-10-21T11:33:55.057342+00:00",
+  "console": {
+    "service": "qwen-launcher"
+  },
+  "model": {
+    "status": "ok",
+    "max_context": 262144,
+    "model": "qwen3.8-flash-next-iq4-xs",
+    "images": true,
+    "api_key": false,
+    "loaded": true,
+    "service": "strata"
+  },
+  "listeners": [
+    {
+      "address": "127.0.0.1",
+      "port": 8768,
+      "pid": 15384
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 8765,
+      "pid": 15384
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 8643,
+      "pid": 14524
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 8080,
+      "pid": 19936
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 8766,
+      "pid": 15384
+    }
+  ],
+  "same_processes": {
+    "8080": true,
+    "8765": true,
+    "8766": true,
+    "8643": true,
+    "8768": true
+  }
+}

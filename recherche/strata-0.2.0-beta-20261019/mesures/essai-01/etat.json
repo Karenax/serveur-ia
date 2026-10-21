@@ -1,0 +1,28 @@
+{
+  "arm": "nouveau-sans-seuil",
+  "phase": "production-retablie",
+  "temperature_cutoff": null,
+  "cooling_between_requests": false,
+  "updated_utc": "2026-10-19T16:10:36.070407+00:00",
+  "case": "reprise-calcul",
+  "last_result": {
+    "name": "reprise-calcul",
+    "elapsed_s": 3.345609426498413,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 38,
+      "prompt_ms": 2455.3,
+      "prompt_per_token_ms": 64.613,
+      "prompt_per_second": 15.5,
+      "predicted_n": 14,
+      "predicted_ms": 866.9,
+      "predicted_per_token_ms": 61.921,
+      "predicted_per_second": 16.1,
+      "draft_n": 10,
+      "draft_n_accepted": 10
+    },
+    "quality_pass": true,
+    "thermally_valid": true
+  },
+  "test_error": null
+}

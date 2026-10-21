@@ -1,0 +1,15 @@
+{
+  "windows": {
+    "version": "3.5.31",
+    "sha256": "4cfcfd22b4081e63adc0bbfcf6d17a86c321bb1b6d3e3a89a74998eaa4caa309",
+    "bytes": 94395511
+  },
+  "android": {
+    "bytes": 18903316,
+    "package": "net.karenax.fred",
+    "version": "1.0.12",
+    "version_code": 13,
+    "sha256": "570f02d795fd5e7e3982c2819d0ccd150a04a2cbf3346da66cf34d4c10aafc85"
+  },
+  "personal_clients_prepared": 1
+}

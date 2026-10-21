@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "windows_version": "3.5.32",
+  "windows_sha256": "5fa5a4b16176d9ea2dcd3b209a1e8036161b649bc74017a7d3cd1748a71282ae",
+  "windows_profile_self_test": true,
+  "windows_silent_pcm_voice_self_test": true,
+  "embedded_files_verified": [
+    "wireguard-bridge.exe",
+    "chat.html",
+    "workspace.html",
+    "markdown.js",
+    "voice/fredaec.dll",
+    "voice/conversation-worker/conversation-worker.exe"
+  ],
+  "android_version": "1.0.13",
+  "android_code": 14,
+  "android_sha256": "7cbc953369f17279909f4ca5bfaf78a93c06e84352c0e844eb9986fcc6b3f421",
+  "android_signing_key_preserved": true,
+  "android_ui_matches_sources": true
+}

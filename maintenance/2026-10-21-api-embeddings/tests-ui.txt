@@ -1,0 +1,179 @@
+
+> fred-shared-ui-tests@3.5.32 test
+> node run_ui_tests.cjs
+
+{
+  "passed": true,
+  "source": "working-tree",
+  "reasoning": "oral none, written preference preserved",
+  "checks": [
+    "direct Qwen + delayed sync preserves session and complete text",
+    "all three PCM frames finish without automatic cancellation",
+    "second ASR turn waits for history sync and submits exactly once",
+    "same conversation with unique turn IDs",
+    "real new speech during calculation cancels original turn",
+    "speech playback barge-in cancels correct audio and scheduled sources",
+    "hangup returns controls",
+    "local requests bypass Hermes; oral reasoning disabled",
+    "short first sentence is spoken before LLM completion",
+    "hangup failure keeps completed text and offers retry"
+  ],
+  "chats": 5,
+  "acks": [
+    1,
+    2,
+    3,
+    4,
+    1
+  ],
+  "simulation": "native ASR and PCM timing; no hardware microphone or server models"
+}
+{
+  "passed": true,
+  "checks": [
+    {
+      "platform": "windows",
+      "passed": true,
+      "modes": [
+        "correct",
+        "professional",
+        "friendly"
+      ],
+      "progressive_sse": true,
+      "json_fallback": false,
+      "partial_cancel": true,
+      "close_cancel": true,
+      "failure_without_hermes_recovery": true,
+      "saved_history_survives_reload": true,
+      "ordinary_chat_stays_hermes": true,
+      "unique_request_ids": 6,
+      "simulation": "Local HTTP transport; no private user data or model"
+    },
+    {
+      "platform": "android",
+      "passed": true,
+      "modes": [
+        "correct",
+        "professional",
+        "friendly"
+      ],
+      "progressive_sse": true,
+      "json_fallback": true,
+      "partial_cancel": true,
+      "close_cancel": false,
+      "failure_without_hermes_recovery": true,
+      "saved_history_survives_reload": true,
+      "ordinary_chat_stays_hermes": true,
+      "unique_request_ids": 6,
+      "simulation": "Local HTTP transport; no private user data or model"
+    }
+  ]
+}
+Windows Hermes UI verified: final-only voice, stable turns, opaque approvals across heartbeat/disconnect/reload, once/refusal, corrector and shared scripts.
+{
+  "passed": true,
+  "checks": [
+    {
+      "platform": "windows",
+      "passed": true,
+      "initial_loading_placeholder": true,
+      "long_catalogue_keyboard": true,
+      "polling_preserves_option_nodes_and_focus": true,
+      "focused_polling_suspended_and_caught_up_on_blur": true,
+      "late_library_redraw_preserves_widget_and_reasoning": true,
+      "late_catalogue_reply_deferred_until_blur": true,
+      "late_catalogue_error_deferred_until_blur": true,
+      "changed_catalogue_deferred_until_blur": true,
+      "loading_keeps_picker_usable": true,
+      "loading_accessibility_outside_native_picker": true,
+      "unavailable_unselected_hidden": true,
+      "default_model": true,
+      "per_conversation_history": true,
+      "provider_labels": true,
+      "vision_capabilities": true,
+      "context_selected_model": true,
+      "unknown_capacity_without_percentage": true,
+      "refresh_without_substitution": true,
+      "inflight_model_binding": true,
+      "unavailable_or_removed_requires_choice": true,
+      "corrector_independent": true,
+      "legacy_catalogue": true,
+      "import_reload_preserves_choice": true
+    },
+    {
+      "platform": "android",
+      "passed": true,
+      "initial_loading_placeholder": true,
+      "long_catalogue_keyboard": true,
+      "polling_preserves_option_nodes_and_focus": true,
+      "focused_polling_suspended_and_caught_up_on_blur": true,
+      "late_library_redraw_preserves_widget_and_reasoning": true,
+      "late_catalogue_reply_deferred_until_blur": true,
+      "late_catalogue_error_deferred_until_blur": true,
+      "changed_catalogue_deferred_until_blur": true,
+      "loading_keeps_picker_usable": true,
+      "loading_accessibility_outside_native_picker": true,
+      "unavailable_unselected_hidden": true,
+      "default_model": true,
+      "per_conversation_history": true,
+      "provider_labels": true,
+      "vision_capabilities": true,
+      "context_selected_model": true,
+      "unknown_capacity_without_percentage": true,
+      "refresh_without_substitution": true,
+      "inflight_model_binding": true,
+      "unavailable_or_removed_requires_choice": true,
+      "corrector_independent": true,
+      "legacy_catalogue": true,
+      "import_reload_preserves_choice": true
+    }
+  ],
+  "simulation": "Local HTTP fixture; no private providers, credentials or server models"
+}
+{
+  "passed": true,
+  "checks": [
+    {
+      "platform": "windows",
+      "passed": true,
+      "all_eight_efforts_exact_in_chat_and_context": true,
+      "model_specific_controls": true,
+      "nemotron_maximum_is_announced_high": true,
+      "per_model_choice_restored": true,
+      "toggle_on_exact": true,
+      "automatic_override_omitted": true,
+      "automatic_note_visible": true,
+      "forced_level_preserved": true,
+      "forced_on_preserved": true,
+      "late_metadata_during_turn_keeps_snapshot": true,
+      "withdrawn_level_normalized_and_persisted": true,
+      "unavailable_model_keeps_preferences": true,
+      "restored_unknown_model_keeps_preferences": true,
+      "legacy_preferences_supported": true,
+      "corrector_direct_unchanged": true,
+      "phone_controls_fit": true
+    },
+    {
+      "platform": "android",
+      "passed": true,
+      "all_eight_efforts_exact_in_chat_and_context": true,
+      "model_specific_controls": true,
+      "nemotron_maximum_is_announced_high": true,
+      "per_model_choice_restored": true,
+      "toggle_on_exact": true,
+      "automatic_override_omitted": true,
+      "automatic_note_visible": true,
+      "forced_level_preserved": true,
+      "forced_on_preserved": true,
+      "late_metadata_during_turn_keeps_snapshot": true,
+      "withdrawn_level_normalized_and_persisted": true,
+      "unavailable_model_keeps_preferences": true,
+      "restored_unknown_model_keeps_preferences": true,
+      "legacy_preferences_supported": true,
+      "corrector_direct_unchanged": true,
+      "phone_controls_fit": true
+    }
+  ],
+  "simulation": "Local catalogue, preferences and SSE fixtures; no private provider, server model or credential"
+}
+5 shared UI suites passed.

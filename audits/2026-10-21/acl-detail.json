@@ -1,0 +1,22 @@
+[
+  {
+    "Path": "Microsoft.PowerShell.Core\\FileSystem::D:\\Serveur IA\\lanceur\\app.py",
+    "AccessToString": "BUILTIN\\Administrateurs Allow  FullControl\nAUTORITE NT\\Système Allow  FullControl\nAUTORITE NT\\Utilisateurs authentifiés Allow  Modify, Synchronize\nBUILTIN\\Utilisateurs Allow  ReadAndExecute, Synchronize"
+  },
+  {
+    "Path": "Microsoft.PowerShell.Core\\FileSystem::D:\\Serveur IA\\lanceur\\acces-distants.json",
+    "AccessToString": "BUILTIN\\Administrateurs Allow  FullControl\nAUTORITE NT\\Système Allow  FullControl\nAUTORITE NT\\Utilisateurs authentifiés Allow  Modify, Synchronize\nBUILTIN\\Utilisateurs Allow  ReadAndExecute, Synchronize"
+  },
+  {
+    "Path": "Microsoft.PowerShell.Core\\FileSystem::D:\\Serveur IA\\lanceur\\hermes-fred",
+    "AccessToString": "AUTORITE NT\\Système Allow  FullControl\nBUILTIN\\Administrateurs Allow  FullControl\nDESKTOP-OGQE53D\\karen Allow  FullControl"
+  },
+  {
+    "Path": "Microsoft.PowerShell.Core\\FileSystem::D:\\Serveur IA\\lanceur\\sauvegardes",
+    "AccessToString": "AUTORITE NT\\Système Allow  FullControl\nBUILTIN\\Administrateurs Allow  FullControl\nDESKTOP-OGQE53D\\karen Allow  FullControl"
+  },
+  {
+    "Path": "Microsoft.PowerShell.Core\\FileSystem::D:\\Serveur IA\\lanceur\\donnees-clients",
+    "AccessToString": "AUTORITE NT\\Système Allow  FullControl\nBUILTIN\\Administrateurs Allow  FullControl\nDESKTOP-OGQE53D\\karen Allow  FullControl"
+  }
+]

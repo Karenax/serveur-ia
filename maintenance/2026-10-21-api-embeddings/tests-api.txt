@@ -1,0 +1,85 @@
+test_actual_windows_local_api_through_wireguard (test_eg2_api.EmbeddingsAPITests.test_actual_windows_local_api_through_wireguard) ... ERROR
+test_auth_origin_pressure_and_revocation_during_calculation (test_eg2_api.EmbeddingsAPITests.test_auth_origin_pressure_and_revocation_during_calculation) ... ok
+test_engine_failure_is_sanitized_and_slot_released (test_eg2_api.EmbeddingsAPITests.test_engine_failure_is_sanitized_and_slot_released) ... ok
+test_float_base64_usage_catalogue_and_no_chat_routing (test_eg2_api.EmbeddingsAPITests.test_float_base64_usage_catalogue_and_no_chat_routing) ... ok
+test_limits_and_unknown_fields_rejected_before_computation (test_eg2_api.EmbeddingsAPITests.test_limits_and_unknown_fields_rejected_before_computation) ... ok
+test_request_rejects_token_arrays_and_wrong_payload_types (test_eg2_api.EmbeddingsAPITests.test_request_rejects_token_arrays_and_wrong_payload_types) ... ok
+test_archiving_and_deleted_history_are_not_recalled (test_knowledge.KnowledgeTests.test_archiving_and_deleted_history_are_not_recalled) ... ok
+test_conversation_move_removes_old_scope_even_with_stale_client_copy (test_knowledge.KnowledgeTests.test_conversation_move_removes_old_scope_even_with_stale_client_copy) ... ok
+test_deleted_or_updated_documents_are_rejected_before_reindex (test_knowledge.KnowledgeTests.test_deleted_or_updated_documents_are_rejected_before_reindex) ... ok
+test_deleted_server_conversation_does_not_return_from_old_client_history (test_knowledge.KnowledgeTests.test_deleted_server_conversation_does_not_return_from_old_client_history) ... ok
+test_engine_unavailable_keeps_lexical_retrieval_and_sources (test_knowledge.KnowledgeTests.test_engine_unavailable_keeps_lexical_retrieval_and_sources) ... ok
+test_known_pre_eg2_backup_migrates_without_changing_data (test_knowledge.KnowledgeTests.test_known_pre_eg2_backup_migrates_without_changing_data) ... ok
+test_no_project_memory_or_documents_in_personal_context (test_knowledge.KnowledgeTests.test_no_project_memory_or_documents_in_personal_context) ... ok
+test_personal_memories_ownership_quota_and_backup (test_knowledge.KnowledgeTests.test_personal_memories_ownership_quota_and_backup) ... ok
+test_project_personal_and_owner_isolation_before_ranking (test_knowledge.KnowledgeTests.test_project_personal_and_owner_isolation_before_ranking) ... ok
+test_reasoning_interrupted_answers_and_foreign_project_claims_are_excluded (test_knowledge.KnowledgeTests.test_reasoning_interrupted_answers_and_foreign_project_claims_are_excluded) ... ok
+test_repeated_sync_and_append_reuse_existing_vectors (test_knowledge.KnowledgeTests.test_repeated_sync_and_append_reuse_existing_vectors) ... ok
+test_vector_response_validation_rejects_nan_wrong_dimensions_and_norm (test_knowledge.KnowledgeTests.test_vector_response_validation_rejects_nan_wrong_dimensions_and_norm) ... ok
+test_console_denies_foreign_account_before_reading_http_headers (test_security_boundaries.SecurityBoundariesTests.test_console_denies_foreign_account_before_reading_http_headers) ... ok
+test_eg2_incomplete_headers_expire_and_capacity_is_recovered (test_security_boundaries.SecurityBoundariesTests.test_eg2_incomplete_headers_expire_and_capacity_is_recovered) ... ok
+test_peer_identity_comes_from_the_outbound_socket_owner (test_security_boundaries.SecurityBoundariesTests.test_peer_identity_comes_from_the_outbound_socket_owner) ... ok
+test_api_failure_updates_connection_and_keeps_error_body (test_remote.RemoteTests.test_api_failure_updates_connection_and_keeps_error_body) ... ok
+test_automatic_fallback_reaches_authenticated_server (test_remote.RemoteTests.test_automatic_fallback_reaches_authenticated_server) ... ok
+test_client_discovers_models_and_tracks_inventory_changes (test_remote.RemoteTests.test_client_discovers_models_and_tracks_inventory_changes) ... ok
+test_end_to_end_local_api_hides_remote_credentials (test_remote.RemoteTests.test_end_to_end_local_api_hides_remote_credentials) ... ok
+test_https_mode_preserves_personal_access_without_starting_wireguard (test_remote.RemoteTests.test_https_mode_preserves_personal_access_without_starting_wireguard) ... ok
+test_https_redirect_never_forwards_personal_token (test_remote.RemoteTests.test_https_redirect_never_forwards_personal_token) ... ok
+test_key_never_stored_in_plaintext_and_revocation (test_remote.RemoteTests.test_key_never_stored_in_plaintext_and_revocation) ... ok
+test_live_backend_model_name_is_used_for_api_and_generation (test_remote.RemoteTests.test_live_backend_model_name_is_used_for_api_and_generation) ... ok
+test_local_network_selection_and_endpoint_validation (test_remote.RemoteTests.test_local_network_selection_and_endpoint_validation) ... ok
+test_private_routes_and_mcp_rejected (test_remote.RemoteTests.test_private_routes_and_mcp_rejected) ... ok
+test_real_wireguard_udp_api_streaming_and_peer_revocation (test_remote.RemoteTests.test_real_wireguard_udp_api_streaming_and_peer_revocation) ... ok
+test_reconnect_preserves_keys_and_protected_settings (test_remote.RemoteTests.test_reconnect_preserves_keys_and_protected_settings) ... ok
+test_response_caps_are_removed_even_for_legacy_clients (test_remote.RemoteTests.test_response_caps_are_removed_even_for_legacy_clients) ... ok
+test_server_history_requires_personal_access_and_is_isolated (test_remote.RemoteTests.test_server_history_requires_personal_access_and_is_isolated) ... ok
+test_streaming_and_private_upstream_key (test_remote.RemoteTests.test_streaming_and_private_upstream_key) ... ok
+test_two_personal_profiles_can_use_tunnel_concurrently (test_remote.RemoteTests.test_two_personal_profiles_can_use_tunnel_concurrently) ... ok
+test_unloaded_backend_does_not_receive_generation (test_remote.RemoteTests.test_unloaded_backend_does_not_receive_generation) ... ok
+test_unloaded_model_is_distinct_from_unreachable_tunnel (test_remote.RemoteTests.test_unloaded_model_is_distinct_from_unreachable_tunnel) ... ok
+test_windows_protection_and_preconfigured_exe_startup (test_remote.RemoteTests.test_windows_protection_and_preconfigured_exe_startup) ... FAIL
+test_wrong_wireguard_secret_cannot_reach_api (test_remote.RemoteTests.test_wrong_wireguard_secret_cannot_reach_api) ... ok
+test_encrypted_history_retains_choice_after_reopen_and_change (test_model_catalogue.ModelCatalogueTests.test_encrypted_history_retains_choice_after_reopen_and_change) ... ok
+test_legacy_catalogue_still_connects_without_new_metadata (test_model_catalogue.ModelCatalogueTests.test_legacy_catalogue_still_connects_without_new_metadata) ... ok
+test_local_qwen_unloaded_does_not_disconnect_available_cloud_and_body_is_retained (test_model_catalogue.ModelCatalogueTests.test_local_qwen_unloaded_does_not_disconnect_available_cloud_and_body_is_retained) ... ok
+test_real_loopback_preserves_public_catalogue_and_rejects_revoked_cache (test_model_catalogue.ModelCatalogueTests.test_real_loopback_preserves_public_catalogue_and_rejects_revoked_cache) ... ok
+
+======================================================================
+ERROR: test_actual_windows_local_api_through_wireguard (test_eg2_api.EmbeddingsAPITests.test_actual_windows_local_api_through_wireguard)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Serveur IA\lanceur\test_eg2_api.py", line 101, in test_actual_windows_local_api_through_wireguard
+    with urllib.request.urlopen(req,timeout=10) as response:self.assertEqual(json.load(response)['usage']['prompt_tokens'],3)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\karen\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\urllib\request.py", line 215, in urlopen
+    return opener.open(url, data, timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\karen\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\urllib\request.py", line 521, in open
+    response = meth(req, response)
+               ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\karen\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\urllib\request.py", line 630, in http_response
+    response = self.parent.error(
+               ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\karen\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\urllib\request.py", line 559, in error
+    return self._call_chain(*args)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\karen\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\urllib\request.py", line 492, in _call_chain
+    result = func(*args)
+             ^^^^^^^^^^^
+  File "C:\Users\karen\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\urllib\request.py", line 639, in http_error_default
+    raise HTTPError(req.full_url, code, msg, hdrs, fp)
+urllib.error.HTTPError: HTTP Error 404: Not Found
+
+======================================================================
+FAIL: test_windows_protection_and_preconfigured_exe_startup (test_remote.RemoteTests.test_windows_protection_and_preconfigured_exe_startup)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Serveur IA\lanceur\test_remote.py", line 230, in test_windows_protection_and_preconfigured_exe_startup
+    verified=releases.status(HOME);self.assertTrue(verified['verified'])
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 45 tests in 96.744s
+
+FAILED (failures=1, errors=1)

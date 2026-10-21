@@ -13,7 +13,7 @@ import tempfile
 import time
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 
-VERSION='3.5.30'
+VERSION='3.5.34'
 AGENT_PROTOCOL=4
 
 def client_filename(number,name):

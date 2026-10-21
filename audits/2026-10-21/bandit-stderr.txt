@@ -1,0 +1,9 @@
+[main]	INFO	profile include tests: None
+[main]	INFO	profile exclude tests: None
+[main]	INFO	cli include tests: None
+[main]	INFO	cli exclude tests: None
+[warnings]	WARNING	invalid escape sequence '\S'
+
+[warnings]	WARNING	invalid escape sequence '\S'
+
+[json]	INFO	JSON output written to file: audits/2026-10-21/bandit.json

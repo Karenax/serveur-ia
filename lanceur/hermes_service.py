@@ -40,6 +40,21 @@ def installation(source=None):
     version = subprocess.run(['git', '-C', str(directory), 'rev-parse', 'HEAD'], capture_output=True,
                              text=True, timeout=10, creationflags=HIDDEN)
     commit = version.stdout.strip() if version.returncode == 0 else ''
+    if source is None:
+        private = Path(__file__).resolve().parent.parent / 'toolchain/hermes-security-runtime'
+        manifest = private / 'runtime.json'
+        if manifest.is_file():
+            selected = json.loads(manifest.read_text(encoding='utf-8'))
+            selected_source = Path(selected.get('source', '')).resolve()
+            selected_python = Path(selected.get('python', '')).resolve()
+            locations = [private, Path(os.environ.get('LOCALAPPDATA', Path.home()/'AppData/Local'))/'Fred/runtime-security/hermes-20261021']
+            known = any(selected_source == (location/'source').resolve()
+                        and selected_python == (location/'venv/Scripts/python.exe').resolve() for location in locations)
+            if (selected.get('format') != 1 or selected.get('validated') is not True
+                    or not known
+                    or not selected_python.is_file() or not (selected_source/'hermes_cli/main.py').is_file()):
+                raise ValueError('Le runtime privé Fred est invalide ; conserver son point de retour.')
+            directory, python, commit = selected_source, selected_python, selected['source_commit']
     return {'source': directory, 'python': python, 'commit': commit,
             'dependencies': install_home / 'installs', 'tools': install_home / 'tools'}
 

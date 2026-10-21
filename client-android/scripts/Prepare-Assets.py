@@ -45,11 +45,12 @@ def prepare(source: Path) -> str:
     chat = read(source / "chat.html")
     chat = replace_once(chat, "width=device-width,initial-scale=1", "width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content", "viewport")
     chat = replace_once(chat, "<body>", "<body>" + read(MOBILE / "onboarding.html"), "onboarding")
-    for name in ("updates", "api"):
+    for name in ("updates",):
         chat = sub_once(chat, rf'<button class="nav-button" data-view-button="{name}">.*?</button>', "", f"{name} navigation")
         chat = sub_once(chat, rf'<section class="settings-view" data-view="{name}" hidden>.*?</section>', "", f"{name} pane")
     for name in ("access", "connection"):
         chat = sub_once(chat, rf'<section class="settings-view" data-view="{name}" hidden>.*?</section>', read(MOBILE / f"{name}.html"), f"{name} pane")
+    chat = sub_once(chat, r'<section class="settings-view" data-view="api" hidden>.*?</section>', read(MOBILE / 'api.html'), 'Android local API pane')
     chat = chat.replace("EXE personnel · connexion automatique", "Accès personnel · Android")
     chat = sub_once(chat, r'<details class="composer-options"><summary>Options</summary>.*?</details>',
                     '<button id="retry-without-thinking" type="button" class="secondary" hidden>Réessayer sans réflexion</button>',
@@ -71,7 +72,7 @@ def prepare(source: Path) -> str:
     chat = replace_once(chat, "setInterval(models,15000);setInterval(clientState,2000);", "setInterval(()=>{if(!document.hidden)models();},15000);setInterval(()=>{if(!document.hidden)clientState();},2000);", "mobile background polling")
 
     workspace = read(source / "workspace.html")
-    workspace = workspace.replace("['access','connection','updates','api']", "['access','connection']")
+    workspace = workspace.replace("['access','connection','updates','api']", "['access','connection','api']")
     workspace = workspace.replace("Glissez une conversation sur un projet pour la déplacer. Clic droit pour déplacer, archiver ou supprimer.", "Touchez ··· pour déplacer, archiver ou supprimer une discussion.")
     workspace = workspace.replace("if(!connected||busy||historySyncPending||conversationActionPending||wsDraggedConversation)", "if(document.hidden||!connected||busy||historySyncPending||conversationActionPending||wsDraggedConversation)")
 
@@ -101,7 +102,7 @@ def prepare(source: Path) -> str:
 def validate(html: str) -> None:
     assert html.count("__CONFIG__") == 1
     assert "__UI_CSS__" not in html
-    assert "data-view=\"api\"" not in html and "data-view=\"updates\"" not in html
+    assert "data-view=\"api\"" in html and "data-view=\"updates\"" not in html
     assert "'/client/update/apply" not in html and "'/client/integrations" not in html
     assert "android-update-install" in html and "'/client/update/check'" in html
     assert "EXE" not in html and "Comme Windows" not in html

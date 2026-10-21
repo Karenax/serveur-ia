@@ -1,0 +1,8 @@
+{"model": "Nemotron 3 Ultra (free)", "caps": {"images": false, "files": ["txt", "md", "pdf", "docx"], "thinking": true, "reasoning_efforts": ["none", "medium", "high"], "max_file_bytes": 2097152, "vision": false, "context_length": 1000000, "reasoning_mode": "effort"}}
+{"status": 400, "error": "{\"error\": {\"message\": \"Ce niveau de r\u00e9flexion n\u2019est pas pris en charge par le mod\u00e8le s\u00e9lectionn\u00e9.\"}}"}
+{"model": "GPT-6.1 Sol", "caps": {"images": true, "files": ["txt", "md", "pdf", "docx"], "thinking": true, "reasoning_efforts": ["low", "medium", "high", "xhigh", "max"], "max_file_bytes": 2097152, "vision": true, "context_length": 1050000, "reasoning_mode": "effort"}}
+{"status": "ok", "model": "gpt-6.1-sol", "seconds": 13.53, "text": "OK"}
+{"model": "GPT-6 Astra", "caps": {"images": true, "files": ["txt", "md", "pdf", "docx"], "thinking": true, "reasoning_efforts": ["low", "medium", "high", "xhigh", "max"], "max_file_bytes": 2097152, "vision": true, "context_length": 1050000, "reasoning_mode": "effort"}}
+{"status": "ok", "model": "gpt-6-astra", "seconds": 11.36, "text": "OK"}
+{"model": "GPT-6 Luna", "caps": {"images": true, "files": ["txt", "md", "pdf", "docx"], "thinking": true, "reasoning_efforts": ["none", "low", "medium", "high", "xhigh", "max"], "max_file_bytes": 2097152, "vision": true, "context_length": 1050000, "reasoning_mode": "effort"}}
+{"status": "ok", "model": "gpt-6-luna", "seconds": 13.7, "text": "OK"}

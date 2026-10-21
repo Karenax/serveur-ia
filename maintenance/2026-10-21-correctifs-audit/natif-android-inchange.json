@@ -1,0 +1,37 @@
+{
+  "passed": true,
+  "reference_apk_version": "1.0.11",
+  "sources_verified": [
+    "client-voice/fred_voice.cpp",
+    "client-voice/fred_voice.h",
+    "client-voice/fred_voice_jni.cpp",
+    "client-qwen/wireguard-bridge/main.go",
+    "client-qwen/wireguard-bridge/go.mod",
+    "client-qwen/wireguard-bridge/go.sum",
+    "client-voice/CMakeLists.txt"
+  ],
+  "libraries_verified": [
+    "lib/arm64-v8a/libfredvoice.so",
+    "lib/arm64-v8a/libfredwireguard.so",
+    "lib/x86_64/libfredvoice.so",
+    "lib/x86_64/libfredwireguard.so",
+    "lib/x86_64/libggml-base.so",
+    "lib/x86_64/libggml-cpu-alderlake.so",
+    "lib/x86_64/libggml-cpu-cannonlake.so",
+    "lib/x86_64/libggml-cpu-cascadelake.so",
+    "lib/x86_64/libggml-cpu-cooperlake.so",
+    "lib/x86_64/libggml-cpu-haswell.so",
+    "lib/x86_64/libggml-cpu-icelake.so",
+    "lib/x86_64/libggml-cpu-ivybridge.so",
+    "lib/x86_64/libggml-cpu-piledriver.so",
+    "lib/x86_64/libggml-cpu-sandybridge.so",
+    "lib/x86_64/libggml-cpu-sapphirerapids.so",
+    "lib/x86_64/libggml-cpu-skylakex.so",
+    "lib/x86_64/libggml-cpu-sse42.so",
+    "lib/x86_64/libggml-cpu-x64.so",
+    "lib/x86_64/libggml-cpu-zen4.so",
+    "lib/x86_64/libggml.so",
+    "lib/x86_64/libparakeet.so",
+    "lib/x86_64/libwhisper.so"
+  ]
+}

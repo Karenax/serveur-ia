@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "windows_version": "3.5.31",
+  "windows_sha256": "4cfcfd22b4081e63adc0bbfcf6d17a86c321bb1b6d3e3a89a74998eaa4caa309",
+  "windows_profile_self_test": true,
+  "windows_silent_pcm_voice_self_test": true,
+  "embedded_files_verified": [
+    "chat.html",
+    "workspace.html",
+    "markdown.js",
+    "voice/fredaec.dll",
+    "voice/conversation-worker/conversation-worker.exe"
+  ],
+  "android_version": "1.0.12",
+  "android_code": 13,
+  "android_sha256": "570f02d795fd5e7e3982c2819d0ccd150a04a2cbf3346da66cf34d4c10aafc85",
+  "android_signing_key_preserved": true,
+  "android_ui_matches_sources": true
+}

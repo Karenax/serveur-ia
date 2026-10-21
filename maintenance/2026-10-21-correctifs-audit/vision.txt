@@ -1,0 +1,1 @@
+WebP decoded and red color identified; loaded Qwen process preserved.

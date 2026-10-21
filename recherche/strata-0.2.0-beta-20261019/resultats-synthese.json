@@ -1,0 +1,103 @@
+{
+  "generation": {
+    "ciel": {
+      "reference_tok_s": 34.1,
+      "new_tok_s": 35.1,
+      "gain_percent": 2.9325513196480912,
+      "reference_samples": [
+        34.9,
+        32.6,
+        34.1
+      ],
+      "new_samples": [
+        35.1,
+        33.5,
+        35.5
+      ]
+    },
+    "fibonacci-code": {
+      "reference_tok_s": 39.0,
+      "new_tok_s": 39.7,
+      "gain_percent": 1.7948717948718107,
+      "reference_samples": [
+        39.1,
+        39.0,
+        38.9
+      ],
+      "new_samples": [
+        39.7,
+        39.1,
+        40.0
+      ]
+    }
+  },
+  "documents": {
+    "1545": {
+      "reference_seconds": 7.8784,
+      "new_seconds": 7.67045,
+      "throughput_gain_percent": 2.7110534584020574
+    },
+    "5962": {
+      "reference_seconds": 17.87985,
+      "new_seconds": 16.792,
+      "throughput_gain_percent": 6.478382563125296
+    },
+    "23627": {
+      "reference_seconds": 58.199400000000004,
+      "new_seconds": 54.2869,
+      "throughput_gain_percent": 7.2070794243178415
+    }
+  },
+  "functional": {
+    "tools": {
+      "passed": true,
+      "arguments": {
+        "background": false,
+        "marker": "True"
+      },
+      "executed": false
+    },
+    "vision": {
+      "passed": true,
+      "content": "{\n  \"code\": \"VISION 47\",\n  \"rouge\": \"cercle\",\n  \"bleu\": \"carré\"\n}"
+    },
+    "cache": {
+      "same_content": true,
+      "reused_fraction": 0.9967304997664642,
+      "restore_wall_seconds": 1.0777361392974854,
+      "prompt_tokens": 2141,
+      "reused_tokens": 2134
+    }
+  },
+  "temperature_cutoff": null,
+  "identical_generation_responses": 1,
+  "thermal": {
+    "reference-sans-seuil": {
+      "sampled_max_c": 73.0,
+      "hardware_thermal_throttle_samples": 0
+    },
+    "nouveau-sans-seuil": {
+      "sampled_max_c": 77.0,
+      "hardware_thermal_throttle_samples": 0
+    }
+  },
+  "production_restored": true,
+  "package": {
+    "exe": "D:\\Serveur IA\\recherche\\strata-0.2.0-beta-20261019\\engine-package\\strata.exe",
+    "exe_sha256": "c97c3e84228c928c46bb2727c1753cbfe76c31c3eb0a9edc7bdd3cd78871cac3",
+    "lib_dirs": [
+      "D:\\Serveur IA\\recherche\\strata-0.2.0-beta-20261019\\engine-package"
+    ],
+    "manifest_version": "0.1.45.3",
+    "binary_version": "strata 0.1.45",
+    "build": "f6d65cb584c0+cuda12.9",
+    "flags": {
+      "STRATA_SM60_PERF": true,
+      "STRATA_FUSE_DECODE": true,
+      "STRATA_ADAPT_NOWAIT": true
+    },
+    "archive_sha256": "909ef954f93dcc9a5a3e756b6ac7836b9731b10f0fbe6e22ae316a1ede3da1f7",
+    "signature_verified": true,
+    "key_id": "5d1bc23abbeffd0d"
+  }
+}

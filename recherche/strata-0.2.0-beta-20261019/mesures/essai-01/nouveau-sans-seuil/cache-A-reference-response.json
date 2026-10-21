@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-1aa2a7b6e6424b45a8f2ad05",
+  "object": "chat.completion",
+  "created": 1792425916,
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Imprimerie"
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 2141,
+    "completion_tokens": 4,
+    "total_tokens": 2145,
+    "prompt_tokens_details": {
+      "cached_tokens": 2112
+    }
+  },
+  "timings": {
+    "cache_n": 2112,
+    "prompt_n": 29,
+    "prompt_ms": 1681.7,
+    "prompt_per_token_ms": 57.99,
+    "prompt_per_second": 17.2,
+    "predicted_n": 4,
+    "predicted_ms": 172.9,
+    "predicted_per_token_ms": 43.225,
+    "predicted_per_second": 23.1,
+    "draft_n": 4,
+    "draft_n_accepted": 2
+  }
+}

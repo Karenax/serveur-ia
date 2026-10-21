@@ -70,14 +70,15 @@ final class Remote implements AutoCloseable {
             JSONObject safe=Json.object("id",id,"object","model","capabilities",row.optJSONObject("capabilities")==null?new JSONObject():Json.copy(row.getJSONObject("capabilities")));
             for(String key:new String[]{"name","label","provider"})if(row.opt(key) instanceof String&&row.getString(key).length()<=512)safe.put(key,row.getString(key));
             if(row.has("available"))safe.put("available",row.opt("available") instanceof Boolean&&row.getBoolean("available"));
-            found.put(id);rows.put(safe);if(safe.optBoolean("available",true))availableIds.add(id);
+            rows.put(safe);if(safe.getJSONObject("capabilities").optBoolean("embedding",false))continue;
+            found.put(id);if(safe.optBoolean("available",true))availableIds.add(id);
         }
         JSONObject safe=Json.object("object","list","data",rows);
         for(String key:new String[]{"default_model","source"})if(value.opt(key) instanceof String&&value.getString(key).length()<=512)safe.put(key,value.getString(key));
         models=found;modelCatalog=safe;catalogReady=true;reachable=true;
         String preferred=safe.optString("default_model");
         if(!availableIds.isEmpty()){if(availableIds.contains(preferred))model=preferred;else if(!availableIds.contains(model))model=availableIds.iterator().next();connected=true;code="ready";error="";}
-        else{connected=false;model="";code=found.length()==0?"no_models":"model_unloaded";error=found.length()==0?"Serveur joint, mais aucun modèle accessible.":"Serveur joint, mais les modèles sont indisponibles. Choisissez un modèle après leur réactivation.";}
+        else{boolean embeddings=false;for(int i=0;i<rows.length();i++){JSONObject row=rows.getJSONObject(i);if(row.getJSONObject("capabilities").optBoolean("embedding",false)&&row.optBoolean("available",true))embeddings=true;}connected=embeddings;model="";code=embeddings?"ready":found.length()==0?"no_models":"model_unloaded";error=embeddings?"":found.length()==0?"Serveur joint, mais aucun modèle accessible.":"Serveur joint, mais les modèles sont indisponibles. Choisissez un modèle après leur réactivation.";}
     }
     boolean hasCatalogue(){return catalogReady;}
     JSONObject modelCatalog(){return Json.copy(modelCatalog);}

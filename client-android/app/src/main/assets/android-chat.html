@@ -203,7 +203,7 @@ function renderMarkdown(element, text) {
 <dialog id="connection-choice" aria-labelledby="connection-choice-title"><h2 id="connection-choice-title">Comment souhaitez-vous vous connecter ?</h2><p>Choisissez votre mode de connexion. Ce choix sera mémorisé et pourra être modifié dans les réglages.</p><button id="choose-https" type="button">Internet · HTTPS</button><p>Connexion Internet sécurisée, sans tunnel WireGuard.</p><button id="choose-wireguard" type="button" class="secondary">Tunnel privé · WireGuard</button><p>Connexion au serveur par le tunnel WireGuard intégré.</p><p id="connection-choice-error" role="alert"></p></dialog><div class="app"><aside class="sidebar" aria-label="Navigation principale">
 <div class="brand"><div class="logo">F</div><div><strong>Accès serveur Fred</strong><small>Votre espace de travail</small></div></div>
 <button id="new" class="new-button"><span class="nav-text">Nouvelle conversation</span></button>
-<nav id="client-navigation" class="sidebar-nav" aria-label="Fonctions du client"><button class="nav-button" data-view-button="chat">Conversations</button><button class="nav-button" data-view-button="access">Mon accès personnel</button><button class="nav-button" data-view-button="connection">Connexion au serveur</button></nav>
+<nav id="client-navigation" class="sidebar-nav" aria-label="Fonctions du client"><button class="nav-button" data-view-button="chat">Conversations</button><button class="nav-button" data-view-button="access">Mon accès personnel</button><button class="nav-button" data-view-button="connection">Connexion au serveur</button><button class="nav-button" data-view-button="api">API locale</button></nav>
 <div class="section-label">Conversations</div><div class="history-search"><input id="search-conversations" type="search" placeholder="Rechercher…" aria-label="Rechercher une conversation"><select id="conversation-filter" aria-label="Afficher les conversations"><option value="active">Actives</option><option value="archived">Archivées</option><option value="all">Toutes</option></select></div>
 <div id="conversation-list" aria-label="Conversations enregistrées"></div><select id="conversations" aria-label="Sélection de conversation" hidden></select>
 <div class="sidebar-tools"><button id="export-conversations" class="secondary">Exporter l’historique</button><button id="import-conversations" class="secondary">Importer</button><input id="import-file" type="file" accept="application/json" hidden></div>
@@ -223,6 +223,7 @@ function renderMarkdown(element, text) {
 <div class="settings-card"><h3>État de la connexion</h3><p id="connection-diagnostic" role="status">Vérification en cours…</p><button id="reconnect" class="secondary" type="button">Réessayer la connexion</button></div></section>
 
 
+<section class="settings-view" data-view="api" hidden><h2>API locale</h2><p>Connectez une autre application de ce téléphone au serveur Fred avec une API compatible OpenAI.</p><div class="settings-card"><label>Adresse API</label><div id="local-api" class="readonly-address"></div><button id="android-copy-api" class="secondary" type="button">Copier l’adresse</button><label for="local-api-key">Clé API locale</label><input id="local-api-key" type="password" readonly aria-label="Clé API locale"><button id="toggle-api-key" class="secondary" type="button">Afficher la clé</button><button id="android-copy-api-key" class="secondary" type="button">Copier la clé</button><p>Dans l’autre application, choisissez une API compatible OpenAI, puis renseignez cette adresse et cette clé.</p><p>Embeddings : modèle <code>google/embeddinggemma-2</code>, 768 dimensions, route <code>/v1/embeddings</code>. Le calcul est effectué sur le serveur.</p><p>Gardez Fred ouvert. Le port et la clé changent quand ce service local redémarre : recopiez-les si nécessaire. Android peut arrêter le service en arrière-plan. L’autre application doit accepter une adresse HTTP locale.</p><p>Cette adresse est utilisable sur ce téléphone uniquement. Ne partagez la clé qu’avec les applications auxquelles vous accordez l’accès.</p></div></section>
 
 </div></div><script nonce="__NONCE__">
     'use strict';
@@ -349,7 +350,7 @@ function renderMarkdown(element, text) {
       if(busy||!loggedIn||$('connection-choice').open||$('android-onboarding').open)return Promise.resolve(false);
       modelPollDeferred=false;modelCatalogLoading=true;modelRefresh(false);modelsPending=(async()=>{
         try{
-          const d=await api('/v1/models'),rows=Array.isArray(d.data)?d.data.filter(m=>m&&typeof m.id==='string'&&m.id.trim()&&m.id.length<=512):[],ids=rows.map(m=>m.id);
+          const d=await api('/v1/models'),rows=Array.isArray(d.data)?d.data.filter(m=>m&&m.capabilities?.embedding!==true&&typeof m.id==='string'&&m.id.trim()&&m.id.length<=512):[],ids=rows.map(m=>m.id);
           if(modelPickerActive()){modelPollDeferred=true;return false;}
           if(!ids.length)throw Object.assign(new Error('Aucun modèle accessible.'),{code:'no_models'});
           const state=await api('/v1/status');if(state.protocol>4)throw new Error('Mettre à jour Accès serveur Fred pour ce serveur.');
@@ -436,20 +437,20 @@ function renderMarkdown(element, text) {
       const candidate=structuredClone(library);candidate.find(c=>c.id===currentId).messages=[...messages,userMessage];
       if(new TextEncoder().encode(JSON.stringify({conversations:candidate,currentId})).length>8*1024*1024){error('Historique trop volumineux. Exportez puis supprimez des conversations.');return;}
       error('');const current=library.find(c=>c.id===currentId);if(!messages.length&&/^Conversation|^Nouvelle conversation/.test(current?.title||'')){current.title=(text||chatAttachments[0]?.name||'Pièce jointe').slice(0,70);drawLibrary();}messages.push(userMessage);chatAttachments=[];attachmentRender();$('prompt').value='';render();save();
-      const history=messages.map(m=>({role:m.role,content:chatRequestContent(m),...(m.reasoning_content?{reasoning_content:m.reasoning_content}:{})})),requestThinking=thinkingRequest();
+      const history=messages.map(m=>({role:m.role,content:chatRequestContent(m),...(m.reasoning_content?{reasoning_content:m.reasoning_content}:{})})),requestThinking=thinkingRequest(),requestVoice=window.conversationRequest?.()||{};
       const answer={role:'assistant',content:'',reasoning_content:'',turn_id:turn};messages.push(answer);const view=draw(answer);chatScrollLatest();window.conversationOnReplyStart?.(answer);
       replyProgress={phase:'requesting',started:Date.now(),lastEvent:Date.now()};busy=true;drawLibrary();controller=new AbortController();requestId=turn;cancelPending=false;agentClearApproval();buttons();
       try{
-        await flushHistory();const response=await fetch('/v1/chat/completions',{method:'POST',headers:{Authorization:'Bearer '+config.key,'Content-Type':'application/json','X-Qwen-Request':requestId},signal:controller.signal,body:JSON.stringify({...workspaceFields(),conversation_id:currentId,turn_id:requestId,history_revision:historyRevision,model:conversationModel(),messages:history,stream:true,...requestThinking})});
+        await flushHistory();const response=await fetch('/v1/chat/completions',{method:'POST',headers:{Authorization:'Bearer '+config.key,'Content-Type':'application/json','X-Qwen-Request':requestId},signal:controller.signal,body:JSON.stringify({...workspaceFields(),conversation_id:currentId,turn_id:requestId,history_revision:historyRevision,model:conversationModel(),messages:history,stream:true,...requestThinking,...requestVoice})});
         if(!response.ok){let detail;try{detail=await response.json();}catch{}throw Object.assign(new Error(detail?.error?.message||'Le serveur a refusé la requête ('+response.status+').'),{code:detail?.error?.code});}
         if(!response.headers.get('content-type')?.includes('text/event-stream')){
-          const value=await response.json(),m=value.choices?.[0]?.message;if(value.error||!m)throw new Error(value.error?.message||'Réponse du serveur invalide.');answer.content=m.content||'';answer.reasoning_content=m.reasoning_content||'';renderMarkdown(view.content,answer.content);view.reasoning.textContent=answer.reasoning_content;view.details.hidden=!answer.reasoning_content;
+          const value=await response.json(),m=value.choices?.[0]?.message;if(value.error||!m)throw new Error(value.error?.message||'Réponse du serveur invalide.');answer.content=m.content||'';answer.reasoning_content=m.reasoning_content||'';window.conversationDelta?.(answer.content);renderMarkdown(view.content,answer.content);view.reasoning.textContent=answer.reasoning_content;view.details.hidden=!answer.reasoning_content;
         }else{
           const reader=response.body.getReader(),decoder=new TextDecoder();let pending='',completed=false;
           while(true){const {value,done}=await reader.read();pending+=done?decoder.decode():decoder.decode(value,{stream:true});const frames=pending.split(/\r?\n\r?\n/);pending=frames.pop();for(const frame of frames)completed=delta(frame,answer,view)||completed;if(done){if(pending.trim())completed=delta(pending,answer,view)||completed;if(!completed)throw new Error("Connexion interrompue : cette réponse est incomplète.");break;}}
         }
         if(!answer.content&&answer.reasoning_content)throw Object.assign(new Error('Le modèle a terminé sa réflexion sans réponse finale. Réessayez sans réflexion approfondie.'),{code:'thinking_without_answer'});if(replyProgress.finish==='length')throw new Error('Le modèle a atteint sa capacité de contexte : la réponse peut être incomplète.');
-      }catch(e){let recovered=false;if(e.name!=='AbortError'&&!cancelPending)try{recovered=await agentReconcile(answer,view);}catch{}if(!recovered){answer.interrupted=true;if(e.name==='TypeError')e.code='connection_error';error(e.name==='AbortError'?'Réponse arrêtée.':e);}}
+      }catch(e){let recovered=false;if(!requestVoice.voice_conversation&&e.name!=='AbortError'&&!cancelPending)try{recovered=await agentReconcile(answer,view);}catch{}if(!recovered){answer.interrupted=true;if(e.name==='TypeError')e.code='connection_error';error(e.name==='AbortError'?'Réponse arrêtée.':e);}}
       finally{window.conversationOnReplyEnd?.(answer);agentClearApproval();$('queue-state').textContent='';if(!answer.content&&!answer.reasoning_content){messages.pop();view.article.remove();}controller=null;cancelPending=false;save();try{await flushHistory();serverHistoryReady=false;await syncServerHistory(true);}catch(e){error(e);}busy=false;render();drawLibrary();buttons();if(matchMedia('(pointer:fine)').matches)$('prompt').focus();models();}
     });
     $('prompt').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)&&!e.isComposing){e.preventDefault();$('composer').requestSubmit();}});
@@ -459,6 +460,8 @@ function renderMarkdown(element, text) {
     async function clientState(){
   try{
     const state=await api('/client/state');
+    $('local-api').textContent=state.local_api||'';
+    $('local-api-key').value=state.key||'';
     if(typeof androidUpdateState==='function')androidUpdateState(state.update);
     const profileRequired=state.profile_required===true;
     loggedIn=!profileRequired;
@@ -538,10 +541,10 @@ for(const [view,title] of [['projects','Projets'],['tasks','Tâches']]){const b=
 const originalShowView=showView;showView=function(name){originalShowView(name);if(['projects','tasks'].includes(name)){$('workspace-heading').textContent=({projects:'Projets',tasks:'Tâches'})[name];wsRefresh().catch(e=>error(e));}if(name!=='chat')$('ws-side').hidden=true;};
 const wsSettings=wsElement('section',undefined,'settings-view');wsSettings.dataset.view='settings';wsSettings.hidden=true;
 const wsSettingsNav=wsElement('nav',undefined,'ws-toolbar');wsSettingsNav.setAttribute('aria-label','Réglages du client');wsSettings.append(wsElement('h2','Réglages'),wsSettingsNav);
-for(const name of ['access','connection']){const b=document.querySelector('[data-view-button="'+name+'"]');b.className='secondary';wsSettingsNav.append(b);const pane=document.querySelector('[data-view="'+name+'"]');pane.style.padding='0';pane.style.overflow='visible';wsSettings.append(pane);}
+for(const name of ['access','connection','api']){const b=document.querySelector('[data-view-button="'+name+'"]');b.className='secondary';wsSettingsNav.append(b);const pane=document.querySelector('[data-view="'+name+'"]');pane.style.padding='0';pane.style.overflow='visible';wsSettings.append(pane);}
 document.querySelector('.workspace').append(wsSettings);
 const wsSettingsButton=wsElement('button','Réglages','nav-button');wsSettingsButton.dataset.viewButton='settings';document.querySelector('#client-navigation').append(wsSettingsButton);
-const wsShowViewOnce=showView;showView=function(name){const selected=name==='settings'?'access':name;wsShowViewOnce(selected);wsSettings.hidden=!['access','connection'].includes(selected);wsSettingsButton.classList.toggle('active',!wsSettings.hidden);if(!wsSettings.hidden)$('workspace-heading').textContent='Réglages · '+({access:'Mon accès',connection:'Connexion',updates:'Mises à jour',api:'API locale'})[selected];};
+const wsShowViewOnce=showView;showView=function(name){const selected=name==='settings'?'access':name;wsShowViewOnce(selected);wsSettings.hidden=!['access','connection','api'].includes(selected);wsSettingsButton.classList.toggle('active',!wsSettings.hidden);if(!wsSettings.hidden)$('workspace-heading').textContent='Réglages · '+({access:'Mon accès',connection:'Connexion',updates:'Mises à jour',api:'API locale'})[selected];};
 wsSettingsButton.onclick=()=>showView('settings');
 const originalDrawLibrary=drawLibrary;drawLibrary=function(){originalDrawLibrary();wsChatSelections();};
 const wsFillProjectOnce=wsFillProject;wsFillProject=function(){if(document.activeElement?.closest('#ws-memories'))return;wsFillProjectOnce();ws.projectRevision=ws.data?.projects.find(p=>p.id===ws.project)?.revision;};
@@ -1271,6 +1274,9 @@ contextRefresh();
 'use strict';
 document.body.classList.add('android-client');
 const androidBridge=window.AndroidClient;
+$('android-copy-api').onclick=()=>androidBridge.copyText($('local-api').textContent);
+$('android-copy-api-key').onclick=()=>androidBridge.copyText($('local-api-key').value);
+$('toggle-api-key').onclick=()=>{const input=$('local-api-key');input.type=input.type==='password'?'text':'password';$('toggle-api-key').textContent=input.type==='password'?'Afficher la clé':'Masquer la clé';};
 function androidRequireBridge(){if(!androidBridge)throw new Error('Cette fonction est disponible dans l’application Fred Android.');return androidBridge;}
 function androidNativeResult(value){
   if(typeof value==='string'&&value.trim().startsWith('{'))value=JSON.parse(value);

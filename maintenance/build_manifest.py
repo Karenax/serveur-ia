@@ -31,7 +31,9 @@ def generate(artifact):
             'source_branch':command(['git','branch','--show-current']),'source_files':sources,
             'artifact':{'name':artifact.name,'bytes':artifact.stat().st_size,'sha256':digest(artifact)},
             'host':{'system':platform.system(),'release':platform.release(),'machine':platform.machine()},
-            'python':{'version':platform.python_version(),'packages':{d.metadata['Name']:d.version for d in sorted(importlib.metadata.distributions(),key=lambda d:d.metadata['Name'].lower())}},
+            'python':{'version':platform.python_version(),'packages':{
+                name:importlib.metadata.version(name) for name in sorted(
+                    {d.metadata['Name'] for d in importlib.metadata.distributions()},key=str.lower)}},
             'engines':engines,'tools':{}}
     for name,path,args in [('go',ROOT/'client-qwen/wireguard-tools/go/bin/go.exe',['version']),
                             ('cmake',ROOT/'toolchain/cmake-3.31.8-windows-x86_64/bin/cmake.exe',['--version'])]:

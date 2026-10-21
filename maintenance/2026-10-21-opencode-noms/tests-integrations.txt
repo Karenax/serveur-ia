@@ -1,0 +1,19 @@
+test_detection_uses_local_installs_and_environment_paths (test_app_integrations.IntegrationTests.test_detection_uses_local_installs_and_environment_paths) ... ok
+test_hermes_compact_yaml_and_empty_provider_lists (test_app_integrations.IntegrationTests.test_hermes_compact_yaml_and_empty_provider_lists) ... ok
+test_hermes_preserves_other_providers_comments_and_model (test_app_integrations.IntegrationTests.test_hermes_preserves_other_providers_comments_and_model) ... ok
+test_hermes_readable_catalogue_replaces_old_ids_and_embeddings (test_app_integrations.IntegrationTests.test_hermes_readable_catalogue_replaces_old_ids_and_embeddings) ... ok
+test_legacy_hermes_both_sequence_indentation_styles (test_app_integrations.IntegrationTests.test_legacy_hermes_both_sequence_indentation_styles) ... ok
+test_new_config_and_bom_are_supported (test_app_integrations.IntegrationTests.test_new_config_and_bom_are_supported) ... ok
+test_opencode2_jsonc_preserves_settings_comments_and_exact_backup (test_app_integrations.IntegrationTests.test_opencode2_jsonc_preserves_settings_comments_and_exact_backup) ... ok
+test_opencode_explicit_config_wins_over_jsonc_and_new_config_stays_json (test_app_integrations.IntegrationTests.test_opencode_explicit_config_wins_over_jsonc_and_new_config_stays_json) ... ok
+test_opencode_jsonc_overrides_json_without_changing_the_lower_priority_file (test_app_integrations.IntegrationTests.test_opencode_jsonc_overrides_json_without_changing_the_lower_priority_file) ... ok
+test_opencode_readable_names_refresh_existing_models_without_importing_catalogue (test_app_integrations.IntegrationTests.test_opencode_readable_names_refresh_existing_models_without_importing_catalogue) ... ok
+test_opencode_rejects_embedding_or_unavailable_selection_before_writing (test_app_integrations.IntegrationTests.test_opencode_rejects_embedding_or_unavailable_selection_before_writing) ... ok
+test_opencode_v1_and_existing_model_options (test_app_integrations.IntegrationTests.test_opencode_v1_and_existing_model_options) ... ok
+test_unreadable_or_ambiguous_config_is_never_written (test_app_integrations.IntegrationTests.test_unreadable_or_ambiguous_config_is_never_written) ... ok
+test_validation_or_absent_app_never_creates_configuration (test_app_integrations.IntegrationTests.test_validation_or_absent_app_never_creates_configuration) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.213s
+
+OK

@@ -1,0 +1,219 @@
+{
+  "tests": {
+    "serveur": {
+      "completed": true,
+      "tests": 475,
+      "seconds": 822.361,
+      "ok": true,
+      "failure_markers": 0
+    },
+    "windows": {
+      "completed": true,
+      "tests": 19,
+      "seconds": 1.762,
+      "ok": true,
+      "failure_markers": 0
+    },
+    "voix": {
+      "completed": true,
+      "tests": 20,
+      "seconds": 1.811,
+      "ok": true,
+      "failure_markers": 0
+    },
+    "android": {
+      "completed": true,
+      "tests": 13,
+      "seconds": 0.635,
+      "ok": true,
+      "failure_markers": 0
+    }
+  },
+  "source_files": 278,
+  "source_lines": 33680,
+  "osv_queries": 230,
+  "osv_errors": 0,
+  "dependencies": [
+    {
+      "name": "PyJWT",
+      "version": "2.13.0",
+      "environments": [
+        "hermes"
+      ],
+      "raw_advisories": 28,
+      "distinct_advisories": 14,
+      "fixed_versions": [
+        "2.14.0",
+        "2.15.0"
+      ]
+    },
+    {
+      "name": "aiohttp",
+      "version": "3.14.3",
+      "environments": [
+        "hermes"
+      ],
+      "raw_advisories": 8,
+      "distinct_advisories": 8,
+      "fixed_versions": [
+        "3.14.4"
+      ]
+    },
+    {
+      "name": "certifi",
+      "version": "2026.5.20",
+      "environments": [
+        "hermes"
+      ],
+      "raw_advisories": 2,
+      "distinct_advisories": 1,
+      "fixed_versions": [
+        "2026.10.19"
+      ]
+    },
+    {
+      "name": "certifi",
+      "version": "2026.7.22",
+      "environments": [
+        "strata",
+        "eg2",
+        "voix_serveur"
+      ],
+      "raw_advisories": 2,
+      "distinct_advisories": 1,
+      "fixed_versions": [
+        "2026.10.19"
+      ]
+    },
+    {
+      "name": "hermes-agent",
+      "version": "0.0.0",
+      "environments": [
+        "hermes"
+      ],
+      "raw_advisories": 20,
+      "distinct_advisories": 10,
+      "fixed_versions": [
+        "0.11.0",
+        "0.15.0",
+        "0.16.0",
+        "0.18.0"
+      ]
+    },
+    {
+      "name": "mcp",
+      "version": "2.0.0",
+      "environments": [
+        "hermes"
+      ],
+      "raw_advisories": 1,
+      "distinct_advisories": 1,
+      "fixed_versions": [
+        "1.30.0",
+        "2.2.0"
+      ]
+    },
+    {
+      "name": "multidict",
+      "version": "6.7.1",
+      "environments": [
+        "hermes"
+      ],
+      "raw_advisories": 2,
+      "distinct_advisories": 1,
+      "fixed_versions": [
+        "6.9.1"
+      ]
+    },
+    {
+      "name": "oauthlib",
+      "version": "3.3.1",
+      "environments": [
+        "hermes"
+      ],
+      "raw_advisories": 4,
+      "distinct_advisories": 2,
+      "fixed_versions": [
+        "4.0.0"
+      ]
+    },
+    {
+      "name": "pillow",
+      "version": "12.3.0",
+      "environments": [
+        "strata",
+        "eg2",
+        "hermes"
+      ],
+      "raw_advisories": 9,
+      "distinct_advisories": 9,
+      "fixed_versions": [
+        "13.0.0"
+      ]
+    },
+    {
+      "name": "pip",
+      "version": "25.0.1",
+      "environments": [
+        "eg2",
+        "voix_serveur",
+        "conversation_windows"
+      ],
+      "raw_advisories": 12,
+      "distinct_advisories": 6,
+      "fixed_versions": [
+        "25.3",
+        "26.0",
+        "26.1",
+        "26.1.2",
+        "26.2",
+        "26.2.0"
+      ]
+    },
+    {
+      "name": "pypdf",
+      "version": "6.10.0",
+      "environments": [
+        "strata"
+      ],
+      "raw_advisories": 61,
+      "distinct_advisories": 31,
+      "fixed_versions": [
+        "6.10.1",
+        "6.10.2",
+        "6.12.0",
+        "6.12.1",
+        "6.12.2",
+        "6.13.0",
+        "6.13.1",
+        "6.13.3",
+        "6.14.0",
+        "6.14.1",
+        "6.14.2",
+        "6.15.0",
+        "6.16.0",
+        "6.16.1",
+        "6.17.0",
+        "6.18.0",
+        "6.18.1",
+        "6.19.0"
+      ]
+    },
+    {
+      "name": "urllib3",
+      "version": "2.7.0",
+      "environments": [
+        "hermes"
+      ],
+      "raw_advisories": 6,
+      "distinct_advisories": 3,
+      "fixed_versions": [
+        "2.8.0"
+      ]
+    }
+  ],
+  "hermes_commit": "79651b71bd56efd76d06f3de1df64dde09b58ff3",
+  "python_version": "3.12.14",
+  "engine_hash_matches_deployment": true,
+  "engine_sha256": "c97c3e84228c928c46bb2727c1753cbfe76c31c3eb0a9edc7bdd3cd78871cac3"
+}

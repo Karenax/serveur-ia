@@ -53,6 +53,7 @@ class AccessStore:
         self.path = home / 'acces-distants.json'
         self.lock = threading.RLock()
         self.active = 0
+        self.embedding_slot = threading.BoundedSemaphore(1)
         self.maintenance = False
         self.on_access_changed = None
         self.storage = None
@@ -562,20 +563,43 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                     catalog = store.hermes.model_catalog(self.identity)
                     if store.authenticate(self.access_token) != self.identity:
                         raise Denied('Accès désactivé.')
-                    return self.respond(200, catalog)
+                    from public_embeddings import catalogue
+                    engine=getattr(getattr(store.workspace,'knowledge',None),'engine',None)
+                    return self.respond(200, {**catalog,'data':catalog['data']+catalogue(engine)})
                 except Denied as error:
                     return self.respond(403, {'error': {'message': str(error)}})
                 except (OSError, ValueError, RuntimeError):
                     return self.respond(503, {'error': {'message': 'Liste des modèles Hermes indisponible.'}})
             upstream_port, model, _ = backend()
             live = health('127.0.0.1', upstream_port)
+            from public_embeddings import catalogue
+            extra=catalogue(getattr(getattr(store.workspace,'knowledge',None),'engine',None))
             if not live.get('loaded'):
+                if extra:return self.respond(200,{'object':'list','data':extra})
                 return self.respond(503, {'error': {'code':'model_unloaded', 'message': 'Serveur connecté, mais le modèle n’est pas chargé. Le lancer dans la console serveur.'}})
             live_model=live.get('model')
             if isinstance(live_model,str) and live_model:model=live_model
-            self.respond(200, {'object': 'list', 'data': [{'id': model, 'object': 'model', 'owned_by': 'local', 'capabilities': capabilities(live)}]})
+            self.respond(200, {'object': 'list', 'data': [{'id': model, 'object': 'model', 'owned_by': 'local', 'capabilities': capabilities(live)}]+extra})
 
         def do_POST(self):
+            if self.path == '/v1/embeddings':
+                if not self.authorized():return
+                from public_embeddings import request, response
+                try:texts,encoding,mode=request(json_body(self,65536))
+                except (ValueError,TypeError):return self.respond(400,{'error':{'message':'Requête embeddings invalide : modèle google/embeddinggemma-2, 1 à 8 textes de 4500 caractères, 768 dimensions, float/base64.'}})
+                if not store.embedding_slot.acquire(blocking=False):
+                    return self.respond(429,{'error':{'message':'EG2 occupé. Réessayez après la requête en cours.'}})
+                try:
+                    if store.authenticate(self.access_token)!=self.identity:raise Denied('Accès désactivé.')
+                    engine=getattr(getattr(store.workspace,'knowledge',None),'engine',None)
+                    if engine is None:raise ValueError('EG2 indisponible.')
+                    result=response(engine,texts,encoding,mode)
+                    if store.authenticate(self.access_token)!=self.identity:raise Denied('Accès désactivé.')
+                    return self.respond(200,result)
+                except Denied:return self.respond(403,{'error':{'message':'Accès désactivé.'}})
+                except (OSError,ValueError,RuntimeError,http.client.HTTPException):
+                    return self.respond(503,{'error':{'message':'EmbeddingGemma 2 indisponible ou occupé. Réessayez plus tard.'}})
+                finally:store.embedding_slot.release()
             if self.path == '/v1/agent/action':
                 if not self.authorized():return
                 try:

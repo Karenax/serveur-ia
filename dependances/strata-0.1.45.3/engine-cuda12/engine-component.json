@@ -1,0 +1,67 @@
+{
+ "schema_version": 2,
+ "id": "strata-engine",
+ "name": "strata-engine",
+ "version": "0.1.45.3",
+ "platform": "windows-x86_64",
+ "backend": "cuda",
+ "archs": [
+  "sm_60",
+  "sm_61",
+  "sm_70",
+  "sm_75",
+  "sm_80",
+  "sm_86",
+  "sm_89",
+  "compute_89"
+ ],
+ "min_driver": {
+  "nvidia": "576.02"
+ },
+ "build_id": "f6d65cb584c0+cuda12.9",
+ "entrypoint": "strata.exe",
+ "files": [
+  {
+   "path": "strata.exe",
+   "sha256": "c97c3e84228c928c46bb2727c1753cbfe76c31c3eb0a9edc7bdd3cd78871cac3",
+   "bytes": 370658816
+  },
+  {
+   "path": "BUILD.json",
+   "sha256": "76614fda693ce48079a45172f3c422d0117e52bcfcc95cddcd450ff5e2f3a4b6",
+   "bytes": 258
+  },
+  {
+   "path": "strata-vision.exe",
+   "sha256": "ef63b5d0c076c81d2e82a1c54736356d89801beabf8e3d261c82bd79d8f7711b",
+   "bytes": 143284736
+  },
+  {
+   "path": "strata_kq.dll",
+   "sha256": "79b28117cc20fcc236986ff033b51c8cf62e09441917144ef33eb8d1ebd1229d",
+   "bytes": 49397248
+  },
+  {
+   "path": "cublas64_12.dll",
+   "sha256": "90052a83efd1b57a8e3616a6590b335855f81b814a4f16eecb7b5bf6d1b1d4eb",
+   "bytes": 102518272
+  },
+  {
+   "path": "cudart64_12.dll",
+   "sha256": "760c38928bbe5759f7b31ed6692599eb7ec83cedd5702e84c2b72028a89837e1",
+   "bytes": 583680
+  },
+  {
+   "path": "cublasLt64_12.dll",
+   "sha256": "c3a05ea244c937314afec09f87b91f814c7e27977681f6c67eb51bb06ced3a4a",
+   "bytes": 668669952
+  }
+ ],
+ "signature": {
+  "alg": "ed25519",
+  "key_id": "5d1bc23abbeffd0d",
+  "value": "BhlHE7CsVKP4SxKWlfhimRppp6opHmE4AvVbrdb3Vy8++BDl3CUle5qZxM3hIh66Z0yqpfKFfKRvdTFWsykXDg=="
+ },
+ "variant": "cuda12",
+ "notes": "0.2.0-beta tester build for older NVIDIA cards (Pascal GTX 10 / P100 / P40, Volta V100 / Titan V, older drivers): CUDA 12.9 engine from f-split-int fd0e3766a + f-split-pkg4, strata-vision (CUDA 12.9) inside, cudart and cublas bundled"
+}

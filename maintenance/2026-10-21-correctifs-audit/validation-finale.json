@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "python_cases_validated": 530,
+  "server_cases": 478,
+  "server_packaging_cases_repeated_after_publication": 2,
+  "web_ui_suites": 5,
+  "windows": "3.5.31",
+  "android": "1.0.12",
+  "model_process_preserved": true,
+  "nas_backup_verified": true,
+  "proofs": {
+    "artefacts.json": "e8eeb3361be3587c98725bde85b4081be8297878a0518387657b0df47820bb98",
+    "restauration-nas.json": "a0e37799da4dc8e45e4981b5816caa4f03d09f5c863257e9ed5055ebae43acb0",
+    "production-apres.json": "5b99624bb8432a320b0602459d66cb1adb6dc3e8488d1107feb698a807d7ca4b",
+    "acces-apres.json": "840325f66688215083138e49825dad6bd0732f5ddd06f7589e51281c732082bb",
+    "sauvegarde-apres.json": "ceb7dc92c163b0b0eaf4353175bfcc4ca84334bdd65c50496f9b61e984b52a7a",
+    "syntaxe-finale.json": "f10b0df9a520d6440cbb10dae5849e22793f0f495820cf9b5c12be9046731d57"
+  },
+  "git_changes_left_for_review": true
+}

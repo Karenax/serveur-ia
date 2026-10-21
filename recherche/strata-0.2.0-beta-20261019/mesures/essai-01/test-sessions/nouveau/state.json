@@ -1,0 +1,19 @@
+{
+  "status": "chargement",
+  "started": "2026-10-19T17:13:14.794255+02:00",
+  "started_epoch": 1792422794.794256,
+  "supervisor": {
+    "pid": 20256,
+    "created": 1792422794.62553
+  },
+  "config_path": "D:\\Serveur IA\\recherche\\strata-0.2.0-beta-20261019\\mesures\\essai-01\\nouveau.json",
+  "host": "127.0.0.1",
+  "port": 8081,
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "min_free_ram_gib": 6.0,
+  "server": {
+    "pid": 17176,
+    "created": 1792422794.8329964
+  },
+  "available_ram_gib": 110.92
+}

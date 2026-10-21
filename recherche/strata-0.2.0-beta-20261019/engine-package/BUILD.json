@@ -1,0 +1,19 @@
+{
+ "version": "0.1.45.3",
+ "source": "f-split-pkg4",
+ "commit": "f6d65cb584c0",
+ "archs": [
+  60,
+  61,
+  70,
+  75,
+  80,
+  86,
+  89
+ ],
+ "ptx": true,
+ "cuda": "12.9",
+ "vision": "gpu-cuda12",
+ "portable": true,
+ "experimental_sm60": true
+}

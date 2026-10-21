@@ -1,0 +1,18 @@
+{
+  "exe": "D:\\Serveur IA\\recherche\\strata-0.2.0-beta-20261019\\engine-package\\strata.exe",
+  "exe_sha256": "c97c3e84228c928c46bb2727c1753cbfe76c31c3eb0a9edc7bdd3cd78871cac3",
+  "lib_dirs": [
+    "D:\\Serveur IA\\recherche\\strata-0.2.0-beta-20261019\\engine-package"
+  ],
+  "manifest_version": "0.1.45.3",
+  "binary_version": "strata 0.1.45",
+  "build": "f6d65cb584c0+cuda12.9",
+  "flags": {
+    "STRATA_SM60_PERF": true,
+    "STRATA_FUSE_DECODE": true,
+    "STRATA_ADAPT_NOWAIT": true
+  },
+  "archive_sha256": "909ef954f93dcc9a5a3e756b6ac7836b9731b10f0fbe6e22ae316a1ede3da1f7",
+  "signature_verified": true,
+  "key_id": "5d1bc23abbeffd0d"
+}

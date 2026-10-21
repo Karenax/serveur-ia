@@ -1,0 +1,2518 @@
+{
+  "date": "2026-10-21T11:22:24.450652+00:00",
+  "head": "749b6adcb068382d1d3255c548d05567b5d41efe",
+  "branch": "main",
+  "tracked_files": 3254,
+  "tracked_bytes": 50647593,
+  "groups": {
+    "(racine)": {
+      "files": 203,
+      "bytes": 2807074
+    },
+    "analyses": {
+      "files": 46,
+      "bytes": 296823
+    },
+    "audits": {
+      "files": 68,
+      "bytes": 2595475
+    },
+    "client-android": {
+      "files": 114,
+      "bytes": 4497789
+    },
+    "client-qwen": {
+      "files": 124,
+      "bytes": 1450606
+    },
+    "client-voice": {
+      "files": 31,
+      "bytes": 85630
+    },
+    "comparatifs": {
+      "files": 705,
+      "bytes": 13175124
+    },
+    "contribution-strata-p100": {
+      "files": 3,
+      "bytes": 94731
+    },
+    "dependances": {
+      "files": 8,
+      "bytes": 229798
+    },
+    "lanceur": {
+      "files": 182,
+      "bytes": 1755466
+    },
+    "maintenance": {
+      "files": 140,
+      "bytes": 1398327
+    },
+    "preuves": {
+      "files": 303,
+      "bytes": 11103722
+    },
+    "recherche": {
+      "files": 1322,
+      "bytes": 11148884
+    },
+    "resultats-premiere-config": {
+      "files": 5,
+      "bytes": 8144
+    }
+  },
+  "source_files": [
+    {
+      "file": "client-android/Build-Android.ps1",
+      "lines": 88,
+      "bytes": 5701,
+      "sha256": "2eedc54b9c1c65d87ac122e04b207adafb5d21d59012f094d7cea185574d300c"
+    },
+    {
+      "file": "client-android/Export-Profil-Android.ps1",
+      "lines": 11,
+      "bytes": 549,
+      "sha256": "505a6aa0c5672bf7816f404cbe4086b5f9684eefb52024b76e74f3187d6024a1"
+    },
+    {
+      "file": "client-android/README.md",
+      "lines": 354,
+      "bytes": 19853,
+      "sha256": "c0dd9743466399480946457f5a61c8cdac3b922f37c038d9a540cc18da324a75"
+    },
+    {
+      "file": "client-android/VALIDATION.md",
+      "lines": 290,
+      "bytes": 21403,
+      "sha256": "8d43b75494a4143e520570de3b938894aa548e6d173c332cbab3991a096f5170"
+    },
+    {
+      "file": "client-android/app/build.gradle",
+      "lines": 20,
+      "bytes": 654,
+      "sha256": "0c13de6f3f363c0f3edef7f8d1d7d7b00a61f36b02bbb4ec38d0662bc6591ea2"
+    },
+    {
+      "file": "client-android/app/src/androidTest/java/net/karenax/fred/CorrectorTransportInstrumentation.java",
+      "lines": 68,
+      "bytes": 4677,
+      "sha256": "4f8a47ec8e5f6641adfae16f152630842f953edef8b879aa51a5fe42a69beba2"
+    },
+    {
+      "file": "client-android/app/src/androidTest/java/net/karenax/fred/ModelSelectionInstrumentation.java",
+      "lines": 145,
+      "bytes": 11098,
+      "sha256": "1a0ba6740232012c41d57016d37d70d712ea638427dc72d12df459702bed1a3e"
+    },
+    {
+      "file": "client-android/app/src/androidTest/java/net/karenax/fred/ReasoningContractInstrumentation.java",
+      "lines": 106,
+      "bytes": 11188,
+      "sha256": "1ba27f9971c7097cb4fd9975b2061708e4a507924273b274b7cd11f6d6e21466"
+    },
+    {
+      "file": "client-android/app/src/androidTest/java/net/karenax/fred/SelfTestInstrumentation.java",
+      "lines": 80,
+      "bytes": 27568,
+      "sha256": "09906276846a2972dd40d480615d57659e83a1efcce59223b4f875dfb492ef48"
+    },
+    {
+      "file": "client-android/app/src/androidTest/java/net/karenax/fred/UpdateChecks.java",
+      "lines": 46,
+      "bytes": 3454,
+      "sha256": "5d4571795bdc931cf75fb0db02143ffd0b2c3ecca6c898fb0780afe2cc10c7f0"
+    },
+    {
+      "file": "client-android/app/src/androidTest/java/net/karenax/fred/UpdateFlowInstrumentation.java",
+      "lines": 51,
+      "bytes": 3864,
+      "sha256": "1c8dd2e012b0fd296fe1ee17106d48f69214b0f1f0cc0e79b343c6b87bbbc3ba"
+    },
+    {
+      "file": "client-android/app/src/androidTest/java/net/karenax/fred/VoiceChecks.java",
+      "lines": 38,
+      "bytes": 7109,
+      "sha256": "4f593db05cb0c60c383c5e11b70b5ad71fcce0ea7f2e864ac377f32f2c04cf40"
+    },
+    {
+      "file": "client-android/app/src/debug/java/net/karenax/fred/DemoTransport.java",
+      "lines": 51,
+      "bytes": 6373,
+      "sha256": "540c84d45c2bf98e3a627d8c3e11887abf487d99629a5839a24cebb555127415"
+    },
+    {
+      "file": "client-android/app/src/debug/java/net/karenax/fred/DemoWorkspace.java",
+      "lines": 134,
+      "bytes": 13013,
+      "sha256": "c1ca0a390898d0520dc1339bafc787b87c38a26d916f0080161bac30bb085a9f"
+    },
+    {
+      "file": "client-android/app/src/main/AndroidManifest.xml",
+      "lines": 14,
+      "bytes": 1530,
+      "sha256": "9c80532c3eaf9a2a58ef9d97b89a0d776cbdad2e78b9ee4b1a03524522d03b33"
+    },
+    {
+      "file": "client-android/app/src/main/java/net/karenax/fred/AndroidUpdates.java",
+      "lines": 149,
+      "bytes": 9455,
+      "sha256": "0a172ced43fe20018318431d13a999fadcb4c4364f6947ddded432624a661a57"
+    },
+    {
+      "file": "client-android/app/src/main/java/net/karenax/fred/ClientBackend.java",
+      "lines": 43,
+      "bytes": 8033,
+      "sha256": "4494e961a4d16d578a80acd732648983414bcd974d2500fdd886a0f7ad35bdc0"
+    },
+    {
+      "file": "client-android/app/src/main/java/net/karenax/fred/HistorySync.java",
+      "lines": 101,
+      "bytes": 18647,
+      "sha256": "ca16beb6fd59dfe64687cac685757cf7d80b4d7a26f7b60ee594188cb89bfb34"
+    },
+    {
+      "file": "client-android/app/src/main/java/net/karenax/fred/Json.java",
+      "lines": 28,
+      "bytes": 2847,
+      "sha256": "285774f246a2207874d7775724226d2705d3e9211d9fe0d8842495d1fec4b1ad"
+    },
+    {
+      "file": "client-android/app/src/main/java/net/karenax/fred/LocalVoice.java",
+      "lines": 114,
+      "bytes": 12363,
+      "sha256": "cb52a5953d0177d17b63f449be0204d60b97d66ec187e44e48778f0548238101"
+    },
+    {
+      "file": "client-android/app/src/main/java/net/karenax/fred/LoopbackServer.java",
+      "lines": 49,
+      "bytes": 11019,
+      "sha256": "3d24f68e54728e52c67485eddb6c1ca20fe48fc16bdc146a2325e68b53af559e"
+    },
+    {
+      "file": "client-android/app/src/main/java/net/karenax/fred/MainActivity.java",
+      "lines": 107,
+      "bytes": 20084,
+      "sha256": "9462c1aac9a4b9f2bb62273351882050db8e8fc080ce224b076467e79c7d0b5e"
+    },
+    {
+      "file": "client-android/app/src/main/java/net/karenax/fred/NativeNotifications.java",
+      "lines": 86,
+      "bytes": 9903,
+      "sha256": "afa2da7d1a46d3bd95408632239052c2c77ce52de6de40f6f6993cdf4bc5b2dd"
+    },
+    {
+      "file": "client-android/app/src/main/java/net/karenax/fred/Profile.java",
+      "lines": 40,
+      "bytes": 5636,
+      "sha256": "a70456d52f8efb1ce18436d705c0b55398050048afcb86f2c8b8a211f88ce95c"
+    },
+    {
+      "file": "client-android/app/src/main/java/net/karenax/fred/Remote.java",
+      "lines": 93,
+      "bytes": 16191,
+      "sha256": "23f34eeb61c325956055f3a2612fb56b8b92a4e5ec8104273766ffcf156b6a14"
+    },
+    {
+      "file": "client-android/app/src/main/java/net/karenax/fred/SecureStore.java",
+      "lines": 45,
+      "bytes": 3923,
+      "sha256": "77d08d14c72e526b0fde3b751c549227fe8ced2e810d68ae51c694ab89d19114"
+    },
+    {
+      "file": "client-android/app/src/main/java/net/karenax/fred/UpdateProvider.java",
+      "lines": 33,
+      "bytes": 2211,
+      "sha256": "03d7cf7af9708cbfc02d261a199673fad27b7630546c1730a6794d216e2f1231"
+    },
+    {
+      "file": "client-android/app/src/main/java/net/karenax/fred/WireGuardBridge.java",
+      "lines": 106,
+      "bytes": 5290,
+      "sha256": "3e1fdc81db1b0b8174bfd27ea5a5c005703d1077e5c8e2d5e49818f04e835ae2"
+    },
+    {
+      "file": "client-android/app/src/main/res/drawable/icon_background.xml",
+      "lines": 1,
+      "bytes": 107,
+      "sha256": "51103425030ca273255d9aedcd253a8481a028b9f62d58ce37eba1a6450789b2"
+    },
+    {
+      "file": "client-android/app/src/main/res/drawable/icon_foreground.xml",
+      "lines": 1,
+      "bytes": 305,
+      "sha256": "f4b2d04950b6e22fac7a30042332ed157708baf6d644861b68d28a792922e55c"
+    },
+    {
+      "file": "client-android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml",
+      "lines": 1,
+      "bytes": 207,
+      "sha256": "aa8f20afde3daa0cfaf37c2514964d3682dca236e9f36d8ca1bc2da660ec5f63"
+    },
+    {
+      "file": "client-android/app/src/main/res/values/styles.xml",
+      "lines": 10,
+      "bytes": 473,
+      "sha256": "1c657e6bf77a78452b855c313256e1cf399b3b83f66f2985812ebc1c1850ff63"
+    },
+    {
+      "file": "client-android/app/src/main/res/xml/data_extraction_rules.xml",
+      "lines": 17,
+      "bytes": 671,
+      "sha256": "8b55ff5489071bb19a4e89967b604a16c0e4d1e87a2df3c73c64417314a59f22"
+    },
+    {
+      "file": "client-android/app/src/main/res/xml/network_security_config.xml",
+      "lines": 5,
+      "bytes": 339,
+      "sha256": "195a8652dd2199be29731f96afc966784b3718b64c2b8e5d379aa136d04d14fa"
+    },
+    {
+      "file": "client-android/app/src/release/java/net/karenax/fred/DemoTransport.java",
+      "lines": 9,
+      "bytes": 517,
+      "sha256": "5d27d3b793150b0e61cdfb52426f9698cd4eaa0d34f72171dffacf541ecf6884"
+    },
+    {
+      "file": "client-android/build.gradle",
+      "lines": 1,
+      "bytes": 70,
+      "sha256": "96a33edb21d173da2c36f5312f50cdfb9f71d9f5078c081c81f2d029547f6cb9"
+    },
+    {
+      "file": "client-android/mobile-ui/access.html",
+      "lines": 3,
+      "bytes": 886,
+      "sha256": "844cd43f9564d81cfa3f6f453ae10d02ef0edbd39041b405ead2a097d4aa2087"
+    },
+    {
+      "file": "client-android/mobile-ui/android.css",
+      "lines": 63,
+      "bytes": 6517,
+      "sha256": "0d291e29fe3405cab1f06483af1b30412cc5ad21d1e20617bde74e9dc5aa921d"
+    },
+    {
+      "file": "client-android/mobile-ui/android.js",
+      "lines": 210,
+      "bytes": 14540,
+      "sha256": "7032b02b70374571a0c26345bc2fd249a9e3960f8a947b1f6adf2dfb8cae6263"
+    },
+    {
+      "file": "client-android/mobile-ui/client-state.js",
+      "lines": 35,
+      "bytes": 2149,
+      "sha256": "a4c2506c61cbe719a250b888a2f716af2cbf347d4204f2e72b0ea403ddce87f0"
+    },
+    {
+      "file": "client-android/mobile-ui/connection.html",
+      "lines": 3,
+      "bytes": 1147,
+      "sha256": "4e8441e4a1da13a6c9812acfccf1e4d4eefe994769c93c1f34a24c4a476063e6"
+    },
+    {
+      "file": "client-android/mobile-ui/corrector-response.js",
+      "lines": 10,
+      "bytes": 1194,
+      "sha256": "f72de7f91645b87978efed2bcb2ee190d0113120c3c8effb1d51756f386a962f"
+    },
+    {
+      "file": "client-android/mobile-ui/onboarding.html",
+      "lines": 9,
+      "bytes": 818,
+      "sha256": "cfd0d455e9a9394637950eac551071b2b380af2646057d559b5ec2d23a253a0c"
+    },
+    {
+      "file": "client-android/scripts/Build-Voice-Android.ps1",
+      "lines": 29,
+      "bytes": 2340,
+      "sha256": "5771235cc6d6cad75358f14db333b4ffd321d6e70d794af159c5cab12b73d9bf"
+    },
+    {
+      "file": "client-android/scripts/Build-WireGuard-Android.ps1",
+      "lines": 48,
+      "bytes": 3151,
+      "sha256": "d89cb5e38dd987d23b59319de06143047971150b7032e7550abb318c50a36747"
+    },
+    {
+      "file": "client-android/scripts/Export-Profile.py",
+      "lines": 129,
+      "bytes": 5373,
+      "sha256": "46431a0f435250c6af325c3625f9b40bf188faa8497b5ef954f515a9657c14a8"
+    },
+    {
+      "file": "client-android/scripts/Prepare-Assets.py",
+      "lines": 141,
+      "bytes": 10144,
+      "sha256": "1e9da996f08ec1b41332a149d4bd2285405648537128fb6f4b93dd539d0c2113"
+    },
+    {
+      "file": "client-android/scripts/Prepare-Licenses.py",
+      "lines": 169,
+      "bytes": 9242,
+      "sha256": "1459663b7cbd0ce0392e0e0608b8adef00e87612566897b77b9f11315a57cad4"
+    },
+    {
+      "file": "client-android/scripts/Protect-Signing-Directory.py",
+      "lines": 39,
+      "bytes": 1668,
+      "sha256": "aae876b9e462a875e8016c6443c0f1f9e6ed6430bbcf50aaef2a66a0f85ac1a3"
+    },
+    {
+      "file": "client-android/scripts/Resolve-Python.ps1",
+      "lines": 21,
+      "bytes": 982,
+      "sha256": "e24ec0b59d2de90c57a2024797a508619b4f2be89ef72719aab0f4dab0d6afa9"
+    },
+    {
+      "file": "client-android/scripts/Sign-Android.ps1",
+      "lines": 92,
+      "bytes": 5493,
+      "sha256": "f8f1b4fa6ddde8ba79e3fef89284340b18cd927470159679851c46c298a56987"
+    },
+    {
+      "file": "client-android/scripts/Test-Assets.cjs",
+      "lines": 195,
+      "bytes": 23106,
+      "sha256": "b3ec2cb377b3c8c9a7f0df3eeaac95af67eb6a226bf63a23adb72efc7d0e8aaf"
+    },
+    {
+      "file": "client-android/settings.gradle",
+      "lines": 4,
+      "bytes": 272,
+      "sha256": "97d6ab74b3881a997a022595db14897854579fd1c0ede29a98c1573ac1764f9b"
+    },
+    {
+      "file": "client-android/tests/Build-Update-Fixture.ps1",
+      "lines": 58,
+      "bytes": 4884,
+      "sha256": "a7c8f0349f5cd9ab7dee7a61bb35c24902ff5fe698d254e4d866812980648509"
+    },
+    {
+      "file": "client-android/tests/Test-Signing.ps1",
+      "lines": 34,
+      "bytes": 2747,
+      "sha256": "52e719e41dd198c03d34595cde70e13d54630fff76d14a100acb9a5cd4a4159c"
+    },
+    {
+      "file": "client-android/tests/inspect_close.mjs",
+      "lines": 78,
+      "bytes": 8136,
+      "sha256": "1b6dd34e335db9df80feded34f30586c6b1cf50fa33bb93749a68cb6a552afcd"
+    },
+    {
+      "file": "client-android/tests/inspect_keyboard.mjs",
+      "lines": 79,
+      "bytes": 7618,
+      "sha256": "5a5b6b253167f62c7978f8de1aeba0d9fd312ce32341d02d9545d1b0baa559fe"
+    },
+    {
+      "file": "client-android/tests/inspect_lots6_8.mjs",
+      "lines": 77,
+      "bytes": 13306,
+      "sha256": "6a68ab3ac1278c33263d03440c529e616ed09f935132fb052cd6e412afef9525"
+    },
+    {
+      "file": "client-android/tests/inspect_model_picker.mjs",
+      "lines": 72,
+      "bytes": 12826,
+      "sha256": "4708f4c11cd1d3ffedfa596b61561edf471860421b71351da4a408926625a77e"
+    },
+    {
+      "file": "client-android/tests/inspect_webview.mjs",
+      "lines": 134,
+      "bytes": 12864,
+      "sha256": "a0adef3bcaeeadf338854da582659d63be2c51edd5b18a102fea11531bbaaf8a"
+    },
+    {
+      "file": "client-android/tests/publish_fixture_notification.py",
+      "lines": 25,
+      "bytes": 1392,
+      "sha256": "5708d56dc28a8ad5008c7e2daaee7878e9a0952e7a3d4ef274233b899786befc"
+    },
+    {
+      "file": "client-android/tests/test_export_profile.py",
+      "lines": 142,
+      "bytes": 7481,
+      "sha256": "006a9fbcd6e3dbcda4fe183695fab7eb5e75ebc9b3ead3fcaa4c89778473488c"
+    },
+    {
+      "file": "client-android/tests/test_prepare_licenses.py",
+      "lines": 78,
+      "bytes": 3969,
+      "sha256": "6da5c62402378f3ca0ff08086116e82f3c2dbe6fdb1ea5b5f5b9f121a64a4e29"
+    },
+    {
+      "file": "client-android/tests/transport_fixture.py",
+      "lines": 307,
+      "bytes": 20780,
+      "sha256": "3f8db2c25ead32b3cda848723465d6d91577f24095a0394b94bc2146ba5d6c82"
+    },
+    {
+      "file": "client-android/tests/update_fixture.py",
+      "lines": 45,
+      "bytes": 1963,
+      "sha256": "bc52149348d622e28ddf29f9e6a5948db4b4d3c8d0890c5909f3c50d783b02de"
+    },
+    {
+      "file": "client-android/tests/verify_transport.mjs",
+      "lines": 55,
+      "bytes": 5181,
+      "sha256": "a2e907be7a82c51e32b1ced451118f09f5f60d577eeb9418dde116edf55df4ca"
+    },
+    {
+      "file": "client-qwen/Build-Client.ps1",
+      "lines": 40,
+      "bytes": 3832,
+      "sha256": "22e78bbb50558ed833b89f24de9fcf5b9c9c2a1fc02b67e16e96b6b8e9ec34df"
+    },
+    {
+      "file": "client-qwen/Build-WireGuard.ps1",
+      "lines": 14,
+      "bytes": 692,
+      "sha256": "c6d4212bffa4a6ec81552108c269f25312b171fcd6bafd09c008b2bf076ee476"
+    },
+    {
+      "file": "client-qwen/Creer-Archive-Sources.py",
+      "lines": 22,
+      "bytes": 1627,
+      "sha256": "3154103f4db4ea46682ff6446794016d994aaea99f6abb5a30d1c59c9b1312cf"
+    },
+    {
+      "file": "client-qwen/LICENSE.txt",
+      "lines": 22,
+      "bytes": 1082,
+      "sha256": "a8c0ece200113587f8ce377f023e8221f7568aaed96b8aee8a53434bfed1292b"
+    },
+    {
+      "file": "client-qwen/LISEZ-MOI.txt",
+      "lines": 186,
+      "bytes": 12940,
+      "sha256": "b7c915006f89f590e7d48a438cd016c2a8db2948bc8ea6b6969088bb411c70e4"
+    },
+    {
+      "file": "client-qwen/Mettre-A-Jour-Clients.py",
+      "lines": 24,
+      "bytes": 851,
+      "sha256": "db6b4db9c564fc18416d62b0aa821ab40fe06c064107f101ba105379475abe7d"
+    },
+    {
+      "file": "client-qwen/Note-test-interface.txt",
+      "lines": 1,
+      "bytes": 79,
+      "sha256": "883fb626f8ae32c874d28262587759a843cf6d8de76193f7dfec1c01d3f45388"
+    },
+    {
+      "file": "client-qwen/THIRD-PARTY.txt",
+      "lines": 1063,
+      "bytes": 57625,
+      "sha256": "ff2a9fbae6cf5f106eac4640da96c6d017de1ba81206550a7eb2761d3b3c0319"
+    },
+    {
+      "file": "client-qwen/Validation-contexte-3.5.13.json",
+      "lines": 1,
+      "bytes": 92,
+      "sha256": "d1927c013ff582e9c4ef35bd672dbd8cc51c7200074f2fac5701bd9bfd0bbc0c"
+    },
+    {
+      "file": "client-qwen/Validation-defilement-3.5.15.json",
+      "lines": 1,
+      "bytes": 220,
+      "sha256": "4091f8482068bf89f979e8462dc9a53e9af92838fedb90f314f0a3d82816d08a"
+    },
+    {
+      "file": "client-qwen/Verifier-Connexion.py",
+      "lines": 26,
+      "bytes": 957,
+      "sha256": "751d72f7af232fcf464bec3af11d577c019a989cfe20840f9a049ed310e3591e"
+    },
+    {
+      "file": "client-qwen/android-outils/Environnement-Android.ps1",
+      "lines": 25,
+      "bytes": 1266,
+      "sha256": "b059bcefdcaa1fdd978be521693859f378a89fd5e70164923a9ee33d722b932e"
+    },
+    {
+      "file": "client-qwen/android-outils/Lancer-Emulateur.ps1",
+      "lines": 11,
+      "bytes": 534,
+      "sha256": "8f99377a63676fdc7702697f478d7bd980fb6c8bf6993149e05e7b3f2e366ad6"
+    },
+    {
+      "file": "client-qwen/android-outils/Ouvrir-Android-Studio.ps1",
+      "lines": 5,
+      "bytes": 283,
+      "sha256": "39d05bfb3db8cd25044d2b9c06a17f2ce046402a92e50994761603542bde5116"
+    },
+    {
+      "file": "client-qwen/android-outils/README.md",
+      "lines": 98,
+      "bytes": 4467,
+      "sha256": "1669303c6a632276e8c03237850f8ead34aeb735830466fcf40f78a28bb19f56"
+    },
+    {
+      "file": "client-qwen/android-outils/Verifier-Android.ps1",
+      "lines": 19,
+      "bytes": 1018,
+      "sha256": "8fb4fb8aef9e1f3a0613b4a2093d61e0d481b68c8b02bac77d944bdd786711ad"
+    },
+    {
+      "file": "client-qwen/app_integrations.py",
+      "lines": 282,
+      "bytes": 15482,
+      "sha256": "6654bcf6d925cc76e4d64e3a496437fc4406b606a3edf82faf359ab9e5208c9a"
+    },
+    {
+      "file": "client-qwen/attachments.js",
+      "lines": 71,
+      "bytes": 6617,
+      "sha256": "8fb023f5c48e243b9f24d034c322a0ec53d7c391e2c73588a83c34a28a251867"
+    },
+    {
+      "file": "client-qwen/browser_test_support.cjs",
+      "lines": 4,
+      "bytes": 328,
+      "sha256": "0b75b883ecea1108c9cb5b998880e587fd266b1fcc0604bb36af5fa162f9d865"
+    },
+    {
+      "file": "client-qwen/chat.html",
+      "lines": 270,
+      "bytes": 57087,
+      "sha256": "c229c534eeac5483ffd512e16f3f5ae354bc67bb2f42cc994bd03f1ac9d270f0"
+    },
+    {
+      "file": "client-qwen/chat_attachments.py",
+      "lines": 66,
+      "bytes": 4101,
+      "sha256": "ed9f13f584abad3830bb330ddaddbdd9330f44e539c5fa7eb323f90fc30c39a2"
+    },
+    {
+      "file": "client-qwen/client.py",
+      "lines": 753,
+      "bytes": 49965,
+      "sha256": "c2a529dce29e0eb7c587890c129b9c41c5c8a929cf129be35228b512434ab0d9"
+    },
+    {
+      "file": "client-qwen/connection_settings.py",
+      "lines": 41,
+      "bytes": 2003,
+      "sha256": "06cf83226a9137e7f2e7ce3c0e937e67cd586c3d8790e7df5761a60d8e21e0a6"
+    },
+    {
+      "file": "client-qwen/conversation.js",
+      "lines": 142,
+      "bytes": 12855,
+      "sha256": "932f26769d454dc3b8876c0a53e1cc6139b262a85bd0808faf953f0dcbac3f94"
+    },
+    {
+      "file": "client-qwen/conversation_service.py",
+      "lines": 115,
+      "bytes": 7507,
+      "sha256": "2792422e379407d6528d22db6f7432ee20eff0ab13bab735e529f171510c7caa"
+    },
+    {
+      "file": "client-qwen/corrector.js",
+      "lines": 43,
+      "bytes": 7842,
+      "sha256": "0eb3b92757313bebf090c0814eca3adbbed5b5a54b4ecb7c4f962a12b412d392"
+    },
+    {
+      "file": "client-qwen/draft_store.py",
+      "lines": 64,
+      "bytes": 3502,
+      "sha256": "95363bacdbda3c7a9f941219a4ea824acdee2f2e36ac95dbb606c9be36762d41"
+    },
+    {
+      "file": "client-qwen/file_lock.py",
+      "lines": 28,
+      "bytes": 1177,
+      "sha256": "a9042e1877243309a262182c0af7f5dea7cff91c436f17d2f3e2b134a2fbf608"
+    },
+    {
+      "file": "client-qwen/fred_http.py",
+      "lines": 61,
+      "bytes": 2342,
+      "sha256": "79293e9675e76e6ae624517dfd4dcbf7f10275dbd496cb39ce5b13cac5c5909e"
+    },
+    {
+      "file": "client-qwen/generate_icon.py",
+      "lines": 59,
+      "bytes": 2441,
+      "sha256": "3987b01215511324e227242dd96b419afe546bf136ae07320edf2fc0acc6b850"
+    },
+    {
+      "file": "client-qwen/generate_version.py",
+      "lines": 14,
+      "bytes": 876,
+      "sha256": "9c5d6ac6b9207e9f6a6fcce9bf1da48a4a8edcc988e38bacba98bb81b3f0dc4d"
+    },
+    {
+      "file": "client-qwen/history_store.py",
+      "lines": 103,
+      "bytes": 5467,
+      "sha256": "e6618a900a3069fd650aece41f01fe8e1b9ab5d37f9fb4e2aa201fe709c5c3fb"
+    },
+    {
+      "file": "client-qwen/history_sync.py",
+      "lines": 184,
+      "bytes": 12307,
+      "sha256": "7cecfa61264e3e9d703594cea126a8b28b1e2aeae3f7d39be83e34a583105f75"
+    },
+    {
+      "file": "client-qwen/local_voice.py",
+      "lines": 245,
+      "bytes": 15037,
+      "sha256": "d9f72ee989e2d8424a935d552c6c36ad3fdbc98cf3cc73ae39a120bd5ebf374c"
+    },
+    {
+      "file": "client-qwen/markdown.js",
+      "lines": 35,
+      "bytes": 2163,
+      "sha256": "48dd2beb1c941fe517b472959ff669a92ffa8cb51ca19fe8771c8281f366e21d"
+    },
+    {
+      "file": "client-qwen/opencode_visibility.py",
+      "lines": 82,
+      "bytes": 4672,
+      "sha256": "23171d274557705f090a4550255c2c1984c1af3206118534979063e5dd71f6cb"
+    },
+    {
+      "file": "client-qwen/package-lock.json",
+      "lines": 65,
+      "bytes": 1802,
+      "sha256": "c0ecbb9c1a9536df6f00810369c6b5a499b7315b6ce68843a1199c5318e18501"
+    },
+    {
+      "file": "client-qwen/package.json",
+      "lines": 8,
+      "bytes": 205,
+      "sha256": "04306124b1981e4d8c4c4f0d3c761faa34fdb2e767b7a0d03dbef8eafde846b7"
+    },
+    {
+      "file": "client-qwen/preview-request.json",
+      "lines": 14,
+      "bytes": 275,
+      "sha256": "01e495ef2dccb02a9a812372467d44ab0cd7a1e3d9796c6df7f9120f874bbb36"
+    },
+    {
+      "file": "client-qwen/preview_chat.py",
+      "lines": 33,
+      "bytes": 1573,
+      "sha256": "8aada406fed65b2477d3d5a017c64f1a1c2ee2880b9683e21cdee8d8eac7cf45"
+    },
+    {
+      "file": "client-qwen/product-version.txt",
+      "lines": 10,
+      "bytes": 608,
+      "sha256": "9f14ed209140bf0c298461881f700f5f2d50c908ac4f9ddfa4ee4a66653c07f6"
+    },
+    {
+      "file": "client-qwen/product.py",
+      "lines": 5,
+      "bytes": 188,
+      "sha256": "a2102d50527d1e4be9be03f3b619f460c7510364024a6c3eaa29c8d513046a71"
+    },
+    {
+      "file": "client-qwen/requirements-build.txt",
+      "lines": 7,
+      "bytes": 128,
+      "sha256": "3d941c7f31d88b04b7b4c0daa4606fedc1a6dc021dfb1dc605e4a4fe1f07c671"
+    },
+    {
+      "file": "client-qwen/run_ui_tests.cjs",
+      "lines": 8,
+      "bytes": 541,
+      "sha256": "a8ac47cce95fd3bfa173b4f2aa541b2d657c6e70b6bc3cac91e97eafca1ff06d"
+    },
+    {
+      "file": "client-qwen/selection.js",
+      "lines": 56,
+      "bytes": 5287,
+      "sha256": "fb4fab5840149a8215c6735fc47919bdc7e59e52082cb476c724c7a68e8bb506"
+    },
+    {
+      "file": "client-qwen/self-test-3510.txt",
+      "lines": 1,
+      "bytes": 32,
+      "sha256": "75b29efe50b979db5b8e5e82ba3ae32fb87f0b9d18c7f62dece9c7f1ead083dd"
+    },
+    {
+      "file": "client-qwen/self-test-3511.txt",
+      "lines": 1,
+      "bytes": 32,
+      "sha256": "75b29efe50b979db5b8e5e82ba3ae32fb87f0b9d18c7f62dece9c7f1ead083dd"
+    },
+    {
+      "file": "client-qwen/self-test-3512.txt",
+      "lines": 1,
+      "bytes": 32,
+      "sha256": "75b29efe50b979db5b8e5e82ba3ae32fb87f0b9d18c7f62dece9c7f1ead083dd"
+    },
+    {
+      "file": "client-qwen/self-test-3513.txt",
+      "lines": 1,
+      "bytes": 32,
+      "sha256": "75b29efe50b979db5b8e5e82ba3ae32fb87f0b9d18c7f62dece9c7f1ead083dd"
+    },
+    {
+      "file": "client-qwen/self-test-3514.txt",
+      "lines": 1,
+      "bytes": 32,
+      "sha256": "75b29efe50b979db5b8e5e82ba3ae32fb87f0b9d18c7f62dece9c7f1ead083dd"
+    },
+    {
+      "file": "client-qwen/self-test-3515.txt",
+      "lines": 1,
+      "bytes": 32,
+      "sha256": "75b29efe50b979db5b8e5e82ba3ae32fb87f0b9d18c7f62dece9c7f1ead083dd"
+    },
+    {
+      "file": "client-qwen/self-test-3516.txt",
+      "lines": 1,
+      "bytes": 32,
+      "sha256": "75b29efe50b979db5b8e5e82ba3ae32fb87f0b9d18c7f62dece9c7f1ead083dd"
+    },
+    {
+      "file": "client-qwen/self-test-356.txt",
+      "lines": 1,
+      "bytes": 32,
+      "sha256": "75b29efe50b979db5b8e5e82ba3ae32fb87f0b9d18c7f62dece9c7f1ead083dd"
+    },
+    {
+      "file": "client-qwen/self-test-357.txt",
+      "lines": 1,
+      "bytes": 32,
+      "sha256": "75b29efe50b979db5b8e5e82ba3ae32fb87f0b9d18c7f62dece9c7f1ead083dd"
+    },
+    {
+      "file": "client-qwen/self-test-358.txt",
+      "lines": 1,
+      "bytes": 32,
+      "sha256": "75b29efe50b979db5b8e5e82ba3ae32fb87f0b9d18c7f62dece9c7f1ead083dd"
+    },
+    {
+      "file": "client-qwen/self-test-359.txt",
+      "lines": 1,
+      "bytes": 32,
+      "sha256": "75b29efe50b979db5b8e5e82ba3ae32fb87f0b9d18c7f62dece9c7f1ead083dd"
+    },
+    {
+      "file": "client-qwen/self-test-https-353-client1.txt",
+      "lines": 1,
+      "bytes": 32,
+      "sha256": "75b29efe50b979db5b8e5e82ba3ae32fb87f0b9d18c7f62dece9c7f1ead083dd"
+    },
+    {
+      "file": "client-qwen/self-test-https-353-client2.txt",
+      "lines": 1,
+      "bytes": 32,
+      "sha256": "75b29efe50b979db5b8e5e82ba3ae32fb87f0b9d18c7f62dece9c7f1ead083dd"
+    },
+    {
+      "file": "client-qwen/self-test-icon-354-0402a094eeb03bdc.txt",
+      "lines": 1,
+      "bytes": 32,
+      "sha256": "75b29efe50b979db5b8e5e82ba3ae32fb87f0b9d18c7f62dece9c7f1ead083dd"
+    },
+    {
+      "file": "client-qwen/self-test-sans-profils-355-0402a094eeb03bdc.json",
+      "lines": 1,
+      "bytes": 219,
+      "sha256": "806c76bca2eaf9ffa92944c5c0ee871d8aff11e7414fe05e5dddd2eb03dd55c1"
+    },
+    {
+      "file": "client-qwen/self-test-ui-3510.json",
+      "lines": 1,
+      "bytes": 267,
+      "sha256": "f4df13915a353de666872460febd8cffa67afd3d55f230200e62aa4687ded93f"
+    },
+    {
+      "file": "client-qwen/self-test-ui-3511.json",
+      "lines": 1,
+      "bytes": 267,
+      "sha256": "f4df13915a353de666872460febd8cffa67afd3d55f230200e62aa4687ded93f"
+    },
+    {
+      "file": "client-qwen/self-test-ui-3512.json",
+      "lines": 1,
+      "bytes": 311,
+      "sha256": "3661587202e345902ddc675b7045040f1b98a76f612149354cf4847b415636b2"
+    },
+    {
+      "file": "client-qwen/self-test-ui-3513.json",
+      "lines": 1,
+      "bytes": 358,
+      "sha256": "d48ce9f5551e72aff6d2db2b6a7e23f76d1fd1042050ad826367072631c295e7"
+    },
+    {
+      "file": "client-qwen/self-test-ui-3515.json",
+      "lines": 1,
+      "bytes": 358,
+      "sha256": "d48ce9f5551e72aff6d2db2b6a7e23f76d1fd1042050ad826367072631c295e7"
+    },
+    {
+      "file": "client-qwen/self-test-ui-356.json",
+      "lines": 1,
+      "bytes": 219,
+      "sha256": "806c76bca2eaf9ffa92944c5c0ee871d8aff11e7414fe05e5dddd2eb03dd55c1"
+    },
+    {
+      "file": "client-qwen/self-test-ui-357.json",
+      "lines": 1,
+      "bytes": 219,
+      "sha256": "806c76bca2eaf9ffa92944c5c0ee871d8aff11e7414fe05e5dddd2eb03dd55c1"
+    },
+    {
+      "file": "client-qwen/self-test-ui-358.json",
+      "lines": 1,
+      "bytes": 219,
+      "sha256": "806c76bca2eaf9ffa92944c5c0ee871d8aff11e7414fe05e5dddd2eb03dd55c1"
+    },
+    {
+      "file": "client-qwen/self-test-ui-359.json",
+      "lines": 1,
+      "bytes": 267,
+      "sha256": "f4df13915a353de666872460febd8cffa67afd3d55f230200e62aa4687ded93f"
+    },
+    {
+      "file": "client-qwen/stable-wireguard-self-test.txt",
+      "lines": 1,
+      "bytes": 32,
+      "sha256": "75b29efe50b979db5b8e5e82ba3ae32fb87f0b9d18c7f62dece9c7f1ead083dd"
+    },
+    {
+      "file": "client-qwen/test_conversation_ui.cjs",
+      "lines": 121,
+      "bytes": 17265,
+      "sha256": "d8f528f4865f700b43ebfa0b918af9d8d42a5a2286d788b7698fef9747f497ac"
+    },
+    {
+      "file": "client-qwen/test_direct_corrector_ui.cjs",
+      "lines": 75,
+      "bytes": 12523,
+      "sha256": "2db6913160b12147b712957ad9dfbd1704256f802824722b5491156a9eec3633"
+    },
+    {
+      "file": "client-qwen/test_hermes_distribution.py",
+      "lines": 35,
+      "bytes": 1985,
+      "sha256": "0eb520f2788dbf4da7e2baa70cc26c40b9733b751c25868411e3f11c53a62e56"
+    },
+    {
+      "file": "client-qwen/test_hermes_history.py",
+      "lines": 67,
+      "bytes": 3946,
+      "sha256": "33dce05611e40c498ec839309b78a9a8543e39224215a90ea4e94199664fda05"
+    },
+    {
+      "file": "client-qwen/test_hermes_ui.cjs",
+      "lines": 85,
+      "bytes": 12374,
+      "sha256": "14e570bdc6784348b0a83cdf300aefc6ffff6a570641328b9ec83b892776cff0"
+    },
+    {
+      "file": "client-qwen/test_model_catalogue.py",
+      "lines": 100,
+      "bytes": 6263,
+      "sha256": "ca206e56bd81c8fbeb1b099909aba053a9ad5349dd70ab56e6f2c10fc7d8fd91"
+    },
+    {
+      "file": "client-qwen/test_model_selector_ui.cjs",
+      "lines": 84,
+      "bytes": 23353,
+      "sha256": "ef45126edd58ac6cc5dfcc3e27f679c1ed3d38a26d21cb49287a08b36b2bbed5"
+    },
+    {
+      "file": "client-qwen/test_thinking_preferences.py",
+      "lines": 71,
+      "bytes": 3572,
+      "sha256": "089c8b36010403ba7fc435dc434aa4aaba65768bdfcf37a1025c94d05490c776"
+    },
+    {
+      "file": "client-qwen/test_thinking_ui.cjs",
+      "lines": 74,
+      "bytes": 16169,
+      "sha256": "15644b63bd12bde01bf9faceb0ff8247d6d7dc08d28a8dfb1c7a15f0f60bba72"
+    },
+    {
+      "file": "client-qwen/test_voice_transport.py",
+      "lines": 58,
+      "bytes": 2727,
+      "sha256": "ece8319006061ca5c832c17171e0f6dd47ae95f3334153b03ce0e93453766622"
+    },
+    {
+      "file": "client-qwen/thinking.js",
+      "lines": 93,
+      "bytes": 8342,
+      "sha256": "4a9a7079f517e8150984cc63634e2f9030277523fdd0bfc6d9f9810b143a6f07"
+    },
+    {
+      "file": "client-qwen/ui.css",
+      "lines": 80,
+      "bytes": 42604,
+      "sha256": "d2d73bf570866ff287cccf28fe91053e18d60777cdc34921f8887a514371dfa0"
+    },
+    {
+      "file": "client-qwen/ui.js",
+      "lines": 244,
+      "bytes": 27342,
+      "sha256": "8fe5e68ce06dac2e238f8daeac852596ab1b5f7109ac4886e9451a0d5b20dbc9"
+    },
+    {
+      "file": "client-qwen/updater.py",
+      "lines": 188,
+      "bytes": 11353,
+      "sha256": "e9be6f074452c87ec0a1b6b8d7c43b4242fc76e3e41e890da40c4fdbaa972edd"
+    },
+    {
+      "file": "client-qwen/voice.js",
+      "lines": 55,
+      "bytes": 6580,
+      "sha256": "4e285ddec832c618a48537ffde282faf89b67baf49f7f422fffefaa37f5cdc79"
+    },
+    {
+      "file": "client-qwen/voice/build-info.json",
+      "lines": 17,
+      "bytes": 1024,
+      "sha256": "33a4bca456bdcdd00cf4dc44f64d7c83d008c10e640c7b7a0f3121b9b30300c4"
+    },
+    {
+      "file": "client-qwen/voice/conversation-models.json",
+      "lines": 46,
+      "bytes": 2231,
+      "sha256": "e1a6f67dad2f0ba35783e606e3da2962abb01799a25c68533a89905fff274459"
+    },
+    {
+      "file": "client-qwen/voice/licenses/CONVERSATION-NOTICES.txt",
+      "lines": 19,
+      "bytes": 1237,
+      "sha256": "5ec9a447fe722f7e5ce3a35e84920b640b7037dc6204e8692c276479b898948c"
+    },
+    {
+      "file": "client-qwen/voice/licenses/conversation/numpy/LICENSE.md",
+      "lines": 71,
+      "bytes": 3582,
+      "sha256": "b4bc2f4fa1c95778f1ed3dd8f14706bece399475b978f9f34b5d3cd72521b48a"
+    },
+    {
+      "file": "client-qwen/voice/licenses/conversation/numpy/LICENSE.txt",
+      "lines": 21,
+      "bytes": 1039,
+      "sha256": "d544761558b510866c21f7e8a2d5716fca76e0b98117e3b6b86314db7244d150"
+    },
+    {
+      "file": "client-qwen/voice/licenses/conversation/numpy/VERSION.txt",
+      "lines": 1,
+      "bytes": 13,
+      "sha256": "f4bfcfcc7af63d62b947b454f2aee5332265b299ff17cfb8b2a57f99e0171a6d"
+    },
+    {
+      "file": "client-qwen/voice/licenses/conversation/onnxruntime/VERSION.txt",
+      "lines": 1,
+      "bytes": 20,
+      "sha256": "b0c2ee60944f5dbf9a3d7a6cc7a6204c193be61084af60a9417c38ac0931b81d"
+    },
+    {
+      "file": "client-qwen/voice/licenses/conversation/sherpa-onnx-core/VERSION.txt",
+      "lines": 1,
+      "bytes": 25,
+      "sha256": "c70f965665545d007cf72695f8c6f8dbebd4e226e01b28bab2e2513033fbe630"
+    },
+    {
+      "file": "client-qwen/voice/licenses/conversation/sherpa-onnx/VERSION.txt",
+      "lines": 1,
+      "bytes": 20,
+      "sha256": "84b0bd2c64b382081c67483262dd6d70785947661f3c825b6e6d6013341eb06f"
+    },
+    {
+      "file": "client-qwen/voice/licenses/ggml-LICENSE.txt",
+      "lines": 21,
+      "bytes": 1078,
+      "sha256": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d"
+    },
+    {
+      "file": "client-qwen/voice/licenses/llamafile-LICENSE.txt",
+      "lines": 21,
+      "bytes": 1079,
+      "sha256": "903db391399dc8ad508cb5ee0ebc0bbd4bb6f1fb8bf9a06e1bcd1d7e3eccd2e4"
+    },
+    {
+      "file": "client-qwen/voice/licenses/silero-vad-LICENSE.txt",
+      "lines": 21,
+      "bytes": 1075,
+      "sha256": "2e63e9a38b6e8fc0c7bc37ce174caca1862870856c6daf5697cfb785e925520b"
+    },
+    {
+      "file": "client-qwen/voice/licenses/smart-turn-LICENSE.txt",
+      "lines": 24,
+      "bytes": 1301,
+      "sha256": "0d66364067f678c08586ebb60a16a2aed4fa081ec11057df35585759ce0e774f"
+    },
+    {
+      "file": "client-qwen/voice/licenses/whisper-model-LICENSE.txt",
+      "lines": 21,
+      "bytes": 1063,
+      "sha256": "b5d65a59060e68c4ff940e1eddfa6f94b2d68fdf58ed7f4dd57721c997e35e9d"
+    },
+    {
+      "file": "client-qwen/voice/licenses/whisper.cpp-LICENSE.txt",
+      "lines": 21,
+      "bytes": 1078,
+      "sha256": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d"
+    },
+    {
+      "file": "client-qwen/voice/model.json",
+      "lines": 13,
+      "bytes": 508,
+      "sha256": "5dde5e5c0d565557189d8e81f261cd3e1588358e0d1906fb46aa97f53bbe0690"
+    },
+    {
+      "file": "client-qwen/voice/native-manifest.json",
+      "lines": 1926,
+      "bytes": 91443,
+      "sha256": "10b232b80836b5a4d5264956f77bd8ffb602d513faf01ef140ccab95583a13b1"
+    },
+    {
+      "file": "client-qwen/wg_bridge.py",
+      "lines": 153,
+      "bytes": 7102,
+      "sha256": "e632fefb15d4bcfb6b074c0f4512379a79260c247f7d0d14dc317a3f2ea3c0b7"
+    },
+    {
+      "file": "client-qwen/workspace.html",
+      "lines": 279,
+      "bytes": 56156,
+      "sha256": "d8d10bed02b1a17383e7d2243958aca97ebfa7c1c2fdcdcf1dcf076db7f77009"
+    },
+    {
+      "file": "client-voice/Build-Conversation.ps1",
+      "lines": 13,
+      "bytes": 1369,
+      "sha256": "a11e8cbd7147853597c00c6ec13cfee7b969bdae0286e26e1a1bcc8dbf0beb60"
+    },
+    {
+      "file": "client-voice/Build-Voice.cmd",
+      "lines": 11,
+      "bytes": 551,
+      "sha256": "2174ef21dc848eb68f3cc202c8188da89389badfb9614b7a61fc26b3227f3fe5"
+    },
+    {
+      "file": "client-voice/CMakeLists.txt",
+      "lines": 47,
+      "bytes": 1889,
+      "sha256": "1baeb84022f196640771e3106d8895821aa9a79534c19ae4f017da54f3b5912b"
+    },
+    {
+      "file": "client-voice/CONVERSATION-WINDOWS.md",
+      "lines": 47,
+      "bytes": 8235,
+      "sha256": "14f4da7058d832181c6bf1a66796b986a7806a05e56cf50228765d43a497d3d0"
+    },
+    {
+      "file": "client-voice/Prepare-Windows.ps1",
+      "lines": 23,
+      "bytes": 2295,
+      "sha256": "0da0371049a408ef5c1a08aeb81a147edb1937aaa3f5d5c7e1c76b79578784cc"
+    },
+    {
+      "file": "client-voice/README.md",
+      "lines": 34,
+      "bytes": 5421,
+      "sha256": "530ae215839c0d862d9189e2ae08a50b27f46cd2c1dc37610c29933cac8b0524"
+    },
+    {
+      "file": "client-voice/aec_capture.py",
+      "lines": 28,
+      "bytes": 1461,
+      "sha256": "dd6c5b723cfaf80c5cf2b2ca90dd1e08f724ad57ce2aa5c5ad567b9737d8cfbc"
+    },
+    {
+      "file": "client-voice/conversation-models.json",
+      "lines": 46,
+      "bytes": 2231,
+      "sha256": "e1a6f67dad2f0ba35783e606e3da2962abb01799a25c68533a89905fff274459"
+    },
+    {
+      "file": "client-voice/conversation_worker.py",
+      "lines": 140,
+      "bytes": 8072,
+      "sha256": "c11d69caa0c1b19ea93d749342231af099653ddc22c63abb308f67af240cb0ae"
+    },
+    {
+      "file": "client-voice/fred_aec.cpp",
+      "lines": 117,
+      "bytes": 6105,
+      "sha256": "8a77533c5feb461f2750bbccc49cc424c86325e85cd4b7cd124059d245b685a4"
+    },
+    {
+      "file": "client-voice/fred_voice.cpp",
+      "lines": 187,
+      "bytes": 10408,
+      "sha256": "71df9feaf1d5403b79fb1f9b7e7707fc94005fd13aab832c2253557364457102"
+    },
+    {
+      "file": "client-voice/fred_voice.h",
+      "lines": 16,
+      "bytes": 582,
+      "sha256": "2a7eebbb3ed0370d2a3d346cb66e2b80778a1ec3f7e15995e9a26c5a3e3d5001"
+    },
+    {
+      "file": "client-voice/fred_voice_jni.cpp",
+      "lines": 29,
+      "bytes": 2368,
+      "sha256": "a59e127dbde4730e9554ecff090e62cb5a670718b3a84018cad5586c621f5d19"
+    },
+    {
+      "file": "client-voice/licenses/CONVERSATION-NOTICES.txt",
+      "lines": 19,
+      "bytes": 1237,
+      "sha256": "5ec9a447fe722f7e5ce3a35e84920b640b7037dc6204e8692c276479b898948c"
+    },
+    {
+      "file": "client-voice/licenses/ggml-LICENSE.txt",
+      "lines": 21,
+      "bytes": 1078,
+      "sha256": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d"
+    },
+    {
+      "file": "client-voice/licenses/llamafile-LICENSE.txt",
+      "lines": 21,
+      "bytes": 1079,
+      "sha256": "903db391399dc8ad508cb5ee0ebc0bbd4bb6f1fb8bf9a06e1bcd1d7e3eccd2e4"
+    },
+    {
+      "file": "client-voice/licenses/silero-vad-LICENSE.txt",
+      "lines": 21,
+      "bytes": 1075,
+      "sha256": "2e63e9a38b6e8fc0c7bc37ce174caca1862870856c6daf5697cfb785e925520b"
+    },
+    {
+      "file": "client-voice/licenses/smart-turn-LICENSE.txt",
+      "lines": 24,
+      "bytes": 1301,
+      "sha256": "0d66364067f678c08586ebb60a16a2aed4fa081ec11057df35585759ce0e774f"
+    },
+    {
+      "file": "client-voice/licenses/whisper-model-LICENSE.txt",
+      "lines": 21,
+      "bytes": 1063,
+      "sha256": "b5d65a59060e68c4ff940e1eddfa6f94b2d68fdf58ed7f4dd57721c997e35e9d"
+    },
+    {
+      "file": "client-voice/licenses/whisper.cpp-LICENSE.txt",
+      "lines": 21,
+      "bytes": 1078,
+      "sha256": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d"
+    },
+    {
+      "file": "client-voice/model.json",
+      "lines": 13,
+      "bytes": 508,
+      "sha256": "5dde5e5c0d565557189d8e81f261cd3e1588358e0d1906fb46aa97f53bbe0690"
+    },
+    {
+      "file": "client-voice/prepare_conversation.py",
+      "lines": 48,
+      "bytes": 2556,
+      "sha256": "bc48ef8d3d7d978c7441a7df5875e7001ef1faee43d4999e057ea113e5c91485"
+    },
+    {
+      "file": "client-voice/prepare_conversation_licenses.py",
+      "lines": 20,
+      "bytes": 1091,
+      "sha256": "e2e52b51caf94289786f273ee39c0a1c1f0bf1159ec7f86e2e7211bf1fcb6f78"
+    },
+    {
+      "file": "client-voice/prepare_model.py",
+      "lines": 34,
+      "bytes": 1515,
+      "sha256": "54224f6a77d4e8822ff82cec551ca7711e2cd535ed86807225f3915080883b40"
+    },
+    {
+      "file": "client-voice/prepare_ui_tests.py",
+      "lines": 35,
+      "bytes": 2688,
+      "sha256": "fcd647466b3df0dd994643df2717990218b1cf0d692908c4663fe0ee5ad40aab"
+    },
+    {
+      "file": "client-voice/requirements-conversation.txt",
+      "lines": 6,
+      "bytes": 150,
+      "sha256": "26a79a773cc6e15708f5809f9d8058276a60316510169d6eaea839187917c577"
+    },
+    {
+      "file": "client-voice/test_conversation.py",
+      "lines": 65,
+      "bytes": 3886,
+      "sha256": "e0f7509bc2f784d534490170715e6a254a396f758aa98d6c9c554679d2bc46a3"
+    },
+    {
+      "file": "client-voice/test_http.py",
+      "lines": 31,
+      "bytes": 2429,
+      "sha256": "3222ead3a8708d53988ec910993aaa607c85c686129a0e2fd2ebdc0f30492965"
+    },
+    {
+      "file": "client-voice/test_service.py",
+      "lines": 82,
+      "bytes": 6102,
+      "sha256": "ad4632ec13716c6a004c87dd0e5b1a0ed480bc66d4333686c2998f90fef5cfb6"
+    },
+    {
+      "file": "client-voice/turn_features.py",
+      "lines": 35,
+      "bytes": 1411,
+      "sha256": "cb937b7ce1ee4e0e28a8aa94f689d8e1c054995a53f8f74ef8d13ba533ea07f0"
+    },
+    {
+      "file": "client-voice/update_conversation_docs.py",
+      "lines": 30,
+      "bytes": 4396,
+      "sha256": "48344276fdb75aaa275d07e76d9779ebccbcb6e03b470a4fa1eb49f511fcd468"
+    },
+    {
+      "file": "lanceur/AUDIT-CLIENT-WIREGUARD.txt",
+      "lines": 90,
+      "bytes": 5484,
+      "sha256": "647276936f423457b76e7d35f2b8443181a0893a4df98321e22377cd431e6836"
+    },
+    {
+      "file": "lanceur/AUDIT-ESPACES-FRED.txt",
+      "lines": 68,
+      "bytes": 4681,
+      "sha256": "650e728834c85a509705b8d1fdd94d54dd3f483c933564db533415442c76a1a3"
+    },
+    {
+      "file": "lanceur/AUDIT-FRED.txt",
+      "lines": 110,
+      "bytes": 6977,
+      "sha256": "ac362a104346346fae03f4f1d06b4c115b164e9d7b3d9c2d6621eb75f759a3fe"
+    },
+    {
+      "file": "lanceur/Appliquer-WireGuard.py",
+      "lines": 43,
+      "bytes": 2024,
+      "sha256": "c9f6c68c703ce540b8e404b9164bea49f41fe2f7f0351b3fa27ffe395126d8c6"
+    },
+    {
+      "file": "lanceur/Autoriser-WireGuard.ps1",
+      "lines": 34,
+      "bytes": 2162,
+      "sha256": "c9b57bd28d0da4be13643f76448c962b1653115ede862b02bd7990fbd7fa45da"
+    },
+    {
+      "file": "lanceur/CHANGEMENTS-V2.txt",
+      "lines": 48,
+      "bytes": 2971,
+      "sha256": "c8b49846264f16ce040b6d855860a894e7172b85afa1c6d38cef01d5ff4e31ea"
+    },
+    {
+      "file": "lanceur/DOSSIERS-CLIENTS.md",
+      "lines": 53,
+      "bytes": 5392,
+      "sha256": "178f6abf69ba8930e32780a653e00569f1a15dbfc7761592f65812f19957dba2"
+    },
+    {
+      "file": "lanceur/ESPACES-FRED.txt",
+      "lines": 90,
+      "bytes": 6048,
+      "sha256": "a2a30fd4c9e83985e3860f4be1fd084baa04a364d3a49183aa4d569b37a4f47a"
+    },
+    {
+      "file": "lanceur/HERMES-FRED.md",
+      "lines": 76,
+      "bytes": 14110,
+      "sha256": "8346acb78bdde61d713d87fac666b1870c2433048db386c7d7868780307ad78b"
+    },
+    {
+      "file": "lanceur/LICENSE.txt",
+      "lines": 22,
+      "bytes": 1082,
+      "sha256": "a8c0ece200113587f8ce377f023e8221f7568aaed96b8aee8a53434bfed1292b"
+    },
+    {
+      "file": "lanceur/LISEZ-MOI.txt",
+      "lines": 153,
+      "bytes": 10056,
+      "sha256": "f5bafca6efb91e7860cc0dfc5c09abe2a065e1e31350e5c1d58d3c65be6b7486"
+    },
+    {
+      "file": "lanceur/MEMOIRE-EG2.md",
+      "lines": 51,
+      "bytes": 5357,
+      "sha256": "4cd94f6b53d04e573f7f11c6e018f734c0993b0664f0e91223abf1f9f4299fc6"
+    },
+    {
+      "file": "lanceur/NOTES-V3.1.txt",
+      "lines": 16,
+      "bytes": 2092,
+      "sha256": "081eb1a982a53bdd118049767d7a2f476099861833cbead0656be0e0e6203e82"
+    },
+    {
+      "file": "lanceur/NOTES-V3.txt",
+      "lines": 60,
+      "bytes": 6142,
+      "sha256": "e0660cc6439a4bb9bf7e37ba704c439ed91f1f599a9d49a9958ae481930a5eba"
+    },
+    {
+      "file": "lanceur/NOUVEAUTES-3.5.0.txt",
+      "lines": 74,
+      "bytes": 5172,
+      "sha256": "e2f0817aa918ddfd422850db36be2ba9809ad2ca54cd0bf8a4f25fdcdbefdaf5"
+    },
+    {
+      "file": "lanceur/PLAN-ESPACES-FRED.txt",
+      "lines": 158,
+      "bytes": 9371,
+      "sha256": "e781db799ae2a667cdec9554e6b314f3fdb0f6c3ec9ae53280458ee848976d22"
+    },
+    {
+      "file": "lanceur/RECHERCHE-NOTIFICATIONS.md",
+      "lines": 37,
+      "bytes": 5096,
+      "sha256": "294f38b6baf1d6c7ae4596db962c5edc3b60f889ce7d6f86eeb636ac59aa3f42"
+    },
+    {
+      "file": "lanceur/RECUPERATION-SIGNATURES.md",
+      "lines": 30,
+      "bytes": 2927,
+      "sha256": "6c0535bcc1f1c9940b237899d2681fc0bc2cc8d2dff2109c536ef92c81524e13"
+    },
+    {
+      "file": "lanceur/REFONTE-INTERFACE.txt",
+      "lines": 56,
+      "bytes": 3879,
+      "sha256": "ec55816bb44831c884d2ea202b9a022ba3a85ea611a6989dc17b23f885db54c1"
+    },
+    {
+      "file": "lanceur/SAUVEGARDES-APPAREILS.md",
+      "lines": 56,
+      "bytes": 7610,
+      "sha256": "f942733247470ed8e114f932b9446b4ab4db89610819fa05c96d46a70f9feab3"
+    },
+    {
+      "file": "lanceur/accounts.py",
+      "lines": 78,
+      "bytes": 4744,
+      "sha256": "844732aed392885a99fd09511fdf5f01f3bf160ffa2d18b0f1f6168afd989fd0"
+    },
+    {
+      "file": "lanceur/android_releases.py",
+      "lines": 39,
+      "bytes": 1806,
+      "sha256": "41f8fcc9f899a64e344d3ee7730df8380dd7227ccd0cfd38eabdb6cf07df1347"
+    },
+    {
+      "file": "lanceur/app.py",
+      "lines": 554,
+      "bytes": 34188,
+      "sha256": "fedd8ee2b0520fa6a7566e84e565c261c09dba258cd38e480e31709dc32102b5"
+    },
+    {
+      "file": "lanceur/backups.py",
+      "lines": 644,
+      "bytes": 39377,
+      "sha256": "eed59621872724d5aa1b4ba0c888c6a238ba41aa51b20a6a665dd006f07d874a"
+    },
+    {
+      "file": "lanceur/base-strata.json",
+      "lines": 94,
+      "bytes": 2631,
+      "sha256": "e7fbf37b43dc2acab0f17aca7102583d0b755a4008a3e05f63a583daf98efd3e"
+    },
+    {
+      "file": "lanceur/bound_workspace_revision.py",
+      "lines": 9,
+      "bytes": 740,
+      "sha256": "039d851123a424c3768a600c41c5a6d33a96a2e5d6dbc593091c616211bc8a61"
+    },
+    {
+      "file": "lanceur/client-self-test-audit.txt",
+      "lines": 1,
+      "bytes": 23,
+      "sha256": "060134b64ab5f8ffb57790720c2ba10e4ae66e520d20f0c30328bc616397e2e0"
+    },
+    {
+      "file": "lanceur/client-self-test-scan.txt",
+      "lines": 1,
+      "bytes": 23,
+      "sha256": "060134b64ab5f8ffb57790720c2ba10e4ae66e520d20f0c30328bc616397e2e0"
+    },
+    {
+      "file": "lanceur/client-self-test-v3.txt",
+      "lines": 1,
+      "bytes": 23,
+      "sha256": "060134b64ab5f8ffb57790720c2ba10e4ae66e520d20f0c30328bc616397e2e0"
+    },
+    {
+      "file": "lanceur/client_storage.py",
+      "lines": 293,
+      "bytes": 16626,
+      "sha256": "9e0337d04b4e01d3c5a6c88d09837208ae135256e7b653d248c86bc5824ef278"
+    },
+    {
+      "file": "lanceur/core.py",
+      "lines": 284,
+      "bytes": 13151,
+      "sha256": "c3fb49de3475cce615404bddd662bd80195a97b2feb5a02aad641f215bd401af"
+    },
+    {
+      "file": "lanceur/derniers-reglages-valides.json",
+      "lines": 30,
+      "bytes": 1069,
+      "sha256": "ed40cf088f22d3e946fdc5b11d66dff8706ab9e72cc1474f62f91c822fe13ba2"
+    },
+    {
+      "file": "lanceur/devices.py",
+      "lines": 104,
+      "bytes": 4767,
+      "sha256": "5ac3fcbcec078ea2991aa46f8f760950c04cc009e133f9e2aa61a3d6032fb663"
+    },
+    {
+      "file": "lanceur/embedding_worker.py",
+      "lines": 101,
+      "bytes": 5096,
+      "sha256": "4aa9a9ce491e213170bbdd7fa2c56c2cbef1e86bcd4b9674eac75ac6d9bf980b"
+    },
+    {
+      "file": "lanceur/embeddings.py",
+      "lines": 169,
+      "bytes": 8641,
+      "sha256": "fbf8ce07f7e1ae2d66483700dea53e9ebf347a31d80db715a665f915ac1ec03a"
+    },
+    {
+      "file": "lanceur/external_api.py",
+      "lines": 113,
+      "bytes": 6024,
+      "sha256": "9f02b87eefe321bc6eb9ff2b30c7758b0378e5731a528433f7f17a557a380249"
+    },
+    {
+      "file": "lanceur/extract_document.py",
+      "lines": 9,
+      "bytes": 390,
+      "sha256": "f56a159cea1fa10add5f46bbabe868d625a86c348cbc0841e6ec2a9005faf14b"
+    },
+    {
+      "file": "lanceur/hermes_accounts.py",
+      "lines": 316,
+      "bytes": 16553,
+      "sha256": "f9703f664832429e8436ffe6703c8e7833a4b1d4b39bee9a67153f9ed843e12e"
+    },
+    {
+      "file": "lanceur/hermes_backup.py",
+      "lines": 261,
+      "bytes": 13819,
+      "sha256": "846ed85d1e1554f8188653ce146024ce975510c3be98aefeeeb744fd2c7181ae"
+    },
+    {
+      "file": "lanceur/hermes_codex_compat.py",
+      "lines": 63,
+      "bytes": 2676,
+      "sha256": "4c671bc735a92946457661d6d06a0642c5374feb686c6b348dba9fda44a3bcde"
+    },
+    {
+      "file": "lanceur/hermes_conversations.py",
+      "lines": 577,
+      "bytes": 37763,
+      "sha256": "1f6100de38d52ad845f9faa982dba9eb5cea24febf3666a3bba1eea5d38bcc05"
+    },
+    {
+      "file": "lanceur/hermes_fred.py",
+      "lines": 159,
+      "bytes": 8219,
+      "sha256": "eb0f11f00a4842bc26635768aa19620dad6c8713742dda874ebdb0a845a71df6"
+    },
+    {
+      "file": "lanceur/hermes_inference.py",
+      "lines": 208,
+      "bytes": 13177,
+      "sha256": "83a7614c711089c56ebdbc9e55ccc90e296d6678d394db6a2d71c9f60aed62b8"
+    },
+    {
+      "file": "lanceur/hermes_model_key.py",
+      "lines": 24,
+      "bytes": 1298,
+      "sha256": "4a69caadf2fdd88b9372a11517bf6c34db1b6e8f13a698bf3a74d3a585809d61"
+    },
+    {
+      "file": "lanceur/hermes_models.py",
+      "lines": 465,
+      "bytes": 30356,
+      "sha256": "b30748c75075447a84dff1b0ac3b99fd49ab5dcd33d7a457cc36a27bc996bf48"
+    },
+    {
+      "file": "lanceur/hermes_projects.py",
+      "lines": 152,
+      "bytes": 8185,
+      "sha256": "68dd3ce5c84c8180674b2280655b100d5503c63e3feb118f3dc104656f16fb38"
+    },
+    {
+      "file": "lanceur/hermes_reasoning.py",
+      "lines": 56,
+      "bytes": 3173,
+      "sha256": "bb34bbcb3b0a8c1d0f51237e52331a35c12f9e50d5f2624b71992b2d6098b2eb"
+    },
+    {
+      "file": "lanceur/hermes_run_binding.py",
+      "lines": 59,
+      "bytes": 2978,
+      "sha256": "0bdc191fd08c8f95a9151b8aaa2632e63ec112bb6dff62360e41fc205ab3a9e8"
+    },
+    {
+      "file": "lanceur/hermes_service.py",
+      "lines": 374,
+      "bytes": 17673,
+      "sha256": "31f807091f0376e94b6f8153503b49b37d94d50790a11a816b2f49943f1b384f"
+    },
+    {
+      "file": "lanceur/hermes_storage.py",
+      "lines": 105,
+      "bytes": 6502,
+      "sha256": "7751045c67cc348f23e5cc59ea1b7c5a2198616a5041d88ce10ab2a823e1e560"
+    },
+    {
+      "file": "lanceur/hermes_tools.py",
+      "lines": 312,
+      "bytes": 17674,
+      "sha256": "d51efdbbe07c77d604657f29e99cc3fa8b37608d7462fe1271b27b15e14defd6"
+    },
+    {
+      "file": "lanceur/hermes_web.py",
+      "lines": 343,
+      "bytes": 17782,
+      "sha256": "d4a20a8758f9cd274d4d8fa472d17745cf8ce3a4772917ebe62e82ce25752b6b"
+    },
+    {
+      "file": "lanceur/http_boundary.py",
+      "lines": 7,
+      "bytes": 331,
+      "sha256": "b31ed234af9b21044eacf118d7046c48137bd231ef182806da290208f13fdd61"
+    },
+    {
+      "file": "lanceur/install_eg2.py",
+      "lines": 11,
+      "bytes": 644,
+      "sha256": "8e14370181c96db81eb6366b3382484ef9361b1e21146557121d19c9f835ef3d"
+    },
+    {
+      "file": "lanceur/knowledge.py",
+      "lines": 274,
+      "bytes": 16497,
+      "sha256": "f8384a5a44d23b19bccf568ff8909dc7ba97cf73db8f5940caa1e1824640f0ea"
+    },
+    {
+      "file": "lanceur/notifications.py",
+      "lines": 390,
+      "bytes": 22709,
+      "sha256": "a948d01c072f7dfd4eace6bc2bef08cb1c6db6efd89380e583cc0e11e4e8e7a9"
+    },
+    {
+      "file": "lanceur/operations.py",
+      "lines": 436,
+      "bytes": 27378,
+      "sha256": "30affe9865b6e2440c6f2f374c15f89d783967580692e8f4b61a4cd399fe8989"
+    },
+    {
+      "file": "lanceur/preview-350-network.txt",
+      "lines": 1,
+      "bytes": 6,
+      "sha256": "f6fc84c9f21c24907d6bee6eec38cabab5fa9a7be8c4a7827fe9e56f245bd2d5"
+    },
+    {
+      "file": "lanceur/preview_client.py",
+      "lines": 17,
+      "bytes": 849,
+      "sha256": "dcbc8532263d651f6fc9d02b7ea5d4b23c189459f8f0ac9535da62cdf10648cc"
+    },
+    {
+      "file": "lanceur/preview_client_350.py",
+      "lines": 75,
+      "bytes": 3725,
+      "sha256": "8ebbf4af325301ae830dea483652775502596d6245aba467fb5aa51c76464924"
+    },
+    {
+      "file": "lanceur/preview_conversations.py",
+      "lines": 88,
+      "bytes": 6776,
+      "sha256": "de0e4b8e70e0cd2e4a1a32224b2bede4d291087d552e0d120df0eb9062d00a84"
+    },
+    {
+      "file": "lanceur/preview_operations.py",
+      "lines": 9,
+      "bytes": 399,
+      "sha256": "30e0b97a6aca7fc4472b5f6f55d21da5af8cdd7967735d456cb8c4405e8a86b0"
+    },
+    {
+      "file": "lanceur/preview_workspace.py",
+      "lines": 50,
+      "bytes": 3131,
+      "sha256": "ffd71f516bc51621a12e7a583137740247368ef08f98f87fd1599e80a91dee43"
+    },
+    {
+      "file": "lanceur/profiles.py",
+      "lines": 67,
+      "bytes": 4171,
+      "sha256": "cec923915127bacc4db24de0fa598eb5d48607479ca9a599a13290c78a3f4a32"
+    },
+    {
+      "file": "lanceur/recovery_signing.py",
+      "lines": 195,
+      "bytes": 10960,
+      "sha256": "18a0b6e02ce96fc82125db2afb7a1a4fd0ad4717f3ce1107c0969b9fd3ac04b1"
+    },
+    {
+      "file": "lanceur/reglages-par-defaut.json",
+      "lines": 30,
+      "bytes": 1071,
+      "sha256": "5d83df35283ecc7ded316d110c4756f73cfe223a2cf6ae74ca6a581fb2602fcd"
+    },
+    {
+      "file": "lanceur/releases.py",
+      "lines": 169,
+      "bytes": 8685,
+      "sha256": "4cad1ca1c84a1b975cf431f1e3febd7446f486ff98c5b7d68f5906254de0027b"
+    },
+    {
+      "file": "lanceur/remote.py",
+      "lines": 961,
+      "bytes": 63319,
+      "sha256": "a87da9a4634a0c2de7234cdb4f0647e8e76d7cc390668706992afde0e3bea261"
+    },
+    {
+      "file": "lanceur/requirements-eg2.txt",
+      "lines": 8,
+      "bytes": 150,
+      "sha256": "3f83c8bdf3b49d915efea4eae2e00a93b962a5f2e71f4c0d2db077e09880394e"
+    },
+    {
+      "file": "lanceur/requirements-voice.txt",
+      "lines": 3,
+      "bytes": 112,
+      "sha256": "e6f964ceb7fee19e6282ff52fbfa134c49e961c80fd73fc86b3506957ce8641e"
+    },
+    {
+      "file": "lanceur/requirements.txt",
+      "lines": 4,
+      "bytes": 68,
+      "sha256": "17ecfd751d456e833a094f92760de2ead90caa4c095171ae9d853a8bf2a8928e"
+    },
+    {
+      "file": "lanceur/restoration.py",
+      "lines": 327,
+      "bytes": 21857,
+      "sha256": "b48f991036b2a9e603e531224cd942c54e28f47dc07d813105229b2b11e44571"
+    },
+    {
+      "file": "lanceur/runtime.py",
+      "lines": 110,
+      "bytes": 5997,
+      "sha256": "9368fa47c423f54e11ba25bac3c93abbbee1e2fb03c7104640520ac61c723d29"
+    },
+    {
+      "file": "lanceur/scheduler.py",
+      "lines": 94,
+      "bytes": 4577,
+      "sha256": "161001a2c72fc19ad0c4033e6bf103aa9a0a532937848ccbc34c3b3483c9b54f"
+    },
+    {
+      "file": "lanceur/server_state.py",
+      "lines": 69,
+      "bytes": 3608,
+      "sha256": "20e0cbd22616f992bc0f542a7d32c9dc39eb6320e001c3219894929dfb979ff8"
+    },
+    {
+      "file": "lanceur/signing.py",
+      "lines": 35,
+      "bytes": 1730,
+      "sha256": "4fc4dffdf18636e503f9859f0987de04288b9371f604c9b1aa5d1b7715269e97"
+    },
+    {
+      "file": "lanceur/startup_memory.py",
+      "lines": 64,
+      "bytes": 2786,
+      "sha256": "31b5df55378f4915f2c4f4c8f6fc25788754ce726b6f62277dbda44a5f923807"
+    },
+    {
+      "file": "lanceur/test_accounts_updates.py",
+      "lines": 278,
+      "bytes": 21124,
+      "sha256": "46bdc295fd9e836096d3b225b5b3d27be1f4416d9b77cd6949f10c90768ebbc6"
+    },
+    {
+      "file": "lanceur/test_android_updates.py",
+      "lines": 107,
+      "bytes": 5852,
+      "sha256": "322dc318b4817f4d3e520499800677c86cb5c6c0fc5fb5727ebc7ef25c69cde7"
+    },
+    {
+      "file": "lanceur/test_app_integrations.py",
+      "lines": 189,
+      "bytes": 12051,
+      "sha256": "e9a2c9cbe9dea28e1ce56656980d40e1a6f518dd6b9a80dc8ef514bce7434440"
+    },
+    {
+      "file": "lanceur/test_audit_corrections.py",
+      "lines": 195,
+      "bytes": 12200,
+      "sha256": "3a8270d83006e1430203941353a815b21e051d3b4ae03b17ddaf7cb6427c9af3"
+    },
+    {
+      "file": "lanceur/test_audit_fred.py",
+      "lines": 199,
+      "bytes": 12871,
+      "sha256": "13217560aec20ab64509335795f0a9f5a65d5f8ee42a99499ae7a2e5a422b7b2"
+    },
+    {
+      "file": "lanceur/test_backups.py",
+      "lines": 468,
+      "bytes": 28410,
+      "sha256": "e43bd1928df5a29007fff42178d7fa212fa8e3b4053a79e988785144bd890498"
+    },
+    {
+      "file": "lanceur/test_chat_356.py",
+      "lines": 78,
+      "bytes": 5773,
+      "sha256": "93e32bc46139a97757701000deac27df9bf005aad426a3f7526247e3474f9279"
+    },
+    {
+      "file": "lanceur/test_client_management.py",
+      "lines": 122,
+      "bytes": 8002,
+      "sha256": "356bb544a01f41220c1f5fbae24344d80cf29aff9d4f9a5e48b2ce99b9f2cfde"
+    },
+    {
+      "file": "lanceur/test_client_storage.py",
+      "lines": 131,
+      "bytes": 8319,
+      "sha256": "a2ded87971cdd63736129b464546be52183c25171b7c5c9c4e92c9eae1f3fa0e"
+    },
+    {
+      "file": "lanceur/test_client_update.js",
+      "lines": 35,
+      "bytes": 1931,
+      "sha256": "5b98b995ba0b6479041a913869ebb1e4859387cf10da3ed523cab3a3a946c2af"
+    },
+    {
+      "file": "lanceur/test_connection_settings.js",
+      "lines": 30,
+      "bytes": 2848,
+      "sha256": "5e92719148b865d5ffe181a658718678b7477c36ccafa8111c8c08270d398bab"
+    },
+    {
+      "file": "lanceur/test_connection_settings.py",
+      "lines": 40,
+      "bytes": 2231,
+      "sha256": "526dd8f6587901f6683f074021964bf9d7100a4e0d67d4c091304fec301ab343"
+    },
+    {
+      "file": "lanceur/test_devices.py",
+      "lines": 287,
+      "bytes": 18349,
+      "sha256": "b783d2d69eb9b81e066e9524736dbe94202802c7a86ea947c95116f9e079657c"
+    },
+    {
+      "file": "lanceur/test_document_research.py",
+      "lines": 191,
+      "bytes": 13786,
+      "sha256": "472a0d4840f66e03f60e0d41a48bece10e4e64108809172df684da4baf6cdcbd"
+    },
+    {
+      "file": "lanceur/test_external_api.py",
+      "lines": 120,
+      "bytes": 7510,
+      "sha256": "e5677bc1e6d093f4c5a45de576434337556be77796cecee2d58daad124ba04c9"
+    },
+    {
+      "file": "lanceur/test_hermes_accounts.py",
+      "lines": 184,
+      "bytes": 9734,
+      "sha256": "09cb4ac5cf0534a6e6db4b6a823fb8102aef820148c7c3a50a0370bb0b69ea54"
+    },
+    {
+      "file": "lanceur/test_hermes_admin_lifecycle.py",
+      "lines": 118,
+      "bytes": 4965,
+      "sha256": "dbb1dd0fe6f6c32a7b9fbc51fa3698736d14168e59c04e576782cced5d3e8b85"
+    },
+    {
+      "file": "lanceur/test_hermes_backup.py",
+      "lines": 152,
+      "bytes": 8777,
+      "sha256": "6a6331c46f088c533948f6fb759cd0c66eb066c519406abe6292dd94c2b3160a"
+    },
+    {
+      "file": "lanceur/test_hermes_codex_compat.py",
+      "lines": 239,
+      "bytes": 12656,
+      "sha256": "96d14ec88d604c4a5649164aceb46d94a47251745445a5e1decd38e83e6def7c"
+    },
+    {
+      "file": "lanceur/test_hermes_conversations.py",
+      "lines": 228,
+      "bytes": 15033,
+      "sha256": "61f303c7886018947ab33de8c257907a3f7d76e79349444796742e6c098d1b52"
+    },
+    {
+      "file": "lanceur/test_hermes_inference.py",
+      "lines": 106,
+      "bytes": 7129,
+      "sha256": "2c2e038187817d37233335f62c4d1bda65246739878eecd9c27edde025fc9066"
+    },
+    {
+      "file": "lanceur/test_hermes_models.py",
+      "lines": 620,
+      "bytes": 44720,
+      "sha256": "ac19ebb4c0c8659de230de272d8eee4a5878707c7e78ec24bd28f4aad1bd93cd"
+    },
+    {
+      "file": "lanceur/test_hermes_projects.py",
+      "lines": 96,
+      "bytes": 5587,
+      "sha256": "d49aa0d097b43df55f969546c1da32d342951070c9463a3cab304378a168d68f"
+    },
+    {
+      "file": "lanceur/test_hermes_provisioning_flow.py",
+      "lines": 44,
+      "bytes": 2352,
+      "sha256": "5d25822f82f7f9f936ed079cf70944769bf07226df3f9f513dfccc89e7457bba"
+    },
+    {
+      "file": "lanceur/test_hermes_reasoning.py",
+      "lines": 99,
+      "bytes": 6817,
+      "sha256": "f2248d43363df197a0f9f629befbfa686e7f085791375a5d956ea90155ccb75c"
+    },
+    {
+      "file": "lanceur/test_hermes_restoration.py",
+      "lines": 367,
+      "bytes": 20584,
+      "sha256": "9e524ea76a7e03b0a381aa21035ac1a52db3d449c061b45bf08d78316dd43166"
+    },
+    {
+      "file": "lanceur/test_hermes_service.py",
+      "lines": 115,
+      "bytes": 6482,
+      "sha256": "75348798f7869b04cc5acf7311a4b564a7f540f8ca74f0a98033454004ec5070"
+    },
+    {
+      "file": "lanceur/test_hermes_tools.py",
+      "lines": 261,
+      "bytes": 16145,
+      "sha256": "82ebb069ef877f60ee0a1d6c4eda61162917bad42914dc8d979b5e8078d2bce8"
+    },
+    {
+      "file": "lanceur/test_hermes_web.py",
+      "lines": 365,
+      "bytes": 25152,
+      "sha256": "3715c5c384a1a2451558231d8e56f22650bf990b8989b21f3086bfcbf4e76a5e"
+    },
+    {
+      "file": "lanceur/test_history_sync.py",
+      "lines": 152,
+      "bytes": 10019,
+      "sha256": "6b2ed5cea3311ccf0fcf8146d797ca01b43e9f8027b735eb5b7ed7503699f3eb"
+    },
+    {
+      "file": "lanceur/test_improvements.py",
+      "lines": 124,
+      "bytes": 7732,
+      "sha256": "1f3da4246e7965b62c630cc34c6063d3ead514d5ee03f530478d0049743032d0"
+    },
+    {
+      "file": "lanceur/test_knowledge.py",
+      "lines": 150,
+      "bytes": 9137,
+      "sha256": "d8b857aabaa56876d772da31121e8e7c1b7ff75f61046c2ddffce893bebb90be"
+    },
+    {
+      "file": "lanceur/test_knowledge_transport.py",
+      "lines": 53,
+      "bytes": 2493,
+      "sha256": "5f2e5b5a524b66ca31fce6dc533b4c1b345ccd55ac83f6f877884e4a9a6f40b5"
+    },
+    {
+      "file": "lanceur/test_launcher.py",
+      "lines": 176,
+      "bytes": 10023,
+      "sha256": "694e7fccf5b22cf4e951a1fb3569d5b1800ff16791cc9418afdae6cc3599cb8f"
+    },
+    {
+      "file": "lanceur/test_markdown.js",
+      "lines": 16,
+      "bytes": 1634,
+      "sha256": "7c318fa5ef39a1aba760c8a171197c404ba6c1008c5ca011073394e96da05750"
+    },
+    {
+      "file": "lanceur/test_model_selection_transport.py",
+      "lines": 136,
+      "bytes": 7710,
+      "sha256": "96caac3d077260f7e48e0b1483842fd0252309588ba9dedcb724f4f5f42503f3"
+    },
+    {
+      "file": "lanceur/test_model_sharing_admin.py",
+      "lines": 94,
+      "bytes": 5023,
+      "sha256": "a286ac929f36c6fc1b6435018910abc2bdf098c48e3b5f55d147ceab5bfa656f"
+    },
+    {
+      "file": "lanceur/test_notifications.py",
+      "lines": 275,
+      "bytes": 16039,
+      "sha256": "60d5b253b00a758820785dd470a573b0c8423935f98a35fefd1ce13bf64d9222"
+    },
+    {
+      "file": "lanceur/test_notifications_transport.py",
+      "lines": 135,
+      "bytes": 8680,
+      "sha256": "61aa48413e70815652000d9051f8e0e379d910b9eb644d4c29dc8f59b52e0217"
+    },
+    {
+      "file": "lanceur/test_notifications_worker_recovery.py",
+      "lines": 313,
+      "bytes": 16933,
+      "sha256": "2463375da9a6f1487d72ff8cd1a4b1cee5503796b424c780248b082e333dc1fa"
+    },
+    {
+      "file": "lanceur/test_opencode_visibility.py",
+      "lines": 99,
+      "bytes": 6835,
+      "sha256": "1609e8c2141281df8e5017c3c623470e846ddfddf657a9a3e4d04fb4fc73fd0c"
+    },
+    {
+      "file": "lanceur/test_recovery_signing.py",
+      "lines": 153,
+      "bytes": 10061,
+      "sha256": "2cea57e8d4ce6718d65363de0aaa6c3f19e9814512861d97b2831f46a40d97fa"
+    },
+    {
+      "file": "lanceur/test_remote.py",
+      "lines": 411,
+      "bytes": 26304,
+      "sha256": "9229a0fd57715bef8a8750cde2683d3b7ef4bc2a64c55ea589ca6da3b2347831"
+    },
+    {
+      "file": "lanceur/test_remote_sources_revocation.py",
+      "lines": 136,
+      "bytes": 7185,
+      "sha256": "4957443b57c73e271c0852debb527c0957407e32eeca9a474d202ac87402a88a"
+    },
+    {
+      "file": "lanceur/test_restoration.py",
+      "lines": 243,
+      "bytes": 15215,
+      "sha256": "6e5ae53597bad863c75f4990cb1fcb05111869e660f27a59f6c5a116ce07c28a"
+    },
+    {
+      "file": "lanceur/test_restoration_clients.py",
+      "lines": 65,
+      "bytes": 3327,
+      "sha256": "b3007796e588422dbb01c7973bd1d5971a867e87e48221a6a0e6eedeabbc4f01"
+    },
+    {
+      "file": "lanceur/test_startup_memory.py",
+      "lines": 85,
+      "bytes": 3688,
+      "sha256": "0a094dacc472ce8629c571ca88b24b692d2137a2b1076e7dab17a3ba07d634d3"
+    },
+    {
+      "file": "lanceur/test_text_transform.py",
+      "lines": 300,
+      "bytes": 17834,
+      "sha256": "dd2a839f36335ac0c54476b65f09afef817b402575cdfb570b77d015470cacdc"
+    },
+    {
+      "file": "lanceur/test_thinking_modes.py",
+      "lines": 65,
+      "bytes": 4695,
+      "sha256": "d89ba086539e960c1fa91a07e8f8a469938ac81d2a1ff4623a90041d9f881269"
+    },
+    {
+      "file": "lanceur/test_voice.py",
+      "lines": 59,
+      "bytes": 3340,
+      "sha256": "ebd5d8c094217a63649a395f522e81c2e79ead0b1563061ef935bbd2e828635e"
+    },
+    {
+      "file": "lanceur/test_voice_conversation.py",
+      "lines": 84,
+      "bytes": 5034,
+      "sha256": "3a5c5b409e41c3a18b0b9095711d7b9de6747831c9a6c9f156a42ef80c64794c"
+    },
+    {
+      "file": "lanceur/test_wireguard_stable.py",
+      "lines": 32,
+      "bytes": 1657,
+      "sha256": "57c19983516e8dc05f090a13339a916b8d34e7072fb2675341cb8114d89f2ff0"
+    },
+    {
+      "file": "lanceur/test_workspace.py",
+      "lines": 301,
+      "bytes": 22200,
+      "sha256": "a33510b3f77a363d02ca2c105ca155ffea91b17d186e75c95f7ccec6f10daf41"
+    },
+    {
+      "file": "lanceur/test_workspace_worker.py",
+      "lines": 158,
+      "bytes": 8008,
+      "sha256": "29ce665bdad7b726e01f027fdbbaf705c83294106e4ab5d4f42f48361b98bfab"
+    },
+    {
+      "file": "lanceur/text_transform.py",
+      "lines": 104,
+      "bytes": 5128,
+      "sha256": "fe165560050b2ec5f428cf68e4841556f15742c9d9762da01cfb45af9e373ad8"
+    },
+    {
+      "file": "lanceur/validate_backups.py",
+      "lines": 55,
+      "bytes": 3252,
+      "sha256": "39b6beff2e16ef252fc510ce658785aba9835955ef5961c3625d58a59f7b80a3"
+    },
+    {
+      "file": "lanceur/validate_delivery_lots6_8.py",
+      "lines": 155,
+      "bytes": 8226,
+      "sha256": "56c967058a732a3c7ec85cc83f6fd331516fdcfd980697bd18ab892559f5924b"
+    },
+    {
+      "file": "lanceur/validate_eg2.py",
+      "lines": 91,
+      "bytes": 5988,
+      "sha256": "a153610e87d36061f664f09f667b7049b39dd59059e841459c583d43b73f37e0"
+    },
+    {
+      "file": "lanceur/validate_hermes_native.py",
+      "lines": 164,
+      "bytes": 10102,
+      "sha256": "2d63cc1cc4ba0f6e4d8ba28f5fd087384246cf5841bc7e71415d45a4d59ea760"
+    },
+    {
+      "file": "lanceur/validate_live_client_storage.py",
+      "lines": 81,
+      "bytes": 4882,
+      "sha256": "fc22678cf3ca355aba7da48a2c9604c406f834471e9a8ca8d073ddbb1e792264"
+    },
+    {
+      "file": "lanceur/validate_live_eg2.py",
+      "lines": 79,
+      "bytes": 4588,
+      "sha256": "f8a8418a3c76da19e42009d418d865125d64d9e22e5c2701dd75a968b8d98a11"
+    },
+    {
+      "file": "lanceur/validate_live_lots6_8.py",
+      "lines": 195,
+      "bytes": 9357,
+      "sha256": "7715d742ff9ce78c4df0a702811af7664c74de30f9ccbb42da5546b25156ec4a"
+    },
+    {
+      "file": "lanceur/validate_lots6_8.py",
+      "lines": 114,
+      "bytes": 5828,
+      "sha256": "70e67bfae60fa0487833ada67c839d463d813e16425be93a153b8fbfa42061ff"
+    },
+    {
+      "file": "lanceur/validate_maintenance.py",
+      "lines": 52,
+      "bytes": 2529,
+      "sha256": "e66795352693c07bbebe273214e5a60e86b25b3bec1d3e5ba39a17ccad4bf646"
+    },
+    {
+      "file": "lanceur/validate_notifications.py",
+      "lines": 38,
+      "bytes": 1832,
+      "sha256": "e60848910a374045ed89cc0e1f800eb9eb270fbddb80a6292b4ad18f8a02b565"
+    },
+    {
+      "file": "lanceur/validate_text_transform_native.py",
+      "lines": 133,
+      "bytes": 6792,
+      "sha256": "6ca315b986eadc48e679f520115e457ac18e9650b58fa4dccc9477a8d32f4d4e"
+    },
+    {
+      "file": "lanceur/verify_fred_native.py",
+      "lines": 43,
+      "bytes": 2291,
+      "sha256": "12300ea342f6e125a383d464039f667565543434c024c3b7629647803e0a3ce6"
+    },
+    {
+      "file": "lanceur/verify_fred_update.py",
+      "lines": 73,
+      "bytes": 4711,
+      "sha256": "d1c9dcae9e0b3a2c9726037da0b807b2a1819b2ed6f4904019b153b48ec68506"
+    },
+    {
+      "file": "lanceur/verify_js.py",
+      "lines": 12,
+      "bytes": 1071,
+      "sha256": "4aec4ab3ba3f1af049567df25c378991d39fbe1fc39de979b7460f5939189905"
+    },
+    {
+      "file": "lanceur/verify_workspaces_live.py",
+      "lines": 42,
+      "bytes": 3076,
+      "sha256": "362cfbe65bda91978c2e20d04b2e2b6b9eb47548b38c5f32fc536b59e2b11441"
+    },
+    {
+      "file": "lanceur/voice.py",
+      "lines": 111,
+      "bytes": 6476,
+      "sha256": "45086b12d95cd16845136ecc329208f000a5a188145730ddb396f1037c95ca81"
+    },
+    {
+      "file": "lanceur/voice_worker.py",
+      "lines": 102,
+      "bytes": 4538,
+      "sha256": "7473ed3f0531149de9598035c70001a8d58d5fb54e8aad3dfbb04a4ed4bfcf13"
+    },
+    {
+      "file": "lanceur/web/app.css",
+      "lines": 16,
+      "bytes": 16759,
+      "sha256": "792f8111d2d69a7d078a17524100e4f961e3cce1817ce9a8b1df58d865e0bba9"
+    },
+    {
+      "file": "lanceur/web/app.js",
+      "lines": 374,
+      "bytes": 42948,
+      "sha256": "7a5b4bc1402d05a2de3d7ecafc7a55845d64fb6b4ddc8ec8431bdcd218b2398b"
+    },
+    {
+      "file": "lanceur/web/index.html",
+      "lines": 66,
+      "bytes": 16138,
+      "sha256": "fff3cc43d5d49810f6e3dcf672cb460f66a0d08f6e3ccf1d6e77c2267eecfcaa"
+    },
+    {
+      "file": "lanceur/web/interface.css",
+      "lines": 13,
+      "bytes": 16352,
+      "sha256": "a420a7d23a3e6ade0848d51238899e6bed0efb42dadfe56fe0c8e9291b1b7121"
+    },
+    {
+      "file": "lanceur/web/interface.js",
+      "lines": 17,
+      "bytes": 5653,
+      "sha256": "52a6a6ce6b16eac99734021373c7951f81a6706bbdbad0efe5f9d822c1bd0783"
+    },
+    {
+      "file": "lanceur/web/maintenance.css",
+      "lines": 5,
+      "bytes": 3848,
+      "sha256": "9b419aa64e20c056026fb99e8bb97a65aa38d8757cb3a16ea7e9a76ee8d06bb5"
+    },
+    {
+      "file": "lanceur/web/maintenance.js",
+      "lines": 139,
+      "bytes": 36974,
+      "sha256": "70cadde66c97717e453ec17009b9f50a06b3368c91023ffebca57233f981a8e2"
+    },
+    {
+      "file": "lanceur/web/notifications.css",
+      "lines": 7,
+      "bytes": 1673,
+      "sha256": "58384913e8d7f20307b0df69389a7899c3ba34d18b91f2bc4880d02885fec17f"
+    },
+    {
+      "file": "lanceur/web/notifications.js",
+      "lines": 34,
+      "bytes": 8587,
+      "sha256": "6849896b5968b8b1291ae21916acaa090af984ed8d251706486fad089cb04e87"
+    },
+    {
+      "file": "lanceur/web/tests/client_storage_fixture.py",
+      "lines": 26,
+      "bytes": 1392,
+      "sha256": "6f93a9ad034525b21d39f896edf9f68403707523b697cd56639926514143780f"
+    },
+    {
+      "file": "lanceur/web/tests/client_storage_ui.mjs",
+      "lines": 26,
+      "bytes": 3917,
+      "sha256": "08824900df72110f1b77a93e77efb76c30d8d27b0eb4cb9342f735a57906c884"
+    },
+    {
+      "file": "lanceur/web/tests/conversation_fixture.py",
+      "lines": 130,
+      "bytes": 8457,
+      "sha256": "c328ab1d998569ea4c13128b6db8c80485da2331378241a42e06ce1a47c1f1db"
+    },
+    {
+      "file": "lanceur/web/tests/conversation_ui.mjs",
+      "lines": 57,
+      "bytes": 10786,
+      "sha256": "896ee1c7786fae8827039557d1751c6644df2775f06fb488535dbf42c351446c"
+    },
+    {
+      "file": "lanceur/web/tests/conversation_ui_body.mjs",
+      "lines": 24,
+      "bytes": 6017,
+      "sha256": "8b9e67f46149d95a160ad6025a01abc832574aaa54619d42fcd92a17a1aebc3d"
+    },
+    {
+      "file": "lanceur/web/tests/hermes_models_ui.cjs",
+      "lines": 209,
+      "bytes": 23964,
+      "sha256": "6247397c99185e7bbdee280104a0fee29c4045aebe5b65c0e261a95395019078"
+    },
+    {
+      "file": "lanceur/web/tests/knowledge_fixture.py",
+      "lines": 33,
+      "bytes": 1969,
+      "sha256": "c06e52f196440b1da154b9801b82dafeeedd8444097708a6b783b32ae52704c9"
+    },
+    {
+      "file": "lanceur/web/tests/knowledge_ui.mjs",
+      "lines": 28,
+      "bytes": 4332,
+      "sha256": "b247b19a268e4466986078ac1ffcc3f99616dfa9ce8cf05736b97aea07b65e0d"
+    },
+    {
+      "file": "lanceur/web/tests/lots6_8_client_ui.mjs",
+      "lines": 55,
+      "bytes": 14157,
+      "sha256": "b20d1bbdfeec3f22e5c685e40240d83cb5415d88ce2ed613a84839398cbc3fac"
+    },
+    {
+      "file": "lanceur/web/tests/lots6_8_fixture.py",
+      "lines": 107,
+      "bytes": 7261,
+      "sha256": "50049364ef94571990a9e55f10ffa5a5ae2aa6f91c9312a39cf16f27e4ebb9d4"
+    },
+    {
+      "file": "lanceur/web/tests/maintenance_backend_fixture.py",
+      "lines": 126,
+      "bytes": 7917,
+      "sha256": "b01d710b3b7501d621ebe7fed5a444f8e07d750dbf5a3b2bb9e2296ca1a5dbc2"
+    },
+    {
+      "file": "lanceur/web/tests/maintenance_backend_ui.mjs",
+      "lines": 59,
+      "bytes": 16209,
+      "sha256": "312891bf9dc4878d6f7bc722da85e58819166f69a6a56130801788245f348784"
+    },
+    {
+      "file": "lanceur/web/tests/maintenance_ui.mjs",
+      "lines": 96,
+      "bytes": 19465,
+      "sha256": "ef74b4f5b914db429b85a6efecefe90b96e75d166b2f77f56b913c3cd1a56cd8"
+    },
+    {
+      "file": "lanceur/web/tests/model_loading_ui.cjs",
+      "lines": 75,
+      "bytes": 5236,
+      "sha256": "5b2ed3e69a0fca538b1d15860027688c47ece78da40373c10c32907be4822431"
+    },
+    {
+      "file": "lanceur/web/tests/notifications_fixture.py",
+      "lines": 58,
+      "bytes": 3056,
+      "sha256": "25dd939e2557be781c4d90b1be78b85f1c4e68d91c4d7a676e6517a59d6e18f6"
+    },
+    {
+      "file": "lanceur/web/tests/notifications_ui.mjs",
+      "lines": 42,
+      "bytes": 8627,
+      "sha256": "22c0c410760454551884b3c14bd67c5119e348fda6dde18ed3c128f1de11b005"
+    },
+    {
+      "file": "lanceur/web/tests/voice_android_install.mjs",
+      "lines": 30,
+      "bytes": 3658,
+      "sha256": "b6a85e751919e507ae0640f944bed6bf1f9744b0f6fc9000db6ced668ba2263c"
+    },
+    {
+      "file": "lanceur/web/tests/voice_android_ui.mjs",
+      "lines": 43,
+      "bytes": 5149,
+      "sha256": "770aae2fbe2fab7d45f9996cc430ba8836f8c9d1410de4c707e41e79b3e1c974"
+    },
+    {
+      "file": "lanceur/web/tests/voice_ui.mjs",
+      "lines": 55,
+      "bytes": 9535,
+      "sha256": "aa3870f2389a897e070ab34a59251362a71da21bd47660955bf5c381b63a53a8"
+    },
+    {
+      "file": "lanceur/web/voice.js",
+      "lines": 14,
+      "bytes": 2236,
+      "sha256": "3392e1094b14c3aee82f0b0ea5e4edd719327c7903e44c5b4893b43fcb9ef9e6"
+    },
+    {
+      "file": "lanceur/web/workspace.js",
+      "lines": 66,
+      "bytes": 17275,
+      "sha256": "e2599dd9ae66f472ccac78d0106ef6db84809b53a416a967820fdefece697ce3"
+    },
+    {
+      "file": "lanceur/wg_crypto.py",
+      "lines": 40,
+      "bytes": 2241,
+      "sha256": "80e8486a9dcf4a31029020dec633d2b717ac96f90b2d5ae1e897358ae21775d4"
+    },
+    {
+      "file": "lanceur/wireguard_access.py",
+      "lines": 279,
+      "bytes": 16269,
+      "sha256": "a8ecaee3ec1116b2495df799157f99537bf1c37aac3d7ede6b244012284f20d1"
+    },
+    {
+      "file": "lanceur/workspace.py",
+      "lines": 1041,
+      "bytes": 81230,
+      "sha256": "78b14130c59008e5ad8e9564e29758a32e15850eca54bce893261d7d685929d7"
+    }
+  ],
+  "long_functions": [
+    {
+      "file": "lanceur/remote.py",
+      "name": "serve_gateway",
+      "line": 404,
+      "lines": 558
+    },
+    {
+      "file": "lanceur/remote.py",
+      "name": "do_POST",
+      "line": 578,
+      "lines": 378
+    },
+    {
+      "file": "client-android/tests/transport_fixture.py",
+      "name": "main",
+      "line": 25,
+      "lines": 279
+    },
+    {
+      "file": "lanceur/app.py",
+      "name": "serve",
+      "line": 264,
+      "lines": 259
+    },
+    {
+      "file": "client-qwen/client.py",
+      "name": "serve_local",
+      "line": 296,
+      "lines": 240
+    },
+    {
+      "file": "lanceur/hermes_inference.py",
+      "name": "__init__",
+      "line": 14,
+      "lines": 186
+    },
+    {
+      "file": "lanceur/workspace.py",
+      "name": "_action",
+      "line": 544,
+      "lines": 172
+    },
+    {
+      "file": "client-android/tests/transport_fixture.py",
+      "name": "route",
+      "line": 116,
+      "lines": 146
+    },
+    {
+      "file": "lanceur/hermes_inference.py",
+      "name": "do_POST",
+      "line": 62,
+      "lines": 133
+    },
+    {
+      "file": "lanceur/app.py",
+      "name": "do_POST",
+      "line": 390,
+      "lines": 130
+    },
+    {
+      "file": "lanceur/hermes_conversations.py",
+      "name": "_execute",
+      "line": 451,
+      "lines": 112
+    },
+    {
+      "file": "lanceur/app.py",
+      "name": "do_GET",
+      "line": 286,
+      "lines": 103
+    },
+    {
+      "file": "lanceur/operations.py",
+      "name": "_restore_legacy",
+      "line": 325,
+      "lines": 100
+    },
+    {
+      "file": "lanceur/hermes_conversations.py",
+      "name": "_prepare",
+      "line": 253,
+      "lines": 99
+    },
+    {
+      "file": "lanceur/web/tests/maintenance_backend_fixture.py",
+      "name": "main",
+      "line": 24,
+      "lines": 99
+    },
+    {
+      "file": "client-qwen/client.py",
+      "name": "main",
+      "line": 657,
+      "lines": 95
+    },
+    {
+      "file": "lanceur/restoration.py",
+      "name": "_restore",
+      "line": 217,
+      "lines": 95
+    },
+    {
+      "file": "lanceur/web/tests/conversation_fixture.py",
+      "name": "main",
+      "line": 22,
+      "lines": 90
+    },
+    {
+      "file": "lanceur/runtime.py",
+      "name": "supervise",
+      "line": 15,
+      "lines": 87
+    },
+    {
+      "file": "lanceur/web/tests/lots6_8_fixture.py",
+      "name": "main",
+      "line": 22,
+      "lines": 83
+    },
+    {
+      "file": "client-qwen/client.py",
+      "name": "forward",
+      "line": 452,
+      "lines": 79
+    },
+    {
+      "file": "lanceur/remote.py",
+      "name": "do_GET",
+      "line": 498,
+      "lines": 79
+    },
+    {
+      "file": "lanceur/core.py",
+      "name": "validate",
+      "line": 99,
+      "lines": 78
+    },
+    {
+      "file": "lanceur/embedding_worker.py",
+      "name": "serve",
+      "line": 13,
+      "lines": 77
+    },
+    {
+      "file": "client-qwen/updater.py",
+      "name": "apply",
+      "line": 113,
+      "lines": 76
+    }
+  ],
+  "secret_candidates": []
+}

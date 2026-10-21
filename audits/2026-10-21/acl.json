@@ -1,0 +1,22 @@
+[
+  {
+    "Path": "Microsoft.PowerShell.Core\\FileSystem::D:\\Serveur IA\\lanceur",
+    "AccessToString": "BUILTIN\\Administrateurs Allow  FullControl\nBUILTIN\\Administrateurs Allow  268435456\nAUTORITE NT\\Système Allow  FullControl\nAUTORITE NT\\Système Allow  268435456\nAUTORITE NT\\Utilisateurs authentifiés Allow  Modify, Synchronize\nAUTORITE NT\\Utilisateurs authentifiés Allow  -536805376\nBUILTIN\\Utilisateurs Allow  ReadAndExecute, Synchronize\nBUILTIN\\Utilisateurs Allow  -1610612736"
+  },
+  {
+    "Path": "Microsoft.PowerShell.Core\\FileSystem::D:\\Serveur IA\\lanceur\\wireguard-prive",
+    "AccessToString": "AUTORITE NT\\Système Allow  FullControl\nBUILTIN\\Administrateurs Allow  FullControl\nDESKTOP-OGQE53D\\karen Allow  FullControl"
+  },
+  {
+    "Path": "Microsoft.PowerShell.Core\\FileSystem::D:\\Serveur IA\\lanceur\\espaces-prives",
+    "AccessToString": "AUTORITE NT\\Système Allow  FullControl\nBUILTIN\\Administrateurs Allow  FullControl\nDESKTOP-OGQE53D\\karen Allow  FullControl"
+  },
+  {
+    "Path": "Microsoft.PowerShell.Core\\FileSystem::D:\\Serveur IA\\lanceur\\clients",
+    "AccessToString": "AUTORITE NT\\Système Allow  FullControl\nBUILTIN\\Administrateurs Allow  FullControl\nDESKTOP-OGQE53D\\karen Allow  FullControl"
+  },
+  {
+    "Path": "Microsoft.PowerShell.Core\\FileSystem::D:\\Serveur IA\\toolchain\\android-signing",
+    "AccessToString": "AUTORITE NT\\Système Allow  FullControl\nBUILTIN\\Administrateurs Allow  FullControl\nDESKTOP-OGQE53D\\karen Allow  FullControl"
+  }
+]

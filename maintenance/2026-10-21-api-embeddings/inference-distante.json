@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "model": "google/embeddinggemma-2",
+  "transports": {
+    "wireguard": {
+      "authenticated": true,
+      "two_normalized_768_vectors": true,
+      "base64_query": true,
+      "prompt_tokens": 17,
+      "catalogue": true
+    },
+    "windows_local_api": {
+      "authenticated": true,
+      "real_eg2_vector": true
+    },
+    "https": {
+      "authenticated": true,
+      "two_normalized_768_vectors": true,
+      "base64_query": true,
+      "prompt_tokens": 17,
+      "catalogue": true
+    }
+  },
+  "qwen_keys_user_data_preserved": true
+}

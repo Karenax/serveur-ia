@@ -1,5 +1,5 @@
 {
-  "exe": "D:\\Serveur IA\\dependances\\strata-0.1.43.1\\engine-cuda12\\strata.exe",
+  "exe": "D:\\Serveur IA\\dependances\\strata-0.1.45.3\\engine-cuda12\\strata.exe",
   "cwd": "D:\\Serveur IA\\dependances\\strata-0.1.43.1\\source",
   "args": [
     "--pack",
@@ -64,8 +64,7 @@
     "STRATA_SPLIT_MTP_BATCH": "1"
   },
   "lib_dirs": [
-    "D:\\Serveur IA\\dependances\\strata-0.1.43.1\\cuda12\\cublas\\bin",
-    "D:\\Serveur IA\\dependances\\strata-0.1.43.1\\cuda12\\cuda_runtime\\bin"
+    "D:\\Serveur IA\\dependances\\strata-0.1.45.3\\engine-cuda12"
   ],
   "tokenizer": "D:\\Serveur IA\\dependances\\strata-0.1.43.1\\tokenizer",
   "model_name": "qwen3.8-flash-next-iq4-xs",

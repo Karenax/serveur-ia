@@ -11,7 +11,8 @@ from validate_live_lots6_8 import get,preserved_files,models,backup_config
 import releases
 def read(name):return json.loads((OUT/name).read_text(encoding='utf-8-sig'))
 def test_log(name):
-    text=(OUT/name).read_text(encoding='utf-8-sig');match=re.search(r'Ran (\d+) tests? in ([\d.]+)s',text)
+    text=(OUT/name).read_text(encoding='utf-8-sig')
+    match=re.search(r'Ran (\d+) tests? in ([\d.]+)s',text)
     assert match and re.search(r'^OK\s*$',text,re.M),name
     return {'passed':int(match[1]),'seconds':float(match[2])}
 suite=test_log('regression.log')

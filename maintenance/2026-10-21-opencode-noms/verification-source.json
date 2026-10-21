@@ -1,0 +1,14 @@
+{
+  "readable_model_name": true,
+  "passed": true,
+  "selected_config": "opencode.jsonc",
+  "comments_preserved": true,
+  "exact_backup": true,
+  "lower_priority_config_unchanged": true,
+  "model_visible": true,
+  "api_url_and_key_effective": true,
+  "opencode_chat_request_passed": true,
+  "chat_requests": 1,
+  "real_user_config_untouched": true,
+  "opencode_version": "opencode v2.0.32"
+}

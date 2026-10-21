@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "python_tests": 47,
+  "web_ui_suites": 5,
+  "windows": "3.5.32",
+  "android": "1.0.13",
+  "proofs": {
+    "artefacts.json": "bda39819c97a84bed4ddad050bef1c411c5a5bbd320f66394274fedd475115cb",
+    "production-apres.json": "2310838256e62938fba8f92b988688244d6d55f4bec22e1288e95725adcbb56d",
+    "inference-distante.json": "18be7eade09c51588d230590d59262140361e6347b40860608cfc40e51d77bf3",
+    "android-api-package.json": "82d553c51be3546b621a4b8b4d976faac17e495401ca8241d4c3c40c6144ed6d",
+    "syntaxe.json": "b69def526f155376b7434cc84f3d16e0035f7155c1c71b06da08dc9129969582"
+  }
+}

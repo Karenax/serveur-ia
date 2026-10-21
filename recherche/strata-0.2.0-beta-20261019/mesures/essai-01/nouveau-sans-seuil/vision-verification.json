@@ -1,0 +1,4 @@
+{
+  "passed": true,
+  "content": "{\n  \"code\": \"VISION 47\",\n  \"rouge\": \"cercle\",\n  \"bleu\": \"carré\"\n}"
+}
