@@ -250,6 +250,9 @@ class Controller:
         errors = tail(directory / 'server.stderr.log', 4000) if directory else tail(ROOT / 'strata-server.stderr.log', 4000)
         if errors:
             logs += '\n--- Serveur ---\n' + errors
+        failures=read_json(self.home/'inference-errors.json',[])
+        if failures:
+            logs+='\n--- Derniers refus du modèle ---\n'+'\n'.join(str(row.get('status',''))+' · '+str(row.get('detail','')) for row in failures[-8:])
         elapsed = time.time() - run['started_epoch'] if run.get('started_epoch') and status in ('chargement', 'validation_cuda') else run.get('ready_seconds')
         return {'status': status, 'error': run.get('error', '') if status == 'erreur' else self.last_error,
                 'running': bool(servers) or bool(self.supervisor(run)),

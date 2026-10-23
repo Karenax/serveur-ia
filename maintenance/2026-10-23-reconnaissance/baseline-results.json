@@ -1,0 +1,86 @@
+[
+  {
+    "model": "Zipformer",
+    "fixture": "francais.wav",
+    "variant": "original",
+    "compute_seconds": 0.7174830000003567,
+    "text": "BONJOUR FRED JE SOUHAITE PRÉPARER UNE RÉUNION DEMAIN MATIN AJOUTE LES DOCUMENTS DU PROJET ET RÉSUMENT LES DÉCISIONS IMPORTANTES"
+  },
+  {
+    "model": "Whisper Small",
+    "fixture": "francais.wav",
+    "variant": "original",
+    "compute_seconds": 4.976076400002057,
+    "text": "Bonjour Fred. Je souhaite préparer une réunion demain matin. Ajoute les documents du projet et résume les décisions importantes."
+  },
+  {
+    "model": "Zipformer",
+    "fixture": "francais.wav",
+    "variant": "quiet",
+    "compute_seconds": 0.6504696000010881,
+    "text": "JE SOUHAITE PRÉPARER UNE RÉUNION DEMAIN MATIN AJOUTE LES DOCUMENTS DU PROJET ET RÉSUMENT LES DÉCISIONS IMPORTANTES"
+  },
+  {
+    "model": "Whisper Small",
+    "fixture": "francais.wav",
+    "variant": "quiet",
+    "compute_seconds": 4.94626419999986,
+    "text": "Bonjour Fred. Je souhaite préparer une réunion demain matin. Ajoute les documents du projet et résume les décisions importantes."
+  },
+  {
+    "model": "Zipformer",
+    "fixture": "francais.wav",
+    "variant": "noise",
+    "compute_seconds": 0.6548108999995748,
+    "text": "BONJOUR FRED JE SOUHAITE PRÉPARER UNE RÉUNION DEMAIN MATIN AJOUTE LES DOCUMENTS DU PROJET ET RÉSUMENT LES DÉCISIONS IMPORTANTES"
+  },
+  {
+    "model": "Whisper Small",
+    "fixture": "francais.wav",
+    "variant": "noise",
+    "compute_seconds": 4.937968199999887,
+    "text": "Bonjour Fred. Je souhaite préparer une réunion demain matin. Ajoute les documents du projet et résume les décisions importantes."
+  },
+  {
+    "model": "Zipformer",
+    "fixture": "fr.wav",
+    "variant": "original",
+    "compute_seconds": 0.43255839999983436,
+    "text": "NE VOUS DEMANDEZ PAS CE QUE VOTRE PAYS PEUT FAIRE POUR VOUS DEMANDEZ VOUS PLUTÔT CE QUE VOUS POUVEZ FAIRE POUR LUI"
+  },
+  {
+    "model": "Whisper Small",
+    "fixture": "fr.wav",
+    "variant": "original",
+    "compute_seconds": 5.020762299998751,
+    "text": "Ne vous demandez pas ce que votre pays peut faire pour vous. Demandez-vous plutôt ce que vous pouvez faire pour lui."
+  },
+  {
+    "model": "Zipformer",
+    "fixture": "fr.wav",
+    "variant": "quiet",
+    "compute_seconds": 0.4118114000011701,
+    "text": "PEUT FAIRE POUR VOUS DEMANDER VOUS POUVEZ"
+  },
+  {
+    "model": "Whisper Small",
+    "fixture": "fr.wav",
+    "variant": "quiet",
+    "compute_seconds": 5.00512979999985,
+    "text": "Ne vous demandez pas ce que votre pays peut faire pour vous. Demandez-vous plutôt ce que vous pouvez faire pour lui."
+  },
+  {
+    "model": "Zipformer",
+    "fixture": "fr.wav",
+    "variant": "noise",
+    "compute_seconds": 0.4121978000002855,
+    "text": "NE VOUS DEMANDEZ PAS CE QUE VOTRE PAYS PEUT FAIRE POUR VOUS DEMANDEZ VOUS PLUTÔT CE QUE VOUS POUVEZ FAIRE POUR LUI"
+  },
+  {
+    "model": "Whisper Small",
+    "fixture": "fr.wav",
+    "variant": "noise",
+    "compute_seconds": 4.976847199999611,
+    "text": "Ne vous demandez pas ce que votre pays peut faire pour vous. Demandez-vous plutôt ce que vous pouvez faire pour lui."
+  }
+]

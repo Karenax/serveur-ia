@@ -181,7 +181,12 @@ async function wsDeleteConversation(id){
     if(local)library.splice(index,1);
     let placeholder=null;
     if(!library.length){placeholder=crypto.randomUUID();library.push({id:placeholder,title:'Nouvelle conversation',messages:[]});}
-    if(!library.some(c=>c.id===currentId)){currentId=(library.find(c=>!c.archived)||library[0]).id;messages=wsCurrent().messages;}
+    if(!library.some(c=>c.id===currentId)){
+      const corrections=historyView==='corrector',candidates=library.filter(c=>isCorrection(c)===corrections);
+      let next=candidates.find(c=>!c.archived)||candidates[0];
+      if(!next&&!corrections){placeholder=crypto.randomUUID();next={id:placeholder,title:'Nouvelle conversation',messages:[]};library.unshift(next);}
+      currentId=(next||library.find(c=>!c.archived)||library[0]).id;messages=wsCurrent().messages;
+    }
     deletedConversation={local,remote,index,placeholder,composerDraft};$('undo-delete').hidden=false;
   });
 }
@@ -208,8 +213,8 @@ function wsConversationButton(c,published=false){
 }
 function wsDrawProjectConversations(){
   const p=ws.data?.projects.find(p=>p.id===ws.project);if(!p)return;
-  const local=library.filter(c=>c.project_id===p.id),known=new Set(local.map(c=>c.id.replaceAll('-','')));
-  const rows=[...local.map(c=>({c,published:false})),...p.conversations.filter(c=>!known.has(c.id)).map(c=>({c,published:true}))];
+  const assigned=library.filter(c=>c.project_id===p.id),local=assigned.filter(c=>!isCorrection(c)),known=new Set(assigned.map(c=>c.id.replaceAll('-','')));
+  const rows=[...local.map(c=>({c,published:false})),...p.conversations.filter(c=>!known.has(c.id)&&!isCorrection(c)).map(c=>({c,published:true}))];
   const shown=rows.filter(({c})=>!c.archived||$('ws-conversation-archived').checked);
   $('ws-conversations').replaceChildren(...shown.map(({c,published})=>{
     const row=wsElement('div',undefined,'ws-conversation-row'),b=wsConversationButton(c,published),actions=wsButton('···',()=>wsOpenConversationMenu(c.id,actions));
@@ -226,6 +231,7 @@ const wsHistoryNavigation=wsElement('div',undefined,'history-navigation'),wsSide
 const wsHistoryLabel=document.querySelector('.sidebar > .section-label');wsHistoryLabel.before(wsHistoryNavigation);
 wsHistoryNavigation.append(wsHistoryLabel,document.querySelector('.history-search'),$('conversation-list'),wsSidebarProjects);
 function wsDrawSidebarProjects(){
+  wsSidebarProjects.hidden=historyView==='corrector';
   const open=new Set([...wsSidebarProjects.querySelectorAll('details[open]')].map(n=>n.dataset.projectDrop));
   wsSidebarProjects.replaceChildren(wsElement('div','Projets','section-label'));
   for(const p of ws.data?.projects.filter(p=>!p.archived)||[]){
@@ -233,9 +239,9 @@ function wsDrawSidebarProjects(){
     const summary=wsElement('summary',p.title);summary.title='Déposer une conversation dans '+p.title;
     const view=wsButton('Ouvrir le projet',async()=>{await wsSelectProject(p.id);showView('projects');});
     group.append(summary,view);
-    const local=library.filter(c=>c.project_id===p.id&&!c.archived),known=new Set(library.filter(c=>c.project_id===p.id).map(c=>c.id.replaceAll('-','')));
+    const local=library.filter(c=>c.project_id===p.id&&!c.archived&&!isCorrection(c)),known=new Set(library.filter(c=>c.project_id===p.id).map(c=>c.id.replaceAll('-','')));
     for(const c of local)group.append(wsConversationButton(c));
-    for(const c of p.conversations.filter(c=>!c.archived&&!known.has(c.id)))group.append(wsConversationButton(c,true));
+    for(const c of p.conversations.filter(c=>!c.archived&&!known.has(c.id)&&!isCorrection(c)))group.append(wsConversationButton(c,true));
     wsSidebarProjects.append(group);
   }
   const unassigned=wsElement('div','Sans projet','conversation-drop-none');unassigned.dataset.projectDrop='none';wsSidebarProjects.append(unassigned);
@@ -248,6 +254,7 @@ const wsConversationProjects=wsDrawProjects;wsDrawProjects=function(){
 };
 let wsDraggedConversation=null;
 function wsPrepareConversationDrag(b){
+  if(isCorrection(library.find(c=>c.id===b.dataset.conversationId))){b.draggable=false;b.title='Clic droit pour les actions';return;}
   b.draggable=!conversationLocked();b.title='Clic droit pour les actions · glissez vers un projet';
   b.ondragstart=e=>{if(conversationLocked()){e.preventDefault();return;}wsCloseConversationMenu();wsDraggedConversation=b.dataset.conversationId;e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('application/x-fred-conversation',wsDraggedConversation);b.classList.add('dragging');document.body.classList.add('conversation-dragging');};
   b.ondragend=wsClearConversationDrag;
@@ -264,14 +271,15 @@ function wsCloseConversationMenu(restoreFocus=false){wsConversationMenu.hidden=t
 function wsOpenConversationMenu(id,anchor,event){
   if(conversationLocked())return;const row=wsConversationRecord(id),archived=Boolean(row.local?.archived??row.published?.archived);
   wsConversationMenuAnchor=anchor;wsConversationMenu.replaceChildren(wsElement('strong',row.local?.title||row.published.title));
-  const archive=wsButton(archived?'Restaurer la conversation':'Archiver la conversation',()=>wsArchiveConversation(id));
-  const remove=wsButton('Supprimer la conversation',()=>wsDeleteConversation(id));remove.classList.add('danger');
+  const correction=isCorrection(row.local||row.published),noun=correction?'le texte':'la conversation';
+  const archive=wsButton(archived?'Restaurer '+noun:'Archiver '+noun,()=>wsArchiveConversation(id));
+  const remove=wsButton('Supprimer '+noun,()=>wsDeleteConversation(id));remove.classList.add('danger');
   const label=wsElement('label','Déplacer vers'),select=wsElement('select');select.setAttribute('aria-label','Projet de destination');
   if(row.local)select.append(new Option('Sans projet',''));
   for(const p of ws.data?.projects.filter(p=>!p.archived)||[])select.append(new Option(p.title,p.id));
   select.value=row.local?.project_id||row.published?.project||'';
   const move=wsButton('Déplacer',()=>wsMoveConversation(id,select.value||null));move.disabled=!select.options.length;
-  label.append(select);wsConversationMenu.append(archive,label,move,remove);wsConversationMenu.hidden=false;
+  label.append(select);wsConversationMenu.append(archive);if(!correction)wsConversationMenu.append(label,move);wsConversationMenu.append(remove);wsConversationMenu.hidden=false;
   const rect=anchor.getBoundingClientRect(),x=event?.clientX??rect.right,y=event?.clientY??rect.bottom;
   wsConversationMenu.style.left=Math.max(8,Math.min(x,innerWidth-wsConversationMenu.offsetWidth-8))+'px';
   wsConversationMenu.style.top=Math.max(8,Math.min(y,innerHeight-wsConversationMenu.offsetHeight-8))+'px';archive.focus();

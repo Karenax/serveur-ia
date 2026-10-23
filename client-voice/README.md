@@ -1,5 +1,21 @@
 # Dictée locale — Windows et Android
 
+## Windows 3.5.35
+
+Windows utilise désormais **Parakeet v3 int8**, partagé entre **Dicter** et
+**Conversation**, avec un cache unique `%LOCALAPPDATA%\QwenClient\asr`.
+Le catalogue vérifié représente environ **680 Mo**, détection de parole comprise.
+Le microphone passe par l'annulation d'écho Windows et le décodage s'exécute dans
+un thread distinct. La dictée conserve la limite de deux minutes, l'envoi manuel
+et la restauration du brouillon lors de l'annulation. Phonon reste la synthèse.
+
+Le [rapport du 23 octobre](../maintenance/2026-10-23-reconnaissance/README.md)
+décrit les comparaisons et les limites. Android conserve la version Whisper Small
+décrite ci-dessous ; Canary 180M Flash est un candidat étudié pour les prochains
+essais sur téléphone, pas une mise à jour Android déjà livrée.
+
+## Dictée Android et ancien moteur Windows
+
 Whisper.cpp **1.9.5**, modèle **Small multilingue complet**, français forcé. Le modèle optionnel pèse **487 601 967 octets** ; son URL, sa révision et son SHA-256 sont fixés dans [model.json](model.json). Les textes de licence MIT sont inclus dans `licenses/` et les paquets clients. Les sources amont sont intactes ; le wrapper Fred est dans ce dossier.
 
 ## Utilisation

@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "version": "3.5.37",
+  "shared_suites": 6,
+  "ux_warnings": 0,
+  "checks": [
+    "network loss preserves microphone and answer",
+    "queued utterance sent once after recovery",
+    "audio failure preserves full text",
+    "access revocation still closes microphone"
+  ],
+  "limits": "ASR, network failures and audio playback are simulated in the browser suite."
+}

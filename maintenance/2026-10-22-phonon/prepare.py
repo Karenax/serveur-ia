@@ -3,6 +3,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import shutil
 import sys
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -19,8 +20,12 @@ def main():
         from huggingface_hub import hf_hub_download
         from huggingface_hub.errors import GatedRepoError
         try:
-            for name in SPEC['files']:
-                hf_hub_download(SPEC['repository'], name, revision=SPEC['revision'], local_dir=MODEL)
+            for name,entry in SPEC['files'].items():
+                if 'repository' in entry:
+                    source=hf_hub_download(entry['repository'],entry['filename'],revision=entry['revision'])
+                    target=MODEL/name;target.parent.mkdir(parents=True,exist_ok=True)
+                    staged=target.with_suffix('.tmp');shutil.copyfile(source,staged);staged.replace(target)
+                else:hf_hub_download(SPEC['repository'], name, revision=SPEC['revision'], local_dir=MODEL)
         except GatedRepoError:
             print('Accès au modèle français requis : accepter les conditions sur ' +
                   'https://huggingface.co/' + SPEC['repository'] + ', puis lancer hf auth login.', file=sys.stderr)

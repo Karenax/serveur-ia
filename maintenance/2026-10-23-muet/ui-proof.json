@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "version": "3.5.38",
+  "shared_suites": 6,
+  "ux_warnings": 0,
+  "checks": [
+    "keyboard mute and resume",
+    "playback and answer continue while muted",
+    "no transcription submits while muted",
+    "command failure preserves truthful microphone state",
+    "mute button hidden after hangup"
+  ],
+  "native_capture_cycle_passed": true
+}

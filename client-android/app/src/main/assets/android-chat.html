@@ -214,7 +214,7 @@ function renderMarkdown(element, text) {
 <div class="brand"><div class="logo">F</div><div><strong>Accès serveur Fred</strong><small>Votre espace de travail</small></div></div>
 <button id="new" class="new-button"><span class="nav-text">Nouvelle conversation</span></button>
 <nav id="client-navigation" class="sidebar-nav" aria-label="Fonctions du client"><button class="nav-button" data-view-button="chat">Conversations</button><button class="nav-button" data-view-button="access">Mon accès personnel</button><button class="nav-button" data-view-button="connection">Connexion au serveur</button><button class="nav-button" data-view-button="api">API locale</button></nav>
-<div class="section-label">Conversations</div><div class="history-search"><input id="search-conversations" type="search" placeholder="Rechercher…" aria-label="Rechercher une conversation"><select id="conversation-filter" aria-label="Afficher les conversations"><option value="active">Actives</option><option value="archived">Archivées</option><option value="all">Toutes</option></select></div>
+<div id="history-label" class="section-label">Conversations</div><div class="history-search"><input id="search-conversations" type="search" placeholder="Rechercher…" aria-label="Rechercher une conversation"><select id="conversation-filter" aria-label="Afficher les conversations"><option value="active">Actives</option><option value="archived">Archivées</option><option value="all">Toutes</option></select></div>
 <div id="conversation-list" aria-label="Conversations enregistrées"></div><select id="conversations" aria-label="Sélection de conversation" hidden></select>
 <div class="sidebar-tools"><button id="export-conversations" class="secondary">Exporter l’historique</button><button id="import-conversations" class="secondary">Importer</button><input id="import-file" type="file" accept="application/json" hidden></div>
 <div class="sidebar-settings"></div><div class="sidebar-bottom"><span class="profile-avatar">F</span><div><div class="profile-name">Accès personnel</div><div id="account-status">Accès personnel · Android</div><div id="client-version">Accès serveur Fred</div></div></div>
@@ -243,7 +243,7 @@ function renderMarkdown(element, text) {
     try{localStorage.removeItem(storage);localStorage.removeItem(storage+'-library');}catch{}
     let networkBanner=false,modelsPending=null,lastConnectionUpdate=0,replyProgress={},agentApproval=null,agentDecisionPending=false,agentRecoveryPending=false,cancelPending=false;
     const connectionCodes=new Set(['wireguard_unreachable','tunnel_request_failed','connection_error','gateway_unavailable','access_denied','access_revoked','access_suspended','access_expired','remote_disabled','model_unloaded','no_models']);
-    function connectionFailure(e){if(!connectionCodes.has(e?.code)||e.code==='model_unloaded'&&modelSource==='hermes'&&modelCatalog.some(m=>m.available))return;connected=false;lastConnectionUpdate=Date.now();$('connection').textContent='● Connexion indisponible';$('connection').title=e.message||'';$('connection').classList.remove('online');buttons();}
+    function connectionFailure(e){if(!connectionCodes.has(e?.code)||e.code==='model_unloaded'&&modelSource==='hermes'&&modelCatalog.some(m=>m.available))return;connected=false;lastConnectionUpdate=Date.now();$('connection').textContent='● Connexion indisponible';$('connection').title=e.message||'';$('connection').classList.remove('online');window.conversationConnectionFailure?.(e);buttons();}
     function error(value){if($('retry-without-thinking'))$('retry-without-thinking').hidden=value?.code!=='thinking_without_answer'||typeof thinkingCanDisable==='function'&&!thinkingCanDisable();const text=typeof value==='string'?value:value?.message;networkBanner=connectionCodes.has(value?.code);if(networkBanner)connectionFailure(value);$('error').hidden=!text;$('error').textContent=text||'';}
     let saveTimer=null,historyWrites=Promise.resolve(),historyRevision="",historyReady=false,historyBlocked=false,endpointDirty=false,deletedConversation=null,conversationActionPending=false;
     function conversationLocked(){return busy||agentRecoveryPending||Boolean(window.voiceBusy)||Boolean(window.conversationBusy)||Boolean(window.chatAttachmentLoading)||historySyncPending||conversationActionPending||!historyReady||historyBlocked;}
@@ -264,6 +264,12 @@ function renderMarkdown(element, text) {
       return historyWrites;
     }
     const libraryKey=storage+'-library';let library=[],currentId=null;
+    let historyView='chat';
+    const historyScopes={chat:{query:'',filter:'active'},corrector:{query:'',filter:'active'}};
+    // Existing corrector records already carry this marker. Keep their history
+    // compatible with installed clients rather than introducing a new schema.
+    function isCorrection(c){return Boolean(c?.title?.startsWith('Correcteur · ')&&(!Array.isArray(c.messages)||/^(Corriger|Reformuler professionnel|Reformuler amical) :\n\n/.test(c.messages.find(m=>m.role==='user')?.content||'')));}
+    function openHistoryRecord(c){if(!c||conversationLocked())return;if(isCorrection(c)){window.correctorOpen?.(c);return;}save();chatAttachments=[];attachmentRender();currentId=c.id;messages=c.messages;render();drawLibrary();showView('chat');error('');}
     function validMessages(value){return Array.isArray(value)&&value.length<=1000&&value.every(m=>m&&['user','assistant'].includes(m.role)&&typeof m.content==='string'&&attachmentValid(m)&&(!m.reasoning_content||typeof m.reasoning_content==='string'));}
     if(!library.length)library=[{id:crypto.randomUUID(),title:'Conversation',messages}];
     currentId=library[0].id;messages=library[0].messages;
@@ -306,17 +312,24 @@ function renderMarkdown(element, text) {
     $('conversation-model').onblur=()=>{modelRefresh(false,true);if(modelPollDeferred)models();};
     function drawLibrary(){
       modelRefresh();
+      const corrections=historyView==='corrector',selected=corrections?window.correctorSelection?.():currentId;
+      $('history-label').textContent=corrections?'Corrections et reformulations':'Conversations';
+      $('new').querySelector('.nav-text').textContent=corrections?'Nouveau texte':'Nouvelle conversation';
+      $('search-conversations').setAttribute('aria-label',corrections?'Rechercher une correction ou reformulation':'Rechercher une conversation');
+      $('conversation-filter').setAttribute('aria-label',corrections?'Afficher les corrections et reformulations':'Afficher les conversations');
+      $('conversation-list').setAttribute('aria-label',corrections?'Corrections et reformulations enregistrées':'Conversations enregistrées');
+      $('conversations').setAttribute('aria-label',corrections?'Sélection de correction ou reformulation':'Sélection de conversation');
       const query=$('search-conversations').value.toLowerCase(),current=library.find(c=>c.id===currentId);$('conversation-title').value=current?.title||'Nouvelle conversation';
       const filter=$('conversation-filter').value;
-      const items=library.filter(c=>(filter==='all'||Boolean(c.archived)===(filter==='archived'))&&(c.title.toLowerCase().includes(query)||c.messages.some(m=>m.content.toLowerCase().includes(query))));
+      const items=library.filter(c=>isCorrection(c)===corrections&&(filter==='all'||Boolean(c.archived)===(filter==='archived'))&&(c.title.toLowerCase().includes(query)||c.messages.some(m=>m.content.toLowerCase().includes(query))));
       $('archive-conversation').textContent=current?.archived?'Restaurer la conversation':'Archiver la conversation';
-      $('conversations').replaceChildren(...items.map(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.title;o.selected=c.id===currentId;return o;}));
-      $('conversation-list').replaceChildren(...items.map(c=>{const b=document.createElement('button');b.className='conversation-item'+(c.id===currentId?' selected':'');b.type='button';b.disabled=conversationLocked();b.dataset.conversationId=c.id;b.setAttribute('aria-current',c.id===currentId?'true':'false');const title=document.createElement('span');title.textContent=c.title;const detail=document.createElement('small');detail.textContent=c.messages.length+' messages'+(c.archived?' · archivée':'');b.append(title,detail);b.onclick=()=>{if(conversationLocked())return;save();chatAttachments=[];attachmentRender();currentId=c.id;messages=c.messages;render();drawLibrary();showView('chat');error('');};return b;}));
-      if(!items.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='Aucune conversation trouvée.';$('conversation-list').append(empty);}
+      $('conversations').replaceChildren(...items.map(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.title;o.selected=c.id===selected;return o;}));
+      $('conversation-list').replaceChildren(...items.map(c=>{const b=document.createElement('button');b.className='conversation-item'+(c.id===selected?' selected':'');b.type='button';b.disabled=conversationLocked();b.dataset.conversationId=c.id;b.setAttribute('aria-current',c.id===selected?'true':'false');const title=document.createElement('span');title.textContent=c.title;const detail=document.createElement('small');detail.textContent=c.messages.length+' messages'+(c.archived?' · archivée':'');b.append(title,detail);b.onclick=()=>openHistoryRecord(c);return b;}));
+      if(!items.length){const empty=document.createElement('p');empty.className='muted';empty.textContent=corrections?'Aucune correction ou reformulation trouvée.':'Aucune conversation trouvée.';$('conversation-list').append(empty);}
     }
     $('search-conversations').oninput=drawLibrary;
     $('conversation-filter').onchange=drawLibrary;
-    $('conversations').onchange=()=>{if(busy)return;const selected=$('conversations').value;save();currentId=selected;messages=library.find(c=>c.id===currentId).messages;render();drawLibrary();error('');};
+    $('conversations').onchange=()=>openHistoryRecord(library.find(c=>c.id===$('conversations').value));
     $('rename-conversation').onclick=()=>{if(busy)return;const c=library.find(c=>c.id===currentId),title=$('conversation-title').value;if(title.trim()){c.title=title.trim().slice(0,120);save();drawLibrary();}};
     $('export-conversations').onclick=()=>{save();const url=URL.createObjectURL(new Blob([JSON.stringify({version:1,conversations:library},null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='conversations-fred.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
     $('import-conversations').onclick=()=>{if(!busy)$('import-file').click();};
@@ -505,8 +518,12 @@ function renderMarkdown(element, text) {
     $('connection-diagnostic').textContent=(c.connected?'Serveur IA accessible.':c.error||(c.connection_required?'Choisissez votre mode de connexion.':'Connexion en cours…'))+'\nMode : '+(c.transport==='wireguard'?'WireGuard':'HTTPS')+'\nAdresse : '+(c.endpoint||state.endpoint||'À configurer');
   }catch(e){error(e);}
 }
-    async function bootstrap(){try{const result=await api('/client/history'),saved=result.history;historyRevision=result.revision;historyReady=true;if(saved){library=saved.conversations;currentId=saved.currentId;messages=library.find(c=>c.id===currentId).messages;}}catch(e){historyBlocked=true;$('history-status').textContent=e.message;$('history-recover').hidden=e.code!=='history_unreadable';error(e);}render();drawLibrary();await clientState();await models();}
-    function showView(name){for(const pane of document.querySelectorAll('[data-view]'))pane.hidden=pane.dataset.view!==name;for(const button of document.querySelectorAll('[data-view-button]')){const active=button.dataset.viewButton===name;button.classList.toggle('active',active);button.setAttribute('aria-selected',String(active));}$('workspace-heading').textContent=({chat:'Conversations',access:'Mon accès',connection:'Connexion au serveur',updates:'Mises à jour',api:'API locale'})[name]||'Conversations';}
+    async function bootstrap(){try{const result=await api('/client/history'),saved=result.history;historyRevision=result.revision;historyReady=true;if(saved){library=saved.conversations;currentId=saved.currentId;messages=library.find(c=>c.id===currentId).messages;}window.historyBootstrapView?.();}catch(e){historyBlocked=true;$('history-status').textContent=e.message;$('history-recover').hidden=e.code!=='history_unreadable';error(e);}render();drawLibrary();await clientState();await models();}
+    function showView(name){
+      const previousScope=historyView==='corrector'?'corrector':'chat',scope=name==='corrector'?'corrector':'chat',scopeChanged=previousScope!==scope;
+      if(scopeChanged){historyScopes[previousScope]={query:$('search-conversations').value,filter:$('conversation-filter').value};$('search-conversations').value=historyScopes[scope].query;$('conversation-filter').value=historyScopes[scope].filter;}
+      historyView=name;for(const pane of document.querySelectorAll('[data-view]'))pane.hidden=pane.dataset.view!==name;for(const button of document.querySelectorAll('[data-view-button]')){const active=button.dataset.viewButton===name;button.classList.toggle('active',active);button.setAttribute('aria-selected',String(active));}$('workspace-heading').textContent=({chat:'Conversations',access:'Mon accès',connection:'Connexion au serveur',updates:'Mises à jour',api:'API locale'})[name]||'Conversations';if(scopeChanged)drawLibrary();
+    }
     document.querySelectorAll('[data-view-button]').forEach(button=>button.onclick=()=>showView(button.dataset.viewButton));
     document.querySelectorAll('[data-prompt]').forEach(button=>button.onclick=()=>{if(conversationLocked())return;$('prompt').value=button.dataset.prompt;$('prompt').dispatchEvent(new Event('input',{bubbles:true}));$('prompt').focus();});
     $('retry-without-thinking').onclick=()=>{uiThinkingSet('none');if(typeof uiPersistPreferences==='function')uiPersistPreferences().catch(e=>error(e));retryLastResponse();};
@@ -695,7 +712,12 @@ async function wsDeleteConversation(id){
     if(local)library.splice(index,1);
     let placeholder=null;
     if(!library.length){placeholder=crypto.randomUUID();library.push({id:placeholder,title:'Nouvelle conversation',messages:[]});}
-    if(!library.some(c=>c.id===currentId)){currentId=(library.find(c=>!c.archived)||library[0]).id;messages=wsCurrent().messages;}
+    if(!library.some(c=>c.id===currentId)){
+      const corrections=historyView==='corrector',candidates=library.filter(c=>isCorrection(c)===corrections);
+      let next=candidates.find(c=>!c.archived)||candidates[0];
+      if(!next&&!corrections){placeholder=crypto.randomUUID();next={id:placeholder,title:'Nouvelle conversation',messages:[]};library.unshift(next);}
+      currentId=(next||library.find(c=>!c.archived)||library[0]).id;messages=wsCurrent().messages;
+    }
     deletedConversation={local,remote,index,placeholder,composerDraft};$('undo-delete').hidden=false;
   });
 }
@@ -722,8 +744,8 @@ function wsConversationButton(c,published=false){
 }
 function wsDrawProjectConversations(){
   const p=ws.data?.projects.find(p=>p.id===ws.project);if(!p)return;
-  const local=library.filter(c=>c.project_id===p.id),known=new Set(local.map(c=>c.id.replaceAll('-','')));
-  const rows=[...local.map(c=>({c,published:false})),...p.conversations.filter(c=>!known.has(c.id)).map(c=>({c,published:true}))];
+  const assigned=library.filter(c=>c.project_id===p.id),local=assigned.filter(c=>!isCorrection(c)),known=new Set(assigned.map(c=>c.id.replaceAll('-','')));
+  const rows=[...local.map(c=>({c,published:false})),...p.conversations.filter(c=>!known.has(c.id)&&!isCorrection(c)).map(c=>({c,published:true}))];
   const shown=rows.filter(({c})=>!c.archived||$('ws-conversation-archived').checked);
   $('ws-conversations').replaceChildren(...shown.map(({c,published})=>{
     const row=wsElement('div',undefined,'ws-conversation-row'),b=wsConversationButton(c,published),actions=wsButton('···',()=>wsOpenConversationMenu(c.id,actions));
@@ -740,6 +762,7 @@ const wsHistoryNavigation=wsElement('div',undefined,'history-navigation'),wsSide
 const wsHistoryLabel=document.querySelector('.sidebar > .section-label');wsHistoryLabel.before(wsHistoryNavigation);
 wsHistoryNavigation.append(wsHistoryLabel,document.querySelector('.history-search'),$('conversation-list'),wsSidebarProjects);
 function wsDrawSidebarProjects(){
+  wsSidebarProjects.hidden=historyView==='corrector';
   const open=new Set([...wsSidebarProjects.querySelectorAll('details[open]')].map(n=>n.dataset.projectDrop));
   wsSidebarProjects.replaceChildren(wsElement('div','Projets','section-label'));
   for(const p of ws.data?.projects.filter(p=>!p.archived)||[]){
@@ -747,9 +770,9 @@ function wsDrawSidebarProjects(){
     const summary=wsElement('summary',p.title);summary.title='Déposer une conversation dans '+p.title;
     const view=wsButton('Ouvrir le projet',async()=>{await wsSelectProject(p.id);showView('projects');});
     group.append(summary,view);
-    const local=library.filter(c=>c.project_id===p.id&&!c.archived),known=new Set(library.filter(c=>c.project_id===p.id).map(c=>c.id.replaceAll('-','')));
+    const local=library.filter(c=>c.project_id===p.id&&!c.archived&&!isCorrection(c)),known=new Set(library.filter(c=>c.project_id===p.id).map(c=>c.id.replaceAll('-','')));
     for(const c of local)group.append(wsConversationButton(c));
-    for(const c of p.conversations.filter(c=>!c.archived&&!known.has(c.id)))group.append(wsConversationButton(c,true));
+    for(const c of p.conversations.filter(c=>!c.archived&&!known.has(c.id)&&!isCorrection(c)))group.append(wsConversationButton(c,true));
     wsSidebarProjects.append(group);
   }
   const unassigned=wsElement('div','Sans projet','conversation-drop-none');unassigned.dataset.projectDrop='none';wsSidebarProjects.append(unassigned);
@@ -762,6 +785,7 @@ const wsConversationProjects=wsDrawProjects;wsDrawProjects=function(){
 };
 let wsDraggedConversation=null;
 function wsPrepareConversationDrag(b){
+  if(isCorrection(library.find(c=>c.id===b.dataset.conversationId))){b.draggable=false;b.title='Clic droit pour les actions';return;}
   b.draggable=!conversationLocked();b.title='Clic droit pour les actions · glissez vers un projet';
   b.ondragstart=e=>{if(conversationLocked()){e.preventDefault();return;}wsCloseConversationMenu();wsDraggedConversation=b.dataset.conversationId;e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('application/x-fred-conversation',wsDraggedConversation);b.classList.add('dragging');document.body.classList.add('conversation-dragging');};
   b.ondragend=wsClearConversationDrag;
@@ -778,14 +802,15 @@ function wsCloseConversationMenu(restoreFocus=false){wsConversationMenu.hidden=t
 function wsOpenConversationMenu(id,anchor,event){
   if(conversationLocked())return;const row=wsConversationRecord(id),archived=Boolean(row.local?.archived??row.published?.archived);
   wsConversationMenuAnchor=anchor;wsConversationMenu.replaceChildren(wsElement('strong',row.local?.title||row.published.title));
-  const archive=wsButton(archived?'Restaurer la conversation':'Archiver la conversation',()=>wsArchiveConversation(id));
-  const remove=wsButton('Supprimer la conversation',()=>wsDeleteConversation(id));remove.classList.add('danger');
+  const correction=isCorrection(row.local||row.published),noun=correction?'le texte':'la conversation';
+  const archive=wsButton(archived?'Restaurer '+noun:'Archiver '+noun,()=>wsArchiveConversation(id));
+  const remove=wsButton('Supprimer '+noun,()=>wsDeleteConversation(id));remove.classList.add('danger');
   const label=wsElement('label','Déplacer vers'),select=wsElement('select');select.setAttribute('aria-label','Projet de destination');
   if(row.local)select.append(new Option('Sans projet',''));
   for(const p of ws.data?.projects.filter(p=>!p.archived)||[])select.append(new Option(p.title,p.id));
   select.value=row.local?.project_id||row.published?.project||'';
   const move=wsButton('Déplacer',()=>wsMoveConversation(id,select.value||null));move.disabled=!select.options.length;
-  label.append(select);wsConversationMenu.append(archive,label,move,remove);wsConversationMenu.hidden=false;
+  label.append(select);wsConversationMenu.append(archive);if(!correction)wsConversationMenu.append(label,move);wsConversationMenu.append(remove);wsConversationMenu.hidden=false;
   const rect=anchor.getBoundingClientRect(),x=event?.clientX??rect.right,y=event?.clientY??rect.bottom;
   wsConversationMenu.style.left=Math.max(8,Math.min(x,innerWidth-wsConversationMenu.offsetWidth-8))+'px';
   wsConversationMenu.style.top=Math.max(8,Math.min(y,innerHeight-wsConversationMenu.offsetHeight-8))+'px';archive.focus();
@@ -957,12 +982,12 @@ function uiConnectionStatus(state=uiLastConnection){
   
   uiLoadedModel(connected?conversationModelLabel():'',state.code);
   const https=state.transport==='https';
-  let label=phase?(uiConnectionPhases[phase]||'Préparation de la réponse'):state.checking?(https?'Vérification HTTPS':'Vérification WireGuard'):connected?'Connecté au serveur IA':'Connexion indisponible';
+  let label=phase?(uiConnectionPhases[phase]||'Préparation de la réponse'):state.reconnecting?'Connexion instable · nouvelle vérification':state.checking?(https?'Vérification HTTPS':'Vérification WireGuard'):connected?'Connecté au serveur IA':'Connexion indisponible';
   const elapsed=busy?Math.max(0,Math.round((Date.now()-(replyProgress.started||Date.now()))/1000)):0;
   const silence=busy?Math.max(0,Math.round((Date.now()-(replyProgress.lastEvent||Date.now()))/1000)):0;
   if(busy)label+=' · '+elapsed+' s';if(busy&&silence>=45)label='Flux silencieux · '+silence+' s';
   $('connection').textContent='● '+label+' ⌄';$('connection').classList.toggle('online',connected&&!state.checking&&silence<45);
-  $('connection-summary').textContent=busy&&silence>=45?'Aucun nouveau texte reçu. Le moteur peut encore calculer ; les compteurs ci-dessous permettent de vérifier le tunnel.':state.checking?'Le client vérifie le serveur et essaie les adresses disponibles.':state.error||label;
+  $('connection-summary').textContent=busy&&silence>=45?'Aucun nouveau texte reçu. Le moteur peut encore calculer ; les compteurs ci-dessous permettent de vérifier le tunnel.':state.checking?'Le client vérifie le serveur et essaie les adresses disponibles.':state.connection_warning||state.error||label;
   const lines=['Adresse active : '+(state.endpoint||'en cours'), 'Mode : '+(state.automatic?'automatique':'adresse manuelle'), 'Handshakes : '+(state.handshake?'un échange authentifié a été reçu':'aucun reçu'), 'Dernier handshake : '+(state.last_handshake_time_sec?new Date(state.last_handshake_time_sec*1000).toLocaleString():'aucun'), 'Reçu / envoyé : '+(state.rx_bytes||0)+' / '+(state.tx_bytes||0)+' octets', 'Dernière réponse HTTP : '+(state.last_contact?new Date(state.last_contact*1000).toLocaleTimeString():'aucune'), 'Tunnels démarrés : '+(state.bridge_starts||0)+' · vérifications : '+(state.attempts||0), 'État : '+(state.code||'connexion')];
   if(state.stream?.started)lines.push('Dernière génération : '+(uiConnectionPhases[state.stream.phase]||state.stream.phase),'Réflexion / réponse : '+(state.stream.reasoning_chars||0)+' / '+(state.stream.answer_chars||0)+' caractères reçus');
   lines.push('','Événements récents :');for(const e of (state.events||[]).slice(-6))lines.push(new Date(e.time*1000).toLocaleTimeString()+' · '+(uiConnectionEvents[e.event]||e.event)+(e.route?' · '+e.route:'')+(e.code?' · '+e.code:'')+(e.status?' · HTTP '+e.status:''));
@@ -1097,7 +1122,8 @@ document.querySelector('.workspace').append(correctorPane);
 uiPaths.corrector='M4 20l4-1L21 6l-3-3L5 16l-1 4M9 8l2 2 4-4M4 3h5';uiNavTitles.corrector='Correcteur';
 const correctorNav=wsElement('button','Correcteur','nav-button');correctorNav.dataset.viewButton='corrector';correctorNav.onclick=()=>showView('corrector');
 document.querySelector('#client-navigation').insertBefore(correctorNav,document.querySelector('[data-view-button="tasks"]'));uiDecorateNavigation();
-let correctorRunning=false,correctorDirty=false,correctorDraftTimer=null,correctorAnswer={content:''};
+let correctorRunning=false,correctorDirty=false,correctorDraftTimer=null,correctorAnswer={content:''},correctorSelectedId,correctorChatId=null;
+window.correctorSelection=()=>correctorSelectedId;
 window.generationCancelBody=()=>correctorRunning?{text_transform:true}:{};
 function correctorResultDisplay(){const show=correctorRunning||!!correctorAnswer.content;$('corrector-result-empty').hidden=show;$('corrector-result').hidden=!show;}
 const correctorModes={
@@ -1106,7 +1132,31 @@ const correctorModes={
   friendly:{label:'Reformuler amical'}
 };
 const correctorButtonsOnce=buttons;buttons=function(){correctorButtonsOnce();for(const id of ['corrector-correct','corrector-pro','corrector-friendly'])$(id).disabled=busy||historySyncPending||!connected;$('corrector-text').readOnly=correctorRunning;$('corrector-cancel').hidden=!correctorRunning;$('corrector-reuse').disabled=correctorRunning||!correctorAnswer.content;$('corrector-copy').disabled=!correctorAnswer.content;};
-const correctorShowOnce=showView;showView=function(name){correctorShowOnce(name);if(name==='corrector'){$('workspace-heading').textContent='Correcteur de français';if(!correctorRunning&&!correctorAnswer.content){const recent=library.find(c=>c.title.startsWith('Correcteur ·'));const answer=recent?.messages.findLast(m=>m.role==='assistant');if(answer?.content){correctorAnswer=answer;renderMarkdown($('corrector-result'),answer.content);$('corrector-result-card').hidden=false;correctorResultDisplay();}}}};
+function correctorLoad(c){
+  correctorSelectedId=c.id;correctorAnswer=c.messages.findLast(m=>m.role==='assistant')||{content:''};
+  $('corrector-text').value=c.messages.find(m=>m.role==='user').content.replace(/^(Corriger|Reformuler professionnel|Reformuler amical) :\n\n/,'');
+  correctorDirty=true;renderMarkdown($('corrector-result'),correctorAnswer.content);correctorResultDisplay();
+  $('corrector-status').textContent=correctorAnswer.interrupted?'Résultat partiel conservé. Vous pouvez relancer la correction.':'Résultat enregistré.';buttons();
+}
+window.correctorOpen=c=>{if(conversationLocked())return;save();if(!isCorrection(library.find(c=>c.id===currentId)))correctorChatId=currentId;currentId=c.id;messages=c.messages;correctorLoad(c);render();showView('corrector');drawLibrary();error('');};
+const correctorShowOnce=showView;showView=function(name){
+  const current=library.find(c=>c.id===currentId);
+  if(name==='corrector'&&!isCorrection(current))correctorChatId=currentId;
+  if(name==='chat'&&isCorrection(current)){
+    if(conversationLocked()){error('Attendez la fin de l’action en cours pour ouvrir une conversation.');return;}
+    let chat=library.find(c=>c.id===correctorChatId&&!isCorrection(c))||library.find(c=>!isCorrection(c)&&!c.archived)||library.find(c=>!isCorrection(c));
+    if(!chat&&library.length>=200){error('Exportez puis supprimez un texte pour créer une conversation.');return;}
+    save();if(!chat){chat={id:crypto.randomUUID(),title:'Nouvelle conversation',messages:[]};library.unshift(chat);}currentId=chat.id;messages=chat.messages;chatAttachments=[];attachmentRender();render();save();
+  }
+  correctorShowOnce(name);
+  if(name==='corrector'){$('workspace-heading').textContent='Correcteur de français';drawLibrary();}
+};
+const correctorNewOnce=$('new').onclick;$('new').onclick=()=>{
+  if(historyView!=='corrector')return correctorNewOnce();if(conversationLocked())return;
+  correctorSelectedId=null;correctorAnswer={content:''};$('corrector-text').value='';correctorDirty=true;
+  renderMarkdown($('corrector-result'),'');correctorResultDisplay();$('corrector-status').textContent='Saisissez le texte à corriger ou à reformuler.';drawLibrary();buttons();uiPersistPreferences().catch(e=>error(e));uiCloseSidebar(false);$('corrector-text').focus();
+};
+window.historyBootstrapView=()=>{if(isCorrection(library.find(c=>c.id===currentId))){if(library.some(c=>!isCorrection(c))||library.length<200)showView('chat');else{correctorLoad(library.find(c=>c.id===currentId));showView('corrector');}}};
 $('corrector-text').oninput=()=>{correctorDirty=true;clearTimeout(correctorDraftTimer);correctorDraftTimer=setTimeout(()=>uiPersistPreferences().catch(e=>error(e)),500);};
 $('corrector-copy').onclick=async()=>{try{await copyText(correctorAnswer.content);$('corrector-status').textContent='Texte copié.';}catch{error('Copie impossible. Sélectionnez le texte du résultat.');}};
 $('corrector-reuse').onclick=()=>{$('corrector-text').value=correctorAnswer.content.slice(0,100000);correctorDirty=true;uiPersistPreferences().catch(e=>error(e));$('corrector-text').focus();};
@@ -1115,7 +1165,7 @@ async function correctorRun(mode){
   if(busy||historySyncPending||!connected)return;const source=$('corrector-text').value.trim();if(!source){$('corrector-status').textContent='Saisissez le texte à retravailler.';$('corrector-text').focus();return;}
   if(library.length>=200){error('Exportez puis supprimez une conversation pour enregistrer ce résultat.');return;}
   try{await uiPersistPreferences();}catch(e){error(e);return;}
-  const instruction=correctorModes[mode];currentId=crypto.randomUUID();correctorAnswer={role:'assistant',content:'',reasoning_content:''};
+  save();const instruction=correctorModes[mode];currentId=crypto.randomUUID();correctorSelectedId=currentId;correctorAnswer={role:'assistant',content:'',reasoning_content:''};
   messages=[{role:'user',content:instruction.label+' :\n\n'+source},correctorAnswer];library.unshift({id:currentId,title:'Correcteur · '+instruction.label+' · '+source.slice(0,40),messages});
   error('');correctorRunning=true;busy=true;replyProgress={phase:'requesting',started:Date.now(),lastEvent:Date.now()};controller=new AbortController();requestId=crypto.randomUUID().replaceAll('-','');cancelPending=false;buttons();save();
   $('corrector-result-card').hidden=false;correctorResultDisplay();renderMarkdown($('corrector-result'),'');$('corrector-status').textContent=instruction.label+' · en cours…';
@@ -1135,7 +1185,7 @@ async function correctorRun(mode){
       renderMarkdown(view.content,correctorAnswer.content);save();
     }
     if(!correctorAnswer.content.trim())throw new Error('Le modèle n’a pas renvoyé de texte corrigé. Réessayez.');
-    $('corrector-status').textContent=instruction.label+' · terminé. Résultat enregistré dans vos conversations.';
+    $('corrector-status').textContent=instruction.label+' · terminé. Résultat enregistré dans le Correcteur.';
   }catch(e){correctorAnswer.interrupted=true;if(e.name==='TypeError')e.code='connection_error';$('corrector-status').textContent=e.name==='AbortError'?'Correction arrêtée. Le texte reçu est conservé.':e.message;if(e.name!=='AbortError')error(e);}
   finally{correctorRunning=false;correctorResultDisplay();controller=null;cancelPending=false;renderMarkdown($('corrector-result'),correctorAnswer.content);save();try{await flushHistory();serverHistoryReady=false;await syncServerHistory(true);}catch(e){error(e);}busy=false;render();drawLibrary();buttons();$('queue-state').textContent='';models();}
 }
@@ -1310,6 +1360,8 @@ contextRefresh();
   function render(value){
     if(session&&value.session&&value.session!==session)return;
     state=value;const active=phases.has(value.phase),installing=['installing','verifying'].includes(value.phase);
+    const model=value.model||'Modèle français',size=value.model_bytes?'environ '+Math.ceil(value.model_bytes/1000000)+' Mo':'taille indiquée à l’installation';
+    description.textContent=model+' · français · '+size+'. Microphone fermé à la fin de la dictée. Aucun envoi automatique. Chaque dictée dure au maximum deux minutes.';
     if(dictating){
       if(value.phase==='cancelled'){prompt.value=draft;unlock();}
       else {if(typeof value.text==='string')prompt.value=draft+(draft&&value.text?'\n':'')+value.text;if(!active)unlock();}
@@ -1328,17 +1380,17 @@ contextRefresh();
   button.onclick=async()=>{
     if(state.phase==='listening'){await act('stop');return;}
     if(phases.has(state.phase)||acting||(typeof conversationLocked==='function'&&conversationLocked()))return;
-    if(!state.installed){if(!confirm('Installer Whisper Small français sur cet appareil ? Environ 488 Mo à télécharger. Après installation, la dictée fonctionne sans Internet et aucun audio n’est envoyé au serveur.'))return;await act('install');return;}
+    if(!state.installed){if(!confirm('Installer la reconnaissance française sur cet appareil ? '+Math.ceil((state.model_bytes||487601967)/1000000)+' Mo à télécharger. La reconnaissance fonctionne ensuite sans Internet ; aucun audio n’est envoyé au serveur.'))return;await act('install');return;}
     draft=prompt.value;dictating=true;window.voiceBusy=true;if(typeof buttons==='function')buttons();if(typeof drawLibrary==='function')drawLibrary();await act('start');
   };
   cancel.onclick=()=>act('cancel');
   const settings=document.createElement('details');settings.className='composer-options';
   const label=document.createElement('summary');label.textContent='Dictée';
-  const description=document.createElement('p');description.textContent='Whisper Small multilingue · français · environ 488 Mo. Microphone fermé à la fin de la dictée. Aucun envoi automatique. Chaque dictée dure au maximum deux minutes.';
+  const description=document.createElement('p');description.textContent='Reconnaissance locale en français. Microphone fermé à la fin de la dictée. Aucun envoi automatique.';
   const reinstall=document.createElement('button');reinstall.type='button';reinstall.className='secondary';reinstall.textContent='Installer / réparer';
   const remove=document.createElement('button');remove.type='button';remove.className='secondary';remove.textContent='Désinstaller le modèle';
-  reinstall.onclick=()=>{if(phases.has(state.phase)||acting)return;if(confirm('Télécharger et vérifier la dictée locale (environ 488 Mo) ?'))act('install');};
-  remove.onclick=()=>{if(phases.has(state.phase)||acting)return;if(confirm('Supprimer le modèle vocal de cet appareil ?'))act('remove');};
+  reinstall.onclick=()=>{if(phases.has(state.phase)||acting)return;if(confirm('Télécharger et vérifier le modèle vocal local ?'))act('install');};
+  remove.onclick=()=>{if(phases.has(state.phase)||acting)return;if(confirm('Supprimer le modèle vocal de cet appareil ?'+(!window.AndroidClient?' Il sert à la dictée et à la conversation.':'')))act('remove');};
   settings.append(label,description,reinstall,remove);document.querySelector('.composer-bottom').append(settings);
   window.voiceFinishForClose=async()=>{if(!dictating)return;if(['listening','loading','permission'].includes(state.phase))await act('stop');const deadline=Date.now()+120000;while(phases.has(state.phase)){if(Date.now()>deadline)throw new Error('La dictée se termine encore. Réessayez de fermer après la finalisation.');await new Promise(r=>setTimeout(r,250));await refresh();}};
   document.addEventListener('visibilitychange',()=>{if(document.hidden&&dictating&&state.phase==='listening')act('stop');else if(!document.hidden)refresh();});

@@ -1,0 +1,65 @@
+{
+  "passed": true,
+  "model": "Parakeet v3 int8",
+  "results": [
+    {
+      "mode": "conversation",
+      "packaged_fixture": {
+        "phase": "test_done",
+        "passed": true,
+        "audio_seconds": 10.05,
+        "partial": "",
+        "partial_speech_id": 1,
+        "text": "",
+        "turns": [
+          {
+            "id": 1,
+            "text": "Bonjour Fred. Je souhaite préparer une réunion demain matin. Ajoute les documents du projet et résume les décisions importantes.",
+            "speech_id": 1
+          }
+        ],
+        "speech_id": 1,
+        "speaking": false,
+        "turn_probability": 0.8688222169876099,
+        "processing": false,
+        "compute_seconds": 1.0123,
+        "model": "Parakeet v3"
+      },
+      "wall_seconds": 3.8589999999967404,
+      "peak_rss_bytes": 946728960
+    },
+    {
+      "mode": "dictation",
+      "packaged_fixture": {
+        "phase": "test_done",
+        "passed": true,
+        "audio_seconds": 10.05,
+        "partial": "",
+        "partial_speech_id": 1,
+        "text": "Bonjour Fred. Je souhaite préparer une réunion demain matin. Ajoute les documents du projet et résume les décisions importantes.",
+        "turns": [],
+        "speech_id": 1,
+        "speaking": false,
+        "turn_probability": 0.7507920265197754,
+        "processing": false,
+        "compute_seconds": 1.5354,
+        "model": "Parakeet v3"
+      },
+      "wall_seconds": 4.032000000002881,
+      "peak_rss_bytes": 938852352
+    },
+    {
+      "mode": "conversation",
+      "aec_open_read_close": true,
+      "final_phase": "stopped",
+      "microphone_closed": true
+    },
+    {
+      "mode": "dictation",
+      "aec_open_read_close": true,
+      "final_phase": "ready",
+      "microphone_closed": true
+    }
+  ],
+  "limits": "No human speech accuracy, acoustic double-talk, Android device or end-to-end Qwen latency measured."
+}

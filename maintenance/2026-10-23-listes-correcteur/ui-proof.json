@@ -1,0 +1,31 @@
+{
+  "passed": true,
+  "version": "3.5.39",
+  "shared_suites": 6,
+  "ux_warnings": 0,
+  "platforms": [
+    "windows",
+    "android"
+  ],
+  "checks": [
+    "existing corrections excluded from chat and project lists",
+    "ordinary chats excluded from Corrector list",
+    "keyboard reopens original source and result in Corrector",
+    "independent search and archive filters",
+    "contextual new button",
+    "drafts preserved across navigation",
+    "deleting a chat keeps an ordinary chat selected",
+    "partial results and reload preserve complete history"
+  ],
+  "source_check": {
+    "python_syntax": 269,
+    "javascript_syntax": 67,
+    "powershell_syntax": {
+      "pwsh": 93,
+      "powershell.exe": 93
+    },
+    "passed": true
+  },
+  "android_assets_verified": true,
+  "native_android_device_test": false
+}

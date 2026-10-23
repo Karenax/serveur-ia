@@ -1,6 +1,6 @@
 # Reconstruire et vérifier Fred
 
-Les constructions Windows/serveur 3.5.34 et Android 1.0.13/code 14 utilisent les
+Les constructions Windows/serveur 3.5.39 et Android 1.0.13/code 14 utilisent les
 sources locales et les clés de signature existantes. Chaque construction produit
 `build-manifest.json` : empreintes des sources, empreinte du binaire, versions des
 paquets Python, Go, CMake, JDK, SDK/NDK Android et commit Hermes réellement utilisés.
@@ -27,6 +27,11 @@ Les sources modifiées avant commit sont identifiées par leurs empreintes.
    et [CONVERSATION-WINDOWS.md](client-voice/CONVERSATION-WINDOWS.md). Le build utilise
    Whisper.cpp 1.9.5, CMake 3.31.8, Ninja 1.12.1 et MSVC sous `toolchain` ; les
    dépendances du worker sont épinglées dans `client-voice/requirements-conversation.txt`.
+   Windows utilise Parakeet v3 pour dictée et conversation avec le runtime ONNX
+   existant ; Android conserve Whisper Small. Le catalogue Windows épinglé se
+   vérifie avec `client-voice/prepare_conversation.py` (`--download` pour installer).
+   L'[étude du 23 octobre](maintenance/2026-10-23-reconnaissance/README.md) décrit les
+   mesures et les propositions Android non encore déployées.
 5. Pour Android, disposer du SDK 36, build-tools 36.0.0, NDK 27.3.13750724,
    Gradle 8.13 et JDK 21 aux emplacements définis par
    `client-qwen/android-outils/Environnement-Android.ps1`. Lancer
@@ -106,3 +111,6 @@ données et des clés, les processus Qwen et la programmation des sauvegardes.
 ## Synthèse française Phonon (22 octobre 2026)
 
 Le runtime actif est `toolchain/phonon-server-python` (Python 3.12), isolé de Strata. Reconstruire avec le verrou `dependances/verrous/voix-serveur.requirements.txt`. Télécharger ensuite le checkpoint épinglé avec `maintenance/2026-10-22-phonon/prepare.py --download` dans cet environnement, après acceptation des conditions Hugging Face et connexion. Ses empreintes sont dans `lanceur/phonon-model.json`. La synthèse exige uniquement les fichiers locaux. La procédure et les tests natifs/HTTP sont dans [le rapport de migration](maintenance/2026-10-22-phonon/README.md). Ne pas relancer `activate.py` sur une production déjà migrée.
+
+
+Depuis le 23 octobre 2026, la voix serveur est Tiphaine (français de France). Le moteur Phonon et son checkpoint restent identiques ; l’embedding de voix est vérifié et épinglé dans `lanceur/phonon-model.json`. Voir [la sélection et les preuves](maintenance/2026-10-23-tiphaine/README.md).

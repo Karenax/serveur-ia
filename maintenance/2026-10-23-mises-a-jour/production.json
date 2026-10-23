@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "version": "3.5.36",
+  "signed_update": true,
+  "qwen_processes_preserved": true,
+  "keys_settings_user_data_preserved": true,
+  "backup_schedule_preserved": true,
+  "phonon_ready": true,
+  "personal_clients_prepared": 1
+}

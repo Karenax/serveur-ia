@@ -74,8 +74,9 @@ class TextTransforms:
 
 class _CancellableReader(io.RawIOBase):
     """Poll before recv: Windows socket shutdown cannot reliably wake a blocked read."""
-    def __init__(self, sock, source, valid):
+    def __init__(self, sock, source, valid, heartbeat=None):
         self.sock = sock; self.source = source; self.valid = valid
+        self.heartbeat=heartbeat;self.last_heartbeat=time.monotonic()
 
     def readable(self): return True
 
@@ -84,6 +85,8 @@ class _CancellableReader(io.RawIOBase):
         while True:
             if not self.valid(): raise ValueError('Demande annulée ou accès désactivé.')
             if time.monotonic() >= deadline: raise TimeoutError('Le moteur ne répond pas.')
+            if self.heartbeat and time.monotonic()-self.last_heartbeat>=5:
+                self.heartbeat();self.last_heartbeat=time.monotonic()
             if select.select([self.sock], [], [], .2)[0]:
                 count = self.source.readinto(buffer)
                 if not self.valid(): raise ValueError('Demande annulée ou accès désactivé.')
@@ -95,10 +98,10 @@ class _CancellableReader(io.RawIOBase):
 
 
 class CancellableResponse(http.client.HTTPResponse):
-    def __init__(self, sock, *args, valid, **kwargs):
+    def __init__(self, sock, *args, valid, heartbeat=None, **kwargs):
         super().__init__(sock, *args, **kwargs)
         original = self.fp
         # Keep a makefile reference: HTTPConnection closes its socket on HTTP/1.0,
         # but the response must continue to own it until its body is consumed.
-        self.fp = io.BufferedReader(_CancellableReader(sock, sock.makefile('rb', buffering=0), valid))
+        self.fp = io.BufferedReader(_CancellableReader(sock, sock.makefile('rb', buffering=0), valid, heartbeat))
         original.close()

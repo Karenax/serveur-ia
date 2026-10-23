@@ -26,6 +26,6 @@ class LocalHTTPTests(unittest.TestCase):
         with self.request(headers=headers) as response:status=json.load(response)
         self.assertTrue(status['local']);self.assertFalse(status['installed'])
         with self.assertRaises(urllib.error.HTTPError) as error:self.request({'action':'start'},headers)
-        self.assertEqual(error.exception.code,400);error.exception.close();self.assertIsNone(self.server.voice.engine)
+        self.assertEqual(error.exception.code,400);error.exception.close();self.assertIsNone(self.server.voice.process)
 
 if __name__=='__main__':unittest.main(verbosity=2)

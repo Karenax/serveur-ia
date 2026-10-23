@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "version": "3.5.35",
+  "sha256": "2561a40f46cbfbf034a0753fc7d56dbb4378bee3d8dcfb94b2dbbbcd6b07716d",
+  "bytes": 94409653,
+  "checks": [
+    "packaged desktop self-test",
+    "dictation lifecycle",
+    "conversation microphone AEC lifecycle"
+  ]
+}

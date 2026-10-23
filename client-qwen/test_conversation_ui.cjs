@@ -31,11 +31,17 @@ async function main(){
     if(req.url==='/client/integrations')return json(res,{apps:[]});
     if(req.url==='/client/voice')return json(res,{phase:'idle',installed:false});
     if(req.url==='/client/conversation'){
-      if(body.action==='start')state.native={...state.native,phase:'listening',session:'qa-conversation',turns:[],speech_id:0};
+      if(body.action==='start')state.native={...state.native,phase:'listening',session:'qa-conversation',turns:[],speech_id:0,muted:false,microphone_closed:false,mute_pending:false};
+      if(body.action==='mute'){
+        assert.equal(body.session,state.native.session);assert.equal(typeof body.muted,'boolean');
+        if(state.failMute){state.failMute=false;return json(res,{error:{message:'État du microphone non modifié. Réessayez.'}},503);}
+        state.native={...state.native,muted:body.muted,microphone_closed:body.muted,mute_pending:false,partial:''};
+      }
       if(body.action==='ack'){assert.equal(body.session,state.native.session);state.acks.push(body.turn);state.native.turns=state.native.turns.filter(turn=>turn.id>body.turn);}
-      if(body.action==='stop'){assert.equal(body.session,state.native.session);if(state.failStop){state.failStop=false;return json(res,{error:{message:'Raccrochage temporairement indisponible'}},503);}state.stops++;state.native={...state.native,phase:'stopped',turns:[],partial:''};}
+      if(body.action==='stop'){assert.equal(body.session,state.native.session);if(state.failStop){state.failStop=false;return json(res,{error:{message:'Raccrochage temporairement indisponible'}},503);}state.stops++;state.native={...state.native,phase:'stopped',turns:[],partial:'',muted:false,microphone_closed:true,mute_pending:false};}
       return json(res,state.native);
     }
+    if(req.url==='/v1/models'&&state.failModels)return json(res,{error:{code:'connection_error',message:'Connexion temporairement indisponible'}},503);
     if(req.url==='/v1/models')return json(res,{source:'hermes',default_model:'Fred-test',data:[{id:'Fred-test',provider:'Qwen local',name:'Modèle local',available:true,capabilities:{images:false,thinking:true,reasoning_efforts:['none','low','medium','high']}},{id:'fred-test-cloud',name:'Modèle vocal choisi',provider:'Cloud de test',available:true,capabilities:{vision:false,thinking:true,reasoning_mode:automaticReasoning?'none':'effort',reasoning_efforts:automaticReasoning?[]:['none','xhigh','max']}}]});
     if(req.url==='/v1/status')return json(res,{protocol:3,agent_protocol:4,version:'test'});
     if(req.url==='/v1/workspace')return json(res,{projects:[],jobs:[]});
@@ -45,6 +51,7 @@ async function main(){
     if(req.url==='/v1/voice/status')return json(res,{ready:true,enabled:true});
     if(req.url==='/v1/voice/cancel'){state.voiceCancels.push(body.request_id);return json(res,{cancelled:true});}
     if(req.url==='/v1/voice/speech'){
+      if(state.failSpeech){state.failSpeech=false;return json(res,{error:{message:'Lecture temporairement interrompue'}},503);}
       state.speech.push({id:body.request_id,text:body.text});res.writeHead(200,{'Content-Type':'text/event-stream; charset=utf-8'});
       const pcm=Buffer.alloc(4800*2).toString('base64'),frames=state.longVoice?30:3;
       for(let i=0;i<frames;i++)later(()=>event(res,{id:body.request_id,rate:24000,pcm}),50+i*30);
@@ -81,6 +88,12 @@ async function main(){
       };
     });
     await page.goto('http://127.0.0.1:'+server.address().port);await page.waitForSelector('#conversation-start:not([disabled])');await page.selectOption('#conversation-model','fred-test-cloud');await page.click('#conversation-start');await page.waitForFunction(()=>document.getElementById('conversation-status').textContent.includes('Qwen local'));assert.equal(await page.evaluate(()=>window.conversationBusy),false);await page.selectOption('#conversation-model','Fred-test');if(!automaticReasoning)await page.locator('.thinking-segment:has(#thinking-high)').click();await page.click('#conversation-start');await page.waitForFunction(()=>window.conversationBusy);assert.equal(await page.isDisabled('#conversation-model'),true,'Model choice stays bound during a voice session');
+    assert.equal(await page.isVisible('#conversation-mute'),true);
+    assert.equal(await page.getAttribute('#conversation-mute','aria-pressed'),'false');
+    state.failMute=true;await page.click('#conversation-mute');
+    await page.waitForFunction(()=>!document.getElementById('conversation-mute').disabled);
+    assert.equal(await page.getAttribute('#conversation-mute','aria-pressed'),'false','A failed command must never claim the microphone is muted');
+    assert.equal(await page.evaluate(()=>window.conversationBusy),true);
     state.syncDelay=1200;state.native.speech_id=1;state.native.turns=[{id:1,text:'Quelle est la livraison du projet Orion ?'}];
     await page.waitForFunction(()=>historySyncPending&&messages.some(message=>message.role==='assistant'&&message.content));await sleep(350);
     snapshot=await page.evaluate(()=>({active:window.conversationBusy,busy,historySyncPending,text:messages.at(-1).content,status:document.getElementById('conversation-status').textContent}));
@@ -98,9 +111,68 @@ async function main(){
 
     // Interrupt actual scheduled PCM, then hang up and recover normal controls.
     state.holdChat=false;state.longVoice=true;const previousSources=await page.evaluate(()=>window.__audio.started);state.native.partial='';state.native.speech_id=5;state.native.turns=[{id:4,text:'Une réponse à interrompre pendant sa lecture.'}];await page.waitForFunction(previous=>window.__audio.started>previous,previousSources);const speechId=state.speech.at(-1).id;
-    state.native.speech_id=6;state.native.partial='Stop.';await until(()=>state.voiceCancels.includes(speechId),'barge-in cancels the correct speech');assert(await page.evaluate(()=>window.__audio.stopped>0));await page.waitForFunction(()=>!busy&&!historySyncPending);
-    await page.click('#conversation-start');await page.waitForFunction(()=>!window.conversationBusy&&!document.getElementById('prompt').readOnly);assert.equal(state.native.phase,'stopped');assert.equal(state.stops,1);assert.deepEqual(errors,[]);
+    // Muting the capture must keep scheduled playback and the call running.
+    const stopsBeforeMute=state.stops,voiceCancelsBeforeMute=state.voiceCancels.length;
+    await page.focus('#conversation-mute');await page.keyboard.press('Space');
+    await page.waitForFunction(()=>document.getElementById('conversation-mute').getAttribute('aria-pressed')==='true'&&!document.getElementById('conversation-mute').disabled);
+    assert.equal(state.native.microphone_closed,true);
+    const chatsWhileMuted=state.chats.length;
+    state.native.speech_id=6;state.native.partial='Une parole qui ne doit pas interrompre Fred.';
+    await sleep(450);assert.equal(state.voiceCancels.length,voiceCancelsBeforeMute);
+    assert.equal(state.stops,stopsBeforeMute);assert.equal(state.chats.length,chatsWhileMuted);
+    assert.equal(await page.evaluate(()=>window.conversationBusy),true);
+    assert.match(await page.textContent('#conversation-status'),/microphone coupé/i);
+    state.native.partial='';await page.focus('#conversation-mute');await page.keyboard.press('Space');
+    await page.waitForFunction(()=>document.getElementById('conversation-mute').getAttribute('aria-pressed')==='false'&&!document.getElementById('conversation-mute').disabled);
+    assert.equal(state.native.microphone_closed,false);
+    const cancelsBeforeEcho=state.voiceCancels.length,chatsBeforeEcho=state.chats.length;
+    state.native.speech_id=6;state.native.partial='';await sleep(350);
+    assert.equal(state.voiceCancels.length,cancelsBeforeEcho,'A bare VAD onset must not cancel spoken audio');
+    state.native.partial=state.speech.at(-1).text;await sleep(300);
+    assert.equal(state.voiceCancels.length,cancelsBeforeEcho,'Recognized playback echo must not cancel audio');
+    state.native.turns=[{id:5,speech_id:6,text:state.speech.at(-1).text}];await until(()=>state.acks.includes(5),'echo acknowledged');
+    assert.equal(state.chats.length,chatsBeforeEcho,'Playback echo must never become a new user message');
+    state.native.speech_id=7;state.native.partial='';await sleep(300);
+    assert.equal(state.voiceCancels.length,cancelsBeforeEcho,'Wait for the delayed transcript of the new utterance');
+    state.native.partial='Stop.';await until(()=>state.voiceCancels.includes(speechId),'barge-in cancels the correct speech');assert(await page.evaluate(()=>window.__audio.stopped>0));await page.waitForFunction(()=>!busy&&!historySyncPending);
+    await page.click('#conversation-start');await page.waitForFunction(()=>!window.conversationBusy&&!document.getElementById('prompt').readOnly);assert.equal(state.native.phase,'stopped');assert.equal(await page.isVisible('#conversation-mute'),false);assert.equal(state.stops,1);assert.deepEqual(errors,[]);
     if(!automaticReasoning)assert.equal(await page.evaluate(()=>thinkingEffort()),'high','Written reasoning preference survives an oral call');
+
+    // Losing a health probe must not cancel a reply or close the microphone.
+    state.longVoice=false;state.delayedReply=true;state.syncDelay=0;
+    await page.click('#conversation-start');await page.waitForFunction(()=>window.conversationBusy);
+    const stopsBeforeDrop=state.stops,cancelsBeforeDrop=state.cancels.length;
+    const audioBeforeDrop=await page.evaluate(()=>window.__audio.started);
+    state.native.speech_id=1;state.native.turns=[{id:1,text:'Une réponse pendant la reconnexion.'}];
+    await page.waitForFunction(previous=>busy&&window.__audio.started>previous,audioBeforeDrop);
+    state.failModels=true;await page.evaluate(()=>connectionFailure({code:'connection_error',message:'Coupure temporaire'}));
+    await sleep(400);assert.equal(await page.evaluate(()=>window.conversationBusy),true);
+    assert.equal(state.stops,stopsBeforeDrop);assert.equal(state.cancels.length,cancelsBeforeDrop);
+    await page.waitForFunction(()=>!busy&&!historySyncPending);
+    assert.equal(await page.evaluate(()=>messages.at(-1).content),'Oui. Je t’entends bien.');
+    const chatsBeforeReconnect=state.chats.length;
+    state.native.speech_id=2;state.native.turns=[{id:2,text:'Une question conservée pendant la coupure.'}];
+    await until(()=>state.acks.includes(2),'offline utterance retained');await sleep(300);
+    assert.equal(state.chats.length,chatsBeforeReconnect);
+    state.failModels=false;await page.evaluate(()=>models());
+    await until(()=>state.chats.length===chatsBeforeReconnect+1,'queued utterance resumes once');
+    await page.waitForFunction(()=>!busy&&!historySyncPending);
+    assert.equal(state.chats.at(-1).messages.at(-1).content,'Une question conservée pendant la coupure.');
+    assert.equal(state.stops,stopsBeforeDrop);await page.click('#conversation-start');
+    await page.waitForFunction(()=>!window.conversationBusy);
+
+    // An audio transport error keeps the complete text and the microphone.
+    await page.click('#conversation-start');await page.waitForFunction(()=>window.conversationBusy);
+    const stopsBeforeAudioFailure=state.stops,cancelsBeforeAudioFailure=state.cancels.length;
+    state.failSpeech=true;state.native.speech_id=1;state.native.turns=[{id:1,text:'La voix coupe, mais continue le texte.'}];
+    const chatsBeforeAudioFailure=state.chats.length;
+    await until(()=>state.chats.length>chatsBeforeAudioFailure,'audio failure answer requested');
+    await page.waitForFunction(()=>!busy&&!historySyncPending);
+    assert.equal(await page.evaluate(()=>messages.at(-1).content),'Oui. Je t’entends bien.');
+    assert.equal(await page.evaluate(()=>messages.at(-1).interrupted),undefined);
+    assert.equal(await page.evaluate(()=>window.conversationBusy),true);
+    assert.equal(state.stops,stopsBeforeAudioFailure);assert.equal(state.cancels.length,cancelsBeforeAudioFailure);
+    await page.click('#conversation-start');await page.waitForFunction(()=>!window.conversationBusy);
 
     // A short first sentence is spoken before the next sentence or end arrives.
     state.longVoice=false;state.delayedReply=true;state.syncDelay=0;
@@ -114,7 +186,10 @@ async function main(){
     await page.waitForFunction(()=>document.getElementById('conversation-start').textContent==='Réessayer le raccrochage'&&!document.getElementById('conversation-start').disabled);
     assert.equal(await page.evaluate(()=>messages.at(-1).content),'Oui. Je t’entends bien.','Hangup or transport failure must not erase a completed reply');
     await page.click('#conversation-start');await page.waitForFunction(()=>!window.conversationBusy&&!document.getElementById('prompt').readOnly);
-    console.log(JSON.stringify({passed:true,source:baseline?'0354e91':'working-tree',reasoning:'oral none, written preference preserved',checks:['direct Qwen + delayed sync preserves session and complete text','all three PCM frames finish without automatic cancellation','second ASR turn waits for history sync and submits exactly once','same conversation with unique turn IDs','real new speech during calculation cancels original turn','speech playback barge-in cancels correct audio and scheduled sources','hangup returns controls','local requests bypass Hermes; oral reasoning disabled','short first sentence is spoken before LLM completion','hangup failure keeps completed text and offers retry'],chats:state.chats.length,acks:state.acks,simulation:'native ASR and PCM timing; no hardware microphone or server models'},null,2));
+    await page.click('#conversation-start');await page.waitForFunction(()=>window.conversationBusy);
+    await page.evaluate(()=>connectionFailure({code:'access_revoked',message:'Accès révoqué'}));
+    await page.waitForFunction(()=>!window.conversationBusy);assert.equal(state.native.phase,'stopped');
+    console.log(JSON.stringify({passed:true,source:baseline?'0354e91':'working-tree',reasoning:'oral none, written preference preserved',checks:['direct Qwen + delayed sync preserves session and complete text','all three PCM frames finish without automatic cancellation','second ASR turn waits for history sync and submits exactly once','same conversation with unique turn IDs','real new speech during calculation cancels original turn','speech playback barge-in cancels correct audio and scheduled sources','hangup returns controls','local requests bypass Hermes; oral reasoning disabled','short first sentence is spoken before LLM completion','hangup failure keeps completed text and offers retry','network probe failure preserves reply and microphone','offline utterance resumes exactly once after reconnection','audio transport failure preserves full text and microphone','revoked access still closes microphone','keyboard mute/unmute preserves playback and session','muted recognition never interrupts or submits','failed mute never reports microphone closed'],chats:state.chats.length,acks:state.acks,simulation:'native ASR and PCM timing; no hardware microphone or server models'},null,2));
   }catch(error){console.error(JSON.stringify({passed:false,source:baseline?'0354e91':'working-tree',snapshot,current:await page.evaluate(()=>({active:window.conversationBusy,busy,button:document.getElementById('conversation-start').textContent,disabled:document.getElementById('conversation-start').disabled,status:document.getElementById('conversation-status').textContent})),recent:state.calls.slice(-12),native:state.native,stops:state.stops,cancels:state.cancels,voiceCancels:state.voiceCancels},null,2));throw error;}
   finally{for(const timer of state.timers)clearTimeout(timer);await browser.close();server.closeAllConnections?.();await new Promise(resolve=>server.close(resolve));}
 }

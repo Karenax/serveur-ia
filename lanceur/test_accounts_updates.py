@@ -117,13 +117,27 @@ class AccountsTests(unittest.TestCase):
         from wg_crypto import keypair,protect
         source=Path(os.environ.get('FRED_TEST_CLIENT_EXE',str(ROOT/'client-qwen/dist/Accès serveur Fred.exe')))
         if not source.exists():self.skipTest('Compiler le client avant ce test.')
+        sys.path.insert(0,str(ROOT/'client-qwen/build-tools'))
+        try:import pefile
+        finally:sys.path.pop(0)
+        with pefile.PE(str(source),fast_load=False) as binary:
+            info=binary.VS_FIXEDFILEINFO[0]
+            binary_version=f'{info.FileVersionMS>>16}.{info.FileVersionMS&65535}.{info.FileVersionLS>>16}'
+        if binary_version!=updater.VERSION:
+            self.skipTest('Recompiler le client '+updater.VERSION+' et définir FRED_TEST_CLIENT_EXE sur ce binaire.')
         with tempfile.TemporaryDirectory(dir=HOME) as folder:
-            home=Path(folder);work=home/'update';work.mkdir()
+            home=Path(folder)
             private,key=keypair()
             profile={'transport':'wireguard','url':'wireguard://10.77.0.1:8766','token':'qwen_0000000000000000_'+'x'*43,'version':'2.9.9','protocol':3,'update_public_key':public(home),'wireguard':{'private_key':private,'server_public_key':key,'preshared_key':key,'address':'10.77.0.2/32','endpoint':'127.0.0.1:1'}}
             target=home/'Accès serveur Fred.exe';shutil.copyfile(source,target)
+            work=updater.work_directory(target,profile)
+            existing_directories={p.name for p in home.iterdir() if p.is_dir()}
             raw=json.dumps(profile).encode()
             with target.open('ab') as stream:stream.write(raw+struct.pack('<I',len(raw))+b'QWENPROFILE1')
+            failure_result=home/'self-test-error.txt'
+            failed=updater.subprocess.run([str(target),'--self-test','--with-profile','--result',str(failure_result)],timeout=30,creationflags=0x08000000)
+            self.assertEqual(failed.returncode,1)
+            self.assertIn('Version du profil incompatible',failure_result.read_text(encoding='utf-8'))
             old=hashlib.sha256(target.read_bytes()).hexdigest()
             payload=work/'QwenClient.base.exe';shutil.copyfile(source,payload)
             release=sign({'version':updater.VERSION,'protocol':3,'bytes':payload.stat().st_size,'sha256':hashlib.sha256(payload.read_bytes()).hexdigest()},home)
@@ -153,16 +167,16 @@ class AccountsTests(unittest.TestCase):
                 fail_startup[0]=False;plan.write_bytes(plan_blob);shutil.copyfile(source,payload)
                 updater.apply(plan,protect,lambda:profile)
             import releases
-            renamed=home/updater.client_filename(updater.VERSION,'Fred')
-            self.assertFalse(target.exists())
+            renamed=target
+            self.assertTrue(target.exists())
             installed=releases.profile(renamed)
             self.assertEqual(installed['wireguard'],profile['wireguard']);self.assertEqual(installed['token'],profile['token'])
             self.assertEqual(installed['version'],updater.VERSION)
             self.assertEqual(installed['client_name'],'Fred')
-            backups=list((home/'Sauvegardes client Fred').rglob('*.exe'))
-            self.assertEqual([p.name for p in backups],[target.name])
+            backups=[work/'previous.exe']
+            self.assertTrue(backups[0].exists())
             self.assertEqual(hashlib.sha256(backups[0].read_bytes()).hexdigest(),old)
-            self.assertFalse(plan.exists());self.assertTrue(read_json(home/'QwenClient-update-result.json')['ok'])
+            self.assertFalse(plan.exists());self.assertTrue(read_json(work/'update-result.json')['ok'])
             # A second update uses the new version and the registered client name.
             next_version='.'.join(map(str,(*updater.version(updater.VERSION)[:2],updater.version(updater.VERSION)[2]+1)))
             shutil.copyfile(source,payload)
@@ -171,9 +185,11 @@ class AccountsTests(unittest.TestCase):
             plan.write_bytes(protect(json.dumps({'target':str(renamed.resolve()),'source':str(payload.resolve()),'profile':installed,'release':next_release,'pid':99999999,'created':0}).encode()))
             with patch.object(updater.sys,'executable',str(helper.resolve())),patch.object(updater.subprocess,'Popen',side_effect=test_launch),patch.object(updater.subprocess,'run',return_value=SimpleNamespace(returncode=0)):
                 updater.apply(plan,protect,lambda:installed)
-            self.assertFalse(renamed.exists())
-            self.assertEqual([p.name for p in home.glob('*.exe')],[updater.client_filename(next_version,'Fred')])
-            self.assertEqual(sorted(p.name for p in (home/'Sauvegardes client Fred').rglob('*.exe')),sorted([target.name,renamed.name]))
+            self.assertTrue(renamed.exists())
+            self.assertEqual([p.name for p in home.glob('*.exe')],[target.name])
+            self.assertEqual({p.name for p in home.iterdir() if p.is_dir()},existing_directories)
+            self.assertEqual(updater.personal_profile(work/'previous.exe')['version'],updater.VERSION)
+            self.assertEqual(updater.personal_profile(target)['version'],next_version)
 
 class AuthGatewayTests(unittest.TestCase):
     # Reuse the fixture, without inheriting and rerunning its full test suite.
@@ -185,6 +201,7 @@ class AuthGatewayTests(unittest.TestCase):
         import threading,urllib.request,yaml
         remote=client.Remote(self.profile,opener=object());key=secrets.token_urlsafe(32)
         home=Path(self.temporary.name)
+        remote.models_catalogue={'object':'list','data':[{'id':'test-model','name':'test-model','available':True}]}
         apps={name:{'installed':True,'config_path':str(home/(name+suffix))} for name,suffix in [('opencode','.json'),('hermes','.yaml')]}
         state={'connected':True,'model':'test-model','models':['test-model']}
         with patch.object(client,'settings_path',return_value=home/'settings.dpapi'):
@@ -202,11 +219,12 @@ class AuthGatewayTests(unittest.TestCase):
                 with self.assertRaises(urllib.error.HTTPError) as denied:urllib.request.urlopen(foreign)
                 self.assertEqual(denied.exception.code,403)
                 for app in apps:
-                    with post({'app':app,'model':'test-model'}) as response:self.assertEqual(json.load(response)['model'],'test-model')
+                    expected='test-model' if app=='opencode' else client.hermes_catalogue.catalogue(remote.models_catalogue)[0]['data'][0]['id']
+                    with post({'app':app,'model':'test-model'}) as response:self.assertEqual(json.load(response)['model'],expected)
                 config=json.loads(Path(apps['opencode']['config_path']).read_text())['providers']['serveur-fred']
                 self.assertEqual(config['settings'],{'baseURL':base+'/v1','apiKey':key})
                 hermes=yaml.safe_load(Path(apps['hermes']['config_path']).read_text())['providers']['serveur-fred']
-                self.assertEqual(hermes['api'],base+'/v1');self.assertEqual(hermes['api_key'],key)
+                self.assertEqual(hermes['api'],base+'/hermes/v1');self.assertEqual(hermes['api_key'],key)
                 snapshots={app:Path(info['config_path']).read_bytes() for app,info in apps.items()}
                 for values in [{'app':'opencode','model':'invented'},{'app':'unknown'},{'app':'opencode','config_path':str(home/'injected.json')},{'app':'hermes','key':'injected'}]:
                     with self.assertRaises(urllib.error.HTTPError) as refused:post(values)

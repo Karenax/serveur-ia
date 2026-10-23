@@ -42,14 +42,19 @@ class TextTransformHTTPTests(unittest.TestCase):
             def do_POST(self):
                 data = json.loads(self.rfile.read(int(self.headers['Content-Length'])))
                 parent.captured.append((dict(self.headers), data))
+                if getattr(parent,'model_refusals',None):
+                    retry=parent.model_refusals.pop(0)
+                    self.send_response(503)
+                    if retry is not None:self.send_header('Retry-After',retry)
+                    self.end_headers();self.wfile.write(b'{"error":{"message":"batch slots are not free right now"}}');return
                 if parent.block_model:
-                    parent.model_ready.set(); parent.model_release.wait(5)
+                    parent.model_ready.set(); parent.model_release.wait(getattr(parent,'block_seconds',5))
                 try:
                     self.send_response(200)
                     if parent.fragmented: self.send_header('Transfer-Encoding', 'chunked')
                     self.end_headers()
                     if parent.block_after_headers:
-                        parent.model_ready.set(); parent.model_release.wait(5)
+                        parent.model_ready.set(); parent.model_release.wait(getattr(parent,'block_seconds',5))
                     raw = b'data: {"choices":[{"delta":{"content":"Texte corrige"}}]}\n\ndata: [DONE]\n\n' if data.get('stream') else b'{"choices":[{"message":{"content":"Texte corrige"}}]}'
                     if parent.fragmented:
                         for offset in range(0, len(raw), 7):

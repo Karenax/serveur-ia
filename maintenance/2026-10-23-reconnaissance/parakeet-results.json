@@ -1,0 +1,73 @@
+{
+  "model": "csukuangfj/sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8",
+  "revision": "2bda32ec70b097a55adaa07d9a7173915b43cc78",
+  "provider": "cpu",
+  "threads": 4,
+  "loading_seconds": 2.096664900000178,
+  "fixtures": [
+    {
+      "file": "preuves\\voix-small-20261011\\francais.wav",
+      "variant": "original",
+      "seconds": 10.05,
+      "compute_seconds": 0.6398042000000714,
+      "text": "Bonjour Fred. Je souhaite préparer une réunion demain matin. Ajoute les documents du projet et résume les décisions importantes."
+    },
+    {
+      "file": "preuves\\voix-small-20261011\\francais.wav",
+      "variant": "quiet",
+      "seconds": 10.05,
+      "compute_seconds": 0.7036100000004808,
+      "text": "Bonjour Fred. Je souhaite préparer une réunion demain matin. Ajoute les documents du projet et résume les décisions importantes."
+    },
+    {
+      "file": "preuves\\voix-small-20261011\\francais.wav",
+      "variant": "noise",
+      "seconds": 10.05,
+      "compute_seconds": 0.597293399998307,
+      "text": "Bonjour Fred. Je souhaite préparer une réunion demain matin. Ajoute les documents du projet et résume les décisions importantes."
+    },
+    {
+      "file": "preuves\\conversation-windows-20261011\\fred-francais.wav",
+      "variant": "original",
+      "seconds": 3.92,
+      "compute_seconds": 0.2672028999986651,
+      "text": "Bonjour, je suis Fred. Nous pouvons maintenant discuter ensemble."
+    },
+    {
+      "file": "preuves\\conversation-windows-20261011\\fred-francais.wav",
+      "variant": "quiet",
+      "seconds": 3.92,
+      "compute_seconds": 0.25797439999951166,
+      "text": "Bonjour, je suis Fred. Nous pouvons maintenant discuter ensemble."
+    },
+    {
+      "file": "preuves\\conversation-windows-20261011\\fred-francais.wav",
+      "variant": "noise",
+      "seconds": 3.92,
+      "compute_seconds": 0.2521510999977181,
+      "text": "Bonjour, je suis Fred. Nous pouvons maintenant discuter ensemble."
+    },
+    {
+      "file": "toolchain\\asr-research-20261023\\parakeet\\test_wavs\\fr.wav",
+      "variant": "original",
+      "seconds": 4.96907029478458,
+      "compute_seconds": 0.3162960000008752,
+      "text": "Ne vous demandez pas ce que votre pays peut faire pour vous. Demandez-vous plutôt ce que vous pouvez faire pour lui."
+    },
+    {
+      "file": "toolchain\\asr-research-20261023\\parakeet\\test_wavs\\fr.wav",
+      "variant": "quiet",
+      "seconds": 4.96907029478458,
+      "compute_seconds": 0.3153735999985656,
+      "text": "Ne vous demandez pas ce que votre pays peut faire pour vous. Demandez-vous plutôt ce que vous pouvez faire pour lui."
+    },
+    {
+      "file": "toolchain\\asr-research-20261023\\parakeet\\test_wavs\\fr.wav",
+      "variant": "noise",
+      "seconds": 4.96907029478458,
+      "compute_seconds": 0.3155460999987554,
+      "text": "Ne vous demandez pas ce que votre pays peut faire pour vous. Demandez-vous plutôt ce que vous pouvez faire pour lui."
+    }
+  ],
+  "limits": "Three fixtures: two synthetic and one public sample with unverified speaker provenance; no representative French WER evaluation."
+}

@@ -7,6 +7,7 @@ import subprocess
 import threading
 import time
 from core import ROOT, read_json, write_json, HIDDEN
+from phonon_model import SPEC
 
 class VoiceService:
     def __init__(self,home):
@@ -17,7 +18,7 @@ class VoiceService:
     def settings(self):return read_json(self.path,{'enabled':False})
     def status(self):
         with self.lock:return {'enabled':self.settings()['enabled'],'phase':self.phase,'ready':self.ready.is_set(),
-            'engine':'Phonon 0.4.1','language':'fr','voice':'default','device':'cpu','error':self.error,
+            'engine':'Phonon 0.4.1','language':'fr','voice':SPEC['voice'],'device':'cpu','error':self.error,
             'busy':self.current is not None,'max_text_chars':600,'max_parallel':1}
     def configure(self,enabled):
         if type(enabled) is not bool:raise ValueError('Activation vocale invalide.')
@@ -82,14 +83,19 @@ class VoiceService:
             self.slot.release();raise
         def frames():
             deadline=time.monotonic()+90
+            last_frame=time.monotonic()
             try:
                 while not job['cancel'].is_set() and time.monotonic()<deadline:
                     if not validate():raise PermissionError('Accès vocal révoqué.')
                     try:frame=job['queue'].get(timeout=.25)
                     except queue.Empty:
                         if job['finished'].is_set():break
+                        if time.monotonic()-last_frame>=5:
+                            yield {'id':identifier,'waiting':True}
+                            last_frame=time.monotonic()
                         continue
                     yield frame
+                    last_frame=time.monotonic()
                     if frame.get('done') or frame.get('error'):return
                 yield {'id':identifier,'done':True,'cancelled':True}
             finally:

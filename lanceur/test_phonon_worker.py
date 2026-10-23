@@ -80,6 +80,7 @@ class PhononWorkerTests(unittest.TestCase):
         self.assertTrue(all(f['rate'] == 24000 for f in frames if 'pcm' in f))
         self.assertEqual({'id': 'a' * 32, 'done': True, 'cancelled': False}, frames[-1])
         self.assertEqual(1, self.model.closed)
+        self.assertEqual([('Bonjour Fred.',phonon_model.SPEC['voice'])],self.model.calls)
 
     def test_cancel_closes_generation_and_next_request_works(self):
         waiting = threading.Event()

@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "version": "3.5.38",
+  "sha256": "4397c5c61a1d76ae4b4c9d20f33ee3f58603aa68f258da1ebc4e8b211dfb3ef1",
+  "bytes": 94421720,
+  "native_conversation_mute_self_test": true,
+  "tests": 31,
+  "skipped": 0,
+  "checks": [
+    "packaged desktop self-test",
+    "incompatible profile exits without a dialog",
+    "signed update and startup rollback",
+    "two updates preserve EXE and directory names",
+    "legacy helper handoff cleanup preserves unrelated files",
+    "mute commands require current session and boolean",
+    "mute closes capture on its owning thread",
+    "unmute reacquires capture without restarting conversation"
+  ]
+}

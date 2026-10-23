@@ -3,16 +3,34 @@
   if(window.AndroidClient)return;
   const row=document.querySelector('.send-row'),prompt=$('prompt');if(!row||!prompt)return;
   const button=document.createElement('button');button.id='conversation-start';button.type='button';button.className='secondary voice-button';button.textContent='Conversation';
+  const muteButton=document.createElement('button');muteButton.id='conversation-mute';muteButton.type='button';muteButton.className='secondary voice-button';muteButton.textContent='Muet';muteButton.hidden=true;muteButton.setAttribute('aria-pressed','false');
   const status=document.createElement('span');status.id='conversation-status';status.className='voice-status';status.setAttribute('role','status');status.setAttribute('aria-live','polite');
-  row.insertBefore(button,$('send'));$('composer').append(status);
+  row.insertBefore(button,$('send'));row.insertBefore(muteButton,button);$('composer').append(status);
   let native={phase:'idle',installed:false},session='',active=false,acting=false,polling=false,seenSpeech=0,seenTurn=0;
   let context=null,sources=new Set(),nextAudio=0,epoch=0,speechQueue=[],speechBuffer='',speechRunning=false,currentSpeech='',speechAbort=null;
   let answerRef=null,heard='',interrupted=false,llmDone=false,pendingTurns=[],voiceRequestId='';
+  let readingText='',playbackReferences=[];
+  let muting=false;
   window.conversationBusy=false;
+  window.conversationConnectionFailure=value=>{
+    if(active&&['access_denied','access_revoked','access_suspended','access_expired','remote_disabled'].includes(value?.code))stop(value.message||'Conversation arrêtée : accès indisponible.').catch(error);
+  };
   function needsRepair(){return native.phase==='error'&&native.message?.includes('corrompu');}
   function localModel(){return modelSource!=='hermes'||conversationModel()==='fred-qwen'||conversationModelEntry()?.provider==='Qwen local';}
-  function refreshButtons(){buttons();drawLibrary();const closing=!active&&window.conversationBusy;if(active||closing)$('voice-start').disabled=true;button.textContent=active?'Raccrocher':closing?'Réessayer le raccrochage':native.phase==='installing'?'Arrêter l’installation':needsRepair()?'Réparer la conversation':native.installed?'Conversation':'Installer la conversation';button.disabled=acting||(!active&&!closing&&(conversationLocked()||!conversationModelAvailable()));button.title='Conversation orale directe avec Qwen local';button.setAttribute('aria-pressed',String(active));}
-  async function command(action,extra={}){return api('/client/conversation',{action,...(['stop','ack'].includes(action)?{session}:{}),...extra});}
+  function refreshButtons(){buttons();drawLibrary();const closing=!active&&window.conversationBusy;if(active||closing)$('voice-start').disabled=true;button.textContent=active?'Raccrocher':closing?'Réessayer le raccrochage':native.phase==='installing'?'Arrêter l’installation':needsRepair()?'Réparer la conversation':native.installed?'Conversation':'Installer la conversation';button.disabled=acting||(!active&&!closing&&(conversationLocked()||!conversationModelAvailable()));button.title='Conversation orale directe avec Qwen local';button.setAttribute('aria-pressed',String(active));muteButton.hidden=!active;muteButton.disabled=acting||muting||native.mute_pending;muteButton.setAttribute('aria-pressed',String(!!native.muted));muteButton.title=native.muted?'Réactiver le microphone':'Couper le microphone';}
+  async function command(action,extra={}){return api('/client/conversation',{action,...(['stop','ack','mute'].includes(action)?{session}:{}),...extra});}
+  muteButton.onclick=async()=>{
+    if(!active||acting||muting)return;
+    const desired=!native.muted,owner=session;muting=true;refreshButtons();
+    status.textContent=desired?'Coupure du microphone…':'Réactivation du microphone…';
+    try{
+      native=await command('mute',{muted:desired});const deadline=Date.now()+5000;
+      while(active&&session===owner&&(native.mute_pending||native.muted!==desired||desired&&!native.microphone_closed)&&Date.now()<deadline){await new Promise(r=>setTimeout(r,50));native=await api('/client/conversation');}
+      if(!active||session!==owner)return;
+      if(native.mute_pending||native.muted!==desired||desired&&!native.microphone_closed)throw new Error('L’état du microphone n’est pas confirmé. Réessayez.');
+      status.textContent=desired?'Microphone coupé · vous entendez Fred':'Microphone actif · je vous écoute';
+    }catch(e){error(e);}finally{muting=false;refreshButtons();}
+  };
   function stopAudio(){
     epoch++;speechQueue=[];speechBuffer='';speechAbort?.abort();
     for(const source of sources){try{source.stop();}catch{}}sources.clear();nextAudio=context?.currentTime||0;
@@ -20,7 +38,7 @@
   }
   function interrupt(reported=true){
     const outstanding=busy||speechRunning||sources.size||speechQueue.length||speechBuffer.trim();
-    if(outstanding&&(reported||busy)){interrupted=true;if(llmDone&&answerRef&&reported){answerRef.content=heard||'[Réponse interrompue avant la fin de sa première phrase.]';answerRef.interrupted=true;save();render();}}
+    if(outstanding&&reported){interrupted=true;if(llmDone&&answerRef){answerRef.content=heard||'[Réponse interrompue avant la fin de sa première phrase.]';answerRef.interrupted=true;save();render();}}
     stopAudio();if(busy)$('cancel').click();status.textContent='Je vous écoute · réponse interrompue';
   }
   async function stop(message='Conversation terminée.'){ 
@@ -34,6 +52,26 @@
     }finally{acting=false;refreshButtons();status.textContent=message;}
   }
   function plain(text){return text.replace(/```[\s\S]*?```/g,' ').replace(/https?:\/\/\S+/g,' ').replace(/\[([^\]]+)\]\([^)]*\)/g,'$1').replace(/[*_`#>|]/g,' ').replace(/\s+/g,' ').trim();}
+  function words(text){return text.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().match(/[a-z0-9]+/g)||[];}
+  function echo(text){
+    const candidate=words(text).slice(-80);if(candidate.length<2)return false;
+    playbackReferences=playbackReferences.filter(reference=>reference.until>Date.now()).slice(-8);
+    return playbackReferences.some(reference=>{
+      const spoken=words(reference.text);
+      if(spoken.join(' ').includes(candidate.join(' ')))return true;
+      if(candidate.length<4)return false;
+      // Allow a few recognition substitutions while keeping word order. This
+      // supplements acoustic AEC; an unrelated utterance must still interrupt.
+      let best=0;
+      for(let start=0;start<spoken.length;start++){
+        let at=start,matched=0;
+        for(const word of candidate){const next=spoken.indexOf(word,at);if(next>=0&&next<start+candidate.length+4){matched++;at=next+1;}}
+        best=Math.max(best,matched);
+      }
+      return best>=3&&best/candidate.length>=.82;
+    });
+  }
+  function confirmedSpeech(text){const tokens=words(text);return tokens.length>=2||/^(stop|arrete|attends|pause|non)$/.test(tokens[0]||'');}
   function enqueue(text){text=plain(text);if(!text)return;if(speechQueue.length>=24){stop('Réponse trop longue pour la lecture vocale. Le texte reste disponible.').catch(error);return;}speechQueue.push(text.slice(0,600));pump();}
   function splitSpeech(final=false){
     while(speechBuffer){
@@ -55,11 +93,18 @@
     if(!active||epoch!==token)return;
     const source=context.createBufferSource();source.buffer=buffer;source.connect(context.destination);sources.add(source);
     source.onended=()=>sources.delete(source);const start=Math.max(context.currentTime+.03,nextAudio);nextAudio=start+buffer.duration;source.start(start);
-    status.textContent='Fred répond · vous pouvez l’interrompre';
+    if(readingText){const previous=playbackReferences.at(-1),until=Date.now()+Math.max(0,nextAudio-context.currentTime)*1000+3000;if(previous?.text===readingText)previous.until=until;else playbackReferences.push({text:readingText,until});playbackReferences=playbackReferences.slice(-8);}
+    status.textContent=native.muted?'Fred répond · microphone coupé':'Fred répond · vous pouvez l’interrompre';
   }
   async function speak(text,token){
-    const id=crypto.randomUUID().replaceAll('-','');currentSpeech=id;speechAbort=new AbortController();
-    const response=await fetch('/v1/voice/speech',{method:'POST',headers:{Authorization:'Bearer '+config.key,'Content-Type':'application/json'},body:JSON.stringify({request_id:id,text,stream:true}),signal:speechAbort.signal});
+    const id=crypto.randomUUID().replaceAll('-','');currentSpeech=id;readingText=text;speechAbort=new AbortController();
+    let response;
+    for(let attempt=0;attempt<4;attempt++){
+      if(!active||epoch!==token)return;
+      response=await fetch('/v1/voice/speech',{method:'POST',headers:{Authorization:'Bearer '+config.key,'Content-Type':'application/json'},body:JSON.stringify({request_id:id,text,stream:true}),signal:speechAbort.signal});
+      if(response.status!==429||attempt===3)break;
+      await response.body?.cancel();await new Promise(resolve=>setTimeout(resolve,150*(attempt+1)));
+    }
     if(!response.ok){let detail;try{detail=await response.json();}catch{}throw new Error(detail?.error?.message||'Lecture vocale indisponible.');}
     const reader=response.body.getReader(),decoder=new TextDecoder();let pending='',done=false;
     try{
@@ -76,8 +121,8 @@
   }
   async function pump(){
     if(speechRunning)return;speechRunning=true;
-    try{while(active&&speechQueue.length){const token=epoch,text=speechQueue.shift();try{await speak(text,token);}catch(e){if(e.name==='AbortError'||token!==epoch)continue;await stop(e.message);break;}}}
-    finally{speechRunning=false;if(active&&llmDone&&!sources.size)status.textContent='Je vous écoute · microphone actif';}
+    try{while(active&&speechQueue.length){const token=epoch,text=speechQueue.shift();try{await speak(text,token);}catch(e){if(e.name==='AbortError'||token!==epoch)continue;stopAudio();error(e);status.textContent='Lecture interrompue · le texte reste disponible';break;}}}
+    finally{speechRunning=false;if(active&&llmDone&&!sources.size)status.textContent=native.muted?'Microphone coupé · vous entendez Fred':'Je vous écoute · microphone actif';}
   }
   window.conversationOnReplyStart=answer=>{if(!active)return;answerRef=answer;voiceRequestId=answer.turn_id;heard='';interrupted=false;llmDone=false;speechBuffer='';status.textContent='Qwen prépare la réponse · vous pouvez l’interrompre';};
   window.conversationDelta=text=>{if(active&&!interrupted){speechBuffer+=text;splitSpeech();}};
@@ -95,7 +140,7 @@
     try{$('composer').requestSubmit();}finally{window.conversationSubmitting=false;}
   }
   async function refresh(){
-    if(polling||acting)return;polling=true;
+    if(polling||acting||muting)return;polling=true;
     try{
       native=await api('/client/conversation');
       if(!active&&native.phase==='installing')status.textContent='Installation des modèles · '+Math.floor(100*(native.downloaded_bytes||0)/native.model_bytes)+' %';
@@ -103,14 +148,28 @@
       if(active){
         // A normal history sync follows every answer. It pauses new sends,
         // while the microphone and the completed answer's audio stay active.
-        if(!connected||historyBlocked||conversationActionPending){await stop('Conversation arrêtée : vérifiez la connexion et la synchronisation.');return;}
-        if(!conversationModelAvailable()&&!busy&&!speechRunning&&!sources.size){await stop('Conversation arrêtée : choisissez un modèle disponible.');return;}
+        if(historyBlocked||conversationActionPending){await stop('Conversation arrêtée : vérifiez la synchronisation.');return;}
+        if(!connected)status.textContent='Connexion interrompue · reconnexion en cours…';
+        if(connected&&!conversationModelAvailable()&&!busy&&!speechRunning&&!sources.size){await stop('Conversation arrêtée : choisissez un modèle disponible.');return;}
         if(native.session!==session||['stopped','error'].includes(native.phase)){await stop(native.message||'Conversation arrêtée.');return;}
-        if(native.phase==='listening'&&!busy&&!speechRunning&&!native.partial&&!pendingTurns.length)status.textContent='Je vous écoute · Qwen local · microphone actif';
-        if(native.speech_id>seenSpeech){seenSpeech=native.speech_id;if(busy||speechRunning||sources.size)interrupt();}
-        if(native.partial&&!busy&&!speechRunning)status.textContent='Vous : '+native.partial;
-        for(const turn of native.turns||[]){if(turn.id<=seenTurn)continue;seenTurn=turn.id;pendingTurns.push(turn);await command('ack',{turn:turn.id});}
-        if(!busy&&!historySyncPending&&!historySaving&&!agentRecoveryPending&&conversationModelAvailable()&&pendingTurns.length)await submitTurn(pendingTurns.shift());
+        if(native.muted)status.textContent=busy||speechRunning||sources.size?'Fred répond · microphone coupé':'Microphone coupé · vous entendez Fred';
+        else if(connected&&native.phase==='listening'&&!busy&&!speechRunning&&!native.partial&&!pendingTurns.length)status.textContent='Je vous écoute · Qwen local · microphone actif';
+        const partialSpeech=native.partial_speech_id??native.speech_id;
+        if(!native.muted&&!native.mute_pending&&!muting&&partialSpeech>seenSpeech&&confirmedSpeech(native.partial||'')&&!echo(native.partial)){
+          seenSpeech=partialSpeech;if(busy||speechRunning||sources.size)interrupt();
+        }
+        if(!native.muted&&!native.mute_pending&&native.partial&&!busy&&!speechRunning)status.textContent='Vous : '+native.partial;
+        for(const turn of native.turns||[]){
+          if(native.muted||native.mute_pending||muting)break;
+          if(turn.id<=seenTurn)continue;
+          // Acknowledge before advancing the local cursor: a failed ACK is
+          // retried and cannot discard a phrase which was never submitted.
+          await command('ack',{turn:turn.id});seenTurn=turn.id;
+          seenSpeech=Math.max(seenSpeech,turn.speech_id??native.speech_id??0);
+          if(echo(turn.text))continue;
+          if(busy||speechRunning||sources.size)interrupt();pendingTurns.push(turn);
+        }
+        if(connected&&!native.muted&&!native.mute_pending&&!busy&&!historySyncPending&&!historySaving&&!agentRecoveryPending&&conversationModelAvailable()&&pendingTurns.length)await submitTurn(pendingTurns.shift());
       }
       refreshButtons();
     }catch(e){if(active)await stop(e.message).catch(()=>{});else status.textContent=e.message;}
@@ -127,7 +186,7 @@
       context=new AudioContext({sampleRate:24000});nextAudio=0;await context.resume();
       const server=await api('/v1/voice/status');if(!server.ready)throw new Error(server.error||'Activez la voix dans la console serveur et attendez son chargement.');
       native=await command('start');session=native.session;active=true;window.conversationBusy=true;
-      seenSpeech=seenTurn=0;pendingTurns=[];status.textContent='Conversation locale · Qwen direct · chargement du microphone';
+      seenSpeech=seenTurn=0;pendingTurns=[];playbackReferences=[];status.textContent='Conversation locale · Qwen direct · chargement du microphone';
     }catch(e){status.textContent=e.message;if(context){await context.close();context=null;}}
     finally{acting=false;refreshButtons();}
   };

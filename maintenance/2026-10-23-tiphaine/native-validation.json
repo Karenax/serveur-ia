@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "engine": "Phonon 0.4.1",
+  "device": "cpu",
+  "language": "fr",
+  "voice": "Tiphaine",
+  "revision": "b0e916ef8d2a9034902c449d113c3b2d4f081651",
+  "source_sha256": {
+    "phonon_worker.py": "bc6c0754a55081744c98e781a94d297edf74c0413301341fea4038dbda27732f",
+    "phonon_model.py": "0da95b56c73cba94af133c90182d5054ceef9107a580752e4477f9d25a5759f8",
+    "phonon-model.json": "e2e11f7e6af3cfc358f22aaba8620b6e6fdf471faa1c136048f3425f9cc84b37",
+    "requirements-phonon.txt": "0700b5be773c2594a58e557d4fa90afe2c281af82eb4120f247b5cd16ca679c1"
+  },
+  "loading_seconds": 0.3430000000007567,
+  "speech": {
+    "first_chunk_seconds": 0.11000000000058208,
+    "compute_seconds": 0.5469999999986612,
+    "audio_seconds": 4.16,
+    "cancelled": false,
+    "rss_bytes": 209420288,
+    "memory_scope": "worker process tree including Windows Python launcher"
+  },
+  "interruption": {
+    "first_chunk_seconds": 0.031000000002677552,
+    "compute_seconds": 0.0940000000045984,
+    "audio_seconds": 0.08,
+    "cancelled": true,
+    "rss_bytes": 225603584,
+    "memory_scope": "worker process tree including Windows Python launcher",
+    "cancel_ack_seconds": 0.07800000000133878
+  },
+  "recovery": {
+    "first_chunk_seconds": 0.0319999999992433,
+    "compute_seconds": 0.375,
+    "audio_seconds": 3.44,
+    "cancelled": false,
+    "rss_bytes": 249106432,
+    "memory_scope": "worker process tree including Windows Python launcher"
+  },
+  "human_listening_validated": false
+}

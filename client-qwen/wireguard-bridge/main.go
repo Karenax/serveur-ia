@@ -48,6 +48,21 @@ type Peer struct {
 	Address      string `json:"address"`
 }
 
+// Long replies and uploads must not occupy the connections needed to check
+// the server or cancel those same replies.
+type bridgeTransport struct {
+	data, control *http.Transport
+}
+
+func (t bridgeTransport) RoundTrip(r *http.Request) (*http.Response, error) {
+	switch r.URL.Path {
+	case "/v1/models", "/v1/status", "/v1/device", "/v1/cancel", "/v1/voice/cancel":
+		return t.control.RoundTrip(r)
+	default:
+		return t.data.RoundTrip(r)
+	}
+}
+
 func peerCommands(peers []Peer, previous map[string]Peer) (string, map[string]Peer, error) {
 	next := map[string]Peer{}
 	var commands strings.Builder
@@ -269,8 +284,11 @@ func run() error {
 		MaxConnsPerHost: 4, DisableKeepAlives: true,
 	}
 	defer transport.CloseIdleConnections()
+	control := transport.Clone()
+	control.MaxConnsPerHost = 2
+	defer control.CloseIdleConnections()
 	proxy := &httputil.ReverseProxy{
-		Transport: transport, FlushInterval: -1, ErrorLog: log.New(io.Discard, "", 0),
+		Transport: bridgeTransport{transport, control}, FlushInterval: -1, ErrorLog: log.New(io.Discard, "", 0),
 		Rewrite: func(r *httputil.ProxyRequest) {
 			r.SetURL(target)
 			r.Out.Header = http.Header{"Authorization": {"Bearer " + cfg.APIToken}, "Content-Type": {"application/json"}, "X-Qwen-Session": {r.In.Header.Get("X-Qwen-Session")}, "X-Qwen-Request": {r.In.Header.Get("X-Qwen-Request")}, "X-Fred-Agent-Protocol": {r.In.Header.Get("X-Fred-Agent-Protocol")}}

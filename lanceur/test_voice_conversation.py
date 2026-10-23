@@ -34,6 +34,27 @@ class VoiceConversationHTTPTests(unittest.TestCase):
         self.assertFalse(data['strata_mcp']);self.assertEqual('system',data['messages'][0]['role'])
         self.assertNotIn('reasoning_content',data['messages'][1]);self.settle()
 
+    def test_silent_model_sends_keepalive_before_headers_and_keeps_one_request(self):
+        import json,threading,urllib.request
+        self.block_model=True;self.block_seconds=10;request=secrets.token_hex(16)
+        keepalive=threading.Event();received=[];errors=[]
+        def read():
+            try:
+                call=urllib.request.Request(f'http://127.0.0.1:{self.gateway.server_port}/v1/chat/completions',json.dumps(self.body(request)).encode(),
+                    {'Authorization':'Bearer '+self.a['token'],'Content-Type':'application/json','X-Qwen-Request':request})
+                with urllib.request.urlopen(call,timeout=7) as response:
+                    for line in response:
+                        received.append(line)
+                        if line.startswith(b': qwen-keepalive'):keepalive.set()
+            except Exception as error:errors.append(error)
+        thread=threading.Thread(target=read);thread.start()
+        try:
+            self.assertTrue(self.model_ready.wait(3));self.assertTrue(keepalive.wait(7))
+            self.assertNotIn(b'Texte corrige',b''.join(received))
+        finally:self.model_release.set();thread.join(4)
+        self.assertFalse(thread.is_alive());self.assertEqual([],errors)
+        self.assertIn(b'[DONE]',b''.join(received));self.assertEqual(1,len(self.captured));self.settle()
+
     def test_invalid_mode_identity_and_tools_cannot_reach_upstream(self):
         request=secrets.token_hex(16)
         for change in ({'voice_conversation':False},{'voice_conversation':1},{'turn_id':'other'},
@@ -79,6 +100,32 @@ class VoiceConversationHTTPTests(unittest.TestCase):
             thread.join(3);self.assertFalse(thread.is_alive())
         finally:self.model_release.set();thread.join(6)
         self.assertEqual([],errors);self.assertNotIn(b'Texte corrige',results[0][1]);self.settle()
+
+    def test_explicit_temporary_refusal_retries_before_model_output(self):
+        self.model_refusals=['0'];request=secrets.token_hex(16)
+        status,raw=self.post(self.body(request),request)
+        self.assertEqual(200,status);self.assertEqual(1,raw.count(b'Texte corrige'))
+        self.assertEqual(1,raw.count(b'[DONE]'));self.assertEqual(2,len(self.captured));self.settle()
+        diagnostics=json.loads((self.store.home/'inference-errors.json').read_text(encoding='utf-8'))
+        self.assertEqual(503,diagnostics[-1]['status']);self.assertIn('batch slots',diagnostics[-1]['detail'])
+
+    def test_unknown_503_is_not_replayed_and_keeps_admin_reason(self):
+        self.model_refusals=[None];request=secrets.token_hex(16)
+        status,raw=self.post(self.body(request),request)
+        self.assertEqual(200,status);self.assertEqual(1,len(self.captured));self.settle()
+        self.assertIn(b'model_temporarily_unavailable',raw);self.assertNotIn(b'batch slots',raw)
+        self.assertIn('batch slots',(self.store.home/'inference-errors.json').read_text(encoding='utf-8'))
+
+    def test_cancel_during_retry_wait_does_not_submit_again(self):
+        import time
+        self.model_refusals=['1'];request=secrets.token_hex(16)
+        thread,results,errors=self.worker(self.body(request),request)
+        deadline=time.monotonic()+3
+        while not self.captured and time.monotonic()<deadline:time.sleep(.01)
+        self.assertEqual(1,len(self.captured))
+        self.post({'voice_conversation':True},request,path='/v1/cancel')
+        thread.join(3);self.assertFalse(thread.is_alive());self.assertEqual([],errors)
+        self.assertEqual(1,len(self.captured));self.settle()
 
 
 if __name__=='__main__':unittest.main(verbosity=2)

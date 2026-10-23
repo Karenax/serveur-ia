@@ -2,7 +2,7 @@
 (()=>{
   const card=document.createElement('section');card.className='topic-card';card.id='voice-service';
   const title=document.createElement('h3');title.textContent='Conversation vocale Windows';
-  const description=document.createElement('p');description.textContent='Reconnaissance et microphone sur le client. Synthèse française Phonon · voix par défaut sur le CPU du serveur. Un traitement vocal simultané, sans utilisation des P100.';
+  const description=document.createElement('p');description.textContent='Micro et reconnaissance sur le client. Phonon · Tiphaine (français de France) sur le CPU du serveur. Une synthèse à la fois, sans P100.';
   const state=document.createElement('p');state.id='voice-service-state';state.setAttribute('aria-live','polite');
   const start=document.createElement('button');start.type='button';start.id='voice-service-start';start.className='button secondary';start.textContent='Activer la voix';
   const stop=document.createElement('button');stop.type='button';stop.id='voice-service-stop';stop.className='button quiet';stop.textContent='Désactiver la voix';

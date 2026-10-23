@@ -11,7 +11,7 @@ import time
 os.environ['CUDA_VISIBLE_DEVICES'] = ''
 os.environ['HF_HUB_OFFLINE'] = '1'
 import numpy as np
-from phonon_model import load
+from phonon_model import load, SPEC
 
 
 def emit(value):
@@ -82,7 +82,7 @@ def serve(model, source, send=emit):
             started = time.monotonic()
             if not stop.is_set():
                 # Exiting this context also cancels and joins native generation workers.
-                with model.stream(text, voice='default') as audio:
+                with model.stream(text, voice=SPEC['voice']) as audio:
                     for chunk in audio:
                         if stop.is_set():
                             break
@@ -115,7 +115,7 @@ def main():
     started = time.monotonic()
     model = load()
     emit({'ready': True, 'rate': model.sample_rate, 'engine': 'Phonon 0.4.1',
-          'language': 'fr', 'voice': 'default', 'loading_seconds': time.monotonic() - started})
+          'language': 'fr', 'voice': SPEC['voice'], 'loading_seconds': time.monotonic() - started})
     serve(model, sys.stdin)
 
 

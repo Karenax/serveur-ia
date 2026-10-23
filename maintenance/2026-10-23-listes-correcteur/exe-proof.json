@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "version": "3.5.39",
+  "sha256": "7b31a5f918cc0787af9e5db4512b325eddc16fa26bc6879b28a81bb5f672bbc4",
+  "bytes": 94422382,
+  "tests": 16,
+  "skipped": 0,
+  "checks": [
+    "packaged desktop self-test",
+    "incompatible profile exits without a dialog",
+    "signed update and startup rollback",
+    "two updates preserve EXE and directory names",
+    "legacy helper handoff cleanup preserves unrelated files"
+  ]
+}

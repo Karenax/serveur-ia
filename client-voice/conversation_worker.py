@@ -1,140 +1,131 @@
-"""Local Windows streaming ASR + Silero VAD + Smart Turn; no network or audio files."""
+"""One local Windows ASR for dictation and conversation; PCM stays in memory."""
 import argparse
+from collections import deque
 import json
-from pathlib import Path
 import sys
-sys.stdout.reconfigure(encoding='utf-8')
-sys.stderr.reconfigure(encoding='utf-8')
 import threading
 import time
-from collections import deque
+import wave
 import numpy as np
-import onnxruntime as ort
-import sherpa_onnx
-from turn_features import features
 from aec_capture import EchoMicrophone
+from recognition import Recognizer
 
-class Recognizer:
-    def __init__(self,models):
-        models=Path(models)
-        self.asr=sherpa_onnx.OnlineRecognizer.from_transducer(
-            tokens=str(models/'tokens.txt'),encoder=str(models/'encoder.onnx'),
-            decoder=str(models/'decoder.onnx'),joiner=str(models/'joiner.onnx'),
-            num_threads=3,provider='cpu',enable_endpoint_detection=False)
-        config=sherpa_onnx.VadModelConfig()
-        config.sample_rate=16000;config.num_threads=1
-        config.silero_vad.model=str(models/'silero-vad.onnx')
-        config.silero_vad.threshold=.6;config.silero_vad.min_silence_duration=.2
-        config.silero_vad.min_speech_duration=.12;config.silero_vad.max_speech_duration=30
-        self.vad=sherpa_onnx.VoiceActivityDetector(config,buffer_size_in_seconds=35)
-        options=ort.SessionOptions();options.intra_op_num_threads=2;options.inter_op_num_threads=1
-        self.turn=ort.InferenceSession(str(models/'smart-turn.onnx'),options,providers=['CPUExecutionProvider'])
-        self.input_name=self.turn.get_inputs()[0].name
-        self.stream=self._new_stream();self.window=deque();self.window_samples=0
-        self.samples=0;self.last_voice=0;self.started=0;self.next_check=0
-        self.speech=False;self.was_speech=False;self.speech_id=0;self.turn_id=0
-        self.partial='';self.turns=deque();self.last_probability=None;self.compute=0
-    def _new_stream(self):
-        stream=self.asr.create_stream()
-        stream.accept_waveform(16000,np.zeros(4800,dtype=np.float32))
-        return stream
-    def accept(self,audio):
-        start=time.perf_counter();audio=np.asarray(audio,dtype=np.float32)
-        self.samples+=len(audio);self.window.append(audio.copy());self.window_samples+=len(audio)
-        while self.window and self.window_samples-len(self.window[0])>=128000:self.window_samples-=len(self.window.popleft())
-        self.stream.accept_waveform(16000,audio)
-        while self.asr.is_ready(self.stream):self.asr.decode_stream(self.stream)
-        self.vad.accept_waveform(audio)
-        speech=self.vad.is_speech_detected()
-        while not self.vad.empty():self.vad.pop()
-        if speech:
-            self.last_voice=self.samples
-            if not self.speech:self.started=self.samples;self.speech=True
-            if not self.was_speech:self.speech_id+=1
-        self.was_speech=speech
-        self.partial=self.asr.get_result(self.stream).strip() if self.speech else ''
-        silence=(self.samples-self.last_voice)/16000
-        if self.speech and not speech and silence>=.55 and self.samples>=self.next_check:
-            self.next_check=self.samples+8000
-            self.last_probability=float(np.asarray(self.turn.run(None,{self.input_name:features(np.concatenate(self.window))})[0]).reshape(-1)[0])
-            if self.last_probability>.5 or silence>=4:self.finish()
-        elif self.speech and (self.samples-self.started)>=30*16000:self.finish()
-        self.compute+=time.perf_counter()-start
-    def finish(self):
-        if not self.speech:return
-        # The French model's first chunk spans roughly 2.6 seconds. A short
-        # greeting still needs enough right padding to flush that first chunk.
-        self.stream.accept_waveform(16000,np.zeros(48000,dtype=np.float32))
-        self.stream.input_finished()
-        while self.asr.is_ready(self.stream):self.asr.decode_stream(self.stream)
-        text=self.asr.get_result(self.stream).strip()
-        if text:
-            if len(self.turns)>=8:raise ValueError('Trop de demandes vocales en attente. Raccrochez puis recommencez.')
-            self.turn_id+=1;self.turns.append({'id':self.turn_id,'text':text[:6000]})
-        self.stream=self._new_stream();self.partial='';self.speech=False
-        self.window.clear();self.window_samples=0;self.next_check=0
-    def status(self):
-        return {'partial':self.partial,'turns':list(self.turns),'speech_id':self.speech_id,
-                'speaking':self.was_speech,'turn_probability':self.last_probability}
 
-def emit(value):print(json.dumps(value,ensure_ascii=False),flush=True)
+def emit(value):
+    print(json.dumps(value, ensure_ascii=False), flush=True)
+
 
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--models',required=True)
-    parser.add_argument('--resources',required=True);parser.add_argument('--fixture')
-    args=parser.parse_args();stop=threading.Event();acks=deque()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--models', required=True)
+    parser.add_argument('--resources', required=True)
+    parser.add_argument('--mode', choices=('conversation', 'dictation'), default='conversation')
+    parser.add_argument('--fixture')
+    args = parser.parse_args()
+    stop = threading.Event(); finish = threading.Event(); muted = threading.Event(); acks = deque()
+
     def commands():
         try:
             for line in sys.stdin:
-                if len(line)>1024:raise ValueError('Command too large')
-                value=json.loads(line)
-                if value.get('action')=='stop':stop.set();break
-                if value.get('action')=='ack' and isinstance(value.get('turn'),int):acks.append(value['turn'])
-        finally:stop.set()
-    if not args.fixture:threading.Thread(target=commands,daemon=True).start()
-    started=time.monotonic();recognizer=Recognizer(args.models)
-    microphone=None
+                if len(line) > 1024:
+                    raise ValueError('Command too large')
+                value = json.loads(line)
+                if value.get('action') == 'stop':
+                    stop.set(); break
+                if value.get('action') == 'finish':
+                    finish.set()
+                if value.get('action') == 'ack' and type(value.get('turn')) is int:
+                    acks.append(value['turn'])
+                if value.get('action') == 'mute' and type(value.get('muted')) is bool and args.mode=='conversation':
+                    muted.set() if value['muted'] else muted.clear()
+        finally:
+            stop.set()
+
+    if not args.fixture:
+        threading.Thread(target=commands, daemon=True).start()
+    started = time.monotonic()
+    recognizer = Recognizer(args.models, mode=args.mode)
+    microphone = None
     try:
         if args.fixture:
-            emit({'phase':'listening','loading_seconds':time.monotonic()-started,'aec':False,'fixture':True})
-            import wave
-            with wave.open(args.fixture) as audio:
-                assert audio.getframerate()==16000 and audio.getnchannels()==1 and audio.getsampwidth()==2
-                pcm=np.frombuffer(audio.readframes(audio.getnframes()),dtype='<i2').astype(np.float32)/32768
-            first=None
-            for offset in range(0,len(pcm)+5*16000,1600):
-                frame=pcm[offset:offset+1600] if offset<len(pcm) else np.zeros(1600,dtype=np.float32)
-                recognizer.accept(frame)
-                if first is None and recognizer.partial:first=(offset+1600)/16000
-            recognizer.finish()
-            emit({'phase':'test_done','passed':bool(recognizer.turns),'first_partial_audio_seconds':first,
-                  'compute_seconds':recognizer.compute,'audio_seconds':len(pcm)/16000,**recognizer.status()});return
-        if stop.is_set():return
-        microphone=EchoMicrophone(args.resources);last_emit=0;last_speech=last_turn=0
-        last_audio=time.monotonic();captured=0;listening=False
-        while not stop.is_set() and time.monotonic()-started<15*60:
+            import math
+            with wave.open(args.fixture) as source:
+                assert source.getnchannels() == 1 and source.getsampwidth() == 2
+                rate = source.getframerate()
+                audio = np.frombuffer(source.readframes(source.getnframes()), dtype='<i2').astype(np.float32) / 32768
+            divisor = math.gcd(rate, 16000)
+            if rate != 16000:
+                from scipy.signal import resample_poly
+                audio = resample_poly(audio, 16000 // divisor, rate // divisor).astype(np.float32)
+            for offset in range(0, len(audio) + 32000, 1600):
+                recognizer.accept(audio[offset:offset+1600] if offset < len(audio) else np.zeros(1600, np.float32))
+            recognizer.finish(); recognizer.drain()
+            result = recognizer.status()
+            emit({'phase': 'test_done', 'passed': bool(result['turns'] or result['text']),
+                  'audio_seconds': len(audio) / 16000, **result})
+            return
+        if stop.is_set():
+            return
+        if finish.is_set():
+            emit({'phase': 'ready', 'microphone_closed': True, 'text': '', 'partial': '', 'turns': [],
+                  'message': 'Texte prêt. Corrigez-le puis envoyez votre message.'})
+            return
+        last_audio = time.monotonic(); last_emit = 0; captured = 0; listening = False
+        was_muted = False
+        limit = 120 if args.mode == 'dictation' else 15 * 60
+        while not stop.is_set() and not finish.is_set() and captured < limit * 16000:
             while acks:
-                acknowledged=acks.popleft()
-                while recognizer.turns and recognizer.turns[0]['id']<=acknowledged:recognizer.turns.popleft()
-            pcm=microphone.read()
+                recognizer.ack(acks.popleft())
+            if muted.is_set():
+                if microphone:
+                    microphone.close(); microphone = None
+                if not was_muted:
+                    recognizer.reset_capture(); was_muted = True
+                if not listening or time.monotonic()-last_emit>=.1:
+                    emit({'phase':'listening','muted':True,'microphone_closed':True,'aec':True,
+                          'captured_samples':captured,'seconds':captured//16000,
+                          'message':'Microphone coupé',**recognizer.status()})
+                    listening = True; last_emit = time.monotonic()
+                stop.wait(.05); continue
+            if microphone is None:
+                microphone = EchoMicrophone(args.resources)
+                was_muted = False; listening = False; last_audio = time.monotonic()
+            pcm = microphone.read()
+            if muted.is_set():continue
             if not pcm:
-                if time.monotonic()-last_audio>5:raise OSError('Le microphone ne fournit aucun son. Vérifiez les périphériques Windows par défaut.')
+                if time.monotonic() - last_audio > 5:
+                    raise OSError('Le microphone ne fournit aucun son. Vérifiez les périphériques Windows par défaut.')
                 continue
-            last_audio=time.monotonic();captured+=len(pcm)//2
-            audio=np.frombuffer(pcm,dtype='<i2').astype(np.float32)/32768
+            last_audio = time.monotonic(); captured += len(pcm) // 2
+            audio = np.frombuffer(pcm, dtype='<i2').astype(np.float32) / 32768
             recognizer.accept(audio)
-            if not listening:
-                emit({'phase':'listening','loading_seconds':time.monotonic()-started,'aec':True,'captured_samples':captured})
-                listening=True
-            if time.monotonic()-last_emit>.1 or recognizer.speech_id!=last_speech or recognizer.turn_id!=last_turn:
-                emit({'phase':'listening','aec':True,'captured_samples':captured,'audio_level':round(float(np.sqrt(np.mean(audio*audio))),5),**recognizer.status()})
-                last_emit=time.monotonic();last_speech=recognizer.speech_id;last_turn=recognizer.turn_id
+            if not listening or time.monotonic() - last_emit >= .1:
+                emit({'phase': 'listening', 'aec': True, 'muted':False, 'microphone_closed':False, 'loading_seconds': time.monotonic()-started,
+                      'message': 'Dictée locale · français' if args.mode=='dictation' else 'Conversation locale · français',
+                      'captured_samples': captured, 'seconds': captured // 16000,
+                      'audio_level': round(float(np.sqrt(np.mean(audio*audio))), 5), **recognizer.status()})
+                listening = True; last_emit = time.monotonic()
+        if microphone:microphone.close(); microphone = None
+        if args.mode == 'dictation' and not stop.is_set():
+            emit({'phase': 'finishing', 'microphone_closed': True, **recognizer.status()})
+            recognizer.finish(); recognizer.drain(stop)
+            if stop.is_set():
+                emit({'phase': 'stopped', 'partial': '', 'text': '', 'turns': [], 'microphone_closed': True})
+            else:
+                emit({'phase': 'ready', 'microphone_closed': True, 'seconds': captured // 16000,
+                      'message': 'Texte prêt. Corrigez-le puis envoyez votre message.', **recognizer.status()})
+        else:
+            emit({'phase': 'stopped', 'partial': '', 'text': '', 'turns': [], 'microphone_closed': True})
     finally:
-        if microphone:microphone.close()
-    emit({'phase':'stopped','partial':'','turns':[],'microphone_closed':True})
+        if microphone:
+            microphone.close()
+        recognizer.close()
 
-if __name__=='__main__':
-    try:main()
+
+if __name__ == '__main__':
+    sys.stdout.reconfigure(encoding='utf-8'); sys.stderr.reconfigure(encoding='utf-8')
+    try:
+        main()
     except Exception as error:
-        emit({'phase':'error','message':str(error) if isinstance(error,(ValueError,OSError)) else 'Le moteur de conversation a échoué.','microphone_closed':True})
+        emit({'phase': 'error', 'message': str(error) if isinstance(error, (ValueError, OSError)) else 'La reconnaissance vocale a échoué. Réessayez.', 'microphone_closed': True})
         raise

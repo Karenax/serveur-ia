@@ -161,12 +161,12 @@ function uiConnectionStatus(state=uiLastConnection){
   uiIntegrationButtons();
   uiLoadedModel(connected?conversationModelLabel():'',state.code);
   const https=state.transport==='https';
-  let label=phase?(uiConnectionPhases[phase]||'Préparation de la réponse'):state.checking?(https?'Vérification HTTPS':'Vérification WireGuard'):connected?'Connecté au serveur IA':'Connexion indisponible';
+  let label=phase?(uiConnectionPhases[phase]||'Préparation de la réponse'):state.reconnecting?'Connexion instable · nouvelle vérification':state.checking?(https?'Vérification HTTPS':'Vérification WireGuard'):connected?'Connecté au serveur IA':'Connexion indisponible';
   const elapsed=busy?Math.max(0,Math.round((Date.now()-(replyProgress.started||Date.now()))/1000)):0;
   const silence=busy?Math.max(0,Math.round((Date.now()-(replyProgress.lastEvent||Date.now()))/1000)):0;
   if(busy)label+=' · '+elapsed+' s';if(busy&&silence>=45)label='Flux silencieux · '+silence+' s';
   $('connection').textContent='● '+label+' ⌄';$('connection').classList.toggle('online',connected&&!state.checking&&silence<45);
-  $('connection-summary').textContent=busy&&silence>=45?'Aucun nouveau texte reçu. Le moteur peut encore calculer ; les compteurs ci-dessous permettent de vérifier le tunnel.':state.checking?'Le client vérifie le serveur et essaie les adresses disponibles.':state.error||label;
+  $('connection-summary').textContent=busy&&silence>=45?'Aucun nouveau texte reçu. Le moteur peut encore calculer ; les compteurs ci-dessous permettent de vérifier le tunnel.':state.checking?'Le client vérifie le serveur et essaie les adresses disponibles.':state.connection_warning||state.error||label;
   const lines=['Adresse active : '+(state.endpoint||'en cours'), 'Mode : '+(state.automatic?'automatique':'adresse manuelle'), 'Handshakes : '+(state.handshake?'un échange authentifié a été reçu':'aucun reçu'), 'Dernier handshake : '+(state.last_handshake_time_sec?new Date(state.last_handshake_time_sec*1000).toLocaleString():'aucun'), 'Reçu / envoyé : '+(state.rx_bytes||0)+' / '+(state.tx_bytes||0)+' octets', 'Dernière réponse HTTP : '+(state.last_contact?new Date(state.last_contact*1000).toLocaleTimeString():'aucune'), 'Tunnels démarrés : '+(state.bridge_starts||0)+' · vérifications : '+(state.attempts||0), 'État : '+(state.code||'connexion')];
   if(state.stream?.started)lines.push('Dernière génération : '+(uiConnectionPhases[state.stream.phase]||state.stream.phase),'Réflexion / réponse : '+(state.stream.reasoning_chars||0)+' / '+(state.stream.answer_chars||0)+' caractères reçus');
   lines.push('','Événements récents :');for(const e of (state.events||[]).slice(-6))lines.push(new Date(e.time*1000).toLocaleTimeString()+' · '+(uiConnectionEvents[e.event]||e.event)+(e.route?' · '+e.route:'')+(e.code?' · '+e.code:'')+(e.status?' · HTTP '+e.status:''));

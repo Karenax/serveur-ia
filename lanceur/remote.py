@@ -327,6 +327,15 @@ class AccessStore:
             write_json(path, rows[-1000:])
             if self.storage:self.storage.changed()
 
+    def inference_failure(self,status,detail,request):
+        # Administrative diagnostics only: never record prompts, audio or keys.
+        # Previous versions discarded the upstream reason and kept only '(503)'.
+        with self.lock:
+            path=self.home/'inference-errors.json'
+            rows=read_json(path,[])
+            rows.append({'epoch':time.time(),'status':status,'detail':str(detail)[:1500],'request':request})
+            write_json(path,rows[-50:])
+
     def denial(self,token):
         if self.maintenance:return 'maintenance','Serveur en maintenance : réessayer après la restauration.'
         digest=hashlib.sha256(token.encode()).hexdigest()
@@ -870,11 +879,12 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                         headers_sent = True
                         if sources:
                             self.wfile.write(('data: '+json.dumps({'workspace_sources':sources},ensure_ascii=False)+'\n\n').encode());self.wfile.flush()
-                def heartbeat(position):
+                def heartbeat(position=None):
                     if select.select([self.connection], [], [], 0)[0] and self.connection.recv(1, socket.MSG_PEEK) == b'':
                         raise OSError('Client déconnecté.')
                     if headers_sent:
-                        self.wfile.write((': qwen-queue '+json.dumps({'position': position})+'\n\n').encode())
+                        frame=': qwen-keepalive\n\n' if position is None else ': qwen-queue '+json.dumps({'position': position})+'\n\n'
+                        self.wfile.write(frame.encode())
                         self.wfile.flush()
                 scheduler.wait(item, lambda: store.authenticate(self.access_token) == self.identity, heartbeat)
                 heartbeat(0)
@@ -892,9 +902,6 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                     self.wfile.write(payload);self.wfile.flush();item['succeeded']=True
                     return
                 # Fixed local destination. No user URL, forwarded identity or remote API key reaches Strata.
-                connection = http.client.HTTPConnection('127.0.0.1', upstream_port, timeout=120)
-                if text_transform or voice_conversation:
-                    connection.response_class=lambda *args,**kwargs:CancellableResponse(*args,valid=lambda:not item['cancelled'] and store.authenticate(self.access_token)==self.identity,**kwargs)
                 headers = {'Content-Type': 'application/json'}
                 if key:
                     headers['Authorization'] = 'Bearer ' + key
@@ -904,17 +911,45 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 with store.lock:
                     if item['cancelled'] or store.authenticate(self.access_token) != self.identity:
                         raise Denied('Demande annulée ou accès désactivé.')
-                connection.request('POST', '/v1/chat/completions', json.dumps(data).encode(), headers)
-                upstream_socket = connection.sock
-                def abort():
-                    try: upstream_socket.shutdown(socket.SHUT_RDWR)
-                    except OSError: pass
-                with scheduler.condition:
-                    item['abort'] = abort
-                    if item['cancelled']: abort()
-                response = connection.getresponse()
-                if headers_sent and response.status != 200:
-                    raise ValueError('Le moteur a refusé la demande ('+str(response.status)+').')
+                for attempt in range(3):
+                    with store.lock:
+                        if item['cancelled'] or store.authenticate(self.access_token)!=self.identity:
+                            raise Denied('Demande annulée ou accès désactivé.')
+                    connection = http.client.HTTPConnection('127.0.0.1', upstream_port, timeout=120)
+                    if text_transform or voice_conversation:
+                        connection.response_class=lambda *args,**kwargs:CancellableResponse(*args,valid=lambda:not item['cancelled'] and store.authenticate(self.access_token)==self.identity,heartbeat=heartbeat if headers_sent else None,**kwargs)
+                    connection.request('POST', '/v1/chat/completions', json.dumps(data).encode(), headers)
+                    upstream_socket = connection.sock
+                    def abort(sock=upstream_socket):
+                        try: sock.shutdown(socket.SHUT_RDWR)
+                        except OSError: pass
+                    with scheduler.condition:
+                        item['abort'] = abort
+                        if item['cancelled']: abort()
+                    response = connection.getresponse()
+                    if response.status==200:break
+                    raw=response.read(16384)
+                    try:detail=json.loads(raw).get('error',{}).get('message','Refus sans détail.')
+                    except (ValueError,AttributeError):detail='Réponse du moteur sans détail JSON.'
+                    store.inference_failure(response.status,detail,item['id'])
+                    retry=response.getheader('Retry-After')
+                    # Retry only an explicit, temporary refusal before any model
+                    # output. A partial answer or an unknown failure is never replayed.
+                    if voice_conversation and response.status==503 and retry and attempt<2:
+                        try:delay=float(retry)
+                        except ValueError:delay=-1
+                        if 0<=delay<=2:
+                            response.close();connection.close()
+                            until=time.monotonic()+max(.1,delay)
+                            while time.monotonic()<until:
+                                if item['cancelled'] or store.authenticate(self.access_token)!=self.identity:raise ValueError('Demande annulée ou accès désactivé.')
+                                time.sleep(.05)
+                            heartbeat(0);continue
+                    message='Le modèle local est temporairement indisponible. Réessayez dans un instant.' if response.status==503 else 'Le modèle local n’a pas pu traiter cette demande. Réessayez.'
+                    if headers_sent:
+                        self.wfile.write(('data: '+json.dumps({'error':{'code':'model_temporarily_unavailable','message':message}})+'\n\n').encode());self.wfile.flush()
+                    else:self.respond(response.status,{'error':{'code':'model_temporarily_unavailable','message':message}})
+                    return
                 if not headers_sent:
                     self.send_response(response.status)
                     self.send_header('Content-Type', 'text/event-stream' if data.get('stream') and response.status == 200 else 'application/json; charset=utf-8')

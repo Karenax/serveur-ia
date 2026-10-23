@@ -67,6 +67,9 @@ class Remote:
         self.mock=opener is not None
         self.bridge=None
         self.bridge_lock=threading.RLock()
+        self.check_lock=threading.Lock()
+        self.probe_failures=0;self.next_probe=0;self.connection_warning=""
+        self.denial_epoch=0;self.denial_state=None
         self.opener = opener or urllib.request.build_opener(urllib.request.ProxyHandler({}),NoRedirect())
         # Default HTTPSHandler verifies the certificate; honor the workplace proxy.
         self.https_opener = opener or urllib.request.build_opener(urllib.request.ProxyHandler(),NoRedirect())
@@ -92,7 +95,7 @@ class Remote:
         self.checked_at = 0
         self.diagnostic = {}
         self.events=deque(maxlen=60);self.bridge_starts=0;self.attempts=0
-        self.checking=False;self.last_contact=0;self.stream={}
+        self.checking=False;self.last_contact=0;self.response_count=0;self.stream={}
         self.override=validate_connection_endpoint(endpoint) if endpoint else None
         self.candidates=[self.override] if self.override else connection_candidates(profile)
         self.endpoint=self.candidates[0]
@@ -111,7 +114,7 @@ class Remote:
         if self.mock or not self.bridge_lock.acquire(blocking=False):return
         try:
             if self.bridge:
-                if self.bridge.process.poll() is not None:self.failure('connection_error','Le moteur WireGuard s’est arrêté. Réessayer la connexion.')
+                if self.bridge.process.poll() is not None:self.failure('connection_error','Le moteur WireGuard s’est arrêté. Réessayer la connexion.',confirmed=True)
                 else:self.diagnostic=self.bridge.status(self.opener)
         finally:self.bridge_lock.release()
 
@@ -128,6 +131,7 @@ class Remote:
             self.model='';self.models=[]
             self.error='Connexion au serveur IA…'
             self.code='connecting';self.checked_at=0;self.diagnostic={}
+            self.probe_failures=0;self.next_probe=0;self.connection_warning=''
 
     def state(self):
         return {'connection_required':self.connection_required,'connected':self.connected,'reachable':self.reachable,'model':self.model,
@@ -136,15 +140,22 @@ class Remote:
                 'transport':'https' if self.endpoint==HTTPS_ENDPOINT else 'wireguard',
                 'checked_at':self.checked_at,'checking':self.checking,'attempts':self.attempts,
                 'bridge_starts':self.bridge_starts,'last_contact':self.last_contact,
+                'reconnecting':bool(self.probe_failures),'connection_warning':self.connection_warning,
                 'events':list(self.events)[-12:],'stream':dict(self.stream),**self.diagnostic}
 
-    def failure(self,code,message):
+    def failure(self,code,message,confirmed=False):
         if code=='model_unloaded' and self.models_catalogue.get('source')=='hermes' and any(row.get('available',True) for row in self.models_catalogue['data']):
             return
         network=code in ('wireguard_unreachable','tunnel_request_failed','connection_error')
         if not network and code not in ('gateway_unavailable','access_denied','access_revoked',
                 'access_suspended','access_expired','remote_disabled','model_unloaded','no_models'):return
+        if network and self.connected and not confirmed:
+            # One failed background request does not disprove a working stream.
+            self.connection_warning=message;self.event('request_failed',code=code)
+            return
         self.connected=False;self.reachable=not network
+        if code in ('access_denied','access_revoked','access_suspended','access_expired','remote_disabled'):
+            self.denial_epoch+=1;self.denial_state=(code,message)
         self.code=code;self.error=message;self.checked_at=time.time()
         self.event('connection_failed',code=code)
 
@@ -175,7 +186,8 @@ class Remote:
             headers={**headers, 'User-Agent':'AccesServeurFred/'+VERSION+' (Windows; '+('HTTPS' if https else 'WireGuard')+')', 'Content-Type': 'application/json','X-Qwen-Session':self.session,'X-Fred-Agent-Protocol':str(AGENT_PROTOCOL),**({'X-Qwen-Request':request_id} if request_id else {})})
         try:
             response=opener.open(request, timeout=900 if path=="/v1/chat/completions" else 120 if path=="/v1/client/download" else 60 if path in ("/v1/workspace/action","/v1/history") else 3 if path=="/v1/device" else 30)
-            self.last_contact=time.time();self.event('server_response',route=path,status=getattr(response,'status',200))
+            with self.activity_lock:self.last_contact=time.time();self.response_count+=1
+            self.event('server_response',route=path,status=getattr(response,'status',200))
             return response
         except urllib.error.HTTPError as error:
             # Preserve the response body for callers after inspecting the structured error.
@@ -222,87 +234,116 @@ class Remote:
             if self.bridge:self.bridge.close();self.bridge=None
 
     def check(self):
-        with self.bridge_lock:
-            if self.connection_required or self.active_requests or self.applying_update:
-                return self.state()
-            candidates=list(dict.fromkeys([self.endpoint,*self.candidates]))
-            self.checking=True
-            code='wireguard_unreachable';diagnostic={}
-            for endpoint in candidates:
-                if endpoint!=self.endpoint:self._switch_endpoint(endpoint)
-                self.attempts+=1;self.event('connection_probe',attempt=self.attempts)
-                self.connected=False;self.reachable=False
-                try:
-                    with self.open('/v1/models') as response:
-                        catalogue=json.load(response);data=catalogue.get('data')
-                    if not isinstance(data,list):raise ValueError('Liste des modèles invalide dans /v1/models.')
-                    # Display hints only; older servers may not implement this route.
-                    if time.time()-getattr(self,'device_reported_at',0)>=60:
-                        self.device_reported_at=time.time()
-                        try:
-                            declaration={'kind':'pc','version':VERSION,'transport':'https' if self.endpoint==HTTPS_ENDPOINT else 'wireguard','agent_protocol':AGENT_PROTOCOL}
-                            with self.open('/v1/device',json.dumps(declaration).encode()) as response:response.read(2048)
-                        except urllib.error.HTTPError as error:
-                            if error.code in (401,403):raise
-                            error.close()
-                        except (OSError,ValueError):pass
-                    public_models=[row for row in data if isinstance(row,dict) and isinstance(row.get('id'),str) and row['id'].strip() and len(row['id'])<=512]
-                    embedding_ids={row['id'] for row in public_models if isinstance(row.get('capabilities'),dict) and row['capabilities'].get('embedding') is True}
-                    models=list(dict.fromkeys(row['id'] for row in public_models if row['id'] not in embedding_ids))
-                    self.model_capabilities={row['id']:row.get('capabilities',{}) for row in data if isinstance(row,dict) and row.get('id') in models and isinstance(row.get('capabilities',{}),dict)}
-                    entries=[]
-                    for row in data:
-                        if not isinstance(row,dict) or row.get('id') not in models+list(embedding_ids) or any(entry['id']==row['id'] for entry in entries):continue
-                        entry={'id':row['id'],'object':'model','capabilities':row.get('capabilities',{}) if isinstance(row.get('capabilities'),dict) else {}}
-                        for field in ('name','label','provider'):
-                            if isinstance(row.get(field),str):entry[field]=row[field][:512]
-                        if type(row.get('available')) is bool:entry['available']=row['available']
-                        entries.append(entry)
-                    self.models_catalogue={'object':'list','data':entries}
-                    for field in ('default_model','source'):
-                        if isinstance(catalogue.get(field),str):self.models_catalogue[field]=catalogue[field][:512]
-                    self.models=models;self.reachable=True
-                    if models:
-                        available=[entry['id'] for entry in entries if entry['id'] in models and entry.get('available',True)]
-                        if self.model not in available:self.model=catalogue.get('default_model') if catalogue.get('default_model') in available else (available or models)[0]
-                        self.connected=True;self.error='';code='ready'
-                    elif any(entry['id'] in embedding_ids and entry.get('available',True) for entry in entries):
-                        self.model='';self.connected=True;self.error='';code='ready'
-                    else:
-                        self.model='';self.error='Serveur joint, mais aucun modèle accessible n’est annoncé par /v1/models.';code='no_models'
-                except urllib.error.HTTPError as error:
-                    try: detail=json.loads(error.read(65536)).get('error',{})
-                    except (OSError,ValueError,AttributeError):detail={}
-                    finally:error.close()
-                    if not isinstance(detail,dict):detail={}
-                    code=detail.get('code','http_'+str(error.code))
-                    message=detail.get('message','')
-                    if not isinstance(message,str):message=''
-                    if error.code==401:
-                        code=detail.get('code','access_denied');self.error=message or 'Serveur joint, mais accès désactivé ou révoqué.';self.reachable=True
-                        if code=='login_required':self.session='';self.username=''
-                    elif code=='model_unloaded' or 'modèle n’est pas chargé' in message:
-                        code='model_unloaded';self.error='Serveur connecté, mais modèle non chargé. Le lancer dans la console serveur.';self.reachable=True
-                    elif code in ('wireguard_unreachable','tunnel_request_failed') or 'serveur WireGuard' in message:
-                        if code not in ('wireguard_unreachable','tunnel_request_failed'):code='wireguard_unreachable'
-                        self.error=message or 'Aucune réponse WireGuard : vérifier adresse, port UDP, pare-feu ou accès client.'
-                    else:
-                        self.error=message if isinstance(message,str) and message else 'Le serveur a répondu avec une erreur HTTP '+str(error.code)+'.'
-                        self.reachable=True
-                except (OSError,ValueError,KeyError,IndexError,TypeError,AttributeError) as error:
-                    code='connection_error'
-                    self.error=str(error) if isinstance(error,ValueError) else ('Connexion HTTPS impossible : vérifier le réseau, le proxy et le certificat.' if self.endpoint==HTTPS_ENDPOINT else 'Connexion impossible : vérifier l’adresse du serveur et son port UDP.')
-                diagnostic=self.bridge.status(self.opener) if self.bridge and not self.mock else {}
-                if self.reachable:break
-            if not self.connected:self.models=[];self.model=''
-            self.code=code;self.diagnostic=diagnostic;self.checked_at=time.time();self.checking=False
+        # Network I/O must never hold the bridge mutex: audio, cancellation and
+        # history uploads can continue while the catalogue probe is slow.
+        if not self.check_lock.acquire(blocking=False):return self.state()
+        try:self._check()
+        finally:self.checking=False;self.check_lock.release()
+        return self.state()
+
+    def _check(self):
+        if self.connection_required or self.active_requests or self.applying_update:
             return self.state()
+        if time.monotonic()<self.next_probe:return
+        was_connected=self.connected;responses_before=self.response_count;denial_before=self.denial_epoch
+        candidates=list(dict.fromkeys([self.endpoint,*self.candidates]))
+        if was_connected and self.probe_failures<2:candidates=[self.endpoint]
+        self.checking=True
+        code='wireguard_unreachable';diagnostic={}
+        for endpoint in candidates:
+            if endpoint!=self.endpoint:
+                with self.activity_lock,self.bridge_lock:
+                    if self.active_requests or self.applying_update:return
+                    self._switch_endpoint(endpoint)
+            self.attempts+=1;self.event('connection_probe',attempt=self.attempts)
+            self.reachable=False
+            try:
+                with self.open('/v1/models') as response:
+                    catalogue=json.load(response);data=catalogue.get('data')
+                if not isinstance(data,list):raise ValueError('Liste des modèles invalide dans /v1/models.')
+                # Display hints only; older servers may not implement this route.
+                if time.time()-getattr(self,'device_reported_at',0)>=60:
+                    self.device_reported_at=time.time()
+                    try:
+                        declaration={'kind':'pc','version':VERSION,'transport':'https' if self.endpoint==HTTPS_ENDPOINT else 'wireguard','agent_protocol':AGENT_PROTOCOL}
+                        with self.open('/v1/device',json.dumps(declaration).encode()) as response:response.read(2048)
+                    except urllib.error.HTTPError as error:
+                        if error.code in (401,403):raise
+                        error.close()
+                    except (OSError,ValueError):pass
+                public_models=[row for row in data if isinstance(row,dict) and isinstance(row.get('id'),str) and row['id'].strip() and len(row['id'])<=512]
+                embedding_ids={row['id'] for row in public_models if isinstance(row.get('capabilities'),dict) and row['capabilities'].get('embedding') is True}
+                models=list(dict.fromkeys(row['id'] for row in public_models if row['id'] not in embedding_ids))
+                self.model_capabilities={row['id']:row.get('capabilities',{}) for row in data if isinstance(row,dict) and row.get('id') in models and isinstance(row.get('capabilities',{}),dict)}
+                entries=[]
+                for row in data:
+                    if not isinstance(row,dict) or row.get('id') not in models+list(embedding_ids) or any(entry['id']==row['id'] for entry in entries):continue
+                    entry={'id':row['id'],'object':'model','capabilities':row.get('capabilities',{}) if isinstance(row.get('capabilities'),dict) else {}}
+                    for field in ('name','label','provider'):
+                        if isinstance(row.get(field),str):entry[field]=row[field][:512]
+                    if type(row.get('available')) is bool:entry['available']=row['available']
+                    entries.append(entry)
+                self.models_catalogue={'object':'list','data':entries}
+                for field in ('default_model','source'):
+                    if isinstance(catalogue.get(field),str):self.models_catalogue[field]=catalogue[field][:512]
+                self.models=models;self.reachable=True
+                if models:
+                    available=[entry['id'] for entry in entries if entry['id'] in models and entry.get('available',True)]
+                    if self.model not in available:self.model=catalogue.get('default_model') if catalogue.get('default_model') in available else (available or models)[0]
+                    self.connected=True;self.error='';code='ready'
+                elif any(entry['id'] in embedding_ids and entry.get('available',True) for entry in entries):
+                    self.model='';self.connected=True;self.error='';code='ready'
+                else:
+                    self.model='';self.error='Serveur joint, mais aucun modèle accessible n’est annoncé par /v1/models.';code='no_models'
+            except urllib.error.HTTPError as error:
+                try: detail=json.loads(error.read(65536)).get('error',{})
+                except (OSError,ValueError,AttributeError):detail={}
+                finally:error.close()
+                if not isinstance(detail,dict):detail={}
+                code=detail.get('code','http_'+str(error.code))
+                message=detail.get('message','')
+                if not isinstance(message,str):message=''
+                if error.code==401:
+                    code=detail.get('code','access_denied');self.error=message or 'Serveur joint, mais accès désactivé ou révoqué.';self.reachable=True
+                    if code=='login_required':self.session='';self.username=''
+                elif code=='model_unloaded' or 'modèle n’est pas chargé' in message:
+                    code='model_unloaded';self.error='Serveur connecté, mais modèle non chargé. Le lancer dans la console serveur.';self.reachable=True
+                elif code in ('wireguard_unreachable','tunnel_request_failed') or 'serveur WireGuard' in message:
+                    if code not in ('wireguard_unreachable','tunnel_request_failed'):code='wireguard_unreachable'
+                    self.error=message or 'Aucune réponse WireGuard : vérifier adresse, port UDP, pare-feu ou accès client.'
+                else:
+                    self.error=message if isinstance(message,str) and message else 'Le serveur a répondu avec une erreur HTTP '+str(error.code)+'.'
+                    self.reachable=True
+            except (ValueError,KeyError,IndexError,TypeError,AttributeError) as error:
+                code='invalid_response';self.reachable=True
+                self.error='Le serveur a renvoyé un catalogue invalide. Réessayez dans un instant.'
+            except OSError as error:
+                code='connection_error'
+                self.error=str(error) if isinstance(error,ValueError) else ('Connexion HTTPS impossible : vérifier le réseau, le proxy et le certificat.' if self.endpoint==HTTPS_ENDPOINT else 'Connexion impossible : vérifier l’adresse du serveur et son port UDP.')
+            diagnostic=self.bridge.status(self.opener) if self.bridge and not self.mock else {}
+            if self.reachable:break
+        if code=='ready' and self.denial_epoch!=denial_before:
+            code,self.error=self.denial_state;self.connected=False
+        if code=='ready':
+            self.probe_failures=0;self.next_probe=0;self.connection_warning=''
+        elif not self.reachable:
+            # Probe failures are consecutive evidence; a concurrent successful
+            # request takes precedence over an older, slower failed probe.
+            self.probe_failures=0 if self.response_count>responses_before else self.probe_failures+1
+            self.next_probe=time.monotonic()+min(30,5*2**min(self.probe_failures,3))
+            if was_connected and self.probe_failures<3:
+                self.connection_warning=self.error;self.error='';self.connected=True;self.reachable=True;code='ready'
+            else:self.connected=False
+            self.event('connection_probe_failed',failures=self.probe_failures)
+        else:self.connected=False
+        if not self.connected:self.models=[];self.model=''
+        self.code=code;self.diagnostic=diagnostic;self.checked_at=time.time()
 
 def serve_local(remote, key, port=LOCAL_API_PORT):
-    from local_voice import VoiceService
-    voice=VoiceService(Path(getattr(sys, "_MEIPASS", Path(__file__).parent))/"voice")
-    from conversation_service import ConversationService
+    from conversation_service import ConversationService, DictationService
+    voice=DictationService(Path(getattr(sys, "_MEIPASS", Path(__file__).parent))/"voice")
     conversation=ConversationService(Path(getattr(sys, "_MEIPASS", Path(__file__).parent))/"voice")
+    voice_control=threading.RLock()
     from draft_store import DraftStore
     from history_sync import HistorySync
     drafts=DraftStore(settings_path(remote.profile),protect)
@@ -430,11 +471,13 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
                     if self.path in ('/client/update/apply','/client/endpoint') and (voice.status()['phase'] in ('loading','listening','finishing','cancelling') or conversation.status()['phase'] in ('loading','listening','stopping')):
                         raise ValueError('Terminez la dictée avant de mettre le client à jour.')
                     if self.path=='/client/conversation':
-                        if values.get('action')=='start' and voice.status()['phase'] in ('loading','listening','finishing','cancelling'):raise ValueError('Terminez la dictée avant de converser.')
-                        result=conversation.action(values)
+                        with voice_control:
+                            if values.get('action') in ('start','install') and voice.status()['phase'] in ('installing','loading','listening','finishing','stopping','cancelling'):raise ValueError('Terminez la dictée avant de converser.')
+                            result=conversation.action(values)
                     elif self.path=='/client/voice':
-                        if values.get('action')=='start' and conversation.status()['phase'] in ('loading','listening','stopping'):raise ValueError('Raccrochez avant de dicter.')
-                        result=voice.action(values)
+                        with voice_control:
+                            if values.get('action') in ('start','install','remove') and conversation.status()['phase'] in ('installing','loading','listening','stopping'):raise ValueError('Raccrochez avant de dicter ou de modifier le modèle vocal.')
+                            result=voice.action(values)
                     elif self.path=='/client/integrations/apply':
                         if set(values)-{'app','model'}:raise ValueError('Paramètres d’intégration invalides.')
                         state=remote.check()
@@ -535,7 +578,7 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
                             self.wfile.write(block)
             except (OSError, ValueError, urllib.error.URLError):
                 cancelled=chat_stream and self.headers.get('X-Qwen-Request') in remote.cancelled_requests
-                if self.path!='/v1/voice/speech' and not cancelled:remote.failure('connection_error','Connexion au serveur IA interrompue. Réessayer la requête.')
+                if self.path!='/v1/voice/speech' and not cancelled:remote.failure('connection_error','Connexion au serveur IA interrompue. Réessayer la requête.',confirmed=chat_stream)
                 if not sent:
                     self.reply(503, {'error': {'message': 'Connexion au serveur IA indisponible.'}})
                 elif streaming:
@@ -701,19 +744,18 @@ def main():
         engine=Path(getattr(sys,'_MEIPASS',Path(__file__).parent))/'wireguard-bridge.exe'
         assert subprocess.run([str(engine),'--self-test'],capture_output=True,timeout=10,creationflags=0x08000000).returncode==0
         if '--voice-self-test' in sys.argv:
-            from local_voice import VoiceService, NativeEngine
+            from conversation_service import DictationService
             resources=Path(getattr(sys,'_MEIPASS',Path(__file__).parent))/'voice'
-            voice=VoiceService(resources)
-            voice._verify()
-            native=NativeEngine(resources,voice.model)
+            voice=DictationService(resources)
             try:
+                session=voice.action({'action':'start'})['session']
                 deadline=time.monotonic()+30
-                while native.status()['phase']=='loading' and time.monotonic()<deadline:time.sleep(.05)
-                assert native.status()['phase']=='listening',native.status()
-                native.feed(b'\0'*3200);native.stop()
-                while native.status()['phase']=='finishing' and time.monotonic()<deadline:time.sleep(.05)
-                assert native.status()['phase']=='ready' and native.status()['text']=='',native.status()
-            finally:native.close();voice.close()
+                while voice.status()['phase']=='loading' and time.monotonic()<deadline:time.sleep(.05)
+                assert voice.status()['phase']=='listening',voice.status()
+                voice.action({'action':'stop','session':session})
+                while voice.status()['phase']=='finishing' and time.monotonic()<deadline:time.sleep(.05)
+                assert voice.status()['phase']=='ready' and voice.status().get('microphone_closed'),voice.status()
+            finally:voice.close()
         if '--conversation-self-test' in sys.argv:
             from conversation_service import ConversationService
             resources=Path(getattr(sys,'_MEIPASS',Path(__file__).parent))/'voice'
@@ -722,6 +764,13 @@ def main():
                 status=conversation.action({'action':'start'});deadline=time.monotonic()+30
                 while conversation.status()['phase']=='loading' and time.monotonic()<deadline:time.sleep(.1)
                 assert conversation.status()['phase']=='listening' and conversation.status().get('aec'),conversation.status()
+                conversation.action({'action':'mute','session':status['session'],'muted':True})
+                while not conversation.status().get('muted') and time.monotonic()<deadline:time.sleep(.05)
+                paused=conversation.status();assert paused.get('muted') and paused.get('microphone_closed'),paused
+                time.sleep(.25);assert conversation.status()['captured_samples']==paused['captured_samples']
+                conversation.action({'action':'mute','session':status['session'],'muted':False})
+                while conversation.status().get('muted') and time.monotonic()<deadline:time.sleep(.05)
+                assert not conversation.status().get('muted') and not conversation.status().get('microphone_closed'),conversation.status()
                 time.sleep(.5);conversation.action({'action':'stop','session':status['session']})
                 while conversation.status()['phase']=='stopping' and time.monotonic()<deadline:time.sleep(.1)
                 assert conversation.status()['phase']=='stopped',conversation.status()
@@ -760,6 +809,8 @@ def main():
                 path=Path(sys.argv[sys.argv.index('--update-ack')+1])
                 if not window.evaluate_js("typeof api==='function' && !!document.getElementById('composer') && !!document.getElementById('client-navigation')"):raise ValueError('Interface cliente non initialisée.')
                 temporary=path.with_suffix('.tmp');temporary.write_text(json.dumps({'version':VERSION,'ready':True}),encoding='utf-8');temporary.replace(path)
+                from updater import cleanup_legacy_update
+                threading.Thread(target=cleanup_legacy_update,args=(path,),daemon=True).start()
             window.events.loaded+=acknowledge
         webview.settings['ALLOW_DOWNLOADS']=True
         storage=settings_path(profile).parent/('webview-'+settings_path(profile).stem)
@@ -783,4 +834,14 @@ def main():
         if remote:remote.close()
         if server:server.shutdown();server.server_close()
 
-if __name__ == '__main__':main()
+if __name__ == '__main__':
+    try:main()
+    except Exception as error:
+        if '--self-test' not in sys.argv:raise
+        # A failed packaging check must return to the updater without opening
+        # PyInstaller's unhandled-exception dialog and blocking its rollback.
+        if '--result' in sys.argv:
+            try:Path(sys.argv[sys.argv.index('--result')+1]).write_text(str(error),encoding='utf-8')
+            except (OSError,IndexError):pass
+        if sys.stderr:print(str(error),file=sys.stderr)
+        sys.exit(1)

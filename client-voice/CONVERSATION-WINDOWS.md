@@ -1,8 +1,8 @@
-# Conversation vocale Windows — version 3.5.30
+# Conversation vocale Windows — version 3.5.35
 
 ## Utilisation
 
-Mettre à jour le client Windows personnel avec la mise à jour intégrée. Sur ce PC, les modèles sont déjà installés. Sur les autres PC, choisir **Installer la conversation** une fois : environ **138 Mo** téléchargés publiquement puis vérifiés par SHA-256. L’installation peut être arrêtée ; un nouvel essai recommence les fichiers. Une corruption détectée propose **Réparer la conversation**.
+Mettre à jour le client Windows personnel avec la mise à jour intégrée. Choisir **Installer la conversation** une fois : environ **680 Mo** téléchargés publiquement puis vérifiés par SHA-256. Le même modèle sert à **Dicter**. Une réparation conserve les fichiers valides et remplace uniquement ceux manquants ou corrompus. L'installation peut être arrêtée. Une corruption détectée propose **Réparer la conversation**.
 
 Dans un chat connecté, terminer ou conserver son brouillon, sélectionner **Qwen local** et le projet voulu, puis cliquer **Conversation**. Parler normalement : le texte provisoire apparaît et une fin de tour déclenche automatiquement l’envoi à Fred. Le mode vocal appelle directement Qwen local, sans Hermes ni fournisseur cloud. Les phrases sont synthétisées pendant la génération. Les réponses orales sont limitées à 512 tokens, sans réflexion ; le réglage du chat écrit reste conservé. L’historique, les sources du projet et la recherche locale de mémoire gardent leur périmètre personnel. Les outils Hermes et la recherche web ne sont pas exécutés pendant un tour vocal.
 
@@ -10,16 +10,16 @@ Reprendre la parole coupe la lecture et annule uniquement la demande vocale conc
 
 La synchronisation automatique de l’historique après chaque réponse conserve le microphone et la lecture actifs. Un nouveau tour vocal reçu pendant cette synchronisation attend son achèvement, puis part une seule fois. La version 3.5.23 corrige l’arrêt intempestif qui affichait « Réponse interrompue avant la fin de sa première phrase » lors d’une synchronisation lente.
 
-Le silence ne raccroche pas. Silero détecte la parole ; après environ 550 ms de silence, Smart Turn estime si le tour est terminé. S’il hésite, le moteur réévalue et termine après quatre secondes de silence au maximum. Un tour est borné à trente secondes. Il peut envoyer trop tôt ou attendre trop longtemps selon l’accent, le bruit et la manière de parler : ces seuils ne garantissent pas une compréhension parfaite de l’intention.
+Le silence ne raccroche pas. Silero détecte la parole ; après au moins 850 ms de silence, Smart Turn estime si le tour est terminé. S’il hésite, le moteur réévalue et termine après 2,5 secondes de silence au maximum. Un segment audio est borné à 28 secondes, silence et préambule compris. Ces seuils ne garantissent pas une compréhension parfaite de l’intention.
 
-**Dicter** conserve le mode Whisper Small existant, avec correction et envoi manuel. Il ne peut pas utiliser le microphone en même temps que Conversation. Android conserve cette dictée ; la conversation automatique est activée uniquement dans Windows.
+**Dicter** utilise le même Parakeet v3, avec correction et envoi manuel. Il ne peut pas utiliser le microphone en même temps que Conversation. Android conserve Whisper Small ; la conversation automatique reste activée uniquement dans Windows.
 
 ## Répartition des traitements
 
 | Client Windows | Serveur Fred |
 | --- | --- |
 | Microphone ; DSP Windows d’annulation d’écho, réduction du bruit et contrôle du niveau ; flux de sortie silencieux maintenu pendant l’écoute | Accès personnel, session, droits et gestion des appareils |
-| Sherpa-ONNX Zipformer français, texte progressif sur CPU | Qwen/Strata direct, projets, documents et mémoire EG2 locale |
+| Sherpa-ONNX Parakeet v3 int8, aperçus par fenêtres et transcription finale sur CPU | Qwen/Strata direct, projets, documents et mémoire EG2 locale |
 | Silero VAD et Smart Turn v3.2, décision de fin de tour | Phonon 0.4.1, modèle français 40m q8, voix fournie default, CPU uniquement |
 | Envoi du texte et des paramètres habituels du chat | Audio de réponse PCM mono 24 kHz, transmis progressivement |
 | Lecture Web Audio, détection d’une reprise de parole, arrêt local immédiat | Annulation limitée à la demande et à l’accès concernés |
@@ -30,7 +30,7 @@ Le son du microphone reste en mémoire sur le PC. Aucun enregistrement de conver
 
 Dans **Démarrage et surveillance**, la carte **Conversation vocale Windows** permet d’activer/désactiver la synthèse et affiche son chargement, sa disponibilité ou une erreur. L’activation est persistante. Les modèles utilisent exclusivement les CPU ; Qwen et EG2 ont leurs processus distincts. La synthèse traite une demande à la fois ; un deuxième accès reçoit une réponse « occupé ». Il n’y a pas de file illimitée ni de bascule GPU.
 
-Mesures historiques avec Pocket TTS, avant le remplacement par Phonon du 22 octobre : environ **249 Mio** de RAM pour le moteur Windows, en plus du client ; Pocket TTS environ **859 Mio** sur la fixture française. Les six modèles client totalisent environ 138 Mo. Le premier aperçu ASR apparaît après 0,8 s d’audio synthétique ; une phrase de 10,05 s est calculée en environ 1,4–1,5 s. La synthèse délivre son premier fragment en environ 0,17 s sur la courte fixture. Ces mesures excluent le chargement initial et la génération Qwen ; elles ne garantissent pas le délai complet ni la précision sur d’autres PC. La fixture ASR contient des erreurs grammaticales : un essai avec votre voix et vos périphériques reste nécessaire pour juger la qualité en situation.
+Mesures historiques avec Zipformer et Pocket TTS, avant Parakeet du 23 octobre et Phonon du 22 octobre : environ **249 Mio** de RAM pour l'ancien moteur Windows ; Pocket TTS environ **859 Mio**. Les anciens modèles client totalisaient 138 Mo et l'ancien premier aperçu apparaissait après 0,8 s d'audio synthétique. Ces valeurs ne décrivent pas le moteur actuel. Les [mesures Parakeet et leurs limites](../maintenance/2026-10-23-reconnaissance/README.md) portent sur des extraits publics ou fictifs : un essai avec votre voix et vos périphériques reste nécessaire.
 
 La capture réelle avec le DSP Windows et sa fermeture sont vérifiées avec réception de trames microphone avant d’annoncer l’écoute. Le DSP nécessite un flux actif sur le périphérique de sortie : le moteur conserve donc un flux partagé silencieux, y compris avant la première réponse. Une absence de trames pendant cinq secondes ou une erreur Windows est signalée au client. L’interruption est vérifiée par événements contrôlés dans le navigateur ; la qualité acoustique de l’annulation d’écho et de l’interruption avec une voix humaine dans votre pièce n’a pas encore été mesurée. Utiliser les périphériques Windows par défaut ; un casque peut améliorer la séparation entre la voix de Fred et la vôtre.
 
@@ -42,10 +42,13 @@ Une restauration ferme le moteur vocal avant de remplacer les données. Le régl
 
 Deux environnements isolés : `toolchain/conversation-client-python` pour la compilation du moteur embarqué, `toolchain/phonon-server-python` pour Phonon serveur. Les versions sont figées dans `requirements-conversation.txt` et `lanceur/requirements-voice.txt`. Le moteur serveur charge le checkpoint local vérifié sous `toolchain/phonon-models`, dont la révision et les empreintes figurent dans `lanceur/phonon-model.json`. Le téléchargement préparatoire requiert les conditions Hugging Face acceptées et un jeton de lecture ; la synthèse fonctionne ensuite hors ligne. Aucun ajout à l’environnement Strata ni à celui d’EG2.
 
-Le cache utilisateur Windows est `%LOCALAPPDATA%\QwenClient\conversation`. `conversation-models.json` fixe les fichiers, tailles, SHA-256 et révisions publiques. Le binaire contient les moteurs et les licences, sans les poids optionnels. Les notices d’attribution Kyutai/CC-BY-4.0 et des moteurs sont dans `licenses/CONVERSATION-NOTICES.txt`.
+Le cache Windows partagé est `%LOCALAPPDATA%\QwenClient\asr`. `conversation-models.json` fixe les fichiers, tailles, SHA-256 et révisions publiques. Le binaire contient le runtime et les licences, sans les poids optionnels. Les notices d'attribution NVIDIA/CC-BY-4.0 et des moteurs sont dans `licenses/CONVERSATION-NOTICES.txt`.
 
 Tests et captures : [validation](../preuves/conversation-windows-20261011/VALIDATION.md). Références : [Zipformer français](https://k2-fsa.github.io/sherpa/onnx/pretrained_models/online-transducer/zipformer-transducer-models.html#shaojieli-sherpa-onnx-streaming-zipformer-fr-2023-04-14-french), [Smart Turn](https://github.com/pipecat-ai/smart-turn), [Pocket TTS](https://kyutai-labs.github.io/pocket-tts/API%20Reference/python-api/), [DSP Windows](https://learn.microsoft.com/en-us/windows/win32/medfound/voicecapturedmo).
 
 ## Synthèse serveur remplacée le 22 octobre 2026
 
 Le moteur actif est désormais Phonon 0.4.1, modèle phonon-40m-fr q8, voix fournie default, quatre threads CPU. Le runtime est `toolchain/phonon-server-python` et le checkpoint local épinglé est sous `toolchain/phonon-models`. Les références Pocket TTS et ses mesures ci-dessus décrivent les validations historiques. Reconnaissance et protocole client conservés. Voir [la migration et les mesures natives](../maintenance/2026-10-22-phonon/README.md).
+
+
+Depuis le 23 octobre 2026, la voix serveur est Tiphaine (français de France). Le moteur Phonon et son checkpoint restent identiques ; l’embedding de voix est vérifié et épinglé dans `lanceur/phonon-model.json`. Voir [la sélection et les preuves](../maintenance/2026-10-23-tiphaine/README.md).

@@ -17,6 +17,8 @@
   function render(value){
     if(session&&value.session&&value.session!==session)return;
     state=value;const active=phases.has(value.phase),installing=['installing','verifying'].includes(value.phase);
+    const model=value.model||'Modèle français',size=value.model_bytes?'environ '+Math.ceil(value.model_bytes/1000000)+' Mo':'taille indiquée à l’installation';
+    description.textContent=model+' · français · '+size+'. Microphone fermé à la fin de la dictée. Aucun envoi automatique. Chaque dictée dure au maximum deux minutes.';
     if(dictating){
       if(value.phase==='cancelled'){prompt.value=draft;unlock();}
       else {if(typeof value.text==='string')prompt.value=draft+(draft&&value.text?'\n':'')+value.text;if(!active)unlock();}
@@ -35,17 +37,17 @@
   button.onclick=async()=>{
     if(state.phase==='listening'){await act('stop');return;}
     if(phases.has(state.phase)||acting||(typeof conversationLocked==='function'&&conversationLocked()))return;
-    if(!state.installed){if(!confirm('Installer Whisper Small français sur cet appareil ? Environ 488 Mo à télécharger. Après installation, la dictée fonctionne sans Internet et aucun audio n’est envoyé au serveur.'))return;await act('install');return;}
+    if(!state.installed){if(!confirm('Installer la reconnaissance française sur cet appareil ? '+Math.ceil((state.model_bytes||487601967)/1000000)+' Mo à télécharger. La reconnaissance fonctionne ensuite sans Internet ; aucun audio n’est envoyé au serveur.'))return;await act('install');return;}
     draft=prompt.value;dictating=true;window.voiceBusy=true;if(typeof buttons==='function')buttons();if(typeof drawLibrary==='function')drawLibrary();await act('start');
   };
   cancel.onclick=()=>act('cancel');
   const settings=document.createElement('details');settings.className='composer-options';
   const label=document.createElement('summary');label.textContent='Dictée';
-  const description=document.createElement('p');description.textContent='Whisper Small multilingue · français · environ 488 Mo. Microphone fermé à la fin de la dictée. Aucun envoi automatique. Chaque dictée dure au maximum deux minutes.';
+  const description=document.createElement('p');description.textContent='Reconnaissance locale en français. Microphone fermé à la fin de la dictée. Aucun envoi automatique.';
   const reinstall=document.createElement('button');reinstall.type='button';reinstall.className='secondary';reinstall.textContent='Installer / réparer';
   const remove=document.createElement('button');remove.type='button';remove.className='secondary';remove.textContent='Désinstaller le modèle';
-  reinstall.onclick=()=>{if(phases.has(state.phase)||acting)return;if(confirm('Télécharger et vérifier la dictée locale (environ 488 Mo) ?'))act('install');};
-  remove.onclick=()=>{if(phases.has(state.phase)||acting)return;if(confirm('Supprimer le modèle vocal de cet appareil ?'))act('remove');};
+  reinstall.onclick=()=>{if(phases.has(state.phase)||acting)return;if(confirm('Télécharger et vérifier le modèle vocal local ?'))act('install');};
+  remove.onclick=()=>{if(phases.has(state.phase)||acting)return;if(confirm('Supprimer le modèle vocal de cet appareil ?'+(!window.AndroidClient?' Il sert à la dictée et à la conversation.':'')))act('remove');};
   settings.append(label,description,reinstall,remove);document.querySelector('.composer-bottom').append(settings);
   window.voiceFinishForClose=async()=>{if(!dictating)return;if(['listening','loading','permission'].includes(state.phase))await act('stop');const deadline=Date.now()+120000;while(phases.has(state.phase)){if(Date.now()>deadline)throw new Error('La dictée se termine encore. Réessayez de fermer après la finalisation.');await new Promise(r=>setTimeout(r,250));await refresh();}};
   document.addEventListener('visibilitychange',()=>{if(document.hidden&&dictating&&state.phase==='listening')act('stop');else if(!document.hidden)refresh();});

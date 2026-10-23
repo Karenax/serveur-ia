@@ -33,7 +33,9 @@ def load():
     folder = verify()
     ptts.set_num_threads(SPEC['threads'])
     model = ptts.TTS(str(folder), lang=SPEC['language'], device='cpu',
-                     quant=SPEC['quant'], voice=SPEC['voice'], voice_catalog=str(folder))
+                     quant=SPEC['quant'], voice='default', voice_catalog=str(folder))
+    if SPEC['voice']!='default':
+        model.add_voice(SPEC['voice'],str(folder/SPEC['voice_file']))
     if model.device != 'cpu' or model.sample_rate != 24000 or 'fr' not in model.languages:
         raise ValueError('Configuration Phonon française CPU incorrecte.')
     return model

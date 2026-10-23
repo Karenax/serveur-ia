@@ -70,6 +70,34 @@ static HRESULT property(IPropertyStore* properties,REFPROPERTYKEY key,LONG n){
     PROPVARIANT value;PropVariantInit(&value);value.vt=VT_I4;value.lVal=n;
     return properties->SetValue(key,value);
 }
+static HRESULT boolean_property(IPropertyStore* properties,REFPROPERTYKEY key,bool enabled){
+    PROPVARIANT value;PropVariantInit(&value);value.vt=VT_BOOL;value.boolVal=enabled?VARIANT_TRUE:VARIANT_FALSE;
+    return properties->SetValue(key,value);
+}
+// Resolve both endpoints for the same Windows role as Web Audio and the silent
+// render stream. In particular, a separate communications headset must not make
+// the DSP listen to a different microphone or echo reference.
+static HRESULT default_index(EDataFlow flow,WORD* index){
+    IMMDeviceEnumerator* devices=nullptr;IMMDeviceCollection* collection=nullptr;IMMDevice* selected=nullptr;
+    LPWSTR selected_id=nullptr;
+    auto hr=CoCreateInstance(__uuidof(MMDeviceEnumerator),nullptr,CLSCTX_ALL,__uuidof(IMMDeviceEnumerator),(void**)&devices);
+    if(SUCCEEDED(hr))hr=devices->GetDefaultAudioEndpoint(flow,eConsole,&selected);
+    if(SUCCEEDED(hr))hr=selected->GetId(&selected_id);
+    if(SUCCEEDED(hr))hr=devices->EnumAudioEndpoints(flow,DEVICE_STATE_ACTIVE,&collection);
+    UINT count=0;if(SUCCEEDED(hr))hr=collection->GetCount(&count);
+    bool found=false;
+    for(UINT i=0;SUCCEEDED(hr)&&i<count&&i<0xffff;++i){
+        IMMDevice* candidate=nullptr;LPWSTR candidate_id=nullptr;
+        hr=collection->Item(i,&candidate);
+        if(SUCCEEDED(hr))hr=candidate->GetId(&candidate_id);
+        if(SUCCEEDED(hr)&&wcscmp(selected_id,candidate_id)==0){*index=(WORD)i;found=true;}
+        if(candidate_id)CoTaskMemFree(candidate_id);if(candidate)candidate->Release();
+        if(found)break;
+    }
+    if(selected_id)CoTaskMemFree(selected_id);if(selected)selected->Release();
+    if(collection)collection->Release();if(devices)devices->Release();
+    return FAILED(hr)?hr:found?S_OK:E_FAIL;
+}
 extern "C" __declspec(dllexport) void* fred_aec_open() {
     last_error=S_OK;
     auto capture=new Capture;
@@ -82,7 +110,13 @@ extern "C" __declspec(dllexport) void* fred_aec_open() {
     hr=capture->object->QueryInterface(IID_IPropertyStore,(void**)&properties);
     if(SUCCEEDED(hr)){
         hr=property(properties,MFPKEY_WMAAECMA_SYSTEM_MODE,SINGLE_CHANNEL_AEC);
-        if(SUCCEEDED(hr))hr=property(properties,MFPKEY_WMAAECMA_DEVICE_INDEXES,-1);
+        WORD input=0,output=0;
+        if(SUCCEEDED(hr))hr=default_index(eCapture,&input);
+        if(SUCCEEDED(hr))hr=default_index(eRender,&output);
+        if(SUCCEEDED(hr))hr=property(properties,MFPKEY_WMAAECMA_DEVICE_INDEXES,LONG((DWORD(output)<<16)|input));
+        if(SUCCEEDED(hr))hr=boolean_property(properties,MFPKEY_WMAAECMA_FEATURE_MODE,true);
+        if(SUCCEEDED(hr))hr=property(properties,MFPKEY_WMAAECMA_FEATR_NS,1);
+        if(SUCCEEDED(hr))hr=boolean_property(properties,MFPKEY_WMAAECMA_FEATR_AGC,true);
         PROPVARIANT source;PropVariantInit(&source);source.vt=VT_BOOL;source.boolVal=VARIANT_TRUE;
         if(SUCCEEDED(hr))hr=properties->SetValue(MFPKEY_WMAAECMA_DMO_SOURCE_MODE,source);
         properties->Release();

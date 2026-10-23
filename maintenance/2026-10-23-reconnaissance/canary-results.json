@@ -1,0 +1,41 @@
+{
+  "loading_seconds": 1.3115703000003123,
+  "results": [
+    {
+      "fixture": "francais.wav",
+      "variant": "original",
+      "compute_seconds": 0.9287948999990476,
+      "text": "Bonjour, Fred, je souhaite préparer une réunion demain matin. Ajoute les documents du projet et résume les décisions importantes."
+    },
+    {
+      "fixture": "francais.wav",
+      "variant": "quiet",
+      "compute_seconds": 0.8728225000013481,
+      "text": "Bonjour, Fred, je souhaite préparer une réunion demain matin. Ajoute les documents du projet et résume les décisions importantes."
+    },
+    {
+      "fixture": "francais.wav",
+      "variant": "noise",
+      "compute_seconds": 0.7931515000018408,
+      "text": "Bonjour Fred Je souhaite préparer une réunion demain matin ajoute les documents du projet et résume les décisions importantes"
+    },
+    {
+      "fixture": "fr.wav",
+      "variant": "original",
+      "compute_seconds": 0.5308794000011403,
+      "text": "Ne vous demandez pas ce que votre pays peut faire pour vous. Demandez vous plutôt ce que vous pouvez faire pour lui."
+    },
+    {
+      "fixture": "fr.wav",
+      "variant": "quiet",
+      "compute_seconds": 0.5376636000000872,
+      "text": "Ne vous demandez pas ce que votre pays peut faire pour vous. Demandez vous plutôt ce que vous pouvez faire pour lui."
+    },
+    {
+      "fixture": "fr.wav",
+      "variant": "noise",
+      "compute_seconds": 0.5364722000012989,
+      "text": "Ne vous demandez pas ce que votre pays peut faire pour vous. Demandez vous plutôt ce que vous pouvez faire pour lui."
+    }
+  ]
+}

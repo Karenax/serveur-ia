@@ -375,6 +375,8 @@ class RemoteTests(unittest.TestCase):
         with self.assertRaises(urllib.error.HTTPError) as error:remote.open('/v1/workspace')
         self.assertEqual(json.load(error.exception)['error']['code'],'wireguard_unreachable')
         error.exception.close()
+        self.assertTrue(remote.state()['connected'])  # A workspace timeout is only one failed request.
+        remote.failure('wireguard_unreachable','Tunnel indisponible',confirmed=True)
         self.assertFalse(remote.state()['connected']);self.assertFalse(remote.state()['reachable'])
         self.assertEqual(remote.state()['code'],'wireguard_unreachable')
         self.assertNotIn(self.access['token'],json.dumps(remote.state()))

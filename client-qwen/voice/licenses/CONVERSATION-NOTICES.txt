@@ -1,8 +1,12 @@
 Conversation Windows Fred — attribution
 
 Sherpa-ONNX 1.13.8, k2-fsa : Apache-2.0.
-Modèle Zipformer français, Shaojie Li / k2-fsa, shaojieli/sherpa-onnx-streaming-zipformer-fr-2023-04-14 : Apache-2.0.
-https://huggingface.co/shaojieli/sherpa-onnx-streaming-zipformer-fr-2023-04-14
+Reconnaissance Windows : Parakeet TDT 0.6B v3, NVIDIA : CC BY 4.0.
+https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3
+https://creativecommons.org/licenses/by/4.0/
+Conversion ONNX int8 par k2-fsa / Fangjun Kuang ; intégration Windows Fred,
+découpage local et transcription progressive en mémoire. Aucun réentraînement.
+https://huggingface.co/csukuangfj/sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8
 Les révisions et empreintes exactes sont dans conversation-models.json.
 Silero VAD, Silero Team : MIT. https://github.com/snakers4/silero-vad
 Smart Turn v3.2, Pipecat / Daily : BSD-2-Clause. https://github.com/pipecat-ai/smart-turn

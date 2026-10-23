@@ -3,7 +3,7 @@
 <div class="brand"><div class="logo">F</div><div><strong>Accès serveur Fred</strong><small>Votre espace de travail</small></div></div>
 <button id="new" class="new-button"><span class="nav-text">Nouvelle conversation</span></button>
 <nav id="client-navigation" class="sidebar-nav" aria-label="Fonctions du client"><button class="nav-button" data-view-button="chat">Conversations</button><button class="nav-button" data-view-button="access">Mon accès personnel</button><button class="nav-button" data-view-button="connection">Connexion au serveur</button><button class="nav-button" data-view-button="updates">Mises à jour</button><button class="nav-button" data-view-button="api">API locale</button></nav>
-<div class="section-label">Conversations</div><div class="history-search"><input id="search-conversations" type="search" placeholder="Rechercher…" aria-label="Rechercher une conversation"><select id="conversation-filter" aria-label="Afficher les conversations"><option value="active">Actives</option><option value="archived">Archivées</option><option value="all">Toutes</option></select></div>
+<div id="history-label" class="section-label">Conversations</div><div class="history-search"><input id="search-conversations" type="search" placeholder="Rechercher…" aria-label="Rechercher une conversation"><select id="conversation-filter" aria-label="Afficher les conversations"><option value="active">Actives</option><option value="archived">Archivées</option><option value="all">Toutes</option></select></div>
 <div id="conversation-list" aria-label="Conversations enregistrées"></div><select id="conversations" aria-label="Sélection de conversation" hidden></select>
 <div class="sidebar-tools"><button id="export-conversations" class="secondary">Exporter l’historique</button><button id="import-conversations" class="secondary">Importer</button><input id="import-file" type="file" accept="application/json" hidden></div>
 <div class="sidebar-settings"></div><div class="sidebar-bottom"><span class="profile-avatar">F</span><div><div class="profile-name">Accès personnel</div><div id="account-status">EXE personnel · connexion automatique</div><div id="client-version">Accès serveur Fred</div></div></div>
@@ -29,7 +29,7 @@
     try{localStorage.removeItem(storage);localStorage.removeItem(storage+'-library');}catch{}
     let networkBanner=false,modelsPending=null,lastConnectionUpdate=0,replyProgress={},agentApproval=null,agentDecisionPending=false,agentRecoveryPending=false,cancelPending=false;
     const connectionCodes=new Set(['wireguard_unreachable','tunnel_request_failed','connection_error','gateway_unavailable','access_denied','access_revoked','access_suspended','access_expired','remote_disabled','model_unloaded','no_models']);
-    function connectionFailure(e){if(!connectionCodes.has(e?.code)||e.code==='model_unloaded'&&modelSource==='hermes'&&modelCatalog.some(m=>m.available))return;connected=false;lastConnectionUpdate=Date.now();$('connection').textContent='● Connexion indisponible';$('connection').title=e.message||'';$('connection').classList.remove('online');buttons();}
+    function connectionFailure(e){if(!connectionCodes.has(e?.code)||e.code==='model_unloaded'&&modelSource==='hermes'&&modelCatalog.some(m=>m.available))return;connected=false;lastConnectionUpdate=Date.now();$('connection').textContent='● Connexion indisponible';$('connection').title=e.message||'';$('connection').classList.remove('online');window.conversationConnectionFailure?.(e);buttons();}
     function error(value){if($('retry-without-thinking'))$('retry-without-thinking').hidden=value?.code!=='thinking_without_answer'||typeof thinkingCanDisable==='function'&&!thinkingCanDisable();const text=typeof value==='string'?value:value?.message;if(value?.code==='thinking_without_answer')$('retry-without-thinking').closest('details').open=true;networkBanner=connectionCodes.has(value?.code);if(networkBanner)connectionFailure(value);$('error').hidden=!text;$('error').textContent=text||'';}
     let saveTimer=null,historyWrites=Promise.resolve(),historyRevision="",historyReady=false,historyBlocked=false,endpointDirty=false,deletedConversation=null,conversationActionPending=false;
     function conversationLocked(){return busy||agentRecoveryPending||Boolean(window.voiceBusy)||Boolean(window.conversationBusy)||Boolean(window.chatAttachmentLoading)||historySyncPending||conversationActionPending||!historyReady||historyBlocked;}
@@ -50,6 +50,12 @@
       return historyWrites;
     }
     const libraryKey=storage+'-library';let library=[],currentId=null;
+    let historyView='chat';
+    const historyScopes={chat:{query:'',filter:'active'},corrector:{query:'',filter:'active'}};
+    // Existing corrector records already carry this marker. Keep their history
+    // compatible with installed clients rather than introducing a new schema.
+    function isCorrection(c){return Boolean(c?.title?.startsWith('Correcteur · ')&&(!Array.isArray(c.messages)||/^(Corriger|Reformuler professionnel|Reformuler amical) :\n\n/.test(c.messages.find(m=>m.role==='user')?.content||'')));}
+    function openHistoryRecord(c){if(!c||conversationLocked())return;if(isCorrection(c)){window.correctorOpen?.(c);return;}save();chatAttachments=[];attachmentRender();currentId=c.id;messages=c.messages;render();drawLibrary();showView('chat');error('');}
     function validMessages(value){return Array.isArray(value)&&value.length<=1000&&value.every(m=>m&&['user','assistant'].includes(m.role)&&typeof m.content==='string'&&attachmentValid(m)&&(!m.reasoning_content||typeof m.reasoning_content==='string'));}
     if(!library.length)library=[{id:crypto.randomUUID(),title:'Conversation',messages}];
     currentId=library[0].id;messages=library[0].messages;
@@ -92,17 +98,24 @@
     $('conversation-model').onblur=()=>{modelRefresh(false,true);if(modelPollDeferred)models();};
     function drawLibrary(){
       modelRefresh();
+      const corrections=historyView==='corrector',selected=corrections?window.correctorSelection?.():currentId;
+      $('history-label').textContent=corrections?'Corrections et reformulations':'Conversations';
+      $('new').querySelector('.nav-text').textContent=corrections?'Nouveau texte':'Nouvelle conversation';
+      $('search-conversations').setAttribute('aria-label',corrections?'Rechercher une correction ou reformulation':'Rechercher une conversation');
+      $('conversation-filter').setAttribute('aria-label',corrections?'Afficher les corrections et reformulations':'Afficher les conversations');
+      $('conversation-list').setAttribute('aria-label',corrections?'Corrections et reformulations enregistrées':'Conversations enregistrées');
+      $('conversations').setAttribute('aria-label',corrections?'Sélection de correction ou reformulation':'Sélection de conversation');
       const query=$('search-conversations').value.toLowerCase(),current=library.find(c=>c.id===currentId);$('conversation-title').value=current?.title||'Nouvelle conversation';
       const filter=$('conversation-filter').value;
-      const items=library.filter(c=>(filter==='all'||Boolean(c.archived)===(filter==='archived'))&&(c.title.toLowerCase().includes(query)||c.messages.some(m=>m.content.toLowerCase().includes(query))));
+      const items=library.filter(c=>isCorrection(c)===corrections&&(filter==='all'||Boolean(c.archived)===(filter==='archived'))&&(c.title.toLowerCase().includes(query)||c.messages.some(m=>m.content.toLowerCase().includes(query))));
       $('archive-conversation').textContent=current?.archived?'Restaurer la conversation':'Archiver la conversation';
-      $('conversations').replaceChildren(...items.map(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.title;o.selected=c.id===currentId;return o;}));
-      $('conversation-list').replaceChildren(...items.map(c=>{const b=document.createElement('button');b.className='conversation-item'+(c.id===currentId?' selected':'');b.type='button';b.disabled=conversationLocked();b.dataset.conversationId=c.id;b.setAttribute('aria-current',c.id===currentId?'true':'false');const title=document.createElement('span');title.textContent=c.title;const detail=document.createElement('small');detail.textContent=c.messages.length+' messages'+(c.archived?' · archivée':'');b.append(title,detail);b.onclick=()=>{if(conversationLocked())return;save();chatAttachments=[];attachmentRender();currentId=c.id;messages=c.messages;render();drawLibrary();showView('chat');error('');};return b;}));
-      if(!items.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='Aucune conversation trouvée.';$('conversation-list').append(empty);}
+      $('conversations').replaceChildren(...items.map(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.title;o.selected=c.id===selected;return o;}));
+      $('conversation-list').replaceChildren(...items.map(c=>{const b=document.createElement('button');b.className='conversation-item'+(c.id===selected?' selected':'');b.type='button';b.disabled=conversationLocked();b.dataset.conversationId=c.id;b.setAttribute('aria-current',c.id===selected?'true':'false');const title=document.createElement('span');title.textContent=c.title;const detail=document.createElement('small');detail.textContent=c.messages.length+' messages'+(c.archived?' · archivée':'');b.append(title,detail);b.onclick=()=>openHistoryRecord(c);return b;}));
+      if(!items.length){const empty=document.createElement('p');empty.className='muted';empty.textContent=corrections?'Aucune correction ou reformulation trouvée.':'Aucune conversation trouvée.';$('conversation-list').append(empty);}
     }
     $('search-conversations').oninput=drawLibrary;
     $('conversation-filter').onchange=drawLibrary;
-    $('conversations').onchange=()=>{if(busy)return;const selected=$('conversations').value;save();currentId=selected;messages=library.find(c=>c.id===currentId).messages;render();drawLibrary();error('');};
+    $('conversations').onchange=()=>openHistoryRecord(library.find(c=>c.id===$('conversations').value));
     $('rename-conversation').onclick=()=>{if(busy)return;const c=library.find(c=>c.id===currentId),title=$('conversation-title').value;if(title.trim()){c.title=title.trim().slice(0,120);save();drawLibrary();}};
     $('export-conversations').onclick=()=>{save();const url=URL.createObjectURL(new Blob([JSON.stringify({version:1,conversations:library},null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='conversations-fred.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
     $('import-conversations').onclick=()=>{if(!busy)$('import-file').click();};
@@ -260,8 +273,12 @@
     $('automatic').onclick=async()=>{try{await api('/client/endpoint',{});endpointDirty=false;await clientState();models();}catch(e){error(e);}};
     $('update-check').onclick=async()=>{try{await api('/client/update/check',{});clientState();}catch(e){error(e);}};
     $('update-apply').onclick=async()=>{try{await uiPersistPreferences();await flushHistory();await api('/client/update/apply',{});clientState();}catch(e){error(e);}};
-    async function bootstrap(){try{const result=await api('/client/history'),saved=result.history;historyRevision=result.revision;historyReady=true;if(saved){library=saved.conversations;currentId=saved.currentId;messages=library.find(c=>c.id===currentId).messages;}}catch(e){historyBlocked=true;$('history-status').textContent=e.message;$('history-recover').hidden=e.code!=='history_unreadable';error(e);}render();drawLibrary();await clientState();await models();}
-    function showView(name){for(const pane of document.querySelectorAll('[data-view]'))pane.hidden=pane.dataset.view!==name;for(const button of document.querySelectorAll('[data-view-button]')){const active=button.dataset.viewButton===name;button.classList.toggle('active',active);button.setAttribute('aria-selected',String(active));}$('workspace-heading').textContent=({chat:'Conversations',access:'Mon accès',connection:'Connexion au serveur',updates:'Mises à jour',api:'API locale'})[name]||'Conversations';}
+    async function bootstrap(){try{const result=await api('/client/history'),saved=result.history;historyRevision=result.revision;historyReady=true;if(saved){library=saved.conversations;currentId=saved.currentId;messages=library.find(c=>c.id===currentId).messages;}window.historyBootstrapView?.();}catch(e){historyBlocked=true;$('history-status').textContent=e.message;$('history-recover').hidden=e.code!=='history_unreadable';error(e);}render();drawLibrary();await clientState();await models();}
+    function showView(name){
+      const previousScope=historyView==='corrector'?'corrector':'chat',scope=name==='corrector'?'corrector':'chat',scopeChanged=previousScope!==scope;
+      if(scopeChanged){historyScopes[previousScope]={query:$('search-conversations').value,filter:$('conversation-filter').value};$('search-conversations').value=historyScopes[scope].query;$('conversation-filter').value=historyScopes[scope].filter;}
+      historyView=name;for(const pane of document.querySelectorAll('[data-view]'))pane.hidden=pane.dataset.view!==name;for(const button of document.querySelectorAll('[data-view-button]')){const active=button.dataset.viewButton===name;button.classList.toggle('active',active);button.setAttribute('aria-selected',String(active));}$('workspace-heading').textContent=({chat:'Conversations',access:'Mon accès',connection:'Connexion au serveur',updates:'Mises à jour',api:'API locale'})[name]||'Conversations';if(scopeChanged)drawLibrary();
+    }
     document.querySelectorAll('[data-view-button]').forEach(button=>button.onclick=()=>showView(button.dataset.viewButton));
     document.querySelectorAll('[data-prompt]').forEach(button=>button.onclick=()=>{if(conversationLocked())return;$('prompt').value=button.dataset.prompt;$('prompt').dispatchEvent(new Event('input',{bubbles:true}));$('prompt').focus();});
     $('toggle-api-key').onclick=()=>{const field=$('local-api-key');field.type=field.type==='password'?'text':'password';$('toggle-api-key').textContent=field.type==='password'?'Afficher la clé':'Masquer la clé';};

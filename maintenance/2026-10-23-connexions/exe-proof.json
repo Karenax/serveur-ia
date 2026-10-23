@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "version": "3.5.37",
+  "sha256": "9d5494087f0a42432b50691cd880efd0311bc5016daa65fbe06fd1f34d861148",
+  "bytes": 94417747,
+  "tests": 40,
+  "skipped": 0,
+  "checks": [
+    "packaged desktop self-test",
+    "incompatible profile exits without a dialog",
+    "signed update and startup rollback",
+    "two updates preserve EXE and directory names",
+    "legacy helper handoff cleanup preserves unrelated files",
+    "real WireGuard: four data streams do not block controls",
+    "real WireGuard: one second of UDP loss recovers without restart",
+    "probes do not monopolize bridge or invalidate a healthy stream",
+    "silent model and TTS send keepalive frames",
+    "revocation still wins over a late probe"
+  ]
+}

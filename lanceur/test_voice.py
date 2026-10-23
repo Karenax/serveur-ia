@@ -56,4 +56,17 @@ class VoiceHTTPTests(unittest.TestCase):
                 self.assertNotIn(b'pcm',response.read())
         self.assertIsNone(self.store.voice.current)
 
+    def test_silent_synthesis_keeps_stream_alive_without_releasing_its_slot(self):
+        import itertools
+        self.ready()
+        with patch.object(self.store.voice,'_write'),patch('voice.time.monotonic',side_effect=itertools.chain([0,0],itertools.repeat(6))):
+            frames=self.store.voice.stream(self.access['id'],{'request_id':'a'*32,'text':'Bonjour'})
+            try:
+                self.assertEqual({'id':'a'*32,'waiting':True},next(frames))
+                self.assertFalse(self.store.voice.slot.acquire(False))
+                job=self.store.voice.current;job['queue'].put({'id':'a'*32,'done':True});job['finished'].set()
+                self.assertEqual({'id':'a'*32,'done':True},next(frames))
+            finally:frames.close()
+        self.assertIsNone(self.store.voice.current)
+
 if __name__=='__main__':unittest.main(verbosity=2)
