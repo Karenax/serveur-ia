@@ -1,0 +1,11 @@
+test_access_revocation_stops_audio_before_first_frame (test_voice.VoiceHTTPTests.test_access_revocation_stops_audio_before_first_frame) ... ok
+test_busy_is_bounded_and_does_not_queue_unlimited_requests (test_voice.VoiceHTTPTests.test_busy_is_bounded_and_does_not_queue_unlimited_requests) ... ok
+test_disabled_voice_rejects_without_worker (test_voice.VoiceHTTPTests.test_disabled_voice_rejects_without_worker) ... ok
+test_input_limits_and_custom_voice_rejected (test_voice.VoiceHTTPTests.test_input_limits_and_custom_voice_rejected) ... ok
+test_stream_returns_pcm_then_done_and_frees_slot (test_voice.VoiceHTTPTests.test_stream_returns_pcm_then_done_and_frees_slot) ... ok
+test_voice_status_requires_personal_session (test_voice.VoiceHTTPTests.test_voice_status_requires_personal_session) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 20.061s
+
+OK

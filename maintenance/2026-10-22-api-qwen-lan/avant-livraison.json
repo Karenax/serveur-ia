@@ -1,0 +1,67 @@
+{
+  "models": [
+    {
+      "pid": 1968,
+      "created": 1792649278.657755
+    },
+    {
+      "pid": 16284,
+      "created": 1792649278.5832696
+    }
+  ],
+  "files": {
+    "acces-distants.json": "1d357907389d2056a608c5e98b47d2fa31f519521af1f18e8f3666eb36e16037",
+    "wireguard.json": "6cbd6b81bd61645cce770ac2a7e03cdb99f86b800c95d4f05e0a425e3a6aa7dd",
+    "reglages.json": "5d83df35283ecc7ded316d110c4756f73cfe223a2cf6ae74ca6a581fb2602fcd",
+    "wireguard-prive/secrets.dpapi": "0bf5ae5faca3ad22177ce07af1d8587441ad569f0595a46a3c8c4d4184600a93",
+    "wireguard-prive/signature.dpapi": "240cd390a95972957889009bfabb7e54942f33d7f99d9ebb9a211ab1f9754a4a"
+  },
+  "users": {
+    "client_histories": {
+      "count": 1,
+      "sha256": "d0f3ac0f00bad77ba01b3f2ae593473f2c21e92ee840c96ecd9496ad266e7777"
+    },
+    "projects": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "documents": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "memories": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "conversations": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "policies": {
+      "count": 1,
+      "sha256": "aa7aff0b13d59517f121a32e8db4de83ac93d7e112cf407376be53b5b5f7dc46"
+    },
+    "jobs": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  },
+  "backups": {
+    "enabled": true,
+    "time": "03:00",
+    "frequency": "daily",
+    "weekday": 0,
+    "destination": "D:\\Serveur IA\\lanceur\\sauvegardes",
+    "secondary_destination": "\\\\DS218\\home\\Sauvegarde\\Serveur IA",
+    "retention": {
+      "daily": 7,
+      "weekly": 4,
+      "monthly": 6
+    },
+    "secret_configured": true
+  },
+  "voice_files": {
+    "voix.json": "d04a75314cdc173966a098cfdbe83b107b1427c8625814855cce326d54fcee9a",
+    "phonon-model.json": "c718f61042ab3801eca30ece845dc89e4264322da05541750df38265318fab54"
+  }
+}

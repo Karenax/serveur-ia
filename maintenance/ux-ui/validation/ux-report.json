@@ -1,0 +1,108 @@
+{
+  "advisory": true,
+  "files": [
+    "client-android/app/src/main/java/net/karenax/fred/AndroidUpdates.java",
+    "client-android/app/src/main/java/net/karenax/fred/ClientBackend.java",
+    "client-android/app/src/main/java/net/karenax/fred/HistorySync.java",
+    "client-android/app/src/main/java/net/karenax/fred/Json.java",
+    "client-android/app/src/main/java/net/karenax/fred/LocalVoice.java",
+    "client-android/app/src/main/java/net/karenax/fred/LoopbackServer.java",
+    "client-android/app/src/main/java/net/karenax/fred/MainActivity.java",
+    "client-android/app/src/main/java/net/karenax/fred/NativeNotifications.java",
+    "client-android/app/src/main/java/net/karenax/fred/Profile.java",
+    "client-android/app/src/main/java/net/karenax/fred/Remote.java",
+    "client-android/app/src/main/java/net/karenax/fred/SecureStore.java",
+    "client-android/app/src/main/java/net/karenax/fred/UpdateProvider.java",
+    "client-android/app/src/main/java/net/karenax/fred/WireGuardBridge.java",
+    "client-android/app/src/main/res/values/styles.xml",
+    "client-android/mobile-ui/access.html",
+    "client-android/mobile-ui/android.css",
+    "client-android/mobile-ui/android.js",
+    "client-android/mobile-ui/api.html",
+    "client-android/mobile-ui/client-state.js",
+    "client-android/mobile-ui/connection.html",
+    "client-android/mobile-ui/corrector-response.js",
+    "client-android/mobile-ui/onboarding.html",
+    "client-qwen/attachments.js",
+    "client-qwen/browser_test_support.cjs",
+    "client-qwen/chat.html",
+    "client-qwen/conversation.js",
+    "client-qwen/corrector.js",
+    "client-qwen/markdown.js",
+    "client-qwen/run_ui_tests.cjs",
+    "client-qwen/selection.js",
+    "client-qwen/thinking.js",
+    "client-qwen/ui.css",
+    "client-qwen/ui.js",
+    "client-qwen/voice.js",
+    "client-qwen/workspace.html",
+    "lanceur/web/app.css",
+    "lanceur/web/app.js",
+    "lanceur/web/index.html",
+    "lanceur/web/interface.css",
+    "lanceur/web/interface.js",
+    "lanceur/web/maintenance.css",
+    "lanceur/web/maintenance.js",
+    "lanceur/web/notifications.css",
+    "lanceur/web/notifications.js",
+    "lanceur/web/voice.js",
+    "lanceur/web/workspace.js"
+  ],
+  "warnings": [
+    {
+      "file": "lanceur/web/index.html",
+      "line": 34,
+      "rule": "LONG-TEXT",
+      "message": "Texte de 362 caractères à relire : Chaque EXE contient ses propres clés d’accès. Le destinataire l’ouvre et se connecte automatiquement"
+    },
+    {
+      "file": "lanceur/web/index.html",
+      "line": 40,
+      "rule": "LONG-TEXT",
+      "message": "Texte de 288 caractères à relire : Le moteur est intégré aux deux applications. Aucun service externe n’est nécessaire. Les accès sont "
+    },
+    {
+      "file": "lanceur/web/index.html",
+      "line": 46,
+      "rule": "LONG-TEXT",
+      "message": "Texte de 194 caractères à relire : Chaque version est signée et vérifiée. Les clients 3.0 peuvent la télécharger depuis leur bouton « M"
+    },
+    {
+      "file": "lanceur/web/workspace.js",
+      "line": 9,
+      "rule": "LONG-TEXT",
+      "message": "Texte de 185 caractères à relire : La sauvegarde chiffrée comprend désormais les espaces, fichiers, tous les historiques de conversatio"
+    },
+    {
+      "file": "lanceur/web/workspace.js",
+      "line": 10,
+      "rule": "LONG-TEXT",
+      "message": "Texte de 233 caractères à relire : Les conversations utilisent la recherche web native de Hermes, selon sa configuration sur ce PC. Aut"
+    },
+    {
+      "file": "lanceur/web/workspace.js",
+      "line": 10,
+      "rule": "LONG-TEXT",
+      "message": "Texte de 258 caractères à relire : Ces réglages concernent les tâches web Fred. Les recherches par sujet transmettent la question à Bra"
+    },
+    {
+      "file": "lanceur/web/workspace.js",
+      "line": 11,
+      "rule": "LONG-TEXT",
+      "message": "Texte de 218 caractères à relire : Les tâches restent enregistrées lorsque le client est fermé. Les demandes interactives passent avant"
+    },
+    {
+      "file": "lanceur/web/workspace.js",
+      "line": 39,
+      "rule": "LONG-TEXT",
+      "message": "Texte de 242 caractères à relire : Les documents, souvenirs et conversations de chaque projet restent dans leur espace. Les conversatio"
+    },
+    {
+      "file": "lanceur/web/workspace.js",
+      "line": 42,
+      "rule": "LONG-TEXT",
+      "message": "Texte de 199 caractères à relire : Le moteur mémoire est indépendant de Qwen. L’indexation se poursuit côté serveur, même lorsque les c"
+    }
+  ],
+  "suppressed": 0
+}

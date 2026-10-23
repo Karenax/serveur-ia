@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "parser_checks": 10,
+  "browser_checks": 12,
+  "viewports": [
+    1440,
+    390
+  ],
+  "fixture_requests_read_only": true,
+  "model_restarted": false
+}

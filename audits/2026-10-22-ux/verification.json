@@ -1,0 +1,36 @@
+{
+  "shared_ui_suites": {
+    "passed": true,
+    "suites": 5,
+    "command": "npm.cmd --prefix client-qwen test"
+  },
+  "static_ux": {
+    "files": 46,
+    "warnings": 9,
+    "errors": 0
+  },
+  "hermes_catalogue": {
+    "passed": true,
+    "checks": 20,
+    "report": "hermes-models.json"
+  },
+  "model_loading": {
+    "passed": true,
+    "parser_checks": 10,
+    "browser_checks": 12,
+    "viewports": [
+      1440,
+      390
+    ],
+    "fixture_requests_read_only": true,
+    "model_restarted": false
+  },
+  "findings": {
+    "P0": 0,
+    "P1": 4,
+    "P2": 6,
+    "P3": 2
+  },
+  "application_changes": false,
+  "native_android_tested": false
+}

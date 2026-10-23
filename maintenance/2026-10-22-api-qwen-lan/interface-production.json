@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "model_processes_preserved": true,
+  "keys_settings_user_data_preserved": true,
+  "backups_preserved": true,
+  "voice_settings_preserved": true,
+  "voice_engine": "Phonon 0.4.1",
+  "local_network": {
+    "base_url": "http://192.168.1.41:8080/v1",
+    "subnet": "192.168.1.0/24",
+    "model": "qwen3.8-flash-next-iq4-xs",
+    "authentication": false,
+    "pending": false,
+    "enabled": true,
+    "available": true,
+    "state": "enabled",
+    "message": "Accès local activé.",
+    "can_disable": true
+  }
+}

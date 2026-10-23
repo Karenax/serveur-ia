@@ -1,4 +1,5 @@
 /* Android additions to the shared Fred interface. Keep the desktop assets intact. */
+@media(max-width:620px){body.android-client .send-row{padding-right:60px}body.android-client .send-row>#send,body.android-client .send-row>#cancel{right:8px;bottom:10px}body.android-client .privacy,body.android-client .context-gauge{font-size:11px}}
 :root{--android-height:100dvh;--reading-font:system-ui,Roboto,sans-serif}
 html,body{height:100%;overscroll-behavior:none;-webkit-text-size-adjust:100%}
 body{font-family:system-ui,Roboto,sans-serif}

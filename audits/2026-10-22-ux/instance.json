@@ -1,0 +1,12 @@
+{
+  "fixture": true,
+  "home": "C:\\Users\\karen\\AppData\\Local\\Temp\\fred-lots6-8-2yhum5v3",
+  "url": "http://127.0.0.1:53723",
+  "admin_url": "http://127.0.0.1:53724",
+  "project": "a33d85809a1ee2495d2077d549db3755",
+  "document": "cc2e6f1221dbd1598ecf1b10b4b6af1e",
+  "source_id": "a361cf144eb8522307d2b187bed1f7006b9f6011ae94eeaaf397b619f320747f",
+  "source_count": 1,
+  "transport": "real-wireguard-udp",
+  "android_url": "http://127.0.0.1:53725"
+}

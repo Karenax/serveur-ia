@@ -1,0 +1,58 @@
+{
+  "passed": true,
+  "expected": [
+    "frontend-design",
+    "frontend-human-centered",
+    "professional-ui-design",
+    "ux-consistency-review",
+    "ux-visual-audit",
+    "ux-writing-cleaner",
+    "web-design-guidelines"
+  ],
+  "detected": [
+    {
+      "name": "frontend-design",
+      "path": "D:\\Serveur IA\\.agents\\skills\\frontend-design\\SKILL.md",
+      "scope": "repo",
+      "enabled": true
+    },
+    {
+      "name": "frontend-human-centered",
+      "path": "D:\\Serveur IA\\.agents\\skills\\frontend-human-centered\\SKILL.md",
+      "scope": "repo",
+      "enabled": true
+    },
+    {
+      "name": "professional-ui-design",
+      "path": "D:\\Serveur IA\\.agents\\skills\\professional-ui-design\\SKILL.md",
+      "scope": "repo",
+      "enabled": true
+    },
+    {
+      "name": "ux-consistency-review",
+      "path": "D:\\Serveur IA\\.agents\\skills\\ux-consistency-review\\SKILL.md",
+      "scope": "repo",
+      "enabled": true
+    },
+    {
+      "name": "ux-visual-audit",
+      "path": "D:\\Serveur IA\\.agents\\skills\\ux-visual-audit\\SKILL.md",
+      "scope": "repo",
+      "enabled": true
+    },
+    {
+      "name": "ux-writing-cleaner",
+      "path": "D:\\Serveur IA\\.agents\\skills\\ux-writing-cleaner\\SKILL.md",
+      "scope": "repo",
+      "enabled": true
+    },
+    {
+      "name": "web-design-guidelines",
+      "path": "D:\\Serveur IA\\.agents\\skills\\web-design-guidelines\\SKILL.md",
+      "scope": "repo",
+      "enabled": true
+    }
+  ],
+  "missing": [],
+  "errors": []
+}

@@ -24,7 +24,7 @@ final class ClientBackend implements AutoCloseable {
     synchronized void selectMode(String mode)throws Exception {if(!remote.hasProfile())throw new IllegalArgumentException("Importez votre accès personnel.");if(!Arrays.asList("https","wireguard").contains(mode))throw new IllegalArgumentException("Choisissez HTTPS ou WireGuard.");selectEndpoint(mode.equals("https")?Profile.HTTPS:remote.profile.getJSONObject("wireguard").getString("endpoint"));}
     synchronized void selectEndpoint(String endpoint)throws Exception {remote.select(endpoint);settings.put("connection_selected",true);settings.put("endpoint",remote.endpoint());store.write(identity+".settings",settings);}
     private synchronized JSONObject savePreferences(JSONObject values)throws Exception {
-        Json.keys(values,"theme","font","text_size","thinking_effort","thinking_by_model","thinking","sidebar_collapsed","corrector_text");
+        Json.keys(values,"theme","font","text_size","thinking_effort","thinking_by_model","thinking","sidebar_collapsed","corrector_text","conversation_drafts");
         Map<String,List<String>> allowed=new HashMap<>();allowed.put("theme",Arrays.asList("light","dark","system"));allowed.put("font",Arrays.asList("system","humanist","serif","mono"));allowed.put("text_size",Arrays.asList("compact","standard","large","extra"));allowed.put("thinking_effort",REASONING_EFFORTS);
         for(String key:allowed.keySet())if(values.has(key)&&!allowed.get(key).contains(values.get(key)))throw new IllegalArgumentException("Réglage invalide : "+key);
         if(values.has("thinking_by_model")){
@@ -34,8 +34,19 @@ final class ClientBackend implements AutoCloseable {
                 String model=models.next();if(model.trim().isEmpty()||model.length()>512||model.chars().anyMatch(c->c<32)||!REASONING_EFFORTS.contains(choices.get(model)))throw new IllegalArgumentException("Réglage invalide : thinking_by_model");
             }
         }
+        if(values.has("conversation_drafts")){
+            Object raw=values.get("conversation_drafts");if(!(raw instanceof JSONObject))throw new IllegalArgumentException("Brouillons des conversations invalides.");
+            JSONObject drafts=(JSONObject)raw;if(drafts.length()>256||Json.bytes(drafts).length>1024*1024)throw new IllegalArgumentException("Brouillons des conversations trop volumineux.");
+            Iterator<String> ids=drafts.keys();while(ids.hasNext()){String id=ids.next();if(id.isEmpty()||id.length()>128||id.chars().anyMatch(c->c<32))throw new IllegalArgumentException("Brouillon de conversation invalide.");Json.string(drafts,id,0,100000);}
+        }
         for(String key:new String[]{"thinking","sidebar_collapsed"})if(values.has(key))Json.bool(values,key,false);if(values.has("corrector_text"))Json.string(values,"corrector_text",0,100000);
-        JSONObject prefs=settings.optJSONObject("preferences");if(prefs==null)prefs=new JSONObject();Iterator<String> keys=values.keys();while(keys.hasNext()){String key=keys.next();prefs.put(key,values.get(key));}settings.put("preferences",prefs);store.write(identity+".settings",settings);return Json.object("saved",true);
+        JSONObject prefs=settings.optJSONObject("preferences");prefs=prefs==null?new JSONObject():new JSONObject(prefs.toString());
+        if(values.has("conversation_drafts")){
+            JSONObject saved=prefs.optJSONObject("conversation_drafts"),drafts=saved==null?new JSONObject():new JSONObject(saved.toString()),changes=values.getJSONObject("conversation_drafts");
+            Iterator<String> ids=changes.keys();while(ids.hasNext()){String id=ids.next(),text=changes.getString(id);if(text.isEmpty())drafts.remove(id);else drafts.put(id,text);}
+            if(drafts.length()>256||Json.bytes(drafts).length>1024*1024)throw new IllegalArgumentException("Brouillons des conversations trop volumineux.");values.put("conversation_drafts",drafts);
+        }
+        Iterator<String> keys=values.keys();while(keys.hasNext()){String key=keys.next();prefs.put(key,values.get(key));}settings.put("preferences",prefs);store.write(identity+".settings",settings);return Json.object("saved",true);
     }
     private JSONObject saveDraft(JSONObject body)throws Exception {Object draft=body.opt("draft");if(draft==null||draft==JSONObject.NULL){store.delete(identity+".draft");return Json.object("saved",true);}if(!(draft instanceof JSONObject))throw new IllegalArgumentException("Brouillon invalide.");JSONObject value=(JSONObject)draft;Json.keys(value,"id","project","title","text","revision");for(String key:new String[]{"id","project"})if(!Json.string(value,key,32,32).matches("[0-9a-f]{32}"))throw new IllegalArgumentException("Identifiant de brouillon invalide.");Json.string(value,"title",0,180);Json.string(value,"text",0,500000);Object revision=value.opt("revision");if(!(revision instanceof Integer||revision instanceof Long)||((Number)revision).longValue()<1)throw new IllegalArgumentException("Révision du brouillon invalide.");if(Json.bytes(value).length>2*1024*1024)throw new IllegalArgumentException("Brouillon trop volumineux.");store.write(identity+".draft",Json.object("draft",value));return Json.object("saved",true);}
     JSONObject config(){return Json.object("key",key,"model",remote.state().optString("model"),"version",BuildConfig.VERSION_NAME,"storage",identity,"platform","android");}

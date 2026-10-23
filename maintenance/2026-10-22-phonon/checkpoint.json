@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "repository": "gradium/phonon-40m-fr",
+  "revision": "b0e916ef8d2a9034902c449d113c3b2d4f081651",
+  "files": {
+    "config.json": "57a441f60dfa379692f31e6c47ecbddabb92b602c2b35fc39a897e6d315b6e60",
+    "tokenizer.json": "a5e8c6060bf927ed367314f21355148fdf4acff6fadb94e49c86bc7182449433",
+    "model.q8.gguf": "e56a68900c0b3883a81e66f2506167f2e48ba7bdd3ce36b5195e24009d484dcb",
+    "default-voice.safetensors": "f739e8c4c76ee7f92e7c94a82002748c8cd22e99582ac49f7b9b94cd63786e18",
+    "README.md": "7a07117b9ca587bfef6b439ac810658f9c9eda012aaa87a64e3d249a564ae52c"
+  }
+}

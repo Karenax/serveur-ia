@@ -102,3 +102,7 @@ personnels sont reconditionnés avec `client-qwen/Mettre-A-Jour-Clients.py`, en
 préservant leurs profils et clés. Conserver les distributions précédentes pour
 le retour. La preuve de chaque mise en service doit confirmer les empreintes des
 données et des clés, les processus Qwen et la programmation des sauvegardes.
+
+## Synthèse française Phonon (22 octobre 2026)
+
+Le runtime actif est `toolchain/phonon-server-python` (Python 3.12), isolé de Strata. Reconstruire avec le verrou `dependances/verrous/voix-serveur.requirements.txt`. Télécharger ensuite le checkpoint épinglé avec `maintenance/2026-10-22-phonon/prepare.py --download` dans cet environnement, après acceptation des conditions Hugging Face et connexion. Ses empreintes sont dans `lanceur/phonon-model.json`. La synthèse exige uniquement les fichiers locaux. La procédure et les tests natifs/HTTP sont dans [le rapport de migration](maintenance/2026-10-22-phonon/README.md). Ne pas relancer `activate.py` sur une production déjà migrée.

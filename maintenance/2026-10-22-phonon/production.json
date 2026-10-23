@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "voice": {
+    "enabled": true,
+    "phase": "ready",
+    "ready": true,
+    "engine": "Phonon 0.4.1",
+    "language": "fr",
+    "voice": "default",
+    "device": "cpu",
+    "error": "",
+    "busy": false,
+    "max_text_chars": 600,
+    "max_parallel": 1
+  },
+  "model_processes_preserved": true,
+  "keys_settings_data_backups_preserved": true,
+  "client_rebuild_required": false,
+  "previous_sources": "D:\\Serveur IA\\toolchain\\releases-staging\\phonon-20261022\\previous"
+}

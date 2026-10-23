@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "states": [
+    "enabled",
+    "pending",
+    "disabled",
+    "cancelled",
+    "unknown",
+    "model_unavailable"
+  ],
+  "copy_verified": true,
+  "keyboard_focus": true,
+  "mobile_overflow": false,
+  "posts": [
+    {
+      "enabled": false
+    },
+    {
+      "enabled": true
+    }
+  ],
+  "production_mutations": false,
+  "errors": []
+}

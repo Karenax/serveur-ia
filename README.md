@@ -1,5 +1,7 @@
 # Serveur IA
 
+Le 22 octobre 2026, [Phonon français remplace Pocket TTS côté serveur](maintenance/2026-10-22-phonon/README.md), sans mise à jour du client : streaming CPU, interruption et reprise validés, Qwen conservé.
+
 Projet privé de serveur Qwen local, avec un lanceur web, des clients Windows et Android (téléphone/tablette), et des mesures d'inférence sur deux Tesla P100.
 
 ## Plan et contexte du projet

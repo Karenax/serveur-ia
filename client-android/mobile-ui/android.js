@@ -204,7 +204,7 @@ window.androidBack=()=>{
   return false;
 };
 window.androidFlush=async()=>{
-  try{if(historyBlocked)throw new Error('Enregistrement bloqué : exporter votre travail puis recharger le client.');await uiPersistPreferences();if(historyReady)await flushHistory();return true;}
+  try{window.uiCheckPendingEdits?.();if(historyBlocked)throw new Error('Enregistrement bloqué : exporter votre travail puis recharger le client.');await uiPersistPreferences();if(historyReady)await flushHistory();return true;}
   catch(e){error(e);return false;}
 };
 document.addEventListener('visibilitychange',()=>{

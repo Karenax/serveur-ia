@@ -1,0 +1,33 @@
+{
+  "production_changed": false,
+  "voice": {
+    "enabled": true,
+    "phase": "ready",
+    "ready": true,
+    "engine": "Pocket TTS 3.3.0",
+    "language": "fr",
+    "voice": "Estelle",
+    "device": "cpu",
+    "error": "",
+    "busy": false,
+    "max_text_chars": 600,
+    "max_parallel": 1
+  },
+  "qwen_processes": [
+    {
+      "pid": 1968,
+      "created": 1792649278.657755
+    },
+    {
+      "pid": 16284,
+      "created": 1792649278.5832696
+    }
+  ],
+  "native_runtime": "0.4.1",
+  "devices": [
+    "cpu"
+  ],
+  "french_normalization": "Bonjour Fred.",
+  "french_checkpoint_access": "HTTP 401; authentication and accepted terms required",
+  "native_french_synthesis_tested": false
+}

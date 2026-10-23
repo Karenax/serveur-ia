@@ -610,19 +610,33 @@ def local_key(profile):
     from file_lock import locked
     with locked(settings_path(profile)):return _local_key(profile)
 
+def validate_conversation_drafts(value):
+    if not isinstance(value,dict) or len(value)>256 or any(not isinstance(key,str) or not 1<=len(key)<=128 or any(ord(c)<32 for c in key) or not isinstance(text,str) or len(text)>100000 for key,text in value.items()) or len(json.dumps(value,ensure_ascii=False).encode('utf-8'))>1024*1024:
+        raise ValueError('Brouillons des conversations trop volumineux ou invalides.')
+
+
 def save_preferences(profile,values):
     allowed={'theme':('light','dark','system'),'font':('system','humanist','serif','mono'),
              'text_size':('compact','standard','large','extra'),'thinking_effort':('none','minimal','low','medium','high','xhigh','max','ultra','on')}
-    if not isinstance(values,dict) or set(values)-set(allowed)-{'thinking','thinking_by_model','sidebar_collapsed','corrector_text'}:raise ValueError('Réglages invalides.')
+    if not isinstance(values,dict) or set(values)-set(allowed)-{'thinking','thinking_by_model','sidebar_collapsed','corrector_text','conversation_drafts'}:raise ValueError('Réglages invalides.')
     for name,value in values.items():
         if name in allowed and value not in allowed[name]:raise ValueError('Réglage invalide : '+name)
         if name in ('thinking','sidebar_collapsed') and type(value) is not bool:raise ValueError('Réglage booléen attendu.')
         if name=='corrector_text' and (not isinstance(value,str) or len(value)>100000):raise ValueError('Brouillon du correcteur invalide (100 000 caractères maximum).')
+        if name=='conversation_drafts':validate_conversation_drafts(value)
         if name=='thinking_by_model' and (not isinstance(value,dict) or len(value)>512 or any(not isinstance(model,str) or not model.strip() or len(model)>512 or any(ord(c)<32 for c in model) or not isinstance(effort,str) or effort not in allowed['thinking_effort'] for model,effort in value.items())):raise ValueError('Réflexion par modèle invalide.')
     from file_lock import locked
     path=settings_path(profile)
     with locked(path):
-        settings=client_settings(profile);settings['preferences']={**settings.get('preferences',{}),**values}
+        settings=client_settings(profile)
+        if 'conversation_drafts' in values:
+            drafts={**settings.get('preferences',{}).get('conversation_drafts',{})}
+            for key,text in values['conversation_drafts'].items():
+                if text:drafts[key]=text
+                else:drafts.pop(key,None)
+            validate_conversation_drafts(drafts)
+            values={**values,'conversation_drafts':drafts}
+        settings['preferences']={**settings.get('preferences',{}),**values}
         settings['preferences'].pop('maximum',None)
         history_store.atomic(path,protect(json.dumps(settings)))
     return {'saved':True}
@@ -655,7 +669,7 @@ def install_close_guard(window):
                 if result.get('saved') or window.create_confirmation_dialog(APP_NAME,'Historique non enregistré : '+result.get('message','')+'\nExportez vos conversations pour les conserver. Fermer quand même ?'):
                     state['ready']=True;window.destroy()
                 else:state['pending']=False
-            try:window.evaluate_js("(async()=>{try{await window.voiceFinishForClose?.();const cancelBody=window.generationCancelBody?.()||{};controller?.abort();if(busy)await api('/v1/cancel',cancelBody, {'X-Qwen-Request':requestId});await uiPersistPreferences();await flushHistory();await api('/client/history/flush',{});return {saved:true};}catch(e){return {saved:false,message:e.message};}})()",callback=complete)
+            try:window.evaluate_js("(async()=>{try{await window.voiceFinishForClose?.();window.uiCheckPendingEdits?.();const cancelBody=window.generationCancelBody?.()||{};controller?.abort();if(busy)await api('/v1/cancel',cancelBody, {'X-Qwen-Request':requestId});await uiPersistPreferences();await flushHistory();await api('/client/history/flush',{});return {saved:true};}catch(e){return {saved:false,message:e.message};}})()",callback=complete)
             except Exception as error:complete({'saved':False,'message':str(error)})
         threading.Thread(target=work,daemon=True).start()
         return False

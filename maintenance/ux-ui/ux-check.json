@@ -1,0 +1,8 @@
+{
+  "roots": ["client-qwen", "client-android/mobile-ui", "lanceur/web", "client-android/app/src/main/java", "client-android/app/src/main/res/layout", "client-android/app/src/main/res/values"],
+  "exclude": ["**/node_modules/**", "**/vendor/**", "**/build/**", "**/dist/**", "**/runtime/**", "**/voice/conversation-worker/**", "**/test/**", "**/tests/**", "**/test_*", "**/*_test.*", "**/*.min.js", "**/.chat-syntax.js", "**/translations/test/**", "**/generated/**"],
+  "technicalExempt": ["lanceur/web/**", "client-android/mobile-ui/api.html"],
+  "technicalSections": ["admin", "diagnostic", "debug", "local-api", "api"],
+  "longText": 180,
+  "terminology": {"Save": "Enregistrer", "New project": "Nouveau projet", "Workspace": "Espace de travail"}
+}

@@ -20,6 +20,7 @@ from remote import AccessStore, GATEWAY_PORT, serve_gateway
 from wireguard_access import WireGuardAccess,firewall
 from http_boundary import json_body
 from local_access import LocalUserHTTPServer
+from local_network import LocalNetwork
 
 class Controller:
     def __init__(self, home=HOME, include_legacy=True):
@@ -55,6 +56,7 @@ class Controller:
         self.remote.storage = self.client_storage
         self.wireguard = WireGuardAccess(self.remote,self.home)
         self.gateway = None
+        self.local_network = LocalNetwork(self.remote_backend, self.home)
         self.operations = Operations(self)
         self.hermes = None
         from hermes_fred import configured
@@ -301,6 +303,8 @@ def serve(port=8765, controller=None):
                 return self.respond(200, inventory(controller))
             if path == '/api/devices':
                 return self.respond(200, controller.remote.metadata())
+            if path == '/api/local-network':
+                return self.respond(200, controller.local_network.status())
             if path == '/api/hermes/models':
                 if not hmac.compare_digest(self.headers.get('X-Launcher-Token', ''), token):
                     return self.respond(403, {'error': 'Accès administrateur requis.'})
@@ -379,7 +383,7 @@ def serve(port=8765, controller=None):
                     return self.respond(200, controller.state())
                 except Exception as error:
                     return self.respond(500, {'error': str(error)})
-            if path in ('/', '/app.css', '/app.js','/workspace.js','/interface.css','/interface.js','/maintenance.js','/maintenance.css','/notifications.js','/notifications.css','/voice.js'):
+            if path in ('/', '/app.css', '/app.js','/workspace.js','/interface.css','/interface.js','/maintenance.js','/maintenance.css','/notifications.js','/notifications.css','/voice.js','/local-network.js'):
                 filename = 'index.html' if path == '/' else path[1:]
                 data = (HOME / 'web' / filename).read_bytes()
                 if filename == 'index.html':
@@ -413,6 +417,8 @@ def serve(port=8765, controller=None):
                     path = urlsplit(self.path).path
                     if path == '/api/voice':
                         result=controller.voice.configure(data.get('enabled'))
+                    elif path == '/api/local-network':
+                        result = controller.local_network.configure(data.get('enabled'))
                     elif path == '/api/operations':
                         result = controller.operations.configure(data)
                     elif path == '/api/client-storage':

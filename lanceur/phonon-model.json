@@ -1,0 +1,17 @@
+{
+  "repository": "gradium/phonon-40m-fr",
+  "revision": "b0e916ef8d2a9034902c449d113c3b2d4f081651",
+  "license": "CC-BY-NC-4.0",
+  "runtime": "0.4.1",
+  "language": "fr",
+  "voice": "default",
+  "quant": "q8_0",
+  "threads": 4,
+  "files": {
+    "config.json": {"size": 4634, "git_sha1": "0e6e5d28c65e6617e31d245941a181b3b24b6ca4"},
+    "tokenizer.json": {"size": 277749, "git_sha1": "e2d7bebf27916234f26883ad8e55c5219d0ae148"},
+    "model.q8.gguf": {"size": 74553568, "sha256": "e56a68900c0b3883a81e66f2506167f2e48ba7bdd3ce36b5195e24009d484dcb"},
+    "default-voice.safetensors": {"size": 256136, "sha256": "f739e8c4c76ee7f92e7c94a82002748c8cd22e99582ac49f7b9b94cd63786e18"},
+    "README.md": {"size": 10575, "git_sha1": "68483b69b49d2954900415a7eb95ec50f649f725"}
+  }
+}

@@ -1,0 +1,15 @@
+test_cancel_before_request_never_starts_synthesis (test_phonon_worker.PhononWorkerTests.test_cancel_before_request_never_starts_synthesis) ... ok
+test_cancel_closes_generation_and_next_request_works (test_phonon_worker.PhononWorkerTests.test_cancel_closes_generation_and_next_request_works) ... ok
+test_corrupt_same_size_checkpoint_is_rejected (test_phonon_worker.PhononWorkerTests.test_corrupt_same_size_checkpoint_is_rejected) ... ok
+test_duration_limit_closes_native_stream (test_phonon_worker.PhononWorkerTests.test_duration_limit_closes_native_stream) ... Phonon synthesis error: ValueError
+ok
+test_invalid_samples_close_native_stream (test_phonon_worker.PhononWorkerTests.test_invalid_samples_close_native_stream) ... Phonon synthesis error: ValueError
+ok
+test_invalid_text_does_not_poison_next_turn (test_phonon_worker.PhononWorkerTests.test_invalid_text_does_not_poison_next_turn) ... Phonon synthesis error: ValueError
+ok
+test_pcm_is_mono_little_endian_clipped_and_bounded (test_phonon_worker.PhononWorkerTests.test_pcm_is_mono_little_endian_clipped_and_bounded) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.025s
+
+OK

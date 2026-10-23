@@ -1,6 +1,12 @@
 # Contexte de reprise — serveur Fred
 
-Mise à jour : 21 octobre 2026.
+Mise à jour : 22 octobre 2026.
+
+L’interface **API et réseau → Qwen sur le réseau local** affiche maintenant ces paramètres et permet de les copier, d’activer ou de couper l’accès avec validation administrateur Windows. Le statut vient de la redirection, du pare-feu et de l’écoute réels. Mise en service de la console effectuée en conservant les processus Qwen, clés, données, sauvegardes et réglages Phonon. Douze tests ciblés, trois tests de sécurité et le parcours navigateur simulé passent. La validation Windows du test natif de coupure a été annulée : l’accès reste activé, sans nouvelle tentative d’élévation. Voir [le rapport et ses limites](maintenance/2026-10-22-api-qwen-lan/README.md).
+
+Le 22 octobre, à la demande de l’utilisateur, [Phonon remplace Pocket TTS pour la synthèse vocale serveur](maintenance/2026-10-22-phonon/README.md) : ptts 0.4.1, phonon-40m-fr q8 et voix fournie default, quatre threads CPU, modèle local épinglé et vérifié. Fred a été redémarré sans redémarrer Qwen ; données, clés, réglages et sauvegardes conservés. Synthèse française réelle, annulation, reprise et dialogue Qwen via une passerelle authentifiée temporaire validés. Première tranche TTS 93 ms dans le test natif et 109 ms via HTTP sur une autre phrase, hors génération Qwen. Aucun nouveau client requis. Le jeton Hugging Face utilisé pour le téléchargement doit être révoqué car partagé dans le chat ; la synthèse fonctionne hors ligne. Qualité auditive et interruption avec un microphone humain non évaluées.
+
+Le 22 octobre, à la demande explicite de l’utilisateur, [l’API native Qwen est ouverte sur le réseau local sans authentification](maintenance/2026-10-22-api-qwen-lan/README.md) : adresse OpenAI `http://192.168.1.41:8080/v1`, modèle `qwen3.8-flash-next-iq4-xs`. Redirection Windows persistante de `192.168.1.41:8080` vers `127.0.0.1:8080`, pare-feu limité à `192.168.1.0/24`. Qwen/Fred n’ont pas été redémarrés. Catalogue et vraie réponse streaming sans clé validés depuis le serveur via son adresse LAN ; aucun autre appareil testé. Les transports Fred restent identiques. Script de retrait administrateur dans le rapport.
 
 Windows/serveur **3.5.34** étend la [correction des noms à OpenCode 2](maintenance/2026-10-21-opencode-noms/README.md) : libellés lisibles dans la configuration et le message d’ajout, actualisation des modèles Fred déjà ajoutés, identifiants de requête et options conservés. Le client distant doit mettre Fred à jour, fermer OpenCode, refaire Ajouter à OpenCode 2 puis le rouvrir. Test natif avec OpenCode 2.0.32 ; livraison signée, Qwen et données conservés. Android reste en 1.0.13/code 14.
 

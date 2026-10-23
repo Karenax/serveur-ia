@@ -1,0 +1,17 @@
+test_access_revocation_stops_audio_before_first_frame (test_voice.VoiceHTTPTests.test_access_revocation_stops_audio_before_first_frame) ... ok
+test_busy_is_bounded_and_does_not_queue_unlimited_requests (test_voice.VoiceHTTPTests.test_busy_is_bounded_and_does_not_queue_unlimited_requests) ... ok
+test_disabled_voice_rejects_without_worker (test_voice.VoiceHTTPTests.test_disabled_voice_rejects_without_worker) ... ok
+test_input_limits_and_custom_voice_rejected (test_voice.VoiceHTTPTests.test_input_limits_and_custom_voice_rejected) ... ok
+test_stream_returns_pcm_then_done_and_frees_slot (test_voice.VoiceHTTPTests.test_stream_returns_pcm_then_done_and_frees_slot) ... ok
+test_voice_status_requires_personal_session (test_voice.VoiceHTTPTests.test_voice_status_requires_personal_session) ... ok
+test_cancel_before_submit_and_during_silent_response (test_voice_conversation.VoiceConversationHTTPTests.test_cancel_before_submit_and_during_silent_response) ... ok
+test_cancellation_and_access_are_owner_scoped (test_voice_conversation.VoiceConversationHTTPTests.test_cancellation_and_access_are_owner_scoped) ... ok
+test_invalid_mode_identity_and_tools_cannot_reach_upstream (test_voice_conversation.VoiceConversationHTTPTests.test_invalid_mode_identity_and_tools_cannot_reach_upstream) ... ok
+test_oral_turn_bypasses_broken_hermes_and_disables_thinking (test_voice_conversation.VoiceConversationHTTPTests.test_oral_turn_bypasses_broken_hermes_and_disables_thinking) ... ok
+test_project_context_stays_scoped_to_the_authenticated_owner (test_voice_conversation.VoiceConversationHTTPTests.test_project_context_stays_scoped_to_the_authenticated_owner) ... ok
+test_revocation_stops_silent_response (test_voice_conversation.VoiceConversationHTTPTests.test_revocation_stops_silent_response) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 28.256s
+
+OK

@@ -17,3 +17,10 @@ https://huggingface.co/kyutai/pocket-tts-without-voice-cloning
 https://creativecommons.org/licenses/by/4.0/
 Le serveur utilise la configuration française officielle ; aucun clonage vocal.
 Modification Fred : intégration CPU, commande d'arrêt et transport PCM en mémoire.
+
+Serveur de synthèse remplacé le 22 octobre 2026 : Phonon / ptts 0.4.1, Gradium.
+Runtime MIT OR Apache-2.0 : https://github.com/gradium-ai/xn-ptts
+Modèle phonon-40m-fr, voix fournie default, CC BY-NC 4.0.
+https://huggingface.co/gradium/phonon-40m-fr
+https://creativecommons.org/licenses/by-nc/4.0/
+Pocket TTS décrit ci-dessus est le moteur historique, conservé pour retour arrière.

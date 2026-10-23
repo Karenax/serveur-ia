@@ -17,7 +17,7 @@ class VoiceService:
     def settings(self):return read_json(self.path,{'enabled':False})
     def status(self):
         with self.lock:return {'enabled':self.settings()['enabled'],'phase':self.phase,'ready':self.ready.is_set(),
-            'engine':'Pocket TTS 3.3.0','language':'fr','voice':'Estelle','device':'cpu','error':self.error,
+            'engine':'Phonon 0.4.1','language':'fr','voice':'default','device':'cpu','error':self.error,
             'busy':self.current is not None,'max_text_chars':600,'max_parallel':1}
     def configure(self,enabled):
         if type(enabled) is not bool:raise ValueError('Activation vocale invalide.')
@@ -29,10 +29,10 @@ class VoiceService:
         with self.lock:
             if not self.settings()['enabled']:raise ValueError('La voix est désactivée dans la console.')
             if self.process and self.process.poll() is None:return
-            executable=ROOT/'toolchain/voice-server-python/Scripts/python.exe'
+            executable=ROOT/'toolchain/phonon-server-python/Scripts/python.exe'
             if not executable.exists():raise ValueError('Le moteur vocal serveur n’est pas installé.')
             self.ready.clear();self.phase='loading';self.error=''
-            self.process=subprocess.Popen([str(executable),'-X','utf8',str(ROOT/'lanceur/voice_worker.py')],
+            self.process=subprocess.Popen([str(executable),'-X','utf8',str(ROOT/'lanceur/phonon_worker.py')],
                 stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,
                 text=True,encoding='utf-8',creationflags=HIDDEN)
             self.thread=threading.Thread(target=self._read,args=(self.process,),daemon=True);self.thread.start()

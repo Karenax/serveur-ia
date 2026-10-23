@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "base_url": "http://192.168.1.41:8080/v1",
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "authorization_header_sent": false,
+  "stream_completed": true,
+  "response": "OK",
+  "test_origin": "server using its LAN IPv4 address",
+  "other_device_tested": false
+}

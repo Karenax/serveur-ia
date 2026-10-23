@@ -1,0 +1,166 @@
+[
+  {
+    "name": "chat",
+    "width": 390,
+    "snapshot": "- banner:\n  - button \"Afficher ou masquer la navigation\"\n  - heading \"Conversations\" [level=1]\n  - 'status \"Modèle : test-model\"'\n  - button \"Copier la sélection\" [disabled]: ⧉\n  - button \"Afficher le diagnostic de connexion\": ● Connecté au serveur IA ⌄\n- textbox \"Nom de la conversation\": Conversation\n- group: ···\n- text: Modèle de cette conversation\n- combobox \"Modèle de cette conversation\":\n  - option \"test-model\" [selected]\n- status: Modèle utilisé pour les prochains messages\n- main \"Conversation\":\n  - text: VOTRE ESPACE POUR AVANCER\n  - heading \"Qu’allons-nous préparer ?\" [level=2]\n  - paragraph: Une idée, un document, une question. Commencez simplement, votre assistant s’occupe de la suite.\n  - button \"Préparer un projet\"\n  - button \"Rédiger un texte\"\n  - button \"Explorer un sujet\"\n  - button \"Travailler sur du code\"\n- textbox \"Votre message\":\n  - /placeholder: Posez une question ou décrivez ce que vous voulez faire…\n- button \"Joindre un document\": +\n- status: TXT, Markdown, PDF texte, Word · 2 Mo · Images indisponibles sur ce modèle\n- text: Projet\n- combobox \"Projet de la discussion\":\n  - option \"Sans projet\" [selected]\n  - option \"Sources et notifications\"\n- group \"Réflexion\":\n  - text: Réflexion\n  - radiogroup \"Niveau de réflexion\":\n    - radio \"Sans\" [checked]\n    - text: Sans\n    - radio \"Faible\"\n    - text: Faible\n    - radio \"Moyen\"\n    - text: Moyen\n    - radio \"Élevé\"\n    - text: Élevé\n  - paragraph: Niveau de réflexion pour la prochaine réponse.\n- button \"Installer la dictée\"\n- button \"Envoyer le message\": ↑\n- text: Contexte 0.1 % · 141 / 262 144\n- progressbar \"Utilisation du contexte\"\n- status: Historique enregistré sur le serveur · copie locale chiffrée.\n- group: ⚙Dictée\n- status: Dictée locale · français",
+    "metrics": {
+      "scroll": 390,
+      "overflow": [
+        {
+          "id": "",
+          "tag": "BUTTON",
+          "text": "",
+          "right": 399.84375
+        },
+        {
+          "id": "",
+          "tag": "BUTTON",
+          "text": "",
+          "right": 419.34375
+        }
+      ]
+    }
+  },
+  {
+    "name": "projects",
+    "width": 390,
+    "snapshot": "- banner:\n  - button \"Afficher ou masquer la navigation\"\n  - heading \"Projets\" [level=1]\n  - 'status \"Modèle : test-model\"'\n  - button \"Copier la sélection\" [disabled]: ⧉\n  - button \"Afficher le diagnostic de connexion\": ● Connecté au serveur IA ⌄\n- heading \"Projets\" [level=2]\n- paragraph: Un espace pour vos documents, vos discussions et vos idées.\n- searchbox \"Rechercher un projet\"\n- checkbox \"Archivés\"\n- text: Archivés\n- button \"＋ Nouveau projet\"\n- button \"Actualiser les projets\": ↻\n- button \"Sources et notifications\"\n- paragraph: Sélectionnez un projet pour retrouver votre travail. Ou créez votre premier espace.",
+    "metrics": {
+      "scroll": 390,
+      "overflow": []
+    }
+  },
+  {
+    "name": "corrector",
+    "width": 390,
+    "snapshot": "- banner:\n  - button \"Afficher ou masquer la navigation\"\n  - heading \"Correcteur de français\" [level=1]\n  - 'status \"Modèle : test-model\"'\n  - button \"Copier la sélection\" [disabled]: ⧉\n  - button \"Afficher le diagnostic de connexion\": ● Connecté au serveur IA ⌄\n- heading \"Correcteur de français\" [level=2]\n- paragraph: Écrivez ou collez votre texte, puis choisissez le ton.\n- text: Vos textes restent sur votre serveur\n- region \"Votre texte\":\n  - text: Votre texte\n  - textbox \"Votre texte\":\n    - /placeholder: Collez ici le texte à corriger ou à reformuler…\n  - button \"Corriger\"\n  - button \"Reformuler professionnel\"\n  - button \"Reformuler amical\"\n  - status: Orthographe, grammaire et ponctuation, en conservant le sens de votre texte.\n- region \"Votre texte retravaillé\":\n  - heading \"Votre texte retravaillé\" [level=3]\n  - button \"Copier le texte\" [disabled]\n  - button \"Reprendre ce texte\" [disabled]\n  - paragraph: Le résultat apparaîtra ici. Vous pourrez comparer les deux textes, le copier ou le reprendre.",
+    "metrics": {
+      "scroll": 390,
+      "overflow": []
+    }
+  },
+  {
+    "name": "tasks",
+    "width": 390,
+    "snapshot": "- banner:\n  - button \"Afficher ou masquer la navigation\"\n  - heading \"Tâches\" [level=1]\n  - 'status \"Modèle : test-model\"'\n  - button \"Copier la sélection\" [disabled]: ⧉\n  - button \"Afficher le diagnostic de connexion\": ● Connecté au serveur IA ⌄\n- heading \"Tâches\" [level=2]\n- paragraph: Confiez un travail au serveur. Retrouvez le résultat même après avoir fermé l’application.\n- group: ＋ Nouvelle tâche\n- status\n- navigation \"Filtrer les tâches\":\n  - button \"Toutes\"\n  - button \"En cours\"\n  - button \"Terminées\"\n  - button \"À reprendre\"\n- text: Aucune tâche dans cette rubrique.",
+    "metrics": {
+      "scroll": 390,
+      "overflow": []
+    }
+  },
+  {
+    "name": "notifications",
+    "width": 390,
+    "snapshot": "- banner:\n  - button \"Afficher ou masquer la navigation\"\n  - heading \"Notifications\" [level=1]\n  - 'status \"Modèle : test-model\"'\n  - button \"Copier la sélection\" [disabled]: ⧉\n  - button \"Afficher le diagnostic de connexion\": ● Connecté au serveur IA ⌄\n- heading \"Notifications\" [level=2]\n- paragraph: Vos résultats et alertes sont conservés sur le serveur. Ils sont retrouvés à la reconnexion.\n- button \"Actualiser\"\n- button \"Tout marquer lu\"\n- status: Notifications synchronisées avec le serveur.\n- article:\n  - heading \"Document prêt\" [level=3]\n  - paragraph: Le document peut être recherché et consulté.\n  - text: 22/10/2026 10:28:48 · Non lu\n  - button \"Ouvrir\"\n  - button \"Marquer lu\"\n- group: Préférences de notification\n- button \"Activer les alertes Android\"\n- paragraph: La boîte de notifications reste disponible dans Fred.",
+    "metrics": {
+      "scroll": 390,
+      "overflow": []
+    }
+  },
+  {
+    "name": "access",
+    "width": 390,
+    "snapshot": "- banner:\n  - button \"Afficher ou masquer la navigation\"\n  - heading \"Réglages · Mon accès\" [level=1]\n  - 'status \"Modèle : test-model\"'\n  - button \"Copier la sélection\" [disabled]: ⧉\n  - button \"Afficher le diagnostic de connexion\": ● Connecté au serveur IA ⌄\n- heading \"Réglages\" [level=2]\n- navigation \"Réglages du client\":\n  - button \"Mon accès personnel\"\n  - button \"Connexion au serveur\"\n  - button \"API locale\"\n- heading \"Apparence\" [level=3]\n- text: Thème de l’interface\n- combobox \"Thème de l’interface\":\n  - option \"Clair\" [selected]\n  - option \"Sombre\"\n  - option \"Comme l’appareil\"\n- text: Police des conversations\n- combobox \"Police des conversations\":\n  - option \"Moderne · Android\" [selected]\n  - option \"Classique · Arial\"\n  - option \"Lecture · Georgia\"\n  - option \"Technique · Consolas\"\n- text: Taille du texte\n- combobox \"Taille du texte\":\n  - option \"Compact · 14 px\"\n  - option \"Standard · 15 px\" [selected]\n  - option \"Grand · 17 px\"\n  - option \"Très grand · 19 px\"\n- paragraph: Une réponse claire, agréable à lire.\n- text: Les changements s’appliquent immédiatement aux conversations et au correcteur.\n- status: \"Appliqué : Moderne · Android · Standard · 15 px\"\n- heading \"Mon accès personnel\" [level=2]\n- paragraph: Votre profil connecte cet appareil au serveur Fred.\n- text: Accès personnel · Android\n- heading \"Votre profil\" [level=3]\n- paragraph: Accès personnel\n- button \"Gérer mon accès\"\n- text: Le profil contient votre accès personnel. Conservez-le pour vous. Le serveur peut suspendre ou révoquer cet accès.\n- heading \"Vos conversations\" [level=3]\n- paragraph: Vos conversations sont enregistrées sur le serveur. Une copie locale chiffrée conserve vos changements pendant une coupure et les synchronise à la reconnexion.\n- text: Vous pouvez importer et exporter l’historique. Les fichiers exportés ne sont pas chiffrés.\n- button \"Exporter l’historique\"\n- button \"Importer\"\n- heading \"Mises à jour Android\" [level=3]\n- status: Cliquer sur Vérifier pour rechercher une mise à jour.\n- button \"Rechercher une mise à jour\"\n- paragraph: Fred recherche et télécharge les nouvelles versions pendant son utilisation. Android vous demandera de confirmer l’installation.",
+    "metrics": {
+      "scroll": 390,
+      "overflow": []
+    }
+  },
+  {
+    "name": "connection",
+    "width": 390,
+    "snapshot": "- banner:\n  - button \"Afficher ou masquer la navigation\"\n  - heading \"Réglages · Connexion\" [level=1]\n  - 'status \"Modèle : test-model\"'\n  - button \"Copier la sélection\" [disabled]: ⧉\n  - button \"Afficher le diagnostic de connexion\": ● Connecté au serveur IA ⌄\n- heading \"Réglages\" [level=2]\n- navigation \"Réglages du client\":\n  - button \"Mon accès personnel\"\n  - button \"Connexion au serveur\"\n  - button \"API locale\"\n- heading \"Connexion au serveur\" [level=2]\n- paragraph: Choisissez votre connexion pour cet appareil.\n- text: Mode de connexion\n- combobox \"Mode de connexion\":\n  - option \"Internet · HTTPS\"\n  - option \"Tunnel privé · WireGuard\" [selected]\n- text: HTTPS passe par la connexion Internet sécurisée du serveur. WireGuard utilise le tunnel privé de votre profil. Adresse du serveur\n- textbox \"Adresse du serveur\": 127.0.0.1:55665\n- button \"Appliquer la connexion\"\n- button \"Paramètres de connexion\"\n- status\n- heading \"État de la connexion\" [level=3]\n- status: \"Serveur IA accessible. Mode : WireGuard Adresse : 127.0.0.1:55665\"\n- button \"Réessayer la connexion\"",
+    "metrics": {
+      "scroll": 390,
+      "overflow": []
+    }
+  },
+  {
+    "name": "api",
+    "width": 390,
+    "snapshot": "- banner:\n  - button \"Afficher ou masquer la navigation\"\n  - heading \"Réglages · API locale\" [level=1]\n  - 'status \"Modèle : test-model\"'\n  - button \"Copier la sélection\" [disabled]: ⧉\n  - button \"Afficher le diagnostic de connexion\": ● Connecté au serveur IA ⌄\n- heading \"Réglages\" [level=2]\n- navigation \"Réglages du client\":\n  - button \"Mon accès personnel\"\n  - button \"Connexion au serveur\"\n  - button \"API locale\"\n- heading \"API locale\" [level=2]\n- paragraph: Connectez une autre application de ce téléphone au serveur Fred avec une API compatible OpenAI.\n- text: Adresse API http://127.0.0.1:60642/v1\n- button \"Copier l’adresse\"\n- text: Clé API locale\n- textbox \"Clé API locale\": CLE_FICTIVE_MASQUEE\n- button \"Afficher la clé\"\n- button \"Copier la clé\"\n- paragraph: Dans l’autre application, choisissez une API compatible OpenAI, puis renseignez cette adresse et cette clé.\n- paragraph:\n  - text: \"Embeddings : modèle\"\n  - code: google/embeddinggemma-2\n  - text: \", 768 dimensions, route\"\n  - code: /v1/embeddings\n  - text: . Le calcul est effectué sur le serveur.\n- paragraph: \"Gardez Fred ouvert. Le port et la clé changent quand ce service local redémarre : recopiez-les si nécessaire. Android peut arrêter le service en arrière-plan. L’autre application doit accepter une adresse HTTP locale.\"\n- paragraph: Cette adresse est utilisable sur ce téléphone uniquement. Ne partagez la clé qu’avec les applications auxquelles vous accordez l’accès.",
+    "metrics": {
+      "scroll": 390,
+      "overflow": []
+    }
+  },
+  {
+    "name": "chat",
+    "width": 768,
+    "snapshot": null,
+    "metrics": {
+      "scroll": 768,
+      "overflow": [
+        {
+          "id": "",
+          "tag": "BUTTON",
+          "text": "",
+          "right": 783.34375
+        }
+      ]
+    }
+  },
+  {
+    "name": "projects",
+    "width": 768,
+    "snapshot": null,
+    "metrics": {
+      "scroll": 768,
+      "overflow": []
+    }
+  },
+  {
+    "name": "corrector",
+    "width": 768,
+    "snapshot": null,
+    "metrics": {
+      "scroll": 768,
+      "overflow": []
+    }
+  },
+  {
+    "name": "tasks",
+    "width": 768,
+    "snapshot": null,
+    "metrics": {
+      "scroll": 768,
+      "overflow": []
+    }
+  },
+  {
+    "name": "notifications",
+    "width": 768,
+    "snapshot": null,
+    "metrics": {
+      "scroll": 768,
+      "overflow": []
+    }
+  },
+  {
+    "name": "access",
+    "width": 768,
+    "snapshot": null,
+    "metrics": {
+      "scroll": 768,
+      "overflow": []
+    }
+  },
+  {
+    "name": "connection",
+    "width": 768,
+    "snapshot": null,
+    "metrics": {
+      "scroll": 768,
+      "overflow": []
+    }
+  },
+  {
+    "name": "api",
+    "width": 768,
+    "snapshot": null,
+    "metrics": {
+      "scroll": 768,
+      "overflow": []
+    }
+  }
+]

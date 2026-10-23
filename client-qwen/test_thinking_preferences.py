@@ -67,5 +67,30 @@ class ThinkingPreferences(unittest.TestCase):
                 with self.assertRaises(ValueError): self.save({'thinking_effort': value})
                 self.assertEqual(self.path.read_bytes(), before)
 
+    def test_conversation_draft_patches_preserve_other_windows_and_encryption(self):
+        self.save({'conversation_drafts': {'conversation-a': 'Texte privé A'}})
+        self.save({'conversation_drafts': {'conversation-b': 'Texte privé B'}})
+        self.assertEqual(self.preferences()['conversation_drafts'], {'conversation-a': 'Texte privé A', 'conversation-b': 'Texte privé B'})
+        self.assertNotIn('Texte privé'.encode(), self.path.read_bytes())
+        self.save({'conversation_drafts': {'conversation-a': ''}})
+        self.assertEqual(self.preferences()['conversation_drafts'], {'conversation-b': 'Texte privé B'})
+        self.save({'theme': 'dark'})
+        self.assertEqual(self.preferences()['conversation_drafts'], {'conversation-b': 'Texte privé B'})
+
+    def test_invalid_or_oversized_draft_patch_leaves_saved_work_unchanged(self):
+        self.save({'conversation_drafts': {'kept': 'Travail conservé'}})
+        before = self.path.read_bytes()
+        invalid = [None, [], True, {'': 'texte'}, {'x\n': 'texte'}, {'a': None}, {'a': 'x' * 100001},
+                   {'a' + str(i): 'é' * 100000 for i in range(6)}]
+        for value in invalid:
+            with self.subTest(value_type=type(value).__name__):
+                with self.assertRaises(ValueError): self.save({'conversation_drafts': value})
+                self.assertEqual(self.path.read_bytes(), before)
+        self.save({'conversation_drafts': {'a' + str(i): 'é' * 100000 for i in range(3)}})
+        before = self.path.read_bytes()
+        with self.assertRaises(ValueError):
+            self.save({'conversation_drafts': {'b' + str(i): 'é' * 100000 for i in range(3)}})
+        self.assertEqual(self.path.read_bytes(), before)
+
 
 if __name__ == '__main__': unittest.main()

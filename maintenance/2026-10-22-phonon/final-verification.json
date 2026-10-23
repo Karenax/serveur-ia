@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "engine": "Phonon 0.4.1",
+  "voice_ready": true,
+  "qwen_loaded": true,
+  "qwen_processes_preserved": true,
+  "keys_settings_backups_preserved": true,
+  "all_user_fingerprints_verified_at_activation": true,
+  "later_user_tables_with_changed_fingerprints": [
+    "client_histories"
+  ],
+  "user_row_counts_preserved": true,
+  "later_history_change_cause": "not attributed; observed after activation while clients remained available",
+  "existing_signed_client_release_verified": true,
+  "new_client_required": false,
+  "french_native_validation": true,
+  "authenticated_http_validation": true,
+  "hf_token_required_for_synthesis": false
+}

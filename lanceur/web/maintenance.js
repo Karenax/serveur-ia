@@ -2,6 +2,7 @@
 (()=>{'use strict';
  const node=(tag,text,cls)=>element(tag,text,cls), byId=id=>document.getElementById(id);
  const state={backup:null,maintenance:null,devices:null,configDirty:false,busy:false,loading:false,deviceLoading:false,catalogFingerprint:'',deviceFingerprint:'',preview:null,previewArchive:null,preferRestore:false,lastRestoredJob:''};
+ window.fredMaintenanceDirty=()=>state.configDirty;
  const date=value=>value?new Date(typeof value==='number'?value*1000:value).toLocaleString('fr-FR'):'—';
  const size=value=>Number.isFinite(Number(value))?new Intl.NumberFormat('fr-FR',{maximumFractionDigits:2}).format(Number(value)/1048576)+' Mo':'—';
  const kinds={unknown:'Non renseigné',pc:'PC',phone:'Téléphone',tablet:'Tablette'};

@@ -69,6 +69,7 @@
 !/lanceur/base-strata.json
 !/lanceur/reglages-par-defaut.json
 !/lanceur/derniers-reglages-valides.json
+!/lanceur/phonon-model.json
 /lanceur/apercu-*.jpg
 /lanceur/client-*.png
 **/configuration-active.json

@@ -1,0 +1,9 @@
+{
+  "console_deployed": true,
+  "enabled": true,
+  "available": true,
+  "pending": false,
+  "model_processes_preserved": true,
+  "private_settings_preserved": true,
+  "native_switch_validation": "Windows administrator prompt cancelled; no retry"
+}

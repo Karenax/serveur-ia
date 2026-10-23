@@ -1,0 +1,547 @@
+{
+  "observed": "2026-10-22T10:26:19.128Z",
+  "fixture": true,
+  "live_console_used": false,
+  "full_console_scripts_loaded": true,
+  "checks": [
+    {
+      "name": "Authenticated admin GET, unavailable-provider label and quota/separation notice",
+      "passed": true
+    },
+    {
+      "name": "Initial individual grants and lifecycle restrictions",
+      "passed": true
+    },
+    {
+      "name": "Global checkbox POST and disabled per-account controls",
+      "passed": true
+    },
+    {
+      "name": "Disabling global sharing restores preserved individual grants",
+      "passed": true
+    },
+    {
+      "name": "Per-account grant and removal POST only the individual list",
+      "passed": true
+    },
+    {
+      "name": "Rejected save is visible and re-reads the authoritative grant state",
+      "passed": true
+    },
+    {
+      "name": "Automatic exposure keeps available models checked and hides unavailable models",
+      "passed": true
+    },
+    {
+      "name": "Provider bulk disable exits automatic mode and retains other providers despite search",
+      "passed": true
+    },
+    {
+      "name": "Provider bulk restore exposes its whole group",
+      "passed": true
+    },
+    {
+      "name": "Partial providers are indeterminate; bulk actions ignore search and preserve offline IDs",
+      "passed": true
+    },
+    {
+      "name": "Rejected provider bulk save restores the authoritative group and offline grants",
+      "passed": true
+    },
+    {
+      "name": "Clear all from automatic mode posts an exact empty allowlist and preserves account sharing",
+      "passed": true
+    },
+    {
+      "name": "Clear all from manual mode removes retained offline IDs as well",
+      "passed": true
+    },
+    {
+      "name": "Rejected clear all restores model/provider selection and leaves sharing untouched",
+      "passed": true
+    },
+    {
+      "name": "Explicit exposure writes the model allowlist and preserves sharing grants",
+      "passed": true
+    },
+    {
+      "name": "Large catalogue scrolls in its own panel and search narrows model/provider rows",
+      "passed": true
+    },
+    {
+      "name": "Rejected model exposure is re-read and restores its authoritative checkbox",
+      "passed": true
+    },
+    {
+      "name": "Automatic exposure persists null and explicit refresh requests the native catalogue",
+      "passed": true
+    },
+    {
+      "name": "Native catalogue errors remain visible alongside the administration controls",
+      "passed": true
+    },
+    {
+      "name": "No JavaScript errors and all sharing requests carry admin header",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "source_sha256": {
+    "app.js": "056ab0fd36739aea56df30fa0d50f71d92171617252d4f735c5b5fe0a2398ca9",
+    "app.css": "792f8111d2d69a7d078a17524100e4f961e3cce1817ce9a8b1df58d865e0bba9",
+    "index.html": "ca30a90c7d6934cbcf1040851e958813f9bf4fa3cb45dc25c9ccb37a57f93355"
+  },
+  "sharing_requests": [
+    {
+      "path": "/api/hermes/models",
+      "query": "",
+      "method": "GET",
+      "admin_header_present": true,
+      "fields": []
+    },
+    {
+      "path": "/api/hermes/models/configure",
+      "query": "",
+      "method": "POST",
+      "admin_header_present": true,
+      "fields": [
+        "share_all"
+      ],
+      "share_all": true
+    },
+    {
+      "path": "/api/hermes/models",
+      "query": "",
+      "method": "GET",
+      "admin_header_present": true,
+      "fields": []
+    },
+    {
+      "path": "/api/hermes/models/configure",
+      "query": "",
+      "method": "POST",
+      "admin_header_present": true,
+      "fields": [
+        "share_all"
+      ],
+      "share_all": false
+    },
+    {
+      "path": "/api/hermes/models",
+      "query": "",
+      "method": "GET",
+      "admin_header_present": true,
+      "fields": []
+    },
+    {
+      "path": "/api/hermes/models/configure",
+      "query": "",
+      "method": "POST",
+      "admin_header_present": true,
+      "fields": [
+        "shared_accounts"
+      ],
+      "shared_accounts_count": 2
+    },
+    {
+      "path": "/api/hermes/models",
+      "query": "",
+      "method": "GET",
+      "admin_header_present": true,
+      "fields": []
+    },
+    {
+      "path": "/api/hermes/models/configure",
+      "query": "",
+      "method": "POST",
+      "admin_header_present": true,
+      "fields": [
+        "shared_accounts"
+      ],
+      "shared_accounts_count": 1
+    },
+    {
+      "path": "/api/hermes/models",
+      "query": "",
+      "method": "GET",
+      "admin_header_present": true,
+      "fields": []
+    },
+    {
+      "path": "/api/hermes/models/configure",
+      "query": "",
+      "method": "POST",
+      "admin_header_present": true,
+      "fields": [
+        "share_all"
+      ],
+      "share_all": true
+    },
+    {
+      "path": "/api/hermes/models",
+      "query": "",
+      "method": "GET",
+      "admin_header_present": true,
+      "fields": []
+    },
+    {
+      "path": "/api/hermes/models/configure",
+      "query": "",
+      "method": "POST",
+      "admin_header_present": true,
+      "fields": [
+        "exposed_models"
+      ],
+      "exposed_models": {
+        "count": 40
+      }
+    },
+    {
+      "path": "/api/hermes/models",
+      "query": "",
+      "method": "GET",
+      "admin_header_present": true,
+      "fields": []
+    },
+    {
+      "path": "/api/hermes/models/configure",
+      "query": "",
+      "method": "POST",
+      "admin_header_present": true,
+      "fields": [
+        "exposed_models"
+      ],
+      "exposed_models": {
+        "count": 80
+      }
+    },
+    {
+      "path": "/api/hermes/models",
+      "query": "",
+      "method": "GET",
+      "admin_header_present": true,
+      "fields": []
+    },
+    {
+      "path": "/api/hermes/models",
+      "query": "?refresh=1",
+      "method": "GET",
+      "admin_header_present": true,
+      "fields": []
+    },
+    {
+      "path": "/api/hermes/models/configure",
+      "query": "",
+      "method": "POST",
+      "admin_header_present": true,
+      "fields": [
+        "exposed_models"
+      ],
+      "exposed_models": {
+        "count": 80
+      }
+    },
+    {
+      "path": "/api/hermes/models",
+      "query": "",
+      "method": "GET",
+      "admin_header_present": true,
+      "fields": []
+    },
+    {
+      "path": "/api/hermes/models/configure",
+      "query": "",
+      "method": "POST",
+      "admin_header_present": true,
+      "fields": [
+        "exposed_models"
+      ],
+      "exposed_models": {
+        "count": 81
+      }
+    },
+    {
+      "path": "/api/hermes/models",
+      "query": "",
+      "method": "GET",
+      "admin_header_present": true,
+      "fields": []
+    },
+    {
+      "path": "/api/hermes/models/configure",
+      "query": "",
+      "method": "POST",
+      "admin_header_present": true,
+      "fields": [
+        "exposed_models"
+      ],
+      "exposed_models": {
+        "count": 41
+      }
+    },
+    {
+      "path": "/api/hermes/models",
+      "query": "",
+      "method": "GET",
+      "admin_header_present": true,
+      "fields": []
+    },
+    {
+      "path": "/api/hermes/models/configure",
+      "query": "",
+      "method": "POST",
+      "admin_header_present": true,
+      "fields": [
+        "exposed_models"
+      ],
+      "exposed_models": {
+        "count": 81
+      }
+    },
+    {
+      "path": "/api/hermes/models",
+      "query": "",
+      "method": "GET",
+      "admin_header_present": true,
+      "fields": []
+    },
+    {
+      "path": "/api/hermes/models/configure",
+      "query": "",
+      "method": "POST",
+      "admin_header_present": true,
+      "fields": [
+        "exposed_models"
+      ],
+      "exposed_models": {
+        "count": 41
+      }
+    },
+    {
+      "path": "/api/hermes/models",
+      "query": "",
+      "method": "GET",
+      "admin_header_present": true,
+      "fields": []
+    },
+    {
+      "path": "/api/hermes/models/configure",
+      "query": "",
+      "method": "POST",
+      "admin_header_present": true,
+      "fields": [
+        "exposed_models"
+      ],
+      "exposed_models": null
+    },
+    {
+      "path": "/api/hermes/models",
+      "query": "",
+      "method": "GET",
+      "admin_header_present": true,
+      "fields": []
+    },
+    {
+      "path": "/api/hermes/models/configure",
+      "query": "",
+      "method": "POST",
+      "admin_header_present": true,
+      "fields": [
+        "exposed_models"
+      ],
+      "exposed_models": {
+        "count": 0
+      }
+    },
+    {
+      "path": "/api/hermes/models",
+      "query": "",
+      "method": "GET",
+      "admin_header_present": true,
+      "fields": []
+    },
+    {
+      "path": "/api/hermes/models",
+      "query": "?refresh=1",
+      "method": "GET",
+      "admin_header_present": true,
+      "fields": []
+    },
+    {
+      "path": "/api/hermes/models/configure",
+      "query": "",
+      "method": "POST",
+      "admin_header_present": true,
+      "fields": [
+        "exposed_models"
+      ],
+      "exposed_models": {
+        "count": 0
+      }
+    },
+    {
+      "path": "/api/hermes/models",
+      "query": "",
+      "method": "GET",
+      "admin_header_present": true,
+      "fields": []
+    },
+    {
+      "path": "/api/hermes/models",
+      "query": "?refresh=1",
+      "method": "GET",
+      "admin_header_present": true,
+      "fields": []
+    },
+    {
+      "path": "/api/hermes/models/configure",
+      "query": "",
+      "method": "POST",
+      "admin_header_present": true,
+      "fields": [
+        "exposed_models"
+      ],
+      "exposed_models": {
+        "count": 0
+      }
+    },
+    {
+      "path": "/api/hermes/models",
+      "query": "",
+      "method": "GET",
+      "admin_header_present": true,
+      "fields": []
+    },
+    {
+      "path": "/api/hermes/models",
+      "query": "?refresh=1",
+      "method": "GET",
+      "admin_header_present": true,
+      "fields": []
+    },
+    {
+      "path": "/api/hermes/models/configure",
+      "query": "",
+      "method": "POST",
+      "admin_header_present": true,
+      "fields": [
+        "exposed_models"
+      ],
+      "exposed_models": {
+        "count": 0
+      }
+    },
+    {
+      "path": "/api/hermes/models",
+      "query": "",
+      "method": "GET",
+      "admin_header_present": true,
+      "fields": []
+    },
+    {
+      "path": "/api/hermes/models/configure",
+      "query": "",
+      "method": "POST",
+      "admin_header_present": true,
+      "fields": [
+        "exposed_models"
+      ],
+      "exposed_models": null
+    },
+    {
+      "path": "/api/hermes/models",
+      "query": "",
+      "method": "GET",
+      "admin_header_present": true,
+      "fields": []
+    },
+    {
+      "path": "/api/hermes/models/configure",
+      "query": "",
+      "method": "POST",
+      "admin_header_present": true,
+      "fields": [
+        "exposed_models"
+      ],
+      "exposed_models": {
+        "count": 80
+      }
+    },
+    {
+      "path": "/api/hermes/models",
+      "query": "",
+      "method": "GET",
+      "admin_header_present": true,
+      "fields": []
+    },
+    {
+      "path": "/api/hermes/models/configure",
+      "query": "",
+      "method": "POST",
+      "admin_header_present": true,
+      "fields": [
+        "exposed_models"
+      ],
+      "exposed_models": {
+        "count": 79
+      }
+    },
+    {
+      "path": "/api/hermes/models",
+      "query": "",
+      "method": "GET",
+      "admin_header_present": true,
+      "fields": []
+    },
+    {
+      "path": "/api/hermes/models/configure",
+      "query": "",
+      "method": "POST",
+      "admin_header_present": true,
+      "fields": [
+        "exposed_models"
+      ],
+      "exposed_models": {
+        "count": 78
+      }
+    },
+    {
+      "path": "/api/hermes/models",
+      "query": "",
+      "method": "GET",
+      "admin_header_present": true,
+      "fields": []
+    },
+    {
+      "path": "/api/hermes/models/configure",
+      "query": "",
+      "method": "POST",
+      "admin_header_present": true,
+      "fields": [
+        "exposed_models"
+      ],
+      "exposed_models": null
+    },
+    {
+      "path": "/api/hermes/models",
+      "query": "",
+      "method": "GET",
+      "admin_header_present": true,
+      "fields": []
+    },
+    {
+      "path": "/api/hermes/models",
+      "query": "?refresh=1",
+      "method": "GET",
+      "admin_header_present": true,
+      "fields": []
+    },
+    {
+      "path": "/api/hermes/models",
+      "query": "?refresh=1",
+      "method": "GET",
+      "admin_header_present": true,
+      "fields": []
+    }
+  ]
+}
