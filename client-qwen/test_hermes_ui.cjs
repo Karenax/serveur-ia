@@ -2,7 +2,7 @@
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http'),vm=require('node:vm');
 const root=__dirname,read=name=>fs.readFileSync(path.join(root,name),'utf8');
-const config={key:'windows-hermes-test-key',model:'Fred-test',version:'Windows-test',storage:'hermes-ui-test'};
+const config={key:'windows-hermes-test-key',model:'Kiara-test',version:'Windows-test',storage:'hermes-ui-test'};
 const script=name=>'<script nonce="test">'+read(name).replaceAll('</script','<\\/script')+'</script>';
 const html=read('chat.html').replace('__UI_CSS__',read('ui.css')).replace('__CONFIG__',JSON.stringify(config)).replaceAll('__NONCE__','test')
   .replace('</head>',()=>script('vendor/markdown-it.min.js')+script('markdown.js')+'</head>')
@@ -19,7 +19,7 @@ async function main(){
     if(req.url==='/'){res.writeHead(200,{'Content-Type':'text/html; charset=utf-8'});res.end(html);return;}
     state.requests.push({path:req.url,body,requestId:req.headers['x-qwen-request']});
     if(req.headers.authorization!=='Bearer '+config.key)return json(res,{error:{message:'Unauthorized'}},401);
-    if(req.url==='/client/state')return json(res,{version:'test',preferences:state.preferences,update:{message:'À jour',available:false,busy:false},endpoint:'https://example.test',internet_endpoint:'example.test:51820',local_api:'http://127.0.0.1/v1',key:config.key,connection:{connected:true,model:'Fred-test',transport:'https',endpoint:'https://example.test',checked_at:Date.now()/1000}});
+    if(req.url==='/client/state')return json(res,{version:'test',preferences:state.preferences,update:{message:'À jour',available:false,busy:false},endpoint:'https://example.test',internet_endpoint:'example.test:51820',local_api:'http://127.0.0.1/v1',key:config.key,connection:{connected:true,model:'Kiara-test',transport:'https',endpoint:'https://example.test',checked_at:Date.now()/1000}});
     if(req.url==='/client/history'&&req.method==='GET')return json(res,{history:state.history,revision:state.revision});
     if(req.url==='/client/history/sync'){state.history=state.history||body.initial;return json(res,{history:state.history,revision:state.revision,message:'Synchronisé'});}
     if(req.url==='/client/history'){state.history=body.history;state.revision=String(Number(state.revision)+1);return json(res,{saved:true,revision:state.revision});}
@@ -27,7 +27,7 @@ async function main(){
     if(req.url==='/client/integrations')return json(res,{apps:[]});
     if(req.url==='/client/draft')return json(res,{draft:null});
     if(req.url==='/client/voice'||req.url==='/client/conversation')return json(res,{phase:'idle',installed:false});
-    if(req.url==='/v1/models')return json(res,{data:[{id:'Fred-test',capabilities:{images:false,thinking:true,reasoning_efforts:['none','low','medium','high']}}]});
+    if(req.url==='/v1/models')return json(res,{data:[{id:'Kiara-test',capabilities:{images:false,thinking:true,reasoning_efforts:['none','low','medium','high']}}]});
     if(req.url==='/v1/status')return json(res,{protocol:4,version:'test'});
     if(req.url==='/v1/workspace')return json(res,{projects:[],jobs:[]});
     if(req.url==='/v1/notifications')return json(res,{items:[],unread:0});
@@ -76,7 +76,7 @@ async function main(){
     assert((await page.textContent('#agent-history-recovery')).includes('30 jours'));
     assert.equal(state.history.conversations.find(c=>c.id===state.history.currentId).messages.length,1,'The valid saved history must retain the user and keep the overflowing answer separately');
     const download=page.waitForEvent('download');await page.click('#agent-history-recovery button');
-    const exported=await download;assert(exported.suggestedFilename().startsWith('reponse-fred-'));assert.equal(fs.readFileSync(await exported.path(),'utf8'),'Voici uniquement la réponse finale.');
+    const exported=await download;assert(exported.suggestedFilename().startsWith('reponse-kiara-'));assert.equal(fs.readFileSync(await exported.path(),'utf8'),'Voici uniquement la réponse finale.');
     await page.reload();await page.waitForSelector('#agent-history-recovery:not([hidden])');assert.equal(await page.locator('.message.assistant').count(),0);assert.deepEqual(errors,[]);
     console.log('Windows Hermes UI verified: final-only voice, stable turns, opaque approvals across heartbeat/disconnect/reload, once/refusal, corrector and shared scripts.');
     await page.close();

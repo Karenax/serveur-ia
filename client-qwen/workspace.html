@@ -49,7 +49,7 @@ function wsChatSelections(){if(!ws.data)return;const c=wsCurrent();wsOptions($('
 for(const id of ['ws-chat-project','ws-chat-document'])$(id).onchange=()=>wsTry(async()=>{if(conversationLocked())return;const c=wsCurrent();if(id==='ws-chat-project'){const target=$('ws-chat-project').value||null;wsChatSelections();await wsMoveConversation(c.id,target);return;}c.document_id=$('ws-chat-document').value||null;save();wsChatSelections();});
 $('ws-publish').onclick=()=>wsTry(()=>wsConversationAction(async()=>{const c=wsCurrent();if(!c.project_id)throw new Error('Choisissez un projet pour enregistrer la discussion sur le serveur.');const r=await wsAction('conversation_save',{id:c.id.replaceAll('-',''),project:c.project_id,title:c.title,messages:c.messages,archived:Boolean(c.archived),revision:c.server_revision||0});c.server_revision=r.revision;}));
 $('ws-panel').onclick=()=>wsTry(async()=>{const c=wsCurrent();if(!c.document_id)return;const d=await wsAction('document_get',{id:c.document_id});$('ws-side-title').textContent=d.title;$('ws-side-text').textContent=d.text;$('ws-side').hidden=false;});$('ws-side-close').onclick=()=>$('ws-side').hidden=true;
-async function wsRefresh(){if(ws.polling)return;ws.polling=true;try{const data=await api('/v1/workspace');ws.data=data;wsChatSelections();wsDrawProjects();wsDrawJobs();wsOptions($('ws-task-project'),data.projects.filter(p=>!p.archived));if(ws.project&&!ws.projectDirty)wsFillProject();if(!ws.initialized){ws.seen=new Set(data.jobs.filter(j=>j.state==='completed').map(j=>j.id));ws.initialized=true;}else{const incoming=data.jobs.filter(j=>j.state==='completed'&&!ws.seen.has(j.id));if(incoming.length){$('ws-task-notice').textContent=incoming.length+(incoming.length===1?' nouveau résultat disponible.':' nouveaux résultats disponibles.');const b=document.querySelector('[data-view-button="tasks"]');b.textContent='Tâches · résultats disponibles';for(const j of incoming)ws.seen.add(j.id);}}}finally{ws.polling=false;}}
+async function wsRefresh(){if(ws.polling)return;ws.polling=true;try{const data=await api('/v1/workspace'),unchanged=JSON.stringify(data)===JSON.stringify(ws.data);ws.data=data;if(unchanged)return;wsChatSelections();wsDrawProjects();wsDrawJobs();wsOptions($('ws-task-project'),data.projects.filter(p=>!p.archived));if(ws.project&&!ws.projectDirty)wsFillProject();if(!ws.initialized){ws.seen=new Set(data.jobs.filter(j=>j.state==='completed').map(j=>j.id));ws.initialized=true;}else{const incoming=data.jobs.filter(j=>j.state==='completed'&&!ws.seen.has(j.id));if(incoming.length){$('ws-task-notice').textContent=incoming.length+(incoming.length===1?' nouveau résultat disponible.':' nouveaux résultats disponibles.');const b=document.querySelector('[data-view-button="tasks"]');b.textContent='Tâches · résultats disponibles';for(const j of incoming)ws.seen.add(j.id);}}}finally{ws.polling=false;}}
 const wsRefreshOnce=wsRefresh;wsRefresh=function(){if(ws.refreshPending)return ws.refreshPending;ws.refreshPending=wsRefreshOnce().finally(()=>ws.refreshPending=null);return ws.refreshPending;};
 function wsDrawProjects(){const query=$('ws-project-search').value.toLocaleLowerCase(),all=ws.data?.projects||[];const list=all.filter(p=>(!p.archived||$('ws-archived').checked)&&(p.title+' '+p.instructions).toLocaleLowerCase().includes(query));$('ws-project-list').replaceChildren(...list.map(p=>{const b=wsButton(p.title+(p.archived?' · archivé':''),()=>wsSelectProject(p.id));b.classList.toggle('selected',p.id===ws.project);return b;}));if(!list.length)$('ws-project-list').append(wsElement('p','Aucun projet correspondant.','muted'));}
 async function wsSelectProject(id){if(id!==ws.project&&uiMemoryEditsPending())throw new Error('Enregistrez les mémoires modifiées avant de changer de projet.');await wsFlush();if(ws.projectDirty)throw new Error('Enregistrez les consignes du projet avant de changer de projet.');ws.project=id;ws.document=null;ws.dirty=false;ws.conflict=false;$('ws-document-editor').hidden=true;$('ws-proposal').hidden=true;wsFillProject();wsDrawProjects();}
@@ -303,7 +303,8 @@ document.querySelector('.workspace').append(fredInboxPane);
 const fredInboxNav=wsElement('button','Notifications','nav-button');fredInboxNav.dataset.viewButton='notifications';fredInboxNav.onclick=()=>showView('notifications');const fredInboxAnchor=document.querySelector('[data-view-button="access"]');$('client-navigation').insertBefore(fredInboxNav,fredInboxAnchor?.parentNode===$('client-navigation')?fredInboxAnchor:null);
 for(const [key,label] of Object.entries(fredNotificationTypes)){const line=wsElement('label');const box=wsElement('input');box.type='checkbox';box.dataset.notificationType=key;box.checked=true;line.append(box,document.createTextNode(' '+label));$('fred-inbox-types').append(line);}
 function fredAndroidInbox(payload){if(typeof window.androidInboxChanged==='function')window.androidInboxChanged(payload);}
-function fredInboxDraw(){const rows=[...fredInbox.items.values()].sort((a,b)=>b.sequence-a.sequence);$('fred-inbox-list').replaceChildren();for(const item of rows){const card=wsElement('article',undefined,'ws-card fred-notification'+(item.read_at?'':' unread'));card.dataset.notificationId=item.id;card.append(wsElement('h3',item.title||'Notification'),wsElement('p',item.body||''),wsElement('small',new Date(item.created*1000).toLocaleString()+(item.read_at?' · Lu':' · Non lu'),'muted'));card.append(wsButton('Ouvrir',()=>window.fredOpenNotificationById(item.id)));if(!item.read_at)card.append(wsButton('Marquer lu',()=>fredInboxRead([item.id])));$('fred-inbox-list').append(card);}if(!rows.length)$('fred-inbox-list').append(wsElement('p','Aucune notification pour le moment.'));const unread=rows.filter(x=>!x.read_at).length;fredInboxNav.dataset.unreadCount=String(unread);fredInboxNav.textContent='Notifications'+(unread?' · '+unread:'');if(typeof uiDecorateNavigation==='function')uiDecorateNavigation();if(fredInbox.preferences&&!fredInbox.dirty){for(const box of $('fred-inbox-types').querySelectorAll('input'))box.checked=fredInbox.preferences.types[box.dataset.notificationType]!==false;$('fred-inbox-discreet').checked=fredInbox.preferences.discreet!==false;}}
+let fredInboxDrawSignature='';
+function fredInboxDraw(){const signature=JSON.stringify([[...fredInbox.items.values()],fredInbox.preferences,fredInbox.dirty]);if(signature===fredInboxDrawSignature)return;fredInboxDrawSignature=signature;const rows=[...fredInbox.items.values()].sort((a,b)=>b.sequence-a.sequence);$('fred-inbox-list').replaceChildren();for(const item of rows){const card=wsElement('article',undefined,'ws-card fred-notification'+(item.read_at?'':' unread'));card.dataset.notificationId=item.id;card.append(wsElement('h3',item.title||'Notification'),wsElement('p',item.body||''),wsElement('small',new Date(item.created*1000).toLocaleString()+(item.read_at?' · Lu':' · Non lu'),'muted'));card.append(wsButton('Ouvrir',()=>window.fredOpenNotificationById(item.id)));if(!item.read_at)card.append(wsButton('Marquer lu',()=>fredInboxRead([item.id])));$('fred-inbox-list').append(card);}if(!rows.length)$('fred-inbox-list').append(wsElement('p','Aucune notification pour le moment.'));const unread=rows.filter(x=>!x.read_at).length;fredInboxNav.dataset.unreadCount=String(unread);if(typeof uiDecorateNavigation==='function')uiDecorateNavigation();else fredInboxNav.textContent='Notifications'+(unread?' · '+unread:'');if(fredInbox.preferences&&!fredInbox.dirty){for(const box of $('fred-inbox-types').querySelectorAll('input'))box.checked=fredInbox.preferences.types[box.dataset.notificationType]!==false;$('fred-inbox-discreet').checked=fredInbox.preferences.discreet!==false;}}
 async function fredInboxRead(ids){for(let i=0;i<ids.length;i+=100)await api('/v1/notifications/action',{action:'read',ids:ids.slice(i,i+100)});await fredInboxLoad();}
 async function fredInboxLoad(){if(fredInbox.busy)return;fredInbox.busy=true;try{let payload=await api('/v1/notifications/action',{action:'list',after:fredInbox.cursor,limit:100});if(fredInbox.generation&&fredInbox.generation!==payload.generation){fredInbox.items.clear();fredInbox.cursor=0;fredInbox.loaded=false;fredAndroidInbox({reset:true,generation:payload.generation,items:[]});payload=await api('/v1/notifications/action',{action:'list',after:0,limit:100});}const newlyDelivered=[];for(let page=0;page<11;page++){if(fredInbox.generation&&fredInbox.generation!==payload.generation){fredInbox.items.clear();fredInbox.cursor=0;fredInbox.loaded=false;newlyDelivered.length=0;fredAndroidInbox({reset:true,generation:payload.generation,items:[]});payload=await api('/v1/notifications/action',{action:'list',after:0,limit:100});}fredInbox.generation=payload.generation;fredInbox.preferences=payload.preferences;for(const item of payload.items||[]){if(!fredInbox.items.has(item.id))newlyDelivered.push(item.id);fredInbox.items.set(item.id,item);}if(Array.isArray(payload.retained_ids)){const retained=new Set(payload.retained_ids);for(const id of fredInbox.items.keys())if(!retained.has(id))fredInbox.items.delete(id);}const read=new Set(payload.read_ids||[]);for(const item of fredInbox.items.values()){if(read.has(item.id))item.read_at=item.read_at||Date.now()/1000;item.enabled=payload.preferences.types[item.type]!==false&&payload.subscription.enabled!==false;}fredInbox.cursor=payload.cursor;fredAndroidInbox({...payload,items:[...fredInbox.items.values()]});if(!payload.has_more)break;payload=await api('/v1/notifications/action',{action:'list',after:fredInbox.cursor,limit:100});}if(fredInbox.items.size>1000){const oldest=[...fredInbox.items.values()].sort((a,b)=>a.sequence-b.sequence);for(const item of oldest.slice(0,oldest.length-1000))fredInbox.items.delete(item.id);}fredInboxDraw();fredInbox.loaded=true;$('fred-inbox-status').textContent='Notifications synchronisées avec le serveur.';const retainedDelivered=newlyDelivered.filter(id=>fredInbox.items.has(id));for(let i=0;i<retainedDelivered.length;i+=100){try{await api('/v1/notifications/action',{action:'delivered',ids:retainedDelivered.slice(i,i+100)});}catch(e){if(e.status===401)throw e;/* A receipt may expire between list and acknowledgement. The authenticated inbox stays usable. */}}}catch(e){if(e.status===401||e.status===403){fredInbox.items.clear();fredInbox.cursor=0;fredInbox.loaded=false;fredInboxDraw();fredAndroidInbox({access_revoked:true,items:[]});}$('fred-inbox-status').textContent=e.status===404?'Le serveur ne propose pas encore les notifications.':('Actualisation indisponible : '+e.message);}finally{fredInbox.busy=false;}}
 window.fredOpenNotification=async target=>{if(target?.kind==='job'){await wsRefresh();showView('tasks');await wsOpenJob(target.id);}else if(target?.kind==='document'){await wsFlush();await wsSelectProject(target.project);await wsOpenDocument(target.id);showView('projects');}else{showView('notifications');await fredInboxLoad();}};
@@ -313,5 +314,134 @@ $('fred-inbox-refresh').onclick=()=>fredInboxLoad();$('fred-inbox-read-all').onc
 $('fred-inbox-preferences').oninput=()=>fredInbox.dirty=true;
 $('fred-inbox-preferences').onsubmit=e=>{e.preventDefault();wsTry(async()=>{if(!fredInbox.preferences)throw new Error('Reconnectez-vous pour enregistrer vos préférences.');const types={};for(const box of $('fred-inbox-types').querySelectorAll('input'))types[box.dataset.notificationType]=box.checked;try{await api('/v1/notifications/action',{action:'preferences',revision:fredInbox.preferences.revision,types,discreet:$('fred-inbox-discreet').checked});fredInbox.dirty=false;await fredInboxLoad();}catch(e){if(e.status===409){await fredInboxLoad();throw new Error('Les préférences ont changé sur un autre client. Vos choix restent visibles ; cliquez de nouveau pour les enregistrer.');}throw e;}});};
 clientReady.then(()=>fredInboxLoad());setInterval(()=>{if(!document.hidden)fredInboxLoad();},15000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)fredInboxLoad();});
+
+// Personal assistant controls share the same transactional service as chat and voice.
+const kiaraAssistant={data:null,project:null,pending:new Map(),busy:false};
+const assistantPane=wsElement('section',undefined,'settings-view');
+assistantPane.dataset.view='assistant';assistantPane.hidden=true;
+assistantPane.innerHTML=`<h2>Mémoire et rappels</h2>
+<label for="assistant-project">Espace</label><select id="assistant-project"><option value="">Personnel</option></select>
+<button id="assistant-refresh" type="button" class="secondary">Actualiser</button>
+<p id="assistant-status" role="status" aria-live="polite"></p>
+<section aria-labelledby="assistant-memory-title"><h3 id="assistant-memory-title">Souvenirs</h3>
+<div id="assistant-memories"></div><details id="assistant-legacy" hidden><summary>Anciens souvenirs Hermes à examiner</summary><p class="muted">Les fichiers d’origine sont conservés. Copiez les informations que vous souhaitez retenir dans le formulaire ci-dessous.</p><div id="assistant-legacy-text"></div></details>
+<details id="assistant-memory-add"><summary>Ajouter ou modifier un souvenir</summary><form id="assistant-memory-form"><label for="assistant-memory-text">Information à retenir</label>
+<textarea id="assistant-memory-text" maxlength="2000" rows="3" required></textarea>
+<label for="assistant-memory-category">Type</label><select id="assistant-memory-category"><option value="information">Information</option><option value="preference">Préférence</option><option value="decision">Décision confirmée</option></select>
+<label><input id="assistant-memory-global" type="checkbox"> Appliquer cette préférence à tous mes projets</label>
+<button type="submit" class="secondary">Enregistrer le souvenir</button><button id="assistant-memory-reset" type="button" class="secondary" hidden>Annuler la modification</button></form></details></section>
+<section aria-labelledby="assistant-reminder-title"><h3 id="assistant-reminder-title">Rappels et comptes rendus</h3>
+<p class="muted">Les rappels restent disponibles à la reconnexion. Les alertes arrivent lorsque ce client est connecté.</p>
+<div id="assistant-background-controls" hidden><label><input id="assistant-background" type="checkbox"> Relever les alertes même lorsque Kiara est fermée</label><p class="muted">Android programme les relevés selon le réseau et la batterie, avec un intervalle minimal de 15 minutes. Une heure précise n’est pas garantie.</p></div>
+<div id="assistant-reminders"></div>
+<details id="assistant-reminder-add"><summary>Nouveau rappel ou compte rendu</summary><form id="assistant-reminder-form"><label for="assistant-reminder-text">À rappeler ou à préparer</label>
+<textarea id="assistant-reminder-text" maxlength="2000" rows="2" required></textarea>
+<label for="assistant-reminder-at">Date et heure</label><input id="assistant-reminder-at" type="datetime-local" required>
+<label for="assistant-reminder-timezone">Fuseau horaire</label><input id="assistant-reminder-timezone" value="Europe/Paris" maxlength="80" required>
+<label for="assistant-reminder-repeat">Répétition</label><select id="assistant-reminder-repeat"><option value="none">Une fois</option><option value="daily">Chaque jour</option><option value="weekdays">Du lundi au vendredi</option><option value="weekly">Chaque semaine</option></select>
+<label for="assistant-reminder-kind">Action</label><select id="assistant-reminder-kind"><option value="reminder">Me rappeler</option><option value="analysis">Préparer un compte rendu du projet</option></select>
+<button type="submit" class="secondary">Enregistrer la programmation</button><button id="assistant-reminder-reset" type="button" class="secondary" hidden>Annuler la modification</button></form></details></section>
+<section aria-labelledby="assistant-brief-title"><h3 id="assistant-brief-title">Bilan du projet</h3>
+<button id="assistant-brief-refresh" type="button" class="secondary">Faire le point</button>
+<button id="assistant-brief-generate" type="button" class="secondary">Préparer une synthèse</button>
+<label class="voice-check"><input id="assistant-brief-auto" type="checkbox"> Actualiser la synthèse après les changements du projet</label>
+<p id="assistant-brief-state" role="status" aria-live="polite"></p><div id="assistant-brief-narrative" class="markdown"></div><div id="assistant-brief"></div></section>`;
+document.querySelector('.workspace').append(assistantPane);
+for(const field of assistantPane.querySelectorAll('input:not([type="checkbox"]),textarea,select'))field.classList.add('ws-field');
+const assistantNav=wsElement('button','Mémoire et rappels','nav-button');assistantNav.dataset.viewButton='assistant';
+$('client-navigation').append(assistantNav);assistantNav.onclick=()=>showView('assistant');
+const assistantShowView=showView;
+showView=function(name){assistantShowView(name);if(name==='assistant'){$('workspace-heading').textContent='Mémoire et rappels';assistantTry(()=>assistantLoad());}};
+function assistantScope(){return $('assistant-project').value||null;}
+async function assistantCommand(operation,values={}){
+  const body={action:'assistant',operation,project:assistantScope(),...values};
+  const signature=JSON.stringify(body);
+  if(!kiaraAssistant.pending.has(signature))kiaraAssistant.pending.set(signature,crypto.randomUUID().replaceAll('-',''));
+  body.request_key=kiaraAssistant.pending.get(signature);
+  const result=await api('/v1/workspace/action',body);
+  kiaraAssistant.pending.delete(signature);return result;
+}
+async function assistantTry(action){
+  if(kiaraAssistant.busy)return;kiaraAssistant.busy=true;
+  const scope=$('assistant-project');scope.disabled=true;
+  assistantPane.setAttribute('aria-busy','true');
+  for(const b of assistantPane.querySelectorAll('button'))b.disabled=true;
+  try{await action();}catch(e){$('assistant-status').textContent=e.status===404?'Cette fonction nécessite la mise à jour du serveur.':e.message;}
+  finally{kiaraAssistant.busy=false;scope.disabled=false;assistantPane.removeAttribute('aria-busy');for(const b of assistantPane.querySelectorAll('button'))b.disabled=false;for(const id of ['assistant-brief-refresh','assistant-brief-generate','assistant-brief-auto'])$(id).disabled=!assistantScope();}
+}
+function assistantDate(value,timezone){return new Intl.DateTimeFormat('fr-FR',{dateStyle:'medium',timeStyle:'short',timeZone:timezone}).format(new Date(value*1000));}
+function assistantLocalInput(value,timezone){
+  const fields=Object.fromEntries(new Intl.DateTimeFormat('sv-SE',{timeZone:timezone,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(value*1000)).map(p=>[p.type,p.value]));
+  return `${fields.year}-${fields.month}-${fields.day}T${fields.hour}:${fields.minute}`;
+}
+function assistantRow(parent,text,actions=[]){
+  const row=wsElement('div',undefined,'assistant-item'),content=wsElement('p',text);row.append(content);
+  if(actions.length){const tools=wsElement('div',undefined,'assistant-item-actions');for(const [title,run] of actions){const b=wsElement('button',title,'secondary');b.type='button';b.onclick=()=>assistantTry(run);tools.append(b);}row.append(tools);}
+  parent.append(row);return row;
+}
+function assistantMemoryReset(){delete kiaraAssistant.memory;$('assistant-memory-form').reset();$('assistant-memory-reset').hidden=true;assistantMemoryScope();}
+function assistantMemoryScope(){const field=$('assistant-memory-global');field.disabled=!!assistantScope()||$('assistant-memory-category').value!=='preference';if(field.disabled)field.checked=false;}
+$('assistant-memory-category').onchange=assistantMemoryScope;
+function assistantReminderReset(){delete kiaraAssistant.reminder;$('assistant-reminder-form').reset();$('assistant-reminder-reset').hidden=true;}
+function assistantDraw(){
+  assistantMemoryScope();
+  const data=kiaraAssistant.data,memory=$('assistant-memories'),reminders=$('assistant-reminders');memory.replaceChildren();reminders.replaceChildren();
+  if(!data.memories.length)memory.append(wsElement('p','Aucun souvenir dans cet espace.'));
+  const legacy=$('assistant-legacy-text');legacy.replaceChildren();$('assistant-legacy').hidden=!data.legacy_memories?.length;
+  for(const m of data.legacy_memories||[]){legacy.append(wsElement('h4',m.name));assistantRow(legacy,m.text);}
+  for(const m of data.memories)assistantRow(memory,m.text+(m.global?' · Tous mes projets':''),[['Modifier',async()=>{kiaraAssistant.memory=m;$('assistant-memory-add').open=true;$('assistant-memory-text').value=m.text;$('assistant-memory-category').value=m.category;$('assistant-memory-global').checked=m.global===true;assistantMemoryScope();$('assistant-memory-reset').hidden=false;$('assistant-memory-text').focus();}],['Oublier',async()=>{const r=await assistantCommand('memory_forget',{id:m.id,revision:m.revision});await assistantLoad(false);$('assistant-status').textContent=r.message;$('assistant-refresh').focus();}]]);
+  const upcoming=data.reminders.filter(r=>r.state==='scheduled');
+  if(!upcoming.length)reminders.append(wsElement('p','Aucun rappel à venir dans cet espace.'));
+  for(const r of upcoming)assistantRow(reminders,r.text+' · '+assistantDate(r.due,r.timezone)+' ('+r.timezone+')'+(r.repeat==='none'?'':' · '+({daily:'Chaque jour',weekly:'Chaque semaine',weekdays:'Du lundi au vendredi'})[r.repeat]),[
+    ['Modifier',async()=>{kiaraAssistant.reminder=r;$('assistant-reminder-add').open=true;$('assistant-reminder-text').value=r.text;$('assistant-reminder-at').value=assistantLocalInput(r.due,r.timezone);$('assistant-reminder-timezone').value=r.timezone;$('assistant-reminder-repeat').value=r.repeat;$('assistant-reminder-kind').value=r.kind;$('assistant-reminder-reset').hidden=false;$('assistant-reminder-text').focus();}],
+    ['Annuler ce rappel',async()=>{const result=await assistantCommand('reminder_cancel',{id:r.id,revision:r.revision});await assistantLoad(false);$('assistant-status').textContent=result.message;$('assistant-refresh').focus();}]]);
+  $('assistant-brief-refresh').disabled=!assistantScope();
+  for(const id of ['assistant-brief-generate','assistant-brief-auto'])$(id).disabled=!assistantScope();
+  if(!assistantScope())$('assistant-brief').textContent='Choisissez un projet pour faire le point.';
+}
+async function assistantLoad(refreshProjects=true){
+  const selected=assistantScope();$('assistant-status').textContent='Actualisation…';
+  if(refreshProjects){const data=await api('/v1/workspace');wsOptions($('assistant-project'),data.projects.filter(p=>!p.archived),'Personnel');$('assistant-project').value=selected||'';}
+  const project=assistantScope(),data=await assistantCommand('list');
+  if(project!==assistantScope())return;
+  kiaraAssistant.data=data;assistantDraw();if(project)await assistantBrief();$('assistant-status').textContent='À jour.';
+  if(window.AndroidClient?.backgroundNotificationStatus){$('assistant-background-controls').hidden=false;const result=JSON.parse(AndroidClient.backgroundNotificationStatus());if(result.error)throw new Error(result.error);$('assistant-background').checked=result.enabled===true;}
+}
+$('assistant-background').onchange=()=>assistantTry(async()=>{const result=JSON.parse(AndroidClient.setBackgroundNotifications($('assistant-background').checked));if(result.error)throw new Error(result.error);$('assistant-status').textContent=result.enabled?'Relevés Android activés. Autorisez aussi les notifications système.':'Relevés Android désactivés.';});
+$('assistant-refresh').onclick=()=>assistantTry(()=>assistantLoad());
+$('assistant-project').onchange=()=>{assistantMemoryReset();assistantReminderReset();$('assistant-brief').replaceChildren();$('assistant-brief-narrative').replaceChildren();$('assistant-brief-state').textContent='';$('assistant-brief-auto').checked=false;delete kiaraAssistant.briefPending;assistantTry(()=>assistantLoad(false));};
+$('assistant-memory-reset').onclick=assistantMemoryReset;$('assistant-reminder-reset').onclick=assistantReminderReset;
+$('assistant-memory-form').onsubmit=e=>{e.preventDefault();assistantTry(async()=>{
+  const m=kiaraAssistant.memory,result=await assistantCommand(m?'memory_update':'memory_add',{text:$('assistant-memory-text').value,category:$('assistant-memory-category').value,scope:$('assistant-memory-global').checked?'global':'current',...(m?{id:m.id,revision:m.revision}:{})});
+  assistantMemoryReset();await assistantLoad(false);$('assistant-status').textContent=result.message;$('assistant-memory-text').focus();
+});};
+$('assistant-reminder-form').onsubmit=e=>{e.preventDefault();assistantTry(async()=>{
+  const r=kiaraAssistant.reminder,result=await assistantCommand(r?'reminder_update':'reminder_create',{text:$('assistant-reminder-text').value,at:$('assistant-reminder-at').value,timezone:$('assistant-reminder-timezone').value,repeat:$('assistant-reminder-repeat').value,kind:$('assistant-reminder-kind').value,...(r?{id:r.id,revision:r.revision}:{})});
+  assistantReminderReset();await assistantLoad(false);$('assistant-status').textContent=result.message;$('assistant-reminder-text').focus();
+});};
+async function assistantBrief(){
+  const data=await assistantCommand('brief_get'),target=$('assistant-brief');target.replaceChildren();
+  $('assistant-brief-auto').checked=data.automatic===true;
+  $('assistant-brief-state').textContent=({queued:'Synthèse en attente.',running:'Synthèse en préparation…',failed:'La synthèse a échoué. Vous pouvez la relancer.',outdated:'Le projet a changé. Préparez une nouvelle synthèse.',completed:'Synthèse disponible.',absent:''})[data.generated_state]||'';
+  $('assistant-brief-narrative').replaceChildren();if(data.narrative)renderMarkdown($('assistant-brief-narrative'),data.narrative);
+  kiaraAssistant.briefPending=['queued','running'].includes(data.generated_state)?assistantScope():null;
+  target.append(wsElement('p',data.message));
+  for(const [title,rows] of [['Décisions confirmées',data.decisions],['Souvenirs',data.memories],['Tâches',data.tasks],['Documents',data.documents],['Discussions récentes',data.conversations]]){
+    target.append(wsElement('h4',title));if(!rows.length)target.append(wsElement('p','Aucun élément enregistré.'));
+    for(const r of rows)assistantRow(target,r.text||r.title);
+  }
+  $('assistant-status').textContent='Bilan actualisé à '+new Date(data.updated*1000).toLocaleTimeString('fr-FR')+'.';
+}
+$('assistant-brief-refresh').onclick=()=>assistantTry(assistantBrief);
+$('assistant-brief-generate').onclick=()=>assistantTry(async()=>{const result=await assistantCommand('brief_generate');await assistantBrief();$('assistant-status').textContent=result.message;});
+$('assistant-brief-auto').onchange=()=>assistantTry(async()=>{const result=await assistantCommand('brief_settings',{enabled:$('assistant-brief-auto').checked});$('assistant-status').textContent=result.message;});
+setInterval(()=>{if(!assistantPane.hidden&&!document.hidden&&kiaraAssistant.briefPending&&kiaraAssistant.briefPending===assistantScope())assistantTry(assistantBrief);},5000);
+const assistantOpenNotification=window.fredOpenNotification;
+window.fredOpenNotification=async target=>{
+  if(target?.kind!=='assistant')return assistantOpenNotification(target);
+  showView('assistant');await assistantLoad();$('assistant-project').value=target.project||'';await assistantLoad(false);
+  const reminder=kiaraAssistant.data.reminders.find(r=>r.id===target.id);
+  if(reminder)$('assistant-status').textContent=reminder.text+' · prévu le '+assistantDate(reminder.last_due||reminder.due,reminder.timezone);
+};
 
 </script>

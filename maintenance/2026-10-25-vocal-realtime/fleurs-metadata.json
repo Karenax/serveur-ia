@@ -1,0 +1,14 @@
+[
+  {
+    "type": "file",
+    "oid": "012f03f9300fca3b7713f6956dd82306ed7e4034",
+    "size": 445464011,
+    "lfs": {
+      "oid": "99a08ff00edbc7b6f040e23b33e49bc4a1fce38f364d50c603227d612fd797ef",
+      "size": 445464011,
+      "pointerSize": 134
+    },
+    "xetHash": "bdfc11c5ccdb6971d964afda2e270c142e52d20a2e7fb579cfa0a9709d714806",
+    "path": "fr_fr/test/0000.parquet"
+  }
+]

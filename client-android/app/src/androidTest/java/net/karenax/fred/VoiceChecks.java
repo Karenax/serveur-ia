@@ -8,7 +8,7 @@ import java.io.*;
 import java.lang.reflect.*;
 
 final class VoiceChecks {
-    private static android.view.accessibility.AccessibilityNodeInfo denyButton(android.view.accessibility.AccessibilityNodeInfo node){if(node==null)return null;String id=node.getViewIdResourceName();if(id!=null&&id.endsWith("/permission_deny_button"))return node;for(int i=0;i<node.getChildCount();i++){android.view.accessibility.AccessibilityNodeInfo found=denyButton(node.getChild(i));if(found!=null)return found;}return null;}
+    static android.view.accessibility.AccessibilityNodeInfo denyButton(android.view.accessibility.AccessibilityNodeInfo node){if(node==null)return null;String id=node.getViewIdResourceName();if(id!=null&&id.endsWith("/permission_deny_button"))return node;for(int i=0;i<node.getChildCount();i++){android.view.accessibility.AccessibilityNodeInfo found=denyButton(node.getChild(i));if(found!=null)return found;}return null;}
     private static Method method(String name,Class<?>...types)throws Exception{Method value=LocalVoice.class.getDeclaredMethod(name,types);value.setAccessible(true);return value;}
     private static JSONObject status(long engine)throws Exception{return new JSONObject((String)method("nativeStatus",long.class).invoke(null,engine));}
     private static JSONObject until(long engine,String phase)throws Exception{long end=System.currentTimeMillis()+600000;while(System.currentTimeMillis()<end){JSONObject value=status(engine);if(value.optString("phase").equals(phase))return value;if(value.optString("phase").equals("error"))throw new AssertionError(value.toString());Thread.sleep(50);}throw new AssertionError("Voice timeout "+status(engine));}

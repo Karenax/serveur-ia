@@ -1,0 +1,619 @@
+{
+  "engine": "parakeet",
+  "passed": true,
+  "loading_seconds": 4.141,
+  "elapsed_seconds": 24.437,
+  "final": {
+    "phase": "listening",
+    "partial": "",
+    "partial_speech_id": 2,
+    "text": "",
+    "turns": [
+      {
+        "id": 1,
+        "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+        "speech_id": 1
+      },
+      {
+        "id": 2,
+        "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+        "speech_id": 2
+      }
+    ],
+    "speech_id": 2,
+    "speaking": false,
+    "turn_probability": 0.9893293380737305,
+    "processing": false,
+    "compute_seconds": 5.4671,
+    "model": "Parakeet v3"
+  },
+  "trace": [
+    {
+      "at": 4.141,
+      "audio_level": 0.0007646438898518682,
+      "phase": "listening",
+      "partial": "",
+      "partial_speech_id": 0,
+      "text": "",
+      "turns": [],
+      "speech_id": 0,
+      "speaking": false,
+      "turn_probability": null,
+      "processing": false,
+      "compute_seconds": 0.0,
+      "model": "Parakeet v3"
+    },
+    {
+      "at": 4.656,
+      "audio_level": 0.09677614271640778,
+      "phase": "listening",
+      "partial": "",
+      "partial_speech_id": 1,
+      "text": "",
+      "turns": [],
+      "speech_id": 1,
+      "speaking": true,
+      "turn_probability": null,
+      "processing": false,
+      "compute_seconds": 0.0,
+      "model": "Parakeet v3"
+    },
+    {
+      "at": 5.156,
+      "audio_level": 0.08216014504432678,
+      "phase": "listening",
+      "partial": "",
+      "partial_speech_id": 1,
+      "text": "",
+      "turns": [],
+      "speech_id": 1,
+      "speaking": true,
+      "turn_probability": null,
+      "processing": true,
+      "compute_seconds": 0.0,
+      "model": "Parakeet v3"
+    },
+    {
+      "at": 5.266,
+      "audio_level": 0.1528977006673813,
+      "phase": "listening",
+      "partial": "Bonjour, je suis un peu...",
+      "partial_speech_id": 1,
+      "text": "Bonjour, je suis un peu...",
+      "turns": [],
+      "speech_id": 1,
+      "speaking": true,
+      "turn_probability": null,
+      "processing": false,
+      "compute_seconds": 0.1029,
+      "model": "Parakeet v3"
+    },
+    {
+      "at": 6.078,
+      "audio_level": 9.003008744912222e-05,
+      "phase": "listening",
+      "partial": "Bonjour, je suis un peu...",
+      "partial_speech_id": 1,
+      "text": "Bonjour, je suis un peu...",
+      "turns": [],
+      "speech_id": 1,
+      "speaking": true,
+      "turn_probability": null,
+      "processing": true,
+      "compute_seconds": 0.1029,
+      "model": "Parakeet v3"
+    },
+    {
+      "at": 6.281,
+      "audio_level": 0.12946192920207977,
+      "phase": "listening",
+      "partial": "Bonjour, je suis la voix de Fred.",
+      "partial_speech_id": 1,
+      "text": "Bonjour, je suis la voix de Fred.",
+      "turns": [],
+      "speech_id": 1,
+      "speaking": true,
+      "turn_probability": null,
+      "processing": false,
+      "compute_seconds": 0.2527,
+      "model": "Parakeet v3"
+    },
+    {
+      "at": 7.187,
+      "audio_level": 0.014407303184270859,
+      "phase": "listening",
+      "partial": "Bonjour, je suis la voix de Fred.",
+      "partial_speech_id": 1,
+      "text": "Bonjour, je suis la voix de Fred.",
+      "turns": [],
+      "speech_id": 1,
+      "speaking": true,
+      "turn_probability": null,
+      "processing": true,
+      "compute_seconds": 0.2527,
+      "model": "Parakeet v3"
+    },
+    {
+      "at": 7.391,
+      "audio_level": 0.04146742448210716,
+      "phase": "listening",
+      "partial": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions.",
+      "partial_speech_id": 1,
+      "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions.",
+      "turns": [],
+      "speech_id": 1,
+      "speaking": true,
+      "turn_probability": null,
+      "processing": false,
+      "compute_seconds": 0.489,
+      "model": "Parakeet v3"
+    },
+    {
+      "at": 8.203,
+      "audio_level": 0.12538473308086395,
+      "phase": "listening",
+      "partial": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions.",
+      "partial_speech_id": 1,
+      "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions.",
+      "turns": [],
+      "speech_id": 1,
+      "speaking": true,
+      "turn_probability": null,
+      "processing": true,
+      "compute_seconds": 0.489,
+      "model": "Parakeet v3"
+    },
+    {
+      "at": 8.406,
+      "audio_level": 0.007634601090103388,
+      "phase": "listening",
+      "partial": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions. Organiser une question.",
+      "partial_speech_id": 1,
+      "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions. Organiser une question.",
+      "turns": [],
+      "speech_id": 1,
+      "speaking": true,
+      "turn_probability": null,
+      "processing": false,
+      "compute_seconds": 0.7637,
+      "model": "Parakeet v3"
+    },
+    {
+      "at": 9.219,
+      "audio_level": 0.20039205253124237,
+      "phase": "listening",
+      "partial": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions. Organiser une question.",
+      "partial_speech_id": 1,
+      "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions. Organiser une question.",
+      "turns": [],
+      "speech_id": 1,
+      "speaking": true,
+      "turn_probability": null,
+      "processing": true,
+      "compute_seconds": 0.7637,
+      "model": "Parakeet v3"
+    },
+    {
+      "at": 9.531,
+      "audio_level": 0.08600664883852005,
+      "phase": "listening",
+      "partial": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous avez des réponses.",
+      "partial_speech_id": 1,
+      "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous avez des réponses.",
+      "turns": [],
+      "speech_id": 1,
+      "speaking": true,
+      "turn_probability": null,
+      "processing": false,
+      "compute_seconds": 1.1299,
+      "model": "Parakeet v3"
+    },
+    {
+      "at": 10.234,
+      "audio_level": 0.0701800212264061,
+      "phase": "listening",
+      "partial": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous avez des réponses.",
+      "partial_speech_id": 1,
+      "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous avez des réponses.",
+      "turns": [],
+      "speech_id": 1,
+      "speaking": true,
+      "turn_probability": null,
+      "processing": true,
+      "compute_seconds": 1.1299,
+      "model": "Parakeet v3"
+    },
+    {
+      "at": 10.547,
+      "audio_level": 9.102670446736738e-05,
+      "phase": "listening",
+      "partial": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+      "partial_speech_id": 1,
+      "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+      "turns": [],
+      "speech_id": 1,
+      "speaking": true,
+      "turn_probability": null,
+      "processing": false,
+      "compute_seconds": 1.5217,
+      "model": "Parakeet v3"
+    },
+    {
+      "at": 11.25,
+      "audio_level": 0.0,
+      "phase": "listening",
+      "partial": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+      "partial_speech_id": 1,
+      "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+      "turns": [],
+      "speech_id": 1,
+      "speaking": false,
+      "turn_probability": null,
+      "processing": true,
+      "compute_seconds": 1.5217,
+      "model": "Parakeet v3"
+    },
+    {
+      "at": 12.172,
+      "audio_level": 0.0,
+      "phase": "listening",
+      "partial": "",
+      "partial_speech_id": 1,
+      "text": "",
+      "turns": [
+        {
+          "id": 1,
+          "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+          "speech_id": 1
+        }
+      ],
+      "speech_id": 1,
+      "speaking": false,
+      "turn_probability": 0.9893293380737305,
+      "processing": false,
+      "compute_seconds": 2.4458,
+      "model": "Parakeet v3"
+    },
+    {
+      "at": 14.703,
+      "audio_level": 0.12208602577447891,
+      "phase": "listening",
+      "partial": "",
+      "partial_speech_id": 2,
+      "text": "",
+      "turns": [
+        {
+          "id": 1,
+          "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+          "speech_id": 1
+        }
+      ],
+      "speech_id": 2,
+      "speaking": true,
+      "turn_probability": 0.9893293380737305,
+      "processing": true,
+      "compute_seconds": 2.4458,
+      "model": "Parakeet v3"
+    },
+    {
+      "at": 14.922,
+      "audio_level": 0.0024231700226664543,
+      "phase": "listening",
+      "partial": "Bonjour.",
+      "partial_speech_id": 2,
+      "text": "Bonjour.",
+      "turns": [
+        {
+          "id": 1,
+          "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+          "speech_id": 1
+        }
+      ],
+      "speech_id": 2,
+      "speaking": true,
+      "turn_probability": 0.9893293380737305,
+      "processing": false,
+      "compute_seconds": 2.6065,
+      "model": "Parakeet v3"
+    },
+    {
+      "at": 15.719,
+      "audio_level": 0.08098838478326797,
+      "phase": "listening",
+      "partial": "Bonjour.",
+      "partial_speech_id": 2,
+      "text": "Bonjour.",
+      "turns": [
+        {
+          "id": 1,
+          "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+          "speech_id": 1
+        }
+      ],
+      "speech_id": 2,
+      "speaking": true,
+      "turn_probability": 0.9893293380737305,
+      "processing": true,
+      "compute_seconds": 2.6065,
+      "model": "Parakeet v3"
+    },
+    {
+      "at": 16.031,
+      "audio_level": 0.012208501808345318,
+      "phase": "listening",
+      "partial": "Bonjour, je suis la voix de.",
+      "partial_speech_id": 2,
+      "text": "Bonjour, je suis la voix de.",
+      "turns": [
+        {
+          "id": 1,
+          "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+          "speech_id": 1
+        }
+      ],
+      "speech_id": 2,
+      "speaking": true,
+      "turn_probability": 0.9893293380737305,
+      "processing": false,
+      "compute_seconds": 2.8123,
+      "model": "Parakeet v3"
+    },
+    {
+      "at": 16.844,
+      "audio_level": 0.09842018038034439,
+      "phase": "listening",
+      "partial": "Bonjour, je suis la voix de.",
+      "partial_speech_id": 2,
+      "text": "Bonjour, je suis la voix de.",
+      "turns": [
+        {
+          "id": 1,
+          "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+          "speech_id": 1
+        }
+      ],
+      "speech_id": 2,
+      "speaking": true,
+      "turn_probability": 0.9893293380737305,
+      "processing": true,
+      "compute_seconds": 2.8123,
+      "model": "Parakeet v3"
+    },
+    {
+      "at": 17.141,
+      "audio_level": 0.035438116639852524,
+      "phase": "listening",
+      "partial": "Bonjour, je suis la voix de Fred. Je peux répondre à F",
+      "partial_speech_id": 2,
+      "text": "Bonjour, je suis la voix de Fred. Je peux répondre à F",
+      "turns": [
+        {
+          "id": 1,
+          "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+          "speech_id": 1
+        }
+      ],
+      "speech_id": 2,
+      "speaking": true,
+      "turn_probability": 0.9893293380737305,
+      "processing": false,
+      "compute_seconds": 3.1201,
+      "model": "Parakeet v3"
+    },
+    {
+      "at": 17.859,
+      "audio_level": 0.1022028997540474,
+      "phase": "listening",
+      "partial": "Bonjour, je suis la voix de Fred. Je peux répondre à F",
+      "partial_speech_id": 2,
+      "text": "Bonjour, je suis la voix de Fred. Je peux répondre à F",
+      "turns": [
+        {
+          "id": 1,
+          "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+          "speech_id": 1
+        }
+      ],
+      "speech_id": 2,
+      "speaking": true,
+      "turn_probability": 0.9893293380737305,
+      "processing": true,
+      "compute_seconds": 3.1201,
+      "model": "Parakeet v3"
+    },
+    {
+      "at": 18.156,
+      "audio_level": 0.15682952105998993,
+      "phase": "listening",
+      "partial": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions.",
+      "partial_speech_id": 2,
+      "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions.",
+      "turns": [
+        {
+          "id": 1,
+          "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+          "speech_id": 1
+        }
+      ],
+      "speech_id": 2,
+      "speaking": true,
+      "turn_probability": 0.9893293380737305,
+      "processing": false,
+      "compute_seconds": 3.4453,
+      "model": "Parakeet v3"
+    },
+    {
+      "at": 18.875,
+      "audio_level": 0.11379583925008774,
+      "phase": "listening",
+      "partial": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions.",
+      "partial_speech_id": 2,
+      "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions.",
+      "turns": [
+        {
+          "id": 1,
+          "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+          "speech_id": 1
+        }
+      ],
+      "speech_id": 2,
+      "speaking": true,
+      "turn_probability": 0.9893293380737305,
+      "processing": true,
+      "compute_seconds": 3.4453,
+      "model": "Parakeet v3"
+    },
+    {
+      "at": 19.281,
+      "audio_level": 0.133520245552063,
+      "phase": "listening",
+      "partial": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets.",
+      "partial_speech_id": 2,
+      "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets.",
+      "turns": [
+        {
+          "id": 1,
+          "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+          "speech_id": 1
+        }
+      ],
+      "speech_id": 2,
+      "speaking": true,
+      "turn_probability": 0.9893293380737305,
+      "processing": false,
+      "compute_seconds": 3.8767,
+      "model": "Parakeet v3"
+    },
+    {
+      "at": 19.891,
+      "audio_level": 0.09043323993682861,
+      "phase": "listening",
+      "partial": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets.",
+      "partial_speech_id": 2,
+      "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets.",
+      "turns": [
+        {
+          "id": 1,
+          "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+          "speech_id": 1
+        }
+      ],
+      "speech_id": 2,
+      "speaking": true,
+      "turn_probability": 0.9893293380737305,
+      "processing": true,
+      "compute_seconds": 3.8767,
+      "model": "Parakeet v3"
+    },
+    {
+      "at": 20.297,
+      "audio_level": 0.08747685700654984,
+      "phase": "listening",
+      "partial": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer des projets.",
+      "partial_speech_id": 2,
+      "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer des projets.",
+      "turns": [
+        {
+          "id": 1,
+          "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+          "speech_id": 1
+        }
+      ],
+      "speech_id": 2,
+      "speaking": true,
+      "turn_probability": 0.9893293380737305,
+      "processing": false,
+      "compute_seconds": 4.3165,
+      "model": "Parakeet v3"
+    },
+    {
+      "at": 20.797,
+      "audio_level": 9.1552734375e-05,
+      "phase": "listening",
+      "partial": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer des projets.",
+      "partial_speech_id": 2,
+      "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer des projets.",
+      "turns": [
+        {
+          "id": 1,
+          "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+          "speech_id": 1
+        }
+      ],
+      "speech_id": 2,
+      "speaking": true,
+      "turn_probability": 0.9893293380737305,
+      "processing": true,
+      "compute_seconds": 4.3165,
+      "model": "Parakeet v3"
+    },
+    {
+      "at": 21.406,
+      "audio_level": 0.0,
+      "phase": "listening",
+      "partial": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+      "partial_speech_id": 2,
+      "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+      "turns": [
+        {
+          "id": 1,
+          "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+          "speech_id": 1
+        }
+      ],
+      "speech_id": 2,
+      "speaking": false,
+      "turn_probability": 0.9893293380737305,
+      "processing": false,
+      "compute_seconds": 4.9088,
+      "model": "Parakeet v3"
+    },
+    {
+      "at": 21.609,
+      "audio_level": 0.0,
+      "phase": "listening",
+      "partial": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+      "partial_speech_id": 2,
+      "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+      "turns": [
+        {
+          "id": 1,
+          "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+          "speech_id": 1
+        }
+      ],
+      "speech_id": 2,
+      "speaking": false,
+      "turn_probability": 0.9893293380737305,
+      "processing": true,
+      "compute_seconds": 4.9088,
+      "model": "Parakeet v3"
+    },
+    {
+      "at": 22.219,
+      "audio_level": 0.0,
+      "phase": "listening",
+      "partial": "",
+      "partial_speech_id": 2,
+      "text": "",
+      "turns": [
+        {
+          "id": 1,
+          "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+          "speech_id": 1
+        },
+        {
+          "id": 2,
+          "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+          "speech_id": 2
+        }
+      ],
+      "speech_id": 2,
+      "speaking": false,
+      "turn_probability": 0.9893293380737305,
+      "processing": false,
+      "compute_seconds": 5.4671,
+      "model": "Parakeet v3"
+    }
+  ]
+}

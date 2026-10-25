@@ -8,6 +8,8 @@ $projectRoot = Split-Path $PSScriptRoot -Parent
 . (Join-Path $projectRoot 'client-qwen\android-outils\Environnement-Android.ps1')
 . (Join-Path $PSScriptRoot 'scripts\Resolve-Python.ps1')
 $pythonExecutable = Resolve-FredPython -Requested $Python -ProjectRoot $projectRoot
+& $pythonExecutable (Join-Path $projectRoot 'maintenance/2026-10-25-assistant-integration/prepare_wakeword.py')
+if ($LASTEXITCODE -ne 0) { throw 'Préparer les ressources vocales avec prepare_wakeword.py --download.' }
 $gradle = Join-Path $projectRoot 'toolchain\gradle-8.13\bin\gradle.bat'
 $apksigner = Join-Path $env:ANDROID_HOME 'build-tools\36.0.0\apksigner.bat'
 foreach ($tool in @($gradle, $apksigner)) {
@@ -62,7 +64,7 @@ try {
 } finally { $archive.Dispose() }
 $distribution = if ($OutputDirectory) { [System.IO.Path]::GetFullPath($OutputDirectory) } else { Join-Path $PSScriptRoot 'dist' }
 New-Item -ItemType Directory -Force -Path $distribution | Out-Null
-$name = if ($Configuration -eq 'Release') { 'Acces-serveur-Fred-Android.apk' } else { 'Acces-serveur-Fred-Android-debug.apk' }
+$name = if ($Configuration -eq 'Release') { 'Acces-serveur-Kiara-Android.apk' } else { 'Acces-serveur-Kiara-Android-debug.apk' }
 $apk = Join-Path $distribution $name
 Copy-Item -LiteralPath $compiled -Destination $apk -Force
 $digest = (Get-FileHash -LiteralPath $apk -Algorithm SHA256).Hash.ToLowerInvariant()

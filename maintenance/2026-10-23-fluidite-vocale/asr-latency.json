@@ -1,0 +1,27 @@
+{
+  "passed": true,
+  "model": "Parakeet v3 int8",
+  "results": [
+    {
+      "configuration": "previous",
+      "minimum_silence_seconds": 0.85,
+      "maximum_silence_seconds": 2.5,
+      "text": "Bonjour Fred. Je souhaite préparer une réunion demain matin. Ajoute les documents du projet et résume les décisions importantes.",
+      "last_sound_seconds": 9.3,
+      "endpoint_after_last_sound_seconds": 1.2900764000034535,
+      "text_available_after_last_sound_seconds": 2.0009354000023443,
+      "decode_compute_seconds": 4.0524
+    },
+    {
+      "configuration": "updated",
+      "minimum_silence_seconds": 0.65,
+      "maximum_silence_seconds": 1.6,
+      "text": "Bonjour Fred. Je souhaite préparer une réunion demain matin. Ajoute les documents du projet et résume les décisions importantes.",
+      "last_sound_seconds": 9.3,
+      "endpoint_after_last_sound_seconds": 1.0896654999989543,
+      "text_available_after_last_sound_seconds": 1.400856600000406,
+      "decode_compute_seconds": 2.2728
+    }
+  ],
+  "limits": "One synthetic spoken fixture fed in real time on this PC. Does not establish microphone, noise or human pause performance."
+}

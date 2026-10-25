@@ -1,4 +1,4 @@
-"""Isolated CPU Phonon process. Same bounded JSON/PCM protocol as Fred's gateway."""
+"""Isolated CPU Phonon process. Same bounded JSON/PCM protocol as Kiara's gateway."""
 import base64
 from collections import OrderedDict
 import json

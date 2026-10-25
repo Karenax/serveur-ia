@@ -1,6 +1,6 @@
 """Explicit direct-corrector smoke test against the already loaded local Qwen.
 
-Uses a disposable Fred account and gateway; no production history is written.
+Uses a disposable Kiara account and gateway; no production history is written.
 Run from the repository with the Strata virtualenv, after unit tests pass.
 """
 import hashlib

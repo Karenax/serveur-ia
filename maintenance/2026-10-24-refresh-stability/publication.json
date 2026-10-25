@@ -1,0 +1,10 @@
+{
+  "version": "3.5.43",
+  "sha256": "47ce79d172cf2069cce551aea660676e307baca69a174a7c92cd13f3e27d33d9",
+  "bytes": 94478818,
+  "signature_verified": true,
+  "personal_clients_prepared": 1,
+  "personal_credentials_preserved": true,
+  "voice_revision": "vulkan-q4-62db5a83ab69c6c7",
+  "voice_pack_bytes": 46151015
+}

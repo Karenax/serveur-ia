@@ -1,0 +1,796 @@
+{
+  "format": 2,
+  "runtime_api": 5,
+  "revision": "vulkan-q4-550bf7639ad29caf",
+  "engine": "Parakeet + Qwen3-TTS",
+  "source_commit": "5916bf7c79dbb4e66fc059cdc507a79a23a28bb4",
+  "upstream_reference": "https://github.com/huggingface/speech-to-speech/tree/0835002ad1c73cf1cc408ac10ebd2a19f777ae12",
+  "runtime": {
+    "name": "runtime.zip",
+    "bytes": 46441601,
+    "sha256": "f13d3042deae750abc0a393c5be32498cd7faed47798eb1e9e724ca05a7f5ef6",
+    "files": [
+      {
+        "name": "_internal/_asyncio.pyd",
+        "bytes": 75056,
+        "sha256": "72b6942e20ba0043ab66af51dabe4986aeb6402bbbd2513b6a3e2eedbd2b1b3d"
+      },
+      {
+        "name": "_internal/_bz2.pyd",
+        "bytes": 88880,
+        "sha256": "e35113599dcb5518f68c0b753144218c1ec4ec9ce4bc84a1095d0905f178a536"
+      },
+      {
+        "name": "_internal/_ctypes.pyd",
+        "bytes": 131888,
+        "sha256": "4ce43ac75e6c061f3b20e8dcf4a9772a72d7c7d7408b2ae5881b379246651ebd"
+      },
+      {
+        "name": "_internal/_decimal.pyd",
+        "bytes": 263984,
+        "sha256": "a9608fff35f91a2342c486bd8fccf50dfc159d5514c5d126331248862efa84a5"
+      },
+      {
+        "name": "_internal/_hashlib.pyd",
+        "bytes": 70448,
+        "sha256": "b988077152a33c2d7579f453388abc742675b46f6a9ad65dfd443e96bfac330f"
+      },
+      {
+        "name": "_internal/_lzma.pyd",
+        "bytes": 168240,
+        "sha256": "e695959ee6df09b7f176e43cb7250e6f52662b9149bfc8920b2e749871f3db1f"
+      },
+      {
+        "name": "_internal/_multiprocessing.pyd",
+        "bytes": 39728,
+        "sha256": "8567d5a49b968a0946a4331f52e12a3fefa4b1a6abee59c67bdd61439b11460a"
+      },
+      {
+        "name": "_internal/_overlapped.pyd",
+        "bytes": 59696,
+        "sha256": "9417b7c502983284acee1ec01a1d3a98c130e3a31b9765556357031a6527f65a"
+      },
+      {
+        "name": "_internal/_queue.pyd",
+        "bytes": 36144,
+        "sha256": "646b899b96520b9bddd8dd20c28179282fe4ea69010c30beeafd271027c63b9d"
+      },
+      {
+        "name": "_internal/_socket.pyd",
+        "bytes": 87344,
+        "sha256": "a70f71d899e1050e05bd0b6946f11be08ea377e7a2ff555e9a5b0dfadb563136"
+      },
+      {
+        "name": "_internal/_ssl.pyd",
+        "bytes": 180528,
+        "sha256": "b937f5273c71143cfcb1af00305a79ec8cc4f6ba37b103c21ee0c96805c6decc"
+      },
+      {
+        "name": "_internal/_uuid.pyd",
+        "bytes": 29488,
+        "sha256": "ca8cbfc9bb87fd5e085886c829a5307a3989666375d66f69ca808b135c5f3d9d"
+      },
+      {
+        "name": "_internal/_wmi.pyd",
+        "bytes": 41264,
+        "sha256": "194cf959a3bfaffd25dafabace44a071316669a1f18056250343e60ed55bce2d"
+      },
+      {
+        "name": "_internal/api-ms-win-core-console-l1-1-0.dll",
+        "bytes": 22872,
+        "sha256": "015bd08815c7b934a8952c3a7578e9ce59f21136e8a880d42bbd414bec2c6058"
+      },
+      {
+        "name": "_internal/api-ms-win-core-datetime-l1-1-0.dll",
+        "bytes": 22896,
+        "sha256": "5534812cdbdae94ba45cb216e5eb9af686b853948df54365103555abbbaf9d9a"
+      },
+      {
+        "name": "_internal/api-ms-win-core-debug-l1-1-0.dll",
+        "bytes": 22872,
+        "sha256": "837d2b1b2cd03e03fc6ccb050698b6b5763af17c201304872342a5eae9e0a2d2"
+      },
+      {
+        "name": "_internal/api-ms-win-core-errorhandling-l1-1-0.dll",
+        "bytes": 22872,
+        "sha256": "de43b165f568c276c00e95acd454e3092f352a18e95874595f4f4658c06d2ec7"
+      },
+      {
+        "name": "_internal/api-ms-win-core-fibers-l1-1-0.dll",
+        "bytes": 22872,
+        "sha256": "3cebc45bf479ad74cfabf2c6bfd4994d7ad639ed1221025981d19cedf9ce0416"
+      },
+      {
+        "name": "_internal/api-ms-win-core-fibers-l1-1-1.dll",
+        "bytes": 22872,
+        "sha256": "5ef70308bcca628ce6b0e2856b15b1c7ae340c3f9bbbc4c1071d8c191a34a5c3"
+      },
+      {
+        "name": "_internal/api-ms-win-core-file-l1-1-0.dll",
+        "bytes": 27008,
+        "sha256": "250ac829f2617bcac1c6e5b8c4f630462e20765863ba573526a3e11bbfb94a9a"
+      },
+      {
+        "name": "_internal/api-ms-win-core-file-l1-2-0.dll",
+        "bytes": 22888,
+        "sha256": "ae14079a114733f60ce87b92cba42acd8083c2cd67594e53bc37dc0b97a4b465"
+      },
+      {
+        "name": "_internal/api-ms-win-core-file-l2-1-0.dll",
+        "bytes": 22912,
+        "sha256": "914bf26a298713119477ea0a8e7bd43171b91344ebe24fb47ad77c49686e3d87"
+      },
+      {
+        "name": "_internal/api-ms-win-core-handle-l1-1-0.dll",
+        "bytes": 22896,
+        "sha256": "ab5489955e371b15f77906c08ec3c7affe2c7a46a08c514ca628768b4478974b"
+      },
+      {
+        "name": "_internal/api-ms-win-core-heap-l1-1-0.dll",
+        "bytes": 22872,
+        "sha256": "c70f9644d8377fa39c5b71f2e9734c1400d7598904fdeb772e8502099982dcb7"
+      },
+      {
+        "name": "_internal/api-ms-win-core-interlocked-l1-1-0.dll",
+        "bytes": 22888,
+        "sha256": "f8129710188e407bb0e6f46d30aeba277d67b947ece5fe09e883fde2323f3ae6"
+      },
+      {
+        "name": "_internal/api-ms-win-core-kernel32-legacy-l1-1-1.dll",
+        "bytes": 22888,
+        "sha256": "5200b16cb2ddc61cfc07373a9a84aa85a3ab50806ca96c879c883275832944c1"
+      },
+      {
+        "name": "_internal/api-ms-win-core-libraryloader-l1-1-0.dll",
+        "bytes": 22872,
+        "sha256": "48786fb88b001dcd1f63acea903d3ca9cc0b3060d5a325e3f2f3cbc3bfd53166"
+      },
+      {
+        "name": "_internal/api-ms-win-core-localization-l1-2-0.dll",
+        "bytes": 22872,
+        "sha256": "9ec3898f7eba91faa28b51616c211a2689e3a13aeef8de6e13cb674e49d689eb"
+      },
+      {
+        "name": "_internal/api-ms-win-core-memory-l1-1-0.dll",
+        "bytes": 22896,
+        "sha256": "3a6cbc524c99e1cd80d5368f5601402a37ad602528b1ab628093573ef638eb3b"
+      },
+      {
+        "name": "_internal/api-ms-win-core-namedpipe-l1-1-0.dll",
+        "bytes": 22888,
+        "sha256": "97145ef89c44949fcf0f04ac834a8bc7d687ef49ee73ae9fc32f3c11136b7201"
+      },
+      {
+        "name": "_internal/api-ms-win-core-processenvironment-l1-1-0.dll",
+        "bytes": 22872,
+        "sha256": "8bc7c10b1851aea644e9c9f381cdb935e091fee6b0be3d3aedc6fffaac96adb7"
+      },
+      {
+        "name": "_internal/api-ms-win-core-processthreads-l1-1-0.dll",
+        "bytes": 22912,
+        "sha256": "d8030b777617c71f0f94564607699dbf7561487d779db9756aed378c5675213f"
+      },
+      {
+        "name": "_internal/api-ms-win-core-processthreads-l1-1-1.dll",
+        "bytes": 22872,
+        "sha256": "f5e676713340f73a03a3d41a6ec9883b431da7d16c7f07bd0a920fb80e6c0753"
+      },
+      {
+        "name": "_internal/api-ms-win-core-profile-l1-1-0.dll",
+        "bytes": 22872,
+        "sha256": "f023d47e44d3eea6b0743580f57e8c6ba81e79d5ebfa7da26250076c647b980e"
+      },
+      {
+        "name": "_internal/api-ms-win-core-rtlsupport-l1-1-0.dll",
+        "bytes": 22888,
+        "sha256": "9746d8930704153578a628c010638a5f818ffe5a927e25591b108e256dc6afca"
+      },
+      {
+        "name": "_internal/api-ms-win-core-string-l1-1-0.dll",
+        "bytes": 22896,
+        "sha256": "7c53ae24c982d16ffd1bf7f918d115b11b7f30e57bc7feaa18cb9781e4abb926"
+      },
+      {
+        "name": "_internal/api-ms-win-core-synch-l1-1-0.dll",
+        "bytes": 22896,
+        "sha256": "56d9d62ca5dba79a6581b8d574a7d8b2a64a5ecb71e47dcf06ed0285708b1859"
+      },
+      {
+        "name": "_internal/api-ms-win-core-synch-l1-2-0.dll",
+        "bytes": 22888,
+        "sha256": "f6482bbec5612c39ecb4822787a333f2b7570f7a5f922a4059be41ba957bb372"
+      },
+      {
+        "name": "_internal/api-ms-win-core-sysinfo-l1-1-0.dll",
+        "bytes": 22896,
+        "sha256": "272d02765fdd3582618236c2d309abba069642f9bc1062ede069d0c144e17007"
+      },
+      {
+        "name": "_internal/api-ms-win-core-sysinfo-l1-2-0.dll",
+        "bytes": 22912,
+        "sha256": "8a0900788859d0eb51c2f48f50cc6ed376a120b518100fa20e11d7702ccde260"
+      },
+      {
+        "name": "_internal/api-ms-win-core-timezone-l1-1-0.dll",
+        "bytes": 22896,
+        "sha256": "ff35de6c03812b332e140f17dade25c5dd4775156da9eeb1eaae3fddd27236ec"
+      },
+      {
+        "name": "_internal/api-ms-win-core-util-l1-1-0.dll",
+        "bytes": 22896,
+        "sha256": "191ef3e98641a57296f19d572d8eb62489470ff1ef6030d136af170c2f835173"
+      },
+      {
+        "name": "_internal/api-ms-win-crt-conio-l1-1-0.dll",
+        "bytes": 22872,
+        "sha256": "54ee5ec719a051496ff60aa00dbeaa94b9a7d2cdac27fe9b7317f1a666b6a2aa"
+      },
+      {
+        "name": "_internal/api-ms-win-crt-convert-l1-1-0.dll",
+        "bytes": 26992,
+        "sha256": "8b94662429171019fcd63c70bbf2095a075170599704a5e7dcdbe3da13f3a429"
+      },
+      {
+        "name": "_internal/api-ms-win-crt-environment-l1-1-0.dll",
+        "bytes": 22912,
+        "sha256": "39e5929593709e8af3bc9e0a75ec1155778d6f4a247f4cdfc58928ad6db88434"
+      },
+      {
+        "name": "_internal/api-ms-win-crt-filesystem-l1-1-0.dll",
+        "bytes": 22872,
+        "sha256": "5a8ecebac32edf4e1f3c5c6c1c8ea1a1add6cda4f9c9cb26f752fb295bea6865"
+      },
+      {
+        "name": "_internal/api-ms-win-crt-heap-l1-1-0.dll",
+        "bytes": 22872,
+        "sha256": "c71080cbcb43bf1f8f3e391deb12a582eb0abefc80946f340675a2c616e4feb4"
+      },
+      {
+        "name": "_internal/api-ms-win-crt-locale-l1-1-0.dll",
+        "bytes": 22896,
+        "sha256": "6c68648e524187e03c4ad9aaa4a99113c6ee9f29fb39cc0ed93f951975138e63"
+      },
+      {
+        "name": "_internal/api-ms-win-crt-math-l1-1-0.dll",
+        "bytes": 31064,
+        "sha256": "d4fbcccbe29371cbce431e43b2eb4f7ba9a6f04a3d740a071f02457a505e9dc8"
+      },
+      {
+        "name": "_internal/api-ms-win-crt-private-l1-1-0.dll",
+        "bytes": 76120,
+        "sha256": "29bf3d90617d3781d19b332d6ceb9f20ba5ce082ec74bf6c34d5d4aee56e48a1"
+      },
+      {
+        "name": "_internal/api-ms-win-crt-process-l1-1-0.dll",
+        "bytes": 22896,
+        "sha256": "47c1935942e3ac0812e4dcf18c0e265e565f0194a3349111c299712f5565f7ac"
+      },
+      {
+        "name": "_internal/api-ms-win-crt-runtime-l1-1-0.dll",
+        "bytes": 26968,
+        "sha256": "72adc1b3677e0814d9c4ebf0964000e84bb2acf67336c8963061665e44f78029"
+      },
+      {
+        "name": "_internal/api-ms-win-crt-stdio-l1-1-0.dll",
+        "bytes": 26968,
+        "sha256": "900afc3989673c9bb1a687ed38c192f46db9e6ba6d11a668898a539e7fc23798"
+      },
+      {
+        "name": "_internal/api-ms-win-crt-string-l1-1-0.dll",
+        "bytes": 26968,
+        "sha256": "fcf12466cc12fd3b73611fc0763a5a1f9d44e90349513c34a0c83b0f36421793"
+      },
+      {
+        "name": "_internal/api-ms-win-crt-time-l1-1-0.dll",
+        "bytes": 22912,
+        "sha256": "886e57c4a6adb299b38f02945369f590a67da4e79a798359fc60aaa067212d7c"
+      },
+      {
+        "name": "_internal/api-ms-win-crt-utility-l1-1-0.dll",
+        "bytes": 22912,
+        "sha256": "5f8f26b216ade615b67a41f6fbbb910972fc6153315a65bb8f09912be50215b1"
+      },
+      {
+        "name": "_internal/base_library.zip",
+        "bytes": 1333490,
+        "sha256": "80a4ca4b78b37bf750037d64236d4ded5d7c36f9a4062a2fa24f9ec3960d2600"
+      },
+      {
+        "name": "_internal/libcrypto-3-x64.dll",
+        "bytes": 8003376,
+        "sha256": "57df468e551cc2579b73bfdf9cec5e80a8e5fdbbfde46ee6344d3fcd446f7e8a"
+      },
+      {
+        "name": "_internal/libffi-8.dll",
+        "bytes": 43824,
+        "sha256": "adf7d8e3413209755f75a7c69cec9e5eac84a1a6f1c8b60c22cd15e2f1732380"
+      },
+      {
+        "name": "_internal/libssl-3-x64.dll",
+        "bytes": 1599280,
+        "sha256": "91579296b970bf1c7c4947e609d84634d41ba3c38c2ada223d4d9b53ae74c4f9"
+      },
+      {
+        "name": "_internal/numpy/_core/_multiarray_tests.cp312-win_amd64.pyd",
+        "bytes": 64000,
+        "sha256": "24adbe4bbf7b2a6208aeb800d11b8b6957c925d3c796552b3a55e1b4e278754e"
+      },
+      {
+        "name": "_internal/numpy/_core/_multiarray_umath.cp312-win_amd64.pyd",
+        "bytes": 4178432,
+        "sha256": "d98a8f4ce703bf7158f639d24ff4a55ece2753a306a3f7074b4fa670660afee5"
+      },
+      {
+        "name": "_internal/numpy/fft/_pocketfft_umath.cp312-win_amd64.pyd",
+        "bytes": 279040,
+        "sha256": "25cc37acd3d849c0fde1e0dc0112979dec4ec4279b7826d1a45395fe966068c9"
+      },
+      {
+        "name": "_internal/numpy/linalg/_umath_linalg.cp312-win_amd64.pyd",
+        "bytes": 108032,
+        "sha256": "88c8d38d7b2f483542442292e149ca335462d1467b8e835b00a71a8b27125cf5"
+      },
+      {
+        "name": "_internal/numpy/random/_bounded_integers.cp312-win_amd64.pyd",
+        "bytes": 208384,
+        "sha256": "0434a5b271f935deb8623bb8663f33132a70a8f4d1936c14432e16d4f6eb46fc"
+      },
+      {
+        "name": "_internal/numpy/random/_common.cp312-win_amd64.pyd",
+        "bytes": 152064,
+        "sha256": "9a39d43e0ef73dfb5a8b1abce92ff0063bffcd580d8be275f468961b24b153af"
+      },
+      {
+        "name": "_internal/numpy/random/_generator.cp312-win_amd64.pyd",
+        "bytes": 714752,
+        "sha256": "6dde7168fc52dcad27779d45dcc6828b91ec0d05bb6094c86d6aff8a1ee8e1b3"
+      },
+      {
+        "name": "_internal/numpy/random/_mt19937.cp312-win_amd64.pyd",
+        "bytes": 83456,
+        "sha256": "3331809b214fc30e2fc167f742ca3b1a84b567d185d4194fa8893a032010eeb4"
+      },
+      {
+        "name": "_internal/numpy/random/_pcg64.cp312-win_amd64.pyd",
+        "bytes": 93696,
+        "sha256": "448b71a0b7d9037d9655008fbc3081070fa801f757b83f9a3ee6e0934c095aa8"
+      },
+      {
+        "name": "_internal/numpy/random/_philox.cp312-win_amd64.pyd",
+        "bytes": 77312,
+        "sha256": "9c989e7b0fc383e2fa5aa15de2f17c5875b690dc64c44891ee1e1d54ce7cac4a"
+      },
+      {
+        "name": "_internal/numpy/random/_sfc64.cp312-win_amd64.pyd",
+        "bytes": 60416,
+        "sha256": "5732d38725cb5177c9de1e1d4bdb67389283a53986f87a5e52ca9255ec98c733"
+      },
+      {
+        "name": "_internal/numpy/random/bit_generator.cp312-win_amd64.pyd",
+        "bytes": 163328,
+        "sha256": "eef81bf02fa9f387d6c4a18d52b22af58b737c01608f0d594130586a06022807"
+      },
+      {
+        "name": "_internal/numpy/random/mtrand.cp312-win_amd64.pyd",
+        "bytes": 603136,
+        "sha256": "339f40f24231643777de36d5ff8121a07ccf2c4a66add63307d25f9d431c9928"
+      },
+      {
+        "name": "_internal/numpy-2.2.6.dist-info/DELVEWHEEL",
+        "bytes": 446,
+        "sha256": "513b04bcaa783e2cee07d76110f470d50fd5f12599006a93953588607f61c953"
+      },
+      {
+        "name": "_internal/numpy-2.2.6.dist-info/entry_points.txt",
+        "bytes": 172,
+        "sha256": "e265c336124343d187a8c05e449f01dcf962c531669171aa537455b9a736d2ad"
+      },
+      {
+        "name": "_internal/numpy-2.2.6.dist-info/INSTALLER",
+        "bytes": 4,
+        "sha256": "ceebae7b8927a3227e5303cf5e0f1f7b34bb542ad7250ac03fbcde36ec2f1508"
+      },
+      {
+        "name": "_internal/numpy-2.2.6.dist-info/LICENSE.txt",
+        "bytes": 47709,
+        "sha256": "14256cc3a2c9d32ac284da96b937feb44f72dd90bee2317ac3020166846ad99d"
+      },
+      {
+        "name": "_internal/numpy-2.2.6.dist-info/METADATA",
+        "bytes": 60844,
+        "sha256": "229f3544b02805e0f6a12030e155d8a45fd3a4100b3291574175e6a76f20e1e1"
+      },
+      {
+        "name": "_internal/numpy-2.2.6.dist-info/RECORD",
+        "bytes": 108709,
+        "sha256": "2cd98b1d3a3679681ff2ecaa1fca7897e12db89af4de31d343b3310c8065bd35"
+      },
+      {
+        "name": "_internal/numpy-2.2.6.dist-info/REQUESTED",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "_internal/numpy-2.2.6.dist-info/WHEEL",
+        "bytes": 85,
+        "sha256": "e743de01ba6503a3e4234858398a1e69c07d512d51e8482ec9f3a7b1c707d165"
+      },
+      {
+        "name": "_internal/numpy.libs/libscipy_openblas64_-13e2df515630b4a41f92893938845698.dll",
+        "bytes": 20390912,
+        "sha256": "6547e9fb966e9773caee2755e91a8bf4d6f3a2f0eebf9646b0158f8675ea4ab5"
+      },
+      {
+        "name": "_internal/numpy.libs/msvcp140-263139962577ecda4cd9469ca360a746.dll",
+        "bytes": 575056,
+        "sha256": "a4c2229bdc2a2a630acdc095b4d86008e5c3e3bc7773174354f3da4f5beb9cde"
+      },
+      {
+        "name": "_internal/pyexpat.pyd",
+        "bytes": 226096,
+        "sha256": "ba075a29d03e78a56086b5d240dee445549c4da928d590bfad2b6bed711bb8a1"
+      },
+      {
+        "name": "_internal/python312.dll",
+        "bytes": 6985520,
+        "sha256": "2b6fffde96cf24a57fca642aaefd5788816ab5ef8624ea63b722cbceb94d49b1"
+      },
+      {
+        "name": "_internal/select.pyd",
+        "bytes": 34608,
+        "sha256": "b8c10338202d5e3faa7168a48565a98b0dab31fde11e6a842d3dbc31d5193a05"
+      },
+      {
+        "name": "_internal/sherpa_onnx/__init__.py",
+        "bytes": 3023,
+        "sha256": "cf058098f28c115b0d9403065f59385342919847d03dc27a01e15f069b6dfb8e"
+      },
+      {
+        "name": "_internal/sherpa_onnx/__main__.py",
+        "bytes": 1241,
+        "sha256": "5457c80fcf576709b69c6430394ecc2635636ecc703004af815e062fb4e045cc"
+      },
+      {
+        "name": "_internal/sherpa_onnx/_info.py",
+        "bytes": 639,
+        "sha256": "56386fef3aec9ab3a7abf38c0266035d4dbdaa3e11214a992d707038d6cf1df6"
+      },
+      {
+        "name": "_internal/sherpa_onnx/cli.py",
+        "bytes": 3822,
+        "sha256": "20f6334fb83217f0c6771206600dcfbe38855d36e8d58266db24e355fd6354a0"
+      },
+      {
+        "name": "_internal/sherpa_onnx/display.py",
+        "bytes": 2018,
+        "sha256": "be8bd6bf4bc06f16350f5df172215dfb172881ea7ba6b15f7e8d4283b1a71495"
+      },
+      {
+        "name": "_internal/sherpa_onnx/include/sherpa-onnx/c-api/c-api.h",
+        "bytes": 172380,
+        "sha256": "d4b8d6b36c59a1a4a1199bece1c6b342031aaa37dfd698c84f8e9296a7b2c50a"
+      },
+      {
+        "name": "_internal/sherpa_onnx/include/sherpa-onnx/c-api/cxx-api.h",
+        "bytes": 69049,
+        "sha256": "6617357101fb3ad5d971666801e087c3de539d7aef1f55eaa5f1ac946d268f96"
+      },
+      {
+        "name": "_internal/sherpa_onnx/keyword_spotter.py",
+        "bytes": 9553,
+        "sha256": "517e7142c8dda12394462c114a6e077b5d8f50b0e06b3428e8959665c457b121"
+      },
+      {
+        "name": "_internal/sherpa_onnx/lib/_sherpa_onnx.cp312-win_amd64.pyd",
+        "bytes": 5769216,
+        "sha256": "c7cbe8071492dde37f7c9d640fd882ff52f62073c5214741c74178502aa6c593"
+      },
+      {
+        "name": "_internal/sherpa_onnx/lib/onnxruntime.dll",
+        "bytes": 17799168,
+        "sha256": "7f66f939a881baf4f46a2216496798edf4a1429878b646d12674aa62f27d8a25"
+      },
+      {
+        "name": "_internal/sherpa_onnx/lib/sherpa-onnx-c-api.dll",
+        "bytes": 4605952,
+        "sha256": "2729a0da3fbd20fb4e14e157f7cc0e00af848b55f04121319d445c138aeba214"
+      },
+      {
+        "name": "_internal/sherpa_onnx/lib/sherpa-onnx-c-api.lib",
+        "bytes": 75604,
+        "sha256": "ff29efcc1af67ecdd860905025cde2c48915d6c1060ca1a43cc2e442a138e401"
+      },
+      {
+        "name": "_internal/sherpa_onnx/lib/sherpa-onnx-cxx-api.dll",
+        "bytes": 259584,
+        "sha256": "5b92c60d4a73d340f5453e17b1c5caf28a6f3baec08dcb8d8951bd3ea842fbe5"
+      },
+      {
+        "name": "_internal/sherpa_onnx/lib/sherpa-onnx-cxx-api.lib",
+        "bytes": 224714,
+        "sha256": "fbad731250ed1c688c76da5ea92c67c2b26cac07d87dd0478c4dcb96f864feee"
+      },
+      {
+        "name": "_internal/sherpa_onnx/offline_recognizer.py",
+        "bytes": 66943,
+        "sha256": "58102abf1eab493df88327ab1c65a2694d65974227533dccac261799929f0201"
+      },
+      {
+        "name": "_internal/sherpa_onnx/online_recognizer.py",
+        "bytes": 45171,
+        "sha256": "21d560bfd5849098aa92172db140a5979104b2352bc3f25d018e9efdf120ecf1"
+      },
+      {
+        "name": "_internal/sherpa_onnx/utils.py",
+        "bytes": 6783,
+        "sha256": "251309d8b41fe8d2baa1dbf4ac6edf4fc6ac1fa65a9e3ab7638c41bf0951eae0"
+      },
+      {
+        "name": "_internal/sherpa_onnx-1.13.8.dist-info/entry_points.txt",
+        "bytes": 56,
+        "sha256": "756136f401963456664e5edad4f1164e85b00ca0f74e35e5f2e967a3d58ac75b"
+      },
+      {
+        "name": "_internal/sherpa_onnx-1.13.8.dist-info/INSTALLER",
+        "bytes": 4,
+        "sha256": "ceebae7b8927a3227e5303cf5e0f1f7b34bb542ad7250ac03fbcde36ec2f1508"
+      },
+      {
+        "name": "_internal/sherpa_onnx-1.13.8.dist-info/licenses/LICENSE",
+        "bytes": 11560,
+        "sha256": "3ddf9be5c28fe27dad143a5dc76eea25222ad1dd68934a047064e56ed2fa40c5"
+      },
+      {
+        "name": "_internal/sherpa_onnx-1.13.8.dist-info/METADATA",
+        "bytes": 54620,
+        "sha256": "a7d15d519c40063fc92210cc4e28e557371a9ad01074b238b4930bd5f62626de"
+      },
+      {
+        "name": "_internal/sherpa_onnx-1.13.8.dist-info/RECORD",
+        "bytes": 1884,
+        "sha256": "cfcdcf6585b14df23781fb47670bf7764fef1970f5012a0382c4ce65618735bb"
+      },
+      {
+        "name": "_internal/sherpa_onnx-1.13.8.dist-info/REQUESTED",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "_internal/sherpa_onnx-1.13.8.dist-info/top_level.txt",
+        "bytes": 25,
+        "sha256": "77e18a1297fed2dd074fa9d4eb7174bdb6d5ea9da62700329edfdc393b7ea777"
+      },
+      {
+        "name": "_internal/sherpa_onnx-1.13.8.dist-info/WHEEL",
+        "bytes": 101,
+        "sha256": "547199cfb31450578b25778938b82f94e190e69e750e6c850e3b6d657fa1a30f"
+      },
+      {
+        "name": "_internal/sherpa_onnx_core-1.13.8.dist-info/INSTALLER",
+        "bytes": 4,
+        "sha256": "ceebae7b8927a3227e5303cf5e0f1f7b34bb542ad7250ac03fbcde36ec2f1508"
+      },
+      {
+        "name": "_internal/sherpa_onnx_core-1.13.8.dist-info/METADATA",
+        "bytes": 532,
+        "sha256": "07285ebda6ae2f6a185926f443b87eed9e3495de3cc6620fb8032d72d3aec088"
+      },
+      {
+        "name": "_internal/sherpa_onnx_core-1.13.8.dist-info/RECORD",
+        "bytes": 1869,
+        "sha256": "73038528114c9d47860c57bbe27bbb6ca6cc85a1815ccef233ac19811414c684"
+      },
+      {
+        "name": "_internal/sherpa_onnx_core-1.13.8.dist-info/top_level.txt",
+        "bytes": 12,
+        "sha256": "12b348b3de981ed4aeaa2d2c76d1b57faf2861e0aaaca20ccc3a80a1b0764a8c"
+      },
+      {
+        "name": "_internal/sherpa_onnx_core-1.13.8.dist-info/WHEEL",
+        "bytes": 98,
+        "sha256": "b51c93d01a4725f420dbb705481aadea999b1b6caa844963abd0279b88024f4e"
+      },
+      {
+        "name": "_internal/ucrtbase.dll",
+        "bytes": 1362264,
+        "sha256": "3239227d27667ba20d10a880751924e5719de0078f9fce232d149d383f7681f6"
+      },
+      {
+        "name": "_internal/unicodedata.pyd",
+        "bytes": 1143600,
+        "sha256": "ccde2f354c01e1e5eedf4caa3c84a20d71ed3cb83c7d46ed958166261a8cfb16"
+      },
+      {
+        "name": "_internal/VCRUNTIME140.dll",
+        "bytes": 124544,
+        "sha256": "d5e4d9a3e835fa679450145d6a7d94e36573a509317111904d9b3712c30d9066"
+      },
+      {
+        "name": "_internal/VCRUNTIME140_1.dll",
+        "bytes": 49792,
+        "sha256": "1f2d41c4aa5db0bc33ebf7b66d72943a817d7ce6cbe880502a9403823633093f"
+      },
+      {
+        "name": "licenses/ggml-LICENSE.txt",
+        "bytes": 1099,
+        "sha256": "bcd8ec749126d45cb06737d0690295d73df4b6e7e194205bcf91190368f27285"
+      },
+      {
+        "name": "licenses/ggml-windows-spaces.patch",
+        "bytes": 1182,
+        "sha256": "35367c965b8d36209da2497f617ea9acc5eb5e1e3ee6708656d0e290173aa704"
+      },
+      {
+        "name": "licenses/Qwen3-TTS-LICENSE.txt",
+        "bytes": 11344,
+        "sha256": "a9eae1c78a93600a66ebb23a75c414cf1376c259b6e7da0fc67fd35406dc4b20"
+      },
+      {
+        "name": "licenses/qwentts-LICENSE.txt",
+        "bytes": 1087,
+        "sha256": "cddbecd5db98ec5bd44af3e7221b6d44c3e9fed1c92940a3be5b0080c9b86475"
+      },
+      {
+        "name": "licenses/recognition/numpy/LICENSE",
+        "bytes": 1616,
+        "sha256": "d78dbb208b80d92b4d333e41a4baae50d12444f46e53199fa7726a91de6e2da7"
+      },
+      {
+        "name": "licenses/recognition/numpy/LICENSE.md",
+        "bytes": 3582,
+        "sha256": "b4bc2f4fa1c95778f1ed3dd8f14706bece399475b978f9f34b5d3cd72521b48a"
+      },
+      {
+        "name": "licenses/recognition/numpy/LICENSE.txt",
+        "bytes": 1039,
+        "sha256": "d544761558b510866c21f7e8a2d5716fca76e0b98117e3b6b86314db7244d150"
+      },
+      {
+        "name": "licenses/recognition/numpy/VERSION.txt",
+        "bytes": 13,
+        "sha256": "f4bfcfcc7af63d62b947b454f2aee5332265b299ff17cfb8b2a57f99e0171a6d"
+      },
+      {
+        "name": "licenses/recognition/onnxruntime/LICENSE",
+        "bytes": 1094,
+        "sha256": "c250d6278f0b47a6439fb7592b08b58a55eb9f535aa49a1db63211c3f982b674"
+      },
+      {
+        "name": "licenses/recognition/onnxruntime/VERSION.txt",
+        "bytes": 20,
+        "sha256": "b0c2ee60944f5dbf9a3d7a6cc7a6204c193be61084af60a9417c38ac0931b81d"
+      },
+      {
+        "name": "licenses/recognition/sherpa-onnx/LICENSE",
+        "bytes": 11560,
+        "sha256": "3ddf9be5c28fe27dad143a5dc76eea25222ad1dd68934a047064e56ed2fa40c5"
+      },
+      {
+        "name": "licenses/recognition/sherpa-onnx/VERSION.txt",
+        "bytes": 20,
+        "sha256": "84b0bd2c64b382081c67483262dd6d70785947661f3c825b6e6d6013341eb06f"
+      },
+      {
+        "name": "licenses/recognition/sherpa-onnx-core/LICENSE",
+        "bytes": 11560,
+        "sha256": "3ddf9be5c28fe27dad143a5dc76eea25222ad1dd68934a047064e56ed2fa40c5"
+      },
+      {
+        "name": "licenses/recognition/sherpa-onnx-core/VERSION.txt",
+        "bytes": 25,
+        "sha256": "c70f965665545d007cf72695f8c6f8dbebd4e226e01b28bab2e2513033fbe630"
+      },
+      {
+        "name": "licenses/SOURCES.json",
+        "bytes": 1042,
+        "sha256": "8f8a734f1b5360e85fc8626ec38029e0450f83907badf425024561309f1d0eaf"
+      },
+      {
+        "name": "licenses/Vulkan-Loader-LICENSE.txt",
+        "bytes": 4008,
+        "sha256": "404deb98dabf3e54bf9070d59676b31d69a3da2f9f6e56bdf09ad315c04c718c"
+      },
+      {
+        "name": "max-worker.exe",
+        "bytes": 4518142,
+        "sha256": "5c90eb7632d53bdc5c6077a44e88c57217e552e8a988d493cd76f89c97fa5453"
+      },
+      {
+        "name": "native/ggml-base.dll",
+        "bytes": 676864,
+        "sha256": "13117e0bbcd475e76c7cf4d2596537f3635f54ebcf478e1af5f86444b8eeed7d"
+      },
+      {
+        "name": "native/ggml-cpu.dll",
+        "bytes": 972288,
+        "sha256": "af34a6678f46edac8befdc7250c783d69c26963be8cec69014a8cbac1e774583"
+      },
+      {
+        "name": "native/ggml-vulkan.dll",
+        "bytes": 41537536,
+        "sha256": "6907b049e7bb39704dda7e654cd4353e163b4584c007a9b84f9b9d1d233fa49e"
+      },
+      {
+        "name": "native/ggml.dll",
+        "bytes": 60928,
+        "sha256": "9df348f5f4ee08b4ddeced8b858afd37d70b8248a2fe72d64e93d47375d02892"
+      },
+      {
+        "name": "native/qwen.dll",
+        "bytes": 310784,
+        "sha256": "ea7dba5748dc78e205e1340f0e4d43c7a44c40fa4e42daaaee9a340cd73d057b"
+      },
+      {
+        "name": "native/vulkan-1.dll",
+        "bytes": 1729464,
+        "sha256": "e1fcfc9489beefa6a6d9d11d6c7517f6a2b7f16e0d3fb8f4103bee0210f314a3"
+      },
+      {
+        "name": "voices/fr-fr/NOTICE.txt",
+        "bytes": 851,
+        "sha256": "1afc5b84ca0d0e500cf4a2029e981fc6fcdca116ee56168c310031d0b31b521d"
+      },
+      {
+        "name": "voices/fr-fr/reference.json",
+        "bytes": 571,
+        "sha256": "b9f1df3137c80e3b11a4007448b51db1739e16e2a4b4797a9d8b2c4abb683737"
+      },
+      {
+        "name": "voices/fr-fr/reference.wav",
+        "bytes": 330284,
+        "sha256": "b4ff8ba50a0cc032a1dc72d3e28d46230d0cbf403d6e000dd74fdf418785d701"
+      }
+    ]
+  },
+  "models": [
+    {
+      "name": "asr/decoder.int8.onnx",
+      "bytes": 11845275,
+      "sha256": "179e50c43d1a9de79c8a24149a2f9bac6eb5981823f2a2ed88d655b24248db4e",
+      "url": "https://huggingface.co/csukuangfj/sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8/resolve/2bda32ec70b097a55adaa07d9a7173915b43cc78/decoder.int8.onnx"
+    },
+    {
+      "name": "asr/encoder.int8.onnx",
+      "bytes": 652184281,
+      "sha256": "acfc2b4456377e15d04f0243af540b7fe7c992f8d898d751cf134c3a55fd2247",
+      "url": "https://huggingface.co/csukuangfj/sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8/resolve/2bda32ec70b097a55adaa07d9a7173915b43cc78/encoder.int8.onnx"
+    },
+    {
+      "name": "asr/joiner.int8.onnx",
+      "bytes": 6355277,
+      "sha256": "3164c13fc2821009440d20fcb5fdc78bff28b4db2f8d0f0b329101719c0948b3",
+      "url": "https://huggingface.co/csukuangfj/sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8/resolve/2bda32ec70b097a55adaa07d9a7173915b43cc78/joiner.int8.onnx"
+    },
+    {
+      "name": "asr/tokens.txt",
+      "bytes": 93939,
+      "sha256": "d58544679ea4bc6ac563d1f545eb7d474bd6cfa467f0a6e2c1dc1c7d37e3c35d",
+      "url": "https://huggingface.co/csukuangfj/sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8/resolve/2bda32ec70b097a55adaa07d9a7173915b43cc78/tokens.txt"
+    },
+    {
+      "name": "asr/smart-turn.onnx",
+      "url": "https://huggingface.co/pipecat-ai/smart-turn-v3/resolve/f766f81d3cfdf7737ac64aad813d91bbfd56bf93/smart-turn-v3.2-cpu.onnx",
+      "bytes": 8679182,
+      "sha256": "2bb026316b14a660486a75b1733cd3fbab8c2fd0314dc9af7be49f8cca967e4f"
+    },
+    {
+      "name": "asr/silero-vad.onnx",
+      "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/silero_vad.onnx",
+      "bytes": 643854,
+      "sha256": "9e2449e1087496d8d4caba907f23e0bd3f78d91fa552479bb9c23ac09cbb1fd6"
+    },
+    {
+      "name": "tts/talker.gguf",
+      "url": "https://huggingface.co/Serveurperso/Qwen3-TTS-GGUF/resolve/b7ee2e8c7459c3bea99da23e3d178125a7d1713c/qwen-talker-1.7b-base-Q4_K_M.gguf",
+      "bytes": 1219245248,
+      "sha256": "ea393ebaf2167ea23ce9fc18b093822851358a950d7075cd47ab4f6ce23e887d"
+    },
+    {
+      "name": "tts/codec.gguf",
+      "url": "https://huggingface.co/Serveurperso/Qwen3-TTS-GGUF/resolve/b7ee2e8c7459c3bea99da23e3d178125a7d1713c/qwen-tokenizer-12hz-F32.gguf",
+      "bytes": 647263104,
+      "sha256": "b16b95557c7c7340a121757bd6855b9609e1cf4ad3fad0778b89393293ae5f3d"
+    }
+  ],
+  "signature": "V45/uZ/qmdW8+ApJEaqoPrFFVlPB+GqIsU5T8ZQlg818FjKgu09V98FnMR4iG5OIyiSLRoe8uvVhJbDdlH8OAQ=="
+}

@@ -1,4 +1,4 @@
-"""Build the Windows icon from the administration console's F favicon."""
+"""Build the Windows icon from the administration console's K favicon."""
 from html.parser import HTMLParser
 from pathlib import Path
 import re
@@ -15,13 +15,13 @@ class Favicon(HTMLParser):
 
 
 def polygon(path):
-    tokens=re.findall(r'[MmHhVvZz]|-?\d+(?:\.\d+)?',path)
+    tokens=re.findall(r'[MmLlHhVvZz]|-?\d+(?:\.\d+)?',path)
     points=[];x=y=0;i=0
     while i<len(tokens):
         command=tokens[i];i+=1
-        if command in ('M','m'):
+        if command in ('M','m','L','l'):
             a,b=float(tokens[i]),float(tokens[i+1]);i+=2
-            x,y=(a,b) if command=='M' else (x+a,y+b)
+            x,y=(a,b) if command in ('M','L') else (x+a,y+b)
         elif command in ('H','h'):
             a=float(tokens[i]);i+=1;x=a if command=='H' else x+a
         elif command in ('V','v'):
@@ -53,7 +53,7 @@ def main():
     image=canvas.resize((256,256),Image.Resampling.LANCZOS)
     image.save(root/'fred.ico',sizes=sizes)
     image.resize((128,128),Image.Resampling.LANCZOS).save(root/'fred-icon.png')
-    print('F icon generated in 9 Windows sizes from the console favicon.')
+    print('K icon generated in 9 Windows sizes from the console favicon.')
 
 
 if __name__=='__main__':main()

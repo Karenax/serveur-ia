@@ -1,0 +1,36 @@
+'use strict';
+const assert=require('node:assert/strict');
+module.exports=async({page,state,errors,until,sleep,event,voiceUI})=>{
+  await voiceUI.click('[data-view-button="voice"]');await voiceUI.selectOption('#voice-quality','max');
+  state.voiceFrames=1;await voiceUI.click('#conversation-start');await page.waitForFunction(()=>window.conversationBusy);
+  state.holdChat=true;
+  state.native.speech_id=1;state.native.turns=[{id:1,speech_id:1,text:'Une réponse complète, sans coupure.'}];
+  await until(()=>!!state.pendingChat,'Reply is waiting for model tokens');
+  const prefix='Je vais conserver tous les mots de cette réponse pour que la lecture reste naturelle et continue';
+  const tail=', sans coupure au milieu des mots. Le Dr. Martin arrive à 14.30 heures. '+('La suite reste entière et bien lisible. '.repeat(30));
+  const pending=state.pendingChat;state.pendingChat=null;
+  event(pending.res,{choices:[{delta:{content:prefix}}]});await sleep(750);
+  assert.equal(state.speech.length,0,'An arbitrary 80-character prefix must not be sent to synthesis');
+  event(pending.res,{choices:[{delta:{content:tail},finish_reason:'stop'}]});pending.res.end('data: [DONE]\n\n');
+  const expected=(prefix+tail).trim();
+  await until(async()=>state.speech.map(row=>row.text).join(' ')===expected,'Every word reaches synthesis, including the long reply tail');
+  assert(state.speech.every(row=>row.text.length<=600));
+  assert(state.speech.some(row=>row.text.includes('Dr. Martin')),'An abbreviation is not an artificial sentence boundary');
+  assert(state.speech.some(row=>row.text.includes('14.30')),'Decimals are preserved');
+  await page.waitForFunction(()=>window.__audio.ended===window.__audio.started&&window.__audio.started>0);
+  const beforeSecond=await page.evaluate(()=>window.__audio.started);
+  // Submit immediately after sound ends, before the former 350 ms deaf window.
+  state.holdChat=false;state.native.speech_id=2;state.native.turns=[{id:2,speech_id:2,text:'Oui'}];
+  await until(()=>state.chats.length===2,'Immediate one-word reply after playback is retained');
+  await page.waitForFunction(previous=>!busy&&!historySyncPending&&window.__audio.started>previous&&window.__audio.ended===window.__audio.started,beforeSecond);
+  const stopped=await page.evaluate(()=>window.__audio.stopped);
+  state.failAfterPCM=true;state.native.speech_id=3;state.native.turns=[{id:3,speech_id:3,text:'Une troisième réponse.'}];
+  await until(()=>state.chats.length===3,'Third turn submitted');
+  await page.waitForFunction(()=>document.getElementById('error').textContent.includes('audio interrompue'));
+  assert.equal(await page.evaluate(()=>window.__audio.stopped),stopped,'Valid queued sound is not abruptly stopped by an unexpected stream EOF');
+  assert.equal(state.stops,0,'An audio error does not hang up the conversation');
+  await page.waitForFunction(()=>window.__audio.ended===window.__audio.started);
+  await voiceUI.click('#conversation-start');await page.waitForFunction(()=>!window.conversationBusy);
+  assert.deepEqual(errors,[]);
+  console.log(JSON.stringify({passed:true,checks:['no arbitrary first fragment','complete long reply without lost tail','abbreviations and decimals','immediate speech after playback','EOF drains queued sound','session survives a failed audio stream']}));
+};

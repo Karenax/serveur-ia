@@ -63,6 +63,20 @@ class KnowledgeTests(unittest.TestCase):
         self.assertNotIn('projet uniquement',messages[0]['content'])
         self.assertTrue(sources)
 
+    def test_voice_excludes_current_conversation_and_keeps_full_scope_and_sources(self):
+        self.history([self.row('current-chat','Décision du jour Orion.'),self.row('other-chat','Ancien engagement Orion.')])
+        self.k.synchronize();calls=self.e.calls
+        messages=[{'role':'system','content':'Kiara oral.'},{'role':'user','content':'Précision ancienne.'},{'role':'assistant','content':'Réponse ancienne.'},{'role':'user','content':'Quel engagement Orion ?'}]
+        result,sources=self.w.context('alice',messages,voice_conversation='currentchat')
+        self.assertTrue(sources);self.assertEqual({r['conversation'] for r in sources},{'other-chat'})
+        self.assertEqual(result[1:4],messages[:3]);self.assertEqual(result[-1],messages[-1])
+        self.assertIn('Ancien engagement',result[-2]['content']);self.assertNotIn('"passage"',result[-2]['content'])
+        self.assertIn('passage',sources[0])
+
+    def test_empty_cache_does_not_run_an_embedding_query(self):
+        before=self.e.calls
+        self.assertEqual(self.retrieve(),[]);self.assertEqual(before,self.e.calls)
+
     def test_deleted_or_updated_documents_are_rejected_before_reindex(self):
         id=self.action('document_create',project=self.p,title='Contrat',text='Ancien engagement')['id']
         self.k.synchronize();self.assertTrue(self.retrieve(self.p))

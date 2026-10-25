@@ -1,4 +1,4 @@
-ESPACES DE TRAVAIL — ACCÈS SERVEUR FRED
+ESPACES DE TRAVAIL — ACCÈS SERVEUR KIARA
 Étude et proposition : 4 octobre 2026
 État : plan initial ; les lots retenus sont intégrés dans la version 3.3.1.
 Guide de la version livrée : ESPACES-FRED.txt ; vérifications : AUDIT-ESPACES-FRED.txt.

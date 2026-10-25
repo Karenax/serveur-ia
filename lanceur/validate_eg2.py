@@ -71,7 +71,7 @@ def main():
             report['checks']+=['owner_isolation','project_personal_isolation','all_french_expected_top_scores']
             assert all(q['retrieved_expected'] for q in questions),questions
             assert personal,'Mémoire personnelle non retrouvée.'
-            # Fred attaches exact source passages to the context sent to Strata.
+            # Kiara attaches exact source passages to the context sent to Strata.
             messages,sources=w.context('alice',[{'role':'user','content':fixtures[0][2]}],p)
             assert any('sept jours' in s['text'] for s in sources)
             assert 'sept jours' in messages[0]['content']

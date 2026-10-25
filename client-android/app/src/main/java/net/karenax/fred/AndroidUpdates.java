@@ -52,7 +52,7 @@ final class AndroidUpdates implements AutoCloseable {
         if(code<=BuildConfig.VERSION_CODE){
             synchronized(this){readyFile=null;readyRelease=null;}
             cleanCache(new File(context.getFilesDir(),"updates"),null);
-            setState("current","Fred Android "+BuildConfig.VERSION_NAME+" est à jour.",0,0);return;
+            setState("current","Kiara Android "+BuildConfig.VERSION_NAME+" est à jour.",0,0);return;
         }
         File directory=new File(context.getFilesDir(),"updates");
         if(!directory.isDirectory()&&!directory.mkdirs())throw new IOException();
@@ -66,7 +66,7 @@ final class AndroidUpdates implements AutoCloseable {
         remote.active.incrementAndGet();
         try{
             long total=release.getLong("bytes"),received=0;
-            setState("downloading","Téléchargement de Fred Android "+release.getString("version")+"…",0,total);
+            setState("downloading","Téléchargement de Kiara Android "+release.getString("version")+"…",0,total);
             response=remote.open("/v1/client/android/download",null,null);
             if(response.status!=200)throw new IOException();
             try(FileOutputStream output=new FileOutputStream(partial)){
@@ -75,7 +75,7 @@ final class AndroidUpdates implements AutoCloseable {
                     if(Thread.currentThread().isInterrupted()||isClosed())throw new InterruptedIOException();
                     received+=count;if(received>total||received>MAX_BYTES)throw new IOException();
                     output.write(buffer,0,count);
-                    setState("downloading","Téléchargement de Fred Android "+release.getString("version")+"…",received,total);
+                    setState("downloading","Téléchargement de Kiara Android "+release.getString("version")+"…",received,total);
                 }
                 output.getFD().sync();
             }
@@ -90,7 +90,7 @@ final class AndroidUpdates implements AutoCloseable {
     private synchronized void markReady(File file,JSONObject release){
         if(closed)return;readyRelease=Json.copy(release);readyFile=file;
         cleanCache(file.getParentFile(),file);
-        setState("ready","Fred Android "+release.optString("version")+" est prêt à installer.",file.length(),file.length());
+        setState("ready","Kiara Android "+release.optString("version")+" est prêt à installer.",file.length(),file.length());
     }
     synchronized File installationFile()throws Exception {
         if(closed||working||readyFile==null||readyRelease==null)throw new IllegalArgumentException("Aucune mise à jour prête. Recherchez une mise à jour.");
@@ -100,7 +100,7 @@ final class AndroidUpdates implements AutoCloseable {
         Uri uri=Uri.parse("content://"+context.getPackageName()+".updates/"+apk.getName());
         Intent intent=new Intent(Intent.ACTION_VIEW).setDataAndType(uri,"application/vnd.android.package-archive")
                 .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        intent.setClipData(ClipData.newRawUri("Mise à jour Fred",uri));return intent;
+        intent.setClipData(ClipData.newRawUri("Mise à jour Kiara",uri));return intent;
     }
     static void cleanCache(File directory,File retained){
         try{
@@ -143,7 +143,7 @@ final class AndroidUpdates implements AutoCloseable {
                 ||versionCode(archive)!=release.getLong("version_code")||versionCode(archive)<=versionCode(installed)
                 ||!release.getString("version").equals(archive.versionName))throw new IllegalArgumentException("APK incompatible ou version trop ancienne.");
         android.content.pm.Signature[] a=signatures(archive),b=signatures(installed);
-        if(a==null||b==null||a.length!=1||b.length!=1||!a[0].equals(b[0]))throw new IllegalArgumentException("La signature de l’APK ne correspond pas à Fred.");
+        if(a==null||b==null||a.length!=1||b.length!=1||!a[0].equals(b[0]))throw new IllegalArgumentException("La signature de l’APK ne correspond pas à Kiara.");
     }
     @Override public synchronized void close(){closed=true;worker.shutdownNow();}
 }

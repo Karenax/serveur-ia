@@ -1,4 +1,4 @@
-AUDIT EN DEUX PASSES — ACCÈS SERVEUR FRED 3.2.1
+AUDIT EN DEUX PASSES — ACCÈS SERVEUR KIARA 3.2.1
 Date : 4 octobre 2026
 
 Périmètre : console, client, API locale, passerelle distante, identités WireGuard,
@@ -8,7 +8,7 @@ Décision conservée : un EXE personnel par destinataire, sans compte ni login c
 
 PREMIÈRE PASSE — 3.2.0
 
-1. Identité du produit : Accès serveur Fred dans la fenêtre et l’interface, les
+1. Identité du produit : Accès serveur Kiara dans la fenêtre et l’interface, les
    propriétés Windows, le binaire compilé et le téléchargement UTF-8 du serveur.
 
 2. Historique : un fichier illisible était assimilé à un fichier absent et pouvait

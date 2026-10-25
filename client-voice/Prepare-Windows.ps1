@@ -14,7 +14,7 @@ Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'conversation-models.json') -Des
 Get-ChildItem -LiteralPath (Join-Path $voiceBuild 'bin') -Filter '*.dll' | ForEach-Object { Copy-Item -LiteralPath $_.FullName -Destination $voiceTarget -Force }
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'licenses') -Destination $voiceTarget -Recurse -Force
 $voiceSources = @{}
-foreach ($voiceSource in @('model.json','conversation-models.json','CMakeLists.txt','fred_voice.cpp','fred_voice.h','fred_voice_jni.cpp','fred_aec.cpp','conversation_worker.py','recognition.py','turn_features.py','aec_capture.py')) {
+foreach ($voiceSource in @('model.json','conversation-models.json','CMakeLists.txt','fred_voice.cpp','fred_voice.h','fred_voice_jni.cpp','fred_aec.cpp','conversation_worker.py','recognition.py','max_recognition.py','turn_features.py','aec_capture.py')) {
     $voiceSources[$voiceSource] = (Get-FileHash -LiteralPath (Join-Path $PSScriptRoot $voiceSource) -Algorithm SHA256).Hash.ToLowerInvariant()
 }
 $voiceBuildInfo = @{engine='sherpa-onnx';version='1.13.8';asr='Parakeet v3';sources=$voiceSources;cpu_only=$true} | ConvertTo-Json -Depth 5

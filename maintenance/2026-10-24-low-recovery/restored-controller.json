@@ -1,0 +1,12 @@
+{
+  "commit": "75e8eb8",
+  "version": "3.5.39",
+  "blocks": {
+    "splitSpeech": "b243796f2b67c76bdba1fb790bf0af9873e7532a5c45f7b680157f0744a411fa",
+    "speak": "5f83c6989752c7a49180fc5a52a15646c512c116a9b87d7a2f8474ce4e33a85f",
+    "refresh": "da2cf00dedca4f78105a82250a7bf3a309b34d6cabb293326895fe53b1e1e601"
+  },
+  "recognition": "unchanged",
+  "tts": "Phonon /v1/voice/speech",
+  "max_controller": "unchanged"
+}

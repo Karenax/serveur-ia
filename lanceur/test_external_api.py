@@ -54,14 +54,14 @@ class ExternalAPITests(unittest.TestCase):
 
     def test_fred_chat_keeps_agent_conversation_route(self):
         self.local_hermes()
-        blocks=[b'data: {"choices":[{"delta":{"content":"Agent Fred"}}]}\n\n',b'data: [DONE]\n\n']
+        blocks=[b'data: {"choices":[{"delta":{"content":"Agent Kiara"}}]}\n\n',b'data: [DONE]\n\n']
         def stream(*args):
             self.agent_calls.append(args)
             yield from blocks
         self.store.hermes.stream=stream
         with self.request('/v1/chat/completions',{'conversation_id':'discussion','turn_id':'a'*32,
             'messages':[{'role':'user','content':'Question'}]}) as response:
-            self.assertEqual(json.load(response)['choices'][0]['message']['content'],'Agent Fred')
+            self.assertEqual(json.load(response)['choices'][0]['message']['content'],'Agent Kiara')
         self.assertEqual(len(self.agent_calls),1)
 
     def test_cloud_worker_uses_only_selected_provider_and_returns_standard_json(self):

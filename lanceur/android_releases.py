@@ -13,7 +13,9 @@ _cache = {}
 
 def status(directory=None):
     directory = Path(directory) if directory is not None else DIRECTORY
-    source = directory / 'Acces-serveur-Fred-Android.apk'
+    source = directory / 'Acces-serveur-Kiara-Android.apk'
+    if not source.is_file():
+        source = directory / 'Acces-serveur-Fred-Android.apk'
     try:
         release = json.loads((directory / 'release.json').read_text(encoding='utf-8-sig'))
         if (release.get('package') != 'net.karenax.fred'

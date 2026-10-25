@@ -1,0 +1,28 @@
+{
+  "api": 5,
+  "revision": "vulkan-q4-550bf7639ad29caf",
+  "upgrade_download_bytes": 1265686849,
+  "reused_bytes": 1327064912,
+  "runtime_signature_verified": true,
+  "workers": {
+    "tts": {
+      "passed": true,
+      "pcm_bytes": 153600,
+      "text": "",
+      "metrics": {
+        "first_audio_ms": 3204.372800013516,
+        "elapsed_ms": 6159.826400020393,
+        "rtf": 1.9249457500063727
+      }
+    },
+    "asr": {
+      "passed": true,
+      "pcm_bytes": 0,
+      "text": "Bonjour, je suis Kiara. Comment puis-je vous aider?",
+      "metrics": {
+        "elapsed_ms": 265.1056999748107,
+        "rtf": 0.07203959238445942
+      }
+    }
+  }
+}

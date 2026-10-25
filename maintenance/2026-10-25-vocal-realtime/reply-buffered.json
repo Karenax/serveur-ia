@@ -1,0 +1,47 @@
+[
+  {
+    "question": "Bonjour, tu m’entends ?",
+    "expected": "answer",
+    "actual": "answer",
+    "query": "",
+    "answer": "Oui, je t'entends parfaitement. Comment puis-je t'aider aujourd'hui ?",
+    "first_text_seconds": 6.005301500001224,
+    "total_seconds": 6.005467899987707
+  },
+  {
+    "question": "Combien font douze plus dix-sept ?",
+    "expected": "answer",
+    "actual": "answer",
+    "query": "",
+    "answer": "Douze plus dix-sept font vingt-neuf. C'est un calcul simple, mais utile pour vérifier ses bases en arithmétique.",
+    "first_text_seconds": 5.581164800008992,
+    "total_seconds": 5.5813230000203475
+  },
+  {
+    "question": "Peux-tu chercher sur Internet ?",
+    "expected": "clarify",
+    "actual": "answer",
+    "query": "",
+    "answer": "Oui, je peux chercher sur Internet si tu me donnes un sujet précis. Dis-moi simplement ce que tu veux savoir.",
+    "first_text_seconds": 5.245646299998043,
+    "total_seconds": 5.24580830000923
+  },
+  {
+    "question": "Quoi de neuf aujourd’hui dans l’IA ?",
+    "expected": "search",
+    "actual": "search",
+    "query": "actualités IA 25 octobre 2026",
+    "answer": "",
+    "first_text_seconds": null,
+    "total_seconds": 5.035187600005884
+  },
+  {
+    "question": "Explique comment fonctionne une recherche sur Internet.",
+    "expected": "answer",
+    "actual": "answer",
+    "query": "",
+    "answer": "Une recherche sur Internet commence par la saisie de mots-clés dans un moteur de recherche. Ce dernier analyse ensuite des milliards de pages indexées pour classer les résultats selon leur pertinence. Il te présente ensuite une liste de liens triés pour répondre à ta question.",
+    "first_text_seconds": 6.3058059999893885,
+    "total_seconds": 6.305938899982721
+  }
+]

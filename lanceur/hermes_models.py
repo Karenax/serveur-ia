@@ -1,7 +1,7 @@
 """Hermes model discovery and explicit, centrally brokered provider sharing.
 
 Only public model metadata reaches clients. Personal refresh tokens stay in the
-original Hermes store; native Fred profiles request a short-lived credential
+original Hermes store; native Kiara profiles request a short-lived credential
 through the authenticated private broker while their own run is active.
 """
 from __future__ import annotations
@@ -134,7 +134,7 @@ with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.St
    selected=[];provider_available=True;unavailable_reason='';copilot_catalog=[]
    # Discovery is bounded and outside admission locks. Refresh a single public
    # capability catalogue per aggregator; a stale disk verdict must not cause
-   # Fred to advertise an effort that the route now silently clamps.
+   # Kiara to advertise an effort that the route now silently clamps.
    reasoning_catalog=None
    if pid in {'nous','openrouter'}:
     reasoning_catalog=_fetch_caps(_NOUS_CAPS if pid=='nous' else _OPENROUTER_CAPS,timeout=4,force=True)
@@ -387,7 +387,7 @@ class HermesModels:
             if not self.allowed(owner):raise Denied('Ce compte ne peut pas utiliser les fournisseurs Hermes partagés.')
             selection=next((dict(row) for row in self.refresh() if row['id']==requested),None)
             if selection is None:raise ValueError('Modèle Hermes inconnu ou connexion retirée.')
-            if not self.exposed(requested):raise Denied('Ce modèle n’est pas exposé aux clients Fred.')
+            if not self.exposed(requested):raise Denied('Ce modèle n’est pas exposé aux clients Kiara.')
             if self.duplicate_local(selection):raise Denied('Ce modèle est déjà disponible avec Qwen local.')
         if require_available and not selection['available']:raise ModelUnavailable('Le modèle sélectionné est indisponible.')
         return selection

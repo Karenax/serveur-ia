@@ -1,19 +1,20 @@
 {
-  "cpu_only": true,
   "sources": {
-    "fred_voice.h": "2a7eebbb3ed0370d2a3d346cb66e2b80778a1ec3f7e15995e9a26c5a3e3d5001",
-    "conversation-models.json": "adcc97067c7c50274f1ff68b45bda4957dea43335e8fd77174b68aba8b14586f",
-    "fred_voice.cpp": "71df9feaf1d5403b79fb1f9b7e7707fc94005fd13aab832c2253557364457102",
-    "aec_capture.py": "dd6c5b723cfaf80c5cf2b2ca90dd1e08f724ad57ce2aa5c5ad567b9737d8cfbc",
-    "conversation_worker.py": "2592f1357fe8e1eeea97b16b0cc0d38b46dbfb4adbb9bf84fe06c4684e7a9db2",
-    "recognition.py": "6853fefb5a94efa48611aee378899d895bb49d6ee1504467e38e70da01646e7c",
-    "fred_voice_jni.cpp": "a59e127dbde4730e9554ecff090e62cb5a670718b3a84018cad5586c621f5d19",
-    "CMakeLists.txt": "1baeb84022f196640771e3106d8895821aa9a79534c19ae4f017da54f3b5912b",
     "turn_features.py": "cb937b7ce1ee4e0e28a8aa94f689d8e1c054995a53f8f74ef8d13ba533ea07f0",
-    "fred_aec.cpp": "939f52d36ee15f08ea56bb1b5f31201b24b8b3876ff1a50bb351259b4a048951",
-    "model.json": "5dde5e5c0d565557189d8e81f261cd3e1588358e0d1906fb46aa97f53bbe0690"
+    "conversation-models.json": "adcc97067c7c50274f1ff68b45bda4957dea43335e8fd77174b68aba8b14586f",
+    "model.json": "5dde5e5c0d565557189d8e81f261cd3e1588358e0d1906fb46aa97f53bbe0690",
+    "fred_voice.cpp": "7be43dedeaf036713cca3a1a61a8db3b0b911f7acd4faa2ebfecb65438a7cb8d",
+    "recognition.py": "5f4b2abbdcac658950ecb321ec7ce14498e812bd0ca90c3a8160fbc7defe50fb",
+    "aec_capture.py": "dd6c5b723cfaf80c5cf2b2ca90dd1e08f724ad57ce2aa5c5ad567b9737d8cfbc",
+    "max_recognition.py": "dd4941588c4f96e50c09c6d46763cee1fa0e45fba0e911a7b7c64376077db52c",
+    "CMakeLists.txt": "1baeb84022f196640771e3106d8895821aa9a79534c19ae4f017da54f3b5912b",
+    "conversation_worker.py": "16fd12fb85caf4c41de165069f9c599bd5f178bddffed10c4903e370079ee608",
+    "fred_voice.h": "107a559afcd43785afa090d0aaee05901d5311595ab38e9aa4e8f97e8744072f",
+    "fred_voice_jni.cpp": "97e6fac01e949323c1c7ef4db232256b7c77d11d769fb865f1ec6b9c0715b054",
+    "fred_aec.cpp": "939f52d36ee15f08ea56bb1b5f31201b24b8b3876ff1a50bb351259b4a048951"
   },
-  "version": "1.13.8",
+  "engine": "sherpa-onnx",
   "asr": "Parakeet v3",
-  "engine": "sherpa-onnx"
+  "version": "1.13.8",
+  "cpu_only": true
 }

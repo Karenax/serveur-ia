@@ -1,0 +1,26 @@
+{
+  "phase": "test_done",
+  "passed": true,
+  "audio_seconds": 10.05,
+  "partial": "",
+  "partial_speech_id": 2,
+  "text": "",
+  "turns": [
+    {
+      "id": 1,
+      "text": "Bonjour Fred. Je souhaite préparer une réunion demain matin.",
+      "speech_id": 1
+    },
+    {
+      "id": 2,
+      "text": "Ajoute les documents du projet et résume les décisions importantes.",
+      "speech_id": 2
+    }
+  ],
+  "speech_id": 2,
+  "speaking": false,
+  "turn_probability": 0.975929319858551,
+  "processing": false,
+  "compute_seconds": 0.8603,
+  "model": "Parakeet v3"
+}

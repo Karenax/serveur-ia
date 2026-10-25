@@ -1,28 +1,29 @@
 {
   "format": 1,
   "entrypoint": "android-chat.html",
-  "sha256": "2995e4785fe9b6c2cebef7f99e6b8b8e62cf6bd3be224e98be0694777a8ea33b",
+  "sha256": "3560f17e12f9364335a23ee160e71d92ad673eea094152881723bbbbe4525930",
   "shared_sources": {
-    "chat.html": "e527d586c83bd1d02b7f1428bc5572c696077547d86bae41c555dde2a6c25df3",
-    "workspace.html": "7be406defc9886c83581b329c6e9b826da0621a623bb26e1c56b524ac556ceb5",
-    "ui.css": "1ae9398c2224f0e06737256dc714f5be2d5401d6a4e0998e662cfec50ee8b6f2",
-    "ui.js": "f9a8d366cdb0c72d7b94fc505d57102a7571914dd3c6fe12591cdddcc575fd00",
+    "chat.html": "43e40523dd95f18ac424c5917085ba1121f51572a2402d24a35544075c7ed818",
+    "workspace.html": "0b90a9e82d350a724fc8e7ec6363142eaf05cdd0d60316464368edae3465e9c9",
+    "ui.css": "cc0ab36c19b20f4ca622c65c666197f5e9a7f794e693210b3c448d8ae2742564",
+    "ui.js": "b452bd14013e7c70174b15837763dc782a3ed2be5bf4c6c4d3ccda46cdad33f2",
     "markdown.js": "48dd2beb1c941fe517b472959ff669a92ffa8cb51ca19fe8771c8281f366e21d",
     "corrector.js": "7a9112b4f6b5c9395e7167b8a173ac57e3af257d51604e6e281a8e5f474a41ca",
     "attachments.js": "8fb023f5c48e243b9f24d034c322a0ec53d7c391e2c73588a83c34a28a251867",
-    "thinking.js": "4a9a7079f517e8150984cc63634e2f9030277523fdd0bfc6d9f9810b143a6f07",
+    "thinking.js": "f580bf42908ff6b72e296f9b3e518f847af8fd3aa3ead325d2cc8655bf223901",
     "selection.js": "fb4fab5840149a8215c6735fc47919bdc7e59e52082cb476c724c7a68e8bb506",
     "voice.js": "9b1ff07e563008d71724a8f52fcc66227ef9795c296d50340faaf8db70606152",
+    "conversation.js": "f1fe0b3015ea8681313ed5c5212c73d304b6c0239bf17ca97c65e320b42c1f72",
     "vendor/markdown-it.min.js": "635972b985228e8af9f0143647c68616b7a3bb09f6946e7e4a52e43dcf5e7be5"
   },
   "mobile_sources": {
-    "access.html": "844cd43f9564d81cfa3f6f453ae10d02ef0edbd39041b405ead2a097d4aa2087",
-    "android.css": "b701c899b13a575ea37479716b9877d43c739168b3bb28fbc9a038c0a24f579e",
-    "android.js": "b4b99ee9649d41899f4ea2ad7d77d7fcff874fe1cc444d78e6158f6227044070",
-    "api.html": "606d70666e7c84e9d280a135b20b6a7fc27166704f34cf395db6e276e632dacf",
-    "client-state.js": "33fd7a97a1e683be8975666487ed95907f42581be11272cfb9fd177adf979905",
+    "access.html": "ad85ed2dba5e3ef4c7f7681381c69f9c51c4e544b04849d73c2dea72f7385b7b",
+    "android.css": "fe4eb5fe5d1b53c8a34e42b0aeb27b25f2a176ecec31df3ec1a4abcaae75f275",
+    "android.js": "5ffe163295a97ba217745a5eba34ebdead9d0f031a6d640a73d45f5c225fd93e",
+    "api.html": "e68498b1f8c93405f66182cd8e6bf7efac709b6f81bdbd81d01faa579aa4eece",
+    "client-state.js": "10485e916f4cb52cedeeb6ea39086bbc0d7e9947d5f5795274b044e368e95995",
     "connection.html": "4e8441e4a1da13a6c9812acfccf1e4d4eefe994769c93c1f34a24c4a476063e6",
     "corrector-response.js": "f72de7f91645b87978efed2bcb2ee190d0113120c3c8effb1d51756f386a962f",
-    "onboarding.html": "cfd0d455e9a9394637950eac551071b2b380af2646057d559b5ec2d23a253a0c"
+    "onboarding.html": "319698f3f13bab6386a6498998766acbb5efcee64848dd97563160eef866143f"
   }
 }

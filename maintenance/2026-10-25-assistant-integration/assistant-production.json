@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "gateway_capabilities_verified": true,
+  "authenticated_assistant_read_verified": true,
+  "canonical_tables_present": true,
+  "hermes_native_memory_disabled": true,
+  "legacy_files_preserved_for_review": true,
+  "automatic_briefs_enabled": 0,
+  "real_user_data_written_for_tests": false,
+  "voice_activation_setting_preserved": true,
+  "canonical_tables_identical_to_pre_delivery_backup": [
+    "projects",
+    "documents",
+    "memories",
+    "personal_memories",
+    "conversations",
+    "client_histories",
+    "policies",
+    "jobs",
+    "knowledge_exclusions",
+    "document_sources"
+  ],
+  "legacy_memory_files_preserved": 0,
+  "backend_source_sha256": "3fc48045dbb1037df7df611a1fa05d4e9268c488cad3ebfc8709f1b6d2aadfcd",
+  "gateway_started_after_backend_update": true
+}

@@ -1,4 +1,4 @@
-"""Disposable HTTP fixture for the memory console; never touches live Fred data."""
+"""Disposable HTTP fixture for the memory console; never touches live Kiara data."""
 import json
 from pathlib import Path
 import sys

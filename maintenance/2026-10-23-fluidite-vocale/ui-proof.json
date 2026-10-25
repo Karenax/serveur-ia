@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "version": "3.5.40",
+  "shared_suites": 6,
+  "ux_warnings": 0,
+  "checks": [
+    "default off; noise and late finals do not interrupt or submit",
+    "explicit opt-in retains interruption",
+    "setting encrypted, boolean and persistent",
+    "unpunctuated first words spoken before model completion",
+    "mute, reconnect, normal text, drafts and correction histories preserved",
+    "reasoning choice hidden during call and restored unchanged after hangup",
+    "speech after playback survives the remaining history save"
+  ],
+  "android_assets_verified": true
+}

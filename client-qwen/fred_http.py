@@ -1,4 +1,4 @@
-"""Shared, bounded HTTP ingress for Fred's loopback services."""
+"""Shared, bounded HTTP ingress for Kiara's loopback services."""
 from http.server import ThreadingHTTPServer
 import json
 import threading

@@ -1,11 +1,11 @@
-Accès serveur Fred Android — licences incluses
+Accès serveur Kiara Android — licences incluses
 
 Le code applicatif est sous licence MIT. Chaque composant conserve sa licence.
 Les textes originaux complets sont fournis dans ce dossier, sans modification.
 Les modules Go téléchargés du bridge sont inclus ; des licences supplémentaires
 peuvent concerner uniquement la variante Windows de ce même bridge.
 
-Accès serveur Fred
+Accès serveur Kiara
   application/LICENSE.txt
 
 Go runtime go1.27.1
@@ -25,6 +25,15 @@ whisper-model small
 
 llamafile 1.9.5
   whisper/llamafile-LICENSE.txt
+
+Sherpa-ONNX 1.13.8
+  wakeword/SHERPA-APACHE-2.0.txt
+
+ONNX Runtime Android 1.28.2
+  wakeword/ONNXRUNTIME-MIT.txt
+
+Kotlin standard library 2.0.21
+  wakeword/KOTLIN-APACHE-2.0.txt
 
 github.com/google/btree v1.1.2
   modules/github.com/google/btree/LICENSE

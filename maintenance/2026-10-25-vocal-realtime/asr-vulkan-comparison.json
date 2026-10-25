@@ -1,0 +1,90 @@
+{
+  "whisper-vulkan": {
+    "loading_seconds": 0.8596520000137389,
+    "word_error_rate": 0.30603448275862066,
+    "mean_seconds": 0.9113396374996228,
+    "rows": [
+      {
+        "file": "fleurs-fr-1.wav",
+        "expected": "L’accident a eu lieu en terrain montagneux, et il semblerait que cela ait été causé par un incendie malveillant.",
+        "recognized": "L'accident a eu lieu en terrain montagneux et il semblerait que cela ait été causé par un incendie malveillant. L'accident a eu lieu en terrain montagneux et il semblerait que cela ait été causé par un incendie malveillant.",
+        "seconds": 1.0018663000082597,
+        "rtf": 0.09822218627531959,
+        "errors": 20,
+        "words": 20
+      },
+      {
+        "file": "fleurs-fr-2.wav",
+        "expected": "Nous sommes d'accord avec la déclaration de l'USOC (Comité olympique des États-Unis) selon laquelle les intérêts de nos athlètes et de nos clubs, ainsi que de leur sport, pourraient être mieux servis. Cela peut être fait en allant de l'avant et en procédant plutôt à des changements significatifs au sein de notre organisation, qu'à la révocation d'accréditation.",
+        "recognized": "Nous sommes d'accord avec la déclaration de l'USOC, Comité Olympique des Etats-Unis, selon laquelle les intérêts de nos athlètes et de nos clubs, ainsi que de leur sport, pourraient être mieux servis. Cela peut être fait en allant de l'avant et en procédant plutôt à des changements significatifs au sein de notre organisation qu'à la révocation d'accréditation.",
+        "seconds": 1.974359200015897,
+        "rtf": 0.08437432478700414,
+        "errors": 0,
+        "words": 63
+      },
+      {
+        "file": "fleurs-fr-3.wav",
+        "expected": "Il a ajouté qu’« on ne devrait cependant pas leur demander d’assumer des obligations qui dépassent leur stade de développement, leur responsabilité et leurs capacités. »",
+        "recognized": "Il ajoutait qu'on ne devrait cependant pas leur demander d'assumer des obligations qui dépassent leur stade de développement, leurs responsabilités et leurs capacités.",
+        "seconds": 0.6307693999842741,
+        "rtf": 0.07617987922515387,
+        "errors": 4,
+        "words": 26
+      },
+      {
+        "file": "fleurs-fr-4.wav",
+        "expected": "Le rugissement du tigre ne ressemble pas au rugissement ample du lion, mais plutôt à une phrase dont les mots seraient des cris et des grondements.",
+        "recognized": "L'urgissement du tigre ne ressemble pas au gissement en plus du lion, mais plutôt à une phrase dont les mots seraient des cris et des grondements. L'urgissement du tigre ne ressemble pas au gissement en plus du lion, mais plutôt à une phrase dont les mots seraient des cris et des grondements.",
+        "seconds": 0.9849003000126686,
+        "rtf": 0.09655885294241849,
+        "errors": 32,
+        "words": 26
+      },
+      {
+        "file": "fleurs-fr-5.wav",
+        "expected": "Le même mois, un autre avion de ligne a fait une sortie de piste à Mashhad et a heurté un mur, tuant ainsi dix-sept personnes.",
+        "recognized": "Le même mois, un autre avion de ligne a fait une sortie de piste à Machad et heurté un mur, tuant ainsi 17 personnes.",
+        "seconds": 0.5980920999718364,
+        "rtf": 0.07171368105177894,
+        "errors": 4,
+        "words": 26
+      },
+      {
+        "file": "fleurs-fr-6.wav",
+        "expected": "Giancarlo Fisichella a perdu le contrôle de sa voiture et a terminé la course peu après le démarrage.",
+        "recognized": "Jean-Carlo Ficciela a perdu le contrôle de sa voiture et a terminé la course peu après le démarrage.",
+        "seconds": 0.5829858999932185,
+        "rtf": 0.08097026388794701,
+        "errors": 3,
+        "words": 18
+      },
+      {
+        "file": "fleurs-fr-7.wav",
+        "expected": "Malgré le net avantage de Del Potro pendant le deuxième set, il a fallu passer par un tie-break une fois que le score a atteint 6-6.",
+        "recognized": "Malgré le net avantage de Del Potro pendant le deuxième set, il a fallu passer par un tie-break une fois que le score atteint 6-6.",
+        "seconds": 0.6114569999917876,
+        "rtf": 0.07279249999902233,
+        "errors": 1,
+        "words": 28
+      },
+      {
+        "file": "fleurs-fr-8.wav",
+        "expected": "Malheureusement, il est difficile d'étudier le flux de circulation car le comportement des conducteurs ne peut être prédit avec cent pour cent de certitude.",
+        "recognized": "Malheureusement, il est difficile d'étudier le flux de circulation car les comportements des conducteurs ne peuvent être prédits avec 100% de certitude.",
+        "seconds": 0.9062869000190403,
+        "rtf": 0.07785969931435054,
+        "errors": 7,
+        "words": 25
+      }
+    ],
+    "device": {
+      "name": "Vulkan0",
+      "description": "Quadro P2200",
+      "pci_id": "0000:41:00.0",
+      "kind": "dedicated",
+      "free_bytes": 4689621812,
+      "total_bytes": 5490343936,
+      "id": "c1bdc62f938b9e7f5b00760d"
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "plan": "5cc5399fb20b135f853bd7c261939ce849a896107207fd3933e0142737d157a4",
+  "download_bytes": 46151015,
+  "required_disk_bytes": 2954478746,
+  "reused_bytes": 2509696208,
+  "engine": "Parakeet + Qwen3-TTS",
+  "hardware": {
+    "checked": true,
+    "eligible": true,
+    "cards": [
+      {
+        "vendor": "nvidia",
+        "name": "NVIDIA Tesla P100-PCIE-16GB"
+      },
+      {
+        "vendor": "nvidia",
+        "name": "NVIDIA Quadro P2200"
+      },
+      {
+        "vendor": "nvidia",
+        "name": "NVIDIA Tesla P100-PCIE-16GB"
+      }
+    ]
+  }
+}

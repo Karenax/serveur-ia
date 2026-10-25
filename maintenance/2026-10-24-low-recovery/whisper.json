@@ -1,0 +1,336 @@
+{
+  "engine": "whisper",
+  "passed": true,
+  "loading_seconds": 0.516,
+  "elapsed_seconds": 22.391,
+  "final": {
+    "phase": "listening",
+    "message": "Microphone ouvert. Parlez, puis terminez la dictée.",
+    "text": "",
+    "seconds": 19,
+    "revision": 205,
+    "pending": 0,
+    "processing": false,
+    "inference_seconds": 12.9813,
+    "speech_id": 2,
+    "speaking": false,
+    "partial": "",
+    "partial_speech_id": 0,
+    "turns": [
+      {
+        "id": 1,
+        "speech_id": 1,
+        "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée."
+      },
+      {
+        "id": 2,
+        "speech_id": 2,
+        "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée."
+      }
+    ]
+  },
+  "trace": [
+    {
+      "at": 0.516,
+      "audio_level": 0.0007646438898518682,
+      "phase": "listening",
+      "message": "Microphone ouvert. Parlez, puis terminez la dictée.",
+      "text": "",
+      "seconds": 0,
+      "revision": 2,
+      "pending": 0,
+      "processing": false,
+      "inference_seconds": 0,
+      "speech_id": 0,
+      "speaking": false,
+      "partial": "",
+      "partial_speech_id": 0,
+      "turns": []
+    },
+    {
+      "at": 0.609,
+      "audio_level": 0.07335979491472244,
+      "phase": "listening",
+      "message": "Microphone ouvert. Parlez, puis terminez la dictée.",
+      "text": "",
+      "seconds": 0,
+      "revision": 3,
+      "pending": 0,
+      "processing": false,
+      "inference_seconds": 0,
+      "speech_id": 1,
+      "speaking": true,
+      "partial": "",
+      "partial_speech_id": 0,
+      "turns": []
+    },
+    {
+      "at": 3.437,
+      "audio_level": 0.10110373795032501,
+      "phase": "listening",
+      "message": "Microphone ouvert. Parlez, puis terminez la dictée.",
+      "text": "",
+      "seconds": 3,
+      "revision": 31,
+      "pending": 0,
+      "processing": true,
+      "inference_seconds": 0,
+      "speech_id": 1,
+      "speaking": true,
+      "partial": "",
+      "partial_speech_id": 0,
+      "turns": []
+    },
+    {
+      "at": 4.453,
+      "audio_level": 0.11120005697011948,
+      "phase": "listening",
+      "message": "Microphone ouvert. Parlez, puis terminez la dictée.",
+      "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions.",
+      "seconds": 4,
+      "revision": 42,
+      "pending": 0,
+      "processing": false,
+      "inference_seconds": 0.92344,
+      "speech_id": 1,
+      "speaking": true,
+      "partial": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions.",
+      "partial_speech_id": 1,
+      "turns": []
+    },
+    {
+      "at": 6.469,
+      "audio_level": 0.09429408609867096,
+      "phase": "listening",
+      "message": "Microphone ouvert. Parlez, puis terminez la dictée.",
+      "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions.",
+      "seconds": 6,
+      "revision": 62,
+      "pending": 0,
+      "processing": true,
+      "inference_seconds": 0.92344,
+      "speech_id": 1,
+      "speaking": true,
+      "partial": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions.",
+      "partial_speech_id": 1,
+      "turns": []
+    },
+    {
+      "at": 7.875,
+      "audio_level": 0.0,
+      "phase": "listening",
+      "message": "Microphone ouvert. Parlez, puis terminez la dictée.",
+      "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+      "seconds": 7,
+      "revision": 77,
+      "pending": 0,
+      "processing": false,
+      "inference_seconds": 2.30572,
+      "speech_id": 1,
+      "speaking": false,
+      "partial": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+      "partial_speech_id": 1,
+      "turns": []
+    },
+    {
+      "at": 8.281,
+      "audio_level": 0.0,
+      "phase": "listening",
+      "message": "Microphone ouvert. Parlez, puis terminez la dictée.",
+      "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+      "seconds": 7,
+      "revision": 81,
+      "pending": 0,
+      "processing": true,
+      "inference_seconds": 2.30572,
+      "speech_id": 1,
+      "speaking": false,
+      "partial": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+      "partial_speech_id": 1,
+      "turns": []
+    },
+    {
+      "at": 10.609,
+      "audio_level": 0.08424634486436844,
+      "phase": "listening",
+      "message": "Microphone ouvert. Parlez, puis terminez la dictée.",
+      "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+      "seconds": 10,
+      "revision": 104,
+      "pending": 0,
+      "processing": true,
+      "inference_seconds": 2.30572,
+      "speech_id": 2,
+      "speaking": true,
+      "partial": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+      "partial_speech_id": 1,
+      "turns": []
+    },
+    {
+      "at": 12.516,
+      "audio_level": 0.047320105135440826,
+      "phase": "listening",
+      "message": "Microphone ouvert. Parlez, puis terminez la dictée.",
+      "text": "",
+      "seconds": 12,
+      "revision": 124,
+      "pending": 0,
+      "processing": false,
+      "inference_seconds": 6.52922,
+      "speech_id": 2,
+      "speaking": true,
+      "partial": "",
+      "partial_speech_id": 0,
+      "turns": [
+        {
+          "id": 1,
+          "speech_id": 1,
+          "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée."
+        }
+      ]
+    },
+    {
+      "at": 13.328,
+      "audio_level": 0.035438116639852524,
+      "phase": "listening",
+      "message": "Microphone ouvert. Parlez, puis terminez la dictée.",
+      "text": "",
+      "seconds": 12,
+      "revision": 132,
+      "pending": 0,
+      "processing": true,
+      "inference_seconds": 6.52922,
+      "speech_id": 2,
+      "speaking": true,
+      "partial": "",
+      "partial_speech_id": 0,
+      "turns": [
+        {
+          "id": 1,
+          "speech_id": 1,
+          "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée."
+        }
+      ]
+    },
+    {
+      "at": 14.234,
+      "audio_level": 0.16523748636245728,
+      "phase": "listening",
+      "message": "Microphone ouvert. Parlez, puis terminez la dictée.",
+      "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions.",
+      "seconds": 13,
+      "revision": 142,
+      "pending": 0,
+      "processing": false,
+      "inference_seconds": 7.4203,
+      "speech_id": 2,
+      "speaking": true,
+      "partial": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions.",
+      "partial_speech_id": 2,
+      "turns": [
+        {
+          "id": 1,
+          "speech_id": 1,
+          "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée."
+        }
+      ]
+    },
+    {
+      "at": 16.344,
+      "audio_level": 0.0934128388762474,
+      "phase": "listening",
+      "message": "Microphone ouvert. Parlez, puis terminez la dictée.",
+      "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions.",
+      "seconds": 15,
+      "revision": 163,
+      "pending": 0,
+      "processing": true,
+      "inference_seconds": 7.4203,
+      "speech_id": 2,
+      "speaking": true,
+      "partial": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions.",
+      "partial_speech_id": 2,
+      "turns": [
+        {
+          "id": 1,
+          "speech_id": 1,
+          "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée."
+        }
+      ]
+    },
+    {
+      "at": 17.766,
+      "audio_level": 0.0,
+      "phase": "listening",
+      "message": "Microphone ouvert. Parlez, puis terminez la dictée.",
+      "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre",
+      "seconds": 17,
+      "revision": 178,
+      "pending": 0,
+      "processing": false,
+      "inference_seconds": 8.78017,
+      "speech_id": 2,
+      "speaking": false,
+      "partial": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre",
+      "partial_speech_id": 2,
+      "turns": [
+        {
+          "id": 1,
+          "speech_id": 1,
+          "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée."
+        }
+      ]
+    },
+    {
+      "at": 18.156,
+      "audio_level": 0.0,
+      "phase": "listening",
+      "message": "Microphone ouvert. Parlez, puis terminez la dictée.",
+      "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre",
+      "seconds": 17,
+      "revision": 182,
+      "pending": 0,
+      "processing": true,
+      "inference_seconds": 8.78017,
+      "speech_id": 2,
+      "speaking": false,
+      "partial": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre",
+      "partial_speech_id": 2,
+      "turns": [
+        {
+          "id": 1,
+          "speech_id": 1,
+          "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée."
+        }
+      ]
+    },
+    {
+      "at": 22.391,
+      "audio_level": 0,
+      "phase": "listening",
+      "message": "Microphone ouvert. Parlez, puis terminez la dictée.",
+      "text": "",
+      "seconds": 19,
+      "revision": 205,
+      "pending": 0,
+      "processing": false,
+      "inference_seconds": 12.9813,
+      "speech_id": 2,
+      "speaking": false,
+      "partial": "",
+      "partial_speech_id": 0,
+      "turns": [
+        {
+          "id": 1,
+          "speech_id": 1,
+          "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée."
+        },
+        {
+          "id": 2,
+          "speech_id": 2,
+          "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée."
+        }
+      ]
+    }
+  ]
+}

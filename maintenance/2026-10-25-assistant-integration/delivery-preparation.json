@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "staged_resources_verified": true,
+  "windows_modules_present": true,
+  "android_jni_both_abis": true,
+  "backup_verified": true,
+  "backup_sha256": "aefa1727dad702ec3488e609deec62d8453f3a5ad1906635b298a432d602f432",
+  "existing_data_unchanged": true
+}

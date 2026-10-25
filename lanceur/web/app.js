@@ -286,7 +286,7 @@ async function refreshHermesModels(force=false){
     container.append(element('p','Le partage donne accès aux modèles configurés sur ce PC. Les comptes utilisent alors les mêmes abonnements, crédits et quotas ; leurs conversations restent séparées.','muted'));
     const all=element('input');all.type='checkbox';all.id='hermes-share-all';all.checked=value.share_all;all.disabled=hermesModelsBusy;
     all.onchange=()=>saveHermesModels({share_all:all.checked});
-    container.append(labelled('Partager les modèles avec tous les comptes Fred',all,'Sinon, autorisez chaque compte sur sa fiche ci-dessous. Les nouveaux comptes héritent seulement du partage global.'));
+    container.append(labelled('Partager les modèles avec tous les comptes Kiara',all,'Sinon, autorisez chaque compte sur sa fiche ci-dessous. Les nouveaux comptes héritent seulement du partage global.'));
     const models=(value.models||[]).filter(model=>model.available!==false);
     const automatic=value.exposed_models==null;
     const auto=element('input');auto.type='checkbox';auto.id='hermes-models-auto';auto.checked=automatic;auto.disabled=hermesModelsBusy;

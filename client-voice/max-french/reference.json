@@ -1,0 +1,10 @@
+{
+  "locale": "fr-FR",
+  "text": "Bonjour, je suis la voix de Fred. Je peux répondre à vos questions, organiser vos projets et vous aider à préparer votre journée.",
+  "source": "Synthetic speech generated locally with gradium/phonon-40m-fr and the Tiphaine fr-FR preset",
+  "model_revision": "b0e916ef8d2a9034902c449d113c3b2d4f081651",
+  "voice_revision": "0ee17205f254b5abc43b266c8a0f215565c352f7",
+  "model_license": "CC-BY-NC-4.0",
+  "voice_license": "Apache-2.0",
+  "audio_sha256": "b4ff8ba50a0cc032a1dc72d3e28d46230d0cbf403d6e000dd74fdf418785d701"
+}

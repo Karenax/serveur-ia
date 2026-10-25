@@ -1,4 +1,4 @@
-"""Private, offline EG2 CPU worker. Only Fred's parent process can call it."""
+"""Private, offline EG2 CPU worker. Only Kiara's parent process can call it."""
 import argparse
 import hashlib
 import hmac
@@ -75,7 +75,7 @@ def serve(model_path, token, port, threads, parent, parent_created):
                 if any(not isinstance(s, str) or not s.strip() or len(s) > 4500 for s in texts):
                     raise ValueError('Texte invalide.')
                 start = time.monotonic()
-                # Titles are formatted by Fred; suppress the model's default prefix.
+                # Titles are formatted by Kiara; suppress the model's default prefix.
                 prompt = 'task: search result | query: ' if mode == 'query' else ''
                 with torch.inference_mode():
                     tokens = int(model.tokenize([prompt+text for text in texts])['attention_mask'].sum().item())

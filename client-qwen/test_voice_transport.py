@@ -1,4 +1,4 @@
-"""A terminal agent error or intentional cancellation must not disconnect Fred."""
+"""A terminal agent error or intentional cancellation must not disconnect Kiara."""
 import base64
 import io
 import json

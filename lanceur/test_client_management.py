@@ -64,7 +64,7 @@ class ClientManagementTests(unittest.TestCase):
         blob=json.dumps({**self.profile,'version':'3.5.3'}).encode()
         exe=b'MZfixture'+blob+struct.pack('<I',len(blob))+b'QWENPROFILE1'
         (directory/(self.access['id']+'.exe')).write_bytes(exe)
-        (directory/'Acces Fred v3.5.3 - Copie.exe').write_bytes(exe)
+        (directory/'Acces Kiara v3.5.3 - Copie.exe').write_bytes(exe)
         backup=controller.operations.backup('test backup password long')
         raw=Path(backup['file']).read_bytes()
         package=json.loads(cipher('test backup password long',raw[11:27]).decrypt(raw[27:]))

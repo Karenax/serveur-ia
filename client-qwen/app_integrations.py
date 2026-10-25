@@ -16,7 +16,7 @@ from file_lock import locked
 from history_store import atomic
 
 PROVIDER='serveur-fred'
-LABEL='Serveur Fred'
+LABEL='Serveur Kiara'
 MAX_CONFIG=2*1024*1024
 
 
@@ -119,7 +119,7 @@ def opencode_text(text,base_url,key,model,catalogue=None):
     providers=value.get(section,{})
     if not isinstance(providers,dict):raise ValueError('Liste des fournisseurs OpenCode invalide.')
     old=providers.get(PROVIDER,{})
-    if not isinstance(old,dict):raise ValueError('Fournisseur Serveur Fred invalide.')
+    if not isinstance(old,dict):raise ValueError('Fournisseur Serveur Kiara invalide.')
     entry=copy.deepcopy(old);models=entry.setdefault('models',{})
     if not isinstance(models,dict):raise ValueError('Liste des modèles OpenCode invalide.')
     details=models.setdefault(model,{})
@@ -227,7 +227,7 @@ def hermes_text(text,base_url,key,model,catalogue=None):
     if legacy:
         if not isinstance(providers,list) or not all(isinstance(p,dict) for p in providers):raise ValueError('Fournisseurs Hermes invalides.')
         matches=[p for p in providers if p.get('name')==PROVIDER]
-        if len(matches)>1:raise ValueError('Fournisseur Serveur Fred dupliqué.')
+        if len(matches)>1:raise ValueError('Fournisseur Serveur Kiara dupliqué.')
         old=matches[0] if matches else {};entry=copy.deepcopy(old)
         entry.update(name=PROVIDER,base_url=base_url,api_key=key,api_mode='chat_completions',model=model)
         models=entry.setdefault('models',{})
@@ -240,14 +240,14 @@ def hermes_text(text,base_url,key,model,catalogue=None):
     else:
         if not isinstance(providers,dict):raise ValueError('Fournisseurs Hermes invalides.')
         old=providers.get(PROVIDER,{})
-        if not isinstance(old,dict):raise ValueError('Fournisseur Serveur Fred invalide.')
+        if not isinstance(old,dict):raise ValueError('Fournisseur Serveur Kiara invalide.')
         entry=copy.deepcopy(old);entry.update(name=LABEL,api=base_url,api_key=key,transport='chat_completions',default_model=model)
         models=entry.setdefault('models',{})
         if not isinstance(models,dict):raise ValueError('Modèles Hermes invalides.')
         models.setdefault(model,{})
         providers[PROVIDER]=entry
     if catalogue is not None:
-        # This provider belongs to Fred: replace obsolete opaque/embedding entries.
+        # This provider belongs to Kiara: replace obsolete opaque/embedding entries.
         entry['models']={row['id']:{} for row in catalogue['data']}
     if value.get(section)==providers:return text
     updated=_yaml_provider(text,node,section,entry,legacy,providers)
@@ -297,13 +297,13 @@ def install(app,base_url,key,model,apps=None,catalogue=None):
             if raw.startswith(b'\xef\xbb\xbf'):payload=b'\xef\xbb\xbf'+payload
             atomic(path,payload)
     visibility=opencode_visibility.enable(apps[app].get('desktop'),PROVIDER,model) if app=='opencode' else None
-    message=f'Modèle {display_model} ajouté à Hermes. Relancez Hermes, puis ouvrez Modèles et activez l’interrupteur du modèle sous Serveur Fred pour le voir dans le sélecteur.'
+    message=f'Modèle {display_model} ajouté à Hermes. Relancez Hermes, puis ouvrez Modèles et activez l’interrupteur du modèle sous Serveur Kiara pour le voir dans le sélecteur.'
     if app=='opencode':
         message=f'Configuration du modèle {display_model} enregistrée pour OpenCode. '
-        if visibility['status']=='enabled':message+='Modèle activé dans le sélecteur. Ouvrez OpenCode et sélectionnez Serveur Fred dans /models.'
+        if visibility['status']=='enabled':message+='Modèle activé dans le sélecteur. Ouvrez OpenCode et sélectionnez Serveur Kiara dans /models.'
         elif visibility['status']=='close_required':message+='Pour afficher le modèle dans OpenCode 2, fermez complètement OpenCode puis cliquez à nouveau sur Ajouter à OpenCode 2.'
-        else:message+='Dans OpenCode 2, ouvrez Paramètres > Modèles et activez ce modèle sous Serveur Fred. Relancez OpenCode si la liste est vide.'
+        else:message+='Dans OpenCode 2, ouvrez Paramètres > Modèles et activez ce modèle sous Serveur Kiara. Relancez OpenCode si la liste est vide.'
     backups=[str(backup)] if backup else []
     if visibility and visibility.get('backup'):backups.append(visibility['backup'])
     return {'app':app,'model':model,'provider':PROVIDER,'config_path':str(path),'backup':str(backup) if backup else None,
-            'backups':backups,'visibility':visibility,'message':message+' Gardez le client Fred ouvert.'}
+            'backups':backups,'visibility':visibility,'message':message+' Gardez le client Kiara ouvert.'}

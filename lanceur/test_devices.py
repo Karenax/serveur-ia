@@ -27,14 +27,14 @@ class DeviceTests(unittest.TestCase):
     def test_admin_metadata_keeps_credentials_and_owner_spaces_separate(self):
         before=read_json(self.store.path)['clients'][0]
         other=self.store.issue('Tablette')
-        self.store.device({'id':self.access['id'],'name':'Téléphone Fred','owner':'Fred','kind':'phone','version':'1.0.0'})
-        self.store.device({'id':other['id'],'owner':'Fred','kind':'tablet'})
+        self.store.device({'id':self.access['id'],'name':'Téléphone Kiara','owner':'Kiara','kind':'phone','version':'1.0.0'})
+        self.store.device({'id':other['id'],'owner':'Kiara','kind':'tablet'})
         after=read_json(self.store.path)['clients'][0]
         self.assertEqual(after['hash'],before['hash'])
         self.assertEqual(after['wireguard_public_key'],before['wireguard_public_key'])
         self.assertEqual(after['address'],before['address'])
         metadata=self.store.metadata()
-        self.assertEqual({c['device_owner'] for c in metadata['clients']},{'Fred'})
+        self.assertEqual({c['device_owner'] for c in metadata['clients']},{'Kiara'})
         self.assertEqual(metadata['clients'][0]['device_kind'],'phone')
         self.assertNotIn('hash',json.dumps(metadata))
         self.assertNotIn(self.access['token'],json.dumps(metadata))
@@ -128,12 +128,12 @@ class DeviceTests(unittest.TestCase):
 
     def test_android_profile_without_windows_release_is_private_and_unique(self):
         with patch('releases.status',side_effect=AssertionError('Android profile needs no Windows release')):
-            first=self.wireguard.create_android('Téléphone Fred','test-model','Fred','phone')
-            second=self.wireguard.create_android('Tablette Fred','test-model','Fred','tablet')
+            first=self.wireguard.create_android('Téléphone Kiara','test-model','Kiara','phone')
+            second=self.wireguard.create_android('Tablette Kiara','test-model','Kiara','tablet')
         a=json.loads(self.wireguard.android_profile(first['id']));b=json.loads(self.wireguard.android_profile(second['id']))
         from wg_bridge import validate_profile
         validate_profile(a);validate_profile(b)
-        self.assertEqual(a['client_name'],'Téléphone Fred')
+        self.assertEqual(a['client_name'],'Téléphone Kiara')
         self.assertEqual(a['protocol'],3)
         for field in ('token',):self.assertNotEqual(a[field],b[field])
         for field in ('address','private_key','preshared_key'):self.assertNotEqual(a['wireguard'][field],b['wireguard'][field])
@@ -158,7 +158,7 @@ class DeviceTests(unittest.TestCase):
             with self.assertRaises(ValueError):self.wireguard.android_profile(identity)
 
     def test_replacement_archives_old_access_keeps_history_and_other_device(self):
-        old=self.wireguard.create_android('Téléphone','test-model','Fred','phone')
+        old=self.wireguard.create_android('Téléphone','test-model','Kiara','phone')
         old_profile=json.loads(self.wireguard.android_profile(old['id']))
         state=self.store.workspace.history_read(old['id'])
         history={'conversations':[{'id':'saved','title':'Conservée','messages':[]}],'currentId':'saved'}
@@ -172,7 +172,7 @@ class DeviceTests(unittest.TestCase):
         self.assertIsNone(self.store.workspace.history_read(new['id'])['history'])
         self.assertTrue(next(c for c in self.store.metadata()['archived_clients'] if c['id']==old['id'])['revoked'])
         new_record=next(c for c in self.store.metadata()['clients'] if c['id']==new['id'])
-        self.assertEqual(new_record['device_owner'],'Fred');self.assertEqual(new_record['device_kind'],'tablet')
+        self.assertEqual(new_record['device_owner'],'Kiara');self.assertEqual(new_record['device_kind'],'tablet')
 
     def test_suspension_removes_peer_and_reactivation_preserves_keys(self):
         before=read_json(self.store.path)['clients'][0]

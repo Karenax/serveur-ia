@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "revision": "vulkan-q4-550bf7639ad29caf",
+  "runtime_api": 5,
+  "runtime_bytes": 46441601,
+  "upgrade_download_bytes": 1265686849,
+  "reused_model_bytes": 1327064912,
+  "models_bytes": 2546310160,
+  "voice": "French reference · fr-FR",
+  "signature_verified": true,
+  "previous_distribution_preserved": true
+}

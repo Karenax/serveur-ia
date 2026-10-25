@@ -1,8 +1,8 @@
-"""Portable snapshots of Fred's dedicated Hermes state, never personal Hermes.
+"""Portable snapshots of Kiara's dedicated Hermes state, never personal Hermes.
 
-The caller must quiesce Fred runs and the Hermes gateway while collecting files,
+The caller must quiesce Kiara runs and the Hermes gateway while collecting files,
 and close the gateway and integration databases before restoring. Archives are
-plaintext mappings intended ONLY for Fred's existing encrypted backup envelope.
+plaintext mappings intended ONLY for Kiara's existing encrypted backup envelope.
 """
 from __future__ import annotations
 
@@ -74,7 +74,7 @@ def _checked(root, name):
         if _linked(path):
             raise ValueError('Lien de fichiers interdit dans la sauvegarde Hermes.')
     if not path.resolve().is_relative_to(root.resolve()):
-        raise ValueError('Chemin hors de l’espace Hermes Fred.')
+        raise ValueError('Chemin hors de l’espace Hermes Kiara.')
     return path
 
 
@@ -157,7 +157,7 @@ class HermesBackup:
     def _owners(owners):
         owners = set(owners)
         if len(owners) > 10000 or any(not isinstance(o, str) or not re.fullmatch('[a-f0-9]{16}', o) for o in owners):
-            raise ValueError('Identités Fred de sauvegarde invalides.')
+            raise ValueError('Identités Kiara de sauvegarde invalides.')
         return owners
 
     def export(self, owners):
@@ -174,7 +174,7 @@ class HermesBackup:
                 for child in list(directories):
                     child_path = Path(current) / child
                     if _linked(child_path):
-                        raise ValueError('Lien interdit dans un profil Hermes Fred.')
+                        raise ValueError('Lien interdit dans un profil Hermes Kiara.')
                     relative = child_path.relative_to(directory)
                     if relative.parts[0] not in PROFILE_DIRS:
                         directories.remove(child)
@@ -210,7 +210,7 @@ class HermesBackup:
         decoded = {}; total = 0; folded = set()
         for name, value in package['files'].items():
             if not _allowed(name, owners, self.root_files) or name.casefold() in folded:
-                raise ValueError('Fichier Hermes absent du périmètre Fred.')
+                raise ValueError('Fichier Hermes absent du périmètre Kiara.')
             folded.add(name.casefold())
             if (not isinstance(value, dict) or set(value) != {'kind', 'sha256', 'bytes', 'data'} or
                     type(value.get('bytes')) is not int or not 0 <= value['bytes'] <= MAX_FILE or
@@ -233,7 +233,7 @@ class HermesBackup:
         return decoded
 
     def restore(self, package, owners):
-        """Replace a CLOSED dedicated root; rollback journal is owned by Fred."""
+        """Replace a CLOSED dedicated root; rollback journal is owned by Kiara."""
         decoded = self.validate(package, owners)
         self.root.parent.mkdir(parents=True, exist_ok=True)
         if _linked(self.root) or self.root.resolve() == self.root.parent.resolve():

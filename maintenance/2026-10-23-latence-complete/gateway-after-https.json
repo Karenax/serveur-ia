@@ -1,0 +1,61 @@
+{
+  "passed": true,
+  "transport": "https",
+  "route": "authenticated gateway with existing profile; no history write or new account",
+  "results": [
+    {
+      "route": "/v1/models",
+      "response_headers_seconds": 0.15011070000036852,
+      "first_event_seconds": null,
+      "first_content_or_pcm_seconds": null,
+      "complete_seconds": 0.15035890000581276,
+      "context": null,
+      "source_count": 0,
+      "answer_characters": 0,
+      "audio_base64_characters": 0,
+      "audio_chunks": 0
+    },
+    {
+      "route": "/v1/voice/status",
+      "response_headers_seconds": 0.08059299999877112,
+      "first_event_seconds": null,
+      "first_content_or_pcm_seconds": null,
+      "complete_seconds": 0.08075979999557603,
+      "context": null,
+      "source_count": 0,
+      "answer_characters": 0,
+      "audio_base64_characters": 0,
+      "audio_chunks": 0
+    },
+    {
+      "route": "/v1/chat/completions",
+      "response_headers_seconds": 0.3533591000013985,
+      "first_event_seconds": 0.35339410000597127,
+      "first_content_or_pcm_seconds": 6.384203000001435,
+      "complete_seconds": 6.982048900004884,
+      "context": {
+        "capacity": 16384,
+        "input_tokens": 1014,
+        "output_tokens": 512,
+        "omitted_messages": 0
+      },
+      "source_count": 6,
+      "answer_characters": 60,
+      "audio_base64_characters": 0,
+      "audio_chunks": 0
+    },
+    {
+      "route": "/v1/voice/speech",
+      "response_headers_seconds": 0.17844020000484306,
+      "first_event_seconds": 0.17856400000164285,
+      "first_content_or_pcm_seconds": 0.17856860000028973,
+      "complete_seconds": 0.36878360000264365,
+      "context": null,
+      "source_count": 0,
+      "answer_characters": 0,
+      "audio_base64_characters": 117772,
+      "audio_chunks": 8
+    }
+  ],
+  "limits": "Microphone and browser playback are not measured; no second WireGuard tunnel is created."
+}

@@ -1,4 +1,4 @@
-Accès serveur Fred 3.5.0 — 4 octobre 2026
+Accès serveur Kiara 3.5.0 — 4 octobre 2026
 
 LECTURE ET INTERFACE
 Les réponses affichent les titres, paragraphes, listes, tableaux, citations, liens

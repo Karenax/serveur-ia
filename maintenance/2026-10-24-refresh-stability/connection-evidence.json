@@ -1,0 +1,105 @@
+{
+  "time": "2026-10-24T17:55:21.958202+02:00",
+  "server": {
+    "status": "pret",
+    "running": true,
+    "managed": true,
+    "error": ""
+  },
+  "log_lines": 148,
+  "matching_categories": {
+    "disconnect": 0,
+    "connection": 0,
+    "broken pipe": 0,
+    "reset by peer": 0,
+    "timed out": 0,
+    "timeout": 0,
+    "cancel": 0,
+    "error": 0,
+    "exception": 0
+  },
+  "audit_recent": [
+    {
+      "time": 1792784117.362527,
+      "event": "remote_enabled"
+    },
+    {
+      "time": 1792784404.2563806,
+      "event": "inference_started"
+    },
+    {
+      "time": 1792784426.3659573,
+      "event": "inference_started"
+    },
+    {
+      "time": 1792784444.8552911,
+      "event": "inference_started"
+    },
+    {
+      "time": 1792784472.8959465,
+      "event": "inference_started"
+    },
+    {
+      "time": 1792784627.4072156,
+      "event": "inference_started"
+    },
+    {
+      "time": 1792785594.5223043,
+      "event": "remote_enabled"
+    },
+    {
+      "time": 1792785629.1038098,
+      "event": "inference_started"
+    },
+    {
+      "time": 1792785743.706453,
+      "event": "inference_started"
+    },
+    {
+      "time": 1792786216.5800276,
+      "event": "remote_enabled"
+    },
+    {
+      "time": 1792786301.4887867,
+      "event": "inference_started"
+    },
+    {
+      "time": 1792821996.8242595,
+      "event": "inference_started"
+    },
+    {
+      "time": 1792822013.0671782,
+      "event": "inference_started"
+    },
+    {
+      "time": 1792822034.9278026,
+      "event": "inference_started"
+    },
+    {
+      "time": 1792822055.475583,
+      "event": "inference_started"
+    },
+    {
+      "time": 1792822087.5054429,
+      "event": "inference_started"
+    },
+    {
+      "time": 1792822118.7259328,
+      "event": "inference_started"
+    },
+    {
+      "time": 1792823121.0701532,
+      "event": "remote_enabled"
+    },
+    {
+      "time": 1792823189.7462342,
+      "event": "inference_started"
+    },
+    {
+      "time": 1792848741.3435261,
+      "event": "remote_enabled"
+    }
+  ],
+  "local_client_journal_available": false,
+  "note": "No local Windows client API is listening; Android journal is not available from this workspace."
+}

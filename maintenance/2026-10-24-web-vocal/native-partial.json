@@ -1,0 +1,56 @@
+[
+  {
+    "prompt": "cherche internet la derniere actualité sur l’IA",
+    "semantic_decision": {
+      "action": "search",
+      "query": "dernière actualité IA 2026-10-24",
+      "seconds": 1.407
+    },
+    "answer": "D'après Token FM, OpenAI a repris l'entraînement de ses modèles après avoir sécurisé ses systèmes et découvert une faille dans l'outil de compression Brotli.\n\nLe même média mentionne aussi que le Royaume-Uni vient de créer un laboratoire de biosécurité dédié à l'IA, soutenu par des engagements privés.",
+    "first_text_seconds": 43.5,
+    "sources": [
+      {
+        "url": "https://tokenfm.fr/replay/2026-10-24",
+        "retrieved": true
+      },
+      {
+        "url": "https://www.boursorama.com/bourse/actualites/openai-reprend-la-formation-en-ia-de-pointe-apres-une-refonte-de-ses-mesures-de-securite-et-revele-une-faille-dans-un-logiciel-largement-utilise-404109633f5e2af4d0b5331b445aa297",
+        "retrieved": true
+      },
+      {
+        "url": "https://www.readaitime.com/digests/2026-10-24",
+        "retrieved": false
+      }
+    ],
+    "research_stages": [
+      "Recherche sur Internet…",
+      "Lecture des sources…"
+    ],
+    "oral_context": {
+      "capacity": 16384,
+      "input_tokens": 3882,
+      "output_tokens": 512,
+      "omitted_messages": 0
+    },
+    "passed": true
+  },
+  {
+    "prompt": "Peux-tu faire une recherche pour moi ?",
+    "semantic_decision": {
+      "action": "clarify",
+      "query": "",
+      "seconds": 1.047
+    },
+    "answer": "Oui, je peux faire une recherche pour toi. Sur quel sujet souhaites-tu que je cherche ?",
+    "first_text_seconds": 4.406,
+    "sources": [],
+    "research_stages": [],
+    "oral_context": {
+      "capacity": 16384,
+      "input_tokens": 203,
+      "output_tokens": 512,
+      "omitted_messages": 0
+    },
+    "passed": true
+  }
+]

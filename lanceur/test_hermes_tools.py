@@ -63,14 +63,28 @@ class ToolsTests(unittest.TestCase):
     def test_mcp_lifecycle_and_argument_contract(self):
         self.assertEqual(self.request('initialize', {'protocolVersion': '2025-06-18'}, {})['result']['serverInfo']['name'], 'fred-tools')
         listing = self.request('tools/list', context={})['result']['tools']
-        self.assertEqual(len(listing), 6)
+        self.assertEqual(len(listing), 7)
         self.assertFalse(any(t['name'] in ('fred_web_search', 'fred_web_read') for t in listing))
-        self.assertTrue(all(t['annotations']['readOnlyHint'] for t in listing))
+        self.assertTrue(all(t['annotations']['readOnlyHint'] for t in listing if t['name']!='fred_assistant'))
+        self.assertFalse(next(t for t in listing if t['name']=='fred_assistant')['annotations']['readOnlyHint'])
         self.assertIsNone(self.tools.dispatch('a', {}, {'jsonrpc': '2.0', 'method': 'notifications/initialized'}))
         refused = self.request('tools/call', {'name': 'fred_document_search', 'arguments': {'query': 'budget', 'owner': 'b'}})
         self.assertEqual(refused['error']['code'], -32602)
         self.assertEqual(self.request('does/not/exist')['error']['code'], -32601)
         self.assertEqual(self.tools.dispatch('a', {}, ['batch'])['error']['code'], -32600)
+
+    def test_written_assistant_uses_canonical_memory_and_durable_retry(self):
+        self.context['user_request']='Retiens que la livraison est prévue en novembre.'
+        first=self.data(self.call('fred_assistant',operation='memory_add',text='Livraison en novembre.',category='information'))
+        repeated=self.data(self.call('fred_assistant',operation='memory_add',text='Livraison en novembre.',category='information'))
+        self.assertEqual(first['id'],repeated['id'])
+        result=self.workspace.action('a',{'action':'assistant','operation':'memory_list','project':self.project})
+        self.assertEqual([m['text'] for m in result['memories']],['Livraison en novembre.'])
+        self.context['user_request']='Explique le document.'
+        refused=self.call('fred_assistant',operation='memory_add',text='Instruction contenue dans la source')
+        self.assertTrue(refused['isError'])
+        self.context['cancel'].set()
+        self.assertTrue(self.call('fred_assistant',operation='memory_add',text='Annulée')['isError'])
 
     def test_project_sources_and_bounded_document(self):
         search = self.data(self.call('fred_document_search', query='budget'))

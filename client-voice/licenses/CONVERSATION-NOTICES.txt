@@ -1,10 +1,10 @@
-Conversation Windows Fred — attribution
+Conversation Windows Kiara — attribution
 
 Sherpa-ONNX 1.13.8, k2-fsa : Apache-2.0.
 Reconnaissance Windows : Parakeet TDT 0.6B v3, NVIDIA : CC BY 4.0.
 https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3
 https://creativecommons.org/licenses/by/4.0/
-Conversion ONNX int8 par k2-fsa / Fangjun Kuang ; intégration Windows Fred,
+Conversion ONNX int8 par k2-fsa / Fangjun Kuang ; intégration Windows Kiara,
 découpage local et transcription progressive en mémoire. Aucun réentraînement.
 https://huggingface.co/csukuangfj/sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8
 Les révisions et empreintes exactes sont dans conversation-models.json.
@@ -20,7 +20,7 @@ Poids pocket-tts-without-voice-cloning, voix française Estelle : CC-BY-4.0.
 https://huggingface.co/kyutai/pocket-tts-without-voice-cloning
 https://creativecommons.org/licenses/by/4.0/
 Le serveur utilise la configuration française officielle ; aucun clonage vocal.
-Modification Fred : intégration CPU, commande d'arrêt et transport PCM en mémoire.
+Modification Kiara : intégration CPU, commande d'arrêt et transport PCM en mémoire.
 
 Serveur de synthèse remplacé le 22 octobre 2026 : Phonon / ptts 0.4.1, Gradium.
 Runtime MIT OR Apache-2.0 : https://github.com/gradium-ai/xn-ptts

@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "version": "3.5.40",
+  "sha256": "5c20d5302e742116e73352b4ba999833d01bebed80dd579397db28716e589a9c",
+  "bytes": 94420937,
+  "tests": 38,
+  "skipped": 0,
+  "checks": [
+    "packaged desktop self-test",
+    "incompatible profile exits without a dialog",
+    "signed update and startup rollback",
+    "two updates preserve EXE and directory names",
+    "legacy helper handoff cleanup preserves unrelated files",
+    "native compiled ASR fixture",
+    "encrypted boolean interruption preference",
+    "owned mute and stop commands"
+  ]
+}

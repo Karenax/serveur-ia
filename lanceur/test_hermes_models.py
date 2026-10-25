@@ -485,7 +485,7 @@ class NativeCloudTests(unittest.TestCase):
         self.assertFalse(any('Accès désactivé' in text or 'Outil non autorisé' in text for text in replies),replies)
 
     def test_native_key_cmd_and_auxiliary_main_cover_chat_and_responses_without_qwen(self):
-        # Real installed SDK clients, provider resolver, key_cmd and Fred broker.
+        # Real installed SDK clients, provider resolver, key_cmd and Kiara broker.
         # Only the network/model endpoint is synthetic.
         self.facade.private.start()
         self.facade.accounts.ensure(self.owner)

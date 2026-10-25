@@ -10,12 +10,18 @@ from turn_features import features
 
 RATE = 16000
 MAX_TURN = 28 * RATE
+CONVERSATION_SILENCE = .65
+CONVERSATION_MAX_SILENCE = 1.6
 
 
 class Recognizer:
-    def __init__(self, models, mode='conversation'):
+    minimum_silence=CONVERSATION_SILENCE
+    maximum_silence=CONVERSATION_MAX_SILENCE
+    turn_threshold=.65
+    def __init__(self, models, mode='conversation', transcribe=None):
         models = Path(models); self.mode = mode
-        self.asr = sherpa_onnx.OfflineRecognizer.from_transducer(
+        self.transcribe = transcribe
+        self.asr = None if transcribe else sherpa_onnx.OfflineRecognizer.from_transducer(
             tokens=str(models/'tokens.txt'), encoder=str(models/'encoder.int8.onnx'),
             decoder=str(models/'decoder.int8.onnx'), joiner=str(models/'joiner.int8.onnx'),
             model_type='nemo_transducer', num_threads=4, provider='cpu')
@@ -67,11 +73,11 @@ class Recognizer:
         if self.audio_samples >= MAX_TURN:
             self.finish(); return
         silence = (self.samples - self.last_voice) / RATE
-        if not speech and silence >= (.85 if self.mode == 'conversation' else 1.5) and self.samples >= self.next_check:
+        if not speech and silence >= (self.minimum_silence if self.mode == 'conversation' else 1.5) and self.samples >= self.next_check:
             self.next_check = self.samples + 4000
             window = np.concatenate(self.audio)[-128000:]
             self.last_probability = float(np.asarray(self.turn.run(None, {self.input_name: features(window)})[0]).reshape(-1)[0])
-            if self.mode == 'dictation' or self.last_probability > .65 or silence >= 2.5:
+            if self.mode == 'dictation' or self.last_probability > self.turn_threshold or silence >= self.maximum_silence:
                 self.finish(); return
         if self.audio_samples >= RATE and self.audio_samples - self.last_preview >= RATE:
             self.last_preview = self.audio_samples
@@ -109,8 +115,11 @@ class Recognizer:
                     self.processing = True
                     epoch = self.capture_epoch
                 started = time.perf_counter()
-                stream = self.asr.create_stream(); stream.accept_waveform(RATE, audio)
-                self.asr.decode_stream(stream); text = stream.result.text.strip()[:6000]
+                if self.transcribe:
+                    text = self.transcribe(audio).strip()[:6000]
+                else:
+                    stream = self.asr.create_stream(); stream.accept_waveform(RATE, audio)
+                    self.asr.decode_stream(stream); text = stream.result.text.strip()[:6000]
                 with self.guard:
                     self.compute += time.perf_counter() - started
                     if self.closed:
@@ -168,7 +177,7 @@ class Recognizer:
                     'text': (self.committed + ' ' + self.partial).strip(), 'turns': list(self.turns),
                     'speech_id': self.speech_id, 'speaking': self.was_speech,
                     'turn_probability': self.last_probability, 'processing': self.processing or bool(self.finals),
-                    'compute_seconds': round(self.compute, 4), 'model': 'Parakeet v3'}
+                    'compute_seconds': round(self.compute, 4), 'model': 'Voxtral Realtime' if self.transcribe else 'Parakeet v3'}
 
     def close(self):
         with self.guard:

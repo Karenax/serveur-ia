@@ -1,0 +1,16 @@
+{
+  "device": "CPU",
+  "first_audio_s": 0.38447950000409037,
+  "generation_s": 6.890094500005944,
+  "chunks": 41,
+  "duration_s": 6.4,
+  "streaming_before_completion": true,
+  "metrics": {
+    "first_audio_ms": 382.9637000017101,
+    "elapsed_ms": 6662.290499996743,
+    "rtf": 1.0409828906244911
+  },
+  "recognized": "Bonjour, la réunion du projet Orion est prévue demain à 15h.",
+  "asr_s": 0.5486541999998735,
+  "scope": "functional CPU smoke only; does not qualify AMD/NVIDIA or perceptual voice quality"
+}

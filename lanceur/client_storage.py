@@ -1,4 +1,4 @@
-"""Private per-client files, automatically materialized from Fred's committed state.
+"""Private per-client files, automatically materialized from Kiara's committed state.
 
 The shared database retains transactional authority. Each dedicated directory is
 a consistent standalone client database plus readable exports, never an input
@@ -22,7 +22,7 @@ TABLES = ('client_histories', 'projects', 'documents', 'chunks', 'memories',
           'policies', 'conversations', 'jobs', 'events', 'document_index',
           'document_sources', 'notifications', 'notification_preferences',
           'notification_subscriptions', 'notification_deliveries',
-          'personal_memories', 'knowledge_exclusions')
+          'personal_memories', 'knowledge_exclusions', 'assistant_items', 'assistant_commands')
 
 
 def encoded(value):
@@ -156,7 +156,7 @@ class ClientStorage:
                 rows = {table: [dict(r) for r in db.execute('SELECT * FROM ' + table + ' WHERE owner=? ORDER BY rowid', (client['id'],))] for table in TABLES}
                 job_ids = {row['id'] for row in rows['jobs']}
                 settings = [dict(r) for r in db.execute('SELECT * FROM settings ORDER BY key')
-                    if r['key'] == 'history_reset_id' or (r['key'].startswith('job_attempt:') and r['key'][12:] in job_ids)]
+                    if r['key'] == 'history_reset_id' or r['key']=='assistant-memory:'+identity or (r['key'].startswith('job_attempt:') and r['key'][12:] in job_ids)]
                 result.append({'client': metadata, 'rows': rows, 'settings': settings,
                     'generation': epoch, 'profile': self.profile(client, saved), '_revision':token})
             return result
@@ -189,6 +189,7 @@ class ClientStorage:
         history = rows['client_histories'][0] if rows['client_histories'] else {'owner': owner, 'revision': 0, 'updated': None, 'history': '{"conversations":[],"currentId":""}'}
         json_file('historique.json', {**history, 'history': json.loads(history['history'])})
         for name, tables in [('memoires.json', ('memories', 'personal_memories')), ('taches.json', ('jobs',)),
+            ('assistant.json', ('assistant_items', 'assistant_commands')),
             ('notifications.json', ('notifications', 'notification_deliveries')), ('evenements.json', ('events',)),
             ('references.json', ('document_sources', 'document_index', 'knowledge_exclusions'))]:
             json_file(name, {table: rows[table] for table in tables})

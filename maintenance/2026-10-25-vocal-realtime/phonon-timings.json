@@ -1,0 +1,28 @@
+{
+  "engine": "Phonon",
+  "device": "CPU",
+  "loading_seconds": 2.513972200016724,
+  "rows": [
+    {
+      "text": "Bonjour, je vous écoute. Que souhaitez-vous faire aujourd’hui ?",
+      "first_audio_seconds": 0.12285790001624264,
+      "total_seconds": 0.6097297000233084,
+      "audio_seconds": 3.92,
+      "rtf": 0.15554329082227256
+    },
+    {
+      "text": "La réunion aura lieu mardi dans la salle principale. Vous pouvez préparer les documents ce matin, puis prévenir les participants. Je garderai ensuite le résumé dans cette conversation.",
+      "first_audio_seconds": 0.04799169997568242,
+      "total_seconds": 1.2126723999972455,
+      "audio_seconds": 9.36,
+      "rtf": 0.12955901709372283
+    },
+    {
+      "text": "Pour retrouver vos anciens échanges, ouvrez l’historique. Vous pourrez ensuite reprendre une conversation ou la ranger dans les archives.",
+      "first_audio_seconds": 0.0474590000230819,
+      "total_seconds": 0.8513874000054784,
+      "audio_seconds": 6.64,
+      "rtf": 0.12822099397672868
+    }
+  ]
+}

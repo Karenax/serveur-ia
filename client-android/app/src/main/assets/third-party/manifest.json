@@ -2,7 +2,7 @@
   "format": 1,
   "components": [
     {
-      "name": "Accès serveur Fred",
+      "name": "Accès serveur Kiara",
       "license_files": [
         "application/LICENSE.txt"
       ]
@@ -47,6 +47,27 @@
       "version": "1.9.5",
       "license_files": [
         "whisper/llamafile-LICENSE.txt"
+      ]
+    },
+    {
+      "name": "Sherpa-ONNX",
+      "version": "1.13.8",
+      "license_files": [
+        "wakeword/SHERPA-APACHE-2.0.txt"
+      ]
+    },
+    {
+      "name": "ONNX Runtime Android",
+      "version": "1.28.2",
+      "license_files": [
+        "wakeword/ONNXRUNTIME-MIT.txt"
+      ]
+    },
+    {
+      "name": "Kotlin standard library",
+      "version": "2.0.21",
+      "license_files": [
+        "wakeword/KOTLIN-APACHE-2.0.txt"
       ]
     },
     {
@@ -158,6 +179,18 @@
     "modules/gvisor.dev/gvisor/LICENSE": {
       "sha256": "5af94223052169198cfa2195455b7d87209d9aa0fff4705822f328b4b272facb",
       "bytes": 12519
+    },
+    "wakeword/KOTLIN-APACHE-2.0.txt": {
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "bytes": 11358
+    },
+    "wakeword/ONNXRUNTIME-MIT.txt": {
+      "sha256": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c",
+      "bytes": 1073
+    },
+    "wakeword/SHERPA-APACHE-2.0.txt": {
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "bytes": 11358
     },
     "whisper/ggml-LICENSE.txt": {
       "sha256": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d",

@@ -1,5 +1,23 @@
 # Dictée locale — Windows et Android
 
+## Extension de l’assistant 3.5.52 / Android 1.0.23
+
+Le vocal utilise maintenant les commandes métier communes à Hermes et Kiara,
+et accepte une image choisie avec la question. L’essai local **« Bonjour Kiara »**
+reste facultatif, désactivé initialement et limité à l’application visible.
+La phrase complète, les ressources et leurs empreintes sont dans
+`wakeword-models.json` ; sa reconnaissance française reste à valider avec des voix
+humaines. Voir le [rapport d’intégration](../maintenance/2026-10-25-assistant-integration/README.md)
+pour les constructions, preuves et limites, sans changement des moteurs Low/Max.
+
+## Conversation Max 3.5.51
+
+Le complément séparé utilise Whisper large-v3-turbo Q5 sur la carte Vulkan AMD ou
+NVIDIA sélectionnée et Phonon 40m Q8 français sur CPU, voix Tiphaine. Low conserve
+Parakeet sur Windows, Whisper Small sur Android et Phonon côté serveur. La dictée
+reste inchangée. Les mesures, limites et procédures sont dans le
+[rapport du 25 octobre](../maintenance/2026-10-25-vocal-realtime/README.md).
+
 ## Windows 3.5.35
 
 Windows utilise désormais **Parakeet v3 int8**, partagé entre **Dicter** et
@@ -16,13 +34,13 @@ essais sur téléphone, pas une mise à jour Android déjà livrée.
 
 ## Dictée Android et ancien moteur Windows
 
-Whisper.cpp **1.9.5**, modèle **Small multilingue complet**, français forcé. Le modèle optionnel pèse **487 601 967 octets** ; son URL, sa révision et son SHA-256 sont fixés dans [model.json](model.json). Les textes de licence MIT sont inclus dans `licenses/` et les paquets clients. Les sources amont sont intactes ; le wrapper Fred est dans ce dossier.
+Whisper.cpp **1.9.5**, modèle **Small multilingue complet**, français forcé. Le modèle optionnel pèse **487 601 967 octets** ; son URL, sa révision et son SHA-256 sont fixés dans [model.json](model.json). Les textes de licence MIT sont inclus dans `licenses/` et les paquets clients. Les sources amont sont intactes ; le wrapper Kiara est dans ce dossier.
 
 ## Utilisation
 
 Dans la conversation, choisir **Installer la dictée** une seule fois par appareil, puis **Dicter**. Sur ce PC, le modèle est déjà installé et vérifié. Android demande l’autorisation microphone à la première utilisation. Une permission refusée laisse le clavier disponible.
 
-Le brouillon existant est conservé. Le texte provisoire apparaît progressivement et peut être révisé. Une pause de 1,5 seconde stabilise une phrase et laisse le microphone ouvert. **Terminer la dictée** ferme le microphone et attend la dernière transcription. Corriger le texte, puis **Envoyer** pour demander la réponse à Fred. Aucun silence, résultat de transcription ou fin de durée ne déclenche un envoi. **Annuler** restaure exactement le brouillon précédent.
+Le brouillon existant est conservé. Le texte provisoire apparaît progressivement et peut être révisé. Une pause de 1,5 seconde stabilise une phrase et laisse le microphone ouvert. **Terminer la dictée** ferme le microphone et attend la dernière transcription. Corriger le texte, puis **Envoyer** pour demander la réponse à Kiara. Aucun silence, résultat de transcription ou fin de durée ne déclenche un envoi. **Annuler** restaure exactement le brouillon précédent.
 
 Chaque dictée est limitée à **deux minutes**. Le passage en arrière-plan sur Android ferme le microphone et finalise le texte. Le bouton de fermeture attend la finalisation ; une destruction forcée annule la capture. Le texte du champ de saisie ne devient une conversation sauvegardée qu’après l’envoi habituel. Ce mode Dictée conserve les réponses écrites. Windows ajoute un mode distinct de [conversation vocale](CONVERSATION-WINDOWS.md), avec envoi automatique et lecture des réponses.
 

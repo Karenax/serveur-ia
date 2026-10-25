@@ -1,4 +1,4 @@
-"""Fred integration lifecycle, without modifying the personal Hermes installation."""
+"""Kiara integration lifecycle, without modifying the personal Hermes installation."""
 from __future__ import annotations
 import atexit
 from pathlib import Path

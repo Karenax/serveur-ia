@@ -1,0 +1,60 @@
+{
+  "revision": "vocal-rt-7e4681b1c2390352",
+  "runtime_api": 6,
+  "signature_verified": true,
+  "installation": {
+    "download_bytes": 109023020,
+    "reused_bytes": 583364231,
+    "required_disk_bytes": 1161330355
+  },
+  "device": {
+    "name": "Vulkan0",
+    "description": "Quadro P2200",
+    "free_bytes": 4689490740,
+    "total_bytes": 5490343936,
+    "id": "c1bdc62f938b9e7f5b00760d",
+    "kind": "dedicated",
+    "pci_id": "0000:41:00.0"
+  },
+  "benchmark": {
+    "asr_rtf": 0.9543178124983699,
+    "tts_rtf": 0.18750676339160624,
+    "first_audio_ms": 269.50560000841506,
+    "asr_ms": 4275.343799992697,
+    "latency_ms": 4544.849400001112,
+    "fingerprint": "b4e32121d3b3947425397f4f420120fefdd67df40085bf2de30f3fe2d6b3b902",
+    "functional": true,
+    "device": {
+      "name": "Vulkan0",
+      "description": "Quadro P2200",
+      "free_bytes": 4689490740,
+      "total_bytes": 5490343936,
+      "id": "c1bdc62f938b9e7f5b00760d",
+      "kind": "dedicated",
+      "pci_id": "0000:41:00.0"
+    },
+    "passed": false
+  },
+  "turns": [
+    {
+      "question": "Combien font douze plus dix-sept ?",
+      "recognized": "Combien font 12 pour 17 ? Combien font 12 pour 17 ? Combien font 12 pour 17 ? Combien font 12 pour 17 ? Combien font 12 pour 17 ? Combien font 12 pour 17 ? Combien font 12 pour 17 ? Combien font 12 pour 17 ? Combien font 12 pour 17 ? Combien font 12 pour 17 ? Combien font 12 pour 17 ? Combien font 12 pour 17 ? Combien font 12 pour 17 ? Combien font 12 pour 17 ? Combien font 12 pour 17 ? Combien font 12 pour 17 ? Combien font 12 pour 17 ? Combien font 12 pour 17 ? Combien font 12 pour 17 ? Combien font 12 pour 17 ? Combien font 12 pour 17 ? Combien font 12 pour 17 ? Combien font 12 pour 17 ? Combien font 12 pour 17 ? Combien font 12 pour 17 ? Combien font 12 pour 17 ?",
+      "answer": "12 pour 17 font 204. C'est le résultat de la multiplication de ces deux nombres.",
+      "recognition_after_recording_ms": 1854.9999999813735,
+      "first_text_after_recording_ms": 81823.99999999325,
+      "first_audio_after_recording_ms": 82948.99999999325,
+      "output_seconds": 5.6,
+      "max_playback_gap_ms": 0
+    },
+    {
+      "question": "Comment retrouver mes anciennes conversations ?",
+      "recognized": "Comment retrouver mes anciennes conversations ? Comment retrouver mes anciennes conversations ? Comment retrouver mes anciennes conversations ? Comment retrouver mes anciennes conversations ? Comment retrouver mes anciennes conversations ? Comment retrouver mes anciennes conversations ? Comment retrouver mes anciennes conversations ? Comment retrouver mes anciennes conversations ? Comment retrouver mes anciennes conversations ? Comment retrouver mes anciennes conversations ? Comment retrouver mes anciennes conversations ? Comment retrouver mes anciennes conversations ? Comment retrouver mes anciennes conversations ? Comment retrouver mes anciennes conversations ? Comment retrouver mes anciennes conversations ? Comment retrouver mes anciennes conversations ? Comment retrouver mes anciennes conversations ? Comment retrouver mes anciennes conversations ? Comment retrouver mes anciennes conversations ? Comment retrouver mes anciennes conversations ? Comment retrouver mes anciennes conversations ? Comment retrouver mes anciennes conversations ? Comment retrouver mes anciennes conversations ? Comment retrouver mes anciennes conversations ? Comment retrouver mes anciennes conversations ? Comment retrouver mes anciennes conversations ? Comment retrouver mes anciennes conversations ? Comment retrouver mes anciennes conversations ? Comment retrouver mes anciennes conversations ? Comment retrouver mes anciennes conversations ? Comment retrouver mes anciennes conversations ? Comment retrouver mes",
+      "answer": "Tu peux retrouver tes anciennes conversations dans la rubrique Historique. C'est l'endroit dédié pour consulter tes échanges passés.",
+      "recognition_after_recording_ms": 2062.999999994645,
+      "first_text_after_recording_ms": 58484.99999998603,
+      "first_audio_after_recording_ms": 65921.99999999139,
+      "output_seconds": 7.36,
+      "max_playback_gap_ms": 0
+    }
+  ]
+}

@@ -56,6 +56,19 @@ class ConversationTests(unittest.TestCase):
         with self.assertRaises(ValueError):dictation.action({'action':'mute','session':'current','muted':True})
     def test_unknown_action_fields_rejected(self):
         with self.assertRaises(ValueError):self.client.action({'action':'start','command':'arbitrary'})
+    def test_playback_pause_is_owned_and_only_available_for_active_max(self):
+        self.client.value.update(phase='listening',session='current',quality='max')
+        message={'action':'playback','session':'current','playing':True,'interruptions':False}
+        with patch.object(self.client,'_send') as send:
+            for invalid in ({**message,'session':'old'},{**message,'playing':'true'}):
+                with self.assertRaises(ValueError):self.client.action(invalid)
+            send.assert_not_called()
+            self.client.action(message)
+            send.assert_called_once_with({'action':'playback','playing':True,'interruptions':False})
+        self.assertTrue(self.client.playback_requested)
+        self.client.value['quality']='low'
+        with self.assertRaises(ValueError):self.client.action(message)
+        self.assertFalse(self.client.cancelled.is_set())
     def test_stop_after_worker_failure_unlocks_client(self):
         self.client.value.update(phase='error',session='ended')
         result=self.client.action({'action':'stop','session':'ended'})

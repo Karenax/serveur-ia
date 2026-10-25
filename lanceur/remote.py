@@ -20,9 +20,12 @@ import time
 from devices import Revocations, fields as device_fields
 from scheduler import Scheduler
 from text_transform import CancellableResponse, TextTransforms, transform_request
+from voice_web import VoiceWeb, CAPABILITIES as VOICE_WEB_CAPABILITIES
+from voice_web_plan import plan as plan_voice_web
+from voice_response import configure as configure_oral_response, respond as stream_oral_response, INSTRUCTION as ORAL_PROTOCOL
 from accounts import Accounts
 from operations import VERSION
-from workspace import Workspace, Conflict, Denied
+from workspace import Workspace, Conflict, Denied, IDENTITY_INSTRUCTIONS
 from urllib.parse import urlsplit
 from core import HOME, ROOT, PYTHON as PYTHON, HIDDEN as HIDDEN, read_json, write_json, health
 
@@ -32,6 +35,7 @@ class GatewayHTTPServer(BoundedHTTPServer):
     def server_close(self):
         if getattr(self,'workspace',None):self.workspace.shutdown()
         if getattr(self,'voice',None):self.voice.close()
+        if getattr(self,'voice_max',None):self.voice_max.close()
         super().server_close()
 def secure_url(value):
     if not isinstance(value, str):
@@ -60,10 +64,14 @@ class AccessStore:
         self.hermes = None
         self.scheduler = Scheduler()
         self.text_transforms = TextTransforms()
+        self.voice_web = VoiceWeb(self)
         self.accounts = Accounts(home)
         self.workspace = Workspace(home)
+        self.workspace.access_lock=self.lock
         from voice import VoiceService
         self.voice = VoiceService(home)
+        from voice_max import AdvancedVoice
+        self.voice_max = AdvancedVoice(ROOT/'toolchain/voice-max-server')
         from notifications import Notifications
         self.notifications = Notifications(self.workspace)
         self.seen = read_json(home / 'connexions.json', {})
@@ -533,6 +541,30 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
             if self.path == '/v1/voice/status':
                 if not self.authorized():return
                 return self.respond(200,store.voice.status())
+            if self.path == '/v1/voice/max/status':
+                if not self.authorized():return
+                return self.respond(200,store.voice_max.status())
+            if self.path in ('/v1/voice/max/package','/v1/voice/max/package/download'):
+                if not self.authorized():return
+                from voice_max_package import package
+                try:
+                    catalogue, source = package(store.home)
+                except ValueError as error:
+                    return self.respond(503, {'error': {'message': str(error)}})
+                if self.path.endswith('/package'):
+                    return self.respond(200, catalogue)
+                with source.open('rb') as stream:
+                    self.send_response(200)
+                    self.send_header('Content-Type', 'application/zip')
+                    self.send_header('Content-Length', str(os.fstat(stream.fileno()).st_size))
+                    self.send_header('Cache-Control', 'no-store')
+                    self.send_header('X-Content-Type-Options', 'nosniff')
+                    self.send_header('Connection', 'close')
+                    self.end_headers()
+                    while block := stream.read(256*1024):
+                        if store.authenticate(self.access_token) != self.identity:return
+                        self.wfile.write(block)
+                return
             if self.path == '/v1/notifications':
                 if not self.authorized(): return
                 try:
@@ -619,6 +651,41 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 except Conflict as error:return self.respond(409,{'error':{'message':str(error)}})
                 except Denied as error:return self.respond(403,{'error':{'message':str(error)}})
                 except (ValueError,OSError,TypeError):return self.respond(400,{'error':{'message':'Cette demande agent ne peut pas être traitée.'}})
+            if self.path in ('/v1/voice/max/test','/v1/voice/max/warm','/v1/voice/max/end','/v1/voice/max/transcribe','/v1/voice/max/speech','/v1/voice/max/cancel'):
+                if not self.authorized():return
+                frames=None;sent=False
+                try:
+                    value=json_body(self,1300000 if self.path.endswith('/transcribe') else 8192)
+                    valid=lambda:store.authenticate(self.access_token)==self.identity
+                    if not valid():raise PermissionError('Accès vocal désactivé.')
+                    if self.path.endswith('/test'):
+                        if value!={}:raise ValueError('Paramètres du test Max invalides.')
+                        return self.respond(200,store.voice_max.test())
+                    if self.path.endswith('/warm'):
+                        if not isinstance(value,dict) or set(value)!={'session'}:raise ValueError('Paramètres Max invalides.')
+                        return self.respond(200,store.voice_max.warm(self.identity,value['session']))
+                    if self.path.endswith('/end'):
+                        if not isinstance(value,dict) or set(value)!={'session'} or not isinstance(value['session'],str):raise ValueError('Session Max invalide.')
+                        return self.respond(200,store.voice_max.release(self.identity,value['session']))
+                    if self.path.endswith('/transcribe'):
+                        return self.respond(200,store.voice_max.transcribe(self.identity,value,valid))
+                    if self.path.endswith('/cancel'):
+                        if not isinstance(value,dict) or set(value)!={'request_id'} or not isinstance(value['request_id'],str) or len(value['request_id'])!=32:raise ValueError('Annulation Max invalide.')
+                        return self.respond(200,store.voice_max.cancel(self.identity,value['request_id']))
+                    frames=store.voice_max.frames(self.identity,'speak',value,valid)
+                    first=next(frames)
+                    self.send_response(200);self.send_header('Content-Type','text/event-stream')
+                    self.send_header('Cache-Control','no-store');self.send_header('Connection','close');self.end_headers();sent=True
+                    self.wfile.write(('data: '+json.dumps(first)+'\n\n').encode());self.wfile.flush()
+                    for frame in frames:
+                        self.wfile.write(('data: '+json.dumps(frame)+'\n\n').encode());self.wfile.flush()
+                except BlockingIOError as error:
+                    if not sent:self.respond(429,{'error':{'message':str(error)}})
+                except (ValueError,OSError,TypeError,PermissionError) as error:
+                    if not sent:self.respond(400,{'error':{'message':str(error)}})
+                finally:
+                    if frames:frames.close()
+                return
             if self.path in ('/v1/voice/speech','/v1/voice/cancel'):
                 if not self.authorized():return
                 frames=None;sent=False
@@ -726,6 +793,9 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 project=raw.pop('project_id',None);raw.pop('assistant_id',None);document=raw.pop('document_id',None)
                 text_transform='text_transform' in raw
                 voice_conversation='voice_conversation' in raw
+                voice_realtime=raw.pop('voice_realtime',False)
+                if type(voice_realtime) is not bool or voice_realtime and (not voice_conversation or raw.get('stream') is not True):
+                    raise ValueError('Mode de réponse vocale invalide.')
                 external_api = external_api and not text_transform and not voice_conversation
                 if voice_conversation and (raw.pop('voice_conversation') is not True or text_transform or self.path!='/v1/chat/completions'):
                     raise ValueError('Mode de conversation vocale invalide.')
@@ -738,25 +808,32 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 data = chat_request(transform_request(raw) if text_transform else raw, selection['id'] if selection else model);sources=[]
                 if external_api:
                     # Standard OpenAI clients own their conversation and tool loop.
-                    # Preserve their output budget instead of the Fred chat's unlimited default.
+                    # Preserve their output budget instead of the Kiara chat's unlimited default.
                     cap=raw.get('max_completion_tokens',raw.get('max_tokens'))
                     if cap is not None and (type(cap) is not int or cap<=0):raise ValueError('Limite de sortie API invalide.')
                     if cap is not None:data['max_tokens']=cap
                 if voice_conversation:
                     if any(field in raw for field in ('tools','tool_choice','parallel_tool_calls','response_format')):
                         raise ValueError('Les outils ne sont pas disponibles en conversation vocale directe.')
-                    data['max_tokens']=512
+                    data['max_tokens']=1024 if voice_realtime else 512
                     data['reasoning_effort']='none'
+                    data['strata_checkpoint']=True
                     data['chat_template_kwargs']={'enable_thinking':False}
                     data['messages']=[{k:v for k,v in message.items() if k!='reasoning_content'} for message in data['messages']]
-                    data['messages'].insert(0,{'role':'system','content':'Tu es Fred, un assistant en conversation orale. Réponds en français naturel, avec des phrases courtes, généralement en deux à quatre phrases. Évite les tableaux, le Markdown et les longs préambules. Si une transcription est ambiguë, demande une précision sans inventer ce qui a été dit.'})
+                    data['messages'].insert(0,{'role':'system','content':'Tu es Kiara, une assistante en conversation orale. Réponds en français naturel, avec des phrases courtes, généralement en deux à quatre phrases. Évite les tableaux, le Markdown et les longs préambules. Si une transcription est ambiguë, demande une précision sans inventer ce qui a été dit.'})
+                web_query = None
+                routing_messages = data['messages'] if voice_conversation else None
+                if voice_conversation:data['messages'][0]['content'] += ' ' + VOICE_WEB_CAPABILITIES
                 if not text_transform and not voice_conversation:
                     from hermes_reasoning import request_reasoning
                     request_reasoning(data,selection.get('capabilities',{}) if selection else capabilities({}))
                 direct_request=store.text_transforms.request_id(self.headers.get('X-Qwen-Request') or secrets.token_hex(16)) if text_transform or voice_conversation else None
                 if direct_request and store.text_transforms.cancelled(self.identity,direct_request):raise ValueError('Demande annulée.')
                 if not external_api and not text_transform and (voice_conversation or not (store.hermes and self.path=='/v1/chat/completions')) and (project or document or getattr(store.workspace,'knowledge',None)):
-                    data['messages'],sources=store.workspace.context(self.identity,data['messages'],project,document)
+                    data['messages'],sources=store.workspace.context(self.identity,data['messages'],project,document,**({'voice_conversation':conversation} if voice_conversation else {}))
+                if not store.hermes and not text_transform and not voice_conversation:
+                    if not any(m['role']=='system' and IDENTITY_INSTRUCTIONS in m['content'] for m in data['messages']):
+                        data['messages'].insert(0,{'role':'system','content':IDENTITY_INSTRUCTIONS})
             except Denied as error:
                 return self.respond(403, {'error': {'code': 'model_access_denied', 'message': str(error)}})
             except ModelUnavailable as error:
@@ -774,6 +851,18 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
             live_model=live.get('model')
             if external_api and local:data['model']=live_model or model
             if (selection is None or external_api and local) and isinstance(live_model,str) and live_model:data['model']=live_model
+            oral_context=None
+            if voice_conversation:
+                if voice_realtime:data=configure_oral_response(data,commands=True)
+                from voice_context import bounded_messages,token_count,CAPACITY,OUTPUT_TOKENS
+                try:
+                    data['messages'],tokens,removed=bounded_messages(data['messages'],lambda values:token_count(upstream_port,data['model'],key,values),limit=CAPACITY-data['max_tokens'])
+                    if voice_realtime:data['strata_prefix']={'messages':1}
+                    from voice_context import image_budget,IMAGE_TOKENS
+                    oral_context={'capacity':CAPACITY,'input_tokens':tokens,'output_tokens':data['max_tokens'],'omitted_messages':removed,
+                                  'estimated':bool(image_budget(data['messages'])),'image_tokens_reserved':image_budget(data['messages'])}
+                except (OSError,ValueError,http.client.HTTPException) as error:
+                    return self.respond(400,{'error':{'code':'voice_context_limit','message':str(error)}})
             if self.path == '/v1/context' and not local:
                 # A local tokenizer cannot measure another provider. Return an
                 # explicit visible-history estimate, without an inference call.
@@ -877,6 +966,8 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                         self.send_header('Connection', 'close')
                         self.end_headers()
                         headers_sent = True
+                        if oral_context:
+                            self.wfile.write(('data: '+json.dumps({'voice_context':oral_context})+'\n\n').encode());self.wfile.flush()
                         if sources:
                             self.wfile.write(('data: '+json.dumps({'workspace_sources':sources},ensure_ascii=False)+'\n\n').encode());self.wfile.flush()
                 def heartbeat(position=None):
@@ -886,7 +977,74 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                         frame=': qwen-keepalive\n\n' if position is None else ': qwen-queue '+json.dumps({'position': position})+'\n\n'
                         self.wfile.write(frame.encode())
                         self.wfile.flush()
-                scheduler.wait(item, lambda: store.authenticate(self.access_token) == self.identity, heartbeat)
+                request_valid = lambda: not item['cancelled'] and store.authenticate(self.access_token)==self.identity and (not web_query or store.voice_web.permitted(self.identity))
+                scheduler.wait(item, request_valid, heartbeat)
+                heartbeat(0)
+                if voice_realtime:
+                    def emit_oral_text(text):
+                        if not request_valid():raise Denied('Demande annulée ou accès désactivé.')
+                        scheduler.progress(item)
+                        frame={'choices':[{'index':0,'delta':{'content':text}}]}
+                        self.wfile.write(('data: '+json.dumps(frame,ensure_ascii=False)+'\n\n').encode());self.wfile.flush()
+                    route=stream_oral_response(upstream_port,data['model'],key,data,request_valid,lambda:heartbeat(0),emit_oral_text,commands=True)
+                    if route['action']=='command':
+                        from assistant_commands import execute, oral_result
+                        with store.lock:
+                            result=execute(store.workspace,self.identity,route['command'],project=project,
+                                           request_key=item['id'],valid=request_valid,origin='Conversation vocale',
+                                           request_text='\n'.join(m['content'] if isinstance(m.get('content'),str) else '\n'.join(p.get('text','') for p in m.get('content',[]) if p.get('type')=='text') for m in routing_messages[-1:] if m['role']=='user'))
+                        emit_oral_text(oral_result(result,route['command']['operation']))
+                        self.wfile.write(('data: '+json.dumps({'assistant_result':result},ensure_ascii=False)+'\n\n').encode());self.wfile.flush()
+                    if route['action']!='search':
+                        self.wfile.write(b'data: {"choices":[{"delta":{},"finish_reason":"stop"}]}\n\ndata: [DONE]\n\n');self.wfile.flush()
+                        item['succeeded']=True;return
+                    # Only an actual search pays for a separate public-query
+                    # decision. The ordinary answer stays a single model call.
+                    # Workspace instructions/documents must never supply the
+                    # provider query through the first, context-rich generation.
+                    if not store.voice_web.permitted(self.identity):
+                        raise Denied('La recherche Internet n’est pas autorisée pour votre accès.')
+                    public_route=plan_voice_web(upstream_port,data['model'],key,routing_messages,request_valid,lambda:heartbeat(0))
+                    if public_route['action']!='search':
+                        raise Denied('Précisez le sujet public à rechercher sur Internet.')
+                    web_query=public_route['query'];data.pop('response_format',None)
+                    data['messages'][0]['content']=data['messages'][0]['content'].rsplit(ORAL_PROTOCOL,1)[0]
+                elif voice_conversation:
+                    route=plan_voice_web(upstream_port,data['model'],key,routing_messages,request_valid,lambda:heartbeat(0))
+                    if route['action']=='search':web_query=route['query']
+                    elif route['action']=='clarify':
+                        data['messages'].insert(-1,{'role':'system','content':'La personne souhaite une recherche Internet mais son sujet manque. Confirme que tu peux rechercher et demande sur quel sujet, en une phrase.'})
+                        data['messages'],tokens,removed=bounded_messages(data['messages'],lambda values:token_count(upstream_port,data['model'],key,values),limit=CAPACITY-data['max_tokens'])
+                        if voice_realtime:data['strata_prefix']={'messages':1}
+                        oral_context.update(input_tokens=tokens,omitted_messages=oral_context['omitted_messages']+removed)
+                        if headers_sent:
+                            self.wfile.write(('data: '+json.dumps({'voice_context':oral_context})+'\n\n').encode());self.wfile.flush()
+                if web_query:
+                    last_web_heartbeat = time.monotonic()
+                    def web_valid():
+                        nonlocal last_web_heartbeat
+                        if (item['cancelled'] or store.text_transforms.cancelled(self.identity,item['id'])
+                                or store.authenticate(self.access_token)!=self.identity):
+                            return False
+                        if not store.voice_web.permitted(self.identity):return False
+                        if time.monotonic()-last_web_heartbeat>=5:
+                            heartbeat();scheduler.progress(item);last_web_heartbeat=time.monotonic()
+                        return True
+                    def web_progress(message):
+                        if not web_valid():raise Denied('Recherche arrêtée : demande annulée ou accès désactivé.')
+                        if headers_sent:
+                            self.wfile.write(('data: '+json.dumps({'hermes_status':{'phase':'tool','message':message}},ensure_ascii=False)+'\n\n').encode());self.wfile.flush()
+                    data['messages'],web_sources=store.voice_web.prepare(self.identity,web_query,data['messages'],web_valid,web_progress)
+                    # Apply the same oral budget after adding external passages.
+                    data['messages'],tokens,removed=bounded_messages(data['messages'],lambda values:token_count(upstream_port,data['model'],key,values),limit=CAPACITY-data['max_tokens'])
+                    if voice_realtime:data['strata_prefix']={'messages':1}
+                    oral_context.update(input_tokens=tokens,omitted_messages=oral_context['omitted_messages']+removed)
+                    if not web_valid():raise Denied('Recherche arrêtée : demande annulée ou accès désactivé.')
+                    sources.extend(web_sources)
+                    if headers_sent:
+                        self.wfile.write(('data: '+json.dumps({'voice_context':oral_context},ensure_ascii=False)+'\n\n').encode())
+                        if sources:self.wfile.write(('data: '+json.dumps({'workspace_sources':sources},ensure_ascii=False)+'\n\n').encode())
+                        self.wfile.flush()
                 heartbeat(0)
                 store.audit('inference_started', self.identity)
                 if not local:
@@ -909,15 +1067,15 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 # queued. Keep network I/O outside the access mutex so an
                 # unavailable engine cannot delay a later revocation.
                 with store.lock:
-                    if item['cancelled'] or store.authenticate(self.access_token) != self.identity:
+                    if not request_valid():
                         raise Denied('Demande annulée ou accès désactivé.')
                 for attempt in range(3):
                     with store.lock:
-                        if item['cancelled'] or store.authenticate(self.access_token)!=self.identity:
+                        if not request_valid():
                             raise Denied('Demande annulée ou accès désactivé.')
                     connection = http.client.HTTPConnection('127.0.0.1', upstream_port, timeout=120)
                     if text_transform or voice_conversation:
-                        connection.response_class=lambda *args,**kwargs:CancellableResponse(*args,valid=lambda:not item['cancelled'] and store.authenticate(self.access_token)==self.identity,heartbeat=heartbeat if headers_sent else None,**kwargs)
+                        connection.response_class=lambda *args,**kwargs:CancellableResponse(*args,valid=request_valid,heartbeat=heartbeat if headers_sent else None,**kwargs)
                     connection.request('POST', '/v1/chat/completions', json.dumps(data).encode(), headers)
                     upstream_socket = connection.sock
                     def abort(sock=upstream_socket):
@@ -942,7 +1100,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                             response.close();connection.close()
                             until=time.monotonic()+max(.1,delay)
                             while time.monotonic()<until:
-                                if item['cancelled'] or store.authenticate(self.access_token)!=self.identity:raise ValueError('Demande annulée ou accès désactivé.')
+                                if not request_valid():raise ValueError('Demande annulée ou accès désactivé.')
                                 time.sleep(.05)
                             heartbeat(0);continue
                     message='Le modèle local est temporairement indisponible. Réessayez dans un instant.' if response.status==503 else 'Le modèle local n’a pas pu traiter cette demande. Réessayez.'
@@ -961,12 +1119,12 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 complete = False
                 if data.get('stream') and response.status == 200:
                     while True:
-                        if item['cancelled'] or not store.authenticate(self.access_token):
+                        if not request_valid():
                             raise ValueError('Demande annulée ou accès désactivé.')
                         line = response.readline(2 * 1024 * 1024)
                         if not line:
                             break
-                        if item['cancelled'] or not store.authenticate(self.access_token):
+                        if not request_valid():
                             raise ValueError('Demande annulée ou accès désactivé.')
                         if line.strip() == b'data: [DONE]': complete = True
                         if line.startswith(b'data: '):
@@ -987,7 +1145,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                         block = response.read1(65536)
                         if not block:
                             break
-                        if item['cancelled'] or not store.authenticate(self.access_token):raise ValueError('Session expirée ou demande annulée.')
+                        if not request_valid():raise ValueError('Session expirée ou demande annulée.')
                         scheduler.progress(item)
                         self.wfile.write(block)
                     complete = response.status == 200
@@ -1015,6 +1173,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
     server = GatewayHTTPServer(('127.0.0.1', port), Handler)
     server.workspace=store.workspace
     server.voice=store.voice
+    server.voice_max=store.voice_max
     store.workspace.start(generate,valid_owner)
     server.daemon_threads = True
     return server

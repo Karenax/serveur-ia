@@ -28,7 +28,7 @@ def parse(value):
         if (not isinstance(settings,dict) or set(settings)!={'format','version','protocol','endpoint'}
                 or settings.get('format')!=FORMAT or type(settings.get('version')) is not int
                 or settings['version']!=1 or settings.get('protocol') not in ('UDP','HTTPS')):
-            raise ValueError('Paramètres de connexion incompatibles. Copiez-les depuis Accès serveur Fred.')
+            raise ValueError('Paramètres de connexion incompatibles. Copiez-les depuis Accès serveur Kiara.')
         value=settings['endpoint']
         if protocol(value)!=settings['protocol']:
             raise ValueError('Le protocole ne correspond pas à l’adresse.')

@@ -1,5 +1,13 @@
 Console Qwen / Strata pour les deux Tesla P100
 
+Version publiée : serveur/Windows 3.5.52 et Android 1.0.23/code 24.
+La mémoire en conversation, les actions vocales, rappels, bilans et images sont
+décrits dans ../GUIDE-ASSISTANT-KIARA.md. Les preuves et limites de la livraison
+sont dans ../maintenance/2026-10-25-assistant-integration/README.md.
+L’attente de « Bonjour Kiara » reste expérimentale, application visible ; les
+relevés Android hors application sont facultatifs et sans horaire garanti.
+Les rubriques datées ci-dessous décrivent aussi les livraisons antérieures.
+
 Ouvrir « Serveur Qwen.cmd » dans D:\Serveur IA.
 L'interface se trouve sur http://127.0.0.1:8765.
 Elle reconnaît le serveur existant. Dans Exploitation, le chargement au démarrage
@@ -78,7 +86,7 @@ une adresse publique de l'opérateur ou une autre infrastructure que vous gérez
 Le programme ne crée pas de redirection sur la box automatiquement.
 
 Côté client : lancer l'EXE personnel, garder sa fenêtre ouverte et attendre
-Connecté. Le chatbot est intégré dans la fenêtre native « Accès serveur Fred ».
+Connecté. Le chatbot est intégré dans la fenêtre native « Accès serveur Kiara ».
 La rubrique API locale affiche l’adresse et la clé pour vos autres applications.
 Aucun réglage de tunnel, import de profil ou installation WireGuard à effectuer.
 Le client choisit l'adresse locale sur le même sous-réseau, puis l'adresse
@@ -141,7 +149,7 @@ Fichiers du lanceur :
 
 Version 2.0.0 : consulter CHANGEMENTS-V2.txt. Le nouvel onglet Exploitation regroupe démarrage Windows, surveillance, sauvegarde, diagnostic et mises à jour. Le démarrage à la connexion Windows, le chargement automatique et la relance sont maintenant activés ; ces options restent modifiables dans la console.
 
-Version publiée après audit : Accès serveur Fred 3.5.28 (Android 1.0.11/code 12). Vérification de publication : audits/2026-10-12/VALIDATION-CORRECTIONS.md. Aucun compte ni login client.
+Version publiée après audit : Accès serveur Kiara 3.5.28 (Android 1.0.11/code 12). Vérification de publication : audits/2026-10-12/VALIDATION-CORRECTIONS.md. Aucun compte ni login client.
 Clients & accès sert à générer, télécharger, suspendre et révoquer les EXE personnels.
 Voir client-qwen/LISEZ-MOI.txt et lanceur/AUDIT-FRED.txt pour les fonctions actuelles.
 

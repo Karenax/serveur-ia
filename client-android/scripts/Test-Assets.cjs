@@ -7,10 +7,10 @@ const vm=require('node:vm');
 const http=require('node:http');
 const root=path.resolve(__dirname,'..');
 const source=fs.readFileSync(path.join(root,'app/src/main/assets/android-chat.html'),'utf8');
-const config={key:'android-ui-test-local-key',model:'Fred-test',version:'Android-test',storage:'ui-test',platform:'android'};
+const config={key:'android-ui-test-local-key',model:'Kiara-test',version:'Android-test',storage:'ui-test',platform:'android'};
 const html=source.replace('__CONFIG__',JSON.stringify(config)).replaceAll('__NONCE__','android-ui-test');
 const scripts=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].map(match=>match[1]);
-assert.equal(scripts.length,11,'All shared scripts and the Android layer must be assembled');
+assert.equal(scripts.length,12,'All shared scripts and the Android layer must be assembled');
 scripts.forEach((script,index)=>new vm.Script(script,{filename:'android-inline-'+index+'.js'}));
 assert(!source.includes('__UI_CSS__'));
 assert(!source.includes("'/client/update/apply"));
@@ -23,7 +23,7 @@ async function browserCheck(){
   const playwrightPath=process.env.PLAYWRIGHT_MODULE||'playwright';
   const {chromium}=require(playwrightPath);
   const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe'});
-  const state={profile:false,required:true,transport:'https',history:null,revision:'1',draft:null,preferences:{},requests:[],jsonFallback:false,chatMode:'normal',runs:new Map(),pendingAgent:null,update:{phase:'current',message:'À jour.',available:false}};
+  const state={profile:false,required:true,transport:'https',history:null,revision:'1',draft:null,preferences:{},requests:[],pendingModels:1,jsonFallback:false,chatMode:'normal',runs:new Map(),pendingAgent:null,update:{phase:'current',message:'À jour.',available:false}};
   const project={id:'project-1',title:'Projet mobile',instructions:'',archived:false,revision:1,documents:[],memories:[],conversations:[]};
   const respond=(res,value,status=200)=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8'});res.end(JSON.stringify(value));};
   const server=http.createServer(async(req,res)=>{
@@ -40,7 +40,10 @@ async function browserCheck(){
     if(req.url==='/client/history'){state.history=body.history;state.revision=String(Number(state.revision)+1);return respond(res,{saved:true,revision:state.revision,message:'Historique enregistré'});}
     if(req.url==='/client/preferences'){state.preferences=body;return respond(res,{saved:true});}
     if(req.url==='/client/draft'){if(req.method==='POST')state.draft=body.draft;return respond(res,{draft:state.draft});}
-    if(req.url==='/v1/models')return respond(res,{data:[{id:'Fred-test',capabilities:{images:false,files:['txt','md','pdf','docx'],thinking:true,reasoning_efforts:['none','low','medium','high']}}]});
+    if(req.url==='/v1/models'){
+      if(state.pendingModels>0){state.pendingModels--;return respond(res,{error:{code:'connecting',message:'Connexion au serveur IA…'}},503);}
+      return respond(res,{data:[{id:'Kiara-test',capabilities:{images:false,files:['txt','md','pdf','docx'],thinking:true,reasoning_efforts:['none','low','medium','high']}}]});
+    }
     if(req.url==='/v1/status')return respond(res,{protocol:4,version:'test'});
     if(req.url==='/v1/agent/state')return respond(res,{enabled:true,available:true,status:'ready',runs:[...state.runs.values()]});
     if(req.url==='/v1/agent/action'){
@@ -105,8 +108,22 @@ async function browserCheck(){
     await page.click('#android-import-profile');
     await page.waitForSelector('#connection-choice[open]');
     assert.equal(state.requests.some(request=>request.path==='/v1/models'),false,'No remote API before explicit transport choice');
-    await page.click('#choose-https');
+    const initialCatalogue=page.waitForResponse(response=>response.url().endsWith('/v1/models')&&response.status()===503);
+    await page.click('#choose-https');await initialCatalogue;
+    await page.waitForFunction(()=>!modelsPending);
+    assert.equal(await page.isVisible('#error'),false,'A native connecting response is progress, not a red error');
+    await page.evaluate(()=>models());
     await page.waitForSelector('#send:not([disabled])');
+    assert.equal(await page.isVisible('#error'),false,'Successful connection must not leave a startup error behind');
+    await page.evaluate(()=>error({message:'Historique non enregistré. Réessayez.',code:'history_conflict'}));
+    state.pendingModels=1;await page.evaluate(()=>models());
+    assert.equal(await page.textContent('#error'),'Historique non enregistré. Réessayez.','Connecting must preserve unrelated save errors');
+    await page.evaluate(()=>models());
+    assert.equal(await page.textContent('#error'),'Historique non enregistré. Réessayez.','Recovery must preserve unrelated save errors');
+    await page.evaluate(()=>error({message:'Accès révoqué.',code:'access_revoked'}));
+    assert.equal(await page.isVisible('#error'),true,'Real access errors stay visible');
+    await page.evaluate(()=>models());
+    assert.equal(await page.isVisible('#error'),false,'A confirmed reconnection clears its own network error');
     assert.equal(state.transport,'https');
     await page.setInputFiles('#chat-file-input',{name:'note-mobile.txt',mimeType:'text/plain',buffer:Buffer.from('Texte joint depuis le sélecteur Android.')});
     await page.waitForSelector('#chat-attachments .attachment-chip');
@@ -132,7 +149,7 @@ async function browserCheck(){
     await page.click('#export-conversations');
     await page.waitForFunction(()=>window.__androidCalls.some(call=>call.method==='exportFile'));
     const exported=await page.evaluate(()=>window.__androidCalls.find(call=>call.method==='exportFile'));
-    assert.equal(exported.name,'conversations-fred.json');assert.equal(exported.mime,'application/json');
+    assert.equal(exported.name,'conversations-kiara.json');assert.equal(exported.mime,'application/json');
     assert.equal(JSON.parse(Buffer.from(exported.data,'base64')).conversations[0].messages.length,2);
     assert.equal(JSON.parse(Buffer.from(exported.data,'base64')).conversations[0].messages[0].attachments[0].name,'note-mobile.txt');
     const firstChat=state.requests.find(request=>request.path==='/v1/chat/completions');const exportedMessages=JSON.parse(Buffer.from(exported.data,'base64')).conversations[0].messages;
@@ -168,7 +185,10 @@ async function browserCheck(){
     const blockedFlush=await page.evaluate(async()=>{const previous=historyBlocked;try{historyBlocked=true;return await window.androidFlush();}finally{historyBlocked=previous;error('');buttons();}});
     assert.equal(blockedFlush,false,'Blocked history must prevent the native close from accepting a false save confirmation');
     assert.equal(await page.evaluate(()=>window.androidFlush()),true,'Healthy history should still flush');
-    assert(!(await page.evaluate(()=>[...document.querySelectorAll('[data-view-button]')].some(button=>['updates','api'].includes(button.dataset.viewButton)))));
+    assert.equal(await page.locator('[data-view-button="updates"]').count(),0);
+    assert.equal(await page.locator('[data-view-button="api"]').count(),1,'Android keeps its local API settings');
+    assert.equal(await page.title(),'Accès serveur Kiara');
+    assert.equal(await page.textContent('.brand .logo'),'K');
     const phoneOverflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1);
     assert(!phoneOverflow,'Phone must not scroll horizontally');
     await page.screenshot({path:path.join(root,'mobile-ui-phone-test.png')});

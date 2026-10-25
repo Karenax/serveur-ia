@@ -1,0 +1,48 @@
+{
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "scope": "direct local inference only; no microphone, no application writes",
+  "samples": [
+    {
+      "prompt": "Bonjour, réponds en une phrase.",
+      "first_text_seconds": 30.1679865999904,
+      "total_seconds": 31.196038499998394,
+      "result": {
+        "action": "answer",
+        "query": "",
+        "answer": " Bonjour, comment puis-je vous aider aujourd'hui ?"
+      },
+      "wire": "R: Bonjour, comment puis-je vous aider aujourd'hui ?",
+      "commands_executed": false
+    },
+    {
+      "prompt": "Retiens que je préfère les réponses courtes à l’oral.",
+      "first_text_seconds": 5.805759000009857,
+      "total_seconds": 9.47246809999342,
+      "result": {
+        "action": "command",
+        "command": {
+          "operation": "memory_add",
+          "text": "Préfère les réponses courtes à l'oral",
+          "category": "preference"
+        },
+        "answer": ""
+      },
+      "wire": "C: {\"operation\":\"memory_add\",\"text\":\"Préfère les réponses courtes à l'oral\",\"category\":\"preference\"}",
+      "commands_executed": false
+    },
+    {
+      "prompt": "Quels sont mes prochains rappels ?",
+      "first_text_seconds": 1.6875062999897636,
+      "total_seconds": 2.866897500003688,
+      "result": {
+        "action": "command",
+        "command": {
+          "operation": "reminder_list"
+        },
+        "answer": ""
+      },
+      "wire": "C: {\"operation\": \"reminder_list\"}",
+      "commands_executed": false
+    }
+  ]
+}

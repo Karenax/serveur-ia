@@ -8,9 +8,56 @@ import time
 from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
+import numpy as np
 
 
 class MuteWorkerTests(unittest.TestCase):
+    def test_max_playback_keeps_capture_open_and_resumes_with_a_fresh_recognizer_buffer(self):
+        with patch.dict(sys.modules,{'recognition':SimpleNamespace(Recognizer=object)}):
+            spec=importlib.util.spec_from_file_location('playback_worker_test',Path(__file__).with_name('conversation_worker.py'))
+            worker=importlib.util.module_from_spec(spec);spec.loader.exec_module(worker)
+        lines=queue.Queue();output=queue.Queue();devices=[];errors=[]
+        lines.put('{"port":12345,"progressive":true}\n')
+        class Input:
+            def readline(self,*args):return lines.get(timeout=5)
+            def __iter__(self):return self
+            def __next__(self):return self.readline()
+        class Microphone:
+            def __init__(self,*args):self.closed=False;self.reads=0;devices.append(self)
+            def read(self):self.reads+=1;time.sleep(.01);return b'\0'*3200
+            def close(self):self.closed=True
+        class Recognizer:
+            accepted=0;resets=0
+            def __init__(self,*args):pass
+            def accept(self,audio):type(self).accepted+=1
+            def reset_capture(self):type(self).resets+=1
+            def status(self):return {'turns':[],'partial':'','speech_id':0}
+            def close(self):pass
+        def wait_for(predicate):
+            until=time.monotonic()+4
+            while time.monotonic()<until:
+                frame=output.get(timeout=4)
+                if predicate(frame):return frame
+            raise AssertionError('Worker state timed out')
+        def run():
+            try:worker.main()
+            except Exception as error:errors.append(error)
+        with patch.dict(sys.modules,{'max_recognition':SimpleNamespace(MaxRecognizer=Recognizer)}),patch.object(worker,'EchoMicrophone',Microphone),patch.object(worker,'emit',output.put),patch.object(sys,'stdin',Input()),patch.object(sys,'argv',['worker','--models','fixture','--resources','fixture','--quality','max']):
+            thread=threading.Thread(target=run);thread.start()
+            try:
+                wait_for(lambda frame:frame.get('phase')=='listening')
+                lines.put('{"action":"playback","playing":true,"interruptions":false}\n')
+                wait_for(lambda frame:frame.get('capture_paused') is True)
+                before=Recognizer.accepted;reads=devices[0].reads;time.sleep(.15)
+                self.assertEqual(before,Recognizer.accepted);self.assertGreater(devices[0].reads,reads)
+                self.assertFalse(devices[0].closed)
+                lines.put('{"action":"playback","playing":false,"interruptions":false}\n')
+                wait_for(lambda frame:frame.get('capture_paused') is False)
+                self.assertGreater(Recognizer.accepted,before);self.assertEqual(2,Recognizer.resets)
+                self.assertEqual(1,len(devices))
+            finally:lines.put('{"action":"stop"}\n');thread.join(4)
+        self.assertEqual([],errors);self.assertFalse(thread.is_alive());self.assertTrue(devices[0].closed)
+
     def test_mute_closes_capture_and_preserves_session_until_explicit_stop(self):
         # Import with a recognizer stand-in: no ONNX dependencies or model download.
         with patch.dict(sys.modules,{'recognition':SimpleNamespace(Recognizer=object)}):
@@ -45,7 +92,9 @@ class MuteWorkerTests(unittest.TestCase):
         with patch.object(worker,'Recognizer',Recognizer),patch.object(worker,'EchoMicrophone',Microphone),patch.object(worker,'emit',output.put),patch.object(sys,'stdin',Input()),patch.object(sys,'argv',['worker','--models','fixture','--resources','fixture']):
             thread=threading.Thread(target=run);thread.start()
             try:
-                wait_for(lambda f:f.get('phase')=='listening')
+                frame=wait_for(lambda f:f.get('phase')=='listening' and 'audio_level_at' in f)
+                self.assertEqual(0,frame['audio_level'])
+                self.assertLess(abs(time.time()-frame['audio_level_at']),1)
                 lines.put('{"action":"mute","muted":true}\n')
                 wait_for(lambda f:f.get('muted') is True and f.get('microphone_closed'))
                 before=Recognizer.accepted;reads=devices[0].reads

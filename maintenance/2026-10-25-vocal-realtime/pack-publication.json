@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "revision": "vocal-rt-f88da3269d16c833",
+  "runtime_api": 6,
+  "signature_verified": true,
+  "runtime_bytes": 109024358,
+  "upgrade_download_bytes": 683065553,
+  "fresh_download_bytes": 692388589,
+  "voice": "Phonon · français · Tiphaine",
+  "recognizer": "Whisper large-v3-turbo Q5 · Vulkan",
+  "previous_distribution_preserved": true
+}

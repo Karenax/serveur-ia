@@ -22,6 +22,9 @@ final class DemoTransport {
         switch(path){
             case "/v1/models":return response(Json.object("object","list","data",new JSONArray().put(Json.object("id","fred-demo","object","model","capabilities",Json.object("images",true,"files",new JSONArray().put("txt").put("md").put("pdf").put("docx"),"thinking",true,"reasoning_efforts",new JSONArray().put("none").put("low").put("medium").put("high"),"max_file_bytes",2097152)))));
             case "/v1/status":return response(Json.object("status","ready","model","fred-demo","context_window",32768,"max_context_tokens",32768,"model_loaded",true));
+            case "/v1/voice/status":return response(Json.object("ready",true,"enabled",true));
+            case "/v1/voice/cancel":return response(Json.object("cancelled",true));
+            case "/v1/voice/speech":return new Remote.Response(200,"text/event-stream",new ByteArrayInputStream(("data: "+Json.object("id",body.optString("request_id"),"rate",24000,"pcm",android.util.Base64.encodeToString(new byte[9600],android.util.Base64.NO_WRAP))+"\n\ndata: "+Json.object("id",body.optString("request_id"),"done",true)+"\n\n").getBytes(StandardCharsets.UTF_8)));
             case "/v1/context":return response(Json.object("tokens",100,"prompt_tokens",100,"used",100,"limit",32768,"capacity",32768,"estimated",false,"context_window",32768,"max_tokens",16384,"available",32668,"remaining",32668,"fits",true));
             case "/v1/history":return history(raw==null?null:body);
             case "/v1/workspace":return response(workspace.get());

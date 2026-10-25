@@ -8,7 +8,7 @@ const output=path.resolve(opt('--output','preuves/lots-6-8/android'));await fs.m
 const fixture=JSON.parse(await fs.readFile(opt('--fixture','toolchain/android-tests/lots6-8-transport/fixture-public.json'),'utf8'));
 let pages=[];const readyUntil=Date.now()+20000;while(Date.now()<readyUntil){try{pages=await(await fetch(`http://127.0.0.1:${port}/json`,{signal:AbortSignal.timeout(1000)})).json();if(pages.some(p=>p.type==='page'&&p.url.startsWith('http://127.0.0.1:')))break;}catch{}await new Promise(resolve=>setTimeout(resolve,100));}
 const page=pages.find(p=>p.type==='page'&&p.url.startsWith('http://127.0.0.1:'));
-assert(page,'Expected local Fred WebView');const socket=new WebSocket(page.webSocketDebuggerUrl);
+assert(page,'Expected local Kiara WebView');const socket=new WebSocket(page.webSocketDebuggerUrl);
 await new Promise((resolve,reject)=>{socket.addEventListener('open',resolve,{once:true});socket.addEventListener('error',reject,{once:true});});
 let seq=0;const pending=new Map(),errors=[];
 socket.addEventListener('message',event=>{const value=JSON.parse(event.data);if(value.id){const request=pending.get(value.id);if(request){clearTimeout(request.timer);pending.delete(value.id);value.error?request.reject(new Error('CDP failure')):request.resolve(value.result);}}else if(value.method==='Runtime.exceptionThrown')errors.push('WebView exception');});

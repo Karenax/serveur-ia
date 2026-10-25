@@ -32,6 +32,7 @@ class VoiceConversationHTTPTests(unittest.TestCase):
         self.assertEqual('actual-local',data['model']);self.assertEqual(512,data['max_tokens'])
         self.assertEqual('none',data['reasoning_effort']);self.assertEqual({'enable_thinking':False},data['chat_template_kwargs'])
         self.assertFalse(data['strata_mcp']);self.assertEqual('system',data['messages'][0]['role'])
+        self.assertIn('Tu es Kiara',data['messages'][0]['content'])
         self.assertNotIn('reasoning_content',data['messages'][1]);self.settle()
 
     def test_silent_model_sends_keepalive_before_headers_and_keeps_one_request(self):
@@ -67,9 +68,22 @@ class VoiceConversationHTTPTests(unittest.TestCase):
         request=secrets.token_hex(16);value={**self.body(request),'project_id':'private-project'}
         with patch.object(self.store.workspace,'context',return_value=(value['messages'],[])) as context:
             self.assertEqual(200,self.post(value,request)[0]);self.assertEqual(self.a['id'],context.call_args.args[0])
+            self.assertEqual(value['conversation_id'],context.call_args.kwargs['voice_conversation'])
         with patch.object(self.store.workspace,'context',side_effect=Denied('Projet privé.')):
             other=secrets.token_hex(16)
             self.assertEqual(403,self.post({**value,'turn_id':other},other)[0])
+
+    def test_oral_16k_limit_is_applied_by_server_without_modifying_caller_history(self):
+        from copy import deepcopy
+        request=secrets.token_hex(16);value=self.body(request)
+        value['messages']=[{'role':'system','content':'Instructions à préserver.'}]
+        for i in range(36):value['messages'] += [{'role':'user','content':str(i)+' question '+('mot '*1500)},{'role':'assistant','content':'réponse '+('mot '*1500)}]
+        value['messages'].append({'role':'user','content':'La question finale à préserver.'})
+        original=deepcopy(value);status,raw=self.post(value,request)
+        self.assertEqual(200,status);self.assertEqual(value,original);self.assertIn(b'voice_context',raw)
+        sent=self.captured[-1][1];self.assertEqual('La question finale à préserver.',sent['messages'][-1]['content'])
+        self.assertLess(len(sent['messages']),len(value['messages']))
+        self.assertLessEqual(sum(len(json.dumps(m)) for m in sent['messages'])//4+20,15872)
 
     def test_cancel_before_submit_and_during_silent_response(self):
         request=secrets.token_hex(16)

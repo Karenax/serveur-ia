@@ -10,7 +10,7 @@ changes={
  ('Le lot 7 est partiellement livré : ASR intégré, TTS et dialogue continu planifiés.','Cette étude précède la livraison suivante : ASR Windows/Android et conversation Windows avec TTS CPU désormais livrés.'),
  ('Le lot 7 reste partiellement réalisé : la dictée ASR est achevée, TTS et dialogue vocal continu restent planifiés.','Cette livraison de dictée a ensuite été complétée par la conversation Windows 3.5.21 ; Android conserve le mode manuel.')],
  'client-voice/README.md':[
- ('Les réponses de Fred restent écrites ; la synthèse vocale et les échanges vocaux continus restent à développer.','Ce mode Dictée conserve les réponses écrites. Windows ajoute un mode distinct de [conversation vocale](CONVERSATION-WINDOWS.md), avec envoi automatique et lecture des réponses.')],
+ ('Les réponses de Kiara restent écrites ; la synthèse vocale et les échanges vocaux continus restent à développer.','Ce mode Dictée conserve les réponses écrites. Windows ajoute un mode distinct de [conversation vocale](CONVERSATION-WINDOWS.md), avec envoi automatique et lecture des réponses.')],
  'PLAN-GLOBAL-SERVEUR-FRED.md':[
  ('Date : 10 octobre 2026.','Date : 11 octobre 2026.'),
  ('La refonte du tableau de bord du lot 5 et les lots 7, 9 et 10 restent planifiés.','La refonte du tableau de bord du lot 5 et les lots 9 et 10 restent planifiés ; le lot 7 comprend désormais la dictée Windows/Android et la conversation Windows.'),

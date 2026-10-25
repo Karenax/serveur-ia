@@ -33,7 +33,7 @@ def main():
                 raise
             if code or not result.is_file():raise RuntimeError('La fenêtre compilée n’a pas confirmé son contrôle.')
             value=json.loads(result.read_text(encoding='utf-8'))
-            if value.get('title')!='Accès serveur Fred' or not value.get('ok'):raise RuntimeError('Nom ou interface cliente incorrects.')
+            if value.get('title')!='Accès serveur Kiara' or not value.get('ok'):raise RuntimeError('Nom ou interface cliente incorrects.')
             write_json(HOME/'native-ui-fred.json',value)
             print(json.dumps(value,ensure_ascii=False))
     finally:

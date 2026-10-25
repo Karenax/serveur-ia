@@ -12,7 +12,7 @@ import time
 from cryptography.fernet import Fernet, InvalidToken
 from core import ROOT, read_json, write_json
 
-VERSION = '3.5.39'
+VERSION = '3.5.52'
 FILES = ['reglages.json', 'reglages-par-defaut.json', 'derniers-reglages-valides.json', 'base-strata.json', 'acces-distants.json', 'wireguard.json', 'comptes.json', 'exploitation.json', 'voix.json', 'hermes-integration.json', 'hermes-models.json']
 
 def cipher(password, salt):
@@ -82,7 +82,7 @@ class Operations:
                     facade.conversations.admission_paused = True
                 if not restoring:
                     c = self.controller
-                    # Preserve the Fred lock order: revocation holds remote's
+                    # Preserve the Kiara lock order: revocation holds remote's
                     # lock before updating Workspace jobs.
                     for lock in (c.lock, c.wireguard.lock, c.remote.lock, c.remote.accounts.lock):
                         lock.acquire(); token['snapshot_locks'].append(lock)

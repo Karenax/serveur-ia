@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "bytes": 18940180,
+  "version": "1.0.18",
+  "package": "net.karenax.fred",
+  "version_code": 19,
+  "sha256": "391bb5851d9b4ebb9508cd71a27b63fed250156734c1b05fff2c7372f98c09f7",
+  "file": "D:\\Serveur IA\\client-android\\dist\\Acces-serveur-Kiara-Android.apk",
+  "signing_certificate_sha256": "40216ff897090b49b21e3cda66169b9fb7070e42dd2b8cb9ebe0f2c441997048",
+  "signing_key_preserved": true,
+  "upgrade_compatible": true,
+  "private_profiles_embedded": false,
+  "served_download_verified": true,
+  "physical_device_installation_tested": false
+}

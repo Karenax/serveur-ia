@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "markdown_files": 13,
+  "local_links_checked": 169,
+  "published_versions_verified": {
+    "windows_server": "3.5.52",
+    "android": "1.0.23",
+    "android_code": 24
+  },
+  "errors": [],
+  "scope": "Documentation and local link targets; no external website or new runtime test"
+}

@@ -1,0 +1,47 @@
+[
+  {
+    "question": "Bonjour, tu m’entends ?",
+    "expected": "answer",
+    "actual": "answer",
+    "query": "",
+    "answer": " Oui, je t'entends parfaitement. Comment puis-je t'aider aujourd'hui ?",
+    "first_text_seconds": 4.504856899991864,
+    "total_seconds": 5.008541799994418
+  },
+  {
+    "question": "Combien font douze plus dix-sept ?",
+    "expected": "answer",
+    "actual": "answer",
+    "query": "",
+    "answer": " Ça fait vingt-neuf.",
+    "first_text_seconds": 1.621241300017573,
+    "total_seconds": 1.8182479999959469
+  },
+  {
+    "question": "Peux-tu chercher sur Internet ?",
+    "expected": "clarify",
+    "actual": "answer",
+    "query": "",
+    "answer": " Oui, je peux chercher sur Internet. Quel sujet public souhaites-tu que je recherche ?",
+    "first_text_seconds": 1.6199429999978747,
+    "total_seconds": 2.1726507999992464
+  },
+  {
+    "question": "Quoi de neuf aujourd’hui dans l’IA ?",
+    "expected": "search",
+    "actual": "search",
+    "query": "actualités intelligence artificielle 25 octobre 2026",
+    "answer": "",
+    "first_text_seconds": null,
+    "total_seconds": 2.5482322000025306
+  },
+  {
+    "question": "Explique comment fonctionne une recherche sur Internet.",
+    "expected": "answer",
+    "actual": "answer",
+    "query": "",
+    "answer": " Une recherche web commence par l'envoi de ta requête à un moteur de recherche qui scanne son index massif de pages. Il classe ensuite les résultats par pertinence grâce à des algorithmes complexes avant de te les afficher.",
+    "first_text_seconds": 1.6581503999768756,
+    "total_seconds": 4.133285199990496
+  }
+]

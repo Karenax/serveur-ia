@@ -1,0 +1,12 @@
+{
+  "installed": true,
+  "available": false,
+  "loaded": true,
+  "busy": false,
+  "testing": false,
+  "message": "Mode Max trop lent sur cet appareil. Low est conseillé.",
+  "latency_ms": 94338.68499999517,
+  "asr_rtf": 11.232484841269661,
+  "tts_rtf": 7.485508214284935,
+  "engine": "Voxtral Realtime + Qwen3-TTS"
+}

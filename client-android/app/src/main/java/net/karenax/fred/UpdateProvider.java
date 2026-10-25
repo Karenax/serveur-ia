@@ -23,7 +23,7 @@ public final class UpdateProvider extends ContentProvider {
     @Override public Cursor query(Uri uri,String[] projection,String selection,String[] args,String sort){
         try{File file=file(uri);String[] columns=projection==null?new String[]{OpenableColumns.DISPLAY_NAME,OpenableColumns.SIZE}:projection;
             MatrixCursor cursor=new MatrixCursor(columns);Object[] row=new Object[columns.length];
-            for(int i=0;i<columns.length;i++)row[i]=OpenableColumns.DISPLAY_NAME.equals(columns[i])?"Fred-Android.apk":OpenableColumns.SIZE.equals(columns[i])?file.length():null;
+            for(int i=0;i<columns.length;i++)row[i]=OpenableColumns.DISPLAY_NAME.equals(columns[i])?"Kiara-Android.apk":OpenableColumns.SIZE.equals(columns[i])?file.length():null;
             cursor.addRow(row);return cursor;
         }catch(FileNotFoundException error){return null;}
     }

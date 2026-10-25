@@ -13,7 +13,7 @@ import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
 import java.util.UUID;
 
-/** Local PCM only: no recording file, no request to Fred, no cloud fallback. */
+/** Local PCM only: no recording file, no request to Kiara, no cloud fallback. */
 final class LocalVoice implements AutoCloseable {
     static final int PERMISSION=45;
     private final Activity activity;
@@ -39,6 +39,10 @@ final class LocalVoice implements AutoCloseable {
         File folder=new File(activity.getFilesDir(),"voice");model=new File(folder,"ggml-small.bin");partial=new File(folder,"ggml-small.part");
     }
     private boolean installed(){return model.isFile()&&model.length()==spec.optLong("bytes");}
+    boolean busy(){synchronized(lock){return active(phase())||worker!=null&&worker.isAlive();}}
+    long modelBytes(){return spec.optLong("bytes");}
+    boolean modelInstalled(){return installed();}
+    File verifiedModel()throws Exception{verify();return model;}
     private String phase(){return value.optString("phase");}
     private static boolean active(String phase){return java.util.Arrays.asList("installing","verifying","permission","loading","listening","finishing","cancelling").contains(phase);}
     String status(){synchronized(lock){try{if(handle!=0&&!phase().equals("error"))merge(new JSONObject(nativeStatus(handle)));return new JSONObject(value.toString()).put("installed",installed()).put("model","Whisper Small").put("model_bytes",spec.getLong("bytes")).put("local",true).toString();}catch(Exception e){return Json.object("phase","error","message","État vocal indisponible.").toString();}}}
@@ -65,7 +69,7 @@ final class LocalVoice implements AutoCloseable {
         else launch(this::record);
         return status();
     }catch(Exception e){return Json.object("error",e instanceof IllegalArgumentException?e.getMessage():"Commande vocale invalide ou indisponible.").toString();}}}
-    private void launch(Runnable job){worker=new Thread(job,"Fred-local-voice");worker.start();}
+    private void launch(Runnable job){worker=new Thread(job,"Kiara-local-voice");worker.start();}
     void permissionResult(boolean granted){synchronized(lock){if(!permissionPending||closed||cancelled)return;permissionPending=false;if(granted){state("loading","Chargement de la dictée…");launch(this::record);}else state("error","Microphone refusé. Autorisez-le dans les paramètres Android puis réessayez.");}}
     void pause(){synchronized(lock){if(permissionPending)return;if(handle!=0)nativeStop(handle);else if(active(phase())){cancelled=true;state("cancelling","Arrêt de la dictée…");}}}
     private void verify()throws Exception{
@@ -83,7 +87,7 @@ final class LocalVoice implements AutoCloseable {
         try{
             for(int redirects=0;redirects<6;redirects++){
                 if(cancelled)return;if(!url.getProtocol().equals("https"))throw new IOException();
-                connection=(HttpURLConnection)url.openConnection();connection.setInstanceFollowRedirects(false);connection.setConnectTimeout(20000);connection.setReadTimeout(20000);connection.setRequestProperty("User-Agent","Fred-local-dictation/1.0");if(offset>0)connection.setRequestProperty("Range","bytes="+offset+"-");
+                connection=(HttpURLConnection)url.openConnection();connection.setInstanceFollowRedirects(false);connection.setConnectTimeout(20000);connection.setReadTimeout(20000);connection.setRequestProperty("User-Agent","Kiara-local-dictation/1.0");if(offset>0)connection.setRequestProperty("Range","bytes="+offset+"-");
                 int code=connection.getResponseCode();if(code>=300&&code<400){String location=connection.getHeaderField("Location");if(location==null)throw new IOException();URL next=new URL(url,location);connection.disconnect();url=next;continue;}
                 if(code==200)offset=0;else if(code!=206||!String.valueOf(connection.getHeaderField("Content-Range")).startsWith("bytes "+offset+"-"))throw new IOException();
                 long size=offset;try(InputStream input=connection.getInputStream();OutputStream output=new FileOutputStream(partial,offset>0)){byte[] buffer=new byte[262144];int count;while(!cancelled&&(count=input.read(buffer))!=-1){size+=count;if(size>expected)throw new IOException();output.write(buffer,0,count);synchronized(lock){value.put("downloaded_bytes",size);}}}

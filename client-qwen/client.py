@@ -183,9 +183,9 @@ class Remote:
             opener=self.https_opener if https else self.opener
         # Capture the URL and its matching secret together; a reconnect may replace the bridge.
         request = urllib.request.Request(url + path, data=data,
-            headers={**headers, 'User-Agent':'AccesServeurFred/'+VERSION+' (Windows; '+('HTTPS' if https else 'WireGuard')+')', 'Content-Type': 'application/json','X-Qwen-Session':self.session,'X-Fred-Agent-Protocol':str(AGENT_PROTOCOL),**({'X-Qwen-Request':request_id} if request_id else {})})
+            headers={**headers, 'User-Agent':'AccesServeurKiara/'+VERSION+' (Windows; '+('HTTPS' if https else 'WireGuard')+')', 'Content-Type': 'application/json','X-Qwen-Session':self.session,'X-Fred-Agent-Protocol':str(AGENT_PROTOCOL),**({'X-Qwen-Request':request_id} if request_id else {})})
         try:
-            response=opener.open(request, timeout=900 if path=="/v1/chat/completions" else 120 if path=="/v1/client/download" else 60 if path in ("/v1/workspace/action","/v1/history") else 3 if path=="/v1/device" else 30)
+            response=opener.open(request, timeout=900 if path=="/v1/chat/completions" else 120 if path=="/v1/client/download" else 90 if path in ('/v1/voice/max/transcribe','/v1/voice/max/speech') else 60 if path in ("/v1/workspace/action","/v1/history") else 3 if path=="/v1/device" else 30)
             with self.activity_lock:self.last_contact=time.time();self.response_count+=1
             self.event('server_response',route=path,status=getattr(response,'status',200))
             return response
@@ -341,9 +341,21 @@ class Remote:
 
 def serve_local(remote, key, port=LOCAL_API_PORT):
     from conversation_service import ConversationService, DictationService
+    from advanced_voice import AdvancedVoice, choose_execution
+    advanced=AdvancedVoice(Path(os.environ.get('LOCALAPPDATA',str(Path.home())))/'QwenClient/voice-max')
     voice=DictationService(Path(getattr(sys, "_MEIPASS", Path(__file__).parent))/"voice")
     conversation=ConversationService(Path(getattr(sys, "_MEIPASS", Path(__file__).parent))/"voice")
+    wakeword=ConversationService(Path(getattr(sys, "_MEIPASS", Path(__file__).parent))/"voice",mode='wakeword')
+    from max_installation import MaxInstallation
+    max_installation=MaxInstallation(advanced.home,remote,advanced,conversation.cache)
     voice_control=threading.RLock()
+    def max_server_status():
+        try:
+            started=time.monotonic()
+            with remote.open('/v1/voice/max/status') as response:value=json.loads(response.read(65536))
+            if value.get('available') and type(value.get('latency_ms')) in (int,float):value['latency_ms']+=(time.monotonic()-started)*1000
+            return value
+        except (OSError,ValueError):return {'available':False,'message':'Mode Max indisponible sur le serveur'}
     from draft_store import DraftStore
     from history_sync import HistorySync
     drafts=DraftStore(settings_path(remote.profile),protect)
@@ -400,11 +412,17 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
             self.wfile.write(content)
 
         def do_GET(self):
+            if self.path=='/client/voice/max':
+                if not self.authorized():return
+                return self.reply(200,{'pc':advanced.status(),'server':max_server_status(),'installation':max_installation.status()})
             if self.path=='/hermes/v1/models':
                 if not self.authorized():return
                 state=remote.check()
                 if not state['connected']:return self.reply(503,{'error':{'message':state['error']}})
                 return self.reply(200,hermes_catalogue.catalogue(remote.models_catalogue)[0])
+            if self.path == '/client/wakeword':
+                if not self.authorized():return
+                return self.reply(200,wakeword.status())
             if self.path == '/client/conversation':
                 if not self.authorized():return
                 return self.reply(200,conversation.status())
@@ -446,7 +464,7 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
         def do_POST(self):
             hermes_request=self.path=='/hermes/v1/chat/completions'
             if hermes_request:self.path='/v1/chat/completions'
-            if self.path not in ('/v1/embeddings','/v1/chat/completions','/v1/context', '/v1/cancel','/v1/workspace/action','/v1/notifications/action','/v1/agent/action','/v1/voice/speech','/v1/voice/cancel','/client/conversation','/client/draft','/client/endpoint','/client/preferences','/client/update/check','/client/update/apply','/client/history','/client/history/sync','/client/history/restore-ack','/client/history/flush','/client/history/recover','/client/integrations/apply','/client/voice'):
+            if self.path not in ('/client/wakeword','/client/capture') and self.path not in ('/v1/embeddings','/v1/chat/completions','/v1/context', '/v1/cancel','/v1/workspace/action','/v1/notifications/action','/v1/agent/action','/v1/voice/speech','/v1/voice/cancel','/client/conversation','/client/draft','/client/endpoint','/client/preferences','/client/update/check','/client/update/apply','/client/history','/client/history/sync','/client/history/restore-ack','/client/history/flush','/client/history/recover','/client/integrations/apply','/client/voice','/client/voice/max/test','/client/voice/max/transcribe','/client/voice/max/speech','/client/voice/max/cancel','/client/voice/max/plan','/client/voice/max/install','/client/voice/max/install-cancel','/client/voice/max/detect','/client/voice/max/remove','/client/voice/max/open-folder','/client/voice/max/devices','/client/voice/max/gpu'):
                 return self.reply(404, {'error': {'message': 'Route non disponible.'}})
             if not self.authorized():
                 return
@@ -464,18 +482,101 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
                 streaming = bool(values.get('stream'))
             except (OSError, ValueError, AttributeError) as error:
                 return self.reply(400, {'error': {'message': str(error)}})
+            if self.path.startswith('/client/voice/max/'):
+                frames=None;sent=False
+                try:
+                    suffix=self.path.rsplit('/',1)[1]
+                    if suffix in ('plan','install','install-cancel','detect','remove','open-folder','devices','gpu'):
+                        if not isinstance(values,dict):raise ValueError('Paramètres d’installation Max invalides.')
+                        with voice_control:
+                            if suffix!='open-folder' and (conversation.status()['phase'] in ('loading','listening','stopping') or voice.status()['phase'] in ('loading','listening','finishing')):
+                                raise ValueError('Terminez le vocal avant de modifier Max.')
+                            if suffix=='plan' and not values:return self.reply(200,max_installation.plan())
+                            if suffix=='install' and set(values)=={'plan'}:return self.reply(200,max_installation.install(values['plan']))
+                            if suffix=='install-cancel' and not values:return self.reply(200,max_installation.cancel())
+                            if suffix=='remove' and set(values)=={'confirm'} and values['confirm'] is True:return self.reply(200,max_installation.remove())
+                            if suffix=='open-folder' and not values:return self.reply(200,max_installation.open_folder())
+                            if suffix in ('devices','gpu'):
+                                if max_installation.status()['phase'] in ('downloading','verifying','testing'):raise ValueError('Attendez la fin de l’installation Max.')
+                                if suffix=='devices' and not values:return self.reply(200,advanced.detect_devices())
+                                if suffix=='gpu' and set(values)=={'device'}:return self.reply(200,advanced.set_gpu(values['device']))
+                            if suffix=='detect' and not values:
+                                max_installation.detect();return self.reply(200,max_installation.status())
+                            raise ValueError('Paramètres d’installation Max invalides.')
+                    if self.path.endswith('/test'):
+                        if not isinstance(values,dict) or set(values)!={'execution'} or values['execution'] not in ('pc','server'):raise ValueError('Choisissez le PC ou le serveur pour le test.')
+                        if conversation.status()['phase'] in ('loading','listening','stopping'):raise ValueError('Raccrochez avant de tester le mode Max.')
+                        if max_installation.status()['phase'] in ('downloading','verifying','testing'):raise ValueError('Attendez la fin de l’installation Max.')
+                        if values['execution']=='server':
+                            with remote.open('/v1/voice/max/test',b'{}') as response:return self.reply(200,json.loads(response.read(65536)))
+                        return self.reply(200,advanced.test())
+                    if not isinstance(values,dict):raise ValueError('Paramètres Max invalides.')
+                    state=conversation.status();owner=values.pop('session',None)
+                    if not owner or owner!=state['session'] or state.get('quality')!='max':raise ValueError('Cette session Max est terminée.')
+                    if state['phase'] not in ('loading','listening') and not self.path.endswith('/cancel'):raise ValueError('Le mode Max est arrêté.')
+                    suffix=self.path.rsplit('/',1)[1]
+                    if suffix=='transcribe':conversation.asr_request_id=values.get('request_id')
+                    if state['execution']=='server':
+                        self.path='/v1/voice/max/'+suffix
+                        return self.forward(json.dumps(values).encode(),suffix=='speech')
+                    valid=lambda:conversation.status()['session']==owner and conversation.status()['phase'] in ('loading','listening')
+                    if suffix=='transcribe':return self.reply(200,advanced.transcribe(owner,values,valid))
+                    if suffix=='cancel':
+                        if set(values)!={'request_id'} or not isinstance(values['request_id'],str):raise ValueError('Annulation Max invalide.')
+                        return self.reply(200,advanced.cancel(owner,values['request_id']))
+                    frames=advanced.frames(owner,'speak',values,valid);first=next(frames)
+                    self.send_response(200);self.send_header('Content-Type','text/event-stream');self.send_header('Cache-Control','no-store');self.send_header('Connection','close');self.end_headers();sent=True
+                    self.wfile.write(('data: '+json.dumps(first)+'\n\n').encode());self.wfile.flush()
+                    for frame in frames:
+                        self.wfile.write(('data: '+json.dumps(frame)+'\n\n').encode());self.wfile.flush()
+                except urllib.error.HTTPError as error:
+                    if not sent:self.reply(error.code,{'error':{'message':'Le mode Max est indisponible sur le serveur. Choisissez Low ou réessayez.'}})
+                    error.close()
+                except (ValueError,OSError,TypeError,StopIteration) as error:
+                    if not sent:self.reply(400,{'error':{'message':str(error) or 'Lecture Max indisponible.'}})
+                finally:
+                    if frames:frames.close()
+                return
             if self.path.startswith('/client/'):
                 try:
                     values=json.loads(body)
                     if not isinstance(values,dict):raise ValueError('Paramètres invalides.')
-                    if self.path in ('/client/update/apply','/client/endpoint') and (voice.status()['phase'] in ('loading','listening','finishing','cancelling') or conversation.status()['phase'] in ('loading','listening','stopping')):
+                    if self.path in ('/client/update/apply','/client/endpoint') and (wakeword.status()['phase'] in ('loading','listening','stopping') or voice.status()['phase'] in ('loading','listening','finishing','cancelling') or conversation.status()['phase'] in ('loading','listening','stopping')):
                         raise ValueError('Terminez la dictée avant de mettre le client à jour.')
-                    if self.path=='/client/conversation':
+                    if self.path=='/client/capture':
+                        if values:raise ValueError('La capture ne reçoit pas de coordonnées ni de chemin.')
+                        from screen_capture import capture
+                        result=capture()
+                    elif self.path=='/client/wakeword':
                         with voice_control:
+                            if values.get('action')=='start' and (voice.status()['phase'] in ('loading','listening','finishing') or conversation.status()['phase'] in ('loading','listening','stopping')):raise ValueError('Terminez la dictée ou la conversation avant d’activer le mot d’appel.')
+                            result=wakeword.action(values)
+                    elif self.path=='/client/conversation':
+                        with voice_control:
+                            current=conversation.status()
+                            if values.get('action')=='start' and wakeword.status()['phase'] in ('loading','listening','stopping'):raise ValueError('Arrêtez le mot d’appel avant de démarrer la conversation.')
                             if values.get('action') in ('start','install') and voice.status()['phase'] in ('installing','loading','listening','finishing','stopping','cancelling'):raise ValueError('Terminez la dictée avant de converser.')
+                            if values.get('action')=='start' and values.get('quality')=='max':
+                                if max_installation.status()['phase'] in ('downloading','verifying','testing'):raise ValueError('Attendez la fin de l’installation Max.')
+                                values['execution']=choose_execution(advanced.status(),max_server_status(),values.get('execution','auto'))
+                            if values.get('action') in ('stop','cancel') and conversation.status().get('quality')=='max':
+                                current=conversation.status();identifier=getattr(conversation,'asr_request_id',None)
+                                if identifier and values.get('session')==current['session']:
+                                    if current.get('execution')=='pc':advanced.cancel(current['session'],identifier)
+                                    else:
+                                        try:
+                                            with remote.open('/v1/voice/max/cancel',json.dumps({'request_id':identifier}).encode()) as response:response.read(8192)
+                                        except OSError:pass
                             result=conversation.action(values)
+                            if values.get('action') in ('stop','cancel') and current.get('quality')=='max':
+                                if current.get('execution')=='pc':advanced.release(current['session'],current['session'])
+                                else:
+                                    try:
+                                        with remote.open('/v1/voice/max/end',json.dumps({'session':current['session']}).encode()) as response:response.read(8192)
+                                    except OSError:pass
                     elif self.path=='/client/voice':
                         with voice_control:
+                            if values.get('action') in ('start','install','remove') and wakeword.status()['phase'] in ('loading','listening','stopping'):raise ValueError('Arrêtez le mot d’appel avant de dicter.')
                             if values.get('action') in ('start','install','remove') and conversation.status()['phase'] in ('installing','loading','listening','stopping'):raise ValueError('Raccrochez avant de dicter ou de modifier le modèle vocal.')
                             result=voice.action(values)
                     elif self.path=='/client/integrations/apply':
@@ -541,7 +642,7 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
                             if line.startswith(b'data: ') and line.strip()!=b'data: [DONE]':
                                 try:stream_error=stream_error or bool(json.loads(line[6:]).get('error'))
                                 except (ValueError,AttributeError):pass
-                            if self.path=='/v1/voice/speech' and line.startswith(b'data: '):
+                            if self.path in ('/v1/voice/speech','/v1/voice/max/speech') and line.startswith(b'data: '):
                                 try:done=done or bool(json.loads(line[6:]).get('done'))
                                 except (ValueError,AttributeError):pass
                             if chat_stream:
@@ -578,7 +679,7 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
                             self.wfile.write(block)
             except (OSError, ValueError, urllib.error.URLError):
                 cancelled=chat_stream and self.headers.get('X-Qwen-Request') in remote.cancelled_requests
-                if self.path!='/v1/voice/speech' and not cancelled:remote.failure('connection_error','Connexion au serveur IA interrompue. Réessayer la requête.',confirmed=chat_stream)
+                if self.path not in ('/v1/voice/speech','/v1/voice/max/speech') and not cancelled:remote.failure('connection_error','Connexion au serveur IA interrompue. Réessayer la requête.',confirmed=chat_stream)
                 if not sent:
                     self.reply(503, {'error': {'message': 'Connexion au serveur IA indisponible.'}})
                 elif streaming:
@@ -593,6 +694,31 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
     server = LocalHTTPServer(('127.0.0.1', port), Handler)
     server.voice = voice
     server.conversation = conversation
+    server.wakeword = wakeword
+    conversation.max_bridge={'port':server.server_port,'token':key}
+    def prepare_max_session():
+        state=conversation.status();target=state['execution'];owner=state['session']
+        if target=='pc':advanced.warm(owner,owner)
+        else:
+            with remote.open('/v1/voice/max/warm',json.dumps({'session':owner}).encode()) as response:response.read(65536)
+        deadline=time.monotonic()+180
+        while not conversation.cancelled.is_set():
+            state=advanced.status() if target=='pc' else max_server_status()
+            if state.get('loaded'):
+                conversation.max_bridge['progressive']=state.get('progressive') is True
+                conversation.max_bridge['recognizer']=state.get('recognizer','Parakeet v3 · progressif')
+                return
+            if state.get('runtime_error'):raise ValueError(state['runtime_error'])
+            if not state.get('available') or time.monotonic()>deadline:raise ValueError(state.get('message') or 'Chargement du mode Max trop long. Choisissez Low.')
+            conversation.cancelled.wait(.3)
+    conversation.max_prepare=prepare_max_session
+    def max_capture_models():
+        configuration=advanced.configuration();folder=Path(configuration.get('asr','')).resolve()
+        if configuration.get('format')==2 and folder.is_relative_to(advanced.home.resolve()) and all((folder/name).is_file() for name in ('silero-vad.onnx','smart-turn.onnx')):return folder
+        return conversation.cache
+    conversation.max_models=max_capture_models
+    server.advanced_voice=advanced
+    server.max_installation=max_installation
     server.daemon_threads = True
     return server
 
@@ -602,8 +728,11 @@ class LocalHTTPServer(BoundedHTTPServer):
         super().__init__(*args,capacity=24,**kwargs)
 
     def server_close(self):
+        if hasattr(self, "max_installation"):self.max_installation.close()
         if hasattr(self, "conversation"):self.conversation.close()
+        if hasattr(self, "wakeword"):self.wakeword.close()
         if hasattr(self, "voice"):self.voice.close()
+        if hasattr(self, "advanced_voice"):self.advanced_voice.close()
         super().server_close()
 
 def read_profile():
@@ -660,11 +789,14 @@ def validate_conversation_drafts(value):
 
 def save_preferences(profile,values):
     allowed={'theme':('light','dark','system'),'font':('system','humanist','serif','mono'),
+             'voice_quality':('low','max'),'voice_execution':('auto','pc','server'),'voice_animation_style':('waves','orb','constellation'),'voice_visual_version':(2,),
              'text_size':('compact','standard','large','extra'),'thinking_effort':('none','minimal','low','medium','high','xhigh','max','ultra','on')}
-    if not isinstance(values,dict) or set(values)-set(allowed)-{'thinking','thinking_by_model','sidebar_collapsed','corrector_text','conversation_drafts'}:raise ValueError('Réglages invalides.')
+    if not isinstance(values,dict) or set(values)-set(allowed)-{'thinking','thinking_by_model','sidebar_collapsed','corrector_text','conversation_drafts','voice_interruptions','voice_animation','voice_volume'}:raise ValueError('Réglages invalides.')
     for name,value in values.items():
         if name in allowed and value not in allowed[name]:raise ValueError('Réglage invalide : '+name)
-        if name in ('thinking','sidebar_collapsed') and type(value) is not bool:raise ValueError('Réglage booléen attendu.')
+        if name in ('thinking','sidebar_collapsed','voice_interruptions','voice_animation') and type(value) is not bool:raise ValueError('Réglage booléen attendu.')
+        if name=='voice_volume' and (type(value) is not int or not 0<=value<=100):raise ValueError('Volume invalide (0 à 100).')
+        if name=='voice_visual_version' and (type(value) is not int or value!=2):raise ValueError('Affichage vocal invalide.')
         if name=='corrector_text' and (not isinstance(value,str) or len(value)>100000):raise ValueError('Brouillon du correcteur invalide (100 000 caractères maximum).')
         if name=='conversation_drafts':validate_conversation_drafts(value)
         if name=='thinking_by_model' and (not isinstance(value,dict) or len(value)>512 or any(not isinstance(model,str) or not model.strip() or len(model)>512 or any(ord(c)<32 for c in model) or not isinstance(effort,str) or effort not in allowed['thinking_effort'] for model,effort in value.items())):raise ValueError('Réflexion par modèle invalide.')

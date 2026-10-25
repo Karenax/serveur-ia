@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "backend_tests": {
+    "voice_context_conversation_and_web": 31,
+    "corrector_and_cancellation": 16,
+    "native_hermes_web": 11,
+    "remote_and_source_access_fences": 25
+  },
+  "ui": {
+    "command": "node client-qwen/test_conversation_ui.cjs --web-events",
+    "passed": true,
+    "source_button_and_web_events_preserve_speech": true,
+    "microphone_and_pcm_simulated": true
+  },
+  "source_syntax": {
+    "python": 283,
+    "javascript": 67,
+    "powershell_per_engine": 93,
+    "passed": true
+  },
+  "ux_check": {
+    "warnings": 0,
+    "passed": true
+  },
+  "backend_test_total": 83
+}

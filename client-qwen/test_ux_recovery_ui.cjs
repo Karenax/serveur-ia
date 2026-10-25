@@ -76,7 +76,10 @@ async function check(browser,platform){
   state.failDelete=false;page.once('dialog',d=>d.accept());await page.locator('#ws-memories button').filter({hasText:'Supprimer'}).click();await page.waitForFunction(()=>document.querySelectorAll('#ws-memories textarea').length===0);assert.equal(await page.evaluate(()=>document.activeElement.id),'ws-memory-text');
   await page.evaluate(()=>wsOpenSource('source-fixture'));assert(await page.getByRole('dialog',{name:'Passage fictif'}).isVisible());await page.keyboard.press('Escape');
   for(const width of [390,768]){
-   await page.setViewportSize({width,height:width===390?844:1024});await page.locator('#ui-sidebar-toggle').focus();await page.keyboard.press('Enter');assert.equal(await page.evaluate(()=>document.activeElement.id),'ui-sidebar-close');
+   await page.setViewportSize({width,height:width===390?844:1024});
+   // Let the resize/media-query handler settle before opening the mobile drawer.
+   await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+   await page.locator('#ui-sidebar-toggle').focus();await page.keyboard.press('Enter');assert.equal(await page.evaluate(()=>document.activeElement.id),'ui-sidebar-close');
    for(let i=0;i<20;i++){await page.keyboard.press('Tab');assert(await page.evaluate(()=>!!document.activeElement.closest('.sidebar')));}
    await page.keyboard.press('Escape');assert.equal(await page.evaluate(()=>document.activeElement.id),'ui-sidebar-toggle');assert(!await page.locator('#fred-main').evaluate(e=>e.inert));
    await sidebar();await page.locator('[data-view-button="projects"]').click();assert.equal(await page.evaluate(()=>document.activeElement.id),'workspace-heading');assert.equal(await page.getByRole('main').count(),1);

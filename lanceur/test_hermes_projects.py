@@ -20,7 +20,7 @@ OTHER = 'b'*16
 class ProjectsTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        # Use the user's installed library, with every write confined to a temporary Fred root.
+        # Use the user's installed library, with every write confined to a temporary Kiara root.
         try: cls.runtime = installation()
         except (OSError, ValueError): raise unittest.SkipTest('Hermes runtime not installed')
 
@@ -29,7 +29,7 @@ class ProjectsTests(unittest.TestCase):
         self.home = Path(self.tmp.name); self.root = self.home / 'hermes-fred'
         for owner in (OWNER, OTHER):
             profile = self.root / 'profiles' / ('fred-'+owner); profile.mkdir(parents=True)
-            (profile / 'profile.yaml').write_text('description: Fred integration test\n', encoding='utf-8')
+            (profile / 'profile.yaml').write_text('description: Kiara integration test\n', encoding='utf-8')
         self.workspace = Workspace(self.home)
         self.accounts = SimpleNamespace(root=self.root, enabled=lambda owner: owner in (OWNER, OTHER))
         self.projects = HermesProjects(self.accounts, self.workspace, SimpleNamespace(runtime=self.runtime))

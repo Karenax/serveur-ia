@@ -1,0 +1,4 @@
+{
+  "toolchain/android-signing/fred-client.p12": "63a94518d31600e86bb9c38499bdeef1636ae6579dfc165e5852509d6fa280c1",
+  "toolchain/android-signing/password.dpapi": "19f76461bf2f0de6eded2841565b008392cb6f40a62d0bfeab7a317da24b1704"
+}

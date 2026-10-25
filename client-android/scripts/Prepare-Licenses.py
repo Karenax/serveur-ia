@@ -95,7 +95,7 @@ def prepare(root: Path, modules: list[dict], goroot: Path) -> dict[str, bytes]:
         packaged[relative.as_posix()] = data
 
     add('application/LICENSE.txt', root / 'client-qwen' / 'LICENSE.txt')
-    components.append({'name': 'Accès serveur Fred', 'license_files': ['application/LICENSE.txt']})
+    components.append({'name': 'Accès serveur Kiara', 'license_files': ['application/LICENSE.txt']})
     add('go/LICENSE', goroot / 'LICENSE')
     version = (goroot / 'VERSION').read_text(encoding='utf-8').splitlines()[0]
     components.append({'name': 'Go runtime', 'version': version, 'license_files': ['go/LICENSE']})
@@ -109,6 +109,14 @@ def prepare(root: Path, modules: list[dict], goroot: Path) -> dict[str, bytes]:
             target='whisper/'+filename
             add(target,root / 'client-voice' / 'licenses' / filename)
             components.append({'name':filename.split('-LICENSE')[0], 'version':'1.9.5' if filename!='whisper-model-LICENSE.txt' else 'small', 'license_files':[target]})
+    wakeword = root / 'client-qwen/voice/wakeword'
+    if (wakeword / 'manifest.json').is_file():
+        for name,filename,version in [('Sherpa-ONNX','SHERPA-APACHE-2.0.txt','1.13.8'),('ONNX Runtime Android','ONNXRUNTIME-MIT.txt','1.28.2')]:
+            target='wakeword/'+filename;add(target,wakeword/filename)
+            components.append({'name':name,'version':version,'license_files':[target]})
+        kotlin_license=wakeword/'KOTLIN-APACHE-2.0.txt'
+        target='wakeword/KOTLIN-APACHE-2.0.txt';add(target,kotlin_license)
+        components.append({'name':'Kotlin standard library','version':'2.0.21','license_files':[target]})
     for module in modules:
         directory = Path(module['directory'])
         licenses = license_files(directory)
@@ -125,7 +133,7 @@ def prepare(root: Path, modules: list[dict], goroot: Path) -> dict[str, bytes]:
              'files': {name: {'sha256': hashlib.sha256(data).hexdigest(), 'bytes': len(data)}
                        for name, data in sorted(packaged.items())}}
     packaged['manifest.json'] = (json.dumps(index, ensure_ascii=False, indent=2) + '\n').encode('utf-8')
-    headings = ['Accès serveur Fred Android — licences incluses', '',
+    headings = ['Accès serveur Kiara Android — licences incluses', '',
                 'Le code applicatif est sous licence MIT. Chaque composant conserve sa licence.',
                 'Les textes originaux complets sont fournis dans ce dossier, sans modification.',
                 'Les modules Go téléchargés du bridge sont inclus ; des licences supplémentaires',

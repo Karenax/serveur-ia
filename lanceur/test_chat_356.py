@@ -46,7 +46,9 @@ class ChatTests(unittest.TestCase):
         with patch('remote.health',return_value={'loaded':True,'images':True}):
             with self.request('/v1/models') as response:self.assertTrue(json.load(response)['data'][0]['capabilities']['images'])
             with self.request('/v1/chat/completions',{'messages':[message],'chat_template_kwargs':{'enable_thinking':True}}) as response:self.assertIn('choices',json.load(response))
-        data=FakeModel.captured[-1][1];self.assertEqual(data['messages'],[message]);self.assertTrue(data['chat_template_kwargs']['enable_thinking'])
+        data=FakeModel.captured[-1][1]
+        self.assertIn('Tu es Kiara',data['messages'][0]['content'])
+        self.assertEqual(data['messages'][1:],[message]);self.assertTrue(data['chat_template_kwargs']['enable_thinking'])
         for source in ('http://localhost/private','file:///secret','D:/secret', 'data:image/png;base64,eA=='):
             with self.subTest(source=source),self.assertRaises(ValueError):validate_parts([{'type':'image_url','image_url':{'url':source}}],'user')
 

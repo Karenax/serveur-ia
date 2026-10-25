@@ -33,11 +33,13 @@ final class NativeNotifications {
     // The global server preference is authoritative. The subscription field is
     // a compatibility fallback, never an additional veto of audible alerts.
     static boolean discreet(JSONObject payload,boolean fallback){JSONObject preferences=payload.optJSONObject("preferences");if(preferences!=null&&preferences.opt("discreet") instanceof Boolean)return preferences.optBoolean("discreet");JSONObject subscription=payload.optJSONObject("subscription");return subscription!=null&&subscription.opt("discreet") instanceof Boolean?subscription.optBoolean("discreet"):fallback;}
-    synchronized void setEnabled(boolean enabled)throws Exception {if(!storageAvailable)throw new IllegalStateException("Le stockage des alertes est illisible. La boîte serveur reste disponible et le fichier local est conservé.");state.put("enabled",enabled);store.write(filename,state);if(!enabled)clear();}
+    synchronized void setEnabled(boolean enabled)throws Exception {synchronized(BackgroundNotifications.LOCK){if(!storageAvailable)throw new IllegalStateException("Le stockage des alertes est illisible. La boîte serveur reste disponible et le fichier local est conservé.");JSONObject latest=store.read(filename);if(latest!=null)state=latest;state.put("enabled",enabled);store.write(filename,state);if(!enabled)clear();}}
     synchronized void clear(){for(android.service.notification.StatusBarNotification active:manager.getActiveNotifications())if(active.getTag()!=null&&active.getTag().startsWith(tag+"."))manager.cancel(active.getTag(),active.getId());}
     synchronized void revoke()throws Exception {setEnabled(false);}
     synchronized JSONArray receive(JSONObject payload)throws Exception {
+        synchronized(BackgroundNotifications.LOCK){
         if(!storageAvailable){clear();return new JSONArray();}
+        JSONObject latest=store.read(filename);if(latest!=null)state=latest;
         if(payload.optBoolean("access_revoked")){revoke();return new JSONArray();}
         if(payload.optBoolean("reset")){clear();state.put("seen",new JSONArray());store.write(filename,state);}
         state.put("discreet",discreet(payload,state.optBoolean("discreet",true)));
@@ -60,27 +62,28 @@ final class NativeNotifications {
             announce.add(id);candidate=id;candidateType=type;
         }
         // Reconnection can contain hundreds of unread entries. One generic
-        // system alert opens the latest result; the complete inbox stays in Fred.
+        // system alert opens the latest result; the complete inbox stays in Kiara.
         if(!candidate.isEmpty()&&!payload.optBoolean("has_more")){
             Notification value=build(candidate);value.extras.putString("fred.type",candidateType);
             try{trimActive();manager.notify(tag+"."+candidate,1,value);seen.addAll(announce);displayed.put(candidate);}catch(SecurityException ignored){}
         }
         while(seen.size()>1000)seen.remove(seen.iterator().next());
         state.put("seen",new JSONArray(seen));store.write(filename,state);return displayed;
+        }
     }
     private void trimActive(){java.util.List<android.service.notification.StatusBarNotification> active=new ArrayList<>();for(android.service.notification.StatusBarNotification item:manager.getActiveNotifications())if(item.getTag()!=null&&item.getTag().startsWith(tag+"."))active.add(item);active.sort(Comparator.comparingLong(android.service.notification.StatusBarNotification::getPostTime));while(active.size()>=20){android.service.notification.StatusBarNotification first=active.remove(0);manager.cancel(first.getTag(),first.getId());}}
     Notification build(String id){
         if(!validId(id))throw new IllegalArgumentException("Notification invalide.");
         String selectedChannel=channelId();boolean silent=selectedChannel.equals(CHANNEL);
-        NotificationChannel channel=new NotificationChannel(selectedChannel,silent?"Résultats Fred · silencieux":"Résultats Fred · son Android",NotificationManager.IMPORTANCE_DEFAULT);
-        channel.setDescription("Résultats lorsque le client Fred est ouvert. Le contenu privé reste masqué.");channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+        NotificationChannel channel=new NotificationChannel(selectedChannel,silent?"Résultats Kiara · silencieux":"Résultats Kiara · son Android",NotificationManager.IMPORTANCE_DEFAULT);
+        channel.setDescription("Résultats lorsque le client Kiara est ouvert. Le contenu privé reste masqué.");channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
         if(silent){channel.enableVibration(false);channel.setSound(null,null);}else{channel.setSound(Settings.System.DEFAULT_NOTIFICATION_URI,new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION).setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build());}
         // Separate channel IDs are required: Android keeps channel sound settings
         // immutable after creation and preserves any settings chosen by the user.
         manager.createNotificationChannel(channel);
         Intent intent=new Intent(context,MainActivity.class).setAction("net.karenax.fred.NOTIFICATION."+id).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP|Intent.FLAG_ACTIVITY_CLEAR_TOP).putExtra(EXTRA_ID,id).putExtra(EXTRA_IDENTITY,identity);
         PendingIntent click=PendingIntent.getActivity(context,id.hashCode(),intent,PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
-        Notification publicValue=new Notification.Builder(context,selectedChannel).setSmallIcon(android.R.drawable.ic_dialog_info).setContentTitle("Fred").setContentText("Une notification est disponible.").build();
-        return new Notification.Builder(context,selectedChannel).setSmallIcon(android.R.drawable.ic_dialog_info).setContentTitle("Fred · Un résultat est disponible").setContentText("Touchez pour ouvrir votre notification.").setContentIntent(click).setAutoCancel(true).setOnlyAlertOnce(true).setVisibility(Notification.VISIBILITY_PRIVATE).setPublicVersion(publicValue).setGroup("fred_results").setCategory(Notification.CATEGORY_STATUS).setShowWhen(true).build();
+        Notification publicValue=new Notification.Builder(context,selectedChannel).setSmallIcon(android.R.drawable.ic_dialog_info).setContentTitle("Kiara").setContentText("Une notification est disponible.").build();
+        return new Notification.Builder(context,selectedChannel).setSmallIcon(android.R.drawable.ic_dialog_info).setContentTitle("Kiara · Un résultat est disponible").setContentText("Touchez pour ouvrir votre notification.").setContentIntent(click).setAutoCancel(true).setOnlyAlertOnce(true).setVisibility(Notification.VISIBILITY_PRIVATE).setPublicVersion(publicValue).setGroup("fred_results").setCategory(Notification.CATEGORY_STATUS).setShowWhen(true).build();
     }
 }

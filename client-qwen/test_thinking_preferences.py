@@ -37,6 +37,43 @@ class ThinkingPreferences(unittest.TestCase):
                 self.assertNotIn(b'thinking_by_model', self.path.read_bytes())
                 self.assertNotIn(b'legacy model', self.path.read_bytes())
 
+    def test_voice_interruption_choice_is_explicit_encrypted_and_boolean(self):
+        self.assertNotIn('voice_interruptions',client.client_settings(self.profile).get('preferences',{}))
+        self.save({'voice_interruptions':True})
+        self.assertIs(self.preferences()['voice_interruptions'],True)
+        self.assertNotIn(b'voice_interruptions',self.path.read_bytes())
+        self.save({'voice_interruptions':False})
+        before=self.path.read_bytes()
+        self.assertIs(self.preferences()['voice_interruptions'],False)
+        for value in (None,0,1,'true',[],{}):
+            with self.subTest(value=value):
+                with self.assertRaises(ValueError):self.save({'voice_interruptions':value})
+                self.assertEqual(before,self.path.read_bytes())
+
+    def test_voice_display_and_volume_are_validated_and_preserved(self):
+        self.save({'voice_animation':False,'voice_animation_style':'constellation','voice_volume':35,'voice_interruptions':True,'voice_quality':'max','voice_execution':'auto'})
+        self.save({'theme':'dark'})
+        self.assertEqual(self.preferences()['voice_volume'],35)
+        self.assertIs(self.preferences()['voice_animation'],False)
+        self.assertEqual(self.preferences()['voice_animation_style'],'constellation')
+        self.assertIs(self.preferences()['voice_interruptions'],True)
+        self.assertEqual(self.preferences()['voice_quality'],'max')
+        self.assertEqual(self.preferences()['voice_execution'],'auto')
+        self.assertNotIn(b'voice_volume',self.path.read_bytes())
+        before=self.path.read_bytes()
+        for name,values in {'voice_volume':(None,True,-1,101,2.5,'50',[],{}),
+                            'voice_animation':(None,0,1,'true',[],{}),
+                            'voice_animation_style':('external','',None,True,[],{}),
+                            'voice_quality':('medium',True,None,[]),
+                            'voice_execution':('external',False,None,{})}.items():
+            for value in values:
+                with self.subTest(name=name,value=value):
+                    with self.assertRaises(ValueError):self.save({name:value})
+                    self.assertEqual(before,self.path.read_bytes())
+        for volume in (0,100):
+            self.save({'voice_volume':volume})
+            self.assertEqual(self.preferences()['voice_volume'],volume)
+
     def test_automatic_mode_omission_keeps_old_global_preferences(self):
         self.save({'thinking_effort': 'max', 'thinking': True, 'theme': 'light',
             'thinking_by_model': {'fred-cloud': 'max', 'fred-toggle': 'on'}})
@@ -46,6 +83,16 @@ class ThinkingPreferences(unittest.TestCase):
         self.assertIs(actual['thinking'], True)
         self.assertEqual(actual['theme'], 'dark')
         self.assertEqual(actual['thinking_by_model']['fred-toggle'], 'on')
+
+    def test_voice_wave_preferences_roundtrip_and_invalid_version_preserve_file(self):
+        self.save({'voice_animation_style': 'waves', 'voice_visual_version': 2})
+        self.assertEqual(self.preferences()['voice_animation_style'], 'waves')
+        self.assertEqual(self.preferences()['voice_visual_version'], 2)
+        before = self.path.read_bytes()
+        for value in (1, 3, True, 2.0, None, '2', [], {}):
+            with self.subTest(value=value):
+                with self.assertRaises(ValueError): self.save({'voice_visual_version': value})
+                self.assertEqual(self.path.read_bytes(), before)
 
     def test_model_map_boundary_accepts_512_and_rejects_invalid_without_writes(self):
         self.save({'thinking_by_model': {'model-' + str(i): 'max' for i in range(512)}})

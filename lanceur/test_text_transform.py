@@ -41,6 +41,20 @@ class TextTransformHTTPTests(unittest.TestCase):
                 self.send_response(200); self.end_headers(); self.wfile.write(raw)
             def do_POST(self):
                 data = json.loads(self.rfile.read(int(self.headers['Content-Length'])))
+                if self.path=='/v1/messages/count_tokens':
+                    raw=json.dumps({'input_tokens':sum(len(json.dumps(m)) for m in data['messages'])//4+20}).encode()
+                    self.send_response(200);self.end_headers();self.wfile.write(raw);return
+                if data.get('response_format',{}).get('json_schema',{}).get('name')=='voice_web_decision':
+                    if not hasattr(parent,'plan_captured'):parent.plan_captured=[]
+                    parent.plan_captured.append(data)
+                    if getattr(parent,'block_planner',False):
+                        parent.model_ready.set();parent.model_release.wait(getattr(parent,'block_seconds',5))
+                    plan=getattr(parent,'voice_plan',{'action':'answer','query':''})
+                    content=json.dumps(plan) if isinstance(plan,dict) else plan
+                    raw=json.dumps({'choices':[{'message':{'content':content},'finish_reason':'stop'}]}).encode()
+                    try:self.send_response(200);self.end_headers();self.wfile.write(raw)
+                    except OSError:pass
+                    return
                 parent.captured.append((dict(self.headers), data))
                 if getattr(parent,'model_refusals',None):
                     retry=parent.model_refusals.pop(0)
@@ -56,6 +70,10 @@ class TextTransformHTTPTests(unittest.TestCase):
                     if parent.block_after_headers:
                         parent.model_ready.set(); parent.model_release.wait(getattr(parent,'block_seconds',5))
                     raw = b'data: {"choices":[{"delta":{"content":"Texte corrige"}}]}\n\ndata: [DONE]\n\n' if data.get('stream') else b'{"choices":[{"message":{"content":"Texte corrige"}}]}'
+                    if any('Protocole vocal :' in str(message.get('content','')) for message in data['messages'] if message.get('role')=='system'):
+                        reply=getattr(parent,'oral_reply',{'action':'answer','query':'','answer':'Bonjour, je vous écoute.'})
+                        content=(('W:'+reply['query']) if reply['action']=='search' else ('R:'+reply['answer'])) if isinstance(reply,dict) else reply
+                        raw=b''.join(('data: '+json.dumps({'choices':[{'delta':{'content':content[i:i+5]}}]})+'\n\n').encode() for i in range(0,len(content),5))+b'data: [DONE]\n\n'
                     if parent.fragmented:
                         for offset in range(0, len(raw), 7):
                             chunk = raw[offset:offset+7]

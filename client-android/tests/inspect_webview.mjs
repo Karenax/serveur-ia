@@ -16,7 +16,7 @@ const output=path.resolve(option('--output',path.join(workspace,'toolchain/andro
 await fs.mkdir(output,{recursive:true});
 const targets=await (await fetch('http://127.0.0.1:'+port+'/json')).json();
 const target=targets.find(target=>target.type==='page'&&target.webSocketDebuggerUrl&&target.url.startsWith('http://127.0.0.1:'));
-assert(target,'No local Fred WebView found on the forwarded CDP port');
+assert(target,'No local Kiara WebView found on the forwarded CDP port');
 const socket=new WebSocket(target.webSocketDebuggerUrl);
 await new Promise((resolve,reject)=>{socket.addEventListener('open',resolve,{once:true});socket.addEventListener('error',reject,{once:true});});
 let nextId=0;const pending=new Map();const errors=[];

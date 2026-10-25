@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "server_only_change": true,
+  "version": "3.5.41",
+  "qwen_processes_preserved": true,
+  "keys_settings_user_histories_preserved": true,
+  "backup_schedule_preserved": true,
+  "existing_client_release_preserved": true,
+  "hermes_ready": true,
+  "phonon_ready": true,
+  "feature_sources": {
+    "lanceur/remote.py": "b1555f5d6b4c26488a5ec67d40203520dc66f9d813f7856ed0a1a255db68f2ca",
+    "lanceur/voice_web.py": "a9718020e610062ca214448195fb707a6c34f5f8adcdd68e855dbd49f5f76e93",
+    "lanceur/voice_web_plan.py": "4966beaf327fdff83398d702780c99a137a150056b979ca6ac356290b192125c"
+  }
+}

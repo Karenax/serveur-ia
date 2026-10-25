@@ -1,0 +1,41 @@
+{
+  "installation": {
+    "phase": "limited",
+    "downloaded_bytes": 46151015,
+    "message": "Max nécessite une carte AMD ou NVIDIA compatible avec au moins 4 Go de mémoire graphique libres. Choisissez le serveur ou Low.",
+    "download_bytes": 46151015,
+    "required_disk_bytes": 2954478746,
+    "reused_bytes": 2509696208,
+    "hardware": {
+      "checked": true,
+      "eligible": true,
+      "cards": [
+        {
+          "vendor": "nvidia",
+          "name": "NVIDIA Tesla P100-PCIE-16GB"
+        },
+        {
+          "vendor": "nvidia",
+          "name": "NVIDIA Quadro P2200"
+        },
+        {
+          "vendor": "nvidia",
+          "name": "NVIDIA Tesla P100-PCIE-16GB"
+        }
+      ]
+    }
+  },
+  "runtime": {
+    "installed": true,
+    "available": false,
+    "loaded": false,
+    "busy": false,
+    "testing": false,
+    "message": "Max nécessite une carte AMD ou NVIDIA compatible avec au moins 4 Go de mémoire graphique libres. Choisissez le serveur ou Low.",
+    "latency_ms": null,
+    "asr_rtf": null,
+    "tts_rtf": null,
+    "engine": "Parakeet + Qwen3-TTS",
+    "progressive": true
+  }
+}

@@ -1,8 +1,8 @@
-"""Fred-owned, resumable Hermes profiles and Windows-protected service credentials.
+"""Kiara-owned, resumable Hermes profiles and Windows-protected service credentials.
 
 The installed Hermes home is never read or cloned. Profile .env files are a private
 runtime projection required by the native multiplexer; the durable authority is
-the DPAPI blob in Fred's registry. They are removed when the supervised service stops.
+the DPAPI blob in Kiara's registry. They are removed when the supervised service stops.
 """
 from __future__ import annotations
 
@@ -22,14 +22,14 @@ from urllib.parse import urlsplit
 from core import HOME, write_json
 from wg_crypto import protect, private_directory
 
-CONFIG_VERSION = 5
+CONFIG_VERSION = 6
 _OWNER = re.compile(r'[a-z0-9][a-z0-9_-]{0,55}\Z')
 _STATES = {'provisioning', 'ready', 'error', 'suspended', 'revoked', 'archived'}
 
 
 def profile_name(owner):
     if not isinstance(owner, str) or not _OWNER.fullmatch(owner):
-        raise ValueError('Identité d’accès Fred invalide.')
+        raise ValueError('Identité d’accès Kiara invalide.')
     return 'fred-' + owner
 
 
@@ -65,7 +65,7 @@ class HermesAccounts:
         self.lock = threading.RLock()
         self.models = None
         if self.root.exists() and self.root.resolve() != self.root.absolute():
-            raise ValueError('La racine Hermes Fred doit être un dossier privé réel.')
+            raise ValueError('La racine Hermes Kiara doit être un dossier privé réel.')
         protect_directory(self.root)
         with self._db() as db:
             db.executescript('''
@@ -138,7 +138,7 @@ class HermesAccounts:
         return None
 
     def config(self, owner=None, port=8643, selection=None):
-        tools = ['memory', 'skills', 'todo'] if owner else []
+        tools = ['skills', 'todo'] if owner else []
         if owner and self.mcp_url: tools.append('web')
         config = {
             'model': {'default': self.model, 'provider': 'custom', 'base_url': self.inference_url,
@@ -151,7 +151,9 @@ class HermesAccounts:
                         'allow_all_users': False, 'honor_system_proxy': False,
                         'api_server': {'max_concurrent_runs': 4}},
             'platform_toolsets': {'api_server': tools},
-            'memory': {'provider': 'builtin'},
+            # Existing MEMORY.md/USER.md files are retained for explicit review/import.
+            # New business memories are stored through the Kiara MCP commands.
+            'memory': {'provider': 'builtin', 'memory_enabled': False, 'user_profile_enabled': False},
             'security': {'allow_lazy_installs': False},
             'skills': {'inline_shell': False},
             'curator': {'enabled': False},

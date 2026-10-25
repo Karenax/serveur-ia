@@ -79,7 +79,7 @@ def validate_profile(profile):
     if not isinstance(profile,dict):raise ValueError('Profil client invalide.')
     if profile.get('url')!='wireguard://10.77.0.1:8766':raise ValueError('Adresse API privée invalide.')
     if profile.get('protocol', 1) not in (1, 2, 3, 4):
-        raise ValueError('Ce profil nécessite une version plus récente d’Accès serveur Fred.')
+        raise ValueError('Ce profil nécessite une version plus récente d’Accès serveur Kiara.')
     if profile.get('transport') != 'wireguard':
         raise ValueError('Cet accès doit utiliser WireGuard.')
     if not isinstance(profile.get('token'),str) or not re.fullmatch(r'qwen_[0-9a-f]{16}_[A-Za-z0-9_-]{43}',profile['token']):

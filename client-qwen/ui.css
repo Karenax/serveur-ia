@@ -87,3 +87,64 @@ main#messages{overflow-y:scroll;scrollbar-gutter:stable;overflow-anchor:none;scr
 .draft-retry{display:block;margin:6px 0 0 auto;font-size:12px}
 
 .ws-doc-library small,.brand small{font-size:11px}
+#conversation-options{padding:0 8px}#conversation-options label{min-height:28px}
+
+/* Vocal: a dedicated workspace; the chat keeps its dictation controls. */
+.voice-view{flex:1;min-height:0;overflow:auto;padding:30px 36px;color:var(--text)}
+.voice-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:24px;border-bottom:1px solid var(--line)}
+.voice-heading h2{font-size:25px;font-weight:500;margin:0 0 6px}.voice-heading p{margin:0;color:var(--muted);font-size:13px;overflow-wrap:anywhere}
+.voice-layout{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:36px;max-width:1100px;margin:auto}
+.voice-main{min-width:0}.voice-stage{min-height:490px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 0}
+.voice-orb{width:clamp(200px,25vw,320px);max-width:100%;color:var(--green)}
+.voice-orb svg{display:block;width:100%;height:auto}.voice-contour{stroke-width:1.6;stroke-linejoin:round}.voice-contour:nth-child(2){opacity:.55}.voice-contour:nth-child(3){opacity:.3}
+.voice-orb canvas{display:block;width:100%;height:auto;aspect-ratio:1}.voice-orb svg[hidden],.voice-orb canvas[hidden]{display:none}
+.voice-settings #voice-animation-style{margin:6px 0 12px}.voice-settings .voice-motion{min-height:28px}
+.voice-view[data-state=thinking] .voice-orb{color:var(--text)}.voice-view[data-state=muted] .voice-orb,.voice-view[data-state=idle] .voice-orb{color:var(--muted)}.voice-view[data-state=error] .voice-orb{color:var(--danger)}
+.voice-view[data-animation=constellation][data-state=idle] .voice-orb{color:var(--green)}
+.voice-stage h3{font-size:21px;font-weight:500;margin:2px 0 12px}.voice-stage #conversation-status{display:block;min-height:40px;max-width:420px;padding:0 12px;color:var(--muted);font-size:13px;line-height:1.6;overflow-wrap:anywhere}
+.voice-actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;margin-top:14px}.voice-actions button{min-height:42px;padding:10px 18px}#conversation-start{background:var(--text);color:var(--bg);border-color:var(--text)}#conversation-start[aria-pressed=true]{background:var(--bg);color:var(--danger);border-color:var(--danger)}#conversation-start:disabled{opacity:.55}
+.voice-settings{padding:28px 0 24px 24px;border-left:1px solid var(--line)}.voice-settings h3{font-size:15px;font-weight:600;margin:0 0 26px}
+.voice-settings fieldset{min-width:0;border:0;padding:0;margin:0 0 26px}.voice-settings legend{font-size:13px;font-weight:600;margin-bottom:12px}.voice-settings p{font-size:12px;line-height:1.65;margin:8px 0}
+.voice-settings label{font-size:13px;line-height:1.6}.voice-check{display:flex;align-items:flex-start;gap:8px}.voice-check input{flex-shrink:0;margin-top:4px;accent-color:var(--green)}
+.voice-settings select{width:100%;min-height:36px;border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--text);padding:6px 8px;font-size:12px}.voice-settings #voice-execution-options>label{display:block;margin:12px 0 6px}.voice-settings #voice-test-max{margin-top:12px;min-height:36px}.voice-settings #voice-max-status{overflow-wrap:anywhere}.voice-settings #voice-execution-options>small{display:block;font-size:11px;color:var(--muted);line-height:1.6}
+.voice-settings #conversation-options{padding:0;display:block}.voice-settings #voice-volume{width:100%;accent-color:var(--green);margin:12px 0 0;min-height:24px}.voice-settings output{float:right;margin-left:12px;color:var(--muted)}
+.voice-max-install{margin-top:16px;padding-top:12px;border-top:1px solid var(--line);overflow-wrap:anywhere}.voice-max-install button{max-width:100%;white-space:normal;min-height:36px;margin:6px 0}.voice-max-install progress{width:100%;height:12px;margin-top:12px;accent-color:var(--green)}
+.voice-diagnostics{font-size:12px;color:var(--muted);padding-top:18px;border-top:1px solid var(--line)}.voice-diagnostics summary,.voice-transcript summary{cursor:pointer;min-height:28px;line-height:28px}.voice-diagnostics #conversation-context{font-size:12px}
+.voice-transcript{border-top:1px solid var(--line);padding:16px 0 24px;font-size:13px}.voice-transcript>summary{font-weight:500}.voice-exchange{padding:16px 0;border-bottom:1px solid var(--line)}.voice-exchange strong{font-size:12px;font-weight:600}.voice-exchange p{margin:8px 0 0;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.75}.voice-transcript #voice-sources{margin-top:14px}
+#voice-ongoing{font-size:12px;flex-shrink:0;min-height:32px}.voice-view :is(button,input,select,summary):focus-visible{outline:2px solid var(--green);outline-offset:3px}
+@media(max-width:1100px){.voice-view{padding:24px}.voice-layout{grid-template-columns:minmax(0,1fr) 230px;gap:20px}.voice-settings{padding-left:20px}}
+@media(max-width:620px){.voice-view{padding:20px 18px}.voice-heading{padding-bottom:18px}.voice-heading h2{font-size:23px}.voice-heading .secondary{font-size:12px;min-height:36px}.voice-layout{grid-template-columns:minmax(0,1fr);gap:0}.voice-stage{min-height:390px;padding:16px 0}.voice-orb{width:240px}.voice-stage h3{font-size:20px}.voice-settings{border-left:0;border-top:1px solid var(--line);padding:24px 0}.voice-settings h3{margin-bottom:22px}#voice-ongoing{max-width:106px;white-space:normal}}
+.voice-folder{overflow-wrap:anywhere;font-size:12px;color:var(--muted);user-select:text}
+.voice-gpu-options{margin:14px 0}.voice-gpu-options select{margin:6px 0}.voice-gpu-options button{margin-top:6px;min-height:36px}.voice-gpu-options p{overflow-wrap:anywhere}
+
+/* Voice workspace: conversation first, settings in a separate accessible panel. */
+.voice-view{--voice-user:#327854;--voice-ai:#4969c5;padding:28px clamp(20px,3vw,48px)}
+:root[data-theme=dark] .voice-view{--voice-user:#7ad9b1;--voice-ai:#91adff}
+.voice-heading{gap:20px;align-items:flex-start;padding-bottom:18px}.voice-heading-name{min-width:0;flex:1}.voice-heading h2{font-size:15px;font-weight:600;color:var(--muted);margin-bottom:7px}.voice-heading #voice-conversation-name{font-size:23px;font-weight:500;color:var(--text);line-height:1.35}
+.voice-heading-actions{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:8px}.voice-heading-actions button,.voice-heading-actions summary{min-height:36px;font-size:12px}.voice-heading-actions .menu{position:relative}.voice-heading-actions summary{display:flex;align-items:center;justify-content:center;width:38px;border:1px solid var(--line);border-radius:7px;cursor:pointer;list-style:none}.voice-heading-actions summary::-webkit-details-marker{display:none}.voice-heading-actions .menu-body{z-index:50;min-width:190px}
+.voice-context-bar{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:14px 0 0;color:var(--muted);font-size:12px}.voice-context-bar #voice-archived{padding-left:12px;border-left:1px solid var(--line)}.voice-text-button{border:0;background:none;color:var(--green);padding:4px 0;text-decoration:underline;text-underline-offset:3px;font-size:12px;cursor:pointer}
+#voice-management-status{font-size:12px;line-height:1.5;color:var(--text);margin:10px 0}#voice-management-status:empty{display:none}
+.voice-rename-form{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:16px}.voice-rename-form label{font-size:12px}.voice-rename-form input{flex:1;min-width:160px;padding:8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--text)}
+.voice-layout{display:block;max-width:1400px;margin:0 auto}.voice-stage{min-height:min(740px,calc(100dvh - 230px));padding:24px 0;justify-content:center}
+.voice-view[data-animation=waves] .voice-orb{width:min(100%,1300px);color:var(--voice-user)}#voice-waves{aspect-ratio:8/3}
+.voice-wave-legend{display:flex;justify-content:center;flex-wrap:wrap;gap:32px;margin:0 0 22px;font-size:12px;color:var(--muted)}.voice-wave-legend>span{display:flex;align-items:center;gap:8px}.voice-wave-legend i{width:8px;height:8px;border-radius:50%;background:var(--voice-user)}.voice-wave-legend .voice-wave-ai i{background:var(--voice-ai)}.voice-wave-legend meter{width:64px;height:6px;border:0;border-radius:8px;accent-color:var(--voice-user)}.voice-wave-ai meter{accent-color:var(--voice-ai)}.voice-wave-legend meter::-webkit-meter-bar{background:var(--line);border:0;border-radius:8px}.voice-wave-legend meter::-webkit-meter-optimum-value{background:var(--voice-user);border-radius:8px}.voice-wave-ai meter::-webkit-meter-optimum-value{background:var(--voice-ai)}
+.voice-stage h3{font-size:23px;margin:0 0 8px}.voice-stage #conversation-status{min-height:30px;max-width:700px}.voice-actions{margin-top:12px}.voice-actions button{min-height:44px}.voice-stage #voice-quick-interruptions{margin-top:18px;font-size:12px;max-width:460px}.voice-stage #conversation-options{padding:0;display:block}.voice-stage .voice-check{justify-content:center;align-items:center;font-size:12px;line-height:1.5;min-height:28px}.voice-stage .voice-check input{margin-top:0}.voice-stage #voice-interruptions-note{font-size:11px;line-height:1.5;color:var(--muted);margin:4px 0 0}
+.voice-transcript{max-width:1100px;margin:0 auto}#voice-transcript-content{max-height:40vh;overflow:auto}
+.voice-settings-dialog{position:fixed;inset:12px 12px 12px auto;margin:0;width:min(400px,calc(100vw - 24px));height:calc(100dvh - 24px);max-height:none;max-width:none;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--text);box-shadow:var(--shadow);padding:0}
+.voice-settings-dialog[open]{display:flex;flex-direction:column}.voice-settings-dialog::backdrop{background:#0003}.voice-settings-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px;border-bottom:1px solid var(--line);flex-shrink:0}.voice-settings-heading h3{font-size:16px;font-weight:600;margin:0}.voice-settings-heading button{min-height:36px}.voice-settings-dialog .voice-settings{flex:1;min-height:0;overflow:auto;border:0;padding:22px 22px 0}.voice-settings-footer{border-top:1px solid var(--line);padding:14px 20px}.voice-settings-footer button{width:100%;min-height:40px}.voice-settings-dialog :is(button,input,select,summary):focus-visible{outline:2px solid var(--green);outline-offset:3px}
+@media(max-width:1050px){.voice-heading{flex-wrap:wrap}.voice-heading-actions{justify-content:flex-start}.voice-heading-name{flex-basis:100%}}
+@media(max-width:620px){.voice-view{padding:20px 18px}.voice-heading{gap:12px}.voice-heading #voice-conversation-name{font-size:21px}.voice-heading-actions{gap:6px}.voice-heading-actions button{min-height:40px;padding:7px 10px;font-size:12px}.voice-stage{min-height:430px;padding:18px 0}.voice-view[data-animation=waves] .voice-orb{width:100%}.voice-wave-legend{gap:16px;margin-bottom:22px;font-size:11px}.voice-wave-legend meter{width:40px}.voice-stage h3{font-size:21px}.voice-settings-dialog{inset:8px;width:calc(100vw - 16px);height:calc(100dvh - 16px)}.voice-settings-heading{padding:14px 18px}}
+/* Personal assistant reuses the existing settings typography and controls. */
+[data-view="assistant"] section{margin-block:24px;border-top:1px solid var(--line);padding-top:16px}
+[data-view="assistant"] form{display:grid;gap:8px;max-width:650px;margin-top:16px}
+[data-view="assistant"] textarea{width:100%;resize:vertical;min-height:60px}
+[data-view="assistant"] input,[data-view="assistant"] select{max-width:100%;min-width:0}
+[data-view="assistant"]>select{max-width:650px;display:block}
+[data-view="assistant"] summary{padding-block:8px;font-weight:500}
+[data-view="assistant"] .ws-field{border-color:var(--muted);color:var(--text)}
+[data-view="assistant"] label:has(input[type="checkbox"]){display:flex;align-items:center;gap:8px;min-height:32px}
+.assistant-item{padding-block:10px;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
+.assistant-item p{margin:0 0 8px;white-space:pre-wrap}
+.assistant-item-actions{display:flex;gap:8px;flex-wrap:wrap}
+.voice-image-tools{padding:12px 0;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.voice-image-tools p,.voice-image-tools #voice-image-preview{flex-basis:100%;margin:0}

@@ -38,7 +38,7 @@ Une révocation reste valable après restauration d’une archive ancienne. Sur 
 
 Dans **Appareils**, créer un accès **Android** ou **Windows** et renseigner son nom, son type (PC, téléphone, tablette) et son propriétaire administratif. Chaque appareil possède une identité, une clé API et un pair WireGuard distincts. Les espaces existants sont conservés ; le champ propriétaire sert au classement et ne fusionne pas les données.
 
-Pour Android, télécharger le **profil Android** `.fred-android` dans la fiche puis l’importer dans l’application. L’APK signé se trouve dans `client-android/dist/Acces-serveur-Fred-Android.apk`. Un EXE Windows personnel peut également être importé par Android. Les profils contiennent des accès privés ; les remettre seulement au destinataire de l’appareil.
+Pour Android, télécharger le **profil Android** `.fred-android` dans la fiche puis l’importer dans l’application. L’APK signé se trouve dans `client-android/dist/Acces-serveur-Kiara-Android.apk`. Un EXE Windows personnel peut également être importé par Android. Les profils contiennent des accès privés ; les remettre seulement au destinataire de l’appareil.
 
 La fiche affiche la version et le type déclarés par le client, la dernière activité authentifiée, la suspension et l’expiration. Les valeurs déclarées servent au suivi ; elles ne donnent aucun droit supplémentaire. Une dernière activité ne garantit pas que l’appareil est encore connecté.
 

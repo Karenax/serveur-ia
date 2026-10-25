@@ -7,6 +7,9 @@
 #endif
 extern "C" {
 FRED_EXPORT void* fred_voice_create(const char* model, const char* backends, int threads);
+FRED_EXPORT void* fred_voice_create_conversation(const char* model, const char* backends, int threads);
+FRED_EXPORT void fred_voice_pause_capture(void* handle, bool paused);
+FRED_EXPORT void fred_voice_ack(void* handle, int turn);
 FRED_EXPORT void fred_voice_feed(void* handle, const int16_t* samples, int count);
 FRED_EXPORT void fred_voice_stop(void* handle);
 FRED_EXPORT void fred_voice_cancel(void* handle);

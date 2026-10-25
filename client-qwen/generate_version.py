@@ -3,7 +3,7 @@ from pathlib import Path
 from product import APP_NAME, EXE_NAME
 from updater import VERSION, version
 numbers = (*version(VERSION), 0)
-values = {'CompanyName':'Fred', 'FileDescription':APP_NAME, 'FileVersion':VERSION,
+values = {'CompanyName':'Kiara', 'FileDescription':APP_NAME, 'FileVersion':VERSION,
           'InternalName':APP_NAME, 'OriginalFilename':EXE_NAME,
           'ProductName':APP_NAME, 'ProductVersion':VERSION}
 strings = ',\n'.join('StringStruct('+repr(k)+', '+repr(v)+')' for k,v in values.items())

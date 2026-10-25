@@ -1,0 +1,6 @@
+{
+  "windows_embedded_ui_matches_sources": true,
+  "android_embedded_ui_matches_sources": true,
+  "low_phonon_synthesis_unchanged": true,
+  "low_sentence_splitting_unchanged": true
+}

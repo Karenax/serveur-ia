@@ -1,0 +1,28 @@
+{
+  "passed": true,
+  "shipped_worker_verified": true,
+  "microphone_opened": false,
+  "synthetic_samples_only": true,
+  "samples": [
+    {
+      "sample": "bonjour-kiara",
+      "detected": 1,
+      "seconds": 1.68
+    },
+    {
+      "sample": "clara",
+      "detected": 0,
+      "seconds": 1.6
+    },
+    {
+      "sample": "kiara",
+      "detected": 0,
+      "seconds": 1.28
+    },
+    {
+      "sample": "ordinary",
+      "detected": 0,
+      "seconds": 2.24
+    }
+  ]
+}

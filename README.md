@@ -1,12 +1,28 @@
 # Serveur IA
 
+L’application et l’assistante s’appellent **Kiara**. Les noms des EXE clients sont
+conservés. Le [rapport du renommage](maintenance/2026-10-24-kiara/README.md) décrit
+les compatibilités conservées et les paquets reconstruits.
+
 Le 22 octobre 2026, [Phonon français remplace Pocket TTS côté serveur](maintenance/2026-10-22-phonon/README.md), sans mise à jour du client : streaming CPU, interruption et reprise validés, Qwen conservé.
 
 Projet privé de serveur Qwen local, avec un lanceur web, des clients Windows et Android (téléphone/tablette), et des mesures d'inférence sur deux Tesla P100.
 
 ## Plan et contexte du projet
 
-Le [plan global](PLAN-GLOBAL-SERVEUR-FRED.md) découpe en lots les sauvegardes, la gestion des appareils, le tableau de bord, la recherche documentaire, la voix, les notifications et les outils de l’assistant. Le [contexte de reprise](CONTEXTE-PROJET.md) conserve les décisions, l’état actuel et les prochaines étapes. Les lots 0 à 4 sont implantés : sauvegardes quotidiennes côté serveur, restauration guidée et gestion des appareils. Consulter le [mode d’emploi](lanceur/SAUVEGARDES-APPAREILS.md) et les [preuves](preuves/lots-0-4/VALIDATION.md). Les **lots 6 et 8 sont également achevés et en service** : recherche avec passages cités et boîte de notifications persistante. Consulter leur [mode d’emploi](lanceur/RECHERCHE-NOTIFICATIONS.md) et les [preuves finales](preuves/lots-6-8/VALIDATION.md), dont 246 tests réussis. Versions publiées : serveur/Windows **3.5.34**, Android **1.0.13, code 14**. Le [correctif du 14 octobre](maintenance/2026-10-14-opencode/README.md) rétablit l’affichage du modèle ajouté dans OpenCode 2. Le lot 7 comprend la dictée Windows/Android et la conversation vocale Windows ; la conversation Android reste différée. Hermes traite les conversations avec les outils Fred autorisés ; les trois actions du correcteur utilisent directement Qwen. Le tableau de bord complet du lot 5 et les extensions des lots 9/10 restent planifiés.
+Le [plan d’intégration de l’assistant Kiara](PLAN-INTEGRATION-ASSISTANT-KIARA.md)
+organise les améliorations : mémoire en conversation, actions vocales,
+rappels, bilans de projet, activation mains libres et images pendant le vocal.
+Il précise les dépendances, les critères de validation et les limites matérielles ;
+une première version est publiée en **serveur/Windows 3.5.52 et Android
+1.0.23/code 24**. Le [rapport d’intégration](maintenance/2026-10-25-assistant-integration/README.md)
+décrit leur utilisation, les vérifications et les essais matériels restants.
+Le [guide de l’assistant](GUIDE-ASSISTANT-KIARA.md) explique les six parcours
+depuis Windows et Android.
+L’attente de « Bonjour Kiara » reste expérimentale et limitée à l’application
+visible ; les alertes Android hors application sont facultatives et non exactes.
+
+Le [plan global](PLAN-GLOBAL-SERVEUR-FRED.md) découpe en lots les sauvegardes, la gestion des appareils, le tableau de bord, la recherche documentaire, la voix, les notifications et les outils de l’assistant. Le [contexte de reprise](CONTEXTE-PROJET.md) conserve les décisions, l’état actuel et les prochaines étapes. Les lots 0 à 4 sont implantés : sauvegardes quotidiennes côté serveur, restauration guidée et gestion des appareils. Consulter le [mode d’emploi](lanceur/SAUVEGARDES-APPAREILS.md) et les [preuves](preuves/lots-0-4/VALIDATION.md). Les **lots 6 et 8 sont également achevés et en service** : recherche avec passages cités et boîte de notifications persistante. Consulter leur [mode d’emploi](lanceur/RECHERCHE-NOTIFICATIONS.md) et les [preuves finales](preuves/lots-6-8/VALIDATION.md), dont 246 tests réussis. Versions de cette livraison historique : serveur/Windows **3.5.34**, Android **1.0.13, code 14**. Le [correctif du 14 octobre](maintenance/2026-10-14-opencode/README.md) rétablit l’affichage du modèle ajouté dans OpenCode 2. Le lot 7 comprend désormais la dictée et la conversation Windows/Android ; les essais physiques restants sont décrits dans les guides actuels. Hermes traite les conversations avec les outils Kiara autorisés ; les trois actions du correcteur utilisent directement Qwen. Le tableau de bord complet du lot 5 et les extensions des lots 9/10 restent planifiés.
 
 ## Organisation
 
@@ -24,7 +40,7 @@ Le poste d'origine utilise Windows et le dossier `D:\Serveur IA`. Certains scrip
 
 `Serveur Qwen.cmd` lance `Start-Interface-Qwen.ps1`. Consulter `lanceur/LISEZ-MOI.txt`, `client-qwen/LISEZ-MOI.txt` et les rapports `RESULTATS-*.txt` pour les commandes et configurations mesurées. Les prérequis Python du lanceur et du client sont dans leurs fichiers `requirements*.txt`.
 
-Sur le PC serveur, le [chat Strata](http://127.0.0.1:8080/) permet de discuter directement avec Qwen local ; la [console Fred](http://127.0.0.1:8765/) propose aussi **Ouvrir le chat**. Ces interfaces écoutent sur `127.0.0.1`. Le PC est configuré en IP fixe **192.168.1.41/24**, DHCP IPv4 désactivé, passerelle et DNS `192.168.1.1`. WireGuard utilise le port UDP **51820** ; les profils corrigés privilégient `192.168.1.41:51820` sur le réseau local. [Configuration et vérification](maintenance/2026-10-13-ip-fixe/README.md).
+Sur le PC serveur, le [chat Strata](http://127.0.0.1:8080/) permet de discuter directement avec Qwen local ; la [console Kiara](http://127.0.0.1:8765/) propose aussi **Ouvrir le chat**. Ces interfaces écoutent sur `127.0.0.1`. Le PC est configuré en IP fixe **192.168.1.41/24**, DHCP IPv4 désactivé, passerelle et DNS `192.168.1.1`. WireGuard utilise le port UDP **51820** ; les profils corrigés privilégient `192.168.1.41:51820` sur le réseau local. [Configuration et vérification](maintenance/2026-10-13-ip-fixe/README.md).
 
 Le moteur actuel est Strata officiel **0.1.45.3**, installé dans `dependances/strata-0.1.45.3/engine-cuda12`, avec le **serveur Python 0.1.43.1 corrigé et l’encodeur P2200 conservés** dans `dependances/strata-0.1.43.1`. Ne pas supprimer ce dernier dossier. Les réglages et la preuve de mise en service sont dans [le dossier de maintenance du 19 octobre](maintenance/2026-10-19-strata-0.1.45.3/README.md). L’ancien moteur personnalisé et ses références restent conservés.
 
@@ -38,17 +54,25 @@ Les comptes, clés et paramètres d'accès WireGuard, fichiers chiffrés DPAPI, 
 
 Les performances consignées correspondent aux versions et au matériel indiqués dans chaque rapport. Elles ne constituent pas une garantie pour d'autres configurations.
 
-La dictée locale Whisper Small est intégrée aux clients Windows et Android : [utilisation](client-voice/README.md), [preuves et mesures](preuves/voix-small-20261011/VALIDATION.md). Windows **3.5.21** ajoute la conversation : transcription locale progressive, envoi automatique après la fin du tour, voix française Pocket TTS sur le CPU serveur et interruption quand l’utilisateur reprend la parole. [Guide](client-voice/CONVERSATION-WINDOWS.md), [preuves](preuves/conversation-windows-20261011/VALIDATION.md). Android **1.0.5/code 6** conserve la dictée manuelle et ajoute le téléchargement automatique des mises à jour.
+La dictée et la conversation sont disponibles sur Windows et Android. Low utilise
+Parakeet sur Windows, Whisper Small sur Android et la voix française Phonon du
+serveur. Le complément Windows Max utilise Whisper Turbo Q5 sur le GPU choisi et
+Phonon français Q8 sur CPU. Voir le [guide vocal](client-voice/README.md),
+le [guide Windows](client-voice/CONVERSATION-WINDOWS.md) et les
+[mesures du 25 octobre](maintenance/2026-10-25-vocal-realtime/README.md).
+Les [preuves Small](preuves/voix-small-20261011/VALIDATION.md) et
+[preuves de la première conversation Windows](preuves/conversation-windows-20261011/VALIDATION.md)
+décrivent les anciennes livraisons et leurs moteurs de l’époque.
 
 La mémoire sémantique **EmbeddingGemma 2** est installée et activée sur le serveur : moteur CPU indépendant de Qwen/Strata, base de connaissances par projet et base hors projet séparées par accès. Les conversations synchronisées sont indexées automatiquement. [Utilisation et limites](lanceur/MEMOIRE-EG2.md), [validation](preuves/eg2-20261011/VALIDATION.md).
 
 Les données connues du serveur sont également regroupées dans un dossier privé par client, sous `lanceur/donnees-clients/<identifiant>/` : base individuelle, historiques, conversations, documents, souvenirs et configuration. Les chemins et dates de mise à jour sont affichés dans la console. [Organisation et fonctionnement](lanceur/DOSSIERS-CLIENTS.md).
 
-Les conversations Windows/Android et les tâches rédactionnelles sont intégrées à **Hermes** : profil créé automatiquement pour chaque accès, session par conversation et projet natif associé à chaque projet Fred. Les trois actions du correcteur utilisent directement Qwen, avec une consigne imposée côté serveur. Le Qwen local est partagé ; les recherches documentaires EG2 et outils web conservent les droits Fred. La recherche web des conversations utilise les outils et connexions natifs Hermes du serveur. Coupures, annulation, sauvegarde et restauration sont raccordées. [Fonctionnement et limites](lanceur/HERMES-FRED.md), [preuves](preuves/hermes-fred/VALIDATION.md).
+Les conversations Windows/Android et les tâches rédactionnelles sont intégrées à **Hermes** : profil créé automatiquement pour chaque accès, session par conversation et projet natif associé à chaque projet Kiara. Les trois actions du correcteur utilisent directement Qwen, avec une consigne imposée côté serveur. Le Qwen local est partagé ; les recherches documentaires EG2 et outils web conservent les droits Kiara. La recherche web des conversations utilise les outils et connexions natifs Hermes du serveur. Coupures, annulation, sauvegarde et restauration sont raccordées. [Fonctionnement et limites](lanceur/HERMES-FRED.md), [preuves](preuves/hermes-fred/VALIDATION.md).
 
 Windows **3.5.23** corrige l’arrêt de la conversation vocale pendant la synchronisation normale de l’historique ; la lecture et le microphone restent actifs, et le tour suivant attend la fin de l’enregistrement. [Validation](preuves/conversation-fix-20261011/VALIDATION.md).
 
-Windows **3.5.26** et Android **1.0.9/code 10** corrigent le sélecteur de modèle par conversation : profil actif Hermes natif Windows, modèles indisponibles masqués et menu stable pendant les actualisations. La console **Clients → Modèles disponibles dans Hermes** permet de choisir les modèles proposés aux clients. Le partage des connexions reste activé pour tous les comptes Fred, avec quotas communs et données séparées. Qwen reste utilisable et le correcteur le conserve en direct. [Guide](lanceur/HERMES-FRED.md), [validation et publication](preuves/model-picker-fix-20261011/VALIDATION.md).
+Windows **3.5.26** et Android **1.0.9/code 10** corrigent le sélecteur de modèle par conversation : profil actif Hermes natif Windows, modèles indisponibles masqués et menu stable pendant les actualisations. La console **Clients → Modèles disponibles dans Hermes** permet de choisir les modèles proposés aux clients. Le partage des connexions reste activé pour tous les comptes Kiara, avec quotas communs et données séparées. Qwen reste utilisable et le correcteur le conserve en direct. [Guide](lanceur/HERMES-FRED.md), [validation et publication](preuves/model-picker-fix-20261011/VALIDATION.md).
 
 La console propose aussi des cases par fournisseur et **Tout désélectionner**, pour retirer notamment tous les modèles Nous Portal en une action. Le choix est enregistré côté serveur et appliqué aux deux clients ; Qwen local reste disponible. [Validation](preuves/provider-selector-20261011/VALIDATION.md).
 

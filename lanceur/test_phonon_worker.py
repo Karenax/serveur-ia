@@ -70,7 +70,7 @@ class PhononWorkerTests(unittest.TestCase):
 
     def test_pcm_is_mono_little_endian_clipped_and_bounded(self):
         self.start()
-        self.source.command('speak', text='Bonjour Fred.')
+        self.source.command('speak', text='Bonjour Kiara.')
         frames = self.frames()
         audio = [base64.b64decode(f['pcm']) for f in frames if 'pcm' in f]
         self.assertTrue(all(len(chunk) <= 16000 and len(chunk) % 2 == 0 for chunk in audio))
@@ -80,7 +80,7 @@ class PhononWorkerTests(unittest.TestCase):
         self.assertTrue(all(f['rate'] == 24000 for f in frames if 'pcm' in f))
         self.assertEqual({'id': 'a' * 32, 'done': True, 'cancelled': False}, frames[-1])
         self.assertEqual(1, self.model.closed)
-        self.assertEqual([('Bonjour Fred.',phonon_model.SPEC['voice'])],self.model.calls)
+        self.assertEqual([('Bonjour Kiara.',phonon_model.SPEC['voice'])],self.model.calls)
 
     def test_cancel_closes_generation_and_next_request_works(self):
         waiting = threading.Event()

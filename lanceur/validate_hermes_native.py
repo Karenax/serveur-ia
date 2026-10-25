@@ -86,7 +86,7 @@ def run(port=8080, output=None):
             messages = [{'role': 'user', 'content': prompt}]
             first = turn(a, conversation, messages, project)
             if 'fred_calculate' not in first['tools'] or '114777' not in first['output'].replace(' ', ''):
-                raise AssertionError('Hermes doit réellement appeler le calcul Fred et donner 114777.')
+                raise AssertionError('Hermes doit réellement appeler le calcul Kiara et donner 114777.')
             report['checks']['native_mcp_tool_executed'] = True
             messages.extend([{'role': 'assistant', 'content': first['output']},
                              {'role': 'user', 'content': 'Rappelle mon identifiant de validation et le résultat du calcul précédent, en une phrase.'}])
@@ -128,7 +128,7 @@ def run(port=8080, output=None):
                                'dans le projet courant. Donne uniquement le code trouvé et cite la source.')
             found = turn(a, secrets.token_hex(16), [{'role': 'user', 'content': document_prompt}], project)
             if 'fred_document_search' not in found['tools'] or 'DOCUMENT-ORANGE-4821' not in found['output']:
-                raise AssertionError('La lecture documentaire doit réellement passer par l’outil Fred autorisé.')
+                raise AssertionError('La lecture documentaire doit réellement passer par l’outil Kiara autorisé.')
             report['checks']['native_document_search_executed'] = True
             if not found['sources'] or any(source.get('document') != doc for source in found['sources']):
                 raise AssertionError('Les sources livrées doivent appartenir au document du projet autorisé.')

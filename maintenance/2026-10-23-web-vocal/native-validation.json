@@ -1,0 +1,43 @@
+{
+  "passed": true,
+  "scope": "temporary isolated account and gateway; actual public web tools and already loaded local Qwen",
+  "hermes_agent_called": false,
+  "qwen_processes_preserved": true,
+  "first_answer_text_seconds": 26.313,
+  "total_seconds": 30.454,
+  "phases": [
+    {
+      "message": "Recherche sur Internet…",
+      "seconds": 0.063
+    },
+    {
+      "message": "Lecture des sources…",
+      "seconds": 8.094
+    }
+  ],
+  "oral_context": {
+    "capacity": 16384,
+    "input_tokens": 2021,
+    "output_tokens": 512,
+    "omitted_messages": 0
+  },
+  "answer": "D'après la documentation officielle de SearXNG, c'est un moteur de recherche méta qui regroupe les résultats d'autres moteurs sans stocker les données des utilisateurs. Il sert donc à chercher sur Internet tout en préservant votre vie privée et en évitant le profilage.",
+  "sources": [
+    {
+      "url": "https://docs.searxng.org/user/about.html",
+      "title": "About SearXNG - SearXNG Documentation (2026.10.19+81371861f)",
+      "retrieved": true
+    },
+    {
+      "url": "https://searx.ng/searxng/info/en/about",
+      "title": "About SearXNG - SearX.NG",
+      "retrieved": true
+    },
+    {
+      "url": "https://searxng.github.io/searxng",
+      "title": "SearXNG Documentation (2026.6.11+4dd0bf486)",
+      "retrieved": false
+    }
+  ],
+  "limits": "No microphone, recognition or browser audio playback; one fictional public question, not a latency benchmark."
+}

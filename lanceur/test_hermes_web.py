@@ -168,7 +168,7 @@ class NativeWebTests(unittest.TestCase):
     def test_actual_native_ssrf_rebinding_redirect_and_fake_ip_policy_stay_fail_closed(self):
         import hermes_web
         # Inject only DNS answers in the real native interpreter. These checks
-        # execute after Fred's forced policy and before the selected provider.
+        # execute after Kiara's forced policy and before the selected provider.
         replacement = '''
   import socket
   url_safety._getaddrinfo=lambda *a,**k:[(socket.AF_INET,socket.SOCK_STREAM,6,'',('198.18.0.1',443))]
@@ -338,7 +338,7 @@ print(result)
 
     def test_native_keyless_firecrawl_attests_destination_before_returning_content(self):
         import hermes_web
-        # Execute the installed keyless parser and Fred's native-worker hook,
+        # Execute the installed keyless parser and Kiara's native-worker hook,
         # with transport payloads in memory. No anonymous provider/network calls.
         replacement = r'''
   import socket

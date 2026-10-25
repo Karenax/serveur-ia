@@ -107,7 +107,7 @@ class HermesPrivateServer:
                     outer.conversations.storage.check(owner)
                     messages = data.get('messages')
                     if not isinstance(messages, list) or not 1 <= len(messages) <= 2000: raise ValueError('Messages invalides.')
-                    # Every destination/model/auth choice belongs to Fred; this
+                    # Every destination/model/auth choice belongs to Kiara; this
                     # endpoint cannot proxy URLs or execute Strata host tools.
                     allowed = {'messages', 'stream', 'max_tokens', 'max_completion_tokens', 'temperature', 'top_p',
                                'top_k', 'min_p', 'seed', 'presence_penalty', 'frequency_penalty',

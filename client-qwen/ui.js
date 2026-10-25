@@ -2,13 +2,15 @@
 'use strict';
 function uiLoadedModel(name,code=''){
   const label=$('loaded-model');
-  label.textContent=name?'Modèle : '+name:['model_unloaded','no_models'].includes(code)?'Aucun modèle disponible':'Modèle : connexion requise';
+  const text=name?'Modèle : '+name:['model_unloaded','no_models'].includes(code)?'Aucun modèle disponible':'Modèle : connexion requise';if(label.textContent!==text)label.textContent=text;
   label.title=label.textContent;
 }
 const uiPaths={notifications:'M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4',chat:'M3 4h18v12H8l-5 4V4',projects:'M3 7V5h6l2 2h10v13H3V7',tasks:'M9 3h6v3H9V3m-3 2H4v16h16V5h-2M8 11l2 2 5-5M8 17h8',settings:'M4 6h16M4 12h16M4 18h16M8 3v6m8 0v6m-6 0v6',new:'M15 4l5 5M4 20l4-1L21 6l-3-3L5 16l-1 4',sidebar:'M3 4h18v16H3V4m5 0v16',project:'M3 7V5h6l2 2h10v13H3V7',writing:'M4 20l4-1L21 6l-3-3L5 16l-1 4',code:'M8 6l-6 6 6 6m8-12 6 6-6 6m-3-14-2 16',analysis:'M4 20h16M7 16v-5m5 5V4m5 12V8',research:'M15 15l6 6M17 9a8 8 0 1 1-16 0 8 8 0 0 1 16 0',general:'M12 3v18M3 12h18M5.6 5.6l12.8 12.8m0-12.8L5.6 18.4'};
 function uiIcon(name){const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('fill','none');svg.setAttribute('stroke','currentColor');svg.setAttribute('stroke-width','1.5');svg.setAttribute('stroke-linecap','round');svg.setAttribute('stroke-linejoin','round');svg.setAttribute('aria-hidden','true');svg.classList.add('icon');const path=document.createElementNS(svg.namespaceURI,'path');path.setAttribute('d',uiPaths[name]||uiPaths.general);svg.append(path);return svg;}
 const uiNavTitles={notifications:'Notifications',chat:'Conversations',projects:'Projets',tasks:'Tâches',settings:'Réglages'};
-function uiDecorateNavigation(){for(const button of document.querySelectorAll('[data-view-button]')){button.removeAttribute('aria-selected');if(button.classList.contains('active'))button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');}for(const b of document.querySelectorAll('.nav-button')){const name=b.dataset.viewButton;if(!uiNavTitles[name])continue;if(name==='notifications'){const count=Number(b.dataset.unreadCount||0);b.replaceChildren(uiIcon(name),wsElement('span',uiNavTitles[name],'nav-text'));if(count)b.append(wsElement('span',String(count),'fred-nav-count'));b.title='Notifications'+(count?' · '+count+' non lues':'');continue;}const notification=name==='tasks'&&(b.textContent.includes('résultats disponibles')||b.dataset.unread==='true');if(name==='tasks')b.dataset.unread=String(notification);b.replaceChildren(uiIcon(name),wsElement('span',uiNavTitles[name],'nav-text'));if(notification){b.append(wsElement('span',undefined,'nav-dot'));b.title='Tâches · nouveaux résultats';}else b.title=uiNavTitles[name];}}
+const uiNavigationLabels=new WeakMap();
+uiNavTitles.assistant='Mémoire et rappels';uiPaths.assistant='M4 4h7v16H4V4m9 0h7v16h-7V4M7 8h1m8 0h1M7 12h1m8 0h1';
+function uiDecorateNavigation(){for(const button of document.querySelectorAll('[data-view-button]')){button.removeAttribute('aria-selected');if(button.classList.contains('active'))button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');}for(const b of document.querySelectorAll('.nav-button')){const name=b.dataset.viewButton;if(!uiNavTitles[name])continue;const unchangedSignature=JSON.stringify([name,uiNavTitles[name],b.dataset.unreadCount||0,b.dataset.unread==='true'||b.textContent.includes('résultats disponibles')]);if(uiNavigationLabels.get(b)===unchangedSignature&&b.querySelector('.nav-text'))continue;uiNavigationLabels.set(b,unchangedSignature);if(name==='notifications'){const count=Number(b.dataset.unreadCount||0);b.replaceChildren(uiIcon(name),wsElement('span',uiNavTitles[name],'nav-text'));if(count)b.append(wsElement('span',String(count),'fred-nav-count'));b.title='Notifications'+(count?' · '+count+' non lues':'');continue;}const notification=name==='tasks'&&(b.textContent.includes('résultats disponibles')||b.dataset.unread==='true');if(name==='tasks')b.dataset.unread=String(notification);b.replaceChildren(uiIcon(name),wsElement('span',uiNavTitles[name],'nav-text'));if(notification){b.append(wsElement('span',undefined,'nav-dot'));b.title='Tâches · nouveaux résultats';}else b.title=uiNavTitles[name];}}
 $('new').prepend(uiIcon('new'));$('ui-sidebar-toggle').append(uiIcon('sidebar'));
 document.querySelector('.sidebar-settings').append(document.querySelector('[data-view-button="settings"]'));
 $('workspace-heading').after($('undo-delete'));
@@ -77,7 +79,7 @@ async function uiPersistPreferences(){
   if(!uiDraftsLoaded){const state=await api('/client/state');uiLoadComposerDrafts(state.preferences||{});}
   uiComposerSync();clearTimeout(uiDraftTimer);const draftVersion=uiDraftVersion;
   uiPreferencesLoaded=true;
-  const values={theme:uiTheme,font:uiFontSelect.value,text_size:uiSizeSelect.value,...uiThinkingPreferences(),sidebar_collapsed:document.body.classList.contains('sidebar-collapsed'),corrector_text:$('corrector-text')?.value||'',conversation_drafts:Object.fromEntries(uiDraftChanges)};
+  const values={theme:uiTheme,font:uiFontSelect.value,text_size:uiSizeSelect.value,...uiThinkingPreferences(),...window.conversationPreferences?.(),sidebar_collapsed:document.body.classList.contains('sidebar-collapsed'),corrector_text:$('corrector-text')?.value||'',conversation_drafts:Object.fromEntries(uiDraftChanges)};
   uiPreferencesPending++;
   uiPreferencesWrites=uiPreferencesWrites.catch(()=>{}).then(()=>api('/client/preferences',values)).then(result=>{if(typeof correctorDirty!=='undefined'&&$('corrector-text')?.value===values.corrector_text)correctorDirty=false;for(const [id,text] of Object.entries(values.conversation_drafts)){if(uiDraftChanges.get(id)===text)uiDraftChanges.delete(id);}uiDraftDirty=uiDraftChanges.size>0;if(uiDraftVersion===draftVersion)uiDraftStatus.textContent='Brouillon enregistré sur cet appareil';if(!uiDraftDirty)uiDraftRetry.hidden=true;return result;}).catch(e=>{if(uiDraftDirty){uiDraftStatus.hidden=false;uiDraftStatus.textContent='Brouillon non enregistré sur cet appareil';uiDraftRetry.hidden=false;}throw e;}).finally(()=>uiPreferencesPending--);
   return uiPreferencesWrites;
@@ -86,6 +88,7 @@ function uiApplyPreferences(values){
   if(values)uiLoadComposerDrafts(values);
   if(uiPreferencesLoaded||uiPreferencesPending||!values)return;
   uiPreferencesLoaded=true;
+  window.conversationApplyPreferences?.(values);
   if(values.theme)uiSetTheme(values.theme);
   uiSetReading(values.font||uiFontSelect.value,values.text_size||uiSizeSelect.value);
   if(!busy){uiThinkingLoad(values);}
@@ -160,12 +163,12 @@ function uiConnectionStatus(state=uiLastConnection){
   uiLastConnection=state;const phase=busy?(replyProgress.phase||state.stream?.phase||'requesting'):null;
   uiIntegrationButtons();
   uiLoadedModel(connected?conversationModelLabel():'',state.code);
-  const https=state.transport==='https';
-  let label=phase?(uiConnectionPhases[phase]||'Préparation de la réponse'):state.reconnecting?'Connexion instable · nouvelle vérification':state.checking?(https?'Vérification HTTPS':'Vérification WireGuard'):connected?'Connecté au serveur IA':'Connexion indisponible';
+  const https=state.transport==='https',checking=state.checking&&!connected;
+  let label=phase?(uiConnectionPhases[phase]||'Préparation de la réponse'):state.reconnecting?'Connexion instable · nouvelle vérification':checking?(https?'Vérification HTTPS':'Vérification WireGuard'):connected?'Connecté au serveur IA':'Connexion indisponible';
   const elapsed=busy?Math.max(0,Math.round((Date.now()-(replyProgress.started||Date.now()))/1000)):0;
   const silence=busy?Math.max(0,Math.round((Date.now()-(replyProgress.lastEvent||Date.now()))/1000)):0;
   if(busy)label+=' · '+elapsed+' s';if(busy&&silence>=45)label='Flux silencieux · '+silence+' s';
-  $('connection').textContent='● '+label+' ⌄';$('connection').classList.toggle('online',connected&&!state.checking&&silence<45);
+  const text='● '+label+' ⌄';if($('connection').textContent!==text)$('connection').textContent=text;$('connection').classList.toggle('online',connected&&silence<45);
   $('connection-summary').textContent=busy&&silence>=45?'Aucun nouveau texte reçu. Le moteur peut encore calculer ; les compteurs ci-dessous permettent de vérifier le tunnel.':state.checking?'Le client vérifie le serveur et essaie les adresses disponibles.':state.connection_warning||state.error||label;
   const lines=['Adresse active : '+(state.endpoint||'en cours'), 'Mode : '+(state.automatic?'automatique':'adresse manuelle'), 'Handshakes : '+(state.handshake?'un échange authentifié a été reçu':'aucun reçu'), 'Dernier handshake : '+(state.last_handshake_time_sec?new Date(state.last_handshake_time_sec*1000).toLocaleString():'aucun'), 'Reçu / envoyé : '+(state.rx_bytes||0)+' / '+(state.tx_bytes||0)+' octets', 'Dernière réponse HTTP : '+(state.last_contact?new Date(state.last_contact*1000).toLocaleTimeString():'aucune'), 'Tunnels démarrés : '+(state.bridge_starts||0)+' · vérifications : '+(state.attempts||0), 'État : '+(state.code||'connexion')];
   if(state.stream?.started)lines.push('Dernière génération : '+(uiConnectionPhases[state.stream.phase]||state.stream.phase),'Réflexion / réponse : '+(state.stream.reasoning_chars||0)+' / '+(state.stream.answer_chars||0)+' caractères reçus');

@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "backend_tests": {
+    "voice_context_conversation_and_semantic_web": 35,
+    "text_transforms_and_cancellation": 16,
+    "source_access_fences": 5
+  },
+  "backend_test_total": 56,
+  "real_qwen_semantic_cases": 14,
+  "native_regression_cases": 2,
+  "source_syntax": {
+    "passed": true,
+    "python": 287,
+    "javascript": 67,
+    "powershell_per_engine": 93
+  },
+  "ux_check": {
+    "passed": true,
+    "warnings": 9,
+    "scope": "Unrelated modified console UI files; no UI source edits for this fix"
+  }
+}

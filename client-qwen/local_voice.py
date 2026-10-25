@@ -178,7 +178,7 @@ class VoiceService:
                 partial = self.model.with_suffix('.part')
                 offset = partial.stat().st_size if partial.exists() else 0
                 if offset >= self.spec['bytes']: offset = 0
-                request = urllib.request.Request(self.spec['url'], headers={'User-Agent': 'Fred-local-dictation/1.0', **({'Range': f'bytes={offset}-'} if offset else {})})
+                request = urllib.request.Request(self.spec['url'], headers={'User-Agent': 'Kiara-local-dictation/1.0', **({'Range': f'bytes={offset}-'} if offset else {})})
                 opener = urllib.request.build_opener(HTTPSRedirect())
                 with opener.open(request, timeout=20) as response:
                     if not response.url.startswith('https://'): raise ValueError('Connexion non sécurisée.')

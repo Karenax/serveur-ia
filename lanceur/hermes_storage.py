@@ -90,7 +90,7 @@ class HermesStorage:
         with self.lock: self.reservations.pop(owner, None)
 
     def compact(self):
-        """Compact only the integration journal, while Fred has no admitted run."""
+        """Compact only the integration journal, while Kiara has no admitted run."""
         paths = [self.root/name for name in ('fred-integration.db','runs_idempotency.db')]
         paths.extend((self.root/'profiles').glob('fred-*/*.db'))
         for path in paths:

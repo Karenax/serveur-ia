@@ -1,4 +1,4 @@
-"""Hermes participates in encrypted Fred snapshots and durable crash recovery."""
+"""Hermes participates in encrypted Kiara snapshots and durable crash recovery."""
 import base64
 from contextlib import closing
 import copy

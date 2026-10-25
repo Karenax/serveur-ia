@@ -1,0 +1,28 @@
+{
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "route": "local Strata; no user history, client transport, ASR or TTS included",
+  "results": [
+    {
+      "prompt": "Bonjour Fred, tu m’entends ?",
+      "text": "Oui, je t'entends parfaitement bien. Comment puis-je t'aider aujourd'hui ?",
+      "first_text_seconds": 2.214008599999943,
+      "six_words_seconds": 2.5103478000019095,
+      "first_sentence_seconds": 2.510297900000296,
+      "total_seconds": 2.8013119000024744,
+      "completion_tokens": 21
+    },
+    {
+      "prompt": "À quelle heure faut-il partir pour arriver à une réunion à neuf heures si le trajet dure trente minutes ?",
+      "text": "Il faut partir à 8h30. Ça te laisse pile le temps d'arriver à l'heure.",
+      "first_text_seconds": 2.4795569000052637,
+      "six_words_seconds": 2.7312434000050416,
+      "first_sentence_seconds": 2.6974386000001687,
+      "total_seconds": 3.230531900000642,
+      "completion_tokens": 26
+    }
+  ],
+  "placement": {
+    "context": 262144
+  },
+  "limits": "Two synthetic short prompts on this server; not measurements on the user client or its current conversation context."
+}

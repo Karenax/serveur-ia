@@ -1,0 +1,47 @@
+{
+  "passed": true,
+  "state": {
+    "partial": "",
+    "partial_speech_id": 1,
+    "text": "",
+    "turns": [
+      {
+        "id": 1,
+        "text": "Bonjour, la réunion du projet Orion est prévue demain à 15h.",
+        "speech_id": 1,
+        "latency": {
+          "speech_end_unix_ms": 1792847893275.1936,
+          "stt_final_ms": 473.9195000001928,
+          "transcript_unix_ms": 1792847894289.1914
+        }
+      }
+    ],
+    "speech_id": 1,
+    "speaking": false,
+    "turn_probability": 0.7280358076095581,
+    "processing": false,
+    "compute_seconds": 1.0461,
+    "model": "Parakeet v3 · progressif"
+  },
+  "segments": [
+    {
+      "samples": 16000,
+      "utterance": "cc72768a4d230ae17b9a1f550f7223b4",
+      "offset": 0,
+      "final": false
+    },
+    {
+      "samples": 96000,
+      "utterance": "cc72768a4d230ae17b9a1f550f7223b4",
+      "offset": 16000,
+      "final": false
+    },
+    {
+      "samples": 1,
+      "utterance": "cc72768a4d230ae17b9a1f550f7223b4",
+      "offset": 107999,
+      "final": true
+    }
+  ],
+  "scope": "real CPU models and Max turn logic; synthetic file, no microphone"
+}

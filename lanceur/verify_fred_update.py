@@ -1,4 +1,4 @@
-"""Actual legacy 3.1 helper -> current Fred build, native acknowledgement, isolated keys."""
+"""Actual legacy 3.1 helper -> current Kiara build, native acknowledgement, isolated keys."""
 import json
 from pathlib import Path
 import shutil

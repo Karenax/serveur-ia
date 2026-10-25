@@ -1,0 +1,119 @@
+{
+  "passed": true,
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "cases": [
+    {
+      "prompt": "cherche internet la derniere actualité sur l’IA",
+      "expected": "search",
+      "action": "search",
+      "query": "dernière actualité IA 2026-10-24",
+      "seconds": 5.172,
+      "passed": true
+    },
+    {
+      "prompt": "Quoi de neuf aujourd’hui dans le monde de l’intelligence artificielle ?",
+      "expected": "search",
+      "action": "search",
+      "query": "actualités intelligence artificielle 2026-10-24",
+      "seconds": 5.14,
+      "passed": true
+    },
+    {
+      "prompt": "Tu peux aller voir ce qui se raconte en ce moment sur l’IA ?",
+      "expected": "search",
+      "action": "search",
+      "query": "actualités intelligence artificielle 2026-10-24",
+      "seconds": 5.14,
+      "passed": true
+    },
+    {
+      "prompt": "sur internet la dernière actualité sur l’intelligence artificielle",
+      "expected": "search",
+      "action": "search",
+      "query": "dernière actualité intelligence artificielle 2026-10-24",
+      "seconds": 5.125,
+      "passed": true
+    },
+    {
+      "prompt": "Est-ce qu’il va pleuvoir à Paris demain ?",
+      "expected": "search",
+      "action": "search",
+      "query": "météo Paris demain 2026-10-25",
+      "seconds": 4.984,
+      "passed": true
+    },
+    {
+      "prompt": "Peux-tu faire une recherche pour moi ?",
+      "expected": "clarify",
+      "action": "clarify",
+      "query": "",
+      "seconds": 4.656,
+      "passed": true
+    },
+    {
+      "prompt": "Tu peux chercher sur Internet ?",
+      "expected": "answer",
+      "action": "answer",
+      "query": "",
+      "seconds": 4.812,
+      "passed": true
+    },
+    {
+      "prompt": "Explique-moi comment fonctionne un moteur de recherche Internet.",
+      "expected": "answer",
+      "action": "answer",
+      "query": "",
+      "seconds": 4.657,
+      "passed": true
+    },
+    {
+      "prompt": "Ne cherche pas sur Internet, explique simplement ce que signifie IA.",
+      "expected": "answer",
+      "action": "answer",
+      "query": "",
+      "seconds": 4.657,
+      "passed": true
+    },
+    {
+      "prompt": "Retrouve le budget dans mes documents du projet.",
+      "expected": "answer",
+      "action": "answer",
+      "query": "",
+      "seconds": 4.61,
+      "passed": true
+    },
+    {
+      "prompt": "Combien font dix-sept fois trois ?",
+      "expected": "answer",
+      "action": "answer",
+      "query": "",
+      "seconds": 4.625,
+      "passed": true
+    },
+    {
+      "prompt": "Bonjour, comment vas-tu ?",
+      "expected": "answer",
+      "action": "answer",
+      "query": "",
+      "seconds": 4.594,
+      "passed": true
+    },
+    {
+      "prompt": "Reformule cette phrase : cherche internet la dernière actualité sur l’IA.",
+      "expected": "answer",
+      "action": "answer",
+      "query": "",
+      "seconds": 4.578,
+      "passed": true
+    },
+    {
+      "prompt": "Merci, c’est tout.",
+      "expected": "answer",
+      "action": "answer",
+      "query": "",
+      "seconds": 4.562,
+      "passed": true
+    }
+  ],
+  "limits": "Local Qwen on fictional public prompts; a focused regression corpus, not a universal intent accuracy claim."
+}

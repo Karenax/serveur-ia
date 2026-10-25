@@ -1,0 +1,51 @@
+{
+  "passed": true,
+  "route": "authenticated local gateway with existing profile; no history write or new account",
+  "results": [
+    {
+      "route": "/v1/models",
+      "response_headers_seconds": 1.447438900002453,
+      "first_event_seconds": null,
+      "first_content_or_pcm_seconds": null,
+      "complete_seconds": 1.4475932999994257,
+      "source_count": 0,
+      "answer_characters": 0,
+      "audio_base64_characters": 0,
+      "audio_chunks": 0
+    },
+    {
+      "route": "/v1/voice/status",
+      "response_headers_seconds": 0.020707699994090945,
+      "first_event_seconds": null,
+      "first_content_or_pcm_seconds": null,
+      "complete_seconds": 0.02078379999875324,
+      "source_count": 0,
+      "answer_characters": 0,
+      "audio_base64_characters": 0,
+      "audio_chunks": 0
+    },
+    {
+      "route": "/v1/chat/completions",
+      "response_headers_seconds": 0.19426609999936773,
+      "first_event_seconds": 0.19434020000335295,
+      "first_content_or_pcm_seconds": 7.608516700005566,
+      "complete_seconds": 8.045503100001952,
+      "source_count": 6,
+      "answer_characters": 53,
+      "audio_base64_characters": 0,
+      "audio_chunks": 0
+    },
+    {
+      "route": "/v1/voice/speech",
+      "response_headers_seconds": 0.0021510000005946495,
+      "first_event_seconds": 0.026334399997722358,
+      "first_content_or_pcm_seconds": 0.02633829999831505,
+      "complete_seconds": 0.2534534000005806,
+      "source_count": 0,
+      "answer_characters": 0,
+      "audio_base64_characters": 117772,
+      "audio_chunks": 8
+    }
+  ],
+  "limits": "Loopback only. Public Cloudflare, WireGuard, microphone and browser playback are not measured."
+}

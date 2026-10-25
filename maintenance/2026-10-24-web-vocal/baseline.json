@@ -1,0 +1,10 @@
+{
+  "cause": "Keyword trigger missed natural oral requests; semantic interpretation requested by user",
+  "reproduction": "cherche internet la derniere actualité sur l’IA",
+  "sources": {
+    "lanceur/remote.py": "665b7da28e59da76b9f22643136cb6aff137d9c2a8b1a07f3926be648f544f90",
+    "lanceur/voice_web.py": "d064a3dedc49e1769425eab142fb6db4fd3faa756a11572357093cf9616d53cb",
+    "lanceur/test_text_transform.py": "c6ca20c7e639b24022a8c320036c346748aeba85fee1cdaccfa4b145b6f6b699",
+    "lanceur/test_voice_web.py": "a08f507856ebe1f57211a4f0bc8a0ae1218a7489917d1c202b5954323c271e04"
+  }
+}

@@ -1,4 +1,4 @@
-ACCÈS SERVEUR FRED 3.5.5 — ESPACES DE TRAVAIL
+ACCÈS SERVEUR KIARA 3.5.5 — ESPACES DE TRAVAIL
 
 Fonctions intégrées
 - Projets : création, recherche, consignes, archivage et restauration.

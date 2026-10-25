@@ -1,7 +1,7 @@
-# Outils Android du client Fred
+# Outils Android du client Kiara
 
 Installation locale du 10 octobre 2026 dans `D:\Serveur IA\toolchain`.
-Le raccourci **Android Studio - client Fred** est disponible sur le bureau.
+Le raccourci **Android Studio - client Kiara** est disponible sur le bureau.
 
 | Outil | Version / emplacement |
 | --- | --- |
@@ -80,12 +80,12 @@ dépendent pas de cet hyperviseur.
 - Hyperviseur WHPX disponible après activation Windows et redémarrage.
 
 Le projet de contrôle sert uniquement à vérifier l'installation. Il ne contient
-ni profil personnel, ni clé d'accès, ni connexion au serveur Fred.
+ni profil personnel, ni clé d'accès, ni connexion au serveur Kiara.
 Les sources de contrôle et binaires restent dans `toolchain`, exclu de Git.
 
 ## Travail restant pour l'application
 
-Ces installations préparent le développement Android. Le client Fred n'a pas
+Ces installations préparent le développement Android. Le client Kiara n'a pas
 encore été porté ni publié sous forme d'APK. Son HTML/CSS/JavaScript peut servir
 de base, mais le serveur local Python, Windows DPAPI, WebView2, le moteur
 WireGuard Windows et les mises à jour EXE doivent être adaptés. Le stockage

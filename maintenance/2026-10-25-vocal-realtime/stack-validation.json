@@ -1,0 +1,60 @@
+{
+  "revision": "vocal-rt-f88da3269d16c833",
+  "runtime_api": 6,
+  "signature_verified": true,
+  "installation": {
+    "download_bytes": 109024358,
+    "reused_bytes": 0,
+    "required_disk_bytes": 577967462
+  },
+  "device": {
+    "name": "Vulkan0",
+    "description": "Quadro P2200",
+    "free_bytes": 4689490740,
+    "total_bytes": 5490343936,
+    "id": "c1bdc62f938b9e7f5b00760d",
+    "kind": "dedicated",
+    "pci_id": "0000:41:00.0"
+  },
+  "benchmark": {
+    "asr_rtf": 0.14996450892925037,
+    "tts_rtf": 0.18930734374537547,
+    "first_audio_ms": 262.6555999740958,
+    "asr_ms": 671.8410000030417,
+    "latency_ms": 934.4965999771375,
+    "fingerprint": "099e8cf460a86d69ae99f80c022f3049018054f367d8e92e6e6811bcc8e7bac7",
+    "functional": true,
+    "device": {
+      "name": "Vulkan0",
+      "description": "Quadro P2200",
+      "free_bytes": 4689490740,
+      "total_bytes": 5490343936,
+      "id": "c1bdc62f938b9e7f5b00760d",
+      "kind": "dedicated",
+      "pci_id": "0000:41:00.0"
+    },
+    "passed": true
+  },
+  "turns": [
+    {
+      "question": "Combien font douze plus dix-sept ?",
+      "recognized": "Combien font 12 plus 17 ?",
+      "answer": "Ça fait 29. C'est un calcul tout simple.",
+      "recognition_after_recording_ms": 839.9999999965075,
+      "first_text_after_recording_ms": 5432.999999989988,
+      "first_audio_after_recording_ms": 5652.000000001863,
+      "output_seconds": 3.92,
+      "max_playback_gap_ms": 0
+    },
+    {
+      "question": "Comment retrouver mes anciennes conversations ?",
+      "recognized": "comment retrouver mes anciennes conversations ?",
+      "answer": "Tu peux utiliser la rubrique Historique pour retrouver tes anciennes conversations.",
+      "recognition_after_recording_ms": 968.9999999827705,
+      "first_text_after_recording_ms": 2516.0000000032596,
+      "first_audio_after_recording_ms": 3000.99999998929,
+      "output_seconds": 4.16,
+      "max_playback_gap_ms": 0
+    }
+  ]
+}

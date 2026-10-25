@@ -1,0 +1,250 @@
+{
+  "parakeet": {
+    "loading_seconds": 6.861370200000238,
+    "word_error_rate": 0.13043478260869565,
+    "mean_seconds": 0.7251511000067694,
+    "rows": [
+      {
+        "file": "fleurs-fr-1.wav",
+        "expected": "L’accident a eu lieu en terrain montagneux, et il semblerait que cela ait été causé par un incendie malveillant.",
+        "recognized": "L'accident a eu lieu en terrain montagneux, et il semblerait que cela ait été causé par un incendie malveillant.",
+        "seconds": 0.6764775000046939,
+        "rtf": 0.06632132352987195,
+        "errors": 2,
+        "words": 19
+      },
+      {
+        "file": "fleurs-fr-2.wav",
+        "expected": "Nous sommes d'accord avec la déclaration de l'USOC (Comité olympique des États-Unis) selon laquelle les intérêts de nos athlètes et de nos clubs, ainsi que de leur sport, pourraient être mieux servis. Cela peut être fait en allant de l'avant et en procédant plutôt à des changements significatifs au sein de notre organisation, qu'à la révocation d'accréditation.",
+        "recognized": "Nous sommes d'accord avec la déclaration de Lusok, comité olympique des États-Unis, selon laquelle les intérêts de nos athlètes et de nos clubs ainsi que de leur sport pourraient être au mieux servis. Cela peut être fait en allant de l'avant et en procédant plutôt à des changements significatifs au sein de notre organisation qu'à la révocation d'accréditation.",
+        "seconds": 1.5364594999991823,
+        "rtf": 0.06566066239312746,
+        "errors": 3,
+        "words": 63
+      },
+      {
+        "file": "fleurs-fr-3.wav",
+        "expected": "Il a ajouté qu’« on ne devrait cependant pas leur demander d’assumer des obligations qui dépassent leur stade de développement, leur responsabilité et leurs capacités. »",
+        "recognized": "Il ajouté qu'on ne devrait cependant pas leur demander d'assumer des obligations qui dépassent leur stade de développement, de responsabilités et leur capacité.",
+        "seconds": 0.5314183000009507,
+        "rtf": 0.06418095410639502,
+        "errors": 7,
+        "words": 25
+      },
+      {
+        "file": "fleurs-fr-4.wav",
+        "expected": "Le rugissement du tigre ne ressemble pas au rugissement ample du lion, mais plutôt à une phrase dont les mots seraient des cris et des grondements.",
+        "recognized": "Le gissement du ting ne ressemble pas au gissement en plus du viant, mais plutôt à une phrase dont les mots seraient des cris et des grondements.",
+        "seconds": 0.7461711000069045,
+        "rtf": 0.07315402941244162,
+        "errors": 6,
+        "words": 26
+      },
+      {
+        "file": "fleurs-fr-5.wav",
+        "expected": "Le même mois, un autre avion de ligne a fait une sortie de piste à Mashhad et a heurté un mur, tuant ainsi dix-sept personnes.",
+        "recognized": "Le même mois, un autre avion de ligne a fait une sortie de piste à Machad et heurté un mur, tuant ainsi dix-sept personnes.",
+        "seconds": 0.5374387000047136,
+        "rtf": 0.0644410911276635,
+        "errors": 2,
+        "words": 26
+      },
+      {
+        "file": "fleurs-fr-6.wav",
+        "expected": "Giancarlo Fisichella a perdu le contrôle de sa voiture et a terminé la course peu après le démarrage.",
+        "recognized": "Giancarlo Ficella a perdu le contrôle de sa voiture et a terminé la course peu après le démarrage.",
+        "seconds": 0.49343600001884624,
+        "rtf": 0.06853277778039531,
+        "errors": 1,
+        "words": 18
+      },
+      {
+        "file": "fleurs-fr-7.wav",
+        "expected": "Malgré le net avantage de Del Potro pendant le deuxième set, il a fallu passer par un tie-break une fois que le score a atteint 6-6.",
+        "recognized": "Malgré le net avantage de Del Potro pendant le deuxième set, il a fallu passer par un tie-break une fois que le score a atteint six-six.",
+        "seconds": 0.5603308000136167,
+        "rtf": 0.06670604762066865,
+        "errors": 2,
+        "words": 28
+      },
+      {
+        "file": "fleurs-fr-8.wav",
+        "expected": "Malheureusement, il est difficile d'étudier le flux de circulation car le comportement des conducteurs ne peut être prédit avec cent pour cent de certitude.",
+        "recognized": "Malheureusement, il est difficile d'étudier le flux de circulation car les comportements des conducteurs ne peuvent être prédits avec 100% de certitude.",
+        "seconds": 0.7194769000052474,
+        "rtf": 0.06181073024100064,
+        "errors": 7,
+        "words": 25
+      }
+    ],
+    "device": "CPU"
+  },
+  "whisper-cpu": {
+    "loading_seconds": 0.6578879000153393,
+    "word_error_rate": 0.11304347826086956,
+    "mean_seconds": 16.20022450000033,
+    "rows": [
+      {
+        "file": "fleurs-fr-1.wav",
+        "expected": "L’accident a eu lieu en terrain montagneux, et il semblerait que cela ait été causé par un incendie malveillant.",
+        "recognized": "L'accident a eu lieu en terrain montagneux et il semblerait que cela ait été causé par un incendie malveillant.",
+        "seconds": 16.351745899999514,
+        "rtf": 1.6031123431372074,
+        "errors": 2,
+        "words": 19
+      },
+      {
+        "file": "fleurs-fr-2.wav",
+        "expected": "Nous sommes d'accord avec la déclaration de l'USOC (Comité olympique des États-Unis) selon laquelle les intérêts de nos athlètes et de nos clubs, ainsi que de leur sport, pourraient être mieux servis. Cela peut être fait en allant de l'avant et en procédant plutôt à des changements significatifs au sein de notre organisation, qu'à la révocation d'accréditation.",
+        "recognized": "Nous sommes d'accord avec la déclaration de l'USOC, Comité Olympique des États-Unis, selon laquelle les intérêts de nos athlètes et de nos clubs, ainsi que de leur sport, pourraient être mieux servis. Cela peut être fait en allant de l'avant et en procédant plutôt à des changements significatifs au sein de notre organisation qu'à la révocation d'accréditation.",
+        "seconds": 16.436462899990147,
+        "rtf": 0.7024129444440235,
+        "errors": 0,
+        "words": 63
+      },
+      {
+        "file": "fleurs-fr-3.wav",
+        "expected": "Il a ajouté qu’« on ne devrait cependant pas leur demander d’assumer des obligations qui dépassent leur stade de développement, leur responsabilité et leurs capacités. »",
+        "recognized": "Il a ajouté qu'on ne devrait cependant pas leur demander d'assumer des obligations qui dépassent leur stade de développement, leurs responsabilités et leurs capacités.",
+        "seconds": 16.01750779998838,
+        "rtf": 1.9344816183560847,
+        "errors": 4,
+        "words": 25
+      },
+      {
+        "file": "fleurs-fr-4.wav",
+        "expected": "Le rugissement du tigre ne ressemble pas au rugissement ample du lion, mais plutôt à une phrase dont les mots seraient des cris et des grondements.",
+        "recognized": "L'eurgissement du tigre ne ressemble pas au reurgissement en plus du lion, mais plutôt à une phrase dont les mots seraient des cris et des grondements.",
+        "seconds": 15.993650599993998,
+        "rtf": 1.5680049607837254,
+        "errors": 5,
+        "words": 26
+      },
+      {
+        "file": "fleurs-fr-5.wav",
+        "expected": "Le même mois, un autre avion de ligne a fait une sortie de piste à Mashhad et a heurté un mur, tuant ainsi dix-sept personnes.",
+        "recognized": "Le même mois, un autre avion de ligne a fait une sortie de piste à Machad et heurté un mur, tuant ainsi 17 personnes.",
+        "seconds": 16.08606410000357,
+        "rtf": 1.928784664269013,
+        "errors": 4,
+        "words": 26
+      },
+      {
+        "file": "fleurs-fr-6.wav",
+        "expected": "Giancarlo Fisichella a perdu le contrôle de sa voiture et a terminé la course peu après le démarrage.",
+        "recognized": "Jean-Carlo Ficciela a perdu le contrôle de sa voiture et a terminé la course peu après le démarrage.",
+        "seconds": 15.992942300013965,
+        "rtf": 2.221241986113051,
+        "errors": 3,
+        "words": 18
+      },
+      {
+        "file": "fleurs-fr-7.wav",
+        "expected": "Malgré le net avantage de Del Potro pendant le deuxième set, il a fallu passer par un tie-break une fois que le score a atteint 6-6.",
+        "recognized": "Malgré le net avantage de Del Potro pendant le deuxième set, il a fallu passer par un tie break une fois que le score atteint 6-6.",
+        "seconds": 16.337792500009527,
+        "rtf": 1.9449752976201817,
+        "errors": 1,
+        "words": 28
+      },
+      {
+        "file": "fleurs-fr-8.wav",
+        "expected": "Malheureusement, il est difficile d'étudier le flux de circulation car le comportement des conducteurs ne peut être prédit avec cent pour cent de certitude.",
+        "recognized": "Malheureusement, il est difficile d'étudier le flux de circulation car les comportements des conducteurs ne peuvent être prédits avec 100% de certitude.",
+        "seconds": 16.38562990000355,
+        "rtf": 1.4077001632305455,
+        "errors": 7,
+        "words": 25
+      }
+    ],
+    "device": "CPU"
+  },
+  "whisper-vulkan": {
+    "loading_seconds": 0.7329087000107393,
+    "word_error_rate": 0.11304347826086956,
+    "mean_seconds": 2.6235612250056874,
+    "rows": [
+      {
+        "file": "fleurs-fr-1.wav",
+        "expected": "L’accident a eu lieu en terrain montagneux, et il semblerait que cela ait été causé par un incendie malveillant.",
+        "recognized": "L'accident a eu lieu en terrain montagneux et il semblerait que cela ait été causé par un incendie malveillant.",
+        "seconds": 6.077736200008076,
+        "rtf": 0.5958564901968703,
+        "errors": 2,
+        "words": 19
+      },
+      {
+        "file": "fleurs-fr-2.wav",
+        "expected": "Nous sommes d'accord avec la déclaration de l'USOC (Comité olympique des États-Unis) selon laquelle les intérêts de nos athlètes et de nos clubs, ainsi que de leur sport, pourraient être mieux servis. Cela peut être fait en allant de l'avant et en procédant plutôt à des changements significatifs au sein de notre organisation, qu'à la révocation d'accréditation.",
+        "recognized": "Nous sommes d'accord avec la déclaration de l'USOC, Comité Olympique des Etats-Unis, selon laquelle les intérêts de nos athlètes et de nos clubs ainsi que de leur sport pourraient être mieux servis. Cela peut être fait en allant de l'avant et en procédant plutôt à des changements significatifs au sein de notre organisation qu'à la révocation d'accréditation.",
+        "seconds": 2.3346943000215106,
+        "rtf": 0.09977326068467994,
+        "errors": 0,
+        "words": 63
+      },
+      {
+        "file": "fleurs-fr-3.wav",
+        "expected": "Il a ajouté qu’« on ne devrait cependant pas leur demander d’assumer des obligations qui dépassent leur stade de développement, leur responsabilité et leurs capacités. »",
+        "recognized": "Il a ajouté qu'on ne devrait cependant pas leur demander d'assumer des obligations qui dépassent leur stade de développement, leurs responsabilités et leurs capacités.",
+        "seconds": 2.1194385000271723,
+        "rtf": 0.255970833336615,
+        "errors": 4,
+        "words": 25
+      },
+      {
+        "file": "fleurs-fr-4.wav",
+        "expected": "Le rugissement du tigre ne ressemble pas au rugissement ample du lion, mais plutôt à une phrase dont les mots seraient des cris et des grondements.",
+        "recognized": "L'urgissement du tigre ne ressemble pas au gissement en plus du lion, mais plutôt à une phrase dont les mots seraient des cris et des grondements.",
+        "seconds": 2.109337499976391,
+        "rtf": 0.20679779411533247,
+        "errors": 5,
+        "words": 26
+      },
+      {
+        "file": "fleurs-fr-5.wav",
+        "expected": "Le même mois, un autre avion de ligne a fait une sortie de piste à Mashhad et a heurté un mur, tuant ainsi dix-sept personnes.",
+        "recognized": "Le même mois, un autre avion de ligne a fait une sortie de piste à Machad et heurté un mur, tuant ainsi 17 personnes.",
+        "seconds": 2.0905955999915022,
+        "rtf": 0.25067093525077966,
+        "errors": 4,
+        "words": 26
+      },
+      {
+        "file": "fleurs-fr-6.wav",
+        "expected": "Giancarlo Fisichella a perdu le contrôle de sa voiture et a terminé la course peu après le démarrage.",
+        "recognized": "Jean-Carlo Ficciela a perdu le contrôle de sa voiture et a terminé la course peu après le démarrage.",
+        "seconds": 2.0496596000157297,
+        "rtf": 0.2846749444466291,
+        "errors": 3,
+        "words": 18
+      },
+      {
+        "file": "fleurs-fr-7.wav",
+        "expected": "Malgré le net avantage de Del Potro pendant le deuxième set, il a fallu passer par un tie-break une fois que le score a atteint 6-6.",
+        "recognized": "Malgré le net avantage de Del Potro pendant le deuxième set, il a fallu passer par un tie-break une fois que le score atteint 6-6.",
+        "seconds": 2.108540000015637,
+        "rtf": 0.2510166666685282,
+        "errors": 1,
+        "words": 28
+      },
+      {
+        "file": "fleurs-fr-8.wav",
+        "expected": "Malheureusement, il est difficile d'étudier le flux de circulation car le comportement des conducteurs ne peut être prédit avec cent pour cent de certitude.",
+        "recognized": "Malheureusement, il est difficile d'étudier le flux de circulation car les comportements des conducteurs ne peuvent être prédits avec 100% de certitude.",
+        "seconds": 2.0984880999894813,
+        "rtf": 0.18028248281696574,
+        "errors": 7,
+        "words": 25
+      }
+    ],
+    "device": {
+      "name": "Vulkan0",
+      "description": "Quadro P2200",
+      "pci_id": "0000:41:00.0",
+      "kind": "dedicated",
+      "free_bytes": 4689621812,
+      "total_bytes": 5490343936,
+      "id": "c1bdc62f938b9e7f5b00760d"
+    }
+  }
+}

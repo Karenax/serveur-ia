@@ -1,6 +1,14 @@
-# Plan global du serveur Fred et de ses clients
+# Plan global du serveur Kiara et de ses clients
 
-Date : 11 octobre 2026. Statut : lots **0 à 4 achevés, validés et en service** — 191 tests réussis, 32 scénarios console et essais Android téléphone/tablette sur émulateurs. Les **lots 6 et 8 sont achevés, validés et en service**, développés en parallèle : **246 tests de régression réussis**, 27 scénarios navigateur et essais Android sur émulateurs téléphone/tablette. Hermes est activé pour les conversations et les outils Fred autorisés. La refonte du tableau de bord du lot 5 et les extensions des lots 9/10 restent planifiées ; le lot 7 comprend désormais la dictée Windows/Android et la conversation Windows.
+L’[extension de l’assistant Kiara du 25 octobre 2026](PLAN-INTEGRATION-ASSISTANT-KIARA.md)
+intègre la mémoire en conversation, les actions vocales, les rappels, les bilans,
+l’activation expérimentale « Bonjour Kiara » et les images pendant le vocal.
+Première version publiée : **serveur/Windows 3.5.52 et Android 1.0.23/code 24** ;
+voir [les preuves et limites](maintenance/2026-10-25-assistant-integration/README.md).
+Ses lots I0–I8 complètent les lots existants, notamment les lots 7 et 9,
+sans déclarer leurs extensions sensibles ou leurs essais matériels réalisés.
+
+Date : 11 octobre 2026. Statut : lots **0 à 4 achevés, validés et en service** — 191 tests réussis, 32 scénarios console et essais Android téléphone/tablette sur émulateurs. Les **lots 6 et 8 sont achevés, validés et en service**, développés en parallèle : **246 tests de régression réussis**, 27 scénarios navigateur et essais Android sur émulateurs téléphone/tablette. Hermes est activé pour les conversations et les outils Kiara autorisés. La refonte du tableau de bord du lot 5 et les extensions des lots 9/10 restent planifiées ; le lot 7 comprend désormais la dictée Windows/Android et la conversation Windows.
 
 ## Demande et décisions
 
@@ -8,27 +16,27 @@ Le périmètre comprend les sept axes proposés : sauvegardes automatiques et re
 
 Les sauvegardes et autorisations d’appareils sont exécutées côté serveur et administrées depuis la console locale. Aucun client ouvert n’est requis pour les sauvegardes. Le serveur reste responsable des données, droits, traitements et travaux persistants ; Windows et Android fournissent les interactions nécessaires : microphone, lecture audio, affichage des sources, notifications et demandes de validation.
 
-Développer par lots utilisables, sans remplacer le stockage ni refaire la console. Préserver les accès, projets et historiques actuels. Après les cinq premiers lots, l’utilisateur a autorisé **les lots 6 et 8 en parallèle** et demandé une **explication du lot 9**. Une demande ultérieure autorise l’intégration complète de Hermes et des outils Fred contrôlés ; les outils système libres et connecteurs externes ne sont pas activés. Le journal minimal d’événements nécessaire aux notifications est intégré au périmètre des lots 6/8 ; il ne constitue pas la refonte du tableau de bord prévue au lot 5.
+Développer par lots utilisables, sans remplacer le stockage ni refaire la console. Préserver les accès, projets et historiques actuels. Après les cinq premiers lots, l’utilisateur a autorisé **les lots 6 et 8 en parallèle** et demandé une **explication du lot 9**. Une demande ultérieure autorise l’intégration complète de Hermes et des outils Kiara contrôlés ; les outils système libres et connecteurs externes ne sont pas activés. Le journal minimal d’événements nécessaire aux notifications est intégré au périmètre des lots 6/8 ; il ne constitue pas la refonte du tableau de bord prévue au lot 5.
 
 Livraison des lots 0–4 à l’époque : serveur et Windows **3.5.24**, Android **1.0.7, code 8**. Pour la version en service après l’audit, consulter le [contexte actuel](CONTEXTE-PROJET.md) et la [preuve de livraison](audits/2026-10-12/VALIDATION-CORRECTIONS.md). Les trois boutons du correcteur utilisent directement Qwen ; les conversations et tâches conservent Hermes. Sauvegardes actives chaque jour à 03 h avec conservation 7/4/6, sur le serveur selon le choix du demandeur ; deuxième destination laissée vide. Le modèle chargé et les clés existantes ont été préservés lors de la mise en service. Voir le [mode d’emploi](lanceur/SAUVEGARDES-APPAREILS.md), le [rapport de validation](preuves/lots-0-4/VALIDATION.md) et le [contexte](CONTEXTE-PROJET.md).
 
 Livraison des lots 6/8 : EXE et APK publiés, signés avec les clés existantes, ressources incorporées vérifiées et mise à jour Android conservant profil et conversation. Le [rapport final](preuves/lots-6-8/VALIDATION.md) et le [contrôle de livraison](preuves/lots-6-8/delivery-final-check.json) rassemblent les preuves effectives. Le serveur a été rechargé sans arrêter les processus du modèle ; données, accès, clés et programmation des sauvegardes sont préservés.
 
-## État constaté
+## État constaté au 25 octobre 2026
 
 | Axe | Existant vérifié | Travail à prévoir |
 | --- | --- | --- |
 | Sauvegardes | Archives chiffrées vérifiées, catalogue, programmation et rattrapage, conservation 7/4/6, seconde copie avec reprise, restauration guidée et retour après interruption | Restauration sélective ; validation NAS physique et volumes maximaux ; service avant ouverture de session si demandé |
 | Appareils | Fiches PC/téléphone/tablette, propriétaire/version/activité, profil Android direct, suspension/expiration, révocation durable, remplacement et archivage conservant les données ; abonnements de notifications privés implantés | Partage d’un espace après migration explicite |
 | Tableau de bord | État du modèle, RAM/GPU, file d’attente et diagnostic ; socle minimal d’événements persistants utilisé par les notifications | Refonte consolidée, historique court, cartes de santé : lot 5 complet planifié |
-| Documents et mémoire | Import TXT/MD/DOCX/PDF texte, recherche FTS5 et sémantique EG2 sur CPU, passages vérifiés ; connaissances par projet et hors projet isolées par accès ; sources conservées avec tâches | OCR optionnel ; mesures de concurrence EG2/Qwen à approfondir |
-| Voix | Dictée locale Small Windows/Android ; conversation Windows 3.5.30 directement vers Qwen, Zipformer/Silero/Smart Turn local et Pocket TTS CPU serveur ; capture AEC et reprise corrigées | Conversation Android différée ; qualité ASR humaine et mesures acoustiques dans la pièce |
-| Notifications | Boîte SQLite persistante, événements dédupliqués, lecture/préférences/abonnements/reçus, console administrative et clients Windows/Android publiés ; rattrapage à la reconnexion | Réveil Android totalement arrêté comme sous-lot distinct, aucun push externe configuré |
-| Outils | Recherche web et lecture d’URL publiques, documents/mémoire et tâches ; outils hôte désactivés sur la passerelle | Registre d’outils serveur autorisés, contrôles par utilisateur, validation des actions |
+| Documents et mémoire | Documents, recherche FTS5/EG2, mémoire canonique gérée en écrit/oral et dans les clients ; préférences globales explicites, bilans avec sources et révisions | OCR ; compléments du plan I0–I8, oubli sémantique non garanti et concurrence prolongée à mesurer |
+| Voix | Conversation Windows et Android directement vers Qwen ; Low Parakeet Windows/Whisper Small Android avec Phonon serveur ; Max Windows Whisper Turbo Q5 et Phonon Q8 CPU ; images et capture choisies | « Bonjour Kiara » expérimental en application visible ; essais physiques micro/caméra, bruit et batterie, latence et activation Android verrouillé non qualifiés |
+| Notifications | Boîte persistante, rattrapage et rappels calendaires ; relevé Android facultatif géré par le système, intervalle minimal de 15 minutes | Heure exacte non garantie ; veille physique à vérifier ; aucun push externe ni alarme exacte |
+| Outils | Catalogue métier partagé Hermes/vocal : mémoire, notes, tâches, rappels et bilans ; droits, révisions et résultats dédoublonnés ; outils hôte désactivés | Propositions et validations sensibles génériques du lot 9 à compléter |
 
 Modules principaux : `lanceur/operations.py`, `workspace.py`, `notifications.py`, `remote.py`, `accounts.py`, `wireguard_access.py`, `app.py`, `lanceur/web/`, `client-qwen/`, `client-android/`.
 
-Orientation demandée le 11 octobre 2026 : faire traiter toutes les conversations clientes par Hermes, déjà installé sur ce PC, et créer automatiquement un profil Hermes à la création de chaque accès. Le [plan d’intégration Hermes/Fred](PLAN-INTEGRATION-HERMES-FRED.md) définit l’architecture, les sessions, les outils, la migration et les lots H0 à H6. L’intégration est implantée et activée, avec profil par accès, session par conversation et projet natif par projet Fred. Les essais avec le Qwen local, les clients signés et les contrôles de livraison sont dans [les preuves](preuves/hermes-fred/VALIDATION.md). Les outils système libres restent désactivés.
+Orientation demandée le 11 octobre 2026 : faire traiter toutes les conversations clientes par Hermes, déjà installé sur ce PC, et créer automatiquement un profil Hermes à la création de chaque accès. Le [plan d’intégration Hermes/Fred](PLAN-INTEGRATION-HERMES-FRED.md) définit l’architecture, les sessions, les outils, la migration et les lots H0 à H6. L’intégration est implantée et activée, avec profil par accès, session par conversation et projet natif par projet Kiara. Les essais avec le Qwen local, les clients signés et les contrôles de livraison sont dans [les preuves](preuves/hermes-fred/VALIDATION.md). Les outils système libres restent désactivés.
 
 ## Lots et dépendances
 
@@ -41,12 +49,12 @@ Orientation demandée le 11 octobre 2026 : faire traiter toutes les conversation
 | 4 | Gestion des appareils et profil Android direct | 0 ; articulation avec 3 | Achevé et validé |
 | 5 | Tableau de bord consolidé et événements internes | 2, 3, 4 | Refonte planifiée ; socle d’événements minimal intégré pour 8 |
 | 6 | Recherche documentaire et sources améliorées | 0 ; alimentation des états de 5 | Achevé, validé et en service sur Windows et Android |
-| 7 | Messages vocaux et lecture des réponses | 0, 4, 5 | Dictée Windows/Android et conversation Windows livrées ; conversation Android différée |
-| 8 | Notifications persistantes et livraison aux appareils | 4 ; socle d’événements de 5 ; événements de 6, puis 7 quand implanté | Achevé, validé et en service ; livraison connectée et rattrapage |
-| 9 | Outils serveur et validation des actions | 4, 5, 6, 8 | Outils Fred contrôlés via Hermes livrés ; outils système et actions externes différés |
+| 7 | Messages vocaux et lecture des réponses | 0, 4, 5 | Dictée et conversation Windows/Android publiées ; qualification physique et extension mains libres à compléter |
+| 8 | Notifications persistantes et livraison aux appareils | 4 ; socle d’événements de 5 ; événements de 6 et rappels | Boîte et rattrapage livrés ; relevé Android périodique facultatif, sans heure exacte garantie |
+| 9 | Outils serveur et validation des actions | 4, 5, 6, 8 | Outils Kiara contrôlés via Hermes livrés ; outils système et actions externes différés |
 | 10 | Récupération complète, compatibilité et livraison globale | 1 à 9 | Planifié |
 
-L’ordre initial était 0 → 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10. La demande initiale a priorisé **6 et 8 en parallèle**, avec le socle d’événements strictement nécessaire ; le tableau de bord complet reste planifié ; la dictée locale et la conversation Windows sont livrées. Chaque lot a sa propre validation ; le lot 10 vérifiera tous les axes ensemble.
+L’ordre initial était 0 → 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10. La demande initiale a priorisé **6 et 8 en parallèle**, avec le socle d’événements strictement nécessaire ; le tableau de bord complet reste planifié ; la dictée et la conversation Windows/Android sont livrées. Chaque lot a sa propre validation ; le lot 10 vérifiera tous les axes ensemble.
 
 ## Lot 0 — fondations et inventaire
 
@@ -136,6 +144,16 @@ Résultat serveur obtenu : références `source_id` opaques, document/projet, ti
 Preuve ciblée : [94 tests isolés réussis](preuves/lots-6-8/recherche/validation.json), sources suivies inchangées, cinq questions connues correctes en première position et citations fidèles. Document de 460 075 caractères : 288 passages, indexation 32,60 ms et recherche de l’information finale 9,22 ms ; PDF réel de deux pages correctement cité page 2. Ces mesures sont celles du jeu contrôlé sur ce poste, pas une précision générale garantie.
 
 ## Lot 7 — messages vocaux et lecture des réponses
+
+État actuel : **dictée et conversation Windows/Android publiées** ; Low utilise
+Parakeet sur Windows, Whisper Small sur Android et Phonon serveur. Max Windows
+utilise Whisper Turbo Q5 et Phonon français Q8. Le
+[guide vocal](client-voice/README.md) et le
+[rapport du 25 octobre](maintenance/2026-10-25-assistant-integration/README.md)
+décrivent les versions actuelles, images et mot d’appel expérimental. Les essais
+physiques restants empêchent de déclarer tous les critères du lot achevés.
+
+### Livraison historique du 11 octobre et plan initial
 
 Statut : **dictée locale Windows/Android et conversation Windows livrées le 11 octobre 2026 ; conversation Android différée**. Le demandeur a retenu Whisper Small multilingue sur Windows et Android. [Guide](client-voice/README.md), [preuves et limites](preuves/voix-small-20261011/VALIDATION.md), [étude des moteurs](recherche/voix-20261011/ETUDE-ASR-CLIENTS.md). La dictée affiche un texte provisoire, finalise avec Terminer, puis attend l’envoi explicite. L’audio reste dans le client et n’est pas conservé. Les permissions, l’annulation, les buffers/durée bornés, l’installation vérifiée et la libération du modèle sont intégrés. Small peut prendre du retard ; aucun téléphone physique n’a été mesuré. Le lot 7 complet n’est pas déclaré achevé.
 

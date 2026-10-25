@@ -157,6 +157,7 @@ class RemoteTests(unittest.TestCase):
         self.assertEqual(headers['Authorization'], 'Bearer private-upstream-key')
         self.assertFalse(request['strata_mcp'])
         self.assertEqual(request['model'], 'test-model')
+        self.assertIn('Tu es Kiara', request['messages'][0]['content'])
         self.assertNotIn(self.access['token'], json.dumps(headers))
     def test_response_caps_are_removed_even_for_legacy_clients(self):
         from core import read_json,write_json
@@ -193,7 +194,7 @@ class RemoteTests(unittest.TestCase):
             self.assertTrue(remote.check()['connected'])
             with urllib.request.urlopen(f'http://127.0.0.1:{local.server_port}/chat', timeout=5) as page:
                 html = page.read().decode()
-                self.assertIn('Accès serveur Fred', html)
+                self.assertIn('Accès serveur Kiara', html)
                 self.assertIn(key, html)
                 self.assertNotIn(self.access['token'], html)
                 self.assertIn("frame-ancestors 'none'", page.headers['Content-Security-Policy'])
@@ -225,15 +226,28 @@ class RemoteTests(unittest.TestCase):
         self.assertNotEqual(encrypted,raw)
         self.assertEqual(client.protect(encrypted,decrypt=True),raw)
         import releases
-        # This isolated server has its own signing identity; verify the production build's
-        # integrity, then authorize that known fixture for this disposable recipient.
-        verified=releases.status(HOME);self.assertTrue(verified['verified'])
-        with patch.object(releases,'status',return_value=verified):exe = self.wireguard.create_client('Test executable', 'test-model')
+        import os
+        staged=os.environ.get('FRED_TEST_CLIENT_EXE')
+        if staged:
+            import shutil
+            fixture_root=Path(self.temporary.name)/'compiled-fixture'
+            fixture_exe=fixture_root/'client-qwen/dist/Accès serveur Fred.exe'
+            fixture_exe.parent.mkdir(parents=True)
+            shutil.copyfile(staged,fixture_exe)
+            with patch.object(releases,'ROOT',fixture_root),patch('remote.ROOT',fixture_root):
+                releases.manifest(self.store.home)
+                exe=self.wireguard.create_client('Test executable','test-model')
+        else:
+            # Authorize the currently deployed build only for this disposable recipient.
+            verified=releases.status(HOME);self.assertTrue(verified['verified'])
+            with patch.object(releases,'status',return_value=verified):exe = self.wireguard.create_client('Test executable', 'test-model')
         path = Path(self.temporary.name) / 'clients' / (exe['id']+'.exe')
         result = Path(self.temporary.name) / 'result.txt'
         process = subprocess.Popen([str(path),'--self-test','--with-profile','--result',str(result)])
         self.assertEqual(process.wait(timeout=30),0)
-        self.assertEqual(result.read_text(encoding='utf-8'),'Accès serveur Fred self-test OK')
+        output=result.read_text(encoding='utf-8')
+        if staged:self.assertEqual(output,'Accès serveur Kiara self-test OK')
+        else:self.assertIn(output,('Accès serveur Fred self-test OK','Accès serveur Kiara self-test OK'))
 
     def test_real_wireguard_udp_api_streaming_and_peer_revocation(self):
         engine=Engine({'role':'server','wireguard':{'private_key':self.wireguard.vault()['private_key']},

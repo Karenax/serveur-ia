@@ -1,0 +1,22 @@
+{
+  "cpu": {
+    "torch": {
+      "url": "https://download-r2.pytorch.org/whl/cpu/torch-2.10.0%2Bcpu-cp312-cp312-win_amd64.whl",
+      "sha256": "21cb5436978ef47c823b7a813ff0f8c2892e266cfe0f1d944879b5fba81bf4e1"
+    },
+    "torchaudio": {
+      "url": "https://download-r2.pytorch.org/whl/cpu/torchaudio-2.10.0%2Bcpu-cp312-cp312-win_amd64.whl",
+      "sha256": "32707736ef079a673433ca36c227c135375602b74d41ee21ff18d1e75caee0b0"
+    }
+  },
+  "cu128": {
+    "torch": {
+      "url": "https://download-r2.pytorch.org/whl/cu128/torch-2.10.0%2Bcu128-cp312-cp312-win_amd64.whl",
+      "sha256": "fbde8f6a9ec8c76979a0d14df21c10b9e5cab6f0d106a73ca73e2179bc597cae"
+    },
+    "torchaudio": {
+      "url": "https://download-r2.pytorch.org/whl/cu128/torchaudio-2.10.0%2Bcu128-cp312-cp312-win_amd64.whl",
+      "sha256": "9a890dfbc7a3301f5ce7930f3ce452841f0c34e51686609628e99ed52c5cc775"
+    }
+  }
+}

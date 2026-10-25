@@ -1,0 +1,95 @@
+{
+  "device": "cpu",
+  "asr": "D:\\Serveur IA\\toolchain\\voice-max-server\\asr",
+  "tts": "D:\\Serveur IA\\toolchain\\voice-max-server\\tts",
+  "models": [
+    {
+      "repo": "mistralai/Voxtral-Mini-4B-Realtime-2602",
+      "revision": "2769294da9567371363522aac9bbcfdd19447add",
+      "target": "D:\\Serveur IA\\toolchain\\voice-max-server\\asr"
+    },
+    {
+      "repo": "Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice",
+      "revision": "0c0e3051f131929182e2c023b9537f8b1c68adfe",
+      "target": "D:\\Serveur IA\\toolchain\\voice-max-server\\tts"
+    }
+  ],
+  "manifest": {
+    "asr/config.json": {
+      "bytes": 1572,
+      "sha256": "96582f5809ad179531d47f9f89d76c696058fbdeff608d6611dcb7e076ea7e93"
+    },
+    "asr/generation_config.json": {
+      "bytes": 191,
+      "sha256": "1fabdbadf2e0ea9e2c36e2a8460a53caa694c1324136e4158032b0a32ff6beec"
+    },
+    "asr/model.safetensors": {
+      "bytes": 8859446848,
+      "sha256": "e745e4902df6a4c48f29f2f8dc1f6d0fb4cc73c7156bc45923451a5bcdfcd1d6"
+    },
+    "asr/params.json": {
+      "bytes": 1343,
+      "sha256": "2ace010ebf7f0b62c60747d91c6d140e3c7238632d3e9c63d60a2bd2065ea301"
+    },
+    "asr/processor_config.json": {
+      "bytes": 384,
+      "sha256": "5fbc4247e0b3b72c1b501b872c4fd6432b1f0fcc1939dcdf1fa5142c6d2ce070"
+    },
+    "asr/README.md": {
+      "bytes": 14942,
+      "sha256": "a5f8e9f596b6d933f8ad0ef4f9654b43b1f61a22bf9a40b63571804e869b2bc5"
+    },
+    "asr/tekken.json": {
+      "bytes": 14910348,
+      "sha256": "8434af1d39eba99f0ef46cf1450bf1a63fa941a26933a1ef5dbbf4adf0d00e44"
+    },
+    "tts/config.json": {
+      "bytes": 4908,
+      "sha256": "17a07f527a1c25ea30b4e023a184482a23d3e279d697b1dc81b1bde498d29cf9"
+    },
+    "tts/generation_config.json": {
+      "bytes": 245,
+      "sha256": "f1b90b4513f3b34c62851049e2492d7b4c5940daf1276f89c82b8ef04127f3aa"
+    },
+    "tts/merges.txt": {
+      "bytes": 1671839,
+      "sha256": "599bab54075088774b1733fde865d5bd747cbcc7a547c5bc12610e874e26f5e3"
+    },
+    "tts/model.safetensors": {
+      "bytes": 3833402552,
+      "sha256": "38b1d5971bdbd982b561cccec982669a53b0537c3cf5e9bd4778ed07bb2f5137"
+    },
+    "tts/preprocessor_config.json": {
+      "bytes": 127,
+      "sha256": "efdde1022ea9d76928bf7a9cd53139138f5ba2e466e837f08f6105ab1af1c119"
+    },
+    "tts/README.md": {
+      "bytes": 57846,
+      "sha256": "64f65e809b51cc0c35f393fbbfcc2d735c0cb3fdbbc6f3fdc4a5e6ce55e9d088"
+    },
+    "tts/tokenizer_config.json": {
+      "bytes": 7344,
+      "sha256": "dc3c31c3bdaedd5016382bb3cbe07323026775ad51f5a4fb564505992ae4a670"
+    },
+    "tts/vocab.json": {
+      "bytes": 2776833,
+      "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+    },
+    "tts/speech_tokenizer/config.json": {
+      "bytes": 2336,
+      "sha256": "ee65bb901c876664ab8707c487157aa1a6ee57c65969b28fb5ec9dc211e68167"
+    },
+    "tts/speech_tokenizer/configuration.json": {
+      "bytes": 76,
+      "sha256": "6bc26d64eb5024b4d1dab5a52371958b429256d6c9d59787f1f5294a54e0cebd"
+    },
+    "tts/speech_tokenizer/model.safetensors": {
+      "bytes": 682293092,
+      "sha256": "836b7b357f5ea43e889936a3709af68dfe3751881acefe4ecf0dbd30ba571258"
+    },
+    "tts/speech_tokenizer/preprocessor_config.json": {
+      "bytes": 234,
+      "sha256": "fcb3805e597e786d4067706e602f6688524640f8d3396790e2e09b5942fcbdfb"
+    }
+  }
+}

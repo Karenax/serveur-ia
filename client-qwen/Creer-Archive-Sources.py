@@ -13,10 +13,10 @@ source_paths = subprocess.check_output([
     'RECONSTRUIRE-FRED.md', 'ARCHIVES-ET-PREUVES.md', 'SOURCES-WIREGUARD.txt', 'Serveur Qwen.cmd', 'Start-Interface-Qwen.ps1'
 ]).decode('utf-8').split('\0')
 suffixes={'.py','.js','.cjs','.html','.css','.md','.txt','.ps1','.cmd','.bat','.go','.mod','.sum','.java','.gradle','.xml','.toml','.properties','.pro','.sh','.c','.cc','.cpp','.h','.hpp','.cmake','.patch','.svg','.ico'}
-public_json={'package.json','package-lock.json','model.json','conversation-models.json','ui-package.json','native-manifest.json','build-info.json','moteurs.json'}
+public_json={'package.json','package-lock.json','model.json','conversation-models.json','max-models.json','max-torch-wheels.json','ui-package.json','native-manifest.json','build-info.json','moteurs.json'}
 files=sorted({name for name in source_paths if name and (root/name).is_file() and
               ((root/name).suffix.lower() in suffixes or (root/name).name in {'gradlew','LICENSE','settings.gradle'}|public_json)})
-target=root/'client-qwen/Acces-serveur-Fred-sources.zip'
+target=root/'client-qwen/Acces-serveur-Kiara-sources.zip'
 with zipfile.ZipFile(target,'w',compression=zipfile.ZIP_DEFLATED) as archive:
     for name in files:archive.write(root/name,name)
 print(target)

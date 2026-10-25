@@ -1,0 +1,26 @@
+diff --git a/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp b/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
+index f5450154..12f3f93d 100644
+--- a/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
++++ b/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
+@@ -110,7 +110,20 @@ int execute_command(std::vector<std::string>& command, std::string& stdout_str,
+ 
+     std::string cmd;
+     for (const auto& part : command) {
+-        cmd += part + " ";
++        // CreateProcess does not quote argv: SDK/source paths may contain spaces.
++        const std::string arg = part.size() >= 2 && part.front() == '"' && part.back() == '"'
++                                ? part.substr(1, part.size() - 2) : part;
++        cmd += '"';
++        size_t slashes = 0;
++        for (char ch : arg) {
++            if (ch == '\\') { ++slashes; continue; }
++            cmd.append(slashes * (ch == '"' ? 2 : 1), '\\');
++            slashes = 0;
++            if (ch == '"') cmd += '\\';
++            cmd += ch;
++        }
++        cmd.append(slashes * 2, '\\');
++        cmd += "\" ";
+     }
+ 
+     if (!CreateProcessA(NULL, cmd.data(), NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi)) {

@@ -1,7 +1,7 @@
-"""The installed Hermes web tools, centrally executed for an authorized Fred run.
+"""The installed Hermes web tools, centrally executed for an authorized Kiara run.
 
 Personal web credentials/configuration stay in the original Hermes profile. The
-Fred gateway only receives its own tool token and calls the private Fred broker;
+Kiara gateway only receives its own tool token and calls the private Kiara broker;
 it never inherits another profile's API keys or gains terminal/browser tools.
 """
 from __future__ import annotations
@@ -133,7 +133,7 @@ try:
    os.environ['HERMES_HOME']=str(get_profile_dir(profile))
   from dotenv import load_dotenv
   load_dotenv(get_hermes_home()/'.env',override=True)
-  # Personal permissive URL preferences must not open Fred's private network.
+  # Personal permissive URL preferences must not open Kiara's private network.
   os.environ['HERMES_ALLOW_PRIVATE_URLS']='false'
   os.environ['WEB_TOOLS_DEBUG']='false'
   from tools import url_safety
@@ -179,7 +179,7 @@ try:
    return original_block(result) or str(result.get('error') or '').startswith('Blocked: URL targets a private or internal')
   web_tools_rescue._policy_blocked_result=blocked_result
   # The central profile may have cached a page when its personal private-URL
-  # setting was permissive. Fred revalidates and fetches public extracts afresh.
+  # setting was permissive. Kiara revalidates and fetches public extracts afresh.
   web_result_cache.extract_cache_get=lambda *a,**k:None
   web_result_cache.extract_cache_put=lambda *a,**k:None
   # We return page text, never references to the personal host filesystem.
@@ -275,8 +275,8 @@ class NativeHermesWeb:
         return result
 
 
-# Injected only into Fred's gateway, before native tool discovery. The upstream
-# schemas remain native; handlers are fenced by Fred's authenticated run broker.
+# Injected only into Kiara's gateway, before native tool discovery. The upstream
+# schemas remain native; handlers are fenced by Kiara's authenticated run broker.
 PATCH_SOURCE = r'''
 def _fred_install_web_bridge():
  import asyncio,copy,http.client,json

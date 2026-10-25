@@ -4,6 +4,8 @@ $root = Split-Path $PSScriptRoot -Parent
 if (!$DistributionDirectory) { $DistributionDirectory = Join-Path $PSScriptRoot 'dist' }
 $DistributionDirectory = [System.IO.Path]::GetFullPath($DistributionDirectory)
 $python = Join-Path $root 'Strata-src\.venv\Scripts\python.exe'
+& $python (Join-Path $root 'maintenance/2026-10-25-assistant-integration/prepare_wakeword.py')
+if ($LASTEXITCODE -ne 0) { throw 'Préparer les ressources vocales avec prepare_wakeword.py --download.' }
 $env:PYTHONPATH = Join-Path $PSScriptRoot 'build-tools'
 if (!$WireGuardBinary) { $WireGuardBinary = Join-Path $PSScriptRoot 'wireguard-bridge.exe' }
 if ([System.IO.Path]::GetFileName($WireGuardBinary) -ne 'wireguard-bridge.exe') { throw 'Le moteur embarqué doit se nommer wireguard-bridge.exe.' }

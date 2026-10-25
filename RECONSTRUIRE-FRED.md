@@ -1,6 +1,6 @@
-# Reconstruire et vérifier Fred
+# Reconstruire et vérifier Kiara
 
-Les constructions Windows/serveur 3.5.39 et Android 1.0.13/code 14 utilisent les
+Les constructions Windows/serveur 3.5.52 et Android 1.0.23/code 24 utilisent les
 sources locales et les clés de signature existantes. Chaque construction produit
 `build-manifest.json` : empreintes des sources, empreinte du binaire, versions des
 paquets Python, Go, CMake, JDK, SDK/NDK Android et commit Hermes réellement utilisés.
@@ -22,7 +22,7 @@ Les sources modifiées avant commit sont identifiées par leurs empreintes.
    suivant le moteur épinglé ; leurs poids restent hors Git.
 3. Installer Hermes avec son runtime Windows. Le commit utilisé par une livraison
    figure dans son manifeste et se vérifie avec `hermes_service.installation()`.
-   Fred réutilise ce runtime ; il ne télécharge pas de dépendances pendant une conversation.
+   Kiara réutilise ce runtime ; il ne télécharge pas de dépendances pendant une conversation.
 4. Préparer les dépendances vocales selon [client-voice/README.md](client-voice/README.md)
    et [CONVERSATION-WINDOWS.md](client-voice/CONVERSATION-WINDOWS.md). Le build utilise
    Whisper.cpp 1.9.5, CMake 3.31.8, Ninja 1.12.1 et MSVC sous `toolchain` ; les
@@ -45,12 +45,19 @@ seul ne contient pas les SDK, moteurs, modèles et clés privées. Le manifeste 
 la construction réalisée ; il ne promet pas un binaire bit à bit identique sur un
 autre poste ou avec une autre clé.
 
+L’intégration de l’assistant ajoute des ressources de détection locale épinglées
+(sherpa-onnx 1.13.8, modèle int8, AAR Android) : exécuter
+`maintenance/2026-10-25-assistant-integration/prepare_wakeword.py --download` avec
+le Python du projet si elles sont absentes. Les deux scripts de build vérifient
+leurs empreintes sans téléchargement implicite. Le modèle reste expérimental
+pour la phrase française ; voir le [rapport et ses limites](maintenance/2026-10-25-assistant-integration/README.md).
+
 ## Exécuter les vérifications
 
 Depuis les correctifs de sécurité du 21 octobre, les cinq runtimes disposent de
 [verrous avec empreintes](dependances/verrous/README.md). Vérifier leur conformité
 avec `maintenance/verrous_runtime.py check`. Reconstruire dans des environnements
-neufs à partir des verrous ; ne pas modifier le runtime personnel Hermes. Fred
+neufs à partir des verrous ; ne pas modifier le runtime personnel Hermes. Kiara
 sélectionne son runtime privé validé par le pointeur
 `toolchain/hermes-security-runtime/runtime.json`, préparé avec le script et le
 patch de `maintenance/2026-10-21-correctifs-audit/`.

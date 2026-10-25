@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Package the shared Fred UI for Android without changing the desktop sources.
+"""Package the shared Kiara UI for Android without changing the desktop sources.
 
 Only __CONFIG__ and __NONCE__ remain for the native loopback server. Credential
 material is intentionally absent from this package; the native layer injects a
@@ -16,7 +16,7 @@ import re
 PROJECT = Path(__file__).resolve().parent.parent
 MOBILE = PROJECT / "mobile-ui"
 SHARED = ("chat.html", "workspace.html", "ui.css", "ui.js", "markdown.js",
-          "corrector.js", "attachments.js", "thinking.js", "selection.js", "voice.js",
+          "corrector.js", "attachments.js", "thinking.js", "selection.js", "voice.js", "conversation.js",
           "vendor/markdown-it.min.js")
 
 
@@ -89,7 +89,7 @@ def prepare(source: Path) -> str:
     corrector = read(source / "corrector.js")
     corrector = sub_once(corrector, r"    const reader=response\.body\.getReader\(\),decoder=new TextDecoder\(\);.*?(?=\n    if\(!correctorAnswer\.content\.trim\(\)\))", read(MOBILE / "corrector-response.js").rstrip(), "corrector JSON fallback")
     presentation = script(ui) + script(read(source / "attachments.js")) + script(corrector)
-    presentation += script(selection) + script(read(source / "thinking.js")) + script(read(source / "voice.js")) + script(read(MOBILE / "android.js"))
+    presentation += script(selection) + script(read(source / "thinking.js")) + script(read(source / "voice.js")) + script(read(source / "conversation.js")) + script(read(MOBILE / "android.js"))
     markdown = script(read(source / "vendor/markdown-it.min.js")) + script(read(source / "markdown.js"))
     css = read(source / "ui.css") + "\n" + read(MOBILE / "android.css")
     chat = replace_once(chat, "</head>", markdown + "</head>", "markdown bootstrap")

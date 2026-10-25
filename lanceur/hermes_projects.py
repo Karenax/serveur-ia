@@ -1,7 +1,7 @@
-"""Mirror Fred projects through the installed Hermes native Project API.
+"""Mirror Kiara projects through the installed Hermes native Project API.
 
-Fred remains authoritative for documents and permissions. Native project folders
-contain a metadata manifest, while document contents are read through Fred MCP.
+Kiara remains authoritative for documents and permissions. Native project folders
+contain a metadata manifest, while document contents are read through Kiara MCP.
 No profile-wide active project is changed by a conversation.
 """
 from __future__ import annotations
@@ -95,9 +95,9 @@ class HermesProjects:
         path = home
         for component in ('workspace', 'projects', identifier(identity)):
             path /= component
-            if _linked(path): raise Denied('Lien interdit dans un projet Hermes Fred.')
+            if _linked(path): raise Denied('Lien interdit dans un projet Hermes Kiara.')
         path.mkdir(parents=True, exist_ok=True)
-        if not path.resolve().is_relative_to(home.resolve()): raise Denied('Projet hors du profil Hermes Fred.')
+        if not path.resolve().is_relative_to(home.resolve()): raise Denied('Projet hors du profil Hermes Kiara.')
         return path
 
     def _native(self, home, operation, **values):

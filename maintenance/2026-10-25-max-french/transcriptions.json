@@ -1,0 +1,10 @@
+[
+  {
+    "file": "french-1.wav",
+    "recognized": "Bonjour, je suis Kiara. Comment puis-je vous aider?"
+  },
+  {
+    "file": "french-2.wav",
+    "recognized": "Vous pouvez créer une nouvelle conversation, puis retrouver vos échanges dans l'historique."
+  }
+]

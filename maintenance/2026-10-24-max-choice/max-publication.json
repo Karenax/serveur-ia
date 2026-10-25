@@ -1,0 +1,12 @@
+{
+  "revision": "vulkan-q4-10088394a5d1bd6e",
+  "runtime_api": 3,
+  "runtime_bytes": 46150289,
+  "sha256": "3d810a58d88eece68794d1f5fda96b7c56bfc7be0bacd26d360e37bdf8e64541",
+  "signature_verified": true,
+  "inventory_verified": true,
+  "unchanged_model_weights": true,
+  "models_bytes": 2509696208,
+  "old_revision": "vulkan-q4-62db5a83ab69c6c7",
+  "included_in_base_client": false
+}

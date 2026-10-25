@@ -1,0 +1,4 @@
+# Isolated optional Max package; excluded from the base executable.
+ptts==0.4.1
+numpy==2.5.4
+pyinstaller==6.16.0

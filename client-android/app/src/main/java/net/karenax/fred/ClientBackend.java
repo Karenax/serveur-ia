@@ -7,6 +7,7 @@ import java.util.*;
 /** Contract consumed by the same chat, project, corrector and task UI as the desktop app. */
 final class ClientBackend implements AutoCloseable {
     private static final List<String> REASONING_EFFORTS=Arrays.asList("none","minimal","low","medium","high","xhigh","max","ultra","on");
+    volatile LocalConversation conversation;
     final Remote remote;
     final HistorySync history;
     final String key="local_"+Json.token();
@@ -24,9 +25,11 @@ final class ClientBackend implements AutoCloseable {
     synchronized void selectMode(String mode)throws Exception {if(!remote.hasProfile())throw new IllegalArgumentException("Importez votre accès personnel.");if(!Arrays.asList("https","wireguard").contains(mode))throw new IllegalArgumentException("Choisissez HTTPS ou WireGuard.");selectEndpoint(mode.equals("https")?Profile.HTTPS:remote.profile.getJSONObject("wireguard").getString("endpoint"));}
     synchronized void selectEndpoint(String endpoint)throws Exception {remote.select(endpoint);settings.put("connection_selected",true);settings.put("endpoint",remote.endpoint());store.write(identity+".settings",settings);}
     private synchronized JSONObject savePreferences(JSONObject values)throws Exception {
-        Json.keys(values,"theme","font","text_size","thinking_effort","thinking_by_model","thinking","sidebar_collapsed","corrector_text","conversation_drafts");
+        Json.keys(values,"theme","font","text_size","thinking_effort","thinking_by_model","thinking","sidebar_collapsed","corrector_text","conversation_drafts","voice_interruptions","voice_volume","voice_animation","voice_animation_style","voice_visual_version","voice_quality","voice_execution");
         Map<String,List<String>> allowed=new HashMap<>();allowed.put("theme",Arrays.asList("light","dark","system"));allowed.put("font",Arrays.asList("system","humanist","serif","mono"));allowed.put("text_size",Arrays.asList("compact","standard","large","extra"));allowed.put("thinking_effort",REASONING_EFFORTS);
         for(String key:allowed.keySet())if(values.has(key)&&!allowed.get(key).contains(values.get(key)))throw new IllegalArgumentException("Réglage invalide : "+key);
+        if(values.has("voice_animation_style")&&!Arrays.asList("waves","orb","constellation").contains(values.get("voice_animation_style")))throw new IllegalArgumentException("Choisissez une animation disponible.");
+        if(values.has("voice_visual_version")&&(!(values.get("voice_visual_version") instanceof Integer)||values.getInt("voice_visual_version")!=2))throw new IllegalArgumentException("Affichage vocal invalide.");
         if(values.has("thinking_by_model")){
             Object raw=values.get("thinking_by_model");if(!(raw instanceof JSONObject))throw new IllegalArgumentException("Réglage invalide : thinking_by_model");
             JSONObject choices=(JSONObject)raw;if(choices.length()>512)throw new IllegalArgumentException("Réglage invalide : thinking_by_model");
@@ -39,7 +42,10 @@ final class ClientBackend implements AutoCloseable {
             JSONObject drafts=(JSONObject)raw;if(drafts.length()>256||Json.bytes(drafts).length>1024*1024)throw new IllegalArgumentException("Brouillons des conversations trop volumineux.");
             Iterator<String> ids=drafts.keys();while(ids.hasNext()){String id=ids.next();if(id.isEmpty()||id.length()>128||id.chars().anyMatch(c->c<32))throw new IllegalArgumentException("Brouillon de conversation invalide.");Json.string(drafts,id,0,100000);}
         }
-        for(String key:new String[]{"thinking","sidebar_collapsed"})if(values.has(key))Json.bool(values,key,false);if(values.has("corrector_text"))Json.string(values,"corrector_text",0,100000);
+        for(String key:new String[]{"thinking","sidebar_collapsed","voice_interruptions","voice_animation"})if(values.has(key))Json.bool(values,key,false);if(values.has("corrector_text"))Json.string(values,"corrector_text",0,100000);
+        if(values.has("voice_volume")){Object volume=values.get("voice_volume");if(!(volume instanceof Integer)||((Integer)volume)<0||((Integer)volume)>100)throw new IllegalArgumentException("Volume invalide.");}
+        if(values.has("voice_quality")&&!values.getString("voice_quality").equals("low"))throw new IllegalArgumentException("Choisissez le mode Low.");
+        if(values.has("voice_execution")&&!values.getString("voice_execution").equals("pc"))throw new IllegalArgumentException("Traitement local requis sur Android.");
         JSONObject prefs=settings.optJSONObject("preferences");prefs=prefs==null?new JSONObject():new JSONObject(prefs.toString());
         if(values.has("conversation_drafts")){
             JSONObject saved=prefs.optJSONObject("conversation_drafts"),drafts=saved==null?new JSONObject():new JSONObject(saved.toString()),changes=values.getJSONObject("conversation_drafts");
@@ -50,5 +56,5 @@ final class ClientBackend implements AutoCloseable {
     }
     private JSONObject saveDraft(JSONObject body)throws Exception {Object draft=body.opt("draft");if(draft==null||draft==JSONObject.NULL){store.delete(identity+".draft");return Json.object("saved",true);}if(!(draft instanceof JSONObject))throw new IllegalArgumentException("Brouillon invalide.");JSONObject value=(JSONObject)draft;Json.keys(value,"id","project","title","text","revision");for(String key:new String[]{"id","project"})if(!Json.string(value,key,32,32).matches("[0-9a-f]{32}"))throw new IllegalArgumentException("Identifiant de brouillon invalide.");Json.string(value,"title",0,180);Json.string(value,"text",0,500000);Object revision=value.opt("revision");if(!(revision instanceof Integer||revision instanceof Long)||((Number)revision).longValue()<1)throw new IllegalArgumentException("Révision du brouillon invalide.");if(Json.bytes(value).length>2*1024*1024)throw new IllegalArgumentException("Brouillon trop volumineux.");store.write(identity+".draft",Json.object("draft",value));return Json.object("saved",true);}
     JSONObject config(){return Json.object("key",key,"model",remote.state().optString("model"),"version",BuildConfig.VERSION_NAME,"storage",identity,"platform","android");}
-    @Override public void close(){updates.close();remote.close();}
+    @Override public void close(){if(conversation!=null)conversation.close();updates.close();remote.close();}
 }

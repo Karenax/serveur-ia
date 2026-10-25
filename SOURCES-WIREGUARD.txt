@@ -1,4 +1,4 @@
-Qwen / Strata : console serveur et Accès serveur Fred 3.2.1
+Qwen / Strata : console serveur et Accès serveur Kiara 3.2.1
 
 Cette archive contient les sources des deux applications et leurs tests.
 Le code applicatif est sous licence MIT. Les dépendances gardent leurs licences,
@@ -16,7 +16,7 @@ Compilation du client Windows x64 :
 3. Depuis la racine de l'archive :
    Strata-src\.venv\Scripts\python.exe -m pip install --target client-qwen\build-tools -r client-qwen\requirements-build.txt
 4. Exécuter client-qwen/Build-WireGuard.ps1 puis client-qwen/Build-Client.ps1.
-5. La base client-qwen/dist/Accès serveur Fred.exe n'a aucun profil de connexion.
+5. La base client-qwen/dist/Accès serveur Kiara.exe n'a aucun profil de connexion.
    Générer les EXE personnels depuis Clients & accès dans la console serveur.
 
 Installation des sources serveur sur un autre PC :

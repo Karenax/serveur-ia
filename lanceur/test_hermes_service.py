@@ -1,4 +1,4 @@
-"""Real installed native multiplexer under two isolated Fred profiles."""
+"""Real installed native multiplexer under two isolated Kiara profiles."""
 import http.client
 import json
 import os
@@ -32,7 +32,7 @@ class NativeMultiplexerContracts(unittest.TestCase):
                 self.assertEqual(status['profiles'], 2)
                 self.assertEqual(status['source_commit'], installation()['commit'])
                 # Native policy must refuse dependency acquisition while both
-                # Fred's environment and durable profile config reuse installed packages.
+                # Kiara's environment and durable profile config reuse installed packages.
                 runtime = installation()
                 policy = subprocess.run([str(runtime['python']), '-c',
                     "import os; from pm.install import lazy_installs_allowed; "
@@ -71,7 +71,7 @@ class NativeMultiplexerContracts(unittest.TestCase):
                 toolsets = service.request(a, 'GET', '/v1/toolsets')
                 entries = toolsets if isinstance(toolsets, list) else toolsets.get('data', [])
                 enabled = {entry['name'] for entry in entries if entry.get('enabled')}
-                self.assertIn('memory', enabled)
+                self.assertNotIn('memory', enabled)
                 self.assertNotIn('terminal', enabled)
                 self.assertNotIn('file', enabled)
                 self.assertNotIn('browser', enabled)

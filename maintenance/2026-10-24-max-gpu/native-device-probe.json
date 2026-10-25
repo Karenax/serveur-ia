@@ -1,0 +1,24 @@
+{
+  "props_size": 56,
+  "devices": [
+    {
+      "name": "Vulkan0",
+      "description": "Quadro P2200",
+      "free_bytes": 4688556852,
+      "total_bytes": 5490343936,
+      "kind": "dedicated",
+      "pci_id": "0000:41:00.0",
+      "id": "c1bdc62f938b9e7f5b00760d"
+    },
+    {
+      "name": "CPU",
+      "description": "AMD Ryzen Threadripper PRO 3955WX 16-Cores     ",
+      "free_bytes": 25342328832,
+      "total_bytes": 137284874240,
+      "kind": "other",
+      "pci_id": "",
+      "id": "fe069032f49c9b6982e168d7"
+    }
+  ],
+  "models_loaded": false
+}

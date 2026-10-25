@@ -24,7 +24,7 @@ def _fred_install_run_binding():
   history._fred_multimodal=True;api_server_runs._resolve_conversation_history=history
  def identity():
   value=_approval_session_key.get()
-  if not isinstance(value,str) or not re.fullmatch(r'[A-Za-z0-9_-]{1,100}',value):raise ValueError('Fred run binding unavailable')
+  if not isinstance(value,str) or not re.fullmatch(r'[A-Za-z0-9_-]{1,100}',value):raise ValueError('Kiara run binding unavailable')
   return value
  def bind_http(request):
   target=get_secret('FRED_PROVIDER_URL','');key=get_secret('FRED_INFERENCE_KEY','')

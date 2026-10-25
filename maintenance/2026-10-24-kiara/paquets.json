@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "exe_name": "Accès serveur Fred.exe",
+  "windows_embedded_sources_match": [
+    "chat.html",
+    "workspace.html",
+    "ui.css",
+    "ui.js",
+    "conversation.js"
+  ],
+  "windows_notices_kiara": true,
+  "android_ui_sources_match": true,
+  "android_package_identity_preserved": true,
+  "artifacts": {
+    "toolchain\\releases-staging\\kiara-windows\\Accès serveur Fred.exe": {
+      "bytes": 94422988,
+      "sha256": "203bd3fb925c3ca091df4aa193190c3ddd0f778c6bb7a759bed93b5d57165413"
+    },
+    "toolchain\\releases-staging\\kiara-android\\Acces-serveur-Kiara-Android.apk": {
+      "bytes": 18911508,
+      "sha256": "3deed1d1420430c001abae1090ac9a5a2030237c486d5d91b01c37c8d9d37153"
+    }
+  }
+}

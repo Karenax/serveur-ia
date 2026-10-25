@@ -21,6 +21,7 @@ JOB_ATTEMPT_PREFIX = 'job_attempt:'
 MAX_JOB_ATTEMPT = 2 ** 63 - 1
 
 CLIENT_TYPES = {
+    'assistant_reminder': ('Rappel', 'Un rappel ou un travail programmé est arrivé à échéance.'),
     'job_completed': ('Tâche terminée', 'Un résultat est disponible dans vos tâches.'),
     'job_failed': ('Tâche interrompue', 'Consultez votre tâche pour connaître son état.'),
     'document_indexed': ('Document prêt', 'Le document peut être recherché et consulté.'),
@@ -102,7 +103,7 @@ def _target(value, owner):
     if kind == 'notifications':
         if set(value) != {'kind'}:
             raise ValueError('Destination de notification invalide.')
-    elif kind in ('job', 'document') and owner != 'admin':
+    elif kind in ('job', 'document', 'assistant') and owner != 'admin':
         _id(value.get('id'))
         if 'project' in value:
             _id(value['project'])

@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "turns": [
+    {
+      "question": "Combien font treize plus vingt-quatre ?",
+      "answer": "37",
+      "first_text_seconds": 19.267825000017183,
+      "pin_messages": 1
+    },
+    {
+      "question": "Ajoute cinq au résultat précédent.",
+      "answer": "42",
+      "first_text_seconds": 2.6435436999890953,
+      "pin_messages": 1
+    },
+    {
+      "question": "Multiplie maintenant ce dernier résultat par deux.",
+      "answer": "84",
+      "first_text_seconds": 2.8380861000041477,
+      "pin_messages": 1
+    },
+    {
+      "question": "Retire quatre à ce résultat.",
+      "answer": "80",
+      "first_text_seconds": 3.677883700001985,
+      "pin_messages": 1
+    },
+    {
+      "question": "Divise le résultat obtenu par deux.",
+      "answer": "40",
+      "first_text_seconds": 4.873491100006504,
+      "pin_messages": 1
+    }
+  ]
+}

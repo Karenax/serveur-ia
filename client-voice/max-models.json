@@ -1,0 +1,20 @@
+{
+  "format": 3,
+  "engine": "Whisper Turbo + Phonon français",
+  "source": "https://github.com/ggml-org/whisper.cpp",
+  "commit": "d1be6fde11ac6e0407606b4e42fe72d34add8037",
+  "upstream_reference": "https://github.com/huggingface/speech-to-speech/tree/0835002ad1c73cf1cc408ac10ebd2a19f777ae12",
+  "models": [
+    {
+      "name": "asr/ggml-large-v3-turbo-q5_0.bin",
+      "url": "https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/ggml-large-v3-turbo-q5_0.bin",
+      "bytes": 574041195,
+      "sha256": "394221709cd5ad1f40c46e6031ca61bce88931e6e088c188294c6d5a55ffa7e2"
+    }
+  ],
+  "native_sources": {
+    "src/whisper.cpp": "891168a838301bd2baa5e8b87422a854dafeeb7da914d40a2e4c6bf33ff448ed",
+    "include/whisper.h": "a7d19f7feb5be52426628ff07e0602de28a30dc4312d0d0603e1e536753f76dd",
+    "ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp": "7cb657dab61cd18816cdcc7b165efa90d46a0b51b9111c25978109d625c80370"
+  }
+}

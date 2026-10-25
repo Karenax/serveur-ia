@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "version": "3.5.50",
+  "update_available": true,
+  "base_and_voice_downloads_verified": true,
+  "voice_pack_authenticated": true,
+  "personal_credentials_preserved": true,
+  "qwen_processes_preserved": true,
+  "settings_keys_user_data_preserved": true,
+  "backup_schedule_preserved": true,
+  "low_voice": "Tiphaine",
+  "personal_clients_prepared": 1,
+  "automatic_max_download": false,
+  "server_voice_enabled": false
+}

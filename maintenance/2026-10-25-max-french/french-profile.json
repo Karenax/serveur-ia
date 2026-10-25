@@ -1,0 +1,17 @@
+{
+  "voice_reference_sha256": "b4ff8ba50a0cc032a1dc72d3e28d46230d0cbf403d6e000dd74fdf418785d701",
+  "qwen_model": {
+    "name": "tts/talker.gguf",
+    "url": "https://huggingface.co/Serveurperso/Qwen3-TTS-GGUF/resolve/b7ee2e8c7459c3bea99da23e3d178125a7d1713c/qwen-talker-1.7b-base-Q4_K_M.gguf",
+    "bytes": 1219245248,
+    "sha256": "ea393ebaf2167ea23ce9fc18b093822851358a950d7075cd47ab4f6ce23e887d"
+  },
+  "runtime_api": 5,
+  "source_hashes": {
+    "client-voice/max_native.py": "d24a1882ef982e54012d25fa46279a58116dd65f0702da87a3a2661ccf040368",
+    "client-voice/french_voice.py": "b20cbfecffb14ca99afd8714499be80c4ace5c298696db8cf3be4e62ea466dd5",
+    "client-voice/max_worker.py": "8b295852e6d6426883ab5d406530eb3d8286d3542e3d0e9974363a22acc4adc2",
+    "client-voice/package_max.py": "6d81454ec666d855dbbee930aaa403a815b9ba7709a790eac2402537a4da3b14",
+    "client-qwen/advanced_voice.py": "26fc54045dc9368827fd52ecdc1aae79ce88d72a9d37c10a78f6cedcc54f9f88"
+  }
+}

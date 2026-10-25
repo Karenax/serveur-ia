@@ -178,7 +178,7 @@ class Knowledge:
             self.thread=None;self.start()
 
     def resolve(self, db, item, memo=None):
-        """Re-read the source under Fred's transaction; never trust cached text or scope."""
+        """Re-read the source under Kiara's transaction; never trust cached text or scope."""
         owner = item['owner']; scope = item['scope']; kind = item['kind']
         if self.workspace.maintenance: return None
         if scope:
@@ -218,15 +218,21 @@ class Knowledge:
         else: return None
         return fresh if fresh['id'] == item['id'] else None
 
-    def retrieve(self, db, owner, scope, query, document=None, kinds=None, limit=6):
+    def retrieve(self, db, owner, scope, query, document=None, kinds=None, limit=6,exclude_conversation=None):
         if self.workspace.maintenance: return []
         with self.db() as cache:
             rows = cache.execute('SELECT data,vector FROM entries WHERE owner=? AND scope=?', (owner, scope or '')).fetchall()
+        if exclude_conversation:
+            canonical=exclude_conversation.replace('-','')
+            rows=[row for row in rows if not ((item:=json.loads(row['data']))['kind']=='conversation' and item['object'].replace('-','')==canonical)]
+        if not rows:return []
         vector = None
         if self.engine.state == 'pret':
             try: vector = self.engine.encode([query[:2000]], mode='query')[0]
             except (OSError, ValueError, http.client.HTTPException): pass
         from workspace import search_words
+        from assistant_commands import suppression_rules,suppressed
+        forgotten=suppression_rules(db,owner,scope)
         words = search_words(query); lexical = []; dense = []; eligible = {};memo={}
         for row in rows:
             item = json.loads(row['data'])
@@ -235,6 +241,7 @@ class Knowledge:
             # Filter scope and authorization before ranking, not after a global top-k.
             fresh = self.resolve(db, item,memo)
             if not fresh: continue
+            if fresh['kind']=='conversation' and suppressed(fresh['text'],forgotten):continue
             eligible[item['id']] = fresh
             normalized = ''.join(c for c in unicodedata.normalize('NFD', (item['title'] + ' ' + item['text']).casefold()) if unicodedata.category(c) != 'Mn')
             coverage = sum(bool(re.search(r'(?<!\w)' + re.escape(w) + r'(?!\w)', normalized)) for w in words)

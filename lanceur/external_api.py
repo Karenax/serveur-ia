@@ -1,4 +1,4 @@
-"""One model call for external OpenAI clients; never execute their tools on Fred.
+"""One model call for external OpenAI clients; never execute their tools on Kiara.
 
 Cloud transports reuse the installed Hermes adapters in an isolated interpreter.
 Keys travel over stdin and remain on the server. Cloud SSE is buffered per call;

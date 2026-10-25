@@ -1,4 +1,4 @@
-# Accès serveur Fred — Android
+# Accès serveur Kiara — Android
 
 Un même APK est fourni pour téléphone et tablette Android 8.0 ou plus récent
 (API 26 minimum, cible API 36). Il inclut les moteurs ARM64 et x86_64.
@@ -6,8 +6,8 @@ Les appareils Android limités aux applications 32 bits ne sont pas pris en char
 
 ## Installer et ouvrir
 
-Le fichier à installer est `dist/Acces-serveur-Fred-Android.apk`, version
-**1.0.10** (`versionCode=11`). Installer le nouvel APK par-dessus l’application
+Le fichier à installer est `dist/Acces-serveur-Kiara-Android.apk`, version
+**1.0.23** (`versionCode=24`). Installer le nouvel APK par-dessus l’application
 existante pour conserver le profil et les conversations.
 Transférer cet APK sur l’appareil puis l’ouvrir et autoriser son installation
 depuis l’application utilisée pour ouvrir le fichier.
@@ -24,10 +24,42 @@ Le moteur WireGuard est intégré à l’application : aucun VPN Android sépar�
 n’est nécessaire. La connexion dépend aussi de la disponibilité du serveur
 et des autorisations de l’accès personnel.
 
+## Conversation vocale Low
+
+La rubrique **Vocal** ouvre une page distincte, avec l’orbe d’écoute, de réflexion
+et de parole, les échanges écrits, le volume et la coupure du microphone.
+Le mode **Low** reconnaît le français sur l’appareil avec Whisper Small et utilise
+Qwen et la voix française du serveur Kiara. La dictée reste dans le chat.
+Le modèle de reconnaissance est partagé avec la dictée : s’il manque,
+l’application annonce environ **488 Mo** avant le téléchargement facultatif.
+Le serveur doit avoir sa voix activée et prête.
+
+Sans interruption vocale activée, le microphone se ferme pendant la réponse et
+se rouvre après la lecture. L’interruption en parlant dépend de l’annulation
+d’écho disponible sur l’appareil. Le passage en arrière-plan et le raccrochage
+ferment le microphone ; une conversation dure au maximum quinze minutes.
+Le mode Max reste destiné aux PC compatibles.
+
+## Mémoire, rappels et images
+
+La rubrique **Mémoire et rappels** permet de gérer les souvenirs personnels ou
+de projet, programmer les rappels et comptes rendus, puis consulter le bilan
+d’un projet. Ces commandes sont aussi disponibles dans les conversations écrites
+et orales. Le [guide commun](../GUIDE-ASSISTANT-KIARA.md) détaille les parcours.
+
+Dans **Vocal**, **Choisir une image** ouvre les fichiers et **Prendre une photo**
+utilise l’application photo du téléphone. Vérifier la prévisualisation avant la
+prochaine question ; l’image rejoint ce tour et reste dans la discussion.
+
+L’attente de **« Bonjour Kiara »** est facultative et expérimentale, limitée à
+l’application visible. Elle s’arrête en arrière-plan et ne fournit pas d’activation
+sur téléphone verrouillé. Les essais physiques micro, caméra, veille et batterie
+restent à réaliser ; voir le [rapport de livraison](../maintenance/2026-10-25-assistant-integration/README.md).
+
 ## Sources et notifications
 
 Dans un projet, ouvrir **Rechercher un passage dans les documents** puis
-**Ouvrir le passage cité**. Fred affiche le texte utilisé, sa révision et
+**Ouvrir le passage cité**. Kiara affiche le texte utilisé, sa révision et
 la page réelle lorsqu’elle existe. Une note n’affiche aucune page inventée.
 Une citation ancienne conserve son extrait et signale un document modifié
 ou supprimé. Les résultats des tâches conservent également leurs sources.
@@ -37,7 +69,7 @@ La rubrique **Notifications** retrouve les événements conservés sur le serveu
 y compris après une fermeture de l’application. **Marquer lu** et les
 préférences par type sont synchronisés avec le serveur. Pour les alertes
 Android, toucher **Activer les alertes Android** : la permission système est
-demandée à cet instant, jamais au démarrage. Un refus laisse la boîte Fred
+demandée à cet instant, jamais au démarrage. Un refus laisse la boîte Kiara
 utilisable.
 
 Le réglage serveur **Alertes discrètes** choisit le canal des prochaines
@@ -49,16 +81,21 @@ chacun des deux canaux ; ces choix système sont respectés.
 Les alertes système utilisent toujours une phrase générique ; aucun titre
 de document, extrait ou conversation privée n’y figure, même sur l’écran
 verrouillé. Un rattrapage produit au maximum une alerte, ouvrant le résultat
-le plus récent ; la boîte Fred conserve tous les événements. Le clic relit
+le plus récent ; la boîte Kiara conserve tous les événements. Le clic relit
 la notification après authentification avant d’ouvrir sa destination.
 La lecture, la révocation et la suppression d’un événement expiré retirent
 les alertes correspondantes. Au maximum vingt alertes restent dans le tiroir
 Android.
 
-Cette livraison reçoit les événements pendant l’utilisation de Fred et à
-sa prochaine ouverture. Une application complètement arrêtée ne reçoit pas
-de nouveau push. Les essais physiques de veille et de gestion de batterie
-restent distincts ; aucun fournisseur de push externe n’est configuré.
+Par défaut, les événements arrivent pendant l’utilisation de Kiara et à sa
+prochaine ouverture. Dans **Mémoire et rappels**, **Relever les alertes même
+lorsque Kiara est fermée** active un relevé facultatif géré par Android,
+avec autorisation des notifications. L’intervalle minimal est de quinze minutes,
+mais Android peut retarder le relevé selon le réseau et la batterie. Une heure
+précise n’est pas garantie. Sans réseau, téléphone éteint ou application forcée
+à l’arrêt, la boîte reste disponible à la prochaine connexion. Aucun fournisseur
+de push externe ni alarme exacte n’est configuré. La veille et la batterie
+physiques restent à vérifier.
 
 ## Préparer l’accès d’un appareil
 
@@ -113,6 +150,9 @@ source reste à l’emplacement choisi dans les fichiers de l’appareil.
 | Restauration serveur | Confirmation explicite avant de reprendre la synchronisation ; copie chiffrée de l’ancien historique local conservée |
 | Documents et pièces jointes | Sélecteur de fichiers Android et enregistrement dans un emplacement choisi |
 | Espaces de travail | Projets, documents, correcteur et tâches côté serveur |
+| Mémoire et rappels | Souvenirs personnels/de projet, rappels récurrents et bilans ; commandes écrites et orales |
+| Vocal et images | Conversation Low, galerie/photo choisie ; mot d’appel expérimental en application visible |
+| Alertes hors application | Relevé facultatif géré par Android, intervalle minimal de 15 minutes ; horaire non garanti |
 | Téléphone/tablette | Interface adaptative, tiroir latéral sur téléphone, clavier tactile |
 | Copie | Presse-papiers Android |
 | Connexion | Choix explicite HTTPS ou WireGuard, accès personnels existants |
@@ -175,7 +215,7 @@ Pour le développement uniquement :
 .\client-android\Build-Android.ps1 -Configuration Debug
 ```
 
-La sortie est alors `dist/Acces-serveur-Fred-Android-debug.apk`.
+La sortie est alors `dist/Acces-serveur-Kiara-Android-debug.apk`.
 Cette variante utilise le certificat debug, autorise l’inspection WebView
 et la démonstration de test ; la variante Release désactive ces fonctions.
 Les certificats debug et Release étant différents, ils ne permettent pas
@@ -208,7 +248,7 @@ Pour installer sur un appareil USB ou un émulateur démarré :
 ```powershell
 . .\client-qwen\android-outils\Environnement-Android.ps1
 adb devices
-adb install -r '.\client-android\dist\Acces-serveur-Fred-Android.apk'
+adb install -r '.\client-android\dist\Acces-serveur-Kiara-Android.apk'
 ```
 
 Les profils virtuels `Fred_Telephone_API36` et `Fred_Tablette_API36`
@@ -246,7 +286,7 @@ nouvel APK pour appliquer cette modification.
 
 ## Mises à jour automatiques 1.0.5
 
-Pendant l’utilisation de Fred, l’application recherche une nouvelle version
+Pendant l’utilisation de Kiara, l’application recherche une nouvelle version
 au démarrage après le choix de connexion, puis toutes les dix minutes.
 Elle télécharge automatiquement l’APK dans son stockage privé, via HTTPS ou
 WireGuard, avec l’accès personnel importé. Dans **Mon accès personnel →
@@ -256,7 +296,7 @@ recherche pas de mises à jour.
 
 Quand l’APK est prêt, le bandeau **Installer la mise à jour** apparaît.
 L’installation attend la fin de la conversation et un enregistrement confirmé.
-Android peut demander d’autoriser Fred à installer des applications ; au retour,
+Android peut demander d’autoriser Kiara à installer des applications ; au retour,
 l’installateur s’ouvre et demande la confirmation. Une annulation conserve
 l’application et ses données ; le bouton permet de recommencer.
 
@@ -272,20 +312,20 @@ nouvelle compilation Release suffit ensuite à la proposer aux appareils.
 
 **Première installation :** les versions 1.0.4 et précédentes n’ont pas cette
 fonction. Installer une fois manuellement l’APK 1.0.10 par-dessus l’application
-existante ; les versions suivantes pourront être téléchargées depuis Fred.
+existante ; les versions suivantes pourront être téléchargées depuis Kiara.
 
 ## Conversations Hermes 1.0.6
 
 Les conversations passent par Hermes sur
-le serveur, avec un profil par accès Fred et une session par discussion.
+le serveur, avec un profil par accès Kiara et une session par discussion.
 La création d’un nouvel accès prépare son profil automatiquement.
 La progression affiche les recherches et outils séparément de la réponse.
-Quand une action exige un accord, Fred décrit son effet : **Autoriser cette
+Quand une action exige un accord, Kiara décrit son effet : **Autoriser cette
 action** ne vaut que pour cette action ; **Refuser** empêche son exécution.
 
-Chaque envoi possède un identifiant durable. Après une coupure, Fred retrouve
+Chaque envoi possède un identifiant durable. Après une coupure, Kiara retrouve
 la réponse finalisée sur le serveur sans exécuter une seconde fois la demande.
-Un accord encore en attente est retrouvé après la réouverture de Fred, dans
+Un accord encore en attente est retrouvé après la réouverture de Kiara, dans
 la même conversation et le même projet.
 **Arrêter** attend la confirmation serveur. L’historique chiffré, les profils
 importés et les mises à jour automatiques APK sont conservés.
@@ -317,7 +357,7 @@ par défaut du serveur.
 
 Le modèle choisi sert au chat, au contexte et à la réflexion. Les possibilités
 d’image suivent ses capacités. Si ce modèle devient indisponible ou est retiré,
-Fred conserve le choix et demande de sélectionner un modèle disponible avant
+Kiara conserve le choix et demande de sélectionner un modèle disponible avant
 d’envoyer ; il ne remplace pas silencieusement le modèle. Un fournisseur distant
 peut répondre lorsque le Qwen local est déchargé.
 
@@ -343,7 +383,7 @@ l’APK signé et la validation isolée des contrôles de partage dans la consol
 
 Les boutons de réflexion suivent les niveaux annoncés pour le modèle choisi.
 Le choix est conservé par modèle dans les préférences chiffrées. Selon le
-modèle, Fred propose des niveaux précis, Sans/Activée ou un fonctionnement
+modèle, Kiara propose des niveaux précis, Sans/Activée ou un fonctionnement
 automatique sans réglage imposé. Pour Nemotron Ultra via OpenRouter, les choix
 sont Sans/Moyen/Élevé ; Élevé est son niveau maximal disponible.
 

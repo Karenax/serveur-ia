@@ -31,15 +31,15 @@ if ($LASTEXITCODE -ne 0) { throw 'Preparation fixture impossible.' }
 if ($LASTEXITCODE -ne 0) { throw 'Compilation fixture impossible.' }
 Invoke-FredAndroidSigning -ProjectRoot $projectRoot -PythonExecutable $fixturePython `
     -UnsignedApk (Join-Path $fixtureRoot 'app\build\outputs\apk\release\app-release-unsigned.apk') `
-    -AlignedApk (Join-Path $fixtureDist 'aligned.apk') -SignedApk (Join-Path $fixtureDist 'Acces-serveur-Fred-Android.apk')
-$fixtureApk = Join-Path $fixtureDist 'Acces-serveur-Fred-Android.apk'
+    -AlignedApk (Join-Path $fixtureDist 'aligned.apk') -SignedApk (Join-Path $fixtureDist 'Acces-serveur-Kiara-Android.apk')
+$fixtureApk = Join-Path $fixtureDist 'Acces-serveur-Kiara-Android.apk'
 $fixtureGradle = Get-Content -LiteralPath (Join-Path $fixtureRoot 'app\build.gradle') -Raw
 $fixtureVersion = [regex]::Match($fixtureGradle, "versionName\s+'([^']+)'").Groups[1].Value
 $fixtureCode = [int][regex]::Match($fixtureGradle, 'versionCode\s+(\d+)').Groups[1].Value
 $manifest = @{package='net.karenax.fred';version=$fixtureVersion;version_code=$fixtureCode;bytes=(Get-Item -LiteralPath $fixtureApk).Length;sha256=(Get-FileHash -LiteralPath $fixtureApk).Hash.ToLowerInvariant()}
 [System.IO.File]::WriteAllText((Join-Path $fixtureDist 'release.json'),($manifest|ConvertTo-Json),[System.Text.UTF8Encoding]::new($false))
 # Reuse the test DEX with a manifest targeting the signed Release application.
-$testManifest = '<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="net.karenax.fred.updatetest"><uses-sdk android:minSdkVersion="26" android:targetSdkVersion="36"/><application android:label="Fred update fixture"/><instrumentation android:name="net.karenax.fred.UpdateFlowInstrumentation" android:targetPackage="net.karenax.fred"/></manifest>'
+$testManifest = '<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="net.karenax.fred.updatetest"><uses-sdk android:minSdkVersion="26" android:targetSdkVersion="36"/><application android:label="Kiara update fixture"/><instrumentation android:name="net.karenax.fred.UpdateFlowInstrumentation" android:targetPackage="net.karenax.fred"/></manifest>'
 [System.IO.File]::WriteAllText((Join-Path $fixtureInstrumentation 'AndroidManifest.xml'),$testManifest,[System.Text.UTF8Encoding]::new($false))
 & (Join-Path $env:ANDROID_HOME 'build-tools\36.0.0\aapt2.exe') link -I (Join-Path $env:ANDROID_HOME 'platforms\android-36\android.jar') --manifest (Join-Path $fixtureInstrumentation 'AndroidManifest.xml') -o (Join-Path $fixtureInstrumentation 'unsigned.apk')
 if ($LASTEXITCODE -ne 0) { throw 'Manifeste instrumentation impossible.' }

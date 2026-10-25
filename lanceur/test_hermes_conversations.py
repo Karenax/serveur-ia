@@ -75,6 +75,7 @@ class ConversationsTests(unittest.TestCase):
         events = self.run_turn()
         text = ''.join(c.get('delta', {}).get('content', '') for e in events for c in e.get('choices', []))
         self.assertEqual(text, self.service.output)
+        self.assertIn('Tu es Kiara', self.service.calls[0][3]['instructions'])
         self.assertNotIn('Texte provisoire', text)
         self.assertEqual(self.completed(self.b)['status'], 'unknown')
         self.run_turn()

@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "route": "existing authenticated production gateway; fictional input only",
+  "hermes_agent_run_created": false,
+  "qwen_processes_preserved": true,
+  "keys_settings_user_histories_preserved": true,
+  "research_stages": [
+    "Recherche sur Internet…",
+    "Lecture des sources…"
+  ],
+  "web_source_count": 3,
+  "pages_read": 1,
+  "oral_context": {
+    "capacity": 16384,
+    "input_tokens": 1965,
+    "output_tokens": 512,
+    "omitted_messages": 0
+  },
+  "first_answer_text_seconds": 23.078,
+  "answer_characters": 185,
+  "phonon_first_pcm_seconds": 0.109,
+  "phonon_completed": true,
+  "limits": "One public fictional question, no microphone or browser audio playback; not a benchmark."
+}

@@ -1,4 +1,4 @@
-"""Enable only Fred's model in OpenCode Desktop's model picker preferences."""
+"""Enable only Kiara's model in OpenCode Desktop's model picker preferences."""
 from contextlib import closing
 import json
 from pathlib import Path

@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "transport": "two incremental PCM requests, same owned utterance, packaged worker",
+  "results": [
+    {
+      "offset": 0,
+      "samples": 48000,
+      "final": false,
+      "frames": [
+        {
+          "id": "36d8a37968f7065e6f07efd9b2996aaf",
+          "text": "Bonjour, la réunion du projet Orion.",
+          "metrics": {
+            "elapsed_ms": 238.3512999949744,
+            "rtf": 0.07945043333165813
+          }
+        },
+        {
+          "id": "36d8a37968f7065e6f07efd9b2996aaf",
+          "done": true,
+          "cancelled": false
+        }
+      ]
+    },
+    {
+      "offset": 48000,
+      "samples": 54400,
+      "final": true,
+      "frames": [
+        {
+          "id": "cb39ffef81283b31b9cbd37710dc075c",
+          "text": "Bonjour, la réunion du projet Orion est prévue demain à 15h.",
+          "metrics": {
+            "elapsed_ms": 418.2762999989791,
+            "rtf": 0.06535567187484048
+          }
+        },
+        {
+          "id": "cb39ffef81283b31b9cbd37710dc075c",
+          "done": true,
+          "cancelled": false
+        }
+      ]
+    }
+  ],
+  "total_audio_samples_sent": 102400,
+  "fixture_samples": 102400
+}

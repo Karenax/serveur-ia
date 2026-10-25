@@ -17,7 +17,7 @@ class AndroidUpdatesTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory()
         self.directory = Path(self.temp.name)
         self.payload = b'APK fixture without personal data' * 4000
-        self.apk = self.directory / 'Acces-serveur-Fred-Android.apk'
+        self.apk = self.directory / 'Acces-serveur-Kiara-Android.apk'
         self.apk.write_bytes(self.payload)
         self.release = {'package': 'net.karenax.fred', 'version': '1.0.5', 'version_code': 6,
                         'bytes': len(self.payload), 'sha256': hashlib.sha256(self.payload).hexdigest()}
@@ -42,6 +42,11 @@ class AndroidUpdatesTests(unittest.TestCase):
             self.release[key] = original
         self.publish()
         self.assertEqual(android_releases.status(self.directory)[1], self.apk)
+
+    def test_legacy_apk_remains_available_until_kiara_is_built(self):
+        legacy = self.apk.with_name('Acces-serveur-Fred-Android.apk')
+        self.apk.rename(legacy)
+        self.assertEqual(android_releases.status(self.directory)[1], legacy)
 
     def test_authenticated_stream_and_revoked_access(self):
         store = AccessStore(self.directory / 'private')

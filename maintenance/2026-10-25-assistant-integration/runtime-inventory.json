@@ -1,0 +1,33 @@
+{
+  "strata": {
+    "mismatch": {},
+    "extra": [
+      "altgraph",
+      "pefile",
+      "pyinstaller",
+      "pyinstaller-hooks-contrib",
+      "pywin32-ctypes"
+    ],
+    "lock_hash_valid": true
+  },
+  "eg2": {
+    "mismatch": {},
+    "extra": [],
+    "lock_hash_valid": true
+  },
+  "voix-serveur": {
+    "mismatch": {},
+    "extra": [],
+    "lock_hash_valid": true
+  },
+  "conversation-windows": {
+    "mismatch": {},
+    "extra": [],
+    "lock_hash_valid": true
+  },
+  "hermes-fred": {
+    "mismatch": {},
+    "extra": [],
+    "lock_hash_valid": true
+  }
+}

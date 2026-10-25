@@ -1,4 +1,4 @@
-"""Bounded OpenAI-compatible embeddings; the private EG2 token stays on Fred."""
+"""Bounded OpenAI-compatible embeddings; the private EG2 token stays on Kiara."""
 import base64
 import struct
 

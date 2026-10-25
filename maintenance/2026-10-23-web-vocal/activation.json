@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "server_only_change": true,
+  "version": "3.5.41",
+  "qwen_processes_preserved": true,
+  "keys_settings_user_data_preserved": true,
+  "backup_schedule_preserved": true,
+  "existing_client_release_preserved": true,
+  "hermes_ready": true,
+  "phonon_ready": true,
+  "voice": "Tiphaine",
+  "feature_sources": {
+    "lanceur/remote.py": "28c34c14d55a6ed5a3821e94a139885c2af99446f8cb16900ebaf2cc3a621eab",
+    "lanceur/voice_web.py": "c5b4c735d6045be2a3e4c65c19e79757d89ff7e26cb844662d43a68cfbe2bf8d"
+  }
+}

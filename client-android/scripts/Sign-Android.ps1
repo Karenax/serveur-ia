@@ -65,7 +65,7 @@ function Invoke-FredAndroidSigning {
         if (!(Test-Path -LiteralPath $keystore)) {
             $keystoreTemporary = Join-Path $SigningDirectory ([Guid]::NewGuid().ToString('N') + '.p12')
             try {
-                & $keytool -genkeypair -alias fred-client -keystore $keystoreTemporary -storetype PKCS12 -keyalg RSA -keysize 3072 -validity 10000 -dname 'CN=Acces Serveur Fred Android' -storepass:env FRED_ANDROID_SIGN_PASSWORD -keypass:env FRED_ANDROID_SIGN_PASSWORD -noprompt
+                & $keytool -genkeypair -alias fred-client -keystore $keystoreTemporary -storetype PKCS12 -keyalg RSA -keysize 3072 -validity 10000 -dname 'CN=Acces Serveur Kiara Android' -storepass:env FRED_ANDROID_SIGN_PASSWORD -keypass:env FRED_ANDROID_SIGN_PASSWORD -noprompt
                 if ($LASTEXITCODE -ne 0) { throw 'Creation de la cle de signature Android impossible.' }
                 Move-Item -LiteralPath $keystoreTemporary -Destination $keystore
             } finally {

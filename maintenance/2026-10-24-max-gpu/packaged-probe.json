@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "revision": "vulkan-q4-766e9e3506345e90",
+  "runtime_api": 4,
+  "models_present": false,
+  "models_loaded": false,
+  "probe_process_finished": true,
+  "selection_persisted": true,
+  "gpu": {
+    "checked": true,
+    "cards": [
+      {
+        "name": "Vulkan0",
+        "description": "Quadro P2200",
+        "free_bytes": 4688556852,
+        "total_bytes": 5490343936,
+        "kind": "dedicated",
+        "pci_id": "0000:41:00.0",
+        "id": "c1bdc62f938b9e7f5b00760d"
+      }
+    ],
+    "recommended": "c1bdc62f938b9e7f5b00760d",
+    "error": "",
+    "selection": "auto",
+    "scanning": false,
+    "supported": true
+  },
+  "scope": "Native GPU discovery on this NVIDIA host only; no AMD inference or voice benchmark."
+}

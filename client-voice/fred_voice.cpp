@@ -40,7 +40,8 @@ std::string quote(const std::string& text) {
     }
     return result + '"';
 }
-struct Job { int id; std::vector<float> audio; bool final; };
+struct Job { int id; std::vector<float> audio; bool final; unsigned epoch=0; };
+struct Turn {int id;int speech_id;std::string text;};
 
 // All audio/recognition buffers are session-local and never written to disk.
 class Voice {
@@ -58,15 +59,27 @@ public:
     int threads, segment=0, quiet=0, seen=0, last_partial=0, provisional_id=-1, last_final_id=-1;
     unsigned revision=0;
     double inference_seconds=0;
-    Voice(const char* path, const char* backends, int count):model(path),backend_dir(backends?backends:""),threads(std::clamp(count,1,4)) {
+    bool conversation=false,capture_paused=false;
+    unsigned capture_epoch=0;
+    int turn_id=0;
+    std::deque<Turn> turns;
+    Voice(const char* path, const char* backends, int count, bool talking=false):model(path),backend_dir(backends?backends:""),threads(std::clamp(count,1,4)),conversation(talking) {
         worker=std::thread([this]{run();});
     }
     ~Voice() { cancel(); if(worker.joinable()) worker.join(); }
+    void pause_capture(bool paused) {
+        std::lock_guard<std::mutex> lock(mutex);
+        if(!conversation || capture_paused==paused)return;
+        capture_paused=paused;++capture_epoch;
+        audio.clear();preroll.clear();finals.clear();partial.audio.clear();partial_pending=false;
+        speech=false;quiet=0;last_partial=0;provisional.clear();provisional_id=-1;++segment;++revision;
+    }
+    void ack(int id){std::lock_guard<std::mutex> lock(mutex);while(!turns.empty()&&turns.front().id<=id)turns.pop_front();}
     void cancel() { aborted=true; {std::lock_guard<std::mutex> lock(mutex);stopping=true;phase="cancelling";++revision;} changed.notify_all(); }
     void end_phrase() { // mutex held
         if(speech && audio.size() >= RATE/4) {
-            if(finals.size()>=MAX_JOBS) { phase="error";message="La dictée ne suit plus. Terminez puis recommencez avec des phrases plus courtes.";aborted=true; }
-            else finals.push_back({segment, std::move(audio), true});
+            if(finals.size()+(conversation?turns.size():0)>=MAX_JOBS) { phase="error";message=conversation?"La reconnaissance ne suit plus. Terminez puis recommencez avec des phrases plus courtes.":"La dictée ne suit plus. Terminez puis recommencez avec des phrases plus courtes.";aborted=true; }
+            else finals.push_back({segment, std::move(audio), true,capture_epoch});
         }
         audio.clear(); speech=false;quiet=0;last_partial=0;++segment;
         partial_pending=false;partial.audio.clear();changed.notify_all();
@@ -74,8 +87,9 @@ public:
     void feed(const int16_t* samples,int count) {
         if(!samples || count<=0 || count>RATE) return;
         std::lock_guard<std::mutex> lock(mutex);
-        if(phase!="listening" || stopping || aborted) return;
-        count=std::min(count,MAX_SESSION-seen);
+        if(phase!="listening" || stopping || aborted || capture_paused) return;
+        const int limit=conversation?900*RATE:MAX_SESSION;
+        count=std::min(count,limit-seen);
         if(count<=0) return;
         seen+=count;
         double energy=0;for(int i=0;i<count;++i) energy+=double(samples[i])*samples[i];
@@ -86,13 +100,13 @@ public:
             quiet=loud?0:quiet+count;
             if(quiet>=SILENCE || audio.size()>=MAX_SEGMENT) end_phrase();
             else if(audio.size()>=3*RATE && int(audio.size())-last_partial>=3*RATE) {
-                partial={segment,audio,false};partial_pending=true;last_partial=int(audio.size());changed.notify_all();
+                partial={segment,audio,false,capture_epoch};partial_pending=true;last_partial=int(audio.size());changed.notify_all();
             }
         } else {
             for(int i=0;i<count;++i) preroll.push_back(float(samples[i])/32768.f);
             if(preroll.size()>RATE/4) preroll.erase(preroll.begin(),preroll.end()-RATE/4);
         }
-        if(seen>=MAX_SESSION) {stopping=true;phase="finishing";message="Limite de deux minutes atteinte. Finalisation du texte…";end_phrase();}
+        if(seen>=limit) {stopping=true;phase="finishing";message=conversation?"Conversation terminée après quinze minutes.":"Limite de deux minutes atteinte. Finalisation du texte…";end_phrase();}
         ++revision;
     }
     void stop() {
@@ -106,7 +120,13 @@ public:
         std::ostringstream s;
         s<<"{\"phase\":"<<quote(phase)<<",\"message\":"<<quote(message)<<",\"text\":"<<quote(text)
          <<",\"seconds\":"<<seen/RATE<<",\"revision\":"<<revision<<",\"pending\":"<<finals.size()
-         <<",\"processing\":"<<(processing?"true":"false")<<",\"inference_seconds\":"<<inference_seconds<<"}";
+         <<",\"processing\":"<<(processing?"true":"false")<<",\"inference_seconds\":"<<inference_seconds;
+        if(conversation){
+            s<<",\"speech_id\":"<<segment+(speech?1:0)<<",\"speaking\":"<<(speech&&quiet<RATE/4?"true":"false")
+             <<",\"partial\":"<<quote(provisional)<<",\"partial_speech_id\":"<<provisional_id+1<<",\"turns\":[";
+            bool first=true;for(const auto& turn:turns){if(!first)s<<',';first=false;s<<"{\"id\":"<<turn.id<<",\"speech_id\":"<<turn.speech_id<<",\"text\":"<<quote(turn.text)<<'}';}s<<']';
+        }
+        s<<'}';
         return s.str();
     }
     static bool abort_callback(void* userdata) {return static_cast<Voice*>(userdata)->aborted.load();}
@@ -152,8 +172,8 @@ public:
                 {
                     std::lock_guard<std::mutex> lock(mutex);
                     processing=false;inference_seconds+=std::chrono::duration<double>(std::chrono::steady_clock::now()-started).count();
-                    if(!aborted) {
-                        if(job.final) {if(!text.empty()) committed=clean(committed+" "+text);last_final_id=job.id;if(job.id==provisional_id){provisional.clear();provisional_id=-1;}}
+                    if(!aborted && (!conversation || job.epoch==capture_epoch)) {
+                        if(job.final) {if(!text.empty()){if(conversation){if(turns.size()>=MAX_JOBS)throw std::runtime_error("Trop de phrases en attente. Raccrochez puis recommencez.");turns.push_back({++turn_id,job.id+1,text});}else committed=clean(committed+" "+text);}last_final_id=job.id;if(job.id==provisional_id){provisional.clear();provisional_id=-1;}}
                         else if(job.id>last_final_id && job.id>=provisional_id) {provisional=text;provisional_id=job.id;}
                     }
                     ++revision;
@@ -174,6 +194,12 @@ void* fred_voice_create(const char* model,const char* backends,int threads) {
     if(!model || !*model) return nullptr;
     try {return new Voice(model,backends,threads);} catch(...) {return nullptr;}
 }
+void* fred_voice_create_conversation(const char* model,const char* backends,int threads) {
+    if(!model || !*model)return nullptr;
+    try{return new Voice(model,backends,threads,true);}catch(...){return nullptr;}
+}
+void fred_voice_pause_capture(void* handle,bool paused){if(handle)static_cast<Voice*>(handle)->pause_capture(paused);}
+void fred_voice_ack(void* handle,int turn){if(handle)static_cast<Voice*>(handle)->ack(turn);}
 void fred_voice_feed(void* handle,const int16_t* audio,int count) {if(handle) static_cast<Voice*>(handle)->feed(audio,count);}
 void fred_voice_stop(void* handle) {if(handle) static_cast<Voice*>(handle)->stop();}
 void fred_voice_cancel(void* handle) {if(handle) static_cast<Voice*>(handle)->cancel();}

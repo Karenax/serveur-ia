@@ -1,0 +1,53 @@
+{
+  "fresh": {
+    "plan": "5cc5399fb20b135f853bd7c261939ce849a896107207fd3933e0142737d157a4",
+    "download_bytes": 2555847223,
+    "required_disk_bytes": 5464174954,
+    "reused_bytes": 0,
+    "engine": "Parakeet + Qwen3-TTS",
+    "hardware": {
+      "checked": true,
+      "eligible": true,
+      "cards": [
+        {
+          "vendor": "nvidia",
+          "name": "NVIDIA fixture for size quotation"
+        }
+      ]
+    }
+  },
+  "low_installed": {
+    "plan": "5cc5399fb20b135f853bd7c261939ce849a896107207fd3933e0142737d157a4",
+    "download_bytes": 1876045415,
+    "required_disk_bytes": 4784373146,
+    "reused_bytes": 679801808,
+    "engine": "Parakeet + Qwen3-TTS",
+    "hardware": {
+      "checked": true,
+      "eligible": true,
+      "cards": [
+        {
+          "vendor": "nvidia",
+          "name": "NVIDIA fixture for size quotation"
+        }
+      ]
+    }
+  },
+  "max_installed": {
+    "plan": "5cc5399fb20b135f853bd7c261939ce849a896107207fd3933e0142737d157a4",
+    "download_bytes": 46151015,
+    "required_disk_bytes": 444782538,
+    "reused_bytes": 0,
+    "engine": "Parakeet + Qwen3-TTS",
+    "hardware": {
+      "checked": true,
+      "eligible": true,
+      "cards": [
+        {
+          "vendor": "nvidia",
+          "name": "NVIDIA fixture for size quotation"
+        }
+      ]
+    }
+  }
+}

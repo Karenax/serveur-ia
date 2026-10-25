@@ -1,4 +1,4 @@
-"""Codex OAuth request headers, scoped to the Fred-owned Hermes process.
+"""Codex OAuth request headers, scoped to the Kiara-owned Hermes process.
 
 The native SDK resolves key_cmd callables while preparing each request. Derive
 the workspace headers afterwards, from that request's actual bearer, so token
@@ -6,7 +6,7 @@ rotation never leaves a previous account's headers on a reused client.
 """
 
 # Kept as standalone source because the installed Hermes interpreter cannot
-# import modules bundled inside Fred's executable. The same source is exercised
+# import modules bundled inside Kiara's executable. The same source is exercised
 # by install() and injected into that interpreter before its gateway starts.
 PATCH_SOURCE = r'''
 def _fred_install_codex_headers():

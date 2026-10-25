@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "version": "3.5.41",
+  "shared_suites": 6,
+  "ux_warnings": 0,
+  "checks": [
+    "oral 16384 capacity replaces written context gauge during call",
+    "actual input token count comes from the server event",
+    "reasoning remains hidden during voice and returns after hangup",
+    "written context counter pauses during call",
+    "all existing voice, history, corrector and model picker suites pass"
+  ],
+  "android_assets_verified": true
+}

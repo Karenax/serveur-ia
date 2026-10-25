@@ -56,6 +56,7 @@ function contextRefresh(){
  contextTimer=setTimeout(contextCount,650);
 }
 async function contextCount(){
+ if(window.conversationBusy)return;
  if(contextPending)return;
  if(!connected||!conversationModelAvailable()){contextSignature='';$('context-label').textContent=connected?'Contexte · choisissez un modèle disponible':'Contexte · connexion requise';$('context-progress').value=0;return;}
  const history=messages.map(m=>({role:m.role,content:chatRequestContent(m),...(m.reasoning_content?{reasoning_content:m.reasoning_content}:{})}));

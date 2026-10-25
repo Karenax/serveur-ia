@@ -1,0 +1,79 @@
+{
+  "source": "google/fleurs, fr_fr/test, first 8 rows",
+  "license": "CC-BY-4.0",
+  "files": [
+    {
+      "file": "fleurs-fr-1.wav",
+      "text": "L’accident a eu lieu en terrain montagneux, et il semblerait que cela ait été causé par un incendie malveillant.",
+      "gender": 1,
+      "rate": 16000,
+      "seconds": 10.2,
+      "source_sha256": "c834367fd212902124bdd0e0f6c1f16b5561af6386600f145e5aec50008b298d",
+      "file_sha256": "9deff27009a368dfe11739192ff5e9feb725f9c4a7520d5e2942036a55abcecf"
+    },
+    {
+      "file": "fleurs-fr-2.wav",
+      "text": "Nous sommes d'accord avec la déclaration de l'USOC (Comité olympique des États-Unis) selon laquelle les intérêts de nos athlètes et de nos clubs, ainsi que de leur sport, pourraient être mieux servis. Cela peut être fait en allant de l'avant et en procédant plutôt à des changements significatifs au sein de notre organisation, qu'à la révocation d'accréditation.",
+      "gender": 0,
+      "rate": 16000,
+      "seconds": 23.4,
+      "source_sha256": "9b9450e1cb9ea3badb2223f726adabb754cd6ff2278b9fc4dc2ad86c73791db7",
+      "file_sha256": "f8959bdb68c74e7aa6164d05dd3b596a9d18d565a90b60d258d7af68aad03453"
+    },
+    {
+      "file": "fleurs-fr-3.wav",
+      "text": "Il a ajouté qu’« on ne devrait cependant pas leur demander d’assumer des obligations qui dépassent leur stade de développement, leur responsabilité et leurs capacités. »",
+      "gender": 0,
+      "rate": 16000,
+      "seconds": 8.28,
+      "source_sha256": "05ccf3ccc2ab4b72d056c3f02e3ffcf6ea0f37b1c42bea5c35789c85291fbdc5",
+      "file_sha256": "76cd57e84a7c221f68a6b821f667e86eafbb95c118495e055a8869fd5fbead9e"
+    },
+    {
+      "file": "fleurs-fr-4.wav",
+      "text": "Le rugissement du tigre ne ressemble pas au rugissement ample du lion, mais plutôt à une phrase dont les mots seraient des cris et des grondements.",
+      "gender": 1,
+      "rate": 16000,
+      "seconds": 10.2,
+      "source_sha256": "fc42db1a8eb9339fa89be21f013b2e2ea231b3eb9b4af3bf82c7a3a1aae78b3b",
+      "file_sha256": "860c98112346499553325ebe971cfc01b1b78548ed6d9a938a270bb153165a94"
+    },
+    {
+      "file": "fleurs-fr-5.wav",
+      "text": "Le même mois, un autre avion de ligne a fait une sortie de piste à Mashhad et a heurté un mur, tuant ainsi dix-sept personnes.",
+      "gender": 1,
+      "rate": 16000,
+      "seconds": 8.34,
+      "source_sha256": "315a3fc3328acea267098f2cbc0cfa5dccee6e125c6861c229335f9b476cb4b9",
+      "file_sha256": "95b7129914302094908768afa8c5809e8c2dc432e6ff781d574f64b2737d8a2e"
+    },
+    {
+      "file": "fleurs-fr-6.wav",
+      "text": "Giancarlo Fisichella a perdu le contrôle de sa voiture et a terminé la course peu après le démarrage.",
+      "gender": 0,
+      "rate": 16000,
+      "seconds": 7.2,
+      "source_sha256": "bbd0709fac97a44791bceecac6d7e9ebf799625bbe62f13658d5634c7a8ddc2e",
+      "file_sha256": "66c5b4f86ee316574d7c30b393d5e918a18b10af8577ea3b1c30d53b9840d295"
+    },
+    {
+      "file": "fleurs-fr-7.wav",
+      "text": "Malgré le net avantage de Del Potro pendant le deuxième set, il a fallu passer par un tie-break une fois que le score a atteint 6-6.",
+      "gender": 0,
+      "rate": 16000,
+      "seconds": 8.4,
+      "source_sha256": "f149d230427496afa3223808edee58e64316f2bd3d879ad9c962b12d2f0bf9a3",
+      "file_sha256": "d94be11acef086e64414179b905a8a308fbeac9dacb126caa54289734d7bfed0"
+    },
+    {
+      "file": "fleurs-fr-8.wav",
+      "text": "Malheureusement, il est difficile d'étudier le flux de circulation car le comportement des conducteurs ne peut être prédit avec cent pour cent de certitude.",
+      "gender": 0,
+      "rate": 16000,
+      "seconds": 11.64,
+      "source_sha256": "7ec432adcd9dc8b56c41238f16fd11ec3acd93a9fd8c4b5d14a567e59aa9e7c3",
+      "file_sha256": "098c3fd4780597dd8106ada52b191d2e5fdd5b2966efaa99245c9062065bbdaf"
+    }
+  ],
+  "downloaded_bytes": 445499532
+}

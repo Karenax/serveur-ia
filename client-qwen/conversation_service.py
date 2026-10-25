@@ -14,31 +14,50 @@ ACTIVE={'installing','loading','listening','stopping','finishing','cancelling'}
 class ConversationService:
     def __init__(self,resources,cache=None,*,mode='conversation'):
         self.mode=mode
-        self.resources=Path(resources);self.spec=json.loads((self.resources/'conversation-models.json').read_text(encoding='utf-8'))
+        self.resources=Path(resources)
+        spec=self.resources/('wakeword/manifest.json' if mode=='wakeword' else 'conversation-models.json')
+        self.spec=json.loads(spec.read_text(encoding='utf-8')) if spec.is_file() or mode!='wakeword' else {'files':[],'asr':'Activation vocale indisponible'}
         self.cache=Path(cache) if cache else Path(os.environ.get('LOCALAPPDATA',str(Path.home())))/'QwenClient/asr'
+        if mode=='wakeword':self.cache=self.resources/'wakeword'
         self.lock=threading.RLock();self.process=None;self.thread=None;self.cancelled=threading.Event()
         self.value={'phase':'idle','session':'','partial':'','text':'','turns':[]};self.closed=False;self.finishing=False
         self.mute_requested=False
+        self.playback_requested=False;self.interruptions_requested=False
+        self.max_bridge=None
     def installed(self):
+        if self.mode=='wakeword' and not self.spec['files']:return False
         return all((self.cache/f['name']).is_file() and (self.cache/f['name']).stat().st_size==f['bytes'] for f in self.spec['files'])
+    def install_files(self):
+        return [f for f in self.spec['files'] if self.value.get('quality')!='max' or f['name'] in ('silero-vad.onnx','smart-turn.onnx')]
     def status(self):
-        with self.lock:return {**self.value,'installed':self.installed(),'model':self.spec.get('asr','Parakeet v3'),'model_bytes':sum(f['bytes'] for f in self.spec['files']),'local':True}
-    def _verify(self):
+        with self.lock:return {**self.value,'installed':self.installed(),'max_tools_bytes':sum(f['bytes'] for f in self.spec['files'] if f['name'] in ('silero-vad.onnx','smart-turn.onnx')),'max_tools_installed':all((self.cache/f['name']).is_file() and (self.cache/f['name']).stat().st_size==f['bytes'] for f in self.spec['files'] if f['name'] in ('silero-vad.onnx','smart-turn.onnx')),'model':(self.max_bridge.get('recognizer','Parakeet v3 · progressif') if self.max_bridge and self.max_bridge.get('progressive') else 'Voxtral Realtime') if self.value.get('quality')=='max' else self.spec.get('asr','Parakeet v3'),'model_bytes':sum(f['bytes'] for f in self.install_files()),'local':self.value.get('execution','pc')=='pc'}
+    def _verify(self, models=None):
         for item in self.spec['files']:
-            with (self.cache/item['name']).open('rb') as stream:
+            if self.value.get('quality')=='max' and item['name'] not in ('silero-vad.onnx','smart-turn.onnx'):continue
+            with ((models or self.cache)/item['name']).open('rb') as stream:
                 if hashlib.file_digest(stream,'sha256').hexdigest()!=item['sha256']:raise ValueError('Modèle de conversation corrompu. Réinstallez-le.')
     def _send(self,value):
         if self.process and self.process.poll() is None:
             self.process.stdin.write(json.dumps(value)+'\n');self.process.stdin.flush()
     def action(self,value):
-        if not isinstance(value,dict) or set(value)-{'action','session','turn','muted'}:raise ValueError('Commande de conversation invalide.')
+        if not isinstance(value,dict) or set(value)-{'action','session','turn','muted','quality','execution','playing','interruptions'}:raise ValueError('Commande de conversation invalide.')
         command=value.get('action')
+        if self.mode=='wakeword' and command in ('start','install') and not self.installed():raise ValueError('Le modèle d’activation est absent. Mettez le client à jour.')
+        if ('quality' in value or 'execution' in value) and (command not in ('start','install') or self.mode!='conversation' or command=='install' and 'execution' in value):raise ValueError('Choisissez la qualité avant de démarrer la conversation.')
+        if value.get('quality','low') not in ('low','max') or value.get('execution','pc') not in ('pc','server'):raise ValueError('Profil vocal invalide.')
+        if value.get('quality')=='max' and not self.max_bridge:raise ValueError('Le moteur Max n’est pas raccordé à ce client.')
         if 'muted' in value and command!='mute':raise ValueError('Commande de microphone invalide.')
+        if any(key in value for key in ('playing','interruptions')) and command!='playback':raise ValueError('Commande de lecture invalide.')
         with self.lock:
             if self.closed:raise ValueError('Client en cours de fermeture.')
-            if command in ('stop','cancel','ack','mute'):
+            if command in ('stop','cancel','ack','mute','playback'):
                 if not value.get('session') or value['session']!=self.value['session']:raise ValueError('Cette session vocale est terminée.')
-                if command=='mute':
+                if command=='playback':
+                    if self.mode!='conversation' or self.value.get('quality')!='max' or self.value.get('phase') not in ('loading','listening') or type(value.get('playing')) is not bool or type(value.get('interruptions')) is not bool:
+                        raise ValueError('Commande de lecture invalide.')
+                    self.playback_requested=value['playing'];self.interruptions_requested=value['interruptions']
+                    self._send({'action':'playback','playing':self.playback_requested,'interruptions':self.interruptions_requested})
+                elif command=='mute':
                     if self.mode!='conversation' or self.value['phase'] not in ('loading','listening') or type(value.get('muted')) is not bool:
                         raise ValueError('Le microphone peut être coupé pendant une conversation active.')
                     self.mute_requested=value['muted'];self.value['mute_pending']=True
@@ -60,8 +79,8 @@ class ConversationService:
                 for item in self.spec['files']:
                     path=self.cache/item['name'];path.unlink(missing_ok=True);path.with_suffix(path.suffix+'.part').unlink(missing_ok=True)
                 self.value.update(phase='idle',text='',partial='',turns=[],message='Modèle vocal désinstallé.');return self.status()
-            if command=='start' and not self.installed():raise ValueError('Installez les modèles de conversation avant de parler.')
-            self.cancelled.clear();self.finishing=False;self.mute_requested=False;self.value={'phase':'installing' if command=='install' else 'loading','session':secrets.token_hex(16),'partial':'','text':'','turns':[],'muted':False,'mute_pending':False}
+            if command=='start' and not self.installed() and value.get('quality')!='max':raise ValueError('Installez les modèles de conversation avant de parler.')
+            self.cancelled.clear();self.finishing=False;self.mute_requested=False;self.playback_requested=False;self.interruptions_requested=False;self.value={'phase':'installing' if command=='install' else 'loading','session':secrets.token_hex(16),'partial':'','text':'','turns':[],'muted':False,'mute_pending':False,'quality':value.get('quality','low'),'execution':value.get('execution','pc')}
             self.thread=threading.Thread(target=self._install if command=='install' else self._run,daemon=True);self.thread.start()
             return self.status()
     def _install(self):
@@ -78,9 +97,10 @@ class ConversationService:
     def _install_locked(self):
         try:
             self.cache.mkdir(parents=True,exist_ok=True)
-            if shutil.disk_usage(self.cache).free<sum(f['bytes'] for f in self.spec['files'])+20*1024*1024:raise OSError('Espace disque insuffisant pour la conversation.')
+            files=self.install_files()
+            if shutil.disk_usage(self.cache).free<sum(f['bytes'] for f in files)+20*1024*1024:raise OSError('Espace disque insuffisant pour la conversation.')
             opener=urllib.request.build_opener(HTTPSRedirect());downloaded=0
-            for item in self.spec['files']:
+            for item in files:
                 path=self.cache/item['name'];part=path.with_suffix(path.suffix+'.part')
                 # A repair downloads only missing/corrupt files. Both Windows
                 # modes use this same immutable, hash-checked model cache.
@@ -108,20 +128,28 @@ class ConversationService:
                 with self.lock:self.value.update(phase='stopped',message='Installation arrêtée.')
     def _run(self):
         try:
-            self._verify()
+            models=self.cache
+            if self.value.get('quality')=='max':
+                self.max_prepare()
+                if self.cancelled.is_set():return
+                models=self.max_models()
+            self._verify(models)
             if self.cancelled.is_set():return
             executable=self.resources/'conversation-worker/conversation-worker.exe'
             if executable.exists():command=[str(executable)]
             else:
                 root=Path(__file__).resolve().parent.parent
                 command=[str(root/'toolchain/conversation-client-python/Scripts/python.exe'),'-X','utf8',str(root/'client-voice/conversation_worker.py')]
-            command+=['--models',str(self.cache),'--resources',str(self.resources),'--mode',self.mode]
+            command+=['--models',str(models),'--resources',str(self.resources),'--mode',self.mode]
+            if self.value.get('quality')=='max':command+=['--quality','max']
             process=subprocess.Popen(command,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,text=True,encoding='utf-8',creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
             with self.lock:
                 self.process=process
+                if self.value.get('quality')=='max':self._send({**self.max_bridge,'session':self.value['session']})
                 if self.cancelled.is_set():self._send({'action':'stop'})
                 elif self.finishing:self._send({'action':'finish'})
                 elif self.mute_requested:self._send({'action':'mute','muted':True})
+                if self.playback_requested:self._send({'action':'playback','playing':True,'interruptions':self.interruptions_requested})
             for line in process.stdout:
                 if len(line)>128000:raise ValueError('Réponse du moteur vocal trop volumineuse.')
                 value=json.loads(line)

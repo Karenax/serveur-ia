@@ -1,4 +1,4 @@
-"""Failure and concurrency regressions from the two Fred audits."""
+"""Failure and concurrency regressions from the two Kiara audits."""
 import hashlib
 import io
 import json

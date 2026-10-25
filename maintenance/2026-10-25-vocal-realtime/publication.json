@@ -1,0 +1,10 @@
+{
+  "version": "3.5.51",
+  "sha256": "5dc90c1d8bc8055eb5b864be405eda3af29372dbef2a35e2138dc29229acee60",
+  "bytes": 94502026,
+  "signature_verified": true,
+  "personal_clients_prepared": 1,
+  "personal_credentials_preserved": true,
+  "voice_revision": "vocal-rt-f88da3269d16c833",
+  "voice_pack_bytes": 109024358
+}

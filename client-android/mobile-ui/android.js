@@ -5,7 +5,7 @@ const androidBridge=window.AndroidClient;
 $('android-copy-api').onclick=()=>androidBridge.copyText($('local-api').textContent);
 $('android-copy-api-key').onclick=()=>androidBridge.copyText($('local-api-key').value);
 $('toggle-api-key').onclick=()=>{const input=$('local-api-key');input.type=input.type==='password'?'text':'password';$('toggle-api-key').textContent=input.type==='password'?'Afficher la clé':'Masquer la clé';};
-function androidRequireBridge(){if(!androidBridge)throw new Error('Cette fonction est disponible dans l’application Fred Android.');return androidBridge;}
+function androidRequireBridge(){if(!androidBridge)throw new Error('Cette fonction est disponible dans l’application Kiara Android.');return androidBridge;}
 function androidNativeResult(value){
   if(typeof value==='string'&&value.trim().startsWith('{'))value=JSON.parse(value);
   if(value?.error)throw new Error(typeof value.error==='string'?value.error:value.error.message||'Action refusée.');
@@ -34,7 +34,7 @@ function androidUpdateState(update){
     const status=wsElement('p');status.id='android-update-status';status.setAttribute('role','status');
     const check=wsElement('button','Rechercher une mise à jour','secondary');check.type='button';check.id='android-update-check';
     check.onclick=()=>wsTry(async()=>androidUpdateState(await api('/client/update/check',{})));
-    card.append(status,check,wsElement('p','Fred recherche et télécharge les nouvelles versions pendant son utilisation. Android vous demandera de confirmer l’installation.'));
+    card.append(status,check,wsElement('p','Kiara recherche et télécharge les nouvelles versions pendant son utilisation. Android vous demandera de confirmer l’installation.'));
     pane.append(card);
     const banner=wsElement('div',undefined,'settings-card');banner.id='android-update-banner';banner.hidden=true;
     const label=wsElement('span');label.id='android-update-label';
@@ -55,7 +55,7 @@ function androidUpdateState(update){
   if(phase==='downloading'&&value.bytes>0)$('android-update-status').textContent+=' '+Math.min(100,Math.round(value.received/value.bytes*100))+' %';
   $('android-update-check').disabled=!loggedIn||['checking','downloading'].includes(phase);
   $('android-update-banner').hidden=!value.available;
-  $('android-update-label').textContent=value.available?'Fred Android '+value.version+' est prêt à installer.':'';
+  $('android-update-label').textContent=value.available?'Kiara Android '+value.version+' est prêt à installer.':'';
   $('android-update-install').disabled=androidUpdateInstalling||conversationLocked()||['checking','downloading'].includes(phase);
 }
 androidUpdateState();
@@ -75,9 +75,9 @@ function androidNotificationControls(){
   try{const state=androidNativeResult(androidRequireBridge().notificationStatus());
     $('android-notification-enable').textContent=state.enabled?'Désactiver les alertes Android':'Activer les alertes Android';
     $('android-notification-enable').disabled=!loggedIn;
-    $('android-notification-status').textContent=state.enabled&&state.permitted?(state.discreet?'Alertes silencieuses actives pendant l’utilisation de Fred.':'Alertes avec le son Android pendant l’utilisation de Fred, selon vos réglages système.')+' Aucun texte privé sur l’écran verrouillé.':state.enabled?'Android bloque les alertes. La boîte de notifications reste disponible ; vérifiez les autorisations système.':'La boîte reste disponible dans Fred. Activez les alertes pour demander l’autorisation Android. L’application arrêtée reçoit ses notifications à la prochaine ouverture.';
+    $('android-notification-status').textContent=state.enabled&&state.permitted?(state.discreet?'Alertes silencieuses actives pendant l’utilisation de Kiara.':'Alertes avec le son Android pendant l’utilisation de Kiara, selon vos réglages système.')+' Aucun texte privé sur l’écran verrouillé.':state.enabled?'Android bloque les alertes. La boîte de notifications reste disponible ; vérifiez les autorisations système.':'La boîte reste disponible dans Kiara. Activez les alertes pour demander l’autorisation Android. L’application arrêtée reçoit ses notifications à la prochaine ouverture.';
     if(state.storage_available===false){$('android-notification-enable').disabled=true;$('android-notification-status').textContent='Le stockage local des alertes est illisible ; la boîte serveur reste disponible et votre fichier est conservé.';}
-  }catch(e){$('android-notification-status').textContent='La boîte de notifications reste disponible dans Fred.';}
+  }catch(e){$('android-notification-status').textContent='La boîte de notifications reste disponible dans Kiara.';}
 }
 window.androidInboxChanged=payload=>{
   androidLastInbox=payload;
@@ -136,7 +136,7 @@ async function androidSaveFile(filename,data,mime='text/plain;charset=utf-8'){
 }
 wsDownload=function(filename,data,mime){return wsTry(()=>androidSaveFile(filename,data,mime||'text/markdown;charset=utf-8'));};
 $('export-conversations').onclick=()=>wsTry(async()=>{
-  save();await androidSaveFile('conversations-fred.json',JSON.stringify({version:1,conversations:library},null,2),'application/json');
+  save();await androidSaveFile('conversations-kiara.json',JSON.stringify({version:1,conversations:library},null,2),'application/json');
 });
 const androidOriginalCopyText=copyText;
 copyText=async function(text){
@@ -211,3 +211,13 @@ document.addEventListener('visibilitychange',()=>{
   if(document.hidden){window.androidFlush();}
   else{clientState().then(()=>models());}
 });
+// A catalogue probe can run before the native connection has finished starting.
+// This is progress, not an error banner; existing actionable errors stay visible.
+const androidSharedError=error;
+error=function(value){
+  if(['connecting','connection_check_pending'].includes(value?.code)){
+    if(!connected){$('model').textContent='Recherche des modèles…';uiConnectionStatus({...uiLastConnection,checking:true});}
+    return;
+  }
+  androidSharedError(value);
+};

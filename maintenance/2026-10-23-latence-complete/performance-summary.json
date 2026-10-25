@@ -1,0 +1,9 @@
+{
+  "context_limit_verified": true,
+  "https_first_text_seconds": 6.384203000001435,
+  "input_tokens": 1014,
+  "warm_repeated_local_first_text_seconds": 1.7441433000058169,
+  "whole_microphone_to_audio_latency_measured": false,
+  "less_than_five_seconds_guaranteed": false,
+  "model_processes_preserved": true
+}

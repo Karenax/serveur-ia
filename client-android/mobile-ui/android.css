@@ -1,4 +1,4 @@
-/* Android additions to the shared Fred interface. Keep the desktop assets intact. */
+/* Android additions to the shared Kiara interface. Keep the desktop assets intact. */
 @media(max-width:620px){body.android-client .send-row{padding-right:60px}body.android-client .send-row>#send,body.android-client .send-row>#cancel{right:8px;bottom:10px}body.android-client .privacy,body.android-client .context-gauge{font-size:11px}}
 :root{--android-height:100dvh;--reading-font:system-ui,Roboto,sans-serif}
 html,body{height:100%;overscroll-behavior:none;-webkit-text-size-adjust:100%}
@@ -62,3 +62,5 @@ body.android-keyboard .composer{max-height:67%}
 }
 @media(min-width:900px){.ws-grid{grid-template-columns:180px minmax(0,1fr)}.corrector-layout{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.corrector-layout{flex:1}#corrector-text{min-height:300px;height:100%}.corrector-result-card{max-height:none}#corrector-result{max-height:none;flex:1}}
 @media(max-height:520px) and (orientation:landscape){.workspace-top{min-height:48px}.composer{max-height:66%}.empty .assistant-avatar,.empty .eyebrow,.empty p{display:none}.empty h2{font-size:22px;margin-bottom:12px}.thinking-control{flex-basis:auto;order:0;width:auto}.thinking-bar{width:auto}.thinking-segment span{min-height:32px;padding:6px}.composer-bottom{display:none}.connection-popover,.ws-document-side{top:48px}}
+/* Vocal shares the desktop page; touch targets match the other Android controls. */
+.android-client .voice-view button,.android-client .voice-view select,.android-client .voice-check,.android-client .voice-view input[type="range"]{min-height:44px}

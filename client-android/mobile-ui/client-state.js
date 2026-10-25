@@ -12,7 +12,7 @@ async function clientState(){
       if(state.history.needs_merge)serverHistoryReady=false;
     }
     $('account-status').textContent=profileRequired?'Profil à importer':'Accès personnel · Android';
-    $('client-version').textContent='Fred Android '+(state.version||config.version);
+    $('client-version').textContent='Kiara Android '+(state.version||config.version);
     $('android-profile-name').textContent=profileRequired?'Profil à importer':state.profile?.name||state.username||'Accès personnel actif';
     if(profileRequired){
       connected=false;buttons();

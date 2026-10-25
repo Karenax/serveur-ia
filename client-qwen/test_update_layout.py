@@ -12,7 +12,7 @@ class UpdateLayoutTests(unittest.TestCase):
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory();self.addCleanup(self.temp.cleanup)
         self.home=Path(self.temp.name)
-        self.target=self.home/'Mon client Fred.exe';self.target.write_bytes(b'personal-client')
+        self.target=self.home/'Mon client Kiara.exe';self.target.write_bytes(b'personal-client')
         self.profile={'url':'wireguard://10.77.0.1:8766','token':'fixture-owned-token'}
 
     def test_preparation_reuses_exact_exe_name_directory_twice(self):

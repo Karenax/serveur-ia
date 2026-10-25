@@ -1,4 +1,4 @@
-"""Supervise only the Fred Hermes gateway and adapt its native, profile-scoped API."""
+"""Supervise only the Kiara Hermes gateway and adapt its native, profile-scoped API."""
 from __future__ import annotations
 
 import atexit
@@ -26,7 +26,7 @@ GATEWAY_BOOTSTRAP = gateway_bootstrap(CODEX_PATCH)
 def installation(source=None):
     directory = Path(source) if source else Path(os.environ.get('LOCALAPPDATA', Path.home() / 'AppData/Local')) / 'hermes/hermes-agent'
     # Resolve the installed committed dependency generation without importing PM
-    # under Fred's different home (which would otherwise try to install it anew).
+    # under Kiara's different home (which would otherwise try to install it anew).
     install_home = directory.parent
     install_key = hashlib.sha256(str(directory.resolve()).encode()).hexdigest()[:16]
     state = install_home / 'installs' / install_key
@@ -53,7 +53,7 @@ def installation(source=None):
             if (selected.get('format') != 1 or selected.get('validated') is not True
                     or not known
                     or not selected_python.is_file() or not (selected_source/'hermes_cli/main.py').is_file()):
-                raise ValueError('Le runtime privé Fred est invalide ; conserver son point de retour.')
+                raise ValueError('Le runtime privé Kiara est invalide ; conserver son point de retour.')
             directory, python, commit = selected_source, selected_python, selected['source_commit']
     return {'source': directory, 'python': python, 'commit': commit,
             'dependencies': install_home / 'installs', 'tools': install_home / 'tools'}
@@ -65,7 +65,7 @@ def prepare_runtime(root, runtime):
     target = runtime['dependencies'].resolve()
     if link.exists():
         if link.resolve() != target:
-            raise ValueError('Le répertoire de dépendances Hermes Fred est incohérent.')
+            raise ValueError('Le répertoire de dépendances Hermes Kiara est incohérent.')
         return
     if os.name == 'nt':
         env = os.environ.copy()
@@ -241,7 +241,7 @@ class HermesService:
                 self.accounts.clear_runtime_secrets()
                 raise
             if self.supervise and (not self.watcher or not self.watcher.is_alive()):
-                self.watcher = threading.Thread(target=self._watch, name='Fred Hermes', daemon=True)
+                self.watcher = threading.Thread(target=self._watch, name='Kiara Hermes', daemon=True)
                 self.watcher.start()
             return self.status()
 
@@ -278,7 +278,7 @@ class HermesService:
                 return None
             home = process.environ().get('HERMES_HOME', '')
             if not home or Path(home).resolve() != self.root.resolve():
-                raise ValueError('Identité du processus Hermes Fred incohérente.')
+                raise ValueError('Identité du processus Hermes Kiara incohérente.')
             return process
         except psutil.NoSuchProcess:
             return None
@@ -289,7 +289,7 @@ class HermesService:
         if not record:
             return
         if record.get('home') != str(self.root.resolve()):
-            raise ValueError('Identité de supervision Hermes Fred incohérente.')
+            raise ValueError('Identité de supervision Hermes Kiara incohérente.')
         self.owned = record.get('processes', [])
         self._stop_owned()
 
