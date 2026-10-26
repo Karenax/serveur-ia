@@ -1,17 +1,17 @@
 {
   "format": 1,
   "entrypoint": "android-chat.html",
-  "sha256": "3560f17e12f9364335a23ee160e71d92ad673eea094152881723bbbbe4525930",
+  "sha256": "2652e70863e0b8175e4211f87db4e345e3e1c087cbbd01172ad129e63d704b9f",
   "shared_sources": {
-    "chat.html": "43e40523dd95f18ac424c5917085ba1121f51572a2402d24a35544075c7ed818",
-    "workspace.html": "0b90a9e82d350a724fc8e7ec6363142eaf05cdd0d60316464368edae3465e9c9",
+    "chat.html": "5c6e4b9e8abd17a998a737a89b48d89dc317d139fe62cdb6825d205e3b74ffb3",
+    "workspace.html": "be6c7306c14413ecdd019d9a5c9d4a39815fe2e7a67eedbc126d3b7d8251215f",
     "ui.css": "cc0ab36c19b20f4ca622c65c666197f5e9a7f794e693210b3c448d8ae2742564",
-    "ui.js": "b452bd14013e7c70174b15837763dc782a3ed2be5bf4c6c4d3ccda46cdad33f2",
+    "ui.js": "28da23736dba934e44999601f69fb814c2f78d74f3bc08c4695dbc035a7e64c3",
     "markdown.js": "48dd2beb1c941fe517b472959ff669a92ffa8cb51ca19fe8771c8281f366e21d",
-    "corrector.js": "7a9112b4f6b5c9395e7167b8a173ac57e3af257d51604e6e281a8e5f474a41ca",
+    "corrector.js": "cdcf4d0ac86220d70f25efe3d400b50f2ebf789d67a392fc37e353d28ef77c97",
     "attachments.js": "8fb023f5c48e243b9f24d034c322a0ec53d7c391e2c73588a83c34a28a251867",
     "thinking.js": "f580bf42908ff6b72e296f9b3e518f847af8fd3aa3ead325d2cc8655bf223901",
-    "selection.js": "fb4fab5840149a8215c6735fc47919bdc7e59e52082cb476c724c7a68e8bb506",
+    "selection.js": "56571f9b8f13b6d34d087577f22d158bb59d7749dbfe0fd94352e50794f43df7",
     "voice.js": "9b1ff07e563008d71724a8f52fcc66227ef9795c296d50340faaf8db70606152",
     "conversation.js": "f1fe0b3015ea8681313ed5c5212c73d304b6c0239bf17ca97c65e320b42c1f72",
     "vendor/markdown-it.min.js": "635972b985228e8af9f0143647c68616b7a3bb09f6946e7e4a52e43dcf5e7be5"
@@ -24,6 +24,7 @@
     "client-state.js": "10485e916f4cb52cedeeb6ea39086bbc0d7e9947d5f5795274b044e368e95995",
     "connection.html": "4e8441e4a1da13a6c9812acfccf1e4d4eefe994769c93c1f34a24c4a476063e6",
     "corrector-response.js": "f72de7f91645b87978efed2bcb2ee190d0113120c3c8effb1d51756f386a962f",
-    "onboarding.html": "319698f3f13bab6386a6498998766acbb5efcee64848dd97563160eef866143f"
+    "onboarding.html": "319698f3f13bab6386a6498998766acbb5efcee64848dd97563160eef866143f",
+    "platform-adapters.json": "e80cd4503ba7bb69a197b275e5f22ccb7a488027b7f01172e828e7b51d650d64"
   }
 }

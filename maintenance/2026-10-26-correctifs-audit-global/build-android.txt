@@ -1,0 +1,305 @@
+Pinned wakeword resources prepared; French acoustic validation is still required.
+all modules verified
+CMake Deprecation Warning at D:/Serveur IA/toolchain/android-sdk/ndk/27.3.13750724/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  D:/Serveur IA/toolchain/voice-build-android-arm64-v8a/CMakeFiles/3.31.8/CMakeSystem.cmake:6 (include)
+  CMakeLists.txt:2 (project)
+
+
+CMake Deprecation Warning at D:/Serveur IA/toolchain/android-sdk/ndk/27.3.13750724/build/cmake/android-legacy.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  D:/Serveur IA/toolchain/android-sdk/ndk/27.3.13750724/build/cmake/android.toolchain.cmake:55 (include)
+  D:/Serveur IA/toolchain/voice-build-android-arm64-v8a/CMakeFiles/3.31.8/CMakeSystem.cmake:6 (include)
+  CMakeLists.txt:2 (project)
+
+
+CMake Deprecation Warning at D:/Serveur IA/toolchain/android-sdk/ndk/27.3.13750724/build/cmake/flags.cmake:18 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  D:/Serveur IA/toolchain/cmake-3.31.8-windows-x86_64/share/cmake-3.31/Modules/Platform/Android-Clang.cmake:23 (include)
+  D:/Serveur IA/toolchain/cmake-3.31.8-windows-x86_64/share/cmake-3.31/Modules/Platform/Android-Clang-C.cmake:1 (include)
+  D:/Serveur IA/toolchain/cmake-3.31.8-windows-x86_64/share/cmake-3.31/Modules/CMakeCInformation.cmake:48 (include)
+  CMakeLists.txt:2 (project)
+
+
+CMake Deprecation Warning at D:/Serveur IA/toolchain/whisper.cpp-1.9.5/CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+-- whisper.cpp version: 1.9.5-dev
+-- Setting GGML_NATIVE_DEFAULT to OFF
+-- Warning: ccache not found - consider installing it for faster compilation or disable this warning with GGML_CCACHE=OFF
+-- CMAKE_SYSTEM_PROCESSOR: aarch64
+-- GGML_SYSTEM_ARCH: ARM
+-- Including CPU backend
+-- ARM detected
+-- Checking for ARM features using flags:
+-- Adding CPU backend variant ggml-cpu:  
+-- ggml version: 0.26.0
+-- ggml commit:  4ca825b
+-- Configuring done (2.1s)
+-- Generating done (0.1s)
+-- Build files have been written to: D:/Serveur IA/toolchain/voice-build-android-arm64-v8a
+[1/3] Building C object whisper/ggml/src/CMakeFiles/ggml-base.dir/ggml.c.o
+[2/3] Linking CXX static library whisper\ggml\src\libggml-base.a
+[3/3] Linking CXX shared library libfredvoice.so
+CMake Deprecation Warning at D:/Serveur IA/toolchain/android-sdk/ndk/27.3.13750724/build/cmake/android.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  D:/Serveur IA/toolchain/voice-build-android-x86_64/CMakeFiles/3.31.8/CMakeSystem.cmake:6 (include)
+  CMakeLists.txt:2 (project)
+
+
+CMake Deprecation Warning at D:/Serveur IA/toolchain/android-sdk/ndk/27.3.13750724/build/cmake/android-legacy.toolchain.cmake:35 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  D:/Serveur IA/toolchain/android-sdk/ndk/27.3.13750724/build/cmake/android.toolchain.cmake:55 (include)
+  D:/Serveur IA/toolchain/voice-build-android-x86_64/CMakeFiles/3.31.8/CMakeSystem.cmake:6 (include)
+  CMakeLists.txt:2 (project)
+
+
+CMake Deprecation Warning at D:/Serveur IA/toolchain/android-sdk/ndk/27.3.13750724/build/cmake/flags.cmake:18 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+Call Stack (most recent call first):
+  D:/Serveur IA/toolchain/cmake-3.31.8-windows-x86_64/share/cmake-3.31/Modules/Platform/Android-Clang.cmake:23 (include)
+  D:/Serveur IA/toolchain/cmake-3.31.8-windows-x86_64/share/cmake-3.31/Modules/Platform/Android-Clang-C.cmake:1 (include)
+  D:/Serveur IA/toolchain/cmake-3.31.8-windows-x86_64/share/cmake-3.31/Modules/CMakeCInformation.cmake:48 (include)
+  CMakeLists.txt:2 (project)
+
+
+CMake Deprecation Warning at D:/Serveur IA/toolchain/whisper.cpp-1.9.5/CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+-- whisper.cpp version: 1.9.5-dev
+-- Setting GGML_NATIVE_DEFAULT to OFF
+-- Warning: ccache not found - consider installing it for faster compilation or disable this warning with GGML_CCACHE=OFF
+-- CMAKE_SYSTEM_PROCESSOR: x86_64
+-- GGML_SYSTEM_ARCH: x86
+-- Including CPU backend
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu-x64:  
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu-sse42: -msse4.2 GGML_SSE42
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu-sandybridge: -msse4.2;-mavx GGML_SSE42;GGML_AVX
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu-ivybridge: -msse4.2;-mf16c;-mavx GGML_SSE42;GGML_F16C;GGML_AVX
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu-piledriver: -msse4.2;-mf16c;-mfma;-mavx GGML_SSE42;GGML_F16C;GGML_FMA;GGML_AVX
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu-haswell: -msse4.2;-mf16c;-mfma;-mbmi2;-mavx;-mavx2 GGML_SSE42;GGML_F16C;GGML_FMA;GGML_BMI2;GGML_AVX;GGML_AVX2
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu-skylakex: -msse4.2;-mf16c;-mfma;-mbmi2;-mavx;-mavx2;-mavx512f;-mavx512cd;-mavx512vl;-mavx512dq;-mavx512bw GGML_SSE42;GGML_F16C;GGML_FMA;GGML_BMI2;GGML_AVX;GGML_AVX2;GGML_AVX512
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu-cannonlake: -msse4.2;-mf16c;-mfma;-mbmi2;-mavx;-mavx2;-mavx512f;-mavx512cd;-mavx512vl;-mavx512dq;-mavx512bw;-mavx512vbmi GGML_SSE42;GGML_F16C;GGML_FMA;GGML_BMI2;GGML_AVX;GGML_AVX2;GGML_AVX512;GGML_AVX512_VBMI
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu-cascadelake: -msse4.2;-mf16c;-mfma;-mbmi2;-mavx;-mavx2;-mavx512f;-mavx512cd;-mavx512vl;-mavx512dq;-mavx512bw;-mavx512vnni GGML_SSE42;GGML_F16C;GGML_FMA;GGML_BMI2;GGML_AVX;GGML_AVX2;GGML_AVX512;GGML_AVX512_VNNI
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu-icelake: -msse4.2;-mf16c;-mfma;-mbmi2;-mavx;-mavx2;-mavx512f;-mavx512cd;-mavx512vl;-mavx512dq;-mavx512bw;-mavx512vbmi;-mavx512vnni GGML_SSE42;GGML_F16C;GGML_FMA;GGML_BMI2;GGML_AVX;GGML_AVX2;GGML_AVX512;GGML_AVX512_VBMI;GGML_AVX512_VNNI
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu-cooperlake: -msse4.2;-mf16c;-mfma;-mbmi2;-mavx;-mavx2;-mavx512f;-mavx512cd;-mavx512vl;-mavx512dq;-mavx512bw;-mavx512vnni;-mavx512bf16 GGML_SSE42;GGML_F16C;GGML_FMA;GGML_BMI2;GGML_AVX;GGML_AVX2;GGML_AVX512;GGML_AVX512_VNNI;GGML_AVX512_BF16
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu-zen4: -msse4.2;-mf16c;-mfma;-mbmi2;-mavx;-mavx2;-mavx512f;-mavx512cd;-mavx512vl;-mavx512dq;-mavx512bw;-mavx512vbmi;-mavx512vnni;-mavx512bf16 GGML_SSE42;GGML_F16C;GGML_FMA;GGML_BMI2;GGML_AVX;GGML_AVX2;GGML_AVX512;GGML_AVX512_VBMI;GGML_AVX512_VNNI;GGML_AVX512_BF16
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu-alderlake: -msse4.2;-mf16c;-mfma;-mbmi2;-mavx;-mavx2;-mavxvnni GGML_SSE42;GGML_F16C;GGML_FMA;GGML_BMI2;GGML_AVX;GGML_AVX2;GGML_AVX_VNNI
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu-sapphirerapids: -msse4.2;-mf16c;-mfma;-mbmi2;-mavx;-mavx2;-mavx512f;-mavx512cd;-mavx512vl;-mavx512dq;-mavx512bw;-mavx512vbmi;-mavx512vnni;-mavx512bf16;-mamx-tile;-mamx-int8 GGML_SSE42;GGML_F16C;GGML_FMA;GGML_BMI2;GGML_AVX;GGML_AVX2;GGML_AVX512;GGML_AVX512_VBMI;GGML_AVX512_VNNI;GGML_AVX512_BF16;GGML_AMX_TILE;GGML_AMX_INT8
+-- ggml version: 0.26.0
+-- ggml commit:  4ca825b
+-- Configuring done (1.1s)
+-- Generating done (0.3s)
+-- Build files have been written to: D:/Serveur IA/toolchain/voice-build-android-x86_64
+[1/20] Building C object whisper/ggml/src/CMakeFiles/ggml-base.dir/ggml.c.o
+[2/20] Linking CXX shared library bin\libggml-base.so
+[3/20] Linking CXX shared module bin\libggml-cpu-x64.so
+[4/20] Linking CXX shared module bin\libggml-cpu-ivybridge.so
+[5/20] Linking CXX shared module bin\libggml-cpu-sandybridge.so
+[6/20] Linking CXX shared module bin\libggml-cpu-sse42.so
+[7/20] Linking CXX shared module bin\libggml-cpu-piledriver.so
+[8/20] Linking CXX shared module bin\libggml-cpu-skylakex.so
+[9/20] Linking CXX shared module bin\libggml-cpu-haswell.so
+[10/20] Linking CXX shared module bin\libggml-cpu-cannonlake.so
+[11/20] Linking CXX shared module bin\libggml-cpu-cascadelake.so
+[12/20] Linking CXX shared module bin\libggml-cpu-icelake.so
+[13/20] Linking CXX shared module bin\libggml-cpu-cooperlake.so
+[14/20] Linking CXX shared module bin\libggml-cpu-zen4.so
+[15/20] Linking CXX shared module bin\libggml-cpu-alderlake.so
+[16/20] Linking CXX shared module bin\libggml-cpu-sapphirerapids.so
+[17/20] Linking CXX shared library bin\libggml.so
+[18/20] Linking CXX shared library bin\libparakeet.so
+[19/20] Linking CXX shared library bin\libwhisper.so
+[20/20] Linking CXX shared library libfredvoice.so
+Android UI prepared: D:\Serveur IA\client-android\app\src\main\assets\android-chat.html (484288 bytes)
+Android UI package verified
+Licences Android pr�par�es : 20 fichiers, 8 modules Go.
+Licences Android v�rifi�es : 20 fichiers, 8 modules Go.
+test_acl_failure_leaves_no_plaintext_file (test_export_profile.ExportProfileTests.test_acl_failure_leaves_no_plaintext_file) ... ok
+test_all_supported_protocol_versions_export (test_export_profile.ExportProfileTests.test_all_supported_protocol_versions_export) ... ok
+test_cli_failure_never_logs_input_credentials (test_export_profile.ExportProfileTests.test_cli_failure_never_logs_input_credentials) ... ok
+test_existing_directory_is_never_used_or_overwritten (test_export_profile.ExportProfileTests.test_existing_directory_is_never_used_or_overwritten) ... ok
+test_footer_and_size_errors_are_bounded (test_export_profile.ExportProfileTests.test_footer_and_size_errors_are_bounded) ... ok
+test_invalid_json_utf8_duplicate_fields_and_constants_are_rejected (test_export_profile.ExportProfileTests.test_invalid_json_utf8_duplicate_fields_and_constants_are_rejected) ... ok
+test_invalid_profile_is_rejected_before_output_directory (test_export_profile.ExportProfileTests.test_invalid_profile_is_rejected_before_output_directory) ... ok
+test_profile_and_source_are_preserved_and_permissions_precede_write (test_export_profile.ExportProfileTests.test_profile_and_source_are_preserved_and_permissions_precede_write) ... ok
+test_windows_export_acl_limits_access_to_user_system_and_administrators (test_export_profile.ExportProfileTests.test_windows_export_acl_limits_access_to_user_system_and_administrators) ... ok
+test_default_region_can_be_reformatted_without_breaking_android (test_platform_contract.PlatformContractTests.test_default_region_can_be_reformatted_without_breaking_android) ... ok
+test_missing_or_duplicated_slot_fails_closed (test_platform_contract.PlatformContractTests.test_missing_or_duplicated_slot_fails_closed) ... ok
+test_windows_markers_never_enter_html_attribute_values (test_platform_contract.PlatformContractTests.test_windows_markers_never_enter_html_attribute_values) ... ok
+test_compiled_module_metadata_requires_consistent_versions (test_prepare_licenses.PrepareLicensesTests.test_compiled_module_metadata_requires_consistent_versions) ... ok
+test_full_licenses_are_copied_without_source_or_profile_files (test_prepare_licenses.PrepareLicensesTests.test_full_licenses_are_copied_without_source_or_profile_files) ... ok
+test_missing_module_license_blocks_packaging (test_prepare_licenses.PrepareLicensesTests.test_missing_module_license_blocks_packaging) ... ok
+test_output_preserves_unrelated_assets_and_check_detects_changes (test_prepare_licenses.PrepareLicensesTests.test_output_preserves_unrelated_assets_and_check_detects_changes) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.701s
+
+OK
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.13/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preReleaseBuild UP-TO-DATE
+> Task :app:mergeReleaseJniLibFolders
+> Task :app:checkReleaseDuplicateClasses UP-TO-DATE
+> Task :app:generateReleaseBuildConfig
+> Task :app:javaPreCompileRelease UP-TO-DATE
+> Task :app:checkReleaseAarMetadata UP-TO-DATE
+> Task :app:processReleaseNavigationResources UP-TO-DATE
+> Task :app:compileReleaseNavigationResources UP-TO-DATE
+> Task :app:generateReleaseResValues UP-TO-DATE
+> Task :app:mapReleaseSourceSetPaths UP-TO-DATE
+> Task :app:generateReleaseResources UP-TO-DATE
+> Task :app:mergeReleaseResources UP-TO-DATE
+> Task :app:packageReleaseResources UP-TO-DATE
+> Task :app:parseReleaseLocalResources UP-TO-DATE
+> Task :app:createReleaseCompatibleScreenManifests
+> Task :app:extractDeepLinksRelease UP-TO-DATE
+
+> Task :app:processReleaseMainManifest
+D:\Serveur IA\client-android\app\src\main\AndroidManifest.xml:10:381-413 Warning:
+	android:extractNativeLibs should not be specified in this source AndroidManifest.xml file. See https://d.android.com/guide/topics/manifest/application-element#extractNativeLibs for more information.
+The AGP Upgrade Assistant can remove the attribute from the AndroidManifest.xml file and update the build file accordingly. See https://d.android.com/studio/build/agp-upgrade-assistant for more information.
+
+> Task :app:processReleaseManifest
+> Task :app:desugarReleaseFileDependencies UP-TO-DATE
+> Task :app:mergeReleaseStartupProfile UP-TO-DATE
+> Task :app:mergeExtDexRelease UP-TO-DATE
+> Task :app:mergeReleaseArtProfile UP-TO-DATE
+> Task :app:mergeReleaseShaders UP-TO-DATE
+> Task :app:compileReleaseShaders NO-SOURCE
+> Task :app:generateReleaseAssets UP-TO-DATE
+> Task :app:mergeReleaseNativeLibs
+> Task :app:mergeReleaseAssets
+> Task :app:extractReleaseVersionControlInfo UP-TO-DATE
+> Task :app:extractProguardFiles UP-TO-DATE
+> Task :app:processReleaseJavaRes NO-SOURCE
+
+> Task :app:stripReleaseDebugSymbols
+Unable to strip the following libraries, packaging them as they are: libfredvoice.so, libggml-base.so. Run with --info option to learn more.
+
+> Task :app:mergeReleaseJavaResource UP-TO-DATE
+> Task :app:collectReleaseDependencies UP-TO-DATE
+> Task :app:sdkReleaseDependencyData UP-TO-DATE
+> Task :app:writeReleaseAppMetadata UP-TO-DATE
+> Task :app:writeReleaseSigningConfigVersions UP-TO-DATE
+> Task :app:extractReleaseNativeSymbolTables
+> Task :app:processReleaseManifestForPackage
+> Task :app:mergeReleaseNativeDebugMetadata NO-SOURCE
+> Task :app:compressReleaseAssets
+> Task :app:processReleaseResources
+
+> Task :app:compileReleaseJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :app:dexBuilderRelease
+> Task :app:mergeReleaseGlobalSynthetics UP-TO-DATE
+> Task :app:generateReleaseLintVitalReportModel
+> Task :app:optimizeReleaseResources
+> Task :app:mergeDexRelease
+> Task :app:compileReleaseArtProfile
+> Task :app:lintVitalAnalyzeRelease
+> Task :app:lintVitalReportRelease
+> Task :app:lintVitalRelease
+> Task :app:packageRelease
+> Task :app:createReleaseApkListingFileRedirect
+> Task :app:assembleRelease
+
+[Incubating] Problems report is available at: file:///D:/Serveur%20IA/client-android/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 24s
+48 actionable tasks: 23 executed, 25 up-to-date
+Verifies
+Verified using v1 scheme (JAR signing): false
+Verified using v2 scheme (APK Signature Scheme v2): true
+Verified using v3 scheme (APK Signature Scheme v3): true
+Verified using v3.1 scheme (APK Signature Scheme v3.1): false
+Verified using v4 scheme (APK Signature Scheme v4): false
+Verified for SourceStamp: false
+Number of signers: 1
+Signer #1 certificate DN: CN=Acces Serveur Fred Android
+Signer #1 certificate SHA-256 digest: 40216ff897090b49b21e3cda66169b9fb7070e42dd2b8cb9ebe0f2c441997048
+Signer #1 certificate SHA-1 digest: 1134a71f47cbd153d12d46e372f8e43204b96f46
+Signer #1 certificate MD5 digest: 39dca2720d23dbfa11ee9a680da1613c
+Signer #1 key algorithm: RSA
+Signer #1 key size (bits): 3072
+Signer #1 public key SHA-256 digest: 789abc19d9dda0537b095c8076938cd9fd0bfae73d302c62c544b94ae341e8ec
+Signer #1 public key SHA-1 digest: 373cd879b70012ee1be3abfd6be681080ddc0997
+Signer #1 public key MD5 digest: 1f23e6c29880e4c05c0c7ae346796df5
+Verifies
+Verified using v1 scheme (JAR signing): false
+Verified using v2 scheme (APK Signature Scheme v2): true
+Verified using v3 scheme (APK Signature Scheme v3): true
+Verified using v3.1 scheme (APK Signature Scheme v3.1): false
+Verified using v4 scheme (APK Signature Scheme v4): false
+Verified for SourceStamp: false
+Number of signers: 1
+Build manifest: D:\Serveur IA\toolchain\releases-staging\android\build-manifest.json

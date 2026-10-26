@@ -1,0 +1,560 @@
+{
+  "utc": "2026-10-26T11:38:44.781832+00:00",
+  "pid": 34904,
+  "outcomes": [
+    {
+      "phase": "inference_1",
+      "seconds": 2.625,
+      "usage": {
+        "prompt_tokens": 31,
+        "completion_tokens": 15,
+        "total_tokens": 46,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "answer": "143 + 158 = 301."
+    },
+    {
+      "phase": "inference_2",
+      "seconds": 4.75,
+      "usage": {
+        "prompt_tokens": 465,
+        "completion_tokens": 32,
+        "total_tokens": 497,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "answer": "Les lots 1 et 2 contiennent ensemble 7 pièces, car il suffit d'additionner les 3 pièces du lot 1 aux "
+    }
+  ],
+  "summary": {
+    "baseline": {
+      "samples": 7,
+      "c_read": {
+        "mean": 0.0,
+        "max": 0.0
+      },
+      "d_read": {
+        "mean": 1141.737,
+        "max": 7992.156
+      },
+      "d_write": {
+        "mean": 1146.729,
+        "max": 8027.102
+      },
+      "d_idle": {
+        "mean": 99.602,
+        "max": 100.0
+      },
+      "pages_in": {
+        "mean": 43.109,
+        "max": 56.595
+      },
+      "strata_read": {
+        "mean": 0.0,
+        "max": 0.0
+      }
+    },
+    "inference_1": {
+      "samples": 5,
+      "c_read": {
+        "mean": 597601.167,
+        "max": 2518274.202
+      },
+      "d_read": {
+        "mean": 305513.562,
+        "max": 1066304.849
+      },
+      "d_write": {
+        "mean": 187792.265,
+        "max": 915112.371
+      },
+      "d_idle": {
+        "mean": 97.573,
+        "max": 100.0
+      },
+      "pages_in": {
+        "mean": 124.743,
+        "max": 316.668
+      },
+      "strata_read": {
+        "mean": 589701.528,
+        "max": 2518274.202
+      }
+    },
+    "after_1": {
+      "samples": 6,
+      "c_read": {
+        "mean": 891080.355,
+        "max": 4808793.56
+      },
+      "d_read": {
+        "mean": 0.0,
+        "max": 0.0
+      },
+      "d_write": {
+        "mean": 37176.496,
+        "max": 143071.544
+      },
+      "d_idle": {
+        "mean": 99.94,
+        "max": 100.0
+      },
+      "pages_in": {
+        "mean": 217.529,
+        "max": 1053.709
+      },
+      "strata_read": {
+        "mean": 164445.326,
+        "max": 794853.554
+      }
+    },
+    "inference_2": {
+      "samples": 10,
+      "c_read": {
+        "mean": 2170804.657,
+        "max": 17395517.357
+      },
+      "d_read": {
+        "mean": 64653.856,
+        "max": 447678.756
+      },
+      "d_write": {
+        "mean": 76602.357,
+        "max": 574416.988
+      },
+      "d_idle": {
+        "mean": 97.93,
+        "max": 100.0
+      },
+      "pages_in": {
+        "mean": 65.148,
+        "max": 150.283
+      },
+      "strata_read": {
+        "mean": 2152810.15,
+        "max": 17355546.04
+      }
+    },
+    "after_2": {
+      "samples": 5,
+      "c_read": {
+        "mean": 1708219.943,
+        "max": 8390546.238
+      },
+      "d_read": {
+        "mean": 1582.395,
+        "max": 7911.976
+      },
+      "d_write": {
+        "mean": 85295.369,
+        "max": 410836.539
+      },
+      "d_idle": {
+        "mean": 99.359,
+        "max": 99.995
+      },
+      "pages_in": {
+        "mean": 491.588,
+        "max": 2231.717
+      },
+      "strata_read": {
+        "mean": 38040.475,
+        "max": 40286.8
+      }
+    }
+  },
+  "samples": [
+    {
+      "t": 1.485,
+      "phase": "baseline",
+      "c_read": 0.0,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 99.96,
+      "pages_in": 54.448,
+      "strata_read": 0.0
+    },
+    {
+      "t": 1.985,
+      "phase": "baseline",
+      "c_read": 0.0,
+      "d_read": 0.0,
+      "d_write": 8027.102,
+      "d_idle": 99.958,
+      "pages_in": 35.275,
+      "strata_read": 0.0
+    },
+    {
+      "t": 2.5,
+      "phase": "baseline",
+      "c_read": 0.0,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 100.0,
+      "pages_in": 46.481,
+      "strata_read": 0.0
+    },
+    {
+      "t": 3.016,
+      "phase": "baseline",
+      "c_read": 0.0,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 99.996,
+      "pages_in": 56.595,
+      "strata_read": 0.0
+    },
+    {
+      "t": 3.532,
+      "phase": "baseline",
+      "c_read": 0.0,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 100.0,
+      "pages_in": 31.258,
+      "strata_read": 0.0
+    },
+    {
+      "t": 4.047,
+      "phase": "baseline",
+      "c_read": 0.0,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 99.991,
+      "pages_in": 42.585,
+      "strata_read": 0.0
+    },
+    {
+      "t": 4.563,
+      "phase": "baseline",
+      "c_read": 0.0,
+      "d_read": 7992.156,
+      "d_write": 0.0,
+      "d_idle": 97.311,
+      "pages_in": 35.122,
+      "strata_read": 0.0
+    },
+    {
+      "t": 5.079,
+      "phase": "inference_1",
+      "c_read": 0.0,
+      "d_read": 461262.963,
+      "d_write": 0.0,
+      "d_idle": 95.345,
+      "pages_in": 145.62,
+      "strata_read": 289.299
+    },
+    {
+      "t": 5.594,
+      "phase": "inference_1",
+      "c_read": 2518274.202,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 100.0,
+      "pages_in": 54.305,
+      "strata_read": 2518274.202
+    },
+    {
+      "t": 6.094,
+      "phase": "inference_1",
+      "c_read": 40058.084,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 100.0,
+      "pages_in": 48.899,
+      "strata_read": 40058.084
+    },
+    {
+      "t": 6.61,
+      "phase": "inference_1",
+      "c_read": 31798.607,
+      "d_read": 0.0,
+      "d_write": 23848.955,
+      "d_idle": 99.898,
+      "pages_in": 58.225,
+      "strata_read": 31798.607
+    },
+    {
+      "t": 7.125,
+      "phase": "inference_1",
+      "c_read": 397874.944,
+      "d_read": 1066304.849,
+      "d_write": 915112.371,
+      "d_idle": 92.621,
+      "pages_in": 316.668,
+      "strata_read": 358087.449
+    },
+    {
+      "t": 7.641,
+      "phase": "after_1",
+      "c_read": 4808793.56,
+      "d_read": 0.0,
+      "d_write": 143071.544,
+      "d_idle": 99.767,
+      "pages_in": 1053.709,
+      "strata_read": 794853.554
+    },
+    {
+      "t": 8.157,
+      "phase": "after_1",
+      "c_read": 393910.908,
+      "d_read": 0.0,
+      "d_write": 71983.719,
+      "d_idle": 99.916,
+      "pages_in": 105.445,
+      "strata_read": 39990.955
+    },
+    {
+      "t": 8.672,
+      "phase": "after_1",
+      "c_read": 31655.163,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 100.0,
+      "pages_in": 48.302,
+      "strata_read": 31655.163
+    },
+    {
+      "t": 9.188,
+      "phase": "after_1",
+      "c_read": 40018.571,
+      "d_read": 0.0,
+      "d_write": 8003.714,
+      "d_idle": 99.964,
+      "pages_in": 21.494,
+      "strata_read": 40018.571
+    },
+    {
+      "t": 9.704,
+      "phase": "after_1",
+      "c_read": 39904.79,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 99.997,
+      "pages_in": 48.712,
+      "strata_read": 39904.79
+    },
+    {
+      "t": 10.204,
+      "phase": "after_1",
+      "c_read": 32199.138,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 99.994,
+      "pages_in": 27.514,
+      "strata_read": 40248.922
+    },
+    {
+      "t": 10.719,
+      "phase": "inference_2",
+      "c_read": 166756.007,
+      "d_read": 15881.524,
+      "d_write": 7940.762,
+      "d_idle": 94.757,
+      "pages_in": 96.933,
+      "strata_read": 35733.43
+    },
+    {
+      "t": 11.235,
+      "phase": "inference_2",
+      "c_read": 17395517.357,
+      "d_read": 447678.756,
+      "d_write": 0.0,
+      "d_idle": 87.665,
+      "pages_in": 150.283,
+      "strata_read": 17355546.04
+    },
+    {
+      "t": 11.75,
+      "phase": "inference_2",
+      "c_read": 31686.52,
+      "d_read": 0.0,
+      "d_write": 7921.63,
+      "d_idle": 99.962,
+      "pages_in": 73.492,
+      "strata_read": 31686.52
+    },
+    {
+      "t": 12.266,
+      "phase": "inference_2",
+      "c_read": 39886.891,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 99.997,
+      "pages_in": 15.581,
+      "strata_read": 39886.891
+    },
+    {
+      "t": 12.782,
+      "phase": "inference_2",
+      "c_read": 40887.32,
+      "d_read": 0.0,
+      "d_write": 574416.988,
+      "d_idle": 99.764,
+      "pages_in": 89.597,
+      "strata_read": 39890.069
+    },
+    {
+      "t": 13.297,
+      "phase": "inference_2",
+      "c_read": 39636.797,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 100.0,
+      "pages_in": 17.419,
+      "strata_read": 39636.797
+    },
+    {
+      "t": 13.813,
+      "phase": "inference_2",
+      "c_read": 39769.593,
+      "d_read": 174986.208,
+      "d_write": 0.0,
+      "d_idle": 99.883,
+      "pages_in": 99.036,
+      "strata_read": 31815.674
+    },
+    {
+      "t": 14.329,
+      "phase": "inference_2",
+      "c_read": 415587.902,
+      "d_read": 7992.075,
+      "d_write": 167833.576,
+      "d_idle": 97.348,
+      "pages_in": 35.121,
+      "strata_read": 415587.902
+    },
+    {
+      "t": 14.844,
+      "phase": "inference_2",
+      "c_read": 1764067.757,
+      "d_read": 0.0,
+      "d_write": 7910.618,
+      "d_idle": 99.934,
+      "pages_in": 30.901,
+      "strata_read": 1764067.757
+    },
+    {
+      "t": 15.36,
+      "phase": "inference_2",
+      "c_read": 1774250.421,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 99.986,
+      "pages_in": 43.121,
+      "strata_read": 1774250.421
+    },
+    {
+      "t": 15.875,
+      "phase": "after_2",
+      "c_read": 39100.759,
+      "d_read": 0.0,
+      "d_write": 15640.304,
+      "d_idle": 99.931,
+      "pages_in": 61.095,
+      "strata_read": 39100.759
+    },
+    {
+      "t": 16.391,
+      "phase": "after_2",
+      "c_read": 32229.44,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 99.995,
+      "pages_in": 41.31,
+      "strata_read": 40286.8
+    },
+    {
+      "t": 16.907,
+      "phase": "after_2",
+      "c_read": 39559.881,
+      "d_read": 7911.976,
+      "d_write": 0.0,
+      "d_idle": 97.082,
+      "pages_in": 50.223,
+      "strata_read": 31647.905
+    },
+    {
+      "t": 17.422,
+      "phase": "after_2",
+      "c_read": 8390546.238,
+      "d_read": 0.0,
+      "d_write": 410836.539,
+      "d_idle": 99.799,
+      "pages_in": 2231.717,
+      "strata_read": 39503.513
+    },
+    {
+      "t": 17.938,
+      "phase": "after_2",
+      "c_read": 39663.396,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 99.989,
+      "pages_in": 73.594,
+      "strata_read": 39663.396
+    }
+  ],
+  "memory_before": {
+    "rss": 30728572928,
+    "vms": 59122098176,
+    "num_page_faults": 42088318,
+    "peak_wset": 68307771392,
+    "wset": 30728572928,
+    "peak_paged_pool": 268516216,
+    "paged_pool": 268500376,
+    "peak_nonpaged_pool": 5370648,
+    "nonpaged_pool": 5136640,
+    "pagefile": 59122098176,
+    "peak_pagefile": 59122098176,
+    "private": 59122098176
+  },
+  "memory_after": {
+    "rss": 38607454208,
+    "vms": 59634733056,
+    "num_page_faults": 44069696,
+    "peak_wset": 68307771392,
+    "wset": 38607454208,
+    "peak_paged_pool": 268516216,
+    "paged_pool": 268500376,
+    "peak_nonpaged_pool": 5378096,
+    "nonpaged_pool": 5138816,
+    "pagefile": 59634733056,
+    "peak_pagefile": 59634782208,
+    "private": 59634733056
+  },
+  "io_before": {
+    "read_count": 8294,
+    "write_count": 754,
+    "read_bytes": 3818689637,
+    "write_bytes": 7481,
+    "other_count": 11185,
+    "other_bytes": 492062
+  },
+  "io_after": {
+    "read_count": 11438,
+    "write_count": 1382,
+    "read_bytes": 3831868672,
+    "write_bytes": 10069,
+    "other_count": 11395,
+    "other_bytes": 502598
+  },
+  "live_after": {
+    "state": "idle",
+    "queued": 0,
+    "phase": null,
+    "prompt_tokens": null,
+    "prompt_read": null,
+    "prompt_total": null,
+    "generated": null,
+    "max_tokens": null,
+    "elapsed_s": null,
+    "tok_s": null,
+    "tok_s_mean": null,
+    "prefill_tok_s_mean": null,
+    "tok_s_window_s": null
+  }
+}

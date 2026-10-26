@@ -1,10 +1,14 @@
 # Reconstruire et vérifier Kiara
 
-Les constructions Windows/serveur 3.5.52 et Android 1.0.23/code 24 utilisent les
+Les constructions Windows/serveur 3.5.53 et Android 1.0.24/code 25 utilisent les
 sources locales et les clés de signature existantes. Chaque construction produit
 `build-manifest.json` : empreintes des sources, empreinte du binaire, versions des
 paquets Python, Go, CMake, JDK, SDK/NDK Android et commit Hermes réellement utilisés.
 Les sources modifiées avant commit sont identifiées par leurs empreintes.
+Le manifeste est propre à son composant ; `maintenance/deployment_manifest.py`
+relie les livrables et les résultats de validation, puis vérifie leurs empreintes.
+La [référence d’architecture](ARCHITECTURE-ACTUELLE.md) décrit les données, versions
+et compatibilités courantes.
 
 ## Préparer le poste
 
@@ -16,11 +20,17 @@ Les sources modifiées avant commit sont identifiées par leurs empreintes.
    [dependances/moteurs.json](dependances/moteurs.json) conserve les références des
    dépôts historiques et de leurs patchs, décrites dans
    [dependances/README.md](dependances/README.md).
-2. Préparer Python 3.12 dans `Strata-src/.venv`, puis installer les versions épinglées
-   de `lanceur/requirements.txt` et `client-qwen/requirements-build.txt`. Les
+2. Préparer Python 3.12 dans `Strata-src/.venv`, sans héritage des bibliothèques
+   d’outillage, puis installer le verrou `dependances/verrous/strata.requirements.txt`
+   et le paquet local `shared` avec `--no-deps --no-build-isolation -e shared`.
+   Préparer séparément `toolchain/build-python` avec
+   `maintenance/prepare_build_environment.py` ; PyInstaller appartient à ce constructeur. Les
    modèles GPU, CUDA, compilateur et dépendances propres à Strata se préparent
    suivant le moteur épinglé ; leurs poids restent hors Git.
-3. Installer Hermes avec son runtime Windows. Le commit utilisé par une livraison
+3. Préparer le runtime privé Hermes et ses dépendances publiques verrouillées.
+   Le pointeur `toolchain/hermes-security-runtime/runtime.json` déclare ses sources,
+   Python, dépendances et outils ; il est résolu avant le bootstrap personnel.
+   Le commit utilisé par une livraison
    figure dans son manifeste et se vérifie avec `hermes_service.installation()`.
    Kiara réutilise ce runtime ; il ne télécharge pas de dépendances pendant une conversation.
 4. Préparer les dépendances vocales selon [client-voice/README.md](client-voice/README.md)
@@ -36,7 +46,8 @@ Les sources modifiées avant commit sont identifiées par leurs empreintes.
    Gradle 8.13 et JDK 21 aux emplacements définis par
    `client-qwen/android-outils/Environnement-Android.ps1`. Lancer
    `Verifier-Android.ps1` pour vérifier ces outils avant compilation.
-6. Installer Go pour le bridge et conserver les caches des modules vérifiés par
+6. Installer le Go épinglé avec `maintenance/prepare_go.py` : version et empreinte
+   publique dans `client-qwen/wireguard-toolchain.json`. Conserver les caches des modules vérifiés par
    `go.mod/go.sum`. Conserver les clés privées dans leurs dossiers exclus de Git :
    une nouvelle clé empêcherait les mises à jour des clients déjà installés.
 
@@ -54,7 +65,7 @@ pour la phrase française ; voir le [rapport et ses limites](maintenance/2026-10
 
 ## Exécuter les vérifications
 
-Depuis les correctifs de sécurité du 21 octobre, les cinq runtimes disposent de
+Les cinq runtimes applicatifs et le constructeur Windows disposent de six
 [verrous avec empreintes](dependances/verrous/README.md). Vérifier leur conformité
 avec `maintenance/verrous_runtime.py check`. Reconstruire dans des environnements
 neufs à partir des verrous ; ne pas modifier le runtime personnel Hermes. Kiara
@@ -62,7 +73,18 @@ sélectionne son runtime privé validé par le pointeur
 `toolchain/hermes-security-runtime/runtime.json`, préparé avec le script et le
 patch de `maintenance/2026-10-21-correctifs-audit/`.
 
-Depuis la racine du projet :
+Le point d’entrée complet, depuis la racine, est :
+
+```powershell
+& '.\Strata-src\.venv\Scripts\python.exe' maintenance/verify_project.py
+```
+
+Il agrège les échecs et produit `validation.json` dans un répertoire d’exécution
+sous `toolchain/test-results`. `--output` permet un emplacement explicite et
+`--checks` un sous-ensemble. Les vérifications OSV et Go consultent les avis publics.
+Les captures UI restent dans ce répertoire et ne remplacent aucune preuve historique.
+
+Les commandes individuelles restent disponibles :
 
 ```powershell
 & '.\Strata-src\.venv\Scripts\python.exe' -m pip check
@@ -102,9 +124,11 @@ vérifient notamment la politique des signatures et la conservation du cache.
 ## Construire avant publication
 
 ```powershell
-& '.\client-qwen\Build-WireGuard.ps1'
-& '.\client-qwen\Build-Client.ps1' -DistributionDirectory "$PWD\toolchain\releases-staging\windows" -SkipManifest
+& '.\Strata-src\.venv\Scripts\python.exe' maintenance/prepare_go.py
+& '.\client-qwen\Build-WireGuard.ps1' -OutputBinary "$PWD\toolchain\releases-staging\wireguard-bridge.exe"
+& '.\client-qwen\Build-Client.ps1' -DistributionDirectory "$PWD\toolchain\releases-staging\windows" -SkipManifest -WireGuardBinary "$PWD\toolchain\releases-staging\wireguard-bridge.exe"
 & '.\client-android\Build-Android.ps1' -OutputDirectory "$PWD\toolchain\releases-staging\android"
+& '.\Strata-src\.venv\Scripts\python.exe' maintenance/package_server.py --output toolchain/releases-staging/server
 ```
 
 Vérifier les manifestes, les ressources incluses et les tests des exécutables avant
@@ -114,6 +138,17 @@ personnels sont reconditionnés avec `client-qwen/Mettre-A-Jour-Clients.py`, en
 préservant leurs profils et clés. Conserver les distributions précédentes pour
 le retour. La preuve de chaque mise en service doit confirmer les empreintes des
 données et des clés, les processus Qwen et la programmation des sauvegardes.
+
+Pour constituer le manifeste d’ensemble, fournir les trois `build-manifest.json`
+et le `validation.json` réussi à `maintenance/deployment_manifest.py`. Le script
+refuse une validation incomplète, un fichier remplacé ou des sources changées
+depuis la construction. Le paquet serveur contient les sources et les verrous,
+pas les modèles, clés ni données privées.
+
+`KIARA_DATA_DIR` permet de séparer les données de la version exécutable ; le chemin
+historique reste la valeur par défaut. Toute migration utilise une sauvegarde
+vérifiée et la restauration existante. `KIARA_RUNTIME_PYTHON` désigne le Python
+d’exécution lorsqu’il se trouve ailleurs que dans le chemin historique.
 
 ## Synthèse française Phonon (22 octobre 2026)
 

@@ -1,0 +1,22 @@
+test_acl_failure_leaves_no_plaintext_file (test_export_profile.ExportProfileTests.test_acl_failure_leaves_no_plaintext_file) ... ok
+test_all_supported_protocol_versions_export (test_export_profile.ExportProfileTests.test_all_supported_protocol_versions_export) ... ok
+test_cli_failure_never_logs_input_credentials (test_export_profile.ExportProfileTests.test_cli_failure_never_logs_input_credentials) ... ok
+test_existing_directory_is_never_used_or_overwritten (test_export_profile.ExportProfileTests.test_existing_directory_is_never_used_or_overwritten) ... ok
+test_footer_and_size_errors_are_bounded (test_export_profile.ExportProfileTests.test_footer_and_size_errors_are_bounded) ... ok
+test_invalid_json_utf8_duplicate_fields_and_constants_are_rejected (test_export_profile.ExportProfileTests.test_invalid_json_utf8_duplicate_fields_and_constants_are_rejected) ... ok
+test_invalid_profile_is_rejected_before_output_directory (test_export_profile.ExportProfileTests.test_invalid_profile_is_rejected_before_output_directory) ... ok
+test_profile_and_source_are_preserved_and_permissions_precede_write (test_export_profile.ExportProfileTests.test_profile_and_source_are_preserved_and_permissions_precede_write) ... ok
+test_windows_export_acl_limits_access_to_user_system_and_administrators (test_export_profile.ExportProfileTests.test_windows_export_acl_limits_access_to_user_system_and_administrators) ... ok
+test_default_region_can_be_reformatted_without_breaking_android (test_platform_contract.PlatformContractTests.test_default_region_can_be_reformatted_without_breaking_android) ... ok
+test_missing_or_duplicated_slot_fails_closed (test_platform_contract.PlatformContractTests.test_missing_or_duplicated_slot_fails_closed) ... ok
+test_windows_markers_never_enter_html_attribute_values (test_platform_contract.PlatformContractTests.test_windows_markers_never_enter_html_attribute_values) ... ok
+test_compiled_module_metadata_requires_consistent_versions (test_prepare_licenses.PrepareLicensesTests.test_compiled_module_metadata_requires_consistent_versions) ... ok
+test_full_licenses_are_copied_without_source_or_profile_files (test_prepare_licenses.PrepareLicensesTests.test_full_licenses_are_copied_without_source_or_profile_files) ... ok
+test_missing_module_license_blocks_packaging (test_prepare_licenses.PrepareLicensesTests.test_missing_module_license_blocks_packaging) ... ok
+test_output_preserves_unrelated_assets_and_check_detects_changes (test_prepare_licenses.PrepareLicensesTests.test_output_preserves_unrelated_assets_and_check_detects_changes) ... ok
+test_packaging_rejects_an_old_or_mixed_go_runtime (test_prepare_licenses.PrepareLicensesTests.test_packaging_rejects_an_old_or_mixed_go_runtime) ... ok
+
+----------------------------------------------------------------------
+Ran 17 tests in 0.611s
+
+OK

@@ -1,0 +1,52 @@
+Using CPython 3.12.14 interpreter at: Strata-src\.venv\Scripts\python.exe
+Creating virtual environment at: toolchain\build-python
+Activate with: toolchain\build-python\Scripts\activate
+Using Python 3.12.14 environment at: toolchain\build-python
+Resolved 22 packages in 2.00s
+   Building proxy-tools==0.1.0
+Downloading pip (1.7MiB)
+Downloading pyinstaller (1.4MiB)
+ Downloaded pip
+ Downloaded pyinstaller
+      Built proxy-tools==0.1.0
+Prepared 14 packages in 1.27s
+warning: Failed to hardlink files; falling back to full copy. This may lead to degraded performance.
+         If the cache and target directories are on different filesystems, hardlinking may not be supported.
+         If this is intentional, set `export UV_LINK_MODE=copy` or use `--link-mode=copy` to suppress this warning.
+Installed 22 packages in 1.52s
+ + altgraph==0.17.5
+ + bottle==0.13.4
+ + certifi==2026.10.19
+ + cffi==2.1.1
+ + clr-loader==0.3.1
+ + cryptography==50.0.2
+ + packaging==26.3
+ + pefile==2024.8.26
+ + pillow==13.0.0
+ + pip==26.2.2
+ + proxy-tools==0.1.0
+ + psutil==7.2.2
+ + pycparser==3.12
+ + pyinstaller==6.22.3
+ + pyinstaller-hooks-contrib==2026.9
+ + pythonnet==3.2.0
+ + pywebview==6.2.1
+ + pywin32-ctypes==0.2.3
+ + pyyaml==6.0.3
+ + setuptools==84.2.1
+ + typing-extensions==4.16.0
+ + wheel==0.45.1
+Using Python 3.12.14 environment at: toolchain\build-python
+Resolved 4 packages in 44ms
+   Building kiara-shared @ file:///D:/Serveur%20IA/shared
+      Built kiara-shared @ file:///D:/Serveur%20IA/shared
+Prepared 1 package in 2.03s
+warning: Failed to hardlink files; falling back to full copy. This may lead to degraded performance.
+         If the cache and target directories are on different filesystems, hardlinking may not be supported.
+         If this is intentional, set `export UV_LINK_MODE=copy` or use `--link-mode=copy` to suppress this warning.
+Installed 1 package in 11ms
+ + kiara-shared==0.1.0 (from file:///D:/Serveur%20IA/shared)
+Using Python 3.12.14 environment at: toolchain\build-python
+Checked 23 packages in 5ms
+All installed packages are compatible
+Builder ready: D:\Serveur IA\toolchain\build-python\Scripts\python.exe

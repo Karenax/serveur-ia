@@ -1,0 +1,12 @@
+Using Python 3.12.14 environment at: toolchain\phonon-server-python
+Resolved 1 package in 2ms
+Uninstalled 1 package in 1.35s
+warning: Failed to hardlink files; falling back to full copy. This may lead to degraded performance.
+         If the cache and target directories are on different filesystems, hardlinking may not be supported.
+         If this is intentional, set `export UV_LINK_MODE=copy` or use `--link-mode=copy` to suppress this warning.
+Installed 1 package in 623ms
+ - pip==25.0.1
+ + pip==26.2.2
+Using Python 3.12.14 environment at: toolchain\phonon-server-python
+Checked 27 packages in 5ms
+All installed packages are compatible

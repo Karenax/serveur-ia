@@ -1,0 +1,2 @@
+COMMAND: "D:\Serveur IA\Strata-src\.venv\Scripts\python.exe" maintenance/check_sources.py
+{"python_syntax": 400, "javascript_syntax": 86, "powershell_syntax": {"pwsh": 93, "powershell.exe": 93}, "passed": true}

@@ -1,0 +1,13 @@
+Using Python 3.12.14 environment at: toolchain\build-python
+Resolved 2 packages in 143ms
+Downloading ptts (6.5MiB)
+Downloading numpy (12.0MiB)
+ Downloaded numpy
+ Downloaded ptts
+Prepared 2 packages in 1.70s
+warning: Failed to hardlink files; falling back to full copy. This may lead to degraded performance.
+         If the cache and target directories are on different filesystems, hardlinking may not be supported.
+         If this is intentional, set `export UV_LINK_MODE=copy` or use `--link-mode=copy` to suppress this warning.
+Installed 2 packages in 2.97s
+ + numpy==2.5.4
+ + ptts==0.4.1

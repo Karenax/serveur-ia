@@ -23,14 +23,12 @@ from urllib.parse import urlsplit, urljoin, urlencode
 import ipaddress
 
 import sys
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / 'client-qwen'))
-from chat_attachments import validate_message
+from kiara_shared.attachments import validate_message
+from workspace_types import Conflict, Denied, identifier, text, MAX_TEXT, HISTORY_RESET_ID
 
 MAX_FILE = 2 * 1024 * 1024
-MAX_TEXT = 500000
 GLOBAL_BYTES = 128 * 1024 * 1024
 DEFAULT_LIMITS = {'storage_mb':20, 'projects':50, 'jobs':5, 'web':False}
-HISTORY_RESET_ID = '20261006-remove-assistants'
 IDENTITY_INSTRUCTIONS = 'Tu es Kiara, une assistante IA.'
 DEFAULT_INSTRUCTIONS = IDENTITY_INSTRUCTIONS + ' Réponds en français, clairement et honnêtement. Cite les sources disponibles et signale tes hypothèses. Tu ne peux pas exécuter de commandes.'
 HISTORY_SCHEMA='CREATE TABLE IF NOT EXISTS client_histories(owner TEXT PRIMARY KEY, history TEXT NOT NULL, revision INTEGER NOT NULL, updated REAL NOT NULL);'
@@ -87,6 +85,9 @@ SCHEMA += PERSONAL_SCHEMA
 PRE_ASSISTANT_SCHEMA = SCHEMA
 from assistant_commands import SCHEMA as ASSISTANT_SCHEMA
 SCHEMA += ASSISTANT_SCHEMA
+SCHEMA_V1 = SCHEMA
+from workspace_migrations import INDEX_SCHEMA, VERSION as SCHEMA_VERSION
+SCHEMA += INDEX_SCHEMA + f'PRAGMA user_version={SCHEMA_VERSION};'
 
 SEARCH_STOP = frozenset('a au aux avec avoir ce ces cette cet dans de des du elle en est et etre fait faire il ils je la le les leur lui ma mais me meme mes mon ne notre nous on ou par pas pour pourquoi quand que quel quelle quelles quels qui sa se ses son sur ta te tes toi ton tous tout tres tu un une vos votre vous comment combien document documents projet donne donner explique expliquer'.split())
 
@@ -119,25 +120,22 @@ def migrate_documents(db):
         # text and its real page markers remain the source of truth.
         db.execute("INSERT INTO search(search) VALUES('rebuild')")
 
-class Conflict(ValueError): pass
-class Denied(ValueError): pass
 
 def migrate_workspace(db):
-    """Remove the old profiles and perform the requested one-time history reset."""
+    """Retire old profile configuration without deleting user conversations."""
     db.execute('PRAGMA secure_delete=ON')
     if 'assistant' in {r[1] for r in db.execute('PRAGMA table_info(jobs)')}:
         db.execute('ALTER TABLE jobs DROP COLUMN assistant')
     db.execute('DROP TABLE IF EXISTS assistants')
     reset=db.execute("SELECT value FROM settings WHERE key='history_reset_id'").fetchone()
     if not reset or reset[0]!=HISTORY_RESET_ID:
-        db.execute('DELETE FROM client_histories')
-        db.execute('DELETE FROM conversations')
-        db.execute("DELETE FROM events WHERE action LIKE 'assistant_%' OR action LIKE 'conversation_%'")
         db.execute("INSERT OR REPLACE INTO settings VALUES('history_reset_id',?)",(HISTORY_RESET_ID,))
 
 
 def initialize_database(db):
     """Current schema for canonical workspaces and standalone client exports."""
+    from workspace_migrations import ensure_supported, upgrade
+    ensure_supported(db)
     db.executescript(SCHEMA)
     if 'archived' not in {r[1] for r in db.execute('PRAGMA table_info(conversations)')}:
         db.execute('ALTER TABLE conversations ADD COLUMN archived INTEGER NOT NULL DEFAULT 0')
@@ -145,16 +143,10 @@ def initialize_database(db):
     migrate_documents(db)
     from notifications import migrate
     migrate(db)
+    upgrade(db)
 
 
-def text(value, maximum, label, empty=False):
-    if not isinstance(value,str) or len(value)>maximum or (not empty and not value.strip()) or '\x00' in value:
-        raise ValueError(label+' invalide.')
-    return value if empty else value.strip()
 
-def identifier(value):
-    if not isinstance(value,str) or not re.fullmatch('[a-f0-9]{32}',value):raise ValueError('Identifiant invalide.')
-    return value
 
 def extract(name, raw):
     """Bound parsing input and expanded DOCX members before running parsers."""
@@ -189,13 +181,13 @@ def extract(name, raw):
     if any('\x00' in p for p in pages):raise ValueError('Contenu texte invalide.')
     return pages
 
-def isolated_extract(name,raw):
+def isolated_extract(name,raw,diagnostics=None):
     """Untrusted document parsers run outside the console process with a watchdog."""
     import subprocess
     import psutil
     from core import PYTHON,HIDDEN
     worker=Path(__file__).with_name('extract_document.py')
-    process=subprocess.Popen([str(PYTHON),str(worker),name],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,creationflags=HIDDEN)
+    process=subprocess.Popen([str(PYTHON),str(worker),name],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,creationflags=HIDDEN)
     finished=threading.Event();exceeded=threading.Event()
     def monitor():
         observed=psutil.Process(process.pid)
@@ -205,14 +197,18 @@ def isolated_extract(name,raw):
             except psutil.Error:return
     threading.Thread(target=monitor,daemon=True).start()
     try:
-        output,_=process.communicate(raw,timeout=25)
+        output,errors=process.communicate(raw,timeout=25)
+        if diagnostics and (process.returncode or errors):
+            diagnostics.record('documents','extract',exit_code=process.returncode,stderr=errors)
         if exceeded.is_set():raise ValueError('Document trop complexe : limite mémoire atteinte.')
         if process.returncode or len(output)>4*1024*1024:raise ValueError('Extraction du document refusée.')
         result=json.loads(output)
         if result.get('error'):raise ValueError(result['error'])
         return result['pages']
-    except subprocess.TimeoutExpired:
-        process.kill();process.communicate();raise ValueError('Extraction trop longue (25 secondes).')
+    except subprocess.TimeoutExpired as error:
+        process.kill();process.communicate()
+        if diagnostics:diagnostics.record('documents','extract_timeout',error)
+        raise ValueError('Extraction trop longue (25 secondes).')
     finally:finished.set()
 
 class PublicText(HTMLParser):
@@ -287,6 +283,8 @@ class Workspace:
         self.owner_revisions = {}
         self.source_revision = 0
         self.storage_changed=None
+        from runtime_diagnostics import Metrics, Diagnostics
+        self.metrics=Metrics();self.diagnostics=Diagnostics(self.home)
         from server_state import generation, installation_id
         generation(self.home)
         installation_id(self.home)
@@ -303,7 +301,10 @@ class Workspace:
 
     @contextlib.contextmanager
     def db(self, owner=None):
+        waiting=time.perf_counter()
         with self.lock:
+            entered=time.perf_counter()
+            self.metrics.observe('db_lock_wait',entered-waiting)
             db=sqlite3.connect(self.path,timeout=20);db.row_factory=sqlite3.Row
             db.execute('PRAGMA foreign_keys=ON');db.execute('PRAGMA journal_mode=WAL')
             source_changes = set()
@@ -323,7 +324,9 @@ class Workspace:
                         self.source_revision += 1
                         if self.knowledge:self.knowledge.changed()
                     if self.storage_changed:self.storage_changed(owner)
-            finally:db.close()
+            finally:
+                db.close()
+                self.metrics.observe('db_transaction',time.perf_counter()-entered)
 
     def own(self,db,table,id,owner):
         if table not in ('projects','documents','memories','conversations','jobs'):raise ValueError('Objet invalide.')
@@ -359,16 +362,27 @@ class Workspace:
         if self.usage(db)+extra>GLOBAL_BYTES:raise ValueError('Limite globale de stockage atteinte (128 Mo).')
 
     def snapshot(self,owner):
+        from memory_service import all_memories
+        from collections import defaultdict
+        started=time.perf_counter()
         with self.db() as db:
             projects=[dict(r) for r in db.execute('SELECT * FROM projects WHERE owner=? ORDER BY updated DESC',(owner,))]
+            memories=all_memories(db,owner)
+            documents=defaultdict(list);conversations=defaultdict(list)
+            for row in db.execute('SELECT d.project,d.id,d.title,d.kind,d.revision,d.updated,i.state AS index_state,i.chunks AS chunk_count,i.pages AS page_count,i.revision AS indexed_revision,i.indexed AS indexed_at FROM documents d LEFT JOIN document_index i ON i.document=d.id WHERE d.owner=? ORDER BY d.updated DESC',(owner,)):
+                value=dict(row);project=value.pop('project');documents[project].append(value)
+            for row in db.execute('SELECT project,id,title,revision,updated,archived FROM conversations WHERE owner=? ORDER BY updated DESC',(owner,)):
+                value=dict(row);project=value.pop('project');conversations[project].append(value)
             for p in projects:
-                p['documents']=[dict(r) for r in db.execute('SELECT d.id,d.title,d.kind,d.revision,d.updated,i.state AS index_state,i.chunks AS chunk_count,i.pages AS page_count,i.revision AS indexed_revision,i.indexed AS indexed_at FROM documents d LEFT JOIN document_index i ON i.document=d.id WHERE d.owner=? AND d.project=? ORDER BY d.updated DESC',(owner,p['id']))]
-                p['memories']=[dict(r) for r in db.execute('SELECT id,text FROM memories WHERE owner=? AND project=? ORDER BY updated',(owner,p['id']))]
-                p['conversations']=[dict(r) for r in db.execute('SELECT id,title,revision,updated,archived FROM conversations WHERE owner=? AND project=? ORDER BY updated DESC',(owner,p['id']))]
-            return {'projects':projects,
+                p['documents']=documents[p['id']]
+                p['memories']=memories[p['id']]
+                p['conversations']=conversations[p['id']]
+            result={'projects':projects,
                     'jobs':[dict(r) for r in db.execute('SELECT id,project,title,state,error,created,due,repeat_hours,parent FROM jobs WHERE owner=? ORDER BY created DESC LIMIT 100',(owner,))],
-                    'personal_memories':[dict(r) for r in db.execute('SELECT id,text,updated FROM personal_memories WHERE owner=? ORDER BY updated DESC',(owner,))],
+                    'personal_memories':memories[None],
                     'limits':self.policy(db,owner),'used_bytes':self.usage(db,owner),'index':self.index_status(db,owner),'capabilities':['projects','documents','document_sources','jobs','memory','web','knowledge','assistant_commands','reminders','project_briefs']}
+        self.metrics.observe('workspace_snapshot',time.perf_counter()-started)
+        return result
 
     def history_read(self,owner):
         with self.db() as db:
@@ -378,7 +392,7 @@ class Workspace:
             return {'history':json.loads(row['history']) if row else None,'revision':row['revision'] if row else 0,'reset_id':HISTORY_RESET_ID,'generation':marker['id'],'restored':marker['restored']}
 
     def history_write(self,owner,value):
-        from history_store import validate
+        from kiara_shared.history_store import validate
         if not isinstance(value,dict) or set(value)-{'history','revision','reset_id','generation'}:raise ValueError('Historique invalide.')
         if value.get('reset_id')!=HISTORY_RESET_ID:raise Conflict('Historique effacé : mettre à jour le client pour commencer de nouvelles discussions.')
         history=validate(value.get('history'));revision=value.get('revision')
@@ -554,7 +568,7 @@ class Workspace:
         except (ValueError,TypeError):raise ValueError('Fichier encodé invalide.')
         if not raw or len(raw)>MAX_FILE:raise ValueError('Fichier vide ou supérieur à 2 Mo.')
         if not self.extract_slots.acquire(blocking=False):raise ValueError('Deux imports sont en cours. Réessayer plus tard.')
-        try:pages=isolated_extract(title,raw)
+        try:pages=isolated_extract(title,raw,self.diagnostics)
         finally:self.extract_slots.release()
         return raw,pages
 
@@ -583,180 +597,30 @@ class Workspace:
             if not content.strip():raise ValueError('Aucun texte lisible dans ce fichier. Les PDF scannés nécessitent un modèle avec vision et une image.')
             if len(content)>50000:raise ValueError('Fichier trop long : maximum 50 000 caractères extraits. Utilisez les documents du projet pour les fichiers longs.')
             return {'text':content,'name':v['title']}
+        from workspace_project import execute as project_action
+        from workspace_document import execute as document_action
+        from workspace_memory import execute as memory_action
+        from workspace_knowledge import execute as knowledge_action
+        from workspace_conversation import execute as conversation_action
+        from workspace_job import execute as job_action
+        domains = {
+            ('project_create', 'project_save'): project_action,
+            ('document_create', 'document_upload', 'document_save', 'document_get', 'document_download', 'document_delete', 'search', 'source_get', 'index_status'): document_action,
+            ('personal_memory_create', 'personal_memory_save', 'personal_memory_delete', 'memory_create', 'memory_save', 'memory_delete'): memory_action,
+            ('knowledge_search',): knowledge_action,
+            ('conversation_save', 'conversation_move', 'conversation_archive', 'conversation_get', 'conversation_delete'): conversation_action,
+            ('job_create', 'job_get', 'job_cancel', 'job_pause', 'job_retry'): job_action,
+        }
+        handler = next((handler for names, handler in domains.items() if action in names), None)
+        if handler is None:
+            raise ValueError("Action inconnue.")
         with self.db(owner) as db:
-            if self.maintenance:raise Denied('Serveur en maintenance.')
-            if action=='project_create':
-                title=text(v.get('title'),120,'Nom');limits=self.policy(db,owner)
-                if db.execute('SELECT COUNT(*) FROM projects WHERE owner=?',(owner,)).fetchone()[0]>=limits['projects']:raise ValueError('Limite de projets atteinte.')
-                id=secrets.token_hex(16);db.execute('INSERT INTO projects VALUES(?,?,?,?,0,1,?)',(id,owner,title,'',now));result={'id':id}
-            elif action=='project_save':
-                p=self.own(db,'projects',v.get('id'),owner)
-                if v.get('revision')!=p['revision']:raise Conflict('Projet modifié ailleurs : rechargez avant de réessayer.')
-                title=text(v.get('title'),120,'Nom');prompt=text(v.get('instructions',''),12000,'Instructions',True)
-                if type(v.get('archived',False)) is not bool:raise ValueError('Archivage invalide.')
-                self.quota(db,owner,max(0,len(prompt.encode())-len(p['instructions'].encode())))
-                db.execute('UPDATE projects SET title=?,instructions=?,archived=?,revision=revision+1,updated=? WHERE id=?',(title,prompt,int(v.get('archived',False)),now,p['id']));result={'revision':p['revision']+1}
-            elif action in ('document_create','document_upload','document_save'):
-                p=self.own(db,'projects',v.get('project'),owner)
-                if p['archived']:raise ValueError('Projet archivé.')
-                title=text(v.get('title'),180,'Nom du document');raw=None;kind='note';pdf=False;previous=None
-                if action=='document_save':
-                    previous=self.own(db,'documents',v.get('id'),owner)
-                    if previous['project']!=p['id']:raise Denied('Document hors projet.')
-                    if v.get('revision')!=previous['revision']:raise Conflict('Document modifié ailleurs. Votre brouillon est conservé ; rechargez pour comparer.')
-                    id=previous['id'];kind=previous['kind'];raw=previous['original']
-                else:
-                    if db.execute('SELECT COUNT(*) FROM documents WHERE owner=?',(owner,)).fetchone()[0]>=500:raise ValueError('Maximum 500 documents par accès.')
-                    id=secrets.token_hex(16)
-                if action=='document_upload':
-                    raw,pages=prepared
-                    kind=Path(title).suffix.lower().lstrip('.');pdf=kind=='pdf';content='\n\n'.join(pages)
-                else:content=text(v.get('text',''),MAX_TEXT,'Texte',True);pages=[content]
-                old_bytes=0
-                if previous:
-                    old_bytes=len(previous['text'].encode())+db.execute('SELECT COALESCE(SUM(length(CAST(text AS BLOB))),0) FROM chunks WHERE document=?',(id,)).fetchone()[0]
-                extra=max(0,len(content.encode())*3-old_bytes)+(len(raw or b'') if not previous else 0)
-                self.quota(db,owner,extra+600)
-                revision=previous['revision']+1 if previous else 1
-                if previous:db.execute('UPDATE documents SET title=?,text=?,revision=?,updated=? WHERE id=?',(title,content,revision,now,id))
-                else:db.execute('INSERT INTO documents VALUES(?,?,?,?,?,?,?,?,?)',(id,owner,p['id'],title,content,raw,kind,revision,now))
-                self.index(db,owner,p['id'],id,pages,pdf);result={'id':id,'revision':revision}
-            elif action=='document_get':
-                d=self.own(db,'documents',v.get('id'),owner);d.pop('original')
-                status=db.execute('SELECT state,chunks,pages,revision,indexed FROM document_index WHERE document=? AND owner=?',(d['id'],owner)).fetchone()
-                d.update({'index_state':status[0] if status else 'unknown','chunk_count':status[1] if status else 0,'page_count':status[2] if status else None,'indexed_revision':status[3] if status else None,'indexed_at':status[4] if status else None});return d
-            elif action=='document_download':
-                d=self.own(db,'documents',v.get('id'),owner)
-                return {'title':d['title'],'data':base64.b64encode(d['original'] or d['text'].encode()).decode(),'original':d['original'] is not None}
-            elif action=='document_delete':
-                d=self.own(db,'documents',v.get('id'),owner)
-                if v.get('revision')!=d['revision']:raise Conflict('Document modifié ailleurs.')
-                db.execute('DELETE FROM documents WHERE id=?',(d['id'],));result={'deleted':True}
-            elif action=='search':
-                p=self.own(db,'projects',v.get('project'),owner)
-                selected=v.get('document')
-                if selected:
-                    d=self.own(db,'documents',selected,owner)
-                    if d['project']!=p['id']:raise Denied('Document hors projet.')
-                sources=self.search(db,owner,p['id'],text(v.get('query'),2000,'Question'),[selected] if selected else None)
-                return {'sources':sources,'empty':not sources,'message':'Aucun passage documentaire correspondant.' if not sources else '', 'index':self.index_status(db,owner,p['id'])}
-            elif action=='source_get':return self.read_source(db,owner,v.get('source_id'))
-            elif action=='index_status':
-                project=v.get('project')
-                if project:self.own(db,'projects',project,owner)
-                return self.index_status(db,owner,project)
-            elif action in ('personal_memory_create','personal_memory_save','personal_memory_delete'):
-                if action=='personal_memory_create':
-                    content=text(v.get('text'),2000,'Mémoire personnelle')
-                    if db.execute('SELECT COUNT(*) FROM personal_memories WHERE owner=?',(owner,)).fetchone()[0]>=50:raise ValueError('Maximum 50 mémoires personnelles.')
-                    self.quota(db,owner,len(content.encode()));id=secrets.token_hex(16)
-                    db.execute('INSERT INTO personal_memories VALUES(?,?,?,?)',(id,owner,content,now));result={'id':id}
-                else:
-                    id=identifier(v.get('id'));m=db.execute('SELECT text FROM personal_memories WHERE id=? AND owner=?',(id,owner)).fetchone()
-                    if not m:raise Denied('Mémoire absente ou accès interdit.')
-                    if action=='personal_memory_save':
-                        if v.get('text')!=m[0]:
-                            from assistant_commands import retire_legacy
-                            retire_legacy(db,owner,None,id,m[0])
-                        content=text(v.get('text'),2000,'Mémoire personnelle');self.quota(db,owner,max(0,len(content.encode())-len(m[0].encode())))
-                        db.execute('UPDATE personal_memories SET text=?,updated=? WHERE id=?',(content,now,id))
-                    else:
-                        from assistant_commands import retire_legacy
-                        retire_legacy(db,owner,None,id,m[0],forgotten=True)
-                        db.execute('DELETE FROM personal_memories WHERE id=?',(id,))
-                    result={'saved':True}
-            elif action=='knowledge_search':
-                project=v.get('project')
-                if project:
-                    p=self.own(db,'projects',project,owner)
-                    if p['archived']:raise ValueError('Projet archivé.')
-                query=text(v.get('query'),2000,'Question')
-                rows=self.knowledge.retrieve(db,owner,project or '',query) if self.knowledge else []
-                return {'sources':[self.knowledge.reference(r) for r in rows],'empty':not rows}
-            elif action=='memory_create':
-                p=self.own(db,'projects',v.get('project'),owner);content=text(v.get('text'),2000,'Mémoire')
-                if db.execute('SELECT COUNT(*) FROM memories WHERE owner=? AND project=?',(owner,p['id'])).fetchone()[0]>=50:raise ValueError('Maximum 50 mémoires par projet.')
-                self.quota(db,owner,len(content.encode()));id=secrets.token_hex(16);db.execute('INSERT INTO memories VALUES(?,?,?,?,?)',(id,owner,p['id'],content,now));result={'id':id}
-            elif action in ('memory_save','memory_delete'):
-                m=self.own(db,'memories',v.get('id'),owner)
-                if action=='memory_delete' or v.get('text')!=m['text']:
-                    from assistant_commands import retire_legacy
-                    retire_legacy(db,owner,m['project'],m['id'],m['text'],forgotten=action=='memory_delete')
-                if action=='memory_save':
-                    content=text(v.get('text'),2000,'Mémoire');self.quota(db,owner,max(0,len(content.encode())-len(m['text'].encode())));db.execute('UPDATE memories SET text=?,updated=? WHERE id=?',(content,now,m['id']))
-                else:db.execute('DELETE FROM memories WHERE id=?',(m['id'],))
-                result={'saved':True}
-            elif action=='conversation_save':
-                if v.get('reset_id')!=HISTORY_RESET_ID:raise Conflict('Historique effacé : mettre à jour le client avant de publier une nouvelle discussion.')
-                p=self.own(db,'projects',v.get('project'),owner);content=v.get('messages')
-                if not isinstance(content,list) or len(content)>1000 :raise ValueError('Conversation invalide.')
-                for message in content:validate_message(message)
-                encoded=json.dumps(content,ensure_ascii=False)
-                if len(encoded.encode())>9*1024*1024:raise ValueError('Conversation limitée à 9 Mo.')
-                title=text(v.get('title'),120,'Nom');id=identifier(v.get('id'));r=db.execute('SELECT * FROM conversations WHERE id=?',(id,)).fetchone()
-                if r and (r['owner']!=owner or r['project']!=p['id']):raise Denied('Conversation hors projet.')
-                if (r['revision'] if r else 0)!=v.get('revision',0):raise Conflict('Conversation modifiée ailleurs. Rechargez avant de publier.')
-                if not r and db.execute('SELECT COUNT(*) FROM conversations WHERE owner=?',(owner,)).fetchone()[0]>=200:raise ValueError('Maximum 200 conversations serveur.')
-                self.quota(db,owner,max(0,len(encoded.encode())-(len(r['messages'].encode()) if r else 0)))
-                revision=r['revision']+1 if r else 1
-                archived=v.get('archived',bool(r['archived']) if r else False)
-                if type(archived) is not bool:raise ValueError('Archivage invalide.')
-                db.execute('INSERT OR REPLACE INTO conversations(id,owner,project,title,messages,revision,updated,archived) VALUES(?,?,?,?,?,?,?,?)',(id,owner,p['id'],title,encoded,revision,now,int(archived)));result={'revision':revision}
-                db.execute('DELETE FROM knowledge_exclusions WHERE owner=? AND conversation=?',(owner,id))
-            elif action in ('conversation_move','conversation_archive'):
-                r=self.own(db,'conversations',v.get('id'),owner)
-                if v.get('revision')!=r['revision']:raise Conflict('Conversation modifiée ailleurs. Rechargez avant de réessayer.')
-                if action=='conversation_move':
-                    p=self.own(db,'projects',v.get('project'),owner)
-                    if p['archived']:raise ValueError('Projet archivé : restaurez-le avant de déplacer une discussion.')
-                    db.execute('UPDATE conversations SET project=?,revision=revision+1,updated=? WHERE id=?',(p['id'],now,r['id']))
-                else:
-                    if type(v.get('archived')) is not bool:raise ValueError('Archivage invalide.')
-                    db.execute('UPDATE conversations SET archived=?,revision=revision+1,updated=? WHERE id=?',(int(v['archived']),now,r['id']))
-                result={'revision':r['revision']+1}
-            elif action=='conversation_get':
-                r=self.own(db,'conversations',v.get('id'),owner);r['messages']=json.loads(r['messages']);return r
-            elif action=='conversation_delete':
-                r=self.own(db,'conversations',v.get('id'),owner)
-                if v.get('revision')!=r['revision']:raise Conflict('Conversation modifiée ailleurs.')
-                history=db.execute('SELECT history FROM client_histories WHERE owner=?',(owner,)).fetchone()
-                if history and any(c['id']==r['id'] for c in json.loads(history[0])['conversations']):
-                    db.execute('INSERT OR IGNORE INTO knowledge_exclusions VALUES(?,?)',(owner,r['id']))
-                db.execute('DELETE FROM conversations WHERE id=?',(r['id'],));result={'deleted':True}
-            elif action=='job_create':
-                p=self.own(db,'projects',v.get('project'),owner)
-                if p['archived']:raise ValueError('Projet archivé.')
-                kind=v.get('kind','analysis')
-                if kind not in ('analysis','web'):raise ValueError('Type de tâche invalide.')
-                prompt=text(v.get('prompt'),12000,'Consigne');url=text(v.get('url',''),2000,'URL',True);title=text(v.get('title',prompt[:100]),120,'Nom')
-                repeat=v.get('repeat_hours',0);delay=v.get('delay_minutes',0)
-                if type(repeat) is not int or repeat not in (0,24,168) or type(delay) is not int or not 0<=delay<=525600:raise ValueError('Planification invalide.')
-                if kind=='web':self.allow_web(db,owner,url)
-                if kind=='web' and not url and (len(prompt)>600 or len(prompt.split())>75):raise ValueError('Recherche par sujet : maximum 600 caractères et 75 mots.')
-                request_key=identifier(v.get('request_key'));existing=db.execute('SELECT id FROM jobs WHERE owner=? AND request_key=?',(owner,request_key)).fetchone()
-                if existing:return {'id':existing[0]}
-                if db.execute("SELECT COUNT(*) FROM jobs WHERE owner=? AND state IN ('queued','running','paused')",(owner,)).fetchone()[0]>=self.policy(db,owner)['jobs']:raise ValueError('Limite de tâches actives atteinte.')
-                self.prune(db,owner);self.quota(db,owner,len(prompt.encode()));id=secrets.token_hex(16)
-                db.execute('INSERT INTO jobs(id,owner,project,title,prompt,kind,url,state,created,due,repeat_hours,request_key) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)',(id,owner,p['id'],title,prompt,kind,url,'queued',now,now+delay*60,repeat,request_key));result={'id':id}
-            elif action=='job_get':return self.own(db,'jobs',v.get('id'),owner)
-            elif action in ('job_cancel','job_pause','job_retry'):
-                job=self.own(db,'jobs',v.get('id'),owner)
-                if action=='job_retry' and job['state'] not in ('failed','cancelled','paused'):raise ValueError('Cette tâche ne peut pas être relancée.')
-                if action=='job_pause' and job['state'] not in ('queued','running'):raise ValueError('Tâche déjà terminée.')
-                if action=='job_retry' and db.execute("SELECT COUNT(*) FROM jobs WHERE owner=? AND state IN ('queued','running')",(owner,)).fetchone()[0]>=self.policy(db,owner)['jobs']:raise ValueError('Limite de tâches atteinte.')
-                if action=='job_retry':
-                    from notifications import advance_job_attempt
-                    self.quota(db,owner,160)
-                    advance_job_attempt(db,job['id'])
-                state={'job_retry':'queued','job_pause':'paused','job_cancel':'cancelled'}[action]
-                db.execute('UPDATE jobs SET state=?,due=?,error=? WHERE id=?',(state,now,'',job['id']));result={'state':state}
-                running=self.running.get(job['id'])
-                if running:running.set()
-            else:raise ValueError('Action inconnue.')
-            if action in ('memory_create','memory_save','memory_delete','personal_memory_create','personal_memory_save','personal_memory_delete'):
-                from assistant_commands import bump_memory
-                bump_memory(db,owner)
-            self.event(db,owner,action,result.get('id',v.get('id',v.get('project',''))));return result
+            if self.maintenance:
+                raise Denied("Serveur en maintenance.")
+            result, changed = handler(self, db, owner, v, now, prepared)
+            if changed:
+                self.event(db, owner, action, result.get("id", v.get("id", v.get("project", ""))))
+            return result
 
     def prune(self,db,owner):
         db.execute("DELETE FROM jobs WHERE owner=? AND state IN ('completed','failed','cancelled') AND id NOT IN (SELECT id FROM jobs WHERE owner=? ORDER BY created DESC LIMIT 100)",(owner,owner))
@@ -931,14 +795,17 @@ class Workspace:
             from assistant_commands import tick
             while not self.stop.wait(1):
                 try:tick(self)
-                except Exception:self.stop.wait(3)
+                except Exception as error:
+                    self.diagnostics.record('workspace','reminder_tick',error)
+                    self.stop.wait(3)
         reminder_worker=threading.Thread(target=reminders,daemon=True,name='kiara-reminders')
         reminder_worker.start()
         try:
             while not self.stop.wait(1):
                 try:self.run_one()
-                except Exception:
+                except Exception as error:
                     # A worker infrastructure error must not silently kill later jobs.
+                    self.diagnostics.record('workspace','run_job',error)
                     self.stop.wait(3)
         finally:
             self.stop.set();reminder_worker.join(timeout=2)
@@ -1006,6 +873,8 @@ class Workspace:
         memory=sqlite3.connect(':memory:')
         try:
             memory.deserialize(raw)
+            from workspace_migrations import ensure_supported, upgrade
+            ensure_supported(memory, archive=True)
             if memory.execute('PRAGMA integrity_check').fetchone()[0]!='ok' or memory.execute('PRAGMA foreign_key_check').fetchone():raise ValueError('Base des espaces endommagée.')
             # Compare schema with our installed schema; never execute restored triggers/views.
             with self.db() as db:
@@ -1014,7 +883,7 @@ class Workspace:
             if [tuple(r) for r in installed]!=restored:
                 # Upgrade only our known previous schema, without executing any restored SQL.
                 accepted=[]
-                for schema in (SCHEMA,PRE_ASSISTANT_SCHEMA,PRE_EMBEDDING_SCHEMA,PRE_DOCUMENT_SCHEMA,PRE_NOTIFICATIONS_SCHEMA,LEGACY_SCHEMA,PRE_DOCUMENT_SCHEMA+NOTIFICATIONS_SCHEMA,LEGACY_SCHEMA+DOCUMENT_SCHEMA,LEGACY_SCHEMA+DOCUMENT_SCHEMA+NOTIFICATIONS_SCHEMA):
+                for schema in (SCHEMA,SCHEMA_V1,PRE_ASSISTANT_SCHEMA,PRE_EMBEDDING_SCHEMA,PRE_DOCUMENT_SCHEMA,PRE_NOTIFICATIONS_SCHEMA,LEGACY_SCHEMA,PRE_DOCUMENT_SCHEMA+NOTIFICATIONS_SCHEMA,LEGACY_SCHEMA+DOCUMENT_SCHEMA,LEGACY_SCHEMA+DOCUMENT_SCHEMA+NOTIFICATIONS_SCHEMA):
                     legacy=sqlite3.connect(':memory:')
                     try:
                         legacy.executescript(schema)
@@ -1034,7 +903,8 @@ class Workspace:
                 migrate(memory)
                 memory.executescript(PERSONAL_SCHEMA)
                 memory.executescript(ASSISTANT_SCHEMA)
-            if memory.execute('PRAGMA user_version').fetchone()[0]!=1:raise ValueError('Version des espaces incompatible.')
+                upgrade(memory)
+            if memory.execute('PRAGMA user_version').fetchone()[0]!=SCHEMA_VERSION:raise ValueError('Version des espaces incompatible.')
             for table in ('projects','documents','chunks','memories','personal_memories','knowledge_exclusions','conversations','jobs','client_histories','document_index','document_sources'):
                 if any(r[0] not in owners for r in memory.execute('SELECT DISTINCT owner FROM '+table)):raise ValueError('Espaces sans accès personnel correspondant.')
             for table in ('documents','chunks','memories','conversations','jobs','document_index','document_sources'):
@@ -1062,7 +932,7 @@ class Workspace:
             validate_notifications(memory,owners)
             from assistant_commands import validate as validate_assistant
             validate_assistant(memory,owners)
-            from history_store import validate
+            from kiara_shared.history_store import validate
             for row in memory.execute('SELECT * FROM personal_memories'):
                 identifier(row['id']);text(row['text'],2000,'Mémoire personnelle')
                 if not isinstance(row['updated'],(int,float)) or not math.isfinite(row['updated']) or row['updated']<=0:raise ValueError('Date de mémoire personnelle invalide.')
@@ -1087,12 +957,7 @@ class Workspace:
             for suffix in ('-wal','-shm'):Path(str(self.path)+suffix).unlink(missing_ok=True)
             os.replace(temporary,self.path)
             with self.db() as db:
-                migrate_workspace(db)
-                migrate_documents(db)
-                from notifications import migrate
-                migrate(db)
-                db.executescript(PERSONAL_SCHEMA)
-                db.executescript(ASSISTANT_SCHEMA)
+                initialize_database(db)
                 db.execute("UPDATE jobs SET state='failed',error='Restauration : relance manuelle nécessaire.' WHERE state IN ('queued','running')")
                 db.execute("DELETE FROM settings WHERE key='worker'")
             if self.knowledge:self.knowledge.reset()

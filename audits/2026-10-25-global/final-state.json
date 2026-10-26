@@ -1,0 +1,61 @@
+{
+  "observed_utc": "2026-10-25T23:20:20.264518+00:00",
+  "head": "4ca825bf6f04e7bb906a9d4def60d69852d54fa5",
+  "git_status": [
+    " M .agents/skills/frontend-human-centered/SKILL.md",
+    " M .agents/skills/professional-ui-design/SKILL.md",
+    " M .agents/skills/ux-consistency-review/SKILL.md",
+    " M .agents/skills/ux-writing-cleaner/SKILL.md",
+    " M AGENTS.md",
+    " M Certificat-NAS-karenax-20261006.md",
+    " M Configuration-Cloudflare-karenax-20261006.md",
+    " M preuves/model-picker-fix-20261011/selector-windows.png",
+    " M preuves/reasoning-models-20261011/reasoning-windows.png",
+    "?? analyses/2026-10-24-deepseek/",
+    "?? audits/2026-10-25-global/",
+    "?? maintenance/2026-10-24-bolt-cpu/",
+    "?? maintenance/2026-10-24-diagnostic-disque/",
+    "?? maintenance/2026-10-25-assistant-integration/avant/"
+  ],
+  "preexisting_status_preserved": true,
+  "audit_fixture_listeners_remaining": [],
+  "local_links_checked": 92,
+  "invalid_links": [],
+  "documents": [
+    {
+      "path": "DEPENDANCES.md",
+      "words": 1177,
+      "sha256": "e312e96ed98b96e6e7de454527f681635b33f788c5a0c006d7691a73c3872a8b"
+    },
+    {
+      "path": "PLAN-ACTION.md",
+      "words": 1405,
+      "sha256": "6d00523597becf99841f6b3d28921f68c7fbffe812fc3fa54cde6f9983d7e9de"
+    },
+    {
+      "path": "RAPPORT.md",
+      "words": 5987,
+      "sha256": "9f9b8b2bdbe53cb49573378d3795d38469b5658f6817abd95148469356da1963"
+    },
+    {
+      "path": "VALIDATION.md",
+      "words": 918,
+      "sha256": "fdff4586d480a48f647044296fff1fb660384c08780e96c3b1f8ddf258be2084"
+    }
+  ],
+  "test_counts": {
+    "python_server": 568,
+    "python_windows": 87,
+    "python_voice": 38,
+    "python_android": 13,
+    "go_tests": 1,
+    "ui_suites": 15
+  },
+  "findings": {
+    "P0": 0,
+    "P1": 2,
+    "P2": 13,
+    "P3": 2
+  },
+  "application_changes_made": false
+}

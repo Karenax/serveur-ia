@@ -1,0 +1,13 @@
+{
+  "result": {
+    "status": "chargement",
+    "worker_pid": 33628
+  },
+  "session": {
+    "directory": "D:\\Serveur IA\\lanceur\\sessions\\20261026-114252-106060",
+    "worker": {
+      "pid": 33628,
+      "created": 1793011376.716437
+    }
+  }
+}

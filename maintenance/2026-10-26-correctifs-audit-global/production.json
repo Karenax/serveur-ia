@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "server_windows": "3.5.53",
+  "android": "1.0.24",
+  "android_code": 25,
+  "voice_revision": "vocal-rt-de5e67a320a06b1f",
+  "personal_identities_preserved": true,
+  "keys_settings_data_preserved": true,
+  "backup_schedule_preserved": true,
+  "model_processes_and_state_preserved": true,
+  "hermes_ready": true,
+  "microphone_tested": false,
+  "physical_android_tested": false
+}

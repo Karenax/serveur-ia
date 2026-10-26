@@ -1,0 +1,4388 @@
+{
+  "config": [
+    {
+      "protocol_version": "v1.0.0",
+      "scanner_name": "govulncheck",
+      "scanner_version": "v1.9.0",
+      "db": "https://vuln.go.dev",
+      "db_last_modified": "2026-10-21T00:27:29Z",
+      "go_version": "go1.27.1",
+      "scan_level": "symbol",
+      "scan_mode": "source"
+    }
+  ],
+  "finding_records": 243,
+  "called_advisories": [
+    {
+      "id": "GO-2026-6603",
+      "summary": "HTTP/2 server memory exhaustion due to Trailer headers in net/http",
+      "fixed": [
+        "v1.27.2"
+      ],
+      "symbols": [
+        "net/http/internal/http2.AddConn",
+        "net/http/internal/http2.Close",
+        "net/http/internal/http2.CloseIdleConnections",
+        "net/http/internal/http2.FlushError",
+        "net/http/internal/http2.NewClientConn",
+        "net/http/internal/http2.Read",
+        "net/http/internal/http2.RoundTrip",
+        "net/http/internal/http2.ServeConn",
+        "net/http/internal/http2.Write",
+        "net/http/internal/http2.WriteHeader",
+        "net/http/internal/http2.WriteString"
+      ],
+      "application_frames": [
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 10752,
+            "line": 286,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 10752,
+            "line": 286,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 10752,
+            "line": 286,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16100,
+            "line": 390,
+            "column": 36
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 10752,
+            "line": 286,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 10752,
+            "line": 286,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16100,
+            "line": 390,
+            "column": 36
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16100,
+            "line": 390,
+            "column": 36
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16100,
+            "line": 390,
+            "column": 36
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 10752,
+            "line": 286,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 10752,
+            "line": 286,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16100,
+            "line": 390,
+            "column": 36
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 10752,
+            "line": 286,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16100,
+            "line": 390,
+            "column": 36
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16100,
+            "line": 390,
+            "column": 36
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16100,
+            "line": 390,
+            "column": 36
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-6605",
+      "summary": "HTTP/1 client connection desynchronization after CONNECT rejection in net/http",
+      "fixed": [
+        "v1.27.2"
+      ],
+      "symbols": [
+        "net/http.CloseIdleConnections",
+        "net/http.RoundTrip",
+        "net/http/httputil.ServeHTTP"
+      ],
+      "application_frames": [
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 10752,
+            "line": 286,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-6607",
+      "summary": "Reject malformed ECH outer extension references in crypto/tls",
+      "fixed": [
+        "v1.27.2"
+      ],
+      "symbols": [
+        "crypto/tls.DialContext",
+        "crypto/tls.HandshakeContext",
+        "crypto/tls.Read",
+        "crypto/tls.Write"
+      ],
+      "application_frames": [
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 10752,
+            "line": 286,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "peerCommands",
+          "position": {
+            "filename": "main.go",
+            "offset": 2636,
+            "line": 92,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer",
+          "position": {
+            "filename": "main.go",
+            "offset": 3304,
+            "line": 109,
+            "column": 36
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 9536,
+            "line": 252,
+            "column": 19
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-6608",
+      "summary": "Memory limit bypass when parsing MIME headers in net/textproto, mime/multipart",
+      "fixed": [
+        "v1.27.2"
+      ],
+      "symbols": [
+        "net/textproto.ReadMIMEHeader"
+      ],
+      "application_frames": [
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 10752,
+            "line": 286,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-6610",
+      "summary": "HTTP/2 transport accepts malformed framing-related headers in net/http",
+      "fixed": [
+        "v1.27.2"
+      ],
+      "symbols": [
+        "net/http/internal/http2.AddConn",
+        "net/http/internal/http2.NewClientConn",
+        "net/http/internal/http2.RoundTrip"
+      ],
+      "application_frames": [
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 10752,
+            "line": 286,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 10752,
+            "line": 286,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 10752,
+            "line": 286,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 10752,
+            "line": 286,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-6611",
+      "summary": "Excessive CPU consumption from repeated initial window changes in net/http",
+      "fixed": [
+        "v1.27.2"
+      ],
+      "symbols": [
+        "net/http/internal/http2.AddConn",
+        "net/http/internal/http2.Close",
+        "net/http/internal/http2.CloseIdleConnections",
+        "net/http/internal/http2.FlushError",
+        "net/http/internal/http2.NewClientConn",
+        "net/http/internal/http2.Read",
+        "net/http/internal/http2.RoundTrip",
+        "net/http/internal/http2.ServeConn",
+        "net/http/internal/http2.Write",
+        "net/http/internal/http2.WriteHeader",
+        "net/http/internal/http2.WriteString"
+      ],
+      "application_frames": [
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 10752,
+            "line": 286,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16100,
+            "line": 390,
+            "column": 36
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 10752,
+            "line": 286,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 10752,
+            "line": 286,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16100,
+            "line": 390,
+            "column": 36
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 10752,
+            "line": 286,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16100,
+            "line": 390,
+            "column": 36
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 10752,
+            "line": 286,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16100,
+            "line": 390,
+            "column": 36
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 10752,
+            "line": 286,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16100,
+            "line": 390,
+            "column": 36
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 10752,
+            "line": 286,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16100,
+            "line": 390,
+            "column": 36
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16100,
+            "line": 390,
+            "column": 36
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16100,
+            "line": 390,
+            "column": 36
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 10752,
+            "line": 286,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-6612",
+      "summary": "Double flow control refund on HTTP/2 server streams in net/http",
+      "fixed": [
+        "v1.27.2"
+      ],
+      "symbols": [
+        "net/http/internal/http2.Close",
+        "net/http/internal/http2.Read",
+        "net/http/internal/http2.ServeConn"
+      ],
+      "application_frames": [
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-6613",
+      "summary": "HTTP/1 server connection desynchronization after 2xx CONNECT response in net/http",
+      "fixed": [
+        "v1.27.2"
+      ],
+      "symbols": [
+        "net/http.CanonicalHeaderKey",
+        "net/http.Clone",
+        "net/http.Close",
+        "net/http.CloseIdleConnections",
+        "net/http.Del",
+        "net/http.Error",
+        "net/http.Read",
+        "net/http.ReadFrom",
+        "net/http.Serve",
+        "net/http.Write",
+        "net/http.WriteString"
+      ],
+      "application_frames": [
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16100,
+            "line": 390,
+            "column": 36
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 10819,
+            "line": 287,
+            "column": 28
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15620,
+            "line": 374,
+            "column": 57
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "init",
+          "position": {
+            "filename": "main.go",
+            "offset": 225,
+            "line": 15,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16100,
+            "line": 390,
+            "column": 36
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16100,
+            "line": 390,
+            "column": 36
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "peerCommands",
+          "position": {
+            "filename": "main.go",
+            "offset": 2636,
+            "line": 92,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer",
+          "position": {
+            "filename": "main.go",
+            "offset": 3304,
+            "line": 109,
+            "column": 36
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 9536,
+            "line": 252,
+            "column": 19
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16100,
+            "line": 390,
+            "column": 36
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16100,
+            "line": 390,
+            "column": 36
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16137,
+            "line": 390,
+            "column": 73
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16100,
+            "line": 390,
+            "column": 36
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 10752,
+            "line": 286,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-6617",
+      "summary": "HTTP/2 server crash due to HPACK encoder race in net/http",
+      "fixed": [
+        "v1.27.2"
+      ],
+      "symbols": [
+        "net/http/internal/http2.AddConn",
+        "net/http/internal/http2.Close",
+        "net/http/internal/http2.CloseIdleConnections",
+        "net/http/internal/http2.FlushError",
+        "net/http/internal/http2.NewClientConn",
+        "net/http/internal/http2.Read",
+        "net/http/internal/http2.RoundTrip",
+        "net/http/internal/http2.ServeConn",
+        "net/http/internal/http2.Write",
+        "net/http/internal/http2.WriteHeader",
+        "net/http/internal/http2.WriteString"
+      ],
+      "application_frames": [
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 10752,
+            "line": 286,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 10752,
+            "line": 286,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 10752,
+            "line": 286,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 10752,
+            "line": 286,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16100,
+            "line": 390,
+            "column": 36
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 10752,
+            "line": 286,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16100,
+            "line": 390,
+            "column": 36
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16100,
+            "line": 390,
+            "column": 36
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 10752,
+            "line": 286,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16100,
+            "line": 390,
+            "column": 36
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16100,
+            "line": 390,
+            "column": 36
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 10752,
+            "line": 286,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 10752,
+            "line": 286,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16100,
+            "line": 390,
+            "column": 36
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16100,
+            "line": 390,
+            "column": 36
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16100,
+            "line": 390,
+            "column": 36
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "runServer$3",
+          "position": {
+            "filename": "main.go",
+            "offset": 6805,
+            "line": 174,
+            "column": 18
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15826,
+            "line": 378,
+            "column": 20
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-6809",
+      "summary": "Distrust compromised intermediate certificates in crypto/x509",
+      "fixed": [
+        "v1.27.3"
+      ],
+      "symbols": [
+        "crypto/x509.Verify"
+      ],
+      "application_frames": [
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run$5",
+          "position": {
+            "filename": "main.go",
+            "offset": 15584,
+            "line": 374,
+            "column": 21
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "run",
+          "position": {
+            "filename": "main.go",
+            "offset": 15565,
+            "line": 374,
+            "column": 2
+          }
+        },
+        {
+          "module": "qwen.local/wireguard-bridge",
+          "package": "qwen.local/wireguard-bridge",
+          "function": "main",
+          "position": {
+            "filename": "main.go",
+            "offset": 16047,
+            "line": 389,
+            "column": 15
+          }
+        }
+      ]
+    }
+  ]
+}

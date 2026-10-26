@@ -1,0 +1,7 @@
+test_actual_native_mcp_transport_carries_admitted_run_identity (test_hermes_models.NativeCloudTests.test_actual_native_mcp_transport_carries_admitted_run_identity) ... ok
+test_fixed_native_key_helper_requires_private_run_and_returns_only_bounded_token (test_hermes_models.ModelsTests.test_fixed_native_key_helper_requires_private_run_and_returns_only_bounded_token) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 35.256s
+
+OK

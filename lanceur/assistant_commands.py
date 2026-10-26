@@ -22,7 +22,7 @@ WRITES = {'memory_add', 'memory_update', 'memory_forget', 'note_create',
           'task_pause', 'task_cancel', 'brief_refresh'}
 WRITES |= {'brief_generate','brief_settings'}
 OPERATIONS = READS | WRITES
-MAX_ITEMS = 250
+from command_journal import RECOVERY, prepare as prepare_command, record as record_command, validate_key, request_key as new_request_key
 INSTRUCTIONS = (
     'Commandes Kiara : utilise fred_assistant pour les souvenirs, notes, tâches, rappels '
     'et bilans du périmètre courant. Une information personnelle ne se mémorise que sur '
@@ -35,61 +35,20 @@ INSTRUCTIONS = (
 )
 
 
-def encoded(value):
-    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(',', ':'), allow_nan=False)
 
 
-def words(value):
-    return re.findall(r'\w+',unicodedata.normalize('NFKC',value).casefold())
 
 
-def suppress_old(payload,value):
-    tokens=words(value)
-    rule={'length':len(tokens),'hash':digest(tokens)}
-    blocked=list(payload.get('blocked',[]))
-    for source in payload.get('source_rules',[]):
-        if source not in blocked:blocked.append(source)
-    if rule not in blocked:blocked.append(rule)
-    return {**payload,'blocked':blocked[-50:]}
 
 
-def suppression_rules(db,owner,project):
-    return [rule for row in db.execute("SELECT payload FROM assistant_items WHERE owner=? AND kind='memory' AND (project IS ? OR (project IS NULL AND json_extract(payload,'$.global')=1))",(owner,project or None))
-            for rule in json.loads(row[0]).get('blocked',[])]
 
 
-def retire_legacy(db,owner,project,identity,value,forgotten=False):
-    row=db.execute("SELECT payload FROM assistant_items WHERE id=? AND owner=? AND kind='memory'",(identity,owner)).fetchone()
-    payload=json.loads(row[0]) if row else {}
-    save(db,owner,project,'memory',identity,{**suppress_old(payload,value),'forgotten':forgotten,'origin':payload.get('origin','Gestion Kiara')})
 
 
-def suppressed(value,rules):
-    tokens=words(value)
-    for length in {r['length'] for r in rules if r['length']>0}:
-        hashes={r['hash'] for r in rules if r['length']==length}
-        if any(digest(tokens[i:i+length]) in hashes for i in range(len(tokens)-length+1)):
-            return True
-    return False
 
 
-def model_history(workspace,owner,project,messages):
-    with workspace.db() as db:rules=suppression_rules(db,owner,project)
-    if not rules:return messages
-    result=[];hide_reply=False
-    for message in messages:
-        content=message.get('content','')
-        text=content if isinstance(content,str) else '\n'.join(p.get('text','') for p in content if p.get('type')=='text')
-        hidden=message.get('role') in ('user','assistant') and suppressed(text,rules)
-        if hidden or hide_reply and message.get('role')=='assistant':
-            result.append({'role':message['role'],'content':'[Ancien souvenir oublié ou corrigé. Consulter les souvenirs actuels.]'})
-        else:result.append(message)
-        if message.get('role')=='user':hide_reply=hidden
-    return result
 
 
-def digest(value):
-    return hashlib.sha256(encoded(value).encode()).hexdigest()
 
 
 def check_intent(operation,request_text):
@@ -97,6 +56,17 @@ def check_intent(operation,request_text):
     if request_text is None or operation in READS or operation=='brief_refresh':
         return
     value=''.join(c for c in unicodedata.normalize('NFD',request_text.casefold()) if unicodedata.category(c)!='Mn')
+    # Quoted text is data; negative or explanatory clauses grant no mutation.
+    value=re.sub(r'«[^»]*»|“[^”]*”|"[^"\n]*"|`[^`]*`',' ',value)
+    value=re.sub(r'\bn[’\x27]oublie(?:z)?\s+pas\s+(?:de\s+|d[’\x27])','',value)
+    clauses=re.split(r'[.!?;,\n]+|\bmais\b',value)
+    affirmative=[]
+    for clause in clauses:
+        if re.search(r"\bne\b|\bn['’]",clause) and re.search(r'\b(pas|jamais|plus|rien|guere|aucun\w*)\b',clause):
+            continue
+        if re.search(r'\b(sans\s+(?:rien\s+)?(?:modifi\w*|enregistr\w*|supprim\w*)|explique\w*|signifie\w*|tradui\w*|cite\w*)\b',clause):
+            continue
+        affirmative.append(clause)
     patterns={
         'memory_add':r'\b(retiens|retenez|memorise\w*|souviens|souvenez|garde\w* en memoire|enregistre\w*.*(?:memoire|souvenir)|note\w* que)\b',
         'memory_update':r'\b(corrig\w*|remplac\w*|modifi\w*|chang\w*|actualis\w*|mets? a jour)\b',
@@ -111,12 +81,12 @@ def check_intent(operation,request_text):
         'brief_generate':r'\b(bilan|synthese|resume\w*|point|repren\w*)\b',
         'brief_settings':r'\b(automati\w*|activ\w*|desactiv\w*)\b',
     }
-    if not re.search(patterns.get(operation,r'(?!)'),value,re.S):
+    if not any(re.search(patterns.get(operation,r'(?!)'),clause,re.S) for clause in affirmative):
         raise ValueError('Précisez la commande que vous souhaitez effectuer ; aucune modification n’a été enregistrée.')
 
 
 def clean(value, maximum=2000, label='Texte', empty=False):
-    from workspace import text
+    from workspace_types import text
     return text(value, maximum, label, empty)
 
 
@@ -179,30 +149,12 @@ def item(db, owner, identity, kind, project):
     return {**dict(row), 'payload': json.loads(row['payload'])}
 
 
-def save(db, owner, project, kind, identity, payload, revision=1):
-    db.execute('INSERT INTO assistant_items VALUES(?,?,?,?,?,?,?) '
-               'ON CONFLICT(id) DO UPDATE SET payload=excluded.payload,revision=excluded.revision,updated=excluded.updated',
-               (identity, owner, project, kind, encoded(payload), revision, time.time()))
 
 
-def memories(db, owner, project):
-    table = 'memories' if project else 'personal_memories'
-    rows = db.execute('SELECT * FROM '+table+' WHERE owner=?'+(' AND project=?' if project else '')+
-                      ' ORDER BY updated DESC', (owner, project) if project else (owner,)).fetchall()
-    result = []
-    for row in rows:
-        meta = db.execute("SELECT * FROM assistant_items WHERE id=? AND owner=? AND kind='memory'", (row['id'], owner)).fetchone()
-        payload = json.loads(meta['payload']) if meta else {}
-        # A legacy UI may edit a memory without updating the sidecar revision.
-        revision = digest({'text': row['text'], 'updated': row['updated']})
-        result.append({'id': row['id'], 'text': row['text'], 'updated': row['updated'],
-                       'revision': revision, 'category': payload.get('category', 'information'),
-                       'origin': payload.get('origin', 'Souvenir existant'), 'project': project,'global':payload.get('global',False)})
-    return result
+from memory_service import bump_memory, epoch, global_preferences, memories, memory_epoch, model_history, mutate_memory, retire_legacy, suppress_old, suppressed, suppression_rules, words
+from assistant_repository import encoded, digest, save
 
 
-def global_preferences(db,owner):
-    return [m for m in memories(db,owner,None) if m['global'] and m['category']=='preference']
 
 
 def legacy_memories(workspace,owner):
@@ -222,14 +174,8 @@ def legacy_memories(workspace,owner):
     return result
 
 
-def epoch(db, owner):
-    row = db.execute("SELECT value FROM settings WHERE key=?", ('assistant-memory:'+owner,)).fetchone()
-    return row[0] if row else '0'
 
 
-def memory_epoch(workspace, owner):
-    with workspace.db() as db:
-        return epoch(db, owner)
 
 
 def oral_context(workspace,owner,project,query=''):
@@ -259,8 +205,6 @@ def oral_result(result,operation):
     return result.get('message','Commande terminée.')
 
 
-def bump_memory(db, owner):
-    db.execute('INSERT OR REPLACE INTO settings VALUES(?,?)', ('assistant-memory:'+owner, secrets.token_hex(16)))
 
 
 def project_conversations(db,owner,project):
@@ -338,7 +282,7 @@ def execute(workspace, owner, values, *, project=None, request_key=None, valid=l
         raise Denied('Demande annulée ou accès désactivé.')
     key = request_key or values.get('request_key')
     if operation in WRITES:
-        identifier(key)
+        validate_key(key)
     fingerprint = digest({'operation': operation, 'values': {k:v for k,v in values.items() if k not in ('request_key','action')}, 'project': project})
     with workspace.access_lock,workspace.db(owner) as db:
         if not valid() or workspace.maintenance:
@@ -348,60 +292,19 @@ def execute(workspace, owner, values, *, project=None, request_key=None, valid=l
             if p['archived']:
                 raise Denied('Projet archivé.')
         if operation in WRITES:
-            previous = db.execute('SELECT * FROM assistant_commands WHERE owner=? AND request_key=?', (owner,key)).fetchone()
-            if previous:
-                if previous['fingerprint'] != fingerprint:
-                    raise Conflict('Cette demande a déjà été utilisée pour une autre commande.')
-                return json.loads(previous['result'])
-            # Bound durable journals without silently dropping deduplication records.
-            if db.execute('SELECT COUNT(*) FROM assistant_commands WHERE owner=?', (owner,)).fetchone()[0] >= 5000:
-                raise ValueError('Journal des commandes plein. Exportez les résultats avant maintenance.')
-            workspace.quota(db, owner, len(encoded(values).encode())*3 + 2048)
+            previous = prepare_command(db, owner, key, fingerprint)
+            if previous is not None:
+                return previous
+            # Recovery remains possible even when ordinary storage is full.
+            # Receipts are bounded independently, with a durable expiry floor.
+            if operation not in RECOVERY:
+                workspace.quota(db, owner, len(encoded(values).encode())*3 + 2048)
         if operation in ('list','memory_list','reminder_list','task_list'):
             return snapshot(db, workspace, owner, project)
         now = time.time()
         if operation in ('memory_add', 'memory_update', 'memory_forget'):
-            table = 'memories' if project else 'personal_memories'
-            identity = secrets.token_hex(16) if operation == 'memory_add' else identifier(values.get('id'))
-            old = next((m for m in memories(db, owner, project) if m['id'] == identity), None)
-            meta=db.execute("SELECT payload FROM assistant_items WHERE id=? AND owner=? AND kind='memory'",(identity,owner)).fetchone()
-            metadata=json.loads(meta[0]) if meta else {}
-            if operation != 'memory_add':
-                if not old:
-                    raise Denied('Souvenir absent de cet espace.')
-                if values.get('revision') != old['revision']:
-                    raise Conflict('Ce souvenir a changé. Consultez sa version actuelle.')
-            elif len(memories(db, owner, project)) >= 50:
-                raise ValueError('Maximum 50 souvenirs dans cet espace.')
-            if operation == 'memory_forget':
-                db.execute('DELETE FROM '+table+' WHERE id=? AND owner=?', (identity,owner))
-                payload = {**suppress_old(metadata,old['text']),'forgotten': True, 'origin': origin}
-                result = {'id': identity, 'message': 'Souvenir oublié. La discussion source reste dans votre historique.'}
-            else:
-                value = clean(values.get('text'))
-                category = values.get('category', 'information')
-                if category not in ('information','preference','decision'):
-                    raise ValueError('Catégorie de souvenir inconnue.')
-                scope=values.get('scope','global' if metadata.get('global') else 'current')
-                if scope not in ('current','global'):raise ValueError('Portée du souvenir inconnue.')
-                if scope=='global' and (project or category!='preference'):
-                    raise ValueError('Choisissez l’espace Personnel et le type Préférence pour l’appliquer à tous vos projets.')
-                if scope=='global' and request_text is not None and operation=='memory_add' and not re.search(r'\b(tous|toutes|partout|global\w*|ensemble)\b',request_text,re.I):
-                    raise ValueError('Précisez si cette préférence doit s’appliquer à tous vos projets.')
-                if operation == 'memory_add':
-                    if project:
-                        db.execute('INSERT INTO memories VALUES(?,?,?,?,?)', (identity,owner,project,value,now))
-                    else:
-                        db.execute('INSERT INTO personal_memories VALUES(?,?,?,?)', (identity,owner,value,now))
-                else:
-                    db.execute('UPDATE '+table+' SET text=?,updated=? WHERE id=? AND owner=?', (value,now,identity,owner))
-                payload = {**(suppress_old(metadata,old['text']) if old and old['text']!=value else metadata), 'category': category, 'origin': origin, 'forgotten': False,'global':scope=='global'}
-                if request_text:
-                    tokens=words(request_text)[:2000]
-                    payload['source_rules']=[{'length':len(tokens),'hash':digest(tokens)}]
-                result = {'id': identity, 'message': 'Souvenir enregistré.', 'text': value}
-            save(db, owner, project, 'memory', identity, payload)
-            bump_memory(db, owner)
+            result = mutate_memory(workspace, db, owner, project, operation, values,
+                                   origin=origin, request_text=request_text)
         elif operation == 'note_create':
             if not project:
                 raise ValueError('Dans quel projet souhaitez-vous créer cette note ?')
@@ -510,7 +413,7 @@ def execute(workspace, owner, values, *, project=None, request_key=None, valid=l
         if not valid():
             raise Denied('Demande annulée ou accès désactivé.')
         if operation in WRITES:
-            db.execute('INSERT INTO assistant_commands VALUES(?,?,?,?,?)',(owner,key,fingerprint,encoded(result),now))
+            record_command(db, owner, key, fingerprint, result, now)
             workspace.event(db,owner,'assistant_'+operation,result.get('id',project or ''))
         return result
 
@@ -582,7 +485,7 @@ def auto_briefs(workspace,now):
                 if data['generated_state'] in ('queued','running','paused') or settings.get('source_fingerprint')==data['source_fingerprint']:continue
                 p=workspace.own(db,'projects',row['project'],row['owner'])
                 if p['archived']:continue
-            execute(workspace,row['owner'],{'operation':'brief_generate'},project=row['project'],request_key=digest([row['id'],data['source_fingerprint'],int(now//300)])[:32],valid=lambda:workspace.valid(row['owner']),origin='Bilan automatique')
+            execute(workspace,row['owner'],{'operation':'brief_generate'},project=row['project'],request_key=new_request_key(seed=digest([row['id'],data['source_fingerprint'],int(now//300)]),issued_at=int(now//300)*300),valid=lambda:workspace.valid(row['owner']),origin='Bilan automatique')
         except (ValueError,OSError):continue
 
 
@@ -607,6 +510,10 @@ def claim_wakeword(workspace,owner,request_key):
 
 
 def validate(db, owners):
+    for row in db.execute("SELECT key,value FROM settings WHERE key LIKE 'command-journal-floor:%'"):
+        owner=row['key'][len('command-journal-floor:'):]
+        if owner not in owners or not row['value'].isdigit() or not 0<=int(row['value'])<=int(time.time()*1000)+300000:
+            raise ValueError('Expiration des commandes sauvegardée invalide.')
     from workspace import identifier
     for row in db.execute('SELECT * FROM assistant_items'):
         identifier(row['id'])
@@ -634,6 +541,6 @@ def validate(db, owners):
             for rule in rules:
                 if not isinstance(rule,dict) or type(rule.get('length')) is not int or not 0<=rule['length']<=2000 or not re.fullmatch('[a-f0-9]{64}',rule.get('hash','')):raise ValueError('Empreinte d’oubli invalide.')
     for row in db.execute('SELECT * FROM assistant_commands'):
-        identifier(row['request_key'])
+        validate_key(row['request_key'])
         if row['owner'] not in owners or not re.fullmatch('[a-f0-9]{64}',row['fingerprint']) or not isinstance(json.loads(row['result']),dict):
             raise ValueError('Journal assistant sauvegardé invalide.')

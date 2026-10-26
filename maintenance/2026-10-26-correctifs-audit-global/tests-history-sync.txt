@@ -1,0 +1,17 @@
+test_archive_survives_offline_sync_and_reopening (test_history_sync.HistoryTests.test_archive_survives_offline_sync_and_reopening) ... ok
+test_background_revision_conflict_requires_merge (test_history_sync.HistoryTests.test_background_revision_conflict_requires_merge) ... ok
+test_concurrent_edits_preserve_both_texts (test_history_sync.HistoryTests.test_concurrent_edits_preserve_both_texts) ... ok
+test_corrupt_metadata_does_not_destroy_local_history (test_history_sync.HistoryTests.test_corrupt_metadata_does_not_destroy_local_history) ... ok
+test_deletions_and_independent_edits_survive_merge (test_history_sync.HistoryTests.test_deletions_and_independent_edits_survive_merge) ... ok
+test_fresh_pc_loads_server_without_empty_overwrite (test_history_sync.HistoryTests.test_fresh_pc_loads_server_without_empty_overwrite) ... ok
+test_history_remains_available_with_model_stopped (test_history_sync.HistoryTests.test_history_remains_available_with_model_stopped) ... ok
+test_missing_marker_preserves_valid_cache_and_existing_recovery_archive (test_history_sync.HistoryTests.test_missing_marker_preserves_valid_cache_and_existing_recovery_archive) ... ok
+test_offline_write_is_uploaded_after_reconnection (test_history_sync.HistoryTests.test_offline_write_is_uploaded_after_reconnection) ... ok
+test_preferences_survive_restart_and_preserve_identity (test_history_sync.HistoryTests.test_preferences_survive_restart_and_preserve_identity) ... ok
+test_server_history_isolation_revision_and_backup_migration (test_history_sync.HistoryTests.test_server_history_isolation_revision_and_backup_migration) ... ok
+test_server_rejects_old_client_history_upload_after_reset (test_history_sync.HistoryTests.test_server_rejects_old_client_history_upload_after_reset) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 1.363s
+
+OK

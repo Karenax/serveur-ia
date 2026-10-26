@@ -379,7 +379,7 @@ class AccessStore:
                     return client['id']
         return None
 
-from chat_attachments import capabilities, validate_parts, normalize_reasoning
+from kiara_shared.attachments import capabilities, validate_parts, normalize_reasoning
 
 def chat_request(value, model):
     if not isinstance(value, dict):
@@ -594,7 +594,10 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 return
             if self.path == '/v1/status':
                 if not self.authorized(): return
-                return self.respond(200, {'version': VERSION, 'protocol': 3, 'agent_protocol':4, 'queue': scheduler.snapshot(self.identity)})
+                from kiara_shared.version import COMMAND_NONCE_VERSION
+                return self.respond(200, {'version': VERSION, 'protocol': 3, 'agent_protocol':4,
+                    'command_nonce_version':COMMAND_NONCE_VERSION,'server_time_ms':int(time.time()*1000),
+                    'queue': scheduler.snapshot(self.identity)})
             if urlsplit(self.path).path != '/v1/models' or urlsplit(self.path).query:
                 return self.respond(404, {'error': {'message': 'Route non disponible.'}})
             if not self.authorized():
@@ -623,134 +626,13 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
             self.respond(200, {'object': 'list', 'data': [{'id': model, 'object': 'model', 'owned_by': 'local', 'capabilities': capabilities(live)}]+extra})
 
         def do_POST(self):
-            if self.path == '/v1/embeddings':
-                if not self.authorized():return
-                from public_embeddings import request, response
-                try:texts,encoding,mode=request(json_body(self,65536))
-                except (ValueError,TypeError):return self.respond(400,{'error':{'message':'Requête embeddings invalide : modèle google/embeddinggemma-2, 1 à 8 textes de 4500 caractères, 768 dimensions, float/base64.'}})
-                if not store.embedding_slot.acquire(blocking=False):
-                    return self.respond(429,{'error':{'message':'EG2 occupé. Réessayez après la requête en cours.'}})
-                try:
-                    if store.authenticate(self.access_token)!=self.identity:raise Denied('Accès désactivé.')
-                    engine=getattr(getattr(store.workspace,'knowledge',None),'engine',None)
-                    if engine is None:raise ValueError('EG2 indisponible.')
-                    result=response(engine,texts,encoding,mode)
-                    if store.authenticate(self.access_token)!=self.identity:raise Denied('Accès désactivé.')
-                    return self.respond(200,result)
-                except Denied:return self.respond(403,{'error':{'message':'Accès désactivé.'}})
-                except (OSError,ValueError,RuntimeError,http.client.HTTPException):
-                    return self.respond(503,{'error':{'message':'EmbeddingGemma 2 indisponible ou occupé. Réessayez plus tard.'}})
-                finally:store.embedding_slot.release()
-            if self.path == '/v1/agent/action':
-                if not self.authorized():return
-                try:
-                    if not store.hermes:raise ValueError('Les agents ne sont pas activés sur ce serveur.')
-                    value = json_body(self, 8192)
-                    if store.authenticate(self.access_token)!=self.identity:raise Denied('Accès désactivé.')
-                    return self.respond(200,store.hermes.action(self.identity,value))
-                except Conflict as error:return self.respond(409,{'error':{'message':str(error)}})
-                except Denied as error:return self.respond(403,{'error':{'message':str(error)}})
-                except (ValueError,OSError,TypeError):return self.respond(400,{'error':{'message':'Cette demande agent ne peut pas être traitée.'}})
-            if self.path in ('/v1/voice/max/test','/v1/voice/max/warm','/v1/voice/max/end','/v1/voice/max/transcribe','/v1/voice/max/speech','/v1/voice/max/cancel'):
-                if not self.authorized():return
-                frames=None;sent=False
-                try:
-                    value=json_body(self,1300000 if self.path.endswith('/transcribe') else 8192)
-                    valid=lambda:store.authenticate(self.access_token)==self.identity
-                    if not valid():raise PermissionError('Accès vocal désactivé.')
-                    if self.path.endswith('/test'):
-                        if value!={}:raise ValueError('Paramètres du test Max invalides.')
-                        return self.respond(200,store.voice_max.test())
-                    if self.path.endswith('/warm'):
-                        if not isinstance(value,dict) or set(value)!={'session'}:raise ValueError('Paramètres Max invalides.')
-                        return self.respond(200,store.voice_max.warm(self.identity,value['session']))
-                    if self.path.endswith('/end'):
-                        if not isinstance(value,dict) or set(value)!={'session'} or not isinstance(value['session'],str):raise ValueError('Session Max invalide.')
-                        return self.respond(200,store.voice_max.release(self.identity,value['session']))
-                    if self.path.endswith('/transcribe'):
-                        return self.respond(200,store.voice_max.transcribe(self.identity,value,valid))
-                    if self.path.endswith('/cancel'):
-                        if not isinstance(value,dict) or set(value)!={'request_id'} or not isinstance(value['request_id'],str) or len(value['request_id'])!=32:raise ValueError('Annulation Max invalide.')
-                        return self.respond(200,store.voice_max.cancel(self.identity,value['request_id']))
-                    frames=store.voice_max.frames(self.identity,'speak',value,valid)
-                    first=next(frames)
-                    self.send_response(200);self.send_header('Content-Type','text/event-stream')
-                    self.send_header('Cache-Control','no-store');self.send_header('Connection','close');self.end_headers();sent=True
-                    self.wfile.write(('data: '+json.dumps(first)+'\n\n').encode());self.wfile.flush()
-                    for frame in frames:
-                        self.wfile.write(('data: '+json.dumps(frame)+'\n\n').encode());self.wfile.flush()
-                except BlockingIOError as error:
-                    if not sent:self.respond(429,{'error':{'message':str(error)}})
-                except (ValueError,OSError,TypeError,PermissionError) as error:
-                    if not sent:self.respond(400,{'error':{'message':str(error)}})
-                finally:
-                    if frames:frames.close()
-                return
-            if self.path in ('/v1/voice/speech','/v1/voice/cancel'):
-                if not self.authorized():return
-                frames=None;sent=False
-                try:
-                    value = json_body(self, 8192)
-                    if self.path.endswith('/cancel'):
-                        if not isinstance(value,dict) or set(value)!={'request_id'} or not isinstance(value['request_id'],str):raise ValueError('Annulation vocale invalide.')
-                        return self.respond(200,store.voice.cancel(self.identity,value['request_id']))
-                    frames=store.voice.stream(self.identity,value,lambda:store.authenticate(self.access_token)==self.identity)
-                    self.send_response(200);self.send_header('Content-Type','text/event-stream')
-                    self.send_header('Cache-Control','no-store');self.send_header('Connection','close');self.end_headers();sent=True
-                    for frame in frames:
-                        self.wfile.write(('data: '+json.dumps(frame,ensure_ascii=False)+'\n\n').encode('utf-8'));self.wfile.flush()
-                except BlockingIOError as error:
-                    if not sent:self.respond(429,{'error':{'message':str(error)}})
-                except (ValueError,OSError,TypeError,PermissionError) as error:
-                    if not sent:self.respond(400,{'error':{'message':str(error)}})
-                finally:
-                    if frames:frames.close()
-                return
-            if self.path == '/v1/notifications/action':
-                if not self.authorized(): return
-                try:
-                    value = json_body(self, 65536)
-                    with store.lock:
-                        if store.authenticate(self.access_token) != self.identity: raise Denied('Accès désactivé.')
-                        result = store.notifications.action(self.identity, value)
-                    return self.respond(200, result)
-                except Conflict as error: return self.respond(409, {'error': {'message': str(error)}})
-                except Denied as error: return self.respond(403, {'error': {'message': str(error)}})
-                except (ValueError, OSError, TypeError) as error: return self.respond(400, {'error': {'message': str(error)}})
-            if self.path == '/v1/device':
-                if not self.authorized():return
-                try:
-                    value = json_body(self, 2048)
-                    with store.lock:
-                        if store.authenticate(self.access_token) != self.identity: raise Denied('Accès désactivé.')
-                        result = store.heartbeat(self.identity, value)
-                    return self.respond(200, result)
-                except Denied as error:return self.respond(403, {'error': {'message': str(error)}})
-                except (ValueError, OSError, TypeError) as error:return self.respond(400, {'error': {'message': str(error)}})
-            if self.path=='/v1/history':
-                if not self.authorized():return
-                try:
-                    value = json_body(self, 10*1024*1024)
-                    with store.lock:
-                        if store.authenticate(self.access_token)!=self.identity:raise Denied('Accès désactivé.')
-                        result=store.workspace.history_write(self.identity,value)
-                    return self.respond(200,result)
-                except Conflict as error:return self.respond(409,{'error':{'code':'history_conflict','message':str(error)}})
-                except Denied as error:return self.respond(403,{'error':{'message':str(error)}})
-                except (ValueError,OSError,TypeError) as error:return self.respond(400,{'error':{'message':str(error)}})
-            if self.path=='/v1/workspace/action':
-                if not self.authorized():return
-                try:
-                    value = json_body(self, 8*1024*1024)
-                    prepared=store.workspace.prepare_upload(self.identity,value)
-                    # Serialize access validation and mutations with suspension/revocation.
-                    with store.lock:
-                        if store.authenticate(self.access_token)!=self.identity:raise Denied('Accès désactivé.')
-                        result=store.workspace.action(self.identity,value,prepared)
-                    return self.respond(200,result)
-                except Conflict as error:return self.respond(409,{'error':{'message':str(error)}})
-                except Denied as error:return self.respond(403,{'error':{'message':str(error)}})
-                except (ValueError,OSError,TypeError,ImportError) as error:return self.respond(400,{'error':{'message':str(error)}})
+            from gateway_commands import ROUTES as COMMAND_ROUTES, handle as command
+            from gateway_voice import MAX_ROUTES, LOW_ROUTES, max_voice, low_voice
+            from gateway_embeddings import handle as embeddings
+            if self.path in COMMAND_ROUTES:return command(self,store)
+            if self.path in MAX_ROUTES:return max_voice(self,store)
+            if self.path in LOW_ROUTES:return low_voice(self,store)
+            if self.path=='/v1/embeddings':return embeddings(self,store)
             if self.path == '/v1/cancel':
                 if not self.authorized(): return
                 try:
@@ -989,9 +871,10 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                     route=stream_oral_response(upstream_port,data['model'],key,data,request_valid,lambda:heartbeat(0),emit_oral_text,commands=True)
                     if route['action']=='command':
                         from assistant_commands import execute, oral_result
+                        from command_journal import derived_key as command_request_key
                         with store.lock:
                             result=execute(store.workspace,self.identity,route['command'],project=project,
-                                           request_key=item['id'],valid=request_valid,origin='Conversation vocale',
+                                           request_key=command_request_key(item['id']),valid=request_valid,origin='Conversation vocale',
                                            request_text='\n'.join(m['content'] if isinstance(m.get('content'),str) else '\n'.join(p.get('text','') for p in m.get('content',[]) if p.get('type')=='text') for m in routing_messages[-1:] if m['role']=='user'))
                         emit_oral_text(oral_result(result,route['command']['operation']))
                         self.wfile.write(('data: '+json.dumps({'assistant_result':result},ensure_ascii=False)+'\n\n').encode());self.wfile.flush()

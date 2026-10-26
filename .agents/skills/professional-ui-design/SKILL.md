@@ -1,12 +1,12 @@
 ---
 name: professional-ui-design
-description: Composer ou améliorer significativement les écrans métier Fred avec une hiérarchie claire, des composants réutilisables et une finition sobre adaptée aux données réelles.
+description: Composer ou améliorer significativement les écrans métier Kiara avec une hiérarchie claire, des composants réutilisables et une finition sobre adaptée aux données réelles.
 ---
 
-# Design professionnel de Fred
+# Design professionnel de Kiara
 
 Lire les styles et composants de la surface modifiée avant de créer une variante.
-Fred utilise HTML/CSS/JavaScript sans framework UI ; le client Windows et le WebView
+Kiara utilise HTML/CSS/JavaScript sans framework UI ; le client Windows et le WebView
 Android partagent des sources. Conserver les variables clair/sombre de
 `client-qwen/ui.css`, Segoe UI/system-ui, et les adaptations de
 `client-android/mobile-ui/android.css`. La console possède ses propres conventions
@@ -14,7 +14,7 @@ dans `lanceur/web/`. Ne pas ajouter de framework ou de police distante par défa
 
 Pour une composition nouvelle, consulter `../frontend-design/SKILL.md` ; pour
 l'audit des bonnes pratiques, `../web-design-guidelines/SKILL.md`. Adapter leurs
-conseils au produit existant : le brief et les conventions de Fred priment sur un
+conseils au produit existant : le brief et les conventions de Kiara priment sur un
 hero, une identité marketing, une nouvelle typographie ou la casse anglaise des titres.
 
 - Hiérarchie lisible, action principale repérable, navigation stable et raccourcis

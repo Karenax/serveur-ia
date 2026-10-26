@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "status_version": "3.5.53",
+  "command_nonce_version": 2,
+  "windows": {
+    "bytes": 115388661,
+    "sha256": "64da23305c4d8cf930a0d42952ba4a9742688d5ba0818b851566cadade613a6f"
+  },
+  "android": {
+    "bytes": 73727027,
+    "sha256": "f71f00aa868c51651437d6410d3a8392ccf9ec97b1102d33ff184c913f6a621e"
+  },
+  "voice": {
+    "bytes": 109408681,
+    "sha256": "42dcb65063ae465b0e3acb65ea030bb4392c62ffdc79c3220d77793def3da6aa"
+  },
+  "signature_pins_preserved": true,
+  "production_mutations": false
+}

@@ -1,0 +1,6 @@
+test_authenticated_agent_dispatch_and_private_error_masking (test_gateway_commands.AgentCommandAdapterTests.test_authenticated_agent_dispatch_and_private_error_masking) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 1.228s
+
+OK

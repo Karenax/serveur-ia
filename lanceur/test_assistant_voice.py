@@ -54,5 +54,20 @@ class AssistantVoiceHTTPTests(unittest.TestCase):
         self.assertEqual(status,200);self.assertIn(b'error',raw)
         self.assertEqual(self.store.workspace.action(self.a['id'],{'action':'assistant','operation':'list'})['memories'],[])
 
+    def test_timestamped_voice_command_survives_full_legacy_journal_and_retry(self):
+        import time
+        from command_journal import request_key,MAX_RECEIPTS
+        with self.store.workspace.db() as db:
+            db.executemany('INSERT INTO assistant_commands VALUES(?,?,?,?,?)',[
+                (self.a['id'],f'{number:032x}','a'*64,'{}',time.time()) for number in range(MAX_RECEIPTS)])
+        request=request_key();body=self.body(request)
+        body['messages'][-1]['content']='Retiens que je préfère le français.'
+        self.oral_reply='C:'+json.dumps({'operation':'memory_add','text':'Préférer le français'})
+        for _ in range(2):
+            status,raw=self.post(body,request);self.settle()
+            self.assertEqual(status,200);self.assertNotIn(b'error',raw)
+        result=self.store.workspace.action(self.a['id'],{'action':'assistant','operation':'list'})
+        self.assertEqual(len(result['memories']),1)
+
 
 if __name__=='__main__':unittest.main()

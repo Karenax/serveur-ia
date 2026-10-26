@@ -156,7 +156,9 @@ class ClientStorage:
                 rows = {table: [dict(r) for r in db.execute('SELECT * FROM ' + table + ' WHERE owner=? ORDER BY rowid', (client['id'],))] for table in TABLES}
                 job_ids = {row['id'] for row in rows['jobs']}
                 settings = [dict(r) for r in db.execute('SELECT * FROM settings ORDER BY key')
-                    if r['key'] == 'history_reset_id' or r['key']=='assistant-memory:'+identity or (r['key'].startswith('job_attempt:') and r['key'][12:] in job_ids)]
+                    if r['key'] == 'history_reset_id' or r['key']=='assistant-memory:'+identity
+                    or r['key']=='command-journal-floor:'+identity
+                    or (r['key'].startswith('job_attempt:') and r['key'][12:] in job_ids)]
                 result.append({'client': metadata, 'rows': rows, 'settings': settings,
                     'generation': epoch, 'profile': self.profile(client, saved), '_revision':token})
             return result

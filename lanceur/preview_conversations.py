@@ -63,7 +63,7 @@ def main():
                         if self.path=='/client/integrations/apply':return self.reply(app_integrations.install(body['app'],f'http://127.0.0.1:{self.server.server_port}/v1',api_key,'Modèle fictif',apps))
                         if self.path=='/v1/workspace/action':return self.reply(workspace.action(owner,body))
                         if self.path=='/client/history':
-                            from history_store import validate
+                            from kiara_shared.history_store import validate
                             if body['revision']!=state['revision']:raise Conflict('Historique modifié.')
                             state['history']=validate(body['history']);state['revision']+=1
                             return self.reply({'saved':True,'revision':state['revision'],'message':'Historique fictif enregistré'})

@@ -1,0 +1,30 @@
+{
+  "captured_at": "2026-10-24T17:03:59.1183238+02:00",
+  "cpu": {
+    "Name": "AMD Ryzen Threadripper PRO 3955WX 16-Cores     ",
+    "NumberOfCores": 16,
+    "NumberOfLogicalProcessors": 32
+  },
+  "memory": {
+    "TotalVisibleMemorySize": 134067260,
+    "FreePhysicalMemory": 69338528
+  },
+  "gpu": [
+    "index, name, memory.total [MiB], memory.used [MiB], memory.free [MiB], utilization.gpu [%]",
+    "0, Quadro P2200, 5120 MiB, 2515 MiB, 2506 MiB, 6 %",
+    "1, Tesla P100-PCIE-16GB, 16384 MiB, 14442 MiB, 1852 MiB, 0 %",
+    "2, Tesla P100-PCIE-16GB, 16384 MiB, 14562 MiB, 1731 MiB, 0 %"
+  ],
+  "production": [
+    {
+      "ProcessId": 8764,
+      "Name": "strata-vision.exe",
+      "CreationDate": "2026-10-23T09:13:29.107622+02:00"
+    },
+    {
+      "ProcessId": 24820,
+      "Name": "strata.exe",
+      "CreationDate": "2026-10-23T09:15:28.359269+02:00"
+    }
+  ]
+}

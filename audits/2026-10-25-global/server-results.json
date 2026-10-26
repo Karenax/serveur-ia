@@ -1,0 +1,16 @@
+[
+  {
+    "command": [
+      "D:\\Serveur IA\\Strata-src\\.venv\\Scripts\\python.exe",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "lanceur",
+      "-v"
+    ],
+    "returncode": 0,
+    "seconds": 1295.23,
+    "log": "server-1.txt"
+  }
+]

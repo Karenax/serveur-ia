@@ -34,49 +34,17 @@ def verify(configuration,engine=None):
                 raise ValueError('Complément Max corrompu. Réinstallez-le depuis Vocal.')
 
 
+from worker_protocol import CommandInbox
+
+
 def serve(configuration, engine, selection=None):
     verify(configuration,engine)
     with redirect_stdout(sys.stderr):
         loaded = WhisperRecognition(configuration['root'],selection or 'auto',configuration.get('native_device') if selection is None else None) if engine=='asr' else PhononVoice(configuration['root'])
-    commands = queue.Queue(maxsize=1)
-    cancelled_ids = OrderedDict()
-    stop = threading.Event()
-    closed = threading.Event()
-    guard = threading.Lock()
-    current = {'id': None}
+    inbox=CommandInbox(engine)
+    commands,stop,closed=inbox.commands,inbox.stop,inbox.closed
 
-    def read():
-        try:
-            while line := sys.stdin.readline(1300002):
-                if len(line) > 1300000:
-                    raise ValueError('Commande Max trop volumineuse.')
-                value = json.loads(line)
-                identifier = value.get('id')
-                if not isinstance(identifier, str) or not re.fullmatch('[a-f0-9]{32}', identifier):
-                    raise ValueError('Identifiant Max invalide.')
-                if value.get('action') == 'cancel':
-                    with guard:
-                        cancelled_ids[identifier] = True
-                        while len(cancelled_ids) > 64:
-                            cancelled_ids.popitem(last=False)
-                        if current['id'] == identifier:
-                            stop.set()
-                elif value.get('action') == ('transcribe' if engine == 'asr' else 'speak'):
-                    commands.put_nowait(value)
-                else:
-                    raise ValueError('Commande Max invalide.')
-        except Exception:
-            if os.environ.get('KIARA_MAX_DIAGNOSTICS')=='1':
-                import traceback
-                traceback.print_exc(file=sys.stderr)
-        finally:
-            closed.set(); stop.set()
-            try:
-                commands.put_nowait(None)
-            except queue.Full:
-                pass
-
-    threading.Thread(target=read, daemon=True).start()
+    inbox.start()
     emit({'ready': True, 'device':getattr(loaded,'device_info',{})})
     try:
         while not closed.is_set():
@@ -84,11 +52,7 @@ def serve(configuration, engine, selection=None):
             if command is None:
                 break
             identifier = command['id']
-            with guard:
-                current['id'] = identifier
-                stop.clear()
-                if identifier in cancelled_ids:
-                    stop.set()
+            inbox.begin(identifier)
             try:
                 if not stop.is_set():
                     started = time.perf_counter()
@@ -120,8 +84,7 @@ def serve(configuration, engine, selection=None):
             except Exception as error:
                 emit({'id': identifier, 'error': str(error) if isinstance(error, ValueError) else 'Le traitement Max a échoué. Réessayez ou choisissez Low.'})
             finally:
-                with guard:
-                    current['id'] = None
+                inbox.finish()
     finally:
         loaded.close()
 

@@ -22,7 +22,7 @@ class WorkspaceTests(unittest.TestCase):
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory(prefix='fred-workspace-');self.home=Path(self.tmp.name);self.w=Workspace(self.home)
         self.p=self.act('project_create',title='Projet A')['id']
-    def tearDown(self):self.w.stop.set();self.tmp.cleanup()
+    def tearDown(self):self.w.shutdown();self.tmp.cleanup()
     def act(self,action,**values):return self.w.action('a',{'action':action,'reset_id':HISTORY_RESET_ID,**values})
     def document(self,content='Le budget approuvé est de 2500 euros.'):
         return self.act('document_create',project=self.p,title='Budget',text=content)['id']
@@ -53,7 +53,9 @@ class WorkspaceTests(unittest.TestCase):
         self.assertIn('Utiliser les euros',context[0]['content']);self.assertTrue(sources)
         self.assertNotIn('assistants',self.w.snapshot('a'))
         self.assertNotIn('assistants',self.w.snapshot('a')['capabilities'])
-        self.act('memory_save',id=m,text='Utiliser les dollars');self.act('memory_delete',id=m)
+        revision=self.w.snapshot('a')['projects'][0]['memories'][0]['revision']
+        saved=self.act('memory_save',id=m,text='Utiliser les dollars',revision=revision)
+        self.act('memory_delete',id=m,revision=saved['revision'])
         self.assertFalse(self.w.snapshot('a')['projects'][0]['memories'])
 
     def test_document_context_rejects_other_project(self):
@@ -99,7 +101,7 @@ class WorkspaceTests(unittest.TestCase):
         with self.assertRaises(ValueError):self.act('conversation_archive',id=identity,archived=1,revision=1)
         self.assertEqual(self.act('conversation_get',id=identity)['revision'],1)
 
-    def test_legacy_profiles_and_histories_are_removed_while_documents_survive(self):
+    def test_legacy_profile_configuration_retires_without_erasing_user_history(self):
         from workspace import LEGACY_SCHEMA
         legacy=sqlite3.connect(':memory:');legacy.executescript(LEGACY_SCHEMA)
         identity=secrets.token_hex(16)
@@ -112,14 +114,14 @@ class WorkspaceTests(unittest.TestCase):
         raw=legacy.serialize();legacy.close()
         validated=self.w.validate_backup(base64.b64encode(raw).decode(),{'a'})
         self.w.restore(validated)
-        self.assertIsNone(self.w.history_read('a')['history'])
-        self.assertEqual(self.w.snapshot('a')['projects'][0]['conversations'],[])
+        self.assertEqual(self.w.history_read('a')['history'],old)
+        self.assertEqual(self.w.snapshot('a')['projects'][0]['conversations'][0]['title'],'Ancienne discussion')
         self.assertEqual(self.act('document_get',id=identity)['text'],'Texte conservé')
         with self.w.db() as db:
             self.assertIsNone(db.execute("SELECT name FROM sqlite_master WHERE name='assistants'").fetchone())
             self.assertNotIn('assistant',{r[1] for r in db.execute('PRAGMA table_info(jobs)')})
-        # A new conversation survives later restarts; the reset happens once.
-        self.act('conversation_save',id=identity,project=self.p,title='Nouvelle',messages=[])
+        # Subsequent writes and restarts keep the restored history.
+        self.act('conversation_save',id=identity,project=self.p,title='Nouvelle',messages=[],revision=1)
         self.assertEqual(Workspace(self.home).snapshot('a')['projects'][0]['conversations'][0]['title'],'Nouvelle')
 
     def test_old_clients_cannot_republish_deleted_discussions(self):
@@ -264,7 +266,9 @@ class GatewayWorkspaceTests(unittest.TestCase):
                 j=post({'action':'job_create','project':p,'prompt':'Résume le texte','request_key':secrets.token_hex(16)})['id']
                 # The client tunnel is closed while the server completes the work.
                 remote.close()
-                deadline=time.monotonic()+10
+                # Functional completion, including slow Windows filesystem sync;
+                # performance thresholds belong to the separate volume benchmark.
+                deadline=time.monotonic()+60
                 while time.monotonic()<deadline:
                     row=fixture.store.workspace.action(fixture.access['id'],{'action':'job_get','id':j})
                     if row['state'] in ('completed','failed'):break

@@ -1,0 +1,33 @@
+test_authenticated_gateway_with_real_wireguard (test_workspace.GatewayWorkspaceTests.test_authenticated_gateway_with_real_wireguard) ... ok
+test_encrypted_operations_backup_contains_spaces_and_restores (test_workspace.GatewayWorkspaceTests.test_encrypted_operations_backup_contains_spaces_and_restores) ... ok
+test_background_results_persist_and_recurrence (test_workspace.WorkspaceTests.test_background_results_persist_and_recurrence) ... ok
+test_backup_rejects_modified_schema (test_workspace.WorkspaceTests.test_backup_rejects_modified_schema) ... ok
+test_backup_roundtrip_and_foreign_owner_rejection (test_workspace.WorkspaceTests.test_backup_roundtrip_and_foreign_owner_rejection) ... ok
+test_bad_drafts_preserve_previous_content (test_workspace.WorkspaceTests.test_bad_drafts_preserve_previous_content) ... ok
+test_bounded_parsers_utf8_pdf_and_docx (test_workspace.WorkspaceTests.test_bounded_parsers_utf8_pdf_and_docx) ... ok
+test_cancel_running_job_prevents_publication (test_workspace.WorkspaceTests.test_cancel_running_job_prevents_publication) ... ok
+test_conversation_actions_reject_other_owner_and_archived_destination (test_workspace.WorkspaceTests.test_conversation_actions_reject_other_owner_and_archived_destination) ... ok
+test_conversation_publish_is_explicit_and_versioned (test_workspace.WorkspaceTests.test_conversation_publish_is_explicit_and_versioned) ... ok
+test_document_context_rejects_other_project (test_workspace.WorkspaceTests.test_document_context_rejects_other_project) ... ok
+test_document_search_citations_and_delete (test_workspace.WorkspaceTests.test_document_search_citations_and_delete) ... ok
+test_drafts_are_encrypted_and_windows_cannot_clear_each_other (test_workspace.WorkspaceTests.test_drafts_are_encrypted_and_windows_cannot_clear_each_other) ... ok
+test_empty_results_fail_and_code_indentation_is_preserved (test_workspace.WorkspaceTests.test_empty_results_fail_and_code_indentation_is_preserved) ... ok
+test_explicit_memory_and_permissions (test_workspace.WorkspaceTests.test_explicit_memory_and_permissions) ... ok
+test_failure_pause_retry_and_disabled_access (test_workspace.WorkspaceTests.test_failure_pause_retry_and_disabled_access) ... ok
+test_job_idempotency_priority_and_restart (test_workspace.WorkspaceTests.test_job_idempotency_priority_and_restart) ... ok
+test_legacy_profile_configuration_retires_without_erasing_user_history (test_workspace.WorkspaceTests.test_legacy_profile_configuration_retires_without_erasing_user_history) ... ok
+test_move_archive_restore_and_delete_published_conversation (test_workspace.WorkspaceTests.test_move_archive_restore_and_delete_published_conversation) ... ok
+test_old_clients_cannot_republish_deleted_discussions (test_workspace.WorkspaceTests.test_old_clients_cannot_republish_deleted_discussions) ... ok
+test_owner_isolation_on_all_objects (test_workspace.WorkspaceTests.test_owner_isolation_on_all_objects) ... ok
+test_real_extraction_subprocess_upload (test_workspace.WorkspaceTests.test_real_extraction_subprocess_upload) ... ok
+test_revision_conflicts_retain_original (test_workspace.WorkspaceTests.test_revision_conflicts_retain_original) ... ok
+test_schedule_delay (test_workspace.WorkspaceTests.test_schedule_delay) ... ok
+test_ssrf_public_validation (test_workspace.WorkspaceTests.test_ssrf_public_validation) ... ok
+test_storage_and_project_quotas (test_workspace.WorkspaceTests.test_storage_and_project_quotas) ... ok
+test_web_decompression_bombs_and_truncated_gzip (test_workspace.WorkspaceTests.test_web_decompression_bombs_and_truncated_gzip) ... ok
+test_web_is_checked_per_client_and_server_without_profiles (test_workspace.WorkspaceTests.test_web_is_checked_per_client_and_server_without_profiles) ... ok
+
+----------------------------------------------------------------------
+Ran 28 tests in 31.675s
+
+OK

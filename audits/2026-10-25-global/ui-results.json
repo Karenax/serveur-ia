@@ -1,0 +1,13 @@
+[
+  {
+    "command": [
+      "npm.cmd",
+      "--prefix",
+      "client-qwen",
+      "test"
+    ],
+    "returncode": 0,
+    "seconds": 173.89,
+    "log": "ui-1.txt"
+  }
+]

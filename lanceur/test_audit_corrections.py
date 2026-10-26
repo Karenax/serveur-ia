@@ -121,9 +121,10 @@ class AuditCorrections(unittest.TestCase):
             memory=w.action(c.b,{'action':'memory_create','project':project,'text':'M'*1500})['id']
             w.admin_action({'action':'policy','owner':c.b,'limits':{**DEFAULT_LIMITS,'storage_mb':1}},{c.a,c.b})
             with patch.object(w,'usage',return_value=1024*1024-1000):
-                w.action(c.b,{'action':'memory_save','id':memory,'text':'M'*1500})
-                w.action(c.b,{'action':'memory_save','id':memory,'text':'M'*1400})
-                with self.assertRaisesRegex(ValueError,'stockage'): w.action(c.b,{'action':'memory_save','id':memory,'text':'é'*1500})
+                revision=w.snapshot(c.b)['projects'][0]['memories'][0]['revision']
+                saved=w.action(c.b,{'action':'memory_save','id':memory,'text':'M'*1500,'revision':revision})
+                saved=w.action(c.b,{'action':'memory_save','id':memory,'text':'M'*1400,'revision':saved['revision']})
+                with self.assertRaisesRegex(ValueError,'stockage'): w.action(c.b,{'action':'memory_save','id':memory,'text':'é'*1500,'revision':saved['revision']})
 
     def test_delayed_mcp_and_inference_cannot_use_next_turn(self):
         with fixture(provider.PrivateInferenceTests) as c:

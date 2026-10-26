@@ -1,0 +1,13 @@
+test_failure_is_reported_to_guard_without_exception (test_startup_memory.StartupMemoryTests.test_failure_is_reported_to_guard_without_exception) ... ok
+test_nonresident_model_is_not_touched (test_startup_memory.StartupMemoryTests.test_nonresident_model_is_not_touched) ... ok
+test_only_owned_text_engine_not_vision_encoder (test_startup_memory.StartupMemoryTests.test_only_owned_text_engine_not_vision_encoder) ... ok
+test_redirected_engine_with_reused_ancestor_is_not_touched (test_startup_memory.StartupMemoryTests.test_redirected_engine_with_reused_ancestor_is_not_touched) ... ok
+test_reparented_engine_is_not_touched (test_startup_memory.StartupMemoryTests.test_reparented_engine_is_not_touched) ... ok
+test_reused_engine_pid_is_not_touched (test_startup_memory.StartupMemoryTests.test_reused_engine_pid_is_not_touched) ... ok
+test_reused_server_pid_is_not_touched (test_startup_memory.StartupMemoryTests.test_reused_server_pid_is_not_touched) ... ok
+test_windows_python_redirector_keeps_engine_owned (test_startup_memory.StartupMemoryTests.test_windows_python_redirector_keeps_engine_owned) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.019s
+
+OK

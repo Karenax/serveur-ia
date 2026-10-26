@@ -8,6 +8,7 @@
     "D:/Serveur IA/strata-data/model-q4/Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
     "--mmap-experts",
     "--resident-cpu-experts",
+    "--resident-experts",
     "--expert-profile",
     "D:\\Serveur IA\\dependances\\strata-0.1.43.1\\expert-profile.bin",
     "--expert-cache",
@@ -61,7 +62,10 @@
     "STRATA_ROUTE_TAIL_SKIP": "0",
     "STRATA_ADAPT_OVERLAP": "0",
     "STRATA_PLE_AUTO_MMAP": "0",
-    "STRATA_SPLIT_MTP_BATCH": "1"
+    "STRATA_SPLIT_MTP_BATCH": "1",
+    "STRATA_RESIDENT_PIN": "1",
+    "STRATA_RESIDENT_HEADROOM_GIB": "6",
+    "KIARA_REQUIRE_LOCKED_RAM": "1"
   },
   "lib_dirs": [
     "D:\\Serveur IA\\dependances\\strata-0.1.45.3\\engine-cuda12"

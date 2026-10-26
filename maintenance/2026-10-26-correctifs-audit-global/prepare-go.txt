@@ -1,0 +1,1 @@
+D:\Serveur IA\client-qwen\wireguard-tools\versions\go1.27.3\go\bin\go.exe

@@ -1,0 +1,7 @@
+{
+  "stopped_at": "2026-10-24T17:14:06.8887531+02:00",
+  "stopped_at_user_request": true,
+  "cpu_test_server_running": false,
+  "models_preserved": true,
+  "production_processes_preserved": true
+}

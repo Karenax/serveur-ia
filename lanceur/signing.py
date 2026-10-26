@@ -9,11 +9,8 @@ from wg_crypto import protect,private_directory
 lock=threading.RLock()
 
 def private(home=HOME,create=True):
-    import sys
-    from core import ROOT
-    sys.path.insert(0,str(ROOT/'client-qwen'))
-    from file_lock import locked
-    from history_store import atomic
+    from kiara_shared.file_lock import locked
+    from kiara_shared.history_store import atomic
     directory=home/'wireguard-prive';path=directory/'signature.dpapi'
     with lock,locked(path):
         if path.exists():return Ed25519PrivateKey.from_private_bytes(protect(path.read_bytes(),decrypt=True))

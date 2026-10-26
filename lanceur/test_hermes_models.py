@@ -478,7 +478,10 @@ class NativeCloudTests(unittest.TestCase):
     def test_actual_native_mcp_transport_carries_admitted_run_identity(self):
         self.facade.start();self.cloud.use_fred_tool=True
         model=self.facade.model_catalog(self.owner)['data'][1]['id']
-        list(self.facade.stream(self.owner,{'model':model,'messages':[{'role':'user','content':'Lis les informations de mon espace.'}]},secrets.token_hex(16),'native-mcp'))
+        from command_journal import request_key
+        request=request_key()
+        list(self.facade.stream(self.owner,{'model':model,'messages':[{'role':'user','content':'Lis les informations de mon espace.'}]},request,'native-mcp'))
+        self.assertEqual(self.facade.conversations.reconcile(self.owner,request,'native-mcp')['status'],'completed')
         replies=[m['content'] for _,_,body in self.cloud.calls for m in body['messages'] if m.get('role')=='tool']
         self.assertTrue(replies, [[t['function']['name'] for t in body.get('tools',[])] for _,_,body in self.cloud.calls])
         self.assertTrue(any('documents' in text and 'personal' in text for text in replies),replies)

@@ -1,0 +1,9 @@
+test_component_source_lists_do_not_inherit_server_implementation (test_delivery_contracts.DeliveryContractsTests.test_component_source_lists_do_not_inherit_server_implementation) ... ok
+test_manifest_rejects_replaced_artifact (test_delivery_contracts.DeliveryContractsTests.test_manifest_rejects_replaced_artifact) ... ok
+test_crash_or_missing_failure_summary_is_not_a_complete_suite (test_server_evidence.ServerEvidenceTests.test_crash_or_missing_failure_summary_is_not_a_complete_suite) ... ok
+test_every_initial_failure_requires_a_successful_named_rerun (test_server_evidence.ServerEvidenceTests.test_every_initial_failure_requires_a_successful_named_rerun) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.169s
+
+OK

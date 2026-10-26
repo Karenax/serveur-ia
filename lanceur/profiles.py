@@ -9,8 +9,7 @@ import sys
 from cryptography.hazmat.primitives.asymmetric.x25519 import X25519PrivateKey
 from cryptography.hazmat.primitives.serialization import Encoding,PublicFormat
 from core import ROOT
-sys.path.insert(0,str(ROOT/'client-qwen'))
-from wg_bridge import validate_profile
+from kiara_shared.profiles import validate_profile
 
 def public_key(private):
     raw=base64.b64decode(private,validate=True)

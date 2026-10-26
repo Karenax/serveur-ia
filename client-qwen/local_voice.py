@@ -15,11 +15,7 @@ import urllib.request
 
 ACTIVE = {'installing', 'verifying', 'loading', 'listening', 'finishing', 'cancelling'}
 
-class HTTPSRedirect(urllib.request.HTTPRedirectHandler):
-    def redirect_request(self, req, fp, code, msg, headers, newurl):
-        if not newurl.startswith('https://'):
-            raise ValueError('Redirection non sécurisée.')
-        return super().redirect_request(req, fp, code, msg, headers, newurl)
+from kiara_shared.http_download import HTTPSRedirect
 
 class NativeEngine:
     def __init__(self, binary_dir: Path, model: Path, threads=4):

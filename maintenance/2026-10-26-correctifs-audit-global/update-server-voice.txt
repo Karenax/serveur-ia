@@ -1,0 +1,1 @@
+{"passed": true, "previous_revision": "vocal-rt-f88da3269d16c833", "revision": "vocal-rt-de5e67a320a06b1f", "models_preserved": true, "user_data_preserved": true, "workers_unloaded": true, "microphone_opened": false, "previous_configuration": "D:\\Serveur IA\\maintenance\\2026-10-26-correctifs-audit-global\\previous-server-voice"}

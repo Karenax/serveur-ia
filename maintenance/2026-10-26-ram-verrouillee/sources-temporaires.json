@@ -1,0 +1,33 @@
+{
+  "engine_pid": 34904,
+  "phases": [
+    {
+      "layers": [
+        0,
+        23
+      ],
+      "reclaim": {
+        "status": "reclaimed",
+        "pid": 34904,
+        "method": "EmptyWorkingSet"
+      },
+      "locked_bytes": 32715571200,
+      "copied_layers": 24
+    },
+    {
+      "layers": [
+        24,
+        47
+      ],
+      "reclaim": {
+        "status": "reclaimed",
+        "pid": 34904,
+        "method": "EmptyWorkingSet"
+      },
+      "locked_bytes": 32715571200,
+      "copied_layers": 48
+    }
+  ],
+  "started": 1793014220.7829943,
+  "seconds": 411.0
+}

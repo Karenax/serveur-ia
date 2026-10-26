@@ -1,0 +1,46 @@
+Using Python 3.12.14 environment at: Strata-src\.venv
+WARN Fixing invalid version specifier by removing trailing comma (before: `>=3.6,`; after: `>=3.6`)
+Resolved 29 packages in 335ms
+Downloading pypdfium2 (3.8MiB)
+Downloading pdfminer-six (6.3MiB)
+Downloading lxml (3.8MiB)
+Downloading pydantic-core (1.9MiB)
+Downloading pandas (9.3MiB)
+Downloading cryptography (3.6MiB)
+ Downloaded pydantic-core
+ Downloaded pypdfium2
+ Downloaded cryptography
+ Downloaded lxml
+ Downloaded pdfminer-six
+ Downloaded pandas
+Prepared 15 packages in 2.74s
+warning: Failed to hardlink files; falling back to full copy. This may lead to degraded performance.
+         If the cache and target directories are on different filesystems, hardlinking may not be supported.
+         If this is intentional, set `export UV_LINK_MODE=copy` or use `--link-mode=copy` to suppress this warning.
+Installed 26 packages in 2.86s
+ + annotated-types==0.8.0
+ + cffi==2.1.1
+ + cryptography==50.0.2
+ + et-xmlfile==2.0.0
+ + lxml==6.1.1
+ + openpyxl==3.1.5
+ + packaging==26.3
+ + pandas==3.0.1
+ + pdf2image==1.17.0
+ + pdfminer-six==20251230
+ + pdfplumber==0.11.9
+ + pycparser==3.0
+ + pydantic==2.13.5
+ + pydantic-core==2.46.5
+ + pyhumps==3.8.0
+ + pypdfium2==5.14.0
+ + python-dateutil==2.9.0.post0
+ + python-docx==1.2.0
+ + python-pptx==1.0.2
+ + reportlab==4.4.9
+ + six==1.17.0
+ + typing-extensions==4.16.0
+ + typing-inspection==0.4.4
+ + tzdata==2026.5
+ + wheel==0.48.0
+ + xlsxwriter==3.2.9

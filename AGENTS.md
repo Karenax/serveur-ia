@@ -1,4 +1,4 @@
-# Instructions du projet Fred
+# Instructions du projet Kiara
 
 Préserver les modifications en cours. Les conventions et commandes de reconstruction
 existantes sont décrites dans `RECONSTRUIRE-FRED.md` ; les contrôles de sources sont
@@ -34,7 +34,7 @@ Charger seulement les skills utiles à la tâche depuis `.agents/skills/` :
 | Cohérence entre écrans ou changement transversal | `ux-consistency-review` |
 | Audit de bonnes pratiques | `web-design-guidelines` |
 
-Les consignes esthétiques amont doivent être adaptées à Fred : interface de travail,
+Les consignes esthétiques amont doivent être adaptées à Kiara : interface de travail,
 conventions existantes et français courant, sans hero marketing ni changement de
 police imposé. Le métier et la demande de l'utilisateur priment sur les préférences
 génériques des skills. Ne pas charger tous les skills à chaque conversation.

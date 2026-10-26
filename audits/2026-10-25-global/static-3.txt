@@ -1,0 +1,8 @@
+COMMAND: "D:\Serveur IA\Strata-src\.venv\Scripts\python.exe" maintenance/verrous_runtime.py check
+Traceback (most recent call last):
+  File "D:\Serveur IA\maintenance\verrous_runtime.py", line 79, in <module>
+    globals()[args.phase]()
+  File "D:\Serveur IA\maintenance\verrous_runtime.py", line 74, in check
+    if wrong or extra:raise ValueError(json.dumps({'runtime':name,'mismatch':wrong,'extra':sorted(extra)}))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: {"runtime": "strata", "mismatch": {}, "extra": ["altgraph", "pefile", "pyinstaller", "pyinstaller-hooks-contrib", "pywin32-ctypes"]}

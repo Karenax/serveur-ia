@@ -25,7 +25,10 @@ def run_go(go: Path, arguments: list[str], cwd: Path, environment: dict) -> str:
 
 def go_components(root: Path) -> tuple[list[dict], Path]:
     source = root / 'client-qwen' / 'wireguard-bridge'
-    go = root / 'client-qwen' / 'wireguard-tools' / 'go' / 'bin' / 'go.exe'
+    spec = json.loads((root / 'client-qwen/wireguard-toolchain.json').read_text(encoding='utf-8'))
+    if not re.fullmatch(r'go1\.\d+\.\d+', spec['version']):
+        raise ValueError('Version Go épinglée invalide.')
+    go = root / 'client-qwen/wireguard-tools/versions' / spec['version'] / 'go/bin/go.exe'
     environment = {**os.environ, 'GOPATH': str(root / 'client-qwen' / 'wireguard-tools' / 'workspace'),
                    'GOTOOLCHAIN': 'local', 'GOPROXY': 'off'}
     # Module metadata is read locally, never from a remote service.
@@ -41,7 +44,10 @@ def go_components(root: Path) -> tuple[list[dict], Path]:
                 for abi in ('arm64-v8a', 'x86_64')]
     if any(not binary.is_file() for binary in binaries):
         raise ValueError('Compiler les deux bridges Android avant de préparer leurs licences.')
-    required = binary_dependencies(run_go(go, ['version', '-m', *(str(binary) for binary in binaries)], source, environment))
+    metadata = run_go(go, ['version', '-m', *(str(binary) for binary in binaries)], source, environment)
+    if re.findall(r': (go1\.\d+\.\d+)\s*$', metadata, re.M) != [spec['version']] * len(binaries):
+        raise ValueError('Les deux bridges Android doivent utiliser la version Go épinglée.')
+    required = binary_dependencies(metadata)
     available = {module['name']: module for module in modules}
     for name, version in required.items():
         if name not in available or available[name]['version'] != version:

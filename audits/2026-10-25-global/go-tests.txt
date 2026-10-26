@@ -1,0 +1,4 @@
+=== RUN   TestControlRequestsPassWhileDataConnectionsAreOccupied
+--- PASS: TestControlRequestsPassWhileDataConnectionsAreOccupied (0.00s)
+PASS
+ok  	qwen.local/wireguard-bridge	1.023s

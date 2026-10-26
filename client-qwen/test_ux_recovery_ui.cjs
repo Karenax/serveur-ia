@@ -30,15 +30,20 @@ async function check(browser,platform){
   if(req.url==='/client/integrations')return json(res,{apps:[]});
   if(req.url==='/client/voice'||req.url==='/client/conversation')return json(res,{installed:false,phase:'idle'});
   if(req.url==='/v1/models')return json(res,{data:[{id:config.model,name:'Modèle fictif',available:true,capabilities:{thinking:false,context_length:4096}}]});
-  if(req.url==='/v1/status')return json(res,{protocol:4,agent_protocol:4});
+  if(req.url==='/v1/status')return json(res,{protocol:4,agent_protocol:4,command_nonce_version:2,server_time_ms:Date.now()});
   if(req.url==='/v1/context')return json(res,{tokens:5,capacity:4096,estimated:true});
   if(req.url==='/v1/workspace')return json(res,{projects:[project],jobs:[]});
   if(req.url==='/v1/notifications'||req.url==='/v1/notifications/action')return json(res,{items:[],unread:0,preferences:{types:{}}});
   if(req.url==='/v1/workspace/action'){
    if(body.action==='project_save'){project.instructions=body.instructions;project.title=body.title;project.revision++;return json(res,{saved:true,revision:project.revision});}
-   if(body.action==='memory_create'){project.memories.push({id:'b'.repeat(32),text:body.text});return json(res,{id:'b'.repeat(32)});}
-   if(body.action==='memory_save'){project.memories.find(m=>m.id===body.id).text=body.text;return json(res,{saved:true});}
-   if(body.action==='memory_delete'){if(state.failDelete)return json(res,{error:{message:'Suppression fictive refusée'}},503);project.memories=project.memories.filter(m=>m.id!==body.id);return json(res,{deleted:true});}
+   if(body.action==='memory_create'){project.memories.push({id:'b'.repeat(32),text:body.text,revision:'1'});return json(res,{id:'b'.repeat(32)});}
+   if(body.action==='memory_save'||body.action==='memory_delete'){
+    const memory=project.memories.find(m=>m.id===body.id);
+    if(body.revision!==memory.revision)return json(res,{error:{message:'Ce souvenir a changé. Rechargez sa version actuelle.'}},409);
+    if(body.action==='memory_save'){memory.text=body.text;memory.revision=String(Number(memory.revision)+1);return json(res,{saved:true,revision:memory.revision});}
+    if(state.failDelete)return json(res,{error:{message:'Suppression fictive refusée'}},503);
+    project.memories=project.memories.filter(m=>m.id!==body.id);return json(res,{deleted:true});
+   }
    if(body.action==='source_get')return json(res,{title:'Passage fictif',revision:1,status:'current',text:'Extrait synthétique'});
   }
   return json(res,{});
@@ -52,6 +57,8 @@ async function check(browser,platform){
  const sidebar=async()=>{if(await page.locator('#ui-sidebar-toggle').getAttribute('aria-expanded')==='false')await page.locator('#ui-sidebar-toggle').click();};
  try{
   await page.goto('http://127.0.0.1:'+server.address().port);await ready();
+  assert.match(await page.evaluate(()=>clientRequestId()),/^v2_[a-f0-9]{32}$/);
+  await page.evaluate(()=>commandNonceVersion=1);assert.match(await page.evaluate(()=>clientRequestId()),/^[a-f0-9]{32}$/);await page.evaluate(()=>commandNonceVersion=2);
   const first=await page.evaluate(()=>currentId);await page.locator('#prompt').fill('Brouillon de la conversation A');await draftSaved();
   await page.locator('#new').click();await ready();assert.equal(await page.locator('#prompt').inputValue(),'');
   const second=await page.evaluate(()=>currentId);assert.notEqual(first,second);await page.locator('#prompt').fill('Brouillon de la conversation B');await draftSaved();
@@ -71,6 +78,15 @@ async function check(browser,platform){
   await page.locator('#ws-memory-text').fill('Mémoire synthétique');await page.locator('#ws-memory-form button').click();await page.locator('#ws-memories textarea').waitFor();
   assert(await page.locator('#ws-memories textarea').evaluate(e=>e.labels.length===1));await page.locator('#ws-memories textarea').fill('Modification en attente');await page.evaluate(()=>wsRefresh());assert.equal(await page.locator('#ws-memories textarea').inputValue(),'Modification en attente');
   await page.locator('#ws-memories button').filter({hasText:'Enregistrer'}).click();await page.waitForFunction(()=>!uiMemoryEditsPending());
+  await page.locator('#ws-memories textarea').fill('Brouillon concurrent à conserver');
+  project.memories[0].text='Modification récente sur un autre appareil';project.memories[0].revision=String(Number(project.memories[0].revision)+1);
+  await page.evaluate(()=>wsRefresh());
+  await page.locator('#ws-memories button').filter({hasText:'Enregistrer'}).click();
+  await page.waitForFunction(()=>document.getElementById('ws-memory-status').textContent.includes('a changé'));
+  assert.equal(await page.locator('#ws-memories textarea').inputValue(),'Brouillon concurrent à conserver');
+  assert.equal(project.memories[0].text,'Modification récente sur un autre appareil');
+  page.once('dialog',d=>d.accept());await page.getByRole('button',{name:'Recharger la version du serveur'}).click();
+  await page.waitForFunction(()=>document.querySelector('#ws-memories textarea').dataset.revision===ws.data.projects[0].memories[0].revision);
   page.once('dialog',d=>d.dismiss());await page.locator('#ws-memories button').filter({hasText:'Supprimer'}).click();assert.equal(project.memories.length,1);
   state.failDelete=true;page.once('dialog',d=>d.accept());await page.locator('#ws-memories button').filter({hasText:'Supprimer'}).click();await page.waitForFunction(()=>document.getElementById('ws-memory-status').textContent.includes('non supprimée'));assert.equal(await page.locator('#ws-memories textarea').count(),1);
   state.failDelete=false;page.once('dialog',d=>d.accept());await page.locator('#ws-memories button').filter({hasText:'Supprimer'}).click();await page.waitForFunction(()=>document.querySelectorAll('#ws-memories textarea').length===0);assert.equal(await page.evaluate(()=>document.activeElement.id),'ws-memory-text');

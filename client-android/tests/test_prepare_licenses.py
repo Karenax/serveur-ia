@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 SCRIPT = Path(__file__).resolve().parents[1] / 'scripts' / 'Prepare-Licenses.py'
 spec = importlib.util.spec_from_file_location('fred_android_license_package', SCRIPT)
@@ -72,6 +73,18 @@ class PrepareLicensesTests(unittest.TestCase):
             licenses.binary_dependencies(metadata + '\tdep\texample.org/module\tv1.2.4\th1:changed\n')
         with self.assertRaises(ValueError):
             licenses.binary_dependencies('not a Go binary')
+
+    def test_packaging_rejects_an_old_or_mixed_go_runtime(self):
+        (self.root/'client-qwen/wireguard-toolchain.json').write_text(json.dumps({'version':'go1.27.3'}))
+        for abi in ('arm64-v8a','x86_64'):
+            path=self.root/'client-android/app/src/main/jniLibs'/abi/'libfredwireguard.so'
+            path.parent.mkdir(parents=True);path.write_bytes(b'fixture')
+        modules='example.org/module|v1.2.3|'+str(self.module)+'\n'
+        for second in ('go1.27.1','go1.27.3'):
+            metadata='arm64: go1.27.1\n\tdep\texample.org/module\tv1.2.3\th1:fixture\nx64: '+second+'\n'
+            with self.subTest(second=second),patch.object(licenses,'run_go',side_effect=[modules,metadata]):
+                with self.assertRaisesRegex(ValueError,'version Go'):
+                    licenses.go_components(self.root)
 
 
 if __name__ == '__main__':

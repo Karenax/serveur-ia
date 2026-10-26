@@ -1,0 +1,16 @@
+{
+  "restored": [
+    "dependances/verrous/manifest.json"
+  ],
+  "preexisting_preserved": {
+    ".agents/skills/frontend-human-centered/SKILL.md": true,
+    ".agents/skills/professional-ui-design/SKILL.md": true,
+    ".agents/skills/ux-consistency-review/SKILL.md": true,
+    ".agents/skills/ux-writing-cleaner/SKILL.md": true,
+    "AGENTS.md": true,
+    "Certificat-NAS-karenax-20261006.md": true,
+    "Configuration-Cloudflare-karenax-20261006.md": true,
+    "preuves/model-picker-fix-20261011/selector-windows.png": true,
+    "preuves/reasoning-models-20261011/reasoning-windows.png": true
+  }
+}

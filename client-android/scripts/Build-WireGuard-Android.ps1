@@ -3,8 +3,11 @@ $ErrorActionPreference = 'Stop'
 $projetAndroid = Split-Path $PSScriptRoot -Parent
 $projetRacine = Split-Path $projetAndroid -Parent
 . (Join-Path $projetRacine 'client-qwen\android-outils\Environnement-Android.ps1')
-$goAndroid = Join-Path $projetRacine 'client-qwen\wireguard-tools\go\bin\go.exe'
-if (!(Test-Path -LiteralPath $goAndroid)) { throw 'Installer les outils Go du bridge WireGuard.' }
+$versionGo = Get-Content -LiteralPath (Join-Path $projetRacine 'client-qwen/wireguard-toolchain.json') -Raw | ConvertFrom-Json
+$goAndroid = Join-Path $projetRacine ('client-qwen/wireguard-tools/versions/' + $versionGo.version + '/go/bin/go.exe')
+if (!(Test-Path -LiteralPath $goAndroid)) { throw 'Préparer le Go épinglé avec maintenance/prepare_go.py.' }
+$versionGoReelle = (& $goAndroid version)
+if ($LASTEXITCODE -ne 0 -or $versionGoReelle -notmatch [regex]::Escape($versionGo.version)) { throw 'Version Go Android inattendue.' }
 $sourcesBridge = Join-Path $projetRacine 'client-qwen\wireguard-bridge'
 $travailBridge = Join-Path $projetRacine 'toolchain\android-wireguard-build'
 New-Item -ItemType Directory -Force -Path $travailBridge | Out-Null
@@ -12,7 +15,7 @@ foreach ($sourceBridge in @('main.go','go.mod','go.sum')) {
     Copy-Item -LiteralPath (Join-Path $sourcesBridge $sourceBridge) -Destination (Join-Path $travailBridge $sourceBridge) -Force
 }
 $clangAndroid = Join-Path $env:ANDROID_HOME 'ndk\27.3.13750724\toolchains\llvm\prebuilt\windows-x86_64\bin\clang.exe'
-$empreinteSources = ((@('main.go','go.mod','go.sum') | ForEach-Object { (Get-FileHash -LiteralPath (Join-Path $travailBridge $_)).Hash }) -join '-') + '-ndk27-api26-pie-16k-v1'
+$empreinteSources = ((@('main.go','go.mod','go.sum') | ForEach-Object { (Get-FileHash -LiteralPath (Join-Path $travailBridge $_)).Hash }) -join '-') + '-go' + $versionGo.version + '-ndk27-api26-pie-16k-v1'
 $variablesGoAvant = @{}
 foreach ($nomGo in @('GOOS','GOARCH','CGO_ENABLED','CC','GOPATH','GOCACHE','GOMAXPROCS','CGO_LDFLAGS','GOTOOLCHAIN')) { $variablesGoAvant[$nomGo] = [Environment]::GetEnvironmentVariable($nomGo,'Process') }
 Push-Location $travailBridge

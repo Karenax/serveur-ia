@@ -119,15 +119,16 @@ class HistoryTests(unittest.TestCase):
             workspace.history_write('a',{'history':initial,'revision':0,'reset_id':HISTORY_RESET_ID})
         finally:workspace.stop.set()
 
-    def test_upgrade_erases_old_encrypted_cache_without_backup_or_reappearance(self):
+    def test_missing_marker_preserves_valid_cache_and_existing_recovery_archive(self):
         import history_store
         path=self.home/'legacy.history.dpapi';old=history('À effacer')
         history_store.write(path,client.protect,old,'')
         recovery=path.with_name(path.stem+'.unreadable-old.dpapi')
         recovery.write_bytes(client.protect(b'ancienne copie'))
         sync=HistorySync(self.remote,path,client.protect)
-        self.assertIsNone(sync.read()['history']);self.assertFalse(recovery.exists())
+        self.assertEqual(sync.read()['history'],old);self.assertTrue(recovery.exists())
         new=history('Nouvelle discussion')
+        history_store.write(path,client.protect,new,sync.read()['revision'])
         sync.synchronize(new)
         self.assertEqual(HistorySync(self.remote,path,client.protect).read()['history'],new)
         self.assertEqual(self.remote.value['history'],new)

@@ -1,0 +1,350 @@
+{
+  "mode": "baseline",
+  "command": [
+    "D:\\Serveur IA\\toolchain\\llama-bolt-b11854-cpu\\llama-server.exe",
+    "-m",
+    "D:\\modèle\\NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q4_K_XL.gguf",
+    "--alias",
+    "bolt-cpu",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "8099",
+    "-ngl",
+    "0",
+    "-t",
+    "16",
+    "-tb",
+    "16",
+    "-c",
+    "8192",
+    "-np",
+    "1",
+    "-b",
+    "512",
+    "-ub",
+    "512",
+    "--load-mode",
+    "none",
+    "--lazy-mode",
+    "off",
+    "--jinja",
+    "--no-webui",
+    "--metrics",
+    "--perf",
+    "--chat-template-kwargs",
+    "{\"enable_thinking\":false,\"conversational_mode\":true}"
+  ],
+  "cpu_only": true,
+  "context_capacity": 8192,
+  "threads": 16,
+  "cache_prompt": false,
+  "fixed_decode_tokens": 128,
+  "rows": [
+    {
+      "first_content_seconds": 2.8728636000014376,
+      "first_sentence_seconds": 3.0005492999916896,
+      "wall_seconds": 11.057816000000457,
+      "text": "Kiara. Confirmer la disponibilité et préparer les documents avant le départ pour tous les dossiers.\n\nDossier 1 : 1 nov, 15 min, Alice, normale.\nDossier 2 : 2 nov, 32 min, Marc, urgente.\nDossier 3 : 3 nov, 49 min, Nora, basse.\nDossier 4 : 4 nov, 66 min, Luc, normale.\nDossier 5 : 5 nov, 83 min, Alice, pri. (Information incomplète)\n\nOrganiser : Vér",
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 281,
+        "prompt_ms": 2870.182,
+        "prompt_per_token_ms": 10.214170818505337,
+        "prompt_per_second": 97.90319916994811,
+        "predicted_n": 128,
+        "predicted_ms": 8184.575,
+        "predicted_per_token_ms": 64.44547244094488,
+        "predicted_per_second": 15.51699385734751
+      },
+      "usage": null,
+      "tokens_evaluated": 281,
+      "tokens_cached": 408,
+      "tokens_predicted": 128,
+      "truncated": false,
+      "stop_type": "limit",
+      "frames": 129,
+      "nominal_input_tokens": 256,
+      "actual_input_tokens": 281,
+      "repeat": 1,
+      "memory": {
+        "working_set_gib": 5.504077911376953,
+        "peak_working_set_gib": 5.504081726074219,
+        "private_gib": 5.6765594482421875
+      }
+    },
+    {
+      "first_content_seconds": 2.765666000006604,
+      "first_sentence_seconds": 2.895045900004334,
+      "wall_seconds": 10.957024899995304,
+      "text": "Kiara. Confirmer la disponibilité et préparer les documents avant le départ pour tous les dossiers.\n\nDossier 1 : 1 nov, 15 min, Alice, normale.\nDossier 2 : 2 nov, 32 min, Marc, urgente.\nDossier 3 : 3 nov, 49 min, Nora, basse.\nDossier 4 : 4 nov, 66 min, Luc, normale.\nDossier 5 : 5 nov, 83 min, Alice, pri. (Information incomplète)\n\nOrganiser : Vér",
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 281,
+        "prompt_ms": 2764.222,
+        "prompt_per_token_ms": 9.837088967971532,
+        "prompt_per_second": 101.65608985095987,
+        "predicted_n": 128,
+        "predicted_ms": 8190.924,
+        "predicted_per_token_ms": 64.49546456692913,
+        "predicted_per_second": 15.504966228474347
+      },
+      "usage": null,
+      "tokens_evaluated": 281,
+      "tokens_cached": 408,
+      "tokens_predicted": 128,
+      "truncated": false,
+      "stop_type": "limit",
+      "frames": 129,
+      "nominal_input_tokens": 256,
+      "actual_input_tokens": 281,
+      "repeat": 2,
+      "memory": {
+        "working_set_gib": 5.504108428955078,
+        "peak_working_set_gib": 5.504112243652344,
+        "private_gib": 5.676582336425781
+      }
+    },
+    {
+      "first_content_seconds": 8.56606670000474,
+      "first_sentence_seconds": 8.705596700005117,
+      "wall_seconds": 16.986943500000052,
+      "text": "Kiara. Organiser les rendez-vous par priorité : Urgent (Dossier 2, 5, 8, 11, 14, 17), Normale (Dossier 1, 4, 7, 10, 13, 16), Basse (Dossier 3, 6, 9, 12, 15, 18). Confirmer la disponibilité et préparer les documents avant chaque départ. Les déplacements sont basés sur les temps de trajet indiqués.\n\n*(Note : Le Dossier 18 est",
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 907,
+        "prompt_ms": 8540.806,
+        "prompt_per_token_ms": 9.416544652701214,
+        "prompt_per_second": 106.1960662729021,
+        "predicted_n": 128,
+        "predicted_ms": 8420.588,
+        "predicted_per_token_ms": 66.30384251968503,
+        "predicted_per_second": 15.08208215388284
+      },
+      "usage": null,
+      "tokens_evaluated": 907,
+      "tokens_cached": 1034,
+      "tokens_predicted": 128,
+      "truncated": false,
+      "stop_type": "limit",
+      "frames": 129,
+      "nominal_input_tokens": 1024,
+      "actual_input_tokens": 907,
+      "repeat": 1,
+      "memory": {
+        "working_set_gib": 5.568378448486328,
+        "peak_working_set_gib": 5.568382263183594,
+        "private_gib": 5.703189849853516
+      }
+    },
+    {
+      "first_content_seconds": 8.491897300002165,
+      "first_sentence_seconds": 8.619283799998811,
+      "wall_seconds": 16.829100200004177,
+      "text": "Kiara. Organiser les rendez-vous par priorité : Urgent (Dossier 2, 5, 8, 11, 14, 17), Normale (Dossier 1, 4, 7, 10, 13, 16), Basse (Dossier 3, 6, 9, 12, 15, 18). Confirmer la disponibilité et préparer les documents avant chaque départ. Les déplacements sont basés sur les temps de trajet indiqués.\n\n*(Note : Le Dossier 18 est",
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 907,
+        "prompt_ms": 8475.317,
+        "prompt_per_token_ms": 9.344340683572215,
+        "prompt_per_second": 107.01664610303072,
+        "predicted_n": 128,
+        "predicted_ms": 8336.939,
+        "predicted_per_token_ms": 65.64518897637795,
+        "predicted_per_second": 15.233408808676662
+      },
+      "usage": null,
+      "tokens_evaluated": 907,
+      "tokens_cached": 1034,
+      "tokens_predicted": 128,
+      "truncated": false,
+      "stop_type": "limit",
+      "frames": 129,
+      "nominal_input_tokens": 1024,
+      "actual_input_tokens": 907,
+      "repeat": 2,
+      "memory": {
+        "working_set_gib": 5.568840026855469,
+        "peak_working_set_gib": 5.568843841552734,
+        "private_gib": 5.703216552734375
+      }
+    },
+    {
+      "first_content_seconds": 31.66561470000306,
+      "first_sentence_seconds": 31.79902310000034,
+      "wall_seconds": 40.22935249999864,
+      "text": "Kiara. Organiser les rendez-vous nécessite de confirmer la disponibilité pour chaque dossier et de préparer les documents avant le départ. Les informations fournies détaillent la date, le temps de trajet, le contact et la priorité pour chaque dossier fictif (1 à 72). Il n'y a pas d'instructions sur la manière spécifique d'organiser ou de préparer les déplacements au-delà de la confirmation de disponibilité et de la préparation des documents. Les priorités (urgente, normale, basse) indiquent l'ordre d'attention.\n\n*Note : Le Dossier fictif 72 est incomplet",
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 3437,
+        "prompt_ms": 31652.252,
+        "prompt_per_token_ms": 9.209267384346814,
+        "prompt_per_second": 108.58627057562919,
+        "predicted_n": 128,
+        "predicted_ms": 8563.258,
+        "predicted_per_token_ms": 67.42722834645669,
+        "predicted_per_second": 14.830803883288347
+      },
+      "usage": null,
+      "tokens_evaluated": 3437,
+      "tokens_cached": 3564,
+      "tokens_predicted": 128,
+      "truncated": false,
+      "stop_type": "limit",
+      "frames": 129,
+      "nominal_input_tokens": 4096,
+      "actual_input_tokens": 3437,
+      "repeat": 1,
+      "memory": {
+        "working_set_gib": 5.575969696044922,
+        "peak_working_set_gib": 5.5759735107421875,
+        "private_gib": 5.7076873779296875
+      }
+    },
+    {
+      "first_content_seconds": 31.329812500000116,
+      "first_sentence_seconds": 31.473318300006213,
+      "wall_seconds": 39.97790630000236,
+      "text": "Kiara. Organiser les rendez-vous nécessite de confirmer la disponibilité pour chaque dossier et de préparer les documents avant le départ. Les informations fournies détaillent la date, le temps de trajet, le contact et la priorité pour chaque dossier fictif (1 à 72). Il n'y a pas d'instructions sur la manière spécifique d'organiser ou de préparer les déplacements au-delà de la confirmation de disponibilité et de la préparation des documents. Les priorités (urgente, normale, basse) indiquent l'ordre d'attention.\n\n*Note : Le Dossier fictif 72 est incomplet",
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 3437,
+        "prompt_ms": 31327.212,
+        "prompt_per_token_ms": 9.114696537678208,
+        "prompt_per_second": 109.71292306509753,
+        "predicted_n": 128,
+        "predicted_ms": 8647.591,
+        "predicted_per_token_ms": 68.09126771653544,
+        "predicted_per_second": 14.686170981028127
+      },
+      "usage": null,
+      "tokens_evaluated": 3437,
+      "tokens_cached": 3564,
+      "tokens_predicted": 128,
+      "truncated": false,
+      "stop_type": "limit",
+      "frames": 129,
+      "nominal_input_tokens": 4096,
+      "actual_input_tokens": 3437,
+      "repeat": 2,
+      "memory": {
+        "working_set_gib": 5.576000213623047,
+        "peak_working_set_gib": 5.576011657714844,
+        "private_gib": 5.707714080810547
+      }
+    }
+  ],
+  "conversation": [
+    {
+      "first_content_seconds": 0.888352499998291,
+      "first_sentence_seconds": 1.454953899999964,
+      "wall_seconds": 2.1867770999961067,
+      "text": "Oui, je t'entends très bien. Comment puis-je t'aider aujourd'hui ?",
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 63,
+        "prompt_ms": 860.933,
+        "prompt_per_token_ms": 13.665603174603174,
+        "prompt_per_second": 73.1764260401216,
+        "predicted_n": 22,
+        "predicted_ms": 1298.269,
+        "predicted_per_token_ms": 61.82233333333333,
+        "predicted_per_second": 16.175384300172
+      },
+      "usage": {
+        "completion_tokens": 22,
+        "prompt_tokens": 63,
+        "total_tokens": 85,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "tokens_evaluated": null,
+      "tokens_cached": null,
+      "tokens_predicted": null,
+      "truncated": null,
+      "stop_type": null,
+      "frames": 24,
+      "prompt": "Bonjour Kiara, tu m’entends ?"
+    },
+    {
+      "first_content_seconds": 0.9940460999932839,
+      "first_sentence_seconds": 1.483327800000552,
+      "wall_seconds": 2.3386341000004904,
+      "text": "Il faut partir à huit heures et demie. Cela te permettra d'arriver à l'heure.",
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 76,
+        "prompt_ms": 964.424,
+        "prompt_per_token_ms": 12.68978947368421,
+        "prompt_per_second": 78.80351380720512,
+        "predicted_n": 22,
+        "predicted_ms": 1344.49,
+        "predicted_per_token_ms": 64.02333333333334,
+        "predicted_per_second": 15.619305461550477
+      },
+      "usage": {
+        "completion_tokens": 22,
+        "prompt_tokens": 76,
+        "total_tokens": 98,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "tokens_evaluated": null,
+      "tokens_cached": null,
+      "tokens_predicted": null,
+      "truncated": null,
+      "stop_type": null,
+      "frames": 24,
+      "prompt": "À quelle heure faut-il partir pour arriver à une réunion à neuf heures si le trajet dure trente minutes ?"
+    }
+  ],
+  "limits": "Synthetic CPU-only local tests; fixed decode ignores EOS for comparable work. No ASR, TTS, client network, Kiara memory retrieval or production routing. Qwen stays loaded.",
+  "pid": 28184,
+  "load_ready_seconds": 3.048227000006591,
+  "memory_after_load": {
+    "working_set_gib": 5.415355682373047,
+    "peak_working_set_gib": 5.4153594970703125,
+    "private_gib": 5.6532440185546875
+  },
+  "warmup": {
+    "first_content_seconds": 0.6066303999978118,
+    "first_sentence_seconds": 0.6673239999945508,
+    "wall_seconds": 0.7295359999989159,
+    "text": "Bonjour.",
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 40,
+      "prompt_ms": 580.569,
+      "prompt_per_token_ms": 14.514225,
+      "prompt_per_second": 68.89792600018258,
+      "predicted_n": 3,
+      "predicted_ms": 122.827,
+      "predicted_per_token_ms": 61.4135,
+      "predicted_per_second": 16.283064798456365
+    },
+    "usage": {
+      "completion_tokens": 3,
+      "prompt_tokens": 40,
+      "total_tokens": 43,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "tokens_evaluated": null,
+    "tokens_cached": null,
+    "tokens_predicted": null,
+    "truncated": null,
+    "stop_type": null,
+    "frames": 5
+  },
+  "memory_final": {
+    "working_set_gib": 5.654571533203125,
+    "peak_working_set_gib": 5.6890716552734375,
+    "private_gib": 5.786418914794922
+  },
+  "passed": true,
+  "server_stopped": true,
+  "elapsed_seconds": 144.8002520000009
+}

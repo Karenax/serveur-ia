@@ -1,0 +1,460 @@
+{
+  "collected_at_utc": "2026-10-24T13:20:18.371056+00:00",
+  "strata_head": "7dd5cf18e68c639a8773e096c5c79f971ea2a9f5",
+  "strata_head_date": "2026-10-24T08:52:25Z",
+  "release": {
+    "tag_name": "v0.2.4",
+    "published_at": "2026-10-24T02:18:52Z",
+    "updated_at": "2026-10-24T09:20:13Z",
+    "html_url": "https://github.com/Niko1221/Strata/releases/tag/v0.2.4"
+  },
+  "deepseek_packages": [
+    {
+      "name": "strata-dsv41-0.1.49.2-linux-x86_64-cuda-cuda13.tar.gz",
+      "size": 439871969,
+      "url": "https://github.com/Niko1221/Strata/releases/download/v0.2.4/strata-dsv41-0.1.49.2-linux-x86_64-cuda-cuda13.tar.gz"
+    },
+    {
+      "name": "strata-dsv41-0.1.49.2-linux-x86_64-hip-rx9070.tar.gz",
+      "size": 362662851,
+      "url": "https://github.com/Niko1221/Strata/releases/download/v0.2.4/strata-dsv41-0.1.49.2-linux-x86_64-hip-rx9070.tar.gz"
+    },
+    {
+      "name": "strata-dsv41-0.1.49.2-windows-x86_64-cuda-cuda13.tar.gz",
+      "size": 417366214,
+      "url": "https://github.com/Niko1221/Strata/releases/download/v0.2.4/strata-dsv41-0.1.49.2-windows-x86_64-cuda-cuda13.tar.gz"
+    }
+  ],
+  "sources": [
+    {
+      "file": "strata-docs_DEEPSEEK41.md",
+      "url": "https://raw.githubusercontent.com/Niko1221/Strata/7dd5cf18e68c639a8773e096c5c79f971ea2a9f5/docs/DEEPSEEK41.md",
+      "bytes": 11983,
+      "sha256": "09e4c5c7a0052377c5a9adab76430acbd1c13ceb288a8719fda67e4f47b86b49"
+    },
+    {
+      "file": "strata-docs_OLDER_GPUS.md",
+      "url": "https://raw.githubusercontent.com/Niko1221/Strata/7dd5cf18e68c639a8773e096c5c79f971ea2a9f5/docs/OLDER_GPUS.md",
+      "bytes": 24764,
+      "sha256": "5d3babc5448cfa9ae45a029131b526f8350df12c24593d86d65b70a788a3e6b4"
+    },
+    {
+      "file": "strata-CMakeLists.txt",
+      "url": "https://raw.githubusercontent.com/Niko1221/Strata/7dd5cf18e68c639a8773e096c5c79f971ea2a9f5/CMakeLists.txt",
+      "bytes": 166953,
+      "sha256": "5ab1eff6dabed717d7c1367fee2250e69c54414714dfa2311cffe322dd0c8606"
+    },
+    {
+      "file": "strata-src_dsv41_vendor_exl3_legacy.cu",
+      "url": "https://raw.githubusercontent.com/Niko1221/Strata/7dd5cf18e68c639a8773e096c5c79f971ea2a9f5/src/dsv41/vendor/exl3_legacy.cu",
+      "bytes": 42206,
+      "sha256": "4b256d2c3532b14783b69f037f2c0131758a336033407fc42cb91756a91649ed"
+    },
+    {
+      "file": "strata-src_dsv41_ds4_kernels.cu",
+      "url": "https://raw.githubusercontent.com/Niko1221/Strata/7dd5cf18e68c639a8773e096c5c79f971ea2a9f5/src/dsv41/ds4_kernels.cu",
+      "bytes": 104233,
+      "sha256": "690be9a8ada21d59243eb627bc25db9141fcd1db9b7f2748c080c19bcbeec0af"
+    },
+    {
+      "file": "strata-src_dsv41_ds4_model.cu",
+      "url": "https://raw.githubusercontent.com/Niko1221/Strata/7dd5cf18e68c639a8773e096c5c79f971ea2a9f5/src/dsv41/ds4_model.cu",
+      "bytes": 509975,
+      "sha256": "a07696ea813f15fc6f7a3a483e77c00bf69ee38e4ea4188d9d5a0164f299a037"
+    },
+    {
+      "file": "strata-strata_control_dsv41_engine.py",
+      "url": "https://raw.githubusercontent.com/Niko1221/Strata/7dd5cf18e68c639a8773e096c5c79f971ea2a9f5/strata_control/dsv41_engine.py",
+      "bytes": 14711,
+      "sha256": "dfe604e71921e7a67114472c495e8ccbedac04a3c2b22bb251628c158007ff26"
+    },
+    {
+      "file": "strata-strata_control_dsv41_fit.py",
+      "url": "https://raw.githubusercontent.com/Niko1221/Strata/7dd5cf18e68c639a8773e096c5c79f971ea2a9f5/strata_control/dsv41_fit.py",
+      "bytes": 28556,
+      "sha256": "a7d64e9e9da08b5220594a5520e2c0b739bacc2ce92670a84eb8bf5db7c47e30"
+    },
+    {
+      "file": "strata-tools_dsv41_pack_gguf.py",
+      "url": "https://raw.githubusercontent.com/Niko1221/Strata/7dd5cf18e68c639a8773e096c5c79f971ea2a9f5/tools/dsv41/pack_gguf.py",
+      "bytes": 54604,
+      "sha256": "6784a50c4252f0d3af36cf04f5d212524dbf0800dac2d3ea633290d044a18fdf"
+    },
+    {
+      "file": "hf-DeepSeek-V4-Flash-0731-GGUF.json",
+      "url": "https://huggingface.co/api/models/unsloth/DeepSeek-V4-Flash-0731-GGUF?blobs=true",
+      "bytes": 29294,
+      "sha256": "2b7e0664dad78d3d89abe74faccf02b644d059da016b9321e9345411cb824125"
+    },
+    {
+      "file": "hf-DeepSeek-R1-Distill-Qwen-32B-GGUF.json",
+      "url": "https://huggingface.co/api/models/unsloth/DeepSeek-R1-Distill-Qwen-32B-GGUF?blobs=true",
+      "bytes": 6014,
+      "sha256": "974c2cdcc98dfcc5146c3f6b296f75751c0c846f38455780eb0673c8de685877"
+    },
+    {
+      "file": "hf-DeepSeek-R1-Distill-Llama-70B-GGUF.json",
+      "url": "https://huggingface.co/api/models/unsloth/DeepSeek-R1-Distill-Llama-70B-GGUF?blobs=true",
+      "bytes": 14273,
+      "sha256": "c6d3459adabbc2b21358cab42f26a7c981d97d1cc0251f7f499eae9074ea5940"
+    },
+    {
+      "file": "hf-DeepSeek-V4.1-Flash-1017-GSQ-RCO-GGUF.json",
+      "url": "https://huggingface.co/api/models/ISTA-DASLab/DeepSeek-V4.1-Flash-1017-GSQ-RCO-GGUF?blobs=true",
+      "bytes": 6230,
+      "sha256": "c1de2a6457f3d612442914b6f1fc0faa994bb2b2544dc70ea99451dfeeac23e5"
+    }
+  ],
+  "model_sizes": {
+    "unsloth/DeepSeek-V4-Flash-0731-GGUF": {
+      "revision": "fbbb5b93fb787c21338159b0af3318bb3f4d9768",
+      "groups": {
+        "UD-IQ1_M": {
+          "bytes": 86901313952,
+          "files": 3,
+          "GB": 86.901,
+          "GiB": 80.933
+        },
+        "UD-IQ1_S": {
+          "bytes": 82539237792,
+          "files": 3,
+          "GB": 82.539,
+          "GiB": 76.871
+        },
+        "UD-IQ2_M": {
+          "bytes": 90926928288,
+          "files": 3,
+          "GB": 90.927,
+          "GiB": 84.682
+        },
+        "UD-IQ2_XXS": {
+          "bytes": 90860736928,
+          "files": 3,
+          "GB": 90.861,
+          "GiB": 84.621
+        },
+        "UD-IQ3_S": {
+          "bytes": 116069339712,
+          "files": 4,
+          "GB": 116.069,
+          "GiB": 108.098
+        },
+        "UD-IQ3_XXS": {
+          "bytes": 104207848032,
+          "files": 4,
+          "GB": 104.208,
+          "GiB": 97.051
+        },
+        "UD-IQ4_NL": {
+          "bytes": 136662446656,
+          "files": 4,
+          "GB": 136.662,
+          "GiB": 127.277
+        },
+        "UD-IQ4_XS": {
+          "bytes": 136662446656,
+          "files": 4,
+          "GB": 136.662,
+          "GiB": 127.277
+        },
+        "UD-Q2_K_XL": {
+          "bytes": 96832508352,
+          "files": 3,
+          "GB": 96.833,
+          "GiB": 90.182
+        },
+        "UD-Q3_K_M": {
+          "bytes": 128078484032,
+          "files": 4,
+          "GB": 128.078,
+          "GiB": 119.282
+        },
+        "UD-Q3_K_XL": {
+          "bytes": 128206729792,
+          "files": 4,
+          "GB": 128.207,
+          "GiB": 119.402
+        },
+        "UD-Q4_K_XL": {
+          "bytes": 155095241120,
+          "files": 5,
+          "GB": 155.095,
+          "GiB": 144.444
+        },
+        "UD-Q8_K_XL": {
+          "bytes": 161869615520,
+          "files": 5,
+          "GB": 161.87,
+          "GiB": 150.753
+        },
+        "dspark-DeepSeek-V4-Flash-0731-Q8_0.gguf": {
+          "bytes": 10896057440,
+          "files": 1,
+          "GB": 10.896,
+          "GiB": 10.148
+        },
+        "dspark": {
+          "bytes": 11314832480,
+          "files": 1,
+          "GB": 11.315,
+          "GiB": 10.538
+        }
+      }
+    },
+    "unsloth/DeepSeek-R1-Distill-Qwen-32B-GGUF": {
+      "revision": "1938d05cc893a60f37be1dc16e7465038f4fca63",
+      "groups": {
+        "DeepSeek-R1-Distill-Qwen-32B-F16": {
+          "bytes": 65535969376,
+          "files": 2,
+          "GB": 65.536,
+          "GiB": 61.035
+        },
+        "DeepSeek-R1-Distill-Qwen-32B-Q2_K.gguf": {
+          "bytes": 12313098144,
+          "files": 1,
+          "GB": 12.313,
+          "GiB": 11.467
+        },
+        "DeepSeek-R1-Distill-Qwen-32B-Q2_K_L.gguf": {
+          "bytes": 12495574944,
+          "files": 1,
+          "GB": 12.496,
+          "GiB": 11.637
+        },
+        "DeepSeek-R1-Distill-Qwen-32B-Q3_K_M.gguf": {
+          "bytes": 15935047584,
+          "files": 1,
+          "GB": 15.935,
+          "GiB": 14.841
+        },
+        "DeepSeek-R1-Distill-Qwen-32B-Q4_K_M.gguf": {
+          "bytes": 19851335584,
+          "files": 1,
+          "GB": 19.851,
+          "GiB": 18.488
+        },
+        "DeepSeek-R1-Distill-Qwen-32B-Q5_K_M.gguf": {
+          "bytes": 23262156704,
+          "files": 1,
+          "GB": 23.262,
+          "GiB": 21.665
+        },
+        "DeepSeek-R1-Distill-Qwen-32B-Q6_K.gguf": {
+          "bytes": 26886154144,
+          "files": 1,
+          "GB": 26.886,
+          "GiB": 25.04
+        },
+        "DeepSeek-R1-Distill-Qwen-32B-Q8_0.gguf": {
+          "bytes": 34820884384,
+          "files": 1,
+          "GB": 34.821,
+          "GiB": 32.429
+        }
+      }
+    },
+    "unsloth/DeepSeek-R1-Distill-Llama-70B-GGUF": {
+      "revision": "732dd974083ea5877d7b6d788b36fe7c2e5eab36",
+      "groups": {
+        "BF16": {
+          "bytes": 141117915872,
+          "files": 3,
+          "GB": 141.118,
+          "GiB": 131.426
+        },
+        "DeepSeek-R1-Distill-Llama-70B-F16": {
+          "bytes": 141117915936,
+          "files": 3,
+          "GB": 141.118,
+          "GiB": 131.426
+        },
+        "DeepSeek-R1-Distill-Llama-70B-IQ4_NL.gguf": {
+          "bytes": 40053621408,
+          "files": 1,
+          "GB": 40.054,
+          "GiB": 37.303
+        },
+        "DeepSeek-R1-Distill-Llama-70B-IQ4_XS.gguf": {
+          "bytes": 37935497888,
+          "files": 1,
+          "GB": 37.935,
+          "GiB": 35.33
+        },
+        "DeepSeek-R1-Distill-Llama-70B-Q2_K.gguf": {
+          "bytes": 26375111328,
+          "files": 1,
+          "GB": 26.375,
+          "GiB": 24.564
+        },
+        "DeepSeek-R1-Distill-Llama-70B-Q2_K_L.gguf": {
+          "bytes": 26621362848,
+          "files": 1,
+          "GB": 26.621,
+          "GiB": 24.793
+        },
+        "DeepSeek-R1-Distill-Llama-70B-Q3_K_M.gguf": {
+          "bytes": 34267497120,
+          "files": 1,
+          "GB": 34.267,
+          "GiB": 31.914
+        },
+        "DeepSeek-R1-Distill-Llama-70B-Q3_K_S.gguf": {
+          "bytes": 30912053920,
+          "files": 1,
+          "GB": 30.912,
+          "GiB": 28.789
+        },
+        "DeepSeek-R1-Distill-Llama-70B-Q4_0.gguf": {
+          "bytes": 40116535968,
+          "files": 1,
+          "GB": 40.117,
+          "GiB": 37.361
+        },
+        "DeepSeek-R1-Distill-Llama-70B-Q4_1.gguf": {
+          "bytes": 44313592480,
+          "files": 1,
+          "GB": 44.314,
+          "GiB": 41.27
+        },
+        "DeepSeek-R1-Distill-Llama-70B-Q4_K_M.gguf": {
+          "bytes": 42520396448,
+          "files": 1,
+          "GB": 42.52,
+          "GiB": 39.6
+        },
+        "DeepSeek-R1-Distill-Llama-70B-Q4_K_S.gguf": {
+          "bytes": 40347222688,
+          "files": 1,
+          "GB": 40.347,
+          "GiB": 37.576
+        },
+        "DeepSeek-R1-Distill-Llama-70B-Q5_K_M.gguf": {
+          "bytes": 49949819552,
+          "files": 1,
+          "GB": 49.95,
+          "GiB": 46.519
+        },
+        "DeepSeek-R1-Distill-Llama-70B-Q5_K_S.gguf": {
+          "bytes": 48657449632,
+          "files": 1,
+          "GB": 48.657,
+          "GiB": 45.316
+        },
+        "DeepSeek-R1-Distill-Llama-70B-Q6_K": {
+          "bytes": 57888146080,
+          "files": 2,
+          "GB": 57.888,
+          "GiB": 53.913
+        },
+        "DeepSeek-R1-Distill-Llama-70B-Q8_0": {
+          "bytes": 74975052416,
+          "files": 2,
+          "GB": 74.975,
+          "GiB": 69.826
+        },
+        "DeepSeek-R1-Distill-Llama-70B-UD-IQ1_M.gguf": {
+          "bytes": 17171563168,
+          "files": 1,
+          "GB": 17.172,
+          "GiB": 15.992
+        },
+        "DeepSeek-R1-Distill-Llama-70B-UD-IQ1_S.gguf": {
+          "bytes": 15885222560,
+          "files": 1,
+          "GB": 15.885,
+          "GiB": 14.794
+        },
+        "DeepSeek-R1-Distill-Llama-70B-UD-IQ2_M.gguf": {
+          "bytes": 24368595616,
+          "files": 1,
+          "GB": 24.369,
+          "GiB": 22.695
+        },
+        "DeepSeek-R1-Distill-Llama-70B-UD-IQ2_XXS.gguf": {
+          "bytes": 19447628448,
+          "files": 1,
+          "GB": 19.448,
+          "GiB": 18.112
+        },
+        "DeepSeek-R1-Distill-Llama-70B-UD-IQ3_XXS.gguf": {
+          "bytes": 27655619232,
+          "files": 1,
+          "GB": 27.656,
+          "GiB": 25.756
+        },
+        "DeepSeek-R1-Distill-Llama-70B-UD-Q2_K_XL.gguf": {
+          "bytes": 26966737568,
+          "files": 1,
+          "GB": 26.967,
+          "GiB": 25.115
+        },
+        "DeepSeek-R1-Distill-Llama-70B-UD-Q3_K_XL.gguf": {
+          "bytes": 34876474016,
+          "files": 1,
+          "GB": 34.876,
+          "GiB": 32.481
+        },
+        "DeepSeek-R1-Distill-Llama-70B-UD-Q4_K_XL.gguf": {
+          "bytes": 42664575648,
+          "files": 1,
+          "GB": 42.665,
+          "GiB": 39.734
+        },
+        "DeepSeek-R1-Distill-Llama-70B-UD-Q5_K_XL.gguf": {
+          "bytes": 49973478048,
+          "files": 1,
+          "GB": 49.973,
+          "GiB": 46.541
+        },
+        "Q6_K": {
+          "bytes": 57888146304,
+          "files": 2,
+          "GB": 57.888,
+          "GiB": 53.913
+        },
+        "UD-Q6_K_XL": {
+          "bytes": 61160063872,
+          "files": 2,
+          "GB": 61.16,
+          "GiB": 56.96
+        },
+        "UD-Q8_K_XL": {
+          "bytes": 81231119200,
+          "files": 2,
+          "GB": 81.231,
+          "GiB": 75.652
+        }
+      }
+    },
+    "ISTA-DASLab/DeepSeek-V4.1-Flash-1017-GSQ-RCO-GGUF": {
+      "revision": "cb02422c900df489cea5833e8a92171224059b3c",
+      "groups": {
+        "DeepSeek-V4.1-Flash-1017-GSQ-RCO-IQ1_M": {
+          "bytes": 120721120256,
+          "files": 4,
+          "GB": 120.721,
+          "GiB": 112.43
+        },
+        "DeepSeek-V4.1-Flash-1017-GSQ-RCO-IQ2_XS": {
+          "bytes": 155225824256,
+          "files": 4,
+          "GB": 155.226,
+          "GiB": 144.565
+        },
+        "DeepSeek-V4.1-Flash-1017-GSQ-RCO-IQ2_XXS": {
+          "bytes": 138238893056,
+          "files": 4,
+          "GB": 138.239,
+          "GiB": 128.745
+        },
+        "DeepSeek-V4.1-Flash-Engram-IQ4_NL.gguf": {
+          "bytes": 110595290816,
+          "files": 1,
+          "GB": 110.595,
+          "GiB": 103.0
+        }
+      }
+    }
+  }
+}

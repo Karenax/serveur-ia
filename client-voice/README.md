@@ -1,5 +1,9 @@
 # Dictée locale — Windows et Android
 
+Référence courante : [matrice des moteurs et packs supportés](COMPATIBILITE.md).
+Les deux familles de workers Max partagent leur protocole borné dans
+`worker_protocol.py`. Les sections datées suivantes conservent l’historique des livraisons.
+
 ## Extension de l’assistant 3.5.52 / Android 1.0.23
 
 Le vocal utilise maintenant les commandes métier communes à Hermes et Kiara,

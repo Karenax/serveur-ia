@@ -1,6 +1,6 @@
 ---
 name: ux-writing-cleaner
-description: Auditer ou réécrire les textes visibles du frontend Fred, lors de leur création ou modification, en conservant les informations métier, les erreurs et les libellés accessibles.
+description: Auditer ou réécrire les textes visibles du frontend Kiara, lors de leur création ou modification, en conservant les informations métier, les erreurs et les libellés accessibles.
 ---
 
 # Nettoyer les textes de l'interface

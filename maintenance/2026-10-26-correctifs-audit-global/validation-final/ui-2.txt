@@ -1,0 +1,14 @@
+
+> kiara-shared-ui-tests@3.5.53 ux:check:all
+> node ../maintenance/ux-ui/run-check.cjs
+
+lanceur/web/index.html:51: warning LONG-TEXT: Texte de 362 caractères à relire : Chaque EXE contient ses propres clés d’accès. Le destinataire l’ouvre et se connecte automatiquement
+lanceur/web/index.html:57: warning LONG-TEXT: Texte de 288 caractères à relire : Le moteur est intégré aux deux applications. Aucun service externe n’est nécessaire. Les accès sont 
+lanceur/web/index.html:63: warning LONG-TEXT: Texte de 194 caractères à relire : Chaque version est signée et vérifiée. Les clients 3.0 peuvent la télécharger depuis leur bouton « M
+lanceur/web/workspace.js:9: warning LONG-TEXT: Texte de 185 caractères à relire : La sauvegarde chiffrée comprend désormais les espaces, fichiers, tous les historiques de conversatio
+lanceur/web/workspace.js:10: warning LONG-TEXT: Texte de 233 caractères à relire : Les conversations utilisent la recherche web native de Hermes, selon sa configuration sur ce PC. Aut
+lanceur/web/workspace.js:10: warning LONG-TEXT: Texte de 259 caractères à relire : Ces réglages concernent les tâches web Kiara. Les recherches par sujet transmettent la question à Br
+lanceur/web/workspace.js:11: warning LONG-TEXT: Texte de 218 caractères à relire : Les tâches restent enregistrées lorsque le client est fermé. Les demandes interactives passent avant
+lanceur/web/workspace.js:39: warning LONG-TEXT: Texte de 242 caractères à relire : Les documents, souvenirs et conversations de chaque projet restent dans leur espace. Les conversatio
+lanceur/web/workspace.js:42: warning LONG-TEXT: Texte de 199 caractères à relire : Le moteur mémoire est indépendant de Qwen. L’indexation se poursuit côté serveur, même lorsque les c
+UX : 56 fichiers, 9 avertissements, 0 exclusions locales. Revue humaine requise ; aucune suppression automatique.

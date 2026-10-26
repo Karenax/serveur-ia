@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "previous_revision": "vocal-rt-f88da3269d16c833",
+  "revision": "vocal-rt-de5e67a320a06b1f",
+  "models_preserved": true,
+  "user_data_preserved": true,
+  "native_benchmark": {
+    "asr_rtf": 0.15944738839347597,
+    "tts_rtf": 0.18978988838560845,
+    "first_audio_ms": 267.1942000160925,
+    "asr_ms": 714.3243000027724,
+    "latency_ms": 981.5185000188649,
+    "fingerprint": "45c5e6eaae3809c4202f6489bd9ef49df42451b5774948f82919d71da68f6564",
+    "functional": true,
+    "device": {
+      "name": "Vulkan0",
+      "description": "Quadro P2200",
+      "free_bytes": 4690801460,
+      "total_bytes": 5490343936,
+      "id": "c1bdc62f938b9e7f5b00760d",
+      "kind": "dedicated",
+      "pci_id": "0000:41:00.0"
+    },
+    "passed": true
+  },
+  "workers_unloaded": true,
+  "microphone_opened": false,
+  "previous_configuration": "D:\\Serveur IA\\maintenance\\2026-10-26-correctifs-audit-global\\previous-server-voice"
+}

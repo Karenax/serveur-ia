@@ -1,0 +1,24 @@
+plugins { id 'com.android.application' }
+android {
+    namespace 'net.karenax.fred'
+    compileSdk 36
+    defaultConfig {
+        applicationId 'net.karenax.fred'
+        minSdk 26
+        targetSdk 36
+        versionCode 23
+        versionName '1.0.22'
+        testInstrumentationRunner 'net.karenax.fred.SelfTestInstrumentation'
+    }
+    buildTypes {
+        debug { applicationIdSuffix '.voiceqa' }
+        release { minifyEnabled false }
+    }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+    buildFeatures { buildConfig true }
+    packaging { jniLibs { useLegacyPackaging true } }
+}
+dependencies {
+    implementation files(rootProject.file('../toolchain/wakeword-downloads/sherpa-onnx-1.13.8.aar'))
+    implementation files(rootProject.file('../toolchain/gradle-8.13/lib/kotlin-stdlib-2.0.21.jar'))
+}

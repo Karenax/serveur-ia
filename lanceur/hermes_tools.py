@@ -216,7 +216,8 @@ class FredTools:
         if name == 'fred_assistant':
             from assistant_commands import execute, digest
             # The model cannot select a different owner/project or invent a request identity.
-            key=digest([context['request_id'],arguments])[:32]
+            from command_journal import derived_key
+            key=derived_key(context['request_id'],seed=digest([context['request_id'],arguments]))
             return execute(w,owner,arguments,project=project,request_key=key,
                            valid=lambda: self._assistant_valid(owner,context),origin='Conversation écrite',
                            request_text=context.get('user_request',''))

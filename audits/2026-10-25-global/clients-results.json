@@ -1,0 +1,44 @@
+[
+  {
+    "command": [
+      "D:\\Serveur IA\\Strata-src\\.venv\\Scripts\\python.exe",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "client-qwen",
+      "-v"
+    ],
+    "returncode": 0,
+    "seconds": 15.45,
+    "log": "clients-1.txt"
+  },
+  {
+    "command": [
+      "D:\\Serveur IA\\Strata-src\\.venv\\Scripts\\python.exe",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "client-voice",
+      "-v"
+    ],
+    "returncode": 0,
+    "seconds": 3.52,
+    "log": "clients-2.txt"
+  },
+  {
+    "command": [
+      "D:\\Serveur IA\\Strata-src\\.venv\\Scripts\\python.exe",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "client-android/tests",
+      "-v"
+    ],
+    "returncode": 0,
+    "seconds": 0.84,
+    "log": "clients-3.txt"
+  }
+]

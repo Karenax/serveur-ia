@@ -11,7 +11,13 @@ import sys
 
 ROOT=Path(__file__).resolve().parents[1]
 SOURCE_DIRS=('lanceur','client-qwen','client-android','client-voice','maintenance')
-SUFFIXES={'.py','.js','.cjs','.html','.css','.ps1','.cmd','.go','.mod','.sum','.java','.gradle','.xml','.toml','.properties','.cpp','.h','.cmake'}
+COMPONENT_DIRS={
+    'windows':('client-qwen','client-voice','shared','maintenance/2026-10-25-assistant-integration'),
+    'android':('client-android','client-qwen','maintenance/2026-10-25-assistant-integration'),
+    'server':('lanceur','shared'),
+    'voice':('client-voice','shared'),
+}
+SUFFIXES={'.py','.js','.cjs','.html','.css','.ps1','.cmd','.go','.mod','.sum','.java','.gradle','.xml','.toml','.properties','.cpp','.h','.cmake','.json'}
 
 def command(arguments,cwd=ROOT):
     result=subprocess.run(arguments,cwd=cwd,capture_output=True,text=True,encoding='utf-8',errors='replace',timeout=30)
@@ -21,21 +27,39 @@ def command(arguments,cwd=ROOT):
 def digest(path):
     with path.open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
 
-def generate(artifact):
-    listed=command(['git','ls-files','--cached','--others','--exclude-standard','-z',*SOURCE_DIRS]).split('\0')
-    sources={name:digest(ROOT/name) for name in sorted(set(listed)) if name and (ROOT/name).is_file() and (ROOT/name).suffix.lower() in SUFFIXES}
+def source_names(component):
+    if component not in COMPONENT_DIRS:raise ValueError('Composant inconnu : '+component)
+    listed=command(['git','ls-files','--cached','--others','--exclude-standard','-z',*COMPONENT_DIRS[component],
+                    'maintenance/build_manifest.py','maintenance/prepare_build_environment.py',
+                    'maintenance/check_windows_artifact.py']).split('\0')
+    for name in sorted(set(listed)):
+        path=ROOT/name
+        if not name or not path.is_file():continue
+        if path.suffix.lower() not in SUFFIXES and not (path.suffix=='.txt' and (path.name.startswith('requirements') or path.name=='product-version.txt')):continue
+        if path.name.startswith(('test_','preview_','verify_','validate_')) or any(part in {'tests','__pycache__','node_modules'} for part in path.parts):continue
+        if '/src/androidTest/' in name or '/src/debug/' in name:continue
+        if component=='android' and name.startswith('client-qwen/') and path.suffix not in {'.js','.html','.css'}:continue
+        if component=='windows' and '/android-outils/' in name:continue
+        yield name
+
+
+def generate(artifact,component=None):
+    component=component or ('android' if artifact.suffix.lower()=='.apk' else 'windows')
+    sources={name:digest(ROOT/name) for name in source_names(component)}
     engines=json.loads((ROOT/'dependances/moteurs.json').read_text(encoding='utf-8'))
     for row in engines:
         if row.get('patch'):row['patch_sha256']=digest(ROOT/'dependances'/row['patch'])
-    result={'version':1,'created_at':datetime.now(timezone.utc).isoformat(),'source_commit':command(['git','rev-parse','HEAD']),
+    result={'version':2,'component':component,'created_at':datetime.now(timezone.utc).isoformat(),'source_commit':command(['git','rev-parse','HEAD']),
             'source_branch':command(['git','branch','--show-current']),'source_files':sources,
             'artifact':{'name':artifact.name,'bytes':artifact.stat().st_size,'sha256':digest(artifact)},
             'host':{'system':platform.system(),'release':platform.release(),'machine':platform.machine()},
             'python':{'version':platform.python_version(),'packages':{
                 name:importlib.metadata.version(name) for name in sorted(
                     {d.metadata['Name'] for d in importlib.metadata.distributions()},key=str.lower)}},
-            'engines':engines,'tools':{}}
-    for name,path,args in [('go',ROOT/'client-qwen/wireguard-tools/go/bin/go.exe',['version']),
+            'engines':engines,'tools':{},
+            'runtime_locks':{path.name:digest(path) for path in sorted((ROOT/'dependances/verrous').glob('*.requirements.txt'))}}
+    spec=json.loads((ROOT/'client-qwen/wireguard-toolchain.json').read_text(encoding='utf-8'))
+    for name,path,args in [('go',ROOT/'client-qwen/wireguard-tools/versions'/spec['version']/'go/bin/go.exe',['version']),
                             ('cmake',ROOT/'toolchain/cmake-3.31.8-windows-x86_64/bin/cmake.exe',['--version'])]:
         if path.is_file():result['tools'][name]=command([str(path),*args])
     import os
@@ -54,6 +78,7 @@ def generate(artifact):
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser();parser.add_argument('--artifact',type=Path,required=True);parser.add_argument('--output',type=Path,required=True)
-    args=parser.parse_args();data=generate(args.artifact.resolve());args.output.parent.mkdir(parents=True,exist_ok=True)
+    parser.add_argument('--component',choices=tuple(COMPONENT_DIRS))
+    args=parser.parse_args();data=generate(args.artifact.resolve(),args.component);args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print('Build manifest:',args.output.resolve())

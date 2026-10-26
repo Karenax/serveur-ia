@@ -44,8 +44,8 @@ selectionMenuAll.onclick=()=>{
   selectionUpdate();
 };
 for(const event of ['selectionchange','select','keyup','mouseup','focusin'])document.addEventListener(event,selectionUpdate);
-document.addEventListener('contextmenu',event=>{
-  selectionUpdate();const target=event.target.closest('textarea,input,.content,.reasoning,.ws-result,.readonly-address,pre,code,p,h1,h2,h3,label,small');
+/* kiara-slot:native-android-selection-handles-33 */document.addEventListener('contextmenu',event=>{
+  selectionUpdate();/* /kiara-slot:native-android-selection-handles-33 */const target=event.target.closest('textarea,input,.content,.reasoning,.ws-result,.readonly-address,pre,code,p,h1,h2,h3,label,small');
   if(!selectionText&&!target)return;if(target instanceof HTMLInputElement&&!selectionField(target))return;
   event.preventDefault();event.stopImmediatePropagation();selectionTarget=target;selectionMenuCopy.disabled=!selectionText;selectionMenuAll.disabled=!target;
   selectionMenu.hidden=false;const rect=selectionMenu.getBoundingClientRect();selectionMenu.style.left=Math.max(8,Math.min(event.clientX,innerWidth-rect.width-8))+'px';selectionMenu.style.top=Math.max(8,Math.min(event.clientY,innerHeight-rect.height-8))+'px';

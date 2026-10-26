@@ -1,0 +1,2 @@
+COMMAND: "D:\Serveur IA\Strata-src\.venv\Scripts\python.exe" client-android/scripts/Prepare-Assets.py --check
+Android UI package verified

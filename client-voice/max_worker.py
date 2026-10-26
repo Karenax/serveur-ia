@@ -98,53 +98,22 @@ def infer(loaded, engine, command, cancelled):
             yield {'metrics': {'rtf': elapsed/(len(audio)/24000), 'first_audio_ms': elapsed*1000}}
 
 
+from worker_protocol import CommandInbox
+
+
 def serve(configuration, engine):
-    commands = queue.Queue(maxsize=1)
-    cancelled_ids = OrderedDict()
-    stop = threading.Event()
-    closed = threading.Event()
-    guard = threading.Lock()
-    current = {'id': None}
-    def read():
-        try:
-            while line := sys.stdin.readline(1300002):
-                if len(line) > 1300000:
-                    raise ValueError('Commande Max trop volumineuse.')
-                value = json.loads(line)
-                identifier = value.get('id')
-                if not isinstance(identifier, str) or len(identifier) != 32 or any(c not in '0123456789abcdef' for c in identifier):
-                    raise ValueError('Identifiant Max invalide.')
-                if value.get('action') == 'cancel':
-                    with guard:
-                        cancelled_ids[identifier] = True
-                        while len(cancelled_ids) > 64:
-                            cancelled_ids.popitem(last=False)
-                        if current['id'] == identifier:
-                            stop.set()
-                elif value.get('action') == ('transcribe' if engine == 'asr' else 'speak'):
-                    commands.put_nowait(value)
-                else:
-                    raise ValueError('Commande Max invalide.')
-        finally:
-            closed.set(); stop.set()
-            try:
-                commands.put_nowait(None)
-            except queue.Full:
-                pass
+    inbox=CommandInbox(engine)
+    commands,stop,closed=inbox.commands,inbox.stop,inbox.closed
     with redirect_stdout(sys.stderr):
         loaded = load_engine(configuration, engine)
-    threading.Thread(target=read, daemon=True).start()
+    inbox.start()
     emit({'ready': True})
     while not closed.is_set():
         command = commands.get()
         if command is None:
             break
         identifier = command['id']
-        with guard:
-            current['id'] = identifier
-            stop.clear()
-            if identifier in cancelled_ids:
-                stop.set()
+        inbox.begin(identifier)
         try:
             if not stop.is_set():
                 output=iter(infer(loaded, engine, command, stop))
@@ -159,8 +128,7 @@ def serve(configuration, engine):
         except Exception:
             emit({'id': identifier, 'error': 'Le traitement Max a échoué. Raccrochez puis réessayez avec Low.'})
         finally:
-            with guard:
-                current['id'] = None
+            inbox.finish()
 
 
 if __name__ == '__main__':

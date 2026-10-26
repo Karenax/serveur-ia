@@ -12,7 +12,7 @@ import time
 from cryptography.fernet import Fernet, InvalidToken
 from core import ROOT, read_json, write_json
 
-VERSION = '3.5.52'
+from kiara_shared.version import VERSION
 FILES = ['reglages.json', 'reglages-par-defaut.json', 'derniers-reglages-valides.json', 'base-strata.json', 'acces-distants.json', 'wireguard.json', 'comptes.json', 'exploitation.json', 'voix.json', 'hermes-integration.json', 'hermes-models.json']
 
 def cipher(password, salt):
@@ -362,8 +362,6 @@ class Operations:
                 if not isinstance(values,dict):raise ValueError('Configuration WireGuard invalide.')
                 if values.get('public_host'):validate_settings(values)
                 elif type(values.get('listen_port')) is not int or not 1<=values['listen_port']<=65535:raise ValueError('Port WireGuard invalide.')
-            import sys
-            sys.path.insert(0,str(ROOT/'client-qwen'))
             if not isinstance(files.get('profiles',{}),dict):raise ValueError('Profils invalides.')
             from profiles import validate_access,match,public_key
             access=validate_access(files['acces-distants.json']) if 'acces-distants.json' in files else {'clients':[]}

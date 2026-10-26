@@ -1,0 +1,3 @@
+{"devices": [{"name": "Vulkan0", "description": "Quadro P2200", "pci_id": "0000:41:00.0", "kind": "dedicated", "free_bytes": 4690801460, "total_bytes": 5490343936, "id": "c1bdc62f938b9e7f5b00760d"}], "recommended": "c1bdc62f938b9e7f5b00760d"}
+ggml_vulkan: Found 1 Vulkan devices:
+ggml_vulkan: 0 = Quadro P2200 (NVIDIA) | uma: 0 | fp16: 0 | bf16: 0 | fp4: 0 | warp size: 32 | shared memory: 49152 | int dot: 1 | matrix cores: none

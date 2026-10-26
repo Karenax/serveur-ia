@@ -1,0 +1,17 @@
+Using Python 3.12.14 environment at: toolchain\eg2-python
+Resolved 3 packages in 2ms
+Prepared 1 package in 24ms
+Uninstalled 3 packages in 622ms
+warning: Failed to hardlink files; falling back to full copy. This may lead to degraded performance.
+         If the cache and target directories are on different filesystems, hardlinking may not be supported.
+         If this is intentional, set `export UV_LINK_MODE=copy` or use `--link-mode=copy` to suppress this warning.
+Installed 3 packages in 619ms
+ - filelock==4.1.0
+ + filelock==4.2.4
+ - pip==26.2.1
+ + pip==26.2.2
+ - setuptools==84.0.0
+ + setuptools==84.2.1
+Using Python 3.12.14 environment at: toolchain\eg2-python
+Checked 50 packages in 12ms
+All installed packages are compatible

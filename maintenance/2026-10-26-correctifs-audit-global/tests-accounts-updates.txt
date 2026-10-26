@@ -1,0 +1,15 @@
+test_helper_replaces_verified_exe_preserves_profile_and_keeps_previous (test_accounts_updates.AccountsTests.test_helper_replaces_verified_exe_preserves_profile_and_keeps_previous) ... ok
+test_old_cancel_cannot_abort_new_request_and_stall_expires (test_accounts_updates.AccountsTests.test_old_cancel_cannot_abort_new_request_and_stall_expires) ... ok
+test_password_hash_reset_expiry_disabled_and_throttle (test_accounts_updates.AccountsTests.test_password_hash_reset_expiry_disabled_and_throttle) ... ok
+test_restore_failure_rolls_back_every_file_and_keeps_restored_profiles (test_accounts_updates.AccountsTests.test_restore_failure_rolls_back_every_file_and_keeps_restored_profiles) ... ok
+test_signed_download_rejects_wrong_key_modified_manifest_and_binary (test_accounts_updates.AccountsTests.test_signed_download_rejects_wrong_key_modified_manifest_and_binary) ... ok
+test_update_starts_with_active_api_requests_and_closes_after_preparation (test_accounts_updates.AccountsTests.test_update_starts_with_active_api_requests_and_closes_after_preparation) ... ok
+test_integration_buttons_require_auth_and_only_use_verified_local_settings (test_accounts_updates.AuthGatewayTests.test_integration_buttons_require_auth_and_only_use_verified_local_settings) ... ok
+test_local_history_encrypted_and_auth_required (test_accounts_updates.AuthGatewayTests.test_local_history_encrypted_and_auth_required) ... ok
+test_pasted_connection_parameters_are_validated_before_switching (test_accounts_updates.AuthGatewayTests.test_pasted_connection_parameters_are_validated_before_switching) ... ok
+test_personal_exe_connects_without_login_and_revocation_crosses_wireguard (test_accounts_updates.AuthGatewayTests.test_personal_exe_connects_without_login_and_revocation_crosses_wireguard) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 49.052s
+
+OK

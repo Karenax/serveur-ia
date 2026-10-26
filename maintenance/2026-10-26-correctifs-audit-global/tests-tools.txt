@@ -1,0 +1,23 @@
+test_arithmetic_cannot_execute_code_or_consume_unbounded_resources (test_hermes_tools.ToolsTests.test_arithmetic_cannot_execute_code_or_consume_unbounded_resources) ... ok
+test_mcp_lifecycle_and_argument_contract (test_hermes_tools.ToolsTests.test_mcp_lifecycle_and_argument_contract) ... ok
+test_native_web_catalogue_and_calls_are_bounded (test_hermes_tools.ToolsTests.test_native_web_catalogue_and_calls_are_bounded) ... ok
+test_native_web_extract_upgrades_search_excerpt_and_never_retains_private_or_failed_urls (test_hermes_tools.ToolsTests.test_native_web_extract_upgrades_search_excerpt_and_never_retains_private_or_failed_urls) ... ok
+test_native_web_failure_does_not_publish_internal_diagnostics (test_hermes_tools.ToolsTests.test_native_web_failure_does_not_publish_internal_diagnostics) ... ok
+test_native_web_first_tool_waits_for_its_accepted_id_without_adopting_incoming_id (test_hermes_tools.ToolsTests.test_native_web_first_tool_waits_for_its_accepted_id_without_adopting_incoming_id) ... ok
+test_native_web_has_no_owner_or_scope_override_and_checks_cancel_maintenance (test_hermes_tools.ToolsTests.test_native_web_has_no_owner_or_scope_override_and_checks_cancel_maintenance) ... ok
+test_native_web_permission_ignores_legacy_brave_settings_and_old_tools_cannot_be_called (test_hermes_tools.ToolsTests.test_native_web_permission_ignores_legacy_brave_settings_and_old_tools_cannot_be_called) ... ok
+test_native_web_rechecks_revocation_and_web_permission_before_publishing (test_hermes_tools.ToolsTests.test_native_web_rechecks_revocation_and_web_permission_before_publishing) ... ok
+test_native_web_stale_run_cannot_be_attached_to_the_next_turn_of_the_same_owner (test_hermes_tools.ToolsTests.test_native_web_stale_run_cannot_be_attached_to_the_next_turn_of_the_same_owner) ... ok
+test_project_archive_blocks_even_calculation (test_hermes_tools.ToolsTests.test_project_archive_blocks_even_calculation) ... ok
+test_project_sources_and_bounded_document (test_hermes_tools.ToolsTests.test_project_sources_and_bounded_document) ... ok
+test_real_knowledge_sources_keep_personal_project_and_document_scopes (test_hermes_tools.ToolsTests.test_real_knowledge_sources_keep_personal_project_and_document_scopes) ... ok
+test_revocation_cancellation_and_maintenance (test_hermes_tools.ToolsTests.test_revocation_cancellation_and_maintenance) ... ok
+test_selected_document_limits_all_tools (test_hermes_tools.ToolsTests.test_selected_document_limits_all_tools) ... ok
+test_source_cannot_escape_project_or_owner (test_hermes_tools.ToolsTests.test_source_cannot_escape_project_or_owner) ... ok
+test_timestamped_command_identity_survives_recreated_tool_context (test_hermes_tools.ToolsTests.test_timestamped_command_identity_survives_recreated_tool_context) ... ok
+test_written_assistant_uses_canonical_memory_and_durable_retry (test_hermes_tools.ToolsTests.test_written_assistant_uses_canonical_memory_and_durable_retry) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 4.908s
+
+OK

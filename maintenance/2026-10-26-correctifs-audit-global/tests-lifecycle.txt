@@ -1,0 +1,8 @@
+test_missing_reset_marker_preserves_current_server_history (test_audit_lifecycle.AuditLifecycleTests.test_missing_reset_marker_preserves_current_server_history) ... ok
+test_negative_quoted_and_explanatory_requests_do_not_authorize_writes (test_audit_lifecycle.AuditLifecycleTests.test_negative_quoted_and_explanatory_requests_do_not_authorize_writes) ... ok
+test_private_runtime_does_not_read_personal_installation (test_audit_lifecycle.AuditLifecycleTests.test_private_runtime_does_not_read_personal_installation) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.532s
+
+OK

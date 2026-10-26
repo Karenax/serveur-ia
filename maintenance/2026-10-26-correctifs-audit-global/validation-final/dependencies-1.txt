@@ -1,0 +1,1 @@
+{"passed": true, "checked_versions": 217, "runtimes": ["strata", "eg2", "voix-serveur", "conversation-windows", "hermes-fred", "construction-windows"], "affected": [], "errors": []}

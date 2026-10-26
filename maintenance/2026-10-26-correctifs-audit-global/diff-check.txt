@@ -1,0 +1,746 @@
+Certificat-NAS-karenax-20261006.md:56: trailing whitespace.
++Les confirmations requises par l'outil navigateur pour créer le connecteur persistant Cloudflare et désactiver temporairement DNSSEC ont été demandées. Aucun changement des serveurs DNS, de DNSSEC, ni de publication des services n'a été effectué sans ces confirmations.
+Certificat-NAS-karenax-20261006.md:57: trailing whitespace.
++
+Certificat-NAS-karenax-20261006.md:65: trailing whitespace.
++Prochaine étape : dans Certificat → Paramètres, affecter nas.karenax.net au service utilisé par DSM, puis vérifier à nouveau le certificat réellement servi. La configuration des autres services doit être préservée.
+Certificat-NAS-karenax-20261006.md:73: trailing whitespace.
++L’import et l’affectation DSM sont donc terminés. La résolution publique et le tunnel Cloudflare restent à activer. Le renouvellement automatique reste à configurer.
+Configuration-Cloudflare-karenax-20261006.md:1: trailing whitespace.
++# Configuration Cloudflare — 6 octobre 2026
+Configuration-Cloudflare-karenax-20261006.md:2: trailing whitespace.
++
+Configuration-Cloudflare-karenax-20261006.md:3: trailing whitespace.
++## État actuel
+Configuration-Cloudflare-karenax-20261006.md:4: trailing whitespace.
++
+Configuration-Cloudflare-karenax-20261006.md:5: trailing whitespace.
++- Domaine actif chez Cloudflare. La résolution NS via 1.1.1.1 confirme louis.ns.cloudflare.com et zoe.ns.cloudflare.com.
+Configuration-Cloudflare-karenax-20261006.md:6: trailing whitespace.
++- karenax.net et www.karenax.net pointent vers l’hébergement OVH 213.186.33.87, en mode DNS uniquement.
+Configuration-Cloudflare-karenax-20261006.md:7: trailing whitespace.
++- Tunnel karenax-maison créé, connecté et configuré avec deux routes.
+Configuration-Cloudflare-karenax-20261006.md:8: trailing whitespace.
++- nas.karenax.net → HTTPS 192.168.1.75:5001. Origin Server Name = nas.karenax.net, vérification du certificat maintenue.
+Configuration-Cloudflare-karenax-20261006.md:9: trailing whitespace.
++- ia.karenax.net → HTTP 127.0.0.1:8766, passerelle authentifiée par les jetons personnels. La liaison locale est limitée à la boucle locale ; le tunnel Internet est chiffré.
+Configuration-Cloudflare-karenax-20261006.md:10: trailing whitespace.
++- Aucun changement des redirections SFR ni du fonctionnement de WireGuard.
+Configuration-Cloudflare-karenax-20261006.md:11: trailing whitespace.
++
+Configuration-Cloudflare-karenax-20261006.md:12: trailing whitespace.
++## Vérifications publiques
+Configuration-Cloudflare-karenax-20261006.md:13: trailing whitespace.
++
+Configuration-Cloudflare-karenax-20261006.md:14: trailing whitespace.
++La résolution des deux sous-domaines via 1.1.1.1 retourne les adresses Cloudflare 104.21.93.114 et 172.67.209.66.
+Configuration-Cloudflare-karenax-20261006.md:15: trailing whitespace.
++
+Configuration-Cloudflare-karenax-20261006.md:16: trailing whitespace.
++Des requêtes HTTPS avec ces adresses explicitement résolues, le nom de domaine correct et la validation TLS normale donnent :
+Configuration-Cloudflare-karenax-20261006.md:17: trailing whitespace.
++
+Configuration-Cloudflare-karenax-20261006.md:18: trailing whitespace.
++| Accès | Résultat |
+Configuration-Cloudflare-karenax-20261006.md:19: trailing whitespace.
++| --- | --- |
+Configuration-Cloudflare-karenax-20261006.md:20: trailing whitespace.
++| https://nas.karenax.net/ | HTTP 200 ; validation TLS réussie |
+Configuration-Cloudflare-karenax-20261006.md:21: trailing whitespace.
++| https://ia.karenax.net/v1/models sans jeton | HTTP 401 ; validation TLS réussie |
+Configuration-Cloudflare-karenax-20261006.md:22: trailing whitespace.
++| NAS local avec le nom nas.karenax.net | HTTP 200 ; certificat Let’s Encrypt valide |
+Configuration-Cloudflare-karenax-20261006.md:23: trailing whitespace.
++
+Configuration-Cloudflare-karenax-20261006.md:24: trailing whitespace.
++La résolution DNS habituelle de ce PC conservait encore des réponses négatives lors du premier test. Le fonctionnement du tunnel public est vérifié, mais les caches des réseaux et des postes peuvent retarder l’accès par le nom.
+Configuration-Cloudflare-karenax-20261006.md:25: trailing whitespace.
++
+Configuration-Cloudflare-karenax-20261006.md:26: trailing whitespace.
++## Protection et confidentialité
+Configuration-Cloudflare-karenax-20261006.md:27: trailing whitespace.
++
+Configuration-Cloudflare-karenax-20261006.md:28: trailing whitespace.
++- HTTPS obligatoire activé chez Cloudflare.
+Configuration-Cloudflare-karenax-20261006.md:29: trailing whitespace.
++- Règle « NAS et IA - sans cache » active, action Bypass cache, expression : (http.host in {"nas.karenax.net" "ia.karenax.net"}).
+Configuration-Cloudflare-karenax-20261006.md:30: trailing whitespace.
++- Authentification DSM conservée pour le NAS. Cloudflare Access n’est pas configuré.
+Configuration-Cloudflare-karenax-20261006.md:31: trailing whitespace.
++- Authentification par jetons personnels conservée pour l’API IA.
+Configuration-Cloudflare-karenax-20261006.md:32: trailing whitespace.
++- Cloudflare termine HTTPS et peut techniquement lire le trafic. Le propriétaire a explicitement accepté cette limite après explication. La mise en cache désactivée ne constitue pas une garantie d’absence de journalisation ou d’accès technique.
+Configuration-Cloudflare-karenax-20261006.md:33: trailing whitespace.
++
+Configuration-Cloudflare-karenax-20261006.md:34: trailing whitespace.
++## DNSSEC
+Configuration-Cloudflare-karenax-20261006.md:35: trailing whitespace.
++
+Configuration-Cloudflare-karenax-20261006.md:36: trailing whitespace.
++L’ancienne protection DNSSEC OVH a été désactivée pour la migration. Le premier changement des serveurs DNS a affiché une erreur « you are not authorized to update DS data », mais le changement des NS a effectivement été appliqué, puis le domaine a été activé chez Cloudflare.
+Configuration-Cloudflare-karenax-20261006.md:37: trailing whitespace.
++
+Configuration-Cloudflare-karenax-20261006.md:38: trailing whitespace.
++DNSSEC a ensuite été activé chez Cloudflare. La clé publique et son DS ont été vérifiés par calcul SHA-256 avant publication. L’ajout chez OVH a été confirmé avec succès. Le DS est maintenant visible via le résolveur validant 1.1.1.1, et Cloudflare affiche « Success! karenax.net is protected with DNSSEC. ».
+Configuration-Cloudflare-karenax-20261006.md:39: trailing whitespace.
++
+Configuration-Cloudflare-karenax-20261006.md:40: trailing whitespace.
++DS attendu : karenax.net. 3600 IN DS 2371 13 2 F49EF809F8363DE5725A7B499437FBEB959C70E588D4B36102B7E621761A456A
+Configuration-Cloudflare-karenax-20261006.md:41: trailing whitespace.
++
+Configuration-Cloudflare-karenax-20261006.md:42: trailing whitespace.
++Ne pas réactiver le bouton DNSSEC pour les serveurs internes OVH : la zone autoritaire est maintenant Cloudflare. La protection repose sur le DS Cloudflare publié chez OVH.
+Configuration-Cloudflare-karenax-20261006.md:43: trailing whitespace.
++
+Configuration-Cloudflare-karenax-20261006.md:44: trailing whitespace.
++## Connecteur Windows
+Configuration-Cloudflare-karenax-20261006.md:45: trailing whitespace.
++
+Configuration-Cloudflare-karenax-20261006.md:46: trailing whitespace.
++- Binaire officiel cloudflared 2026.10.0, empreinte vérifiée contre la publication GitHub.
+Configuration-Cloudflare-karenax-20261006.md:47: trailing whitespace.
++- Jeton enregistré hors du dépôt, dans un dossier à accès restreint ; absent de la ligne de commande et des rapports.
+Configuration-Cloudflare-karenax-20261006.md:48: trailing whitespace.
++- Tâche Windows Karenax-Cloudflare-Tunnel, en cours d’exécution, lancée à l’ouverture de session, relancée toutes les minutes en cas d’échec.
+Configuration-Cloudflare-karenax-20261006.md:49: trailing whitespace.
++- Le premier connecteur temporaire a été arrêté après vérification du connecteur de la tâche.
+Configuration-Cloudflare-karenax-20261006.md:50: trailing whitespace.
++- Le tunnel dépend actuellement de ce serveur Windows, qui doit rester allumé. Il démarre avec la session de son propriétaire, pas avant connexion Windows.
+Configuration-Cloudflare-karenax-20261006.md:51: trailing whitespace.
++
+Configuration-Cloudflare-karenax-20261006.md:52: trailing whitespace.
++## Éléments restant à terminer
+Configuration-Cloudflare-karenax-20261006.md:53: trailing whitespace.
++
+Configuration-Cloudflare-karenax-20261006.md:54: trailing whitespace.
++- Les certificats gratuits OVH sont affichés Actif pour karenax.net et www.karenax.net (expiration 4 janvier 2027). Après un délai de déploiement, karenax.net répond HTTP 200 avec validation TLS normale sur 213.186.33.87. Le certificat www.karenax.net est actif dans OVH mais son déploiement effectif présente encore un certificat ne couvrant pas ce nom au dernier test ; il reste à confirmer.
+Configuration-Cloudflare-karenax-20261006.md:55: trailing whitespace.
++- Le certificat NAS est importé et affecté à DSM ; son renouvellement automatique reste à configurer avant expiration le 4 janvier 2027.
+Configuration-Cloudflare-karenax-20261006.md:56: trailing whitespace.
++- Installer la version personnelle 3.5.3 sur le PC distant pour disposer du choix WireGuard / HTTPS. Les deux EXE personnels ont été préparés dans lanceur/clients, avec leurs clés existantes conservées.
+Configuration-Cloudflare-karenax-20261006.md:57: trailing whitespace.
++
+Configuration-Cloudflare-karenax-20261006.md:58: trailing whitespace.
++Sources : [fonctionnement du déchiffrement Cloudflare](https://developers.cloudflare.com/data-localization/regional-services/), [DNSSEC OVH](https://docs.ovhcloud.com/fr/guides/web-cloud/domains/dns-dnssec), [paramètres du tunnel](https://developers.cloudflare.com/tunnel/advanced/origin-parameters/).
+Configuration-Cloudflare-karenax-20261006.md:59: trailing whitespace.
++
+Configuration-Cloudflare-karenax-20261006.md:60: trailing whitespace.
++
+Configuration-Cloudflare-karenax-20261006.md:61: trailing whitespace.
++## Client Fred 3.5.3 — choix de connexion disponible
+Configuration-Cloudflare-karenax-20261006.md:62: trailing whitespace.
++
+Configuration-Cloudflare-karenax-20261006.md:63: trailing whitespace.
++Dans Réglages → Connexion : choisir WireGuard · VPN ou HTTPS · Cloudflare, puis Appliquer la connexion. WireGuard reste le mode initial et son bouton Automatique conserve la sélection des adresses locales / Internet. Aucun repli silencieux vers Cloudflare n’est ajouté.
+Configuration-Cloudflare-karenax-20261006.md:64: trailing whitespace.
++
+Configuration-Cloudflare-karenax-20261006.md:65: trailing whitespace.
++Le mode HTTPS utilise exclusivement https://ia.karenax.net, avec la vérification normale du certificat, les paramètres de proxy Windows et les jetons personnels existants. Les redirections HTTP sont refusées pour éviter de transmettre le jeton à une autre origine. Le choix est enregistré dans les réglages DPAPI ; les conversations, la clé API locale pour Hermes / OpenCode et les mises à jour restent compatibles.
+Configuration-Cloudflare-karenax-20261006.md:66: trailing whitespace.
++
+Configuration-Cloudflare-karenax-20261006.md:67: trailing whitespace.
++Le User-Agent identifie le logiciel AccesServeurFred/3.5.3 : la signature Python-urllib par défaut provoquait un blocage Cloudflare 1010, résolu sans modifier les protections de la zone.
+Configuration-Cloudflare-karenax-20261006.md:68: trailing whitespace.
++
+Configuration-Cloudflare-karenax-20261006.md:69: trailing whitespace.
++Vérifications :
+Configuration-Cloudflare-karenax-20261006.md:70: trailing whitespace.
++- 46 tests Python couverts ; les 3 échecs initiaux liés à un contrôle TLS de test et aux anciens binaires ont été refaits avec succès après correction et compilation. Les contrôles WireGuard, accès révoqués, historiques, signature et retour de mise à jour passent.
+Configuration-Cloudflare-karenax-20261006.md:71: trailing whitespace.
++- Les deux EXE personnels 3.5.3 ont réussi leur auto-test avec profil intégré.
+Configuration-Cloudflare-karenax-20261006.md:72: trailing whitespace.
++- Analyse syntaxique JavaScript et tests de collage / sélection explicite des modes réussis.
+Configuration-Cloudflare-karenax-20261006.md:73: trailing whitespace.
++- Test réel avec un EXE personnel : HTTPS connecté, protocole 3, zéro tunnel WireGuard démarré.
+Configuration-Cloudflare-karenax-20261006.md:74: trailing whitespace.
++- Manifeste de mise à jour 3.5.3 récupéré par HTTPS et signature vérifiée avec la clé épinglée du profil.
+Configuration-Cloudflare-karenax-20261006.md:75: trailing whitespace.
++- Passerelle rechargée après vérification de l’absence de générations et de tâches en cours, avec préservation de l’état du modèle. Le processus modèle 17404 est resté lancé depuis 08:27:48 ; WireGuard est en fonctionnement sur UDP 51820.
+Configuration-Cloudflare-karenax-20261006.md:76: trailing whitespace.
++
+Configuration-Cloudflare-karenax-20261006.md:77: trailing whitespace.
++Les EXE préparés sont lanceur/clients/0402a094eeb03bdc.exe (Client Windows) et lanceur/clients/8ab49467b5ff732e.exe (Client Windows 2). Chacun conserve son propre accès. Une ancienne version bloquée sur WireGuard au travail doit recevoir son nouvel EXE pour pouvoir sélectionner HTTPS ; elle ne peut pas utiliser ce nouveau mode avant mise à jour.
+Configuration-Cloudflare-karenax-20261006.md:78: trailing whitespace.
++
+Configuration-Cloudflare-karenax-20261006.md:79: trailing whitespace.
++
+Configuration-Cloudflare-karenax-20261006.md:80: trailing whitespace.
++## Noms des EXE corrigés
+Configuration-Cloudflare-karenax-20261006.md:81: trailing whitespace.
++
+Configuration-Cloudflare-karenax-20261006.md:82: trailing whitespace.
++Les téléchargements incluent maintenant la version réelle du profil et le nom du client : « Accès serveur Fred v3.5.3 - Client Windows.exe » et « Accès serveur Fred v3.5.3 - Client Windows 2.exe ». Des copies identiques sont disponibles dans lanceur/clients sous ces noms. Les identifiants internes restent utilisés par le stockage ; ni les clés ni le contenu des EXE ne sont modifiés. Le nom et le SHA-256 des deux téléchargements ont été vérifiés sur la passerelle rechargée.
+README.md:3: trailing whitespace.
++Référence courante : [architecture, versions et compatibilités](ARCHITECTURE-ACTUELLE.md).
+README.md:4: trailing whitespace.
++La livraison des corrections de l’audit global est **serveur/Windows 3.5.53 et
+README.md:5: trailing whitespace.
++Android 1.0.24/code 25**. Le [suivi des corrections](maintenance/2026-10-26-correctifs-audit-global/AVANCEMENT.md)
+README.md:6: trailing whitespace.
++regroupe les changements et les validations ; les dossiers datés ci-dessous décrivent les livraisons précédentes.
+README.md:7: trailing whitespace.
++
+RECONSTRUIRE-FRED.md:3: trailing whitespace.
++Les constructions Windows/serveur 3.5.53 et Android 1.0.24/code 25 utilisent les
+RECONSTRUIRE-FRED.md:8: trailing whitespace.
++Le manifeste est propre à son composant ; `maintenance/deployment_manifest.py`
+RECONSTRUIRE-FRED.md:9: trailing whitespace.
++relie les livrables et les résultats de validation, puis vérifie leurs empreintes.
+RECONSTRUIRE-FRED.md:10: trailing whitespace.
++La [référence d’architecture](ARCHITECTURE-ACTUELLE.md) décrit les données, versions
+RECONSTRUIRE-FRED.md:11: trailing whitespace.
++et compatibilités courantes.
+RECONSTRUIRE-FRED.md:23: trailing whitespace.
++2. Préparer Python 3.12 dans `Strata-src/.venv`, sans héritage des bibliothèques
+RECONSTRUIRE-FRED.md:24: trailing whitespace.
++   d’outillage, puis installer le verrou `dependances/verrous/strata.requirements.txt`
+RECONSTRUIRE-FRED.md:25: trailing whitespace.
++   et le paquet local `shared` avec `--no-deps --no-build-isolation -e shared`.
+RECONSTRUIRE-FRED.md:26: trailing whitespace.
++   Préparer séparément `toolchain/build-python` avec
+RECONSTRUIRE-FRED.md:27: trailing whitespace.
++   `maintenance/prepare_build_environment.py` ; PyInstaller appartient à ce constructeur. Les
+RECONSTRUIRE-FRED.md:30: trailing whitespace.
++3. Préparer le runtime privé Hermes et ses dépendances publiques verrouillées.
+RECONSTRUIRE-FRED.md:31: trailing whitespace.
++   Le pointeur `toolchain/hermes-security-runtime/runtime.json` déclare ses sources,
+RECONSTRUIRE-FRED.md:32: trailing whitespace.
++   Python, dépendances et outils ; il est résolu avant le bootstrap personnel.
+RECONSTRUIRE-FRED.md:33: trailing whitespace.
++   Le commit utilisé par une livraison
+RECONSTRUIRE-FRED.md:49: trailing whitespace.
++6. Installer le Go épinglé avec `maintenance/prepare_go.py` : version et empreinte
+RECONSTRUIRE-FRED.md:50: trailing whitespace.
++   publique dans `client-qwen/wireguard-toolchain.json`. Conserver les caches des modules vérifiés par
+RECONSTRUIRE-FRED.md:68: trailing whitespace.
++Les cinq runtimes applicatifs et le constructeur Windows disposent de six
+RECONSTRUIRE-FRED.md:76: trailing whitespace.
++Le point d’entrée complet, depuis la racine, est :
+RECONSTRUIRE-FRED.md:77: trailing whitespace.
++
+RECONSTRUIRE-FRED.md:78: trailing whitespace.
++```powershell
+RECONSTRUIRE-FRED.md:79: trailing whitespace.
++& '.\Strata-src\.venv\Scripts\python.exe' maintenance/verify_project.py
+RECONSTRUIRE-FRED.md:80: trailing whitespace.
++```
+RECONSTRUIRE-FRED.md:81: trailing whitespace.
++
+RECONSTRUIRE-FRED.md:82: trailing whitespace.
++Il agrège les échecs et produit `validation.json` dans un répertoire d’exécution
+RECONSTRUIRE-FRED.md:83: trailing whitespace.
++sous `toolchain/test-results`. `--output` permet un emplacement explicite et
+RECONSTRUIRE-FRED.md:84: trailing whitespace.
++`--checks` un sous-ensemble. Les vérifications OSV et Go consultent les avis publics.
+RECONSTRUIRE-FRED.md:85: trailing whitespace.
++Les captures UI restent dans ce répertoire et ne remplacent aucune preuve historique.
+RECONSTRUIRE-FRED.md:86: trailing whitespace.
++
+RECONSTRUIRE-FRED.md:87: trailing whitespace.
++Les commandes individuelles restent disponibles :
+RECONSTRUIRE-FRED.md:127: trailing whitespace.
++& '.\Strata-src\.venv\Scripts\python.exe' maintenance/prepare_go.py
+RECONSTRUIRE-FRED.md:128: trailing whitespace.
++& '.\client-qwen\Build-WireGuard.ps1' -OutputBinary "$PWD\toolchain\releases-staging\wireguard-bridge.exe"
+RECONSTRUIRE-FRED.md:129: trailing whitespace.
++& '.\client-qwen\Build-Client.ps1' -DistributionDirectory "$PWD\toolchain\releases-staging\windows" -SkipManifest -WireGuardBinary "$PWD\toolchain\releases-staging\wireguard-bridge.exe"
+RECONSTRUIRE-FRED.md:131: trailing whitespace.
++& '.\Strata-src\.venv\Scripts\python.exe' maintenance/package_server.py --output toolchain/releases-staging/server
+RECONSTRUIRE-FRED.md:142: trailing whitespace.
++Pour constituer le manifeste d’ensemble, fournir les trois `build-manifest.json`
+RECONSTRUIRE-FRED.md:143: trailing whitespace.
++et le `validation.json` réussi à `maintenance/deployment_manifest.py`. Le script
+RECONSTRUIRE-FRED.md:144: trailing whitespace.
++refuse une validation incomplète, un fichier remplacé ou des sources changées
+RECONSTRUIRE-FRED.md:145: trailing whitespace.
++depuis la construction. Le paquet serveur contient les sources et les verrous,
+RECONSTRUIRE-FRED.md:146: trailing whitespace.
++pas les modèles, clés ni données privées.
+RECONSTRUIRE-FRED.md:147: trailing whitespace.
++
+RECONSTRUIRE-FRED.md:148: trailing whitespace.
++`KIARA_DATA_DIR` permet de séparer les données de la version exécutable ; le chemin
+RECONSTRUIRE-FRED.md:149: trailing whitespace.
++historique reste la valeur par défaut. Toute migration utilise une sauvegarde
+RECONSTRUIRE-FRED.md:150: trailing whitespace.
++vérifiée et la restauration existante. `KIARA_RUNTIME_PYTHON` désigne le Python
+RECONSTRUIRE-FRED.md:151: trailing whitespace.
++d’exécution lorsqu’il se trouve ailleurs que dans le chemin historique.
+RECONSTRUIRE-FRED.md:152: trailing whitespace.
++
+client-android/app/build.gradle:9: trailing whitespace.
++        versionCode 25
+client-android/app/build.gradle:10: trailing whitespace.
++        versionName '1.0.24'
+client-android/scripts/Prepare-Assets.py:44: trailing whitespace.
++def platform_source(source: Path, name: str, adapters: dict) -> str:
+client-android/scripts/Prepare-Assets.py:45: trailing whitespace.
++    value = read(source / name)
+client-android/scripts/Prepare-Assets.py:46: trailing whitespace.
++    for operation in adapters.get('sources', {}).get(name, []):
+client-android/scripts/Prepare-Assets.py:47: trailing whitespace.
++        if 'file' in operation:
+client-android/scripts/Prepare-Assets.py:48: trailing whitespace.
++            replacement = read(MOBILE / operation['file'])
+client-android/scripts/Prepare-Assets.py:49: trailing whitespace.
++            if operation.get('rstrip'): replacement = replacement.rstrip()
+client-android/scripts/Prepare-Assets.py:50: trailing whitespace.
++            replacement = operation.get('prefix', '') + replacement + operation.get('suffix', '')
+client-android/scripts/Prepare-Assets.py:51: trailing whitespace.
++        else:
+client-android/scripts/Prepare-Assets.py:52: trailing whitespace.
++            replacement = operation['value']
+client-android/scripts/Prepare-Assets.py:53: trailing whitespace.
++        if 'label' in operation:
+client-android/scripts/Prepare-Assets.py:54: trailing whitespace.
++            value = value.replace(operation['label'], replacement)
+client-android/scripts/Prepare-Assets.py:55: trailing whitespace.
++            continue
+client-android/scripts/Prepare-Assets.py:56: trailing whitespace.
++        identity = re.escape(operation['slot'])
+client-android/scripts/Prepare-Assets.py:57: trailing whitespace.
++        if operation.get('html'):
+client-android/scripts/Prepare-Assets.py:58: trailing whitespace.
++            pattern = r'<!-- kiara-slot:' + identity + r' -->(.*?)<!-- /kiara-slot:' + identity + r' -->'
+client-android/scripts/Prepare-Assets.py:59: trailing whitespace.
++        else:
+client-android/scripts/Prepare-Assets.py:60: trailing whitespace.
++            pattern = r'/\* kiara-slot:' + identity + r' \*/(.*?)/\* /kiara-slot:' + identity + r' \*/'
+client-android/scripts/Prepare-Assets.py:61: trailing whitespace.
++        value, count = re.subn(pattern, lambda _: replacement, value, flags=re.S)
+client-android/scripts/Prepare-Assets.py:62: trailing whitespace.
++        if count != 1:
+client-android/scripts/Prepare-Assets.py:63: trailing whitespace.
++            raise ValueError('Missing or duplicated platform slot: ' + operation['slot'])
+client-android/scripts/Prepare-Assets.py:64: trailing whitespace.
++    return value
+client-android/scripts/Prepare-Assets.py:65: trailing whitespace.
++
+client-android/scripts/Prepare-Assets.py:66: trailing whitespace.
++
+client-android/scripts/Prepare-Assets.py:68: trailing whitespace.
++    adapters = json.loads(read(MOBILE / 'platform-adapters.json'))
+client-android/scripts/Prepare-Assets.py:69: trailing whitespace.
++    if adapters.get('format') != 1: raise ValueError('Unsupported UI platform contract')
+client-android/scripts/Prepare-Assets.py:70: trailing whitespace.
++    files = {name: platform_source(source, name, adapters) for name in SHARED}
+client-android/scripts/Prepare-Assets.py:71: trailing whitespace.
++    presentation = ''.join(script(files[name]) for name in ('ui.js', 'attachments.js', 'corrector.js',
+client-android/scripts/Prepare-Assets.py:72: trailing whitespace.
++        'selection.js', 'thinking.js', 'voice.js', 'conversation.js')) + script(read(MOBILE / 'android.js'))
+client-android/scripts/Prepare-Assets.py:73: trailing whitespace.
++    platform = script('window.kiaraPlatform=Object.freeze(' + json.dumps(adapters['capabilities'],ensure_ascii=False) + ');')
+client-android/scripts/Prepare-Assets.py:74: trailing whitespace.
++    markdown = platform + script(files['vendor/markdown-it.min.js']) + script(files['markdown.js'])
+client-android/scripts/Prepare-Assets.py:75: trailing whitespace.
++    chat = replace_once(files['chat.html'], '</head>', markdown + '</head>', 'markdown bootstrap')
+client-android/scripts/Prepare-Assets.py:76: trailing whitespace.
++    chat = replace_once(chat, '</body>', files['workspace.html'] + presentation + '</body>', 'workspace bootstrap')
+client-android/scripts/Prepare-Assets.py:77: trailing whitespace.
++    chat = replace_once(chat, '__UI_CSS__', files['ui.css'] + '\n' + read(MOBILE / 'android.css'), 'style assembly')
+client-qwen/Accès serveur Fred.spec:5: trailing whitespace.
++binaries = [('D:/Serveur IA/toolchain/releases-staging/wireguard-bridge.exe', '.')]
+client-qwen/Accès serveur Fred.spec:7: trailing whitespace.
++tmp_ret = collect_all('kiara_shared')
+client-qwen/Accès serveur Fred.spec:8: trailing whitespace.
++datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
+client-qwen/Accès serveur Fred.spec:19: trailing whitespace.
++    pathex=['D:/Serveur IA/shared'],
+client-qwen/Build-Client.ps1:6: trailing whitespace.
++$python = Join-Path $root 'toolchain\build-python\Scripts\python.exe'
+client-qwen/Build-Client.ps1:7: trailing whitespace.
++if (!(Test-Path -LiteralPath $python)) { throw 'Préparer le constructeur isolé avec maintenance/prepare_build_environment.py.' }
+client-qwen/Build-Client.ps1:10: trailing whitespace.
++$env:PYTHONPATH = ''
+client-qwen/Build-Client.ps1:35: trailing whitespace.
++& $python -m PyInstaller --noconfirm --onefile --windowed --paths (Join-Path $root 'shared') --collect-all kiara_shared --collect-all webview --collect-all pythonnet --collect-all clr_loader --name "Accès serveur Fred" --icon (Join-Path $PSScriptRoot "fred.ico") --version-file (Join-Path $PSScriptRoot "product-version.txt") --add-data $voiceData --add-data $voiceJsData --add-data $conversationJsData --add-data $workspaceData --add-data $uiCssData --add-data $uiJsData --add-data $attachmentsData --add-data $selectionData --add-data $thinkingData --add-data $markdownData --add-data $correctorData --add-data $markdownVendor --add-data ((Join-Path $PSScriptRoot 'chat.html') + ';.') --add-data ((Join-Path $PSScriptRoot 'LICENSE.txt') + ';.') --add-data ((Join-Path $PSScriptRoot 'THIRD-PARTY.txt') + ';.') --add-binary ($WireGuardBinary + ';.') --distpath $DistributionDirectory --workpath (Join-Path $PSScriptRoot 'build') --specpath $PSScriptRoot (Join-Path $PSScriptRoot 'client.py')
+client-qwen/Build-Client.ps1:37: trailing whitespace.
++& $python (Join-Path $root 'maintenance/check_windows_artifact.py') --artifact (Join-Path $DistributionDirectory 'Accès serveur Fred.exe') --result (Join-Path $DistributionDirectory 'self-test.txt')
+client-qwen/Build-Client.ps1:38: trailing whitespace.
++if ($LASTEXITCODE -ne 0) { throw 'Le client construit ne passe pas sa vérification native.' }
+client-qwen/Build-Client.ps1:39: trailing whitespace.
++& $python (Join-Path $root 'maintenance\build_manifest.py') --component windows --artifact (Join-Path $DistributionDirectory 'Accès serveur Fred.exe') --output (Join-Path $DistributionDirectory 'build-manifest.json')
+client-qwen/fred_http.py:1: trailing whitespace.
++"""Compatibility import; implementation belongs to kiara_shared.http."""
+client-qwen/fred_http.py:2: trailing whitespace.
++import sys
+client-qwen/fred_http.py:3: trailing whitespace.
++from kiara_shared import http as _implementation
+client-qwen/fred_http.py:4: trailing whitespace.
++sys.modules[__name__] = _implementation
+client-qwen/max_installation.py:1: trailing whitespace.
++"""Compatibility import; implementation belongs to kiara_shared.voice_packs."""
+client-qwen/max_installation.py:2: trailing whitespace.
++import sys
+client-qwen/max_installation.py:3: trailing whitespace.
++from kiara_shared import voice_packs as _implementation
+client-qwen/max_installation.py:4: trailing whitespace.
++sys.modules[__name__] = _implementation
+client-qwen/package.json:4: trailing whitespace.
++  "version": "3.5.53",
+client-qwen/product-version.txt:1: trailing whitespace.
++VSVersionInfo(ffi=FixedFileInfo(filevers=(3, 5, 53, 0), prodvers=(3, 5, 53, 0),
+client-qwen/product-version.txt:5: trailing whitespace.
++StringStruct('FileVersion', '3.5.53'),
+client-qwen/product-version.txt:9: trailing whitespace.
++StringStruct('ProductVersion', '3.5.53')])]),
+client-qwen/requirements-build.txt:10: trailing whitespace.
++# Shared Windows constructor also builds the optional CPU voice runtime.
+client-qwen/requirements-build.txt:11: trailing whitespace.
++ptts==0.4.1
+client-qwen/requirements-build.txt:12: trailing whitespace.
++numpy==2.5.4
+client-qwen/selection.js:14: trailing whitespace.
++  const el=document.activeElement;
+client-qwen/selection.js:15: trailing whitespace.
++  if(selectionField(el)&&typeof el.selectionStart==='number')return el.value.slice(el.selectionStart,el.selectionEnd);
+client-qwen/selection.js:16: trailing whitespace.
++  if(el instanceof HTMLInputElement)return '';
+client-qwen/selection.js:43: trailing whitespace.
++  else{document.activeElement?.blur();const range=document.createRange();range.selectNodeContents(selectionTarget);const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);}
+client-qwen/selection.js:47: trailing whitespace.
++/* kiara-slot:native-android-selection-handles-33 */document.addEventListener('contextmenu',event=>{
+client-qwen/selection.js:48: trailing whitespace.
++  selectionUpdate();/* /kiara-slot:native-android-selection-handles-33 */const target=event.target.closest('textarea,input,.content,.reasoning,.ws-result,.readonly-address,pre,code,p,h1,h2,h3,label,small');
+client-qwen/test_conversation_ui.cjs:486: trailing whitespace.
++    const proof=require('./test_artifacts.cjs').directory('conversation');await page.screenshot({path:path.join(proof,'windows-interruptions-desactivees.png'),animations:'disabled'});
+client-qwen/test_model_selector_ui.cjs:65: trailing whitespace.
++    const proof=require('./test_artifacts.cjs').directory('model-selector');fs.mkdirSync(proof,{recursive:true});await page.screenshot({path:path.join(proof,'selector-'+platform+'.png'),fullPage:true});
+client-qwen/ui.js:108: trailing whitespace.
++const uiShowView=showView;showView=function(name){const moveFocus=uiSidebarModal()||uiSidebar.contains(document.activeElement);uiShowView(name);uiDecorateNavigation();uiCloseSidebar(false);if(moveFocus){$('workspace-heading').tabIndex=-1;$('workspace-heading').focus();}/* kiara-slot:platform-expression-25 */if(name==='api')uiRefreshIntegrations();/* /kiara-slot:platform-expression-25 */};
+client-qwen/ui.js:132: trailing whitespace.
++/* kiara-slot:desktop-integration-logic-26 */let uiLastConnection={},uiIntegrations=null,uiIntegrationsLoading=false,uiIntegrationPending=false;
+client-qwen/ui.js:160: trailing whitespace.
++/* /kiara-slot:desktop-integration-logic-26 */const uiConnectionPhases={requesting:'Envoi de la demande',queued:'En attente du moteur',waiting_model:'Calcul en cours',thinking:'Réflexion en cours',answering:'Rédaction de la réponse',working:'Préparation de la réponse',tool:'Utilisation des outils',approval:'Accord nécessaire',stopping:'Arrêt en cours',complete:'Réponse terminée',interrupted:'Réponse interrompue'};
+client-qwen/ui.js:164: trailing whitespace.
++  /* kiara-slot:platform-expression-31 */uiIntegrationButtons();/* /kiara-slot:platform-expression-31 */
+client-qwen/ui.js:183: trailing whitespace.
++/* kiara-slot:desktop-connection-transfer-controls-32 */let uiWireGuardEndpoint='';
+client-qwen/ui.js:238: trailing whitespace.
++/* /kiara-slot:desktop-connection-transfer-controls-32 */setInterval(()=>{if(busy)uiConnectionStatus();},1000);
+client-qwen/updater.py:15: trailing whitespace.
++from kiara_shared.releases import verify, version, client_filename
+client-qwen/updater.py:16: trailing whitespace.
++
+client-qwen/updater.py:17: trailing whitespace.
++from kiara_shared.version import VERSION, AGENT_PROTOCOL
+client-qwen/updater.py:27: trailing whitespace.
++
+client-voice/README.md:3: trailing whitespace.
++Référence courante : [matrice des moteurs et packs supportés](COMPATIBILITE.md).
+client-voice/README.md:4: trailing whitespace.
++Les deux familles de workers Max partagent leur protocole borné dans
+client-voice/README.md:5: trailing whitespace.
++`worker_protocol.py`. Les sections datées suivantes conservent l’historique des livraisons.
+client-voice/README.md:6: trailing whitespace.
++
+dependances/verrous/conversation-windows.requirements.txt:1: trailing whitespace.
++# Versions installées et vérifiées le 2026-10-26.
+dependances/verrous/conversation-windows.requirements.txt:98: trailing whitespace.
++pip==26.2.2 \
+dependances/verrous/conversation-windows.requirements.txt:99: trailing whitespace.
++    --hash=sha256:3a8e5c800492787f33a4114ef54444546c340df428974ebba17e0fd47e11af2f \
+dependances/verrous/conversation-windows.requirements.txt:100: trailing whitespace.
++    --hash=sha256:fd7f4dfa8190e014013b9f08f3e973f4e4c26ffd179a204895533a7254813a70
+dependances/verrous/conversation-windows.requirements.txt:176: trailing whitespace.
++setuptools==84.2.1 \
+dependances/verrous/conversation-windows.requirements.txt:177: trailing whitespace.
++    --hash=sha256:3ff8b3b5492a0aa66960f4419365a86b84e013070d4313e4d4a6894f5d64d6bc \
+dependances/verrous/conversation-windows.requirements.txt:178: trailing whitespace.
++    --hash=sha256:ca140b45d5325a9478f880e351484f62fef15f336462e449ca0c03c873d589c2
+dependances/verrous/eg2.requirements.txt:1: trailing whitespace.
++# Versions installées et vérifiées le 2026-10-26.
+dependances/verrous/eg2.requirements.txt:122: trailing whitespace.
++filelock==4.2.4 \
+dependances/verrous/eg2.requirements.txt:123: trailing whitespace.
++    --hash=sha256:301241438c57936ef93f4243a94f2559022268bfcf9b375a9a72eb0f8db8358e \
+dependances/verrous/eg2.requirements.txt:124: trailing whitespace.
++    --hash=sha256:c6d8663535e1650ee430507b4ffbac7b464dd64b7647ea0112a9f406499d163d
+dependances/verrous/eg2.requirements.txt:488: trailing whitespace.
++pip==26.2.2 \
+dependances/verrous/eg2.requirements.txt:489: trailing whitespace.
++    --hash=sha256:3a8e5c800492787f33a4114ef54444546c340df428974ebba17e0fd47e11af2f \
+dependances/verrous/eg2.requirements.txt:490: trailing whitespace.
++    --hash=sha256:fd7f4dfa8190e014013b9f08f3e973f4e4c26ffd179a204895533a7254813a70
+dependances/verrous/eg2.requirements.txt:854: trailing whitespace.
++setuptools==84.2.1 \
+dependances/verrous/eg2.requirements.txt:855: trailing whitespace.
++    --hash=sha256:3ff8b3b5492a0aa66960f4419365a86b84e013070d4313e4d4a6894f5d64d6bc \
+dependances/verrous/eg2.requirements.txt:856: trailing whitespace.
++    --hash=sha256:ca140b45d5325a9478f880e351484f62fef15f336462e449ca0c03c873d589c2
+dependances/verrous/hermes-fred.requirements.txt:1: trailing whitespace.
++# Versions installées et vérifiées le 2026-10-26.
+dependances/verrous/hermes-fred.requirements.txt:604: trailing whitespace.
++filelock==4.2.4 \
+dependances/verrous/hermes-fred.requirements.txt:605: trailing whitespace.
++    --hash=sha256:301241438c57936ef93f4243a94f2559022268bfcf9b375a9a72eb0f8db8358e \
+dependances/verrous/hermes-fred.requirements.txt:606: trailing whitespace.
++    --hash=sha256:c6d8663535e1650ee430507b4ffbac7b464dd64b7647ea0112a9f406499d163d
+dependances/verrous/hermes-fred.requirements.txt:1454: trailing whitespace.
++opentelemetry-api==1.45.1 \
+dependances/verrous/hermes-fred.requirements.txt:1455: trailing whitespace.
++    --hash=sha256:aa38ed19bcc084ba42782a73255b3582283eced7ad6dddbd6695189e69adfb75 \
+dependances/verrous/hermes-fred.requirements.txt:1456: trailing whitespace.
++    --hash=sha256:b31553efa588ae44bc306f863c785c5333a9ecc091248c6ee68b4b6c87fdedfb
+dependances/verrous/hermes-fred.requirements.txt:2305: trailing whitespace.
++setuptools==84.2.1 \
+dependances/verrous/hermes-fred.requirements.txt:2306: trailing whitespace.
++    --hash=sha256:3ff8b3b5492a0aa66960f4419365a86b84e013070d4313e4d4a6894f5d64d6bc \
+dependances/verrous/hermes-fred.requirements.txt:2307: trailing whitespace.
++    --hash=sha256:ca140b45d5325a9478f880e351484f62fef15f336462e449ca0c03c873d589c2
+dependances/verrous/strata.requirements.txt:1: trailing whitespace.
++# Versions installées et vérifiées le 2026-10-26.
+dependances/verrous/strata.requirements.txt:361: trailing whitespace.
++# kiara-shared==0.1.0 : source locale / outil hors application.
+dependances/verrous/strata.requirements.txt:802: trailing whitespace.
++pip==26.2.2 \
+dependances/verrous/strata.requirements.txt:803: trailing whitespace.
++    --hash=sha256:3a8e5c800492787f33a4114ef54444546c340df428974ebba17e0fd47e11af2f \
+dependances/verrous/strata.requirements.txt:804: trailing whitespace.
++    --hash=sha256:fd7f4dfa8190e014013b9f08f3e973f4e4c26ffd179a204895533a7254813a70
+dependances/verrous/strata.requirements.txt:959: trailing whitespace.
++pypdf==6.21.2 \
+dependances/verrous/strata.requirements.txt:960: trailing whitespace.
++    --hash=sha256:0a3e1c5c886a1be03646c16a04827cc166c2a0575c971b26a4bf89686551c2d4 \
+dependances/verrous/strata.requirements.txt:961: trailing whitespace.
++    --hash=sha256:1d44d1a3a200f25062adff0085b02040e4646431ac2ccac22e42679e91466084
+dependances/verrous/strata.requirements.txt:1212: trailing whitespace.
++setuptools==84.2.1 \
+dependances/verrous/strata.requirements.txt:1213: trailing whitespace.
++    --hash=sha256:3ff8b3b5492a0aa66960f4419365a86b84e013070d4313e4d4a6894f5d64d6bc \
+dependances/verrous/strata.requirements.txt:1214: trailing whitespace.
++    --hash=sha256:ca140b45d5325a9478f880e351484f62fef15f336462e449ca0c03c873d589c2
+lanceur/app.py:256: trailing whitespace.
++        diagnostics=self.remote.workspace.diagnostics.recent()
+lanceur/app.py:257: trailing whitespace.
++        if diagnostics:
+lanceur/app.py:258: trailing whitespace.
++            logs+='\n--- Diagnostics Kiara ---\n'+'\n'.join(
+lanceur/app.py:259: trailing whitespace.
++                row['component']+' / '+row['operation']+' · '+row['category']+' · référence '+row['reference']
+lanceur/app.py:260: trailing whitespace.
++                for row in diagnostics)
+lanceur/app.py:273: trailing whitespace.
++                'logs': logs, 'queue': self.remote.scheduler.snapshot(), 'operations': self.operations.status(),
+lanceur/app.py:274: trailing whitespace.
++                'diagnostics': {'workspace':self.remote.workspace.metrics.snapshot(),
+lanceur/app.py:275: trailing whitespace.
++                                'recent':diagnostics}}
+lanceur/core.py:17: trailing whitespace.
++HOME = Path(os.environ.get('KIARA_DATA_DIR', ROOT / 'lanceur')).expanduser().resolve()
+lanceur/core.py:19: trailing whitespace.
++PYTHON = Path(os.environ.get('KIARA_RUNTIME_PYTHON',ROOT / 'Strata-src/.venv/Scripts/python.exe')).expanduser().resolve()
+lanceur/http_boundary.py:1: trailing whitespace.
++"""Canonical bounded HTTP ingress shared with the desktop client."""
+lanceur/http_boundary.py:2: trailing whitespace.
++from kiara_shared.http import BoundedHTTPServer, json_body
+lanceur/operations.py:15: trailing whitespace.
++from kiara_shared.version import VERSION
+lanceur/releases.py:17: trailing whitespace.
++from kiara_shared.file_lock import locked
+lanceur/releases.py:18: trailing whitespace.
++from kiara_shared.releases import verify as verify_release
+lanceur/releases.py:34: trailing whitespace.
++    from kiara_shared.releases import client_filename
+lanceur/remote.py:382: trailing whitespace.
++from kiara_shared.attachments import capabilities, validate_parts, normalize_reasoning
+lanceur/remote.py:597: trailing whitespace.
++                from kiara_shared.version import COMMAND_NONCE_VERSION
+lanceur/remote.py:598: trailing whitespace.
++                return self.respond(200, {'version': VERSION, 'protocol': 3, 'agent_protocol':4,
+lanceur/remote.py:599: trailing whitespace.
++                    'command_nonce_version':COMMAND_NONCE_VERSION,'server_time_ms':int(time.time()*1000),
+lanceur/remote.py:600: trailing whitespace.
++                    'queue': scheduler.snapshot(self.identity)})
+lanceur/remote.py:629: trailing whitespace.
++            from gateway_commands import ROUTES as COMMAND_ROUTES, handle as command
+lanceur/remote.py:630: trailing whitespace.
++            from gateway_voice import MAX_ROUTES, LOW_ROUTES, max_voice, low_voice
+lanceur/remote.py:631: trailing whitespace.
++            from gateway_embeddings import handle as embeddings
+lanceur/remote.py:632: trailing whitespace.
++            if self.path in COMMAND_ROUTES:return command(self,store)
+lanceur/remote.py:633: trailing whitespace.
++            if self.path in MAX_ROUTES:return max_voice(self,store)
+lanceur/remote.py:634: trailing whitespace.
++            if self.path in LOW_ROUTES:return low_voice(self,store)
+lanceur/remote.py:635: trailing whitespace.
++            if self.path=='/v1/embeddings':return embeddings(self,store)
+lanceur/remote.py:874: trailing whitespace.
++                        from command_journal import derived_key as command_request_key
+lanceur/remote.py:877: trailing whitespace.
++                                           request_key=command_request_key(item['id']),valid=request_valid,origin='Conversation vocale',
+lanceur/scheduler.py:6: trailing whitespace.
++from kiara_shared.request_ids import validate_request_id
+lanceur/scheduler.py:21: trailing whitespace.
++        if request_id is not None:validate_request_id(request_id)
+lanceur/test_history_sync.py:122: trailing whitespace.
++    def test_missing_marker_preserves_valid_cache_and_existing_recovery_archive(self):
+lanceur/test_history_sync.py:129: trailing whitespace.
++        self.assertEqual(sync.read()['history'],old);self.assertTrue(recovery.exists())
+lanceur/test_history_sync.py:131: trailing whitespace.
++        history_store.write(path,client.protect,new,sync.read()['revision'])
+lanceur/test_remote.py:128: trailing whitespace.
++        self.store.workspace.shutdown()
+lanceur/test_remote.py:129: trailing whitespace.
++        self.store.voice.close()
+lanceur/web/workspace.js:59: trailing whitespace.
++ $('knowledge-memories').replaceChildren(...data.memories.map(m=>{const card=element('div',null,'topic-card');card.append(element('p',m.text),workspaceButton('Modifier',async()=>{const text=prompt('Modifier ce souvenir personnel',m.text);if(text===null)return;await request('/api/knowledge/memory',{action:'personal_memory_save',owner,id:m.id,text,revision:m.revision});await knowledgeMemories();}),workspaceButton('Supprimer',async()=>{if(!confirm('Supprimer ce souvenir personnel ?'))return;await request('/api/knowledge/memory',{action:'personal_memory_delete',owner,id:m.id,revision:m.revision});await knowledgeMemories();}));return card;}));}
+lanceur/workspace.py:26: trailing whitespace.
++from kiara_shared.attachments import validate_message
+lanceur/workspace.py:27: trailing whitespace.
++from workspace_types import Conflict, Denied, identifier, text, MAX_TEXT, HISTORY_RESET_ID
+lanceur/workspace.py:88: trailing whitespace.
++SCHEMA_V1 = SCHEMA
+lanceur/workspace.py:89: trailing whitespace.
++from workspace_migrations import INDEX_SCHEMA, VERSION as SCHEMA_VERSION
+lanceur/workspace.py:90: trailing whitespace.
++SCHEMA += INDEX_SCHEMA + f'PRAGMA user_version={SCHEMA_VERSION};'
+lanceur/workspace.py:125: trailing whitespace.
++    """Retire old profile configuration without deleting user conversations."""
+lanceur/workspace.py:137: trailing whitespace.
++    from workspace_migrations import ensure_supported, upgrade
+lanceur/workspace.py:138: trailing whitespace.
++    ensure_supported(db)
+lanceur/workspace.py:146: trailing whitespace.
++    upgrade(db)
+lanceur/workspace.py:184: trailing whitespace.
++def isolated_extract(name,raw,diagnostics=None):
+lanceur/workspace.py:190: trailing whitespace.
++    process=subprocess.Popen([str(PYTHON),str(worker),name],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,creationflags=HIDDEN)
+lanceur/workspace.py:200: trailing whitespace.
++        output,errors=process.communicate(raw,timeout=25)
+lanceur/workspace.py:201: trailing whitespace.
++        if diagnostics and (process.returncode or errors):
+lanceur/workspace.py:202: trailing whitespace.
++            diagnostics.record('documents','extract',exit_code=process.returncode,stderr=errors)
+lanceur/workspace.py:208: trailing whitespace.
++    except subprocess.TimeoutExpired as error:
+lanceur/workspace.py:209: trailing whitespace.
++        process.kill();process.communicate()
+lanceur/workspace.py:210: trailing whitespace.
++        if diagnostics:diagnostics.record('documents','extract_timeout',error)
+lanceur/workspace.py:211: trailing whitespace.
++        raise ValueError('Extraction trop longue (25 secondes).')
+lanceur/workspace.py:286: trailing whitespace.
++        from runtime_diagnostics import Metrics, Diagnostics
+lanceur/workspace.py:287: trailing whitespace.
++        self.metrics=Metrics();self.diagnostics=Diagnostics(self.home)
+lanceur/workspace.py:304: trailing whitespace.
++        waiting=time.perf_counter()
+lanceur/workspace.py:306: trailing whitespace.
++            entered=time.perf_counter()
+lanceur/workspace.py:307: trailing whitespace.
++            self.metrics.observe('db_lock_wait',entered-waiting)
+lanceur/workspace.py:327: trailing whitespace.
++            finally:
+lanceur/workspace.py:328: trailing whitespace.
++                db.close()
+lanceur/workspace.py:329: trailing whitespace.
++                self.metrics.observe('db_transaction',time.perf_counter()-entered)
+lanceur/workspace.py:365: trailing whitespace.
++        from memory_service import all_memories
+lanceur/workspace.py:366: trailing whitespace.
++        from collections import defaultdict
+lanceur/workspace.py:367: trailing whitespace.
++        started=time.perf_counter()
+lanceur/workspace.py:370: trailing whitespace.
++            memories=all_memories(db,owner)
+lanceur/workspace.py:371: trailing whitespace.
++            documents=defaultdict(list);conversations=defaultdict(list)
+lanceur/workspace.py:372: trailing whitespace.
++            for row in db.execute('SELECT d.project,d.id,d.title,d.kind,d.revision,d.updated,i.state AS index_state,i.chunks AS chunk_count,i.pages AS page_count,i.revision AS indexed_revision,i.indexed AS indexed_at FROM documents d LEFT JOIN document_index i ON i.document=d.id WHERE d.owner=? ORDER BY d.updated DESC',(owner,)):
+lanceur/workspace.py:373: trailing whitespace.
++                value=dict(row);project=value.pop('project');documents[project].append(value)
+lanceur/workspace.py:374: trailing whitespace.
++            for row in db.execute('SELECT project,id,title,revision,updated,archived FROM conversations WHERE owner=? ORDER BY updated DESC',(owner,)):
+lanceur/workspace.py:375: trailing whitespace.
++                value=dict(row);project=value.pop('project');conversations[project].append(value)
+lanceur/workspace.py:377: trailing whitespace.
++                p['documents']=documents[p['id']]
+lanceur/workspace.py:378: trailing whitespace.
++                p['memories']=memories[p['id']]
+lanceur/workspace.py:379: trailing whitespace.
++                p['conversations']=conversations[p['id']]
+lanceur/workspace.py:380: trailing whitespace.
++            result={'projects':projects,
+lanceur/workspace.py:382: trailing whitespace.
++                    'personal_memories':memories[None],
+lanceur/workspace.py:384: trailing whitespace.
++        self.metrics.observe('workspace_snapshot',time.perf_counter()-started)
+lanceur/workspace.py:385: trailing whitespace.
++        return result
+lanceur/workspace.py:395: trailing whitespace.
++        from kiara_shared.history_store import validate
+lanceur/workspace.py:571: trailing whitespace.
++        try:pages=isolated_extract(title,raw,self.diagnostics)
+lanceur/workspace.py:600: trailing whitespace.
++        from workspace_project import execute as project_action
+lanceur/workspace.py:601: trailing whitespace.
++        from workspace_document import execute as document_action
+lanceur/workspace.py:602: trailing whitespace.
++        from workspace_memory import execute as memory_action
+lanceur/workspace.py:603: trailing whitespace.
++        from workspace_knowledge import execute as knowledge_action
+lanceur/workspace.py:604: trailing whitespace.
++        from workspace_conversation import execute as conversation_action
+lanceur/workspace.py:605: trailing whitespace.
++        from workspace_job import execute as job_action
+lanceur/workspace.py:606: trailing whitespace.
++        domains = {
+lanceur/workspace.py:607: trailing whitespace.
++            ('project_create', 'project_save'): project_action,
+lanceur/workspace.py:608: trailing whitespace.
++            ('document_create', 'document_upload', 'document_save', 'document_get', 'document_download', 'document_delete', 'search', 'source_get', 'index_status'): document_action,
+lanceur/workspace.py:609: trailing whitespace.
++            ('personal_memory_create', 'personal_memory_save', 'personal_memory_delete', 'memory_create', 'memory_save', 'memory_delete'): memory_action,
+lanceur/workspace.py:610: trailing whitespace.
++            ('knowledge_search',): knowledge_action,
+lanceur/workspace.py:611: trailing whitespace.
++            ('conversation_save', 'conversation_move', 'conversation_archive', 'conversation_get', 'conversation_delete'): conversation_action,
+lanceur/workspace.py:612: trailing whitespace.
++            ('job_create', 'job_get', 'job_cancel', 'job_pause', 'job_retry'): job_action,
+lanceur/workspace.py:613: trailing whitespace.
++        }
+lanceur/workspace.py:614: trailing whitespace.
++        handler = next((handler for names, handler in domains.items() if action in names), None)
+lanceur/workspace.py:615: trailing whitespace.
++        if handler is None:
+lanceur/workspace.py:616: trailing whitespace.
++            raise ValueError("Action inconnue.")
+lanceur/workspace.py:618: trailing whitespace.
++            if self.maintenance:
+lanceur/workspace.py:619: trailing whitespace.
++                raise Denied("Serveur en maintenance.")
+lanceur/workspace.py:620: trailing whitespace.
++            result, changed = handler(self, db, owner, v, now, prepared)
+lanceur/workspace.py:621: trailing whitespace.
++            if changed:
+lanceur/workspace.py:622: trailing whitespace.
++                self.event(db, owner, action, result.get("id", v.get("id", v.get("project", ""))))
+lanceur/workspace.py:623: trailing whitespace.
++            return result
+lanceur/workspace.py:798: trailing whitespace.
++                except Exception as error:
+lanceur/workspace.py:799: trailing whitespace.
++                    self.diagnostics.record('workspace','reminder_tick',error)
+lanceur/workspace.py:800: trailing whitespace.
++                    self.stop.wait(3)
+lanceur/workspace.py:806: trailing whitespace.
++                except Exception as error:
+lanceur/workspace.py:808: trailing whitespace.
++                    self.diagnostics.record('workspace','run_job',error)
+lanceur/workspace.py:876: trailing whitespace.
++            from workspace_migrations import ensure_supported, upgrade
+lanceur/workspace.py:877: trailing whitespace.
++            ensure_supported(memory, archive=True)
+lanceur/workspace.py:886: trailing whitespace.
++                for schema in (SCHEMA,SCHEMA_V1,PRE_ASSISTANT_SCHEMA,PRE_EMBEDDING_SCHEMA,PRE_DOCUMENT_SCHEMA,PRE_NOTIFICATIONS_SCHEMA,LEGACY_SCHEMA,PRE_DOCUMENT_SCHEMA+NOTIFICATIONS_SCHEMA,LEGACY_SCHEMA+DOCUMENT_SCHEMA,LEGACY_SCHEMA+DOCUMENT_SCHEMA+NOTIFICATIONS_SCHEMA):
+lanceur/workspace.py:906: trailing whitespace.
++                upgrade(memory)
+lanceur/workspace.py:907: trailing whitespace.
++            if memory.execute('PRAGMA user_version').fetchone()[0]!=SCHEMA_VERSION:raise ValueError('Version des espaces incompatible.')
+lanceur/workspace.py:935: trailing whitespace.
++            from kiara_shared.history_store import validate
+lanceur/workspace.py:960: trailing whitespace.
++                initialize_database(db)

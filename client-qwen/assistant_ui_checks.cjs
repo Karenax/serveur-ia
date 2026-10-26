@@ -1,7 +1,7 @@
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 module.exports=async({page,state,android,errors})=>{
-  const project='a'.repeat(32),proof=path.resolve(__dirname,'../maintenance/2026-10-25-assistant-integration/ui');
+  const project='a'.repeat(32),proof=require('./test_artifacts.cjs').directory('assistant');
   fs.mkdirSync(proof,{recursive:true});
   const records={memories:[],reminders:[],legacy_memories:[],tasks:[]},requests=[];
   let fail=false,sequence=0;

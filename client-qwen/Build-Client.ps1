@@ -3,10 +3,11 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
 if (!$DistributionDirectory) { $DistributionDirectory = Join-Path $PSScriptRoot 'dist' }
 $DistributionDirectory = [System.IO.Path]::GetFullPath($DistributionDirectory)
-$python = Join-Path $root 'Strata-src\.venv\Scripts\python.exe'
+$python = Join-Path $root 'toolchain\build-python\Scripts\python.exe'
+if (!(Test-Path -LiteralPath $python)) { throw 'Préparer le constructeur isolé avec maintenance/prepare_build_environment.py.' }
 & $python (Join-Path $root 'maintenance/2026-10-25-assistant-integration/prepare_wakeword.py')
 if ($LASTEXITCODE -ne 0) { throw 'Préparer les ressources vocales avec prepare_wakeword.py --download.' }
-$env:PYTHONPATH = Join-Path $PSScriptRoot 'build-tools'
+$env:PYTHONPATH = ''
 if (!$WireGuardBinary) { $WireGuardBinary = Join-Path $PSScriptRoot 'wireguard-bridge.exe' }
 if ([System.IO.Path]::GetFileName($WireGuardBinary) -ne 'wireguard-bridge.exe') { throw 'Le moteur embarqué doit se nommer wireguard-bridge.exe.' }
 if (!(Test-Path -LiteralPath $WireGuardBinary)) { throw 'Compiler le moteur WireGuard avec Build-WireGuard.ps1.' }
@@ -31,9 +32,11 @@ $thinkingData = (Join-Path $PSScriptRoot 'thinking.js') + ';.'
 $markdownData = (Join-Path $PSScriptRoot 'markdown.js') + ';.'
 $correctorData = (Join-Path $PSScriptRoot 'corrector.js') + ';.'
 $markdownVendor = (Join-Path $PSScriptRoot 'vendor') + ';vendor'
-& $python -m PyInstaller --noconfirm --onefile --windowed --collect-all webview --collect-all pythonnet --collect-all clr_loader --name "Accès serveur Fred" --icon (Join-Path $PSScriptRoot "fred.ico") --version-file (Join-Path $PSScriptRoot "product-version.txt") --add-data $voiceData --add-data $voiceJsData --add-data $conversationJsData --add-data $workspaceData --add-data $uiCssData --add-data $uiJsData --add-data $attachmentsData --add-data $selectionData --add-data $thinkingData --add-data $markdownData --add-data $correctorData --add-data $markdownVendor --add-data ((Join-Path $PSScriptRoot 'chat.html') + ';.') --add-data ((Join-Path $PSScriptRoot 'LICENSE.txt') + ';.') --add-data ((Join-Path $PSScriptRoot 'THIRD-PARTY.txt') + ';.') --add-binary ($WireGuardBinary + ';.') --distpath $DistributionDirectory --workpath (Join-Path $PSScriptRoot 'build') --specpath $PSScriptRoot (Join-Path $PSScriptRoot 'client.py')
+& $python -m PyInstaller --noconfirm --onefile --windowed --paths (Join-Path $root 'shared') --collect-all kiara_shared --collect-all webview --collect-all pythonnet --collect-all clr_loader --name "Accès serveur Fred" --icon (Join-Path $PSScriptRoot "fred.ico") --version-file (Join-Path $PSScriptRoot "product-version.txt") --add-data $voiceData --add-data $voiceJsData --add-data $conversationJsData --add-data $workspaceData --add-data $uiCssData --add-data $uiJsData --add-data $attachmentsData --add-data $selectionData --add-data $thinkingData --add-data $markdownData --add-data $correctorData --add-data $markdownVendor --add-data ((Join-Path $PSScriptRoot 'chat.html') + ';.') --add-data ((Join-Path $PSScriptRoot 'LICENSE.txt') + ';.') --add-data ((Join-Path $PSScriptRoot 'THIRD-PARTY.txt') + ';.') --add-binary ($WireGuardBinary + ';.') --distpath $DistributionDirectory --workpath (Join-Path $PSScriptRoot 'build') --specpath $PSScriptRoot (Join-Path $PSScriptRoot 'client.py')
 if ($LASTEXITCODE -ne 0) { throw 'La compilation du client a echoue.' }
-& $python (Join-Path $root 'maintenance\build_manifest.py') --artifact (Join-Path $DistributionDirectory 'Accès serveur Fred.exe') --output (Join-Path $DistributionDirectory 'build-manifest.json')
+& $python (Join-Path $root 'maintenance/check_windows_artifact.py') --artifact (Join-Path $DistributionDirectory 'Accès serveur Fred.exe') --result (Join-Path $DistributionDirectory 'self-test.txt')
+if ($LASTEXITCODE -ne 0) { throw 'Le client construit ne passe pas sa vérification native.' }
+& $python (Join-Path $root 'maintenance\build_manifest.py') --component windows --artifact (Join-Path $DistributionDirectory 'Accès serveur Fred.exe') --output (Join-Path $DistributionDirectory 'build-manifest.json')
 if ($LASTEXITCODE -ne 0) { throw 'Inventaire de compilation Windows impossible.' }
 if (!$SkipManifest) {
     if ($DistributionDirectory -ne [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot 'dist'))) { throw 'La signature du manifeste nécessite le dossier de distribution par défaut ; utiliser -SkipManifest pour une compilation isolée.' }

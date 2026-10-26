@@ -9,7 +9,7 @@ module.exports=async({page,state,android,errors,until,sleep,event})=>{
   const action=async selector=>{await click('#voice-conversation-menu summary');await click(selector);};
   const current=()=>page.evaluate(()=>({id:currentId,title:library.find(c=>c.id===currentId)?.title,count:library.length,records:library}));
   const canvas=()=>page.evaluate(()=>document.getElementById('voice-waves').toDataURL());
-  const proof=path.resolve(__dirname,'../maintenance/2026-10-24-vocal-workspace/ui');fs.mkdirSync(proof,{recursive:true});
+  const proof=require('./test_artifacts.cjs').directory('voice-workspace');
   await control('#prompt').fill('Brouillon écrit à conserver');await page.evaluate(()=>uiPersistPreferences());
   const before=await current();await enter();
   assert.equal(await control('#voice-settings-dialog').evaluate(el=>el.open),false);

@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "signature_verified": true,
+  "inventory_verified": true,
+  "revision": "vocal-rt-de5e67a320a06b1f",
+  "runtime_bytes": 109408681,
+  "frozen_worker_probe": true,
+  "microphone_opened": false,
+  "speech_inference_tested": false
+}

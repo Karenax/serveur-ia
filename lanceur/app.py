@@ -253,6 +253,11 @@ class Controller:
         failures=read_json(self.home/'inference-errors.json',[])
         if failures:
             logs+='\n--- Derniers refus du modèle ---\n'+'\n'.join(str(row.get('status',''))+' · '+str(row.get('detail','')) for row in failures[-8:])
+        diagnostics=self.remote.workspace.diagnostics.recent()
+        if diagnostics:
+            logs+='\n--- Diagnostics Kiara ---\n'+'\n'.join(
+                row['component']+' / '+row['operation']+' · '+row['category']+' · référence '+row['reference']
+                for row in diagnostics)
         elapsed = time.time() - run['started_epoch'] if run.get('started_epoch') and status in ('chargement', 'validation_cuda') else run.get('ready_seconds')
         return {'status': status, 'error': run.get('error', '') if status == 'erreur' else self.last_error,
                 'running': bool(servers) or bool(self.supervisor(run)),
@@ -265,7 +270,9 @@ class Controller:
                 'active': {'context': int(arg(cfg, '--max-context', 4096)), 'workers': int(arg(cfg, '--pool-workers', 15)),
                            'history': int(arg(cfg, '--prompt-cache', 0)), 'mtp': '--mtp' in cfg.get('args', []),
                            'host': config_host, 'port': cfg.get('port', 8080)},
-                'logs': logs, 'queue': self.remote.scheduler.snapshot(), 'operations': self.operations.status()}
+                'logs': logs, 'queue': self.remote.scheduler.snapshot(), 'operations': self.operations.status(),
+                'diagnostics': {'workspace':self.remote.workspace.metrics.snapshot(),
+                                'recent':diagnostics}}
 
 def serve(port=8765, controller=None):
     controller = controller or Controller()

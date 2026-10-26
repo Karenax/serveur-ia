@@ -1,6 +1,6 @@
 ---
 name: ux-consistency-review
-description: Vérifier la cohérence de plusieurs écrans ou d'un changement transversal Fred, y compris entre le client Windows, Android et les conventions de la console.
+description: Vérifier la cohérence de plusieurs écrans ou d'un changement transversal Kiara, y compris entre le client Windows, Android et les conventions de la console.
 ---
 
 # Cohérence des écrans
@@ -14,7 +14,7 @@ notifications, icônes, dimensions, espacements, tableaux, formulaires (normal,
 invalide, désactivé, chargement), raccourcis clavier et organisation des fonctions
 avancées. Une action identique doit porter le même nom et produire un retour cohérent.
 
-Pour Fred, contrôler l'effet d'une modification des sources `client-qwen` sur Android
+Pour Kiara, contrôler l'effet d'une modification des sources `client-qwen` sur Android
 et ses adaptations `client-android/mobile-ui`. Préférer un composant commun à deux
 copies presque identiques. Ne pas éditer les assets Android générés directement :
 suivre `client-android/scripts/Prepare-Assets.py` et les procédures du projet si une

@@ -24,14 +24,14 @@
         "pdfminer.six": "20251230",
         "pdfplumber": "0.11.9",
         "pillow": "13.0.0",
-        "pip": "26.2.1",
+        "pip": "26.2.2",
         "proxy-tools": "0.1.0",
         "psutil": "7.2.2",
         "pycparser": "3.0",
         "pydantic": "2.13.5",
         "pydantic-core": "2.46.5",
         "pyhumps": "3.8.0",
-        "pypdf": "6.19.0",
+        "pypdf": "6.21.2",
         "pypdfium2": "5.14.0",
         "python-dateutil": "2.9.0.post0",
         "python-docx": "1.2.0",
@@ -42,7 +42,7 @@
         "regex": "2026.9.29",
         "reportlab": "4.4.9",
         "requests": "2.34.2",
-        "setuptools": "84.0.0",
+        "setuptools": "84.2.1",
         "six": "1.17.0",
         "tqdm": "4.70.1",
         "typing-extensions": "4.16.0",
@@ -52,7 +52,7 @@
         "wheel": "0.48.0",
         "xlsxwriter": "3.2.9"
       },
-      "sha256": "ad10e7f712378c1cf80701912ad7d984514e8025c2eb57c8b0f2be60135a0f41"
+      "sha256": "d5d9685e50ea54709709b55080603e755654502e913b652bb9551f5f715bb9bb"
     },
     "eg2": {
       "packages": {
@@ -63,7 +63,7 @@
         "click": "8.5.0",
         "cloudpickle": "3.1.2",
         "colorama": "0.4.6",
-        "filelock": "4.1.0",
+        "filelock": "4.2.4",
         "fsspec": "2026.9.0",
         "h11": "0.16.0",
         "hf-xet": "1.7.0",
@@ -82,7 +82,7 @@
         "numpy": "2.5.4",
         "packaging": "26.3",
         "pillow": "13.0.0",
-        "pip": "26.2.1",
+        "pip": "26.2.2",
         "psutil": "7.2.2",
         "pycparser": "3.11",
         "pygments": "2.21.0",
@@ -93,7 +93,7 @@
         "scikit-learn": "1.9.1",
         "scipy": "1.18.1",
         "sentence-transformers": "6.1.0",
-        "setuptools": "84.0.0",
+        "setuptools": "84.2.1",
         "shellingham": "1.5.4",
         "soundfile": "0.14.0",
         "sympy": "1.14.0",
@@ -107,7 +107,7 @@
         "typer": "0.27.3",
         "typing-extensions": "4.16.0"
       },
-      "sha256": "d8ed4d71fc934462756c25dbc6b2e30585074037c8486d3583eb5a4d3655d8ce"
+      "sha256": "092b64da50f8dacdeced46a5821d654ae60a078e40487370114ca81d16df6bd3"
     },
     "voix-serveur": {
       "packages": {
@@ -128,7 +128,7 @@
         "mdurl": "0.1.2",
         "numpy": "2.5.4",
         "packaging": "26.3",
-        "pip": "25.0.1",
+        "pip": "26.2.2",
         "psutil": "7.2.2",
         "ptts": "0.4.1",
         "pygments": "2.21.0",
@@ -139,7 +139,7 @@
         "typer": "0.25.1",
         "typing-extensions": "4.16.0"
       },
-      "sha256": "5e29381354d229008a92438ff148e6bdf5027113be3f237f7f6b5774a3a84bd9"
+      "sha256": "40282e37521340af1dd5e0d5176f7fd5ee41c81b666f4a05dd225e04f0a851d1"
     },
     "conversation-windows": {
       "packages": {
@@ -150,18 +150,18 @@
         "onnxruntime": "1.24.4",
         "packaging": "26.3",
         "pefile": "2023.2.7",
-        "pip": "26.2.1",
+        "pip": "26.2.2",
         "protobuf": "7.36.2",
         "pyinstaller": "6.16.0",
         "pyinstaller-hooks-contrib": "2026.8",
         "pywin32-ctypes": "0.2.3",
         "scipy": "1.15.3",
-        "setuptools": "84.0.0",
+        "setuptools": "84.2.1",
         "sherpa-onnx": "1.13.8",
         "sherpa-onnx-core": "1.13.8",
         "sympy": "1.14.0"
       },
-      "sha256": "f0d1b396caf8f3ebfb3aed7de1479352abc953740c1906bc23624578e8ed9c9d"
+      "sha256": "e3b5f3294eaa962eee8dca1b7496cd19dd0ca742a55cde7753f4ede74aa9f106"
     },
     "hermes-fred": {
       "packages": {
@@ -192,7 +192,7 @@
         "fastapi": "0.133.1",
         "faster-whisper": "1.2.1",
         "fetch-use": "0.4.0",
-        "filelock": "3.32.4",
+        "filelock": "4.2.4",
         "fire": "0.7.1",
         "firecrawl-anydoc": "0.2.4",
         "firecrawl-py": "4.17.0",
@@ -236,7 +236,7 @@
         "oauthlib": "4.0.0",
         "onnxruntime": "1.29.0",
         "openai": "2.24.0",
-        "opentelemetry-api": "1.39.1",
+        "opentelemetry-api": "1.45.1",
         "packaging": "26.0",
         "pathspec": "1.1.1",
         "pillow": "13.0.0",
@@ -273,7 +273,7 @@
         "ruamel.yaml": "0.18.16",
         "s3transfer": "0.16.1",
         "sentencepiece": "0.2.2",
-        "setuptools": "83.0.0",
+        "setuptools": "84.2.1",
         "sherpa-onnx": "1.13.8",
         "sherpa-onnx-core": "1.13.8",
         "six": "1.17.0",
@@ -307,11 +307,41 @@
         "youtube-transcript-api": "1.2.4",
         "zipp": "4.1.0"
       },
-      "sha256": "3ea2d0d0cf207ee6bf6b9197962384a2c0d08622b84f6eb9211ef8d07d56a4c4"
+      "sha256": "da3acb2bbddcb9f5483c145246fb6bc2584743ad41d8d19dd98df60bca9c76e9"
+    },
+    "construction-windows": {
+      "packages": {
+        "altgraph": "0.17.5",
+        "bottle": "0.13.4",
+        "certifi": "2026.10.19",
+        "cffi": "2.1.1",
+        "clr-loader": "0.3.1",
+        "cryptography": "50.0.2",
+        "numpy": "2.5.4",
+        "packaging": "26.3",
+        "pefile": "2024.8.26",
+        "pillow": "13.0.0",
+        "pip": "26.2.2",
+        "proxy-tools": "0.1.0",
+        "psutil": "7.2.2",
+        "ptts": "0.4.1",
+        "pycparser": "3.12",
+        "pyinstaller": "6.22.3",
+        "pyinstaller-hooks-contrib": "2026.9",
+        "pythonnet": "3.2.0",
+        "pywebview": "6.2.1",
+        "pywin32-ctypes": "0.2.3",
+        "pyyaml": "6.0.3",
+        "setuptools": "84.2.1",
+        "typing-extensions": "4.16.0",
+        "wheel": "0.48.0"
+      },
+      "sha256": "3e1272898611786f40a6ba23ba6174626bdedd13403a016e06f2832caa1c3111"
     }
   },
   "local_exclusions": [
     "hermes-agent",
-    "artifact-tool-v2"
+    "artifact-tool-v2",
+    "kiara-shared"
   ]
 }

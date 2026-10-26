@@ -1,0 +1,43 @@
+[
+  {
+    "command": [
+      "D:\\Serveur IA\\Strata-src\\.venv\\Scripts\\python.exe",
+      "maintenance/check_sources.py"
+    ],
+    "returncode": 0,
+    "seconds": 6.7,
+    "log": "static-1.txt"
+  },
+  {
+    "command": [
+      "D:\\Serveur IA\\Strata-src\\.venv\\Scripts\\python.exe",
+      "client-android/scripts/Prepare-Assets.py",
+      "--check"
+    ],
+    "returncode": 0,
+    "seconds": 0.12,
+    "log": "static-2.txt"
+  },
+  {
+    "command": [
+      "D:\\Serveur IA\\Strata-src\\.venv\\Scripts\\python.exe",
+      "maintenance/verrous_runtime.py",
+      "check"
+    ],
+    "returncode": 1,
+    "seconds": 0.62,
+    "log": "static-3.txt"
+  },
+  {
+    "command": [
+      "npm.cmd",
+      "--prefix",
+      "client-qwen",
+      "run",
+      "ux:check:all"
+    ],
+    "returncode": 0,
+    "seconds": 1.05,
+    "log": "static-4.txt"
+  }
+]

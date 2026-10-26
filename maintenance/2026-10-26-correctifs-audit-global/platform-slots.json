@@ -1,0 +1,12 @@
+{
+  "identical_output": true,
+  "generated_sha256": "07e6717af4cd4f4f27815f9007f0a7ab7b1da3645ac1f613d98284f00933ecdc",
+  "slots": 30,
+  "source_files": [
+    "chat.html",
+    "workspace.html",
+    "ui.js",
+    "selection.js",
+    "corrector.js"
+  ]
+}

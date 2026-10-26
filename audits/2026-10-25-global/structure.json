@@ -1,0 +1,226 @@
+{
+  "source_file_count": 186,
+  "source_components": {
+    "lanceur": 75,
+    "client-qwen": 45,
+    "client-voice": 28,
+    "client-android": 38
+  },
+  "exact_function_body_candidates": [],
+  "exact_file_candidates": [],
+  "selected_common_blocks": [
+    {
+      "a": "client-voice/max_worker.py",
+      "a_line": 108,
+      "b": "client-voice/max_pack_worker.py",
+      "b_line": 48,
+      "lines": 7
+    },
+    {
+      "a": "client-voice/max_worker.py",
+      "a_line": 116,
+      "b": "client-voice/max_pack_worker.py",
+      "b_line": 56,
+      "lines": 12
+    },
+    {
+      "a": "client-voice/max_worker.py",
+      "a_line": 138,
+      "b": "client-voice/max_pack_worker.py",
+      "b_line": 82,
+      "lines": 12
+    },
+    {
+      "a": "client-voice/max_worker.py",
+      "a_line": 164,
+      "b": "client-voice/max_pack_worker.py",
+      "b_line": 127,
+      "lines": 6
+    }
+  ],
+  "lines_over_1000_chars": 52,
+  "longest_lines": [
+    {
+      "path": "lanceur/web/interface.css",
+      "line": 4,
+      "characters": 10172
+    },
+    {
+      "path": "lanceur/web/app.css",
+      "line": 2,
+      "characters": 8422
+    },
+    {
+      "path": "client-qwen/ui.css",
+      "line": 8,
+      "characters": 7655
+    },
+    {
+      "path": "client-qwen/ui.css",
+      "line": 6,
+      "characters": 5161
+    },
+    {
+      "path": "lanceur/web/app.css",
+      "line": 14,
+      "characters": 3223
+    },
+    {
+      "path": "lanceur/web/index.html",
+      "line": 4,
+      "characters": 2844
+    },
+    {
+      "path": "client-qwen/ui.css",
+      "line": 7,
+      "characters": 2816
+    },
+    {
+      "path": "client-qwen/workspace.html",
+      "line": 309,
+      "characters": 2714
+    },
+    {
+      "path": "lanceur/web/maintenance.css",
+      "line": 2,
+      "characters": 2703
+    },
+    {
+      "path": "client-android/app/src/main/java/net/karenax/fred/LoopbackServer.java",
+      "line": 44,
+      "characters": 2587
+    },
+    {
+      "path": "client-qwen/ui.css",
+      "line": 5,
+      "characters": 2442
+    },
+    {
+      "path": "client-android/app/src/main/java/net/karenax/fred/MainActivity.java",
+      "line": 94,
+      "characters": 2427
+    },
+    {
+      "path": "lanceur/web/interface.css",
+      "line": 11,
+      "characters": 2346
+    },
+    {
+      "path": "client-qwen/ui.css",
+      "line": 2,
+      "characters": 2084
+    },
+    {
+      "path": "client-qwen/chat.html",
+      "line": 17,
+      "characters": 2063
+    },
+    {
+      "path": "client-qwen/corrector.js",
+      "line": 3,
+      "characters": 1711
+    },
+    {
+      "path": "client-qwen/chat.html",
+      "line": 274,
+      "characters": 1643
+    },
+    {
+      "path": "lanceur/web/workspace.js",
+      "line": 9,
+      "characters": 1626
+    },
+    {
+      "path": "client-qwen/conversation.js",
+      "line": 402,
+      "characters": 1599
+    },
+    {
+      "path": "client-qwen/chat.html",
+      "line": 240,
+      "characters": 1597
+    }
+  ],
+  "most_imported_local": [
+    [
+      "client-qwen/chat_attachments.py",
+      6
+    ],
+    [
+      "client-qwen/file_lock.py",
+      14
+    ],
+    [
+      "client-qwen/history_store.py",
+      8
+    ],
+    [
+      "client-qwen/max_installation.py",
+      5
+    ],
+    [
+      "client-qwen/wg_bridge.py",
+      6
+    ],
+    [
+      "lanceur/assistant_commands.py",
+      6
+    ],
+    [
+      "lanceur/core.py",
+      30
+    ],
+    [
+      "lanceur/devices.py",
+      4
+    ],
+    [
+      "lanceur/hermes_reasoning.py",
+      4
+    ],
+    [
+      "lanceur/hermes_service.py",
+      6
+    ],
+    [
+      "lanceur/hermes_web.py",
+      4
+    ],
+    [
+      "lanceur/http_boundary.py",
+      5
+    ],
+    [
+      "lanceur/operations.py",
+      6
+    ],
+    [
+      "lanceur/profiles.py",
+      7
+    ],
+    [
+      "lanceur/server_state.py",
+      7
+    ],
+    [
+      "lanceur/signing.py",
+      6
+    ],
+    [
+      "lanceur/wg_crypto.py",
+      15
+    ],
+    [
+      "lanceur/wireguard_access.py",
+      5
+    ],
+    [
+      "lanceur/workspace.py",
+      12
+    ]
+  ],
+  "secret_scan": {
+    "text_files": 4024,
+    "candidates": []
+  }
+}

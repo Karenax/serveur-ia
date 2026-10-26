@@ -1,6 +1,6 @@
-# Runtimes Fred verrouillés
+# Environnements Kiara verrouillés
 
-Les cinq fichiers `*.requirements.txt` enregistrent les versions effectivement
+Les six fichiers `*.requirements.txt` enregistrent les versions effectivement
 résolues par Python et les empreintes SHA-256 des distributions publiques PyPI.
 `manifest.json` enregistre aussi l’empreinte de chaque verrou.
 
@@ -32,6 +32,16 @@ Un environnement de développement peut hériter du `site-packages` du runtime
 d’outillage. Le générateur retient la première distribution réellement résolue
 par Python ; les doublons des dossiers de repli ne remplacent pas ses versions.
 Une reconstruction avec les verrous dans un venv neuf n’exige pas cet héritage.
+
+Depuis le 26 octobre, Strata n’hérite plus du runtime d’outillage et le constructeur
+Windows dispose de son propre profil `construction-windows`. Préparer ce dernier
+avec `maintenance/prepare_build_environment.py`. Le contrôle rapporte tous les
+environnements avant d’échouer, afin qu’un écart ne masque pas les suivants.
+
+`kiara-shared` est le paquet local du dépôt : installer ses sources après le verrou,
+sans acquisition implicite de dépendances. Ses fichiers sont couverts par le manifeste
+du composant. Le pointeur Hermes privé est résolu avant le bootstrap personnel ;
+ses répertoires de dépendances et outils restent des prérequis explicites.
 
 Ne régénérer ces fichiers qu’après installation et validation des mises à jour :
 `maintenance/verrous_runtime.py create` consulte PyPI, sans transmettre de données

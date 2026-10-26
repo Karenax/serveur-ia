@@ -14,8 +14,8 @@ _CACHE={}
 from core import ROOT, read_json, write_json
 from operations import VERSION
 from profiles import match,validate_access
-from file_lock import locked
-from updater import verify as verify_release
+from kiara_shared.file_lock import locked
+from kiara_shared.releases import verify as verify_release
 
 def digest(path):
     with Path(path).open('rb') as stream:
@@ -31,7 +31,7 @@ def profile(path):
         return json.loads(f.read(size))
 
 def download_name(path, name):
-    from updater import client_filename
+    from kiara_shared.releases import client_filename
     return client_filename(profile(path)['version'],name)
 
 def manifest(home=HOME):

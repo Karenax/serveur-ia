@@ -16,12 +16,12 @@ import sqlite3
 import threading
 import time
 from workspace import Conflict, Denied
-from history_store import validate as validate_history, HistoryError
+from kiara_shared.history_store import validate as validate_history, HistoryError
 from hermes_storage import HermesStorage, JOURNAL_DAYS, RECOVERY_DAYS
 
 TERMINAL = {'completed', 'failed', 'cancelled', 'interrupted'}
 IDENTITY = re.compile(r'[A-Za-z0-9_-]{1,80}\Z')
-REQUEST = re.compile(r'[a-f0-9]{32}\Z')
+from kiara_shared.request_ids import REQUEST
 NATIVE_WEB_INSTRUCTIONS = (
     'Pour rechercher sur Internet ou lire des pages publiques, utilise les outils natifs Hermes '
     'web_search et web_extract lorsqu’ils sont disponibles pour ce compte. '
@@ -264,7 +264,7 @@ class HermesConversations:
         if not public or not public[-1]['content'] and not isinstance(messages[-1].get('content'), list): raise ValueError('Message utilisateur vide.')
         selection=self.models.select(owner,data.get('model')) if self.models else {'id':'fred-qwen','local':True,'native_model':'fred-qwen'}
         from hermes_reasoning import request_reasoning
-        from chat_attachments import capabilities as local_capabilities
+        from kiara_shared.attachments import capabilities as local_capabilities
         reasoning_request=request_reasoning(data,selection.get('capabilities') or local_capabilities({}))
         identity={'messages': messages, 'conversation': conversation, 'model':selection['id'],
                   'project': project, 'document': document, 'effort':reasoning_request['effort']}

@@ -24,6 +24,7 @@
 **/node_modules/
 **/.venv/
 **/__pycache__/
+**/*.egg-info/
 **/.pytest_cache/
 **/.coverage*
 /audits/2026-10-12/ui/*.js

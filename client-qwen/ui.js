@@ -105,7 +105,7 @@ const uiSourceButton=wsElement('button','Sources','context-details');uiSourceBut
 let uiConversation=null;
 const uiRender=render;render=function(){uiComposerSync();uiRender();document.querySelector('.chat-view').classList.toggle('is-empty',!messages.length);if(uiConversation!==currentId){uiSourceButton.hidden=true;$('ws-side').hidden=true;uiConversation=currentId;}uiDecorateNavigation();};
 const uiDrawLibrary=drawLibrary;drawLibrary=function(){uiComposerSync();uiDrawLibrary();document.querySelector('.chat-view').classList.toggle('is-empty',!messages.length);};
-const uiShowView=showView;showView=function(name){const moveFocus=uiSidebarModal()||uiSidebar.contains(document.activeElement);uiShowView(name);uiDecorateNavigation();uiCloseSidebar(false);if(moveFocus){$('workspace-heading').tabIndex=-1;$('workspace-heading').focus();}if(name==='api')uiRefreshIntegrations();};
+const uiShowView=showView;showView=function(name){const moveFocus=uiSidebarModal()||uiSidebar.contains(document.activeElement);uiShowView(name);uiDecorateNavigation();uiCloseSidebar(false);if(moveFocus){$('workspace-heading').tabIndex=-1;$('workspace-heading').focus();}/* kiara-slot:platform-expression-25 */if(name==='api')uiRefreshIntegrations();/* /kiara-slot:platform-expression-25 */};
 $('prompt').addEventListener('input',()=>{const field=$('prompt');field.style.height='auto';field.style.height=Math.min(180,Math.max(74,field.scrollHeight))+'px';});
 $('conversation-title').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('rename-conversation').click();e.target.blur();}});$('conversation-title').addEventListener('change',()=>$('rename-conversation').click());
 document.addEventListener('click',e=>{for(const menu of document.querySelectorAll('.menu[open]')){if(!menu.contains(e.target)||e.target.closest('.menu-body button'))menu.open=false;}});
@@ -129,7 +129,7 @@ const uiRefresh=wsRefresh;wsRefresh=async function(){await uiRefresh();uiDecorat
 uiDecorateNavigation();render();uiProjectTab('documents');
 window.addEventListener('beforeunload',e=>{if(uiDraftDirty||uiPreferencesPending||ws.projectDirty||ws.dirty||uiMemoryEditsPending()||$('ws-task-prompt').value.trim()||typeof correctorDirty!=='undefined'&&correctorDirty){e.preventDefault();e.returnValue='';}});
 
-let uiLastConnection={},uiIntegrations=null,uiIntegrationsLoading=false,uiIntegrationPending=false;
+/* kiara-slot:desktop-integration-logic-26 */let uiLastConnection={},uiIntegrations=null,uiIntegrationsLoading=false,uiIntegrationPending=false;
 function uiIntegrationButtons(){
   const model=connected&&conversationModelAvailable()?conversationModel():'';
   $('integration-model').textContent=model?'Modèle à ajouter : '+conversationModelLabel():'Connectez le client au serveur et chargez un modèle pour l’ajouter.';
@@ -157,11 +157,11 @@ for(const name of ['opencode','hermes'])$('integration-'+name).onclick=async()=>
   }catch(e){$('integration-result').textContent=e.message;}
   finally{uiIntegrationPending=false;uiIntegrationButtons();}
 };
-const uiConnectionPhases={requesting:'Envoi de la demande',queued:'En attente du moteur',waiting_model:'Calcul en cours',thinking:'Réflexion en cours',answering:'Rédaction de la réponse',working:'Préparation de la réponse',tool:'Utilisation des outils',approval:'Accord nécessaire',stopping:'Arrêt en cours',complete:'Réponse terminée',interrupted:'Réponse interrompue'};
+/* /kiara-slot:desktop-integration-logic-26 */const uiConnectionPhases={requesting:'Envoi de la demande',queued:'En attente du moteur',waiting_model:'Calcul en cours',thinking:'Réflexion en cours',answering:'Rédaction de la réponse',working:'Préparation de la réponse',tool:'Utilisation des outils',approval:'Accord nécessaire',stopping:'Arrêt en cours',complete:'Réponse terminée',interrupted:'Réponse interrompue'};
 const uiConnectionEvents={endpoint_selected:'Adresse sélectionnée',wireguard_started:'Nouveau tunnel WireGuard',connection_probe:'Vérification de connexion',connection_failed:'Échec de connexion',server_response:'Réponse du serveur',generation_complete:'Génération terminée',generation_interrupted:'Flux interrompu'};
 function uiConnectionStatus(state=uiLastConnection){
   uiLastConnection=state;const phase=busy?(replyProgress.phase||state.stream?.phase||'requesting'):null;
-  uiIntegrationButtons();
+  /* kiara-slot:platform-expression-31 */uiIntegrationButtons();/* /kiara-slot:platform-expression-31 */
   uiLoadedModel(connected?conversationModelLabel():'',state.code);
   const https=state.transport==='https',checking=state.checking&&!connected;
   let label=phase?(uiConnectionPhases[phase]||'Préparation de la réponse'):state.reconnecting?'Connexion instable · nouvelle vérification':checking?(https?'Vérification HTTPS':'Vérification WireGuard'):connected?'Connecté au serveur IA':'Connexion indisponible';
@@ -180,7 +180,7 @@ function uiConnectionStatus(state=uiLastConnection){
 $('connection').onclick=()=>{const panel=$('connection-panel');panel.hidden=!panel.hidden;$('connection').setAttribute('aria-expanded',String(!panel.hidden));uiConnectionStatus();};
 $('connection-close').onclick=()=>{$('connection-panel').hidden=true;$('connection').setAttribute('aria-expanded','false');};
 $('connection-retry').onclick=()=>{$('reconnect').click();};
-let uiWireGuardEndpoint='';
+/* kiara-slot:desktop-connection-transfer-controls-32 */let uiWireGuardEndpoint='';
 function uiSetConnectionMode(https){
   $('connection-mode').value=https?'https':'wireguard';
   $('endpoint').readOnly=https;
@@ -235,7 +235,7 @@ $('connection-paste').onclick=()=>wsTry(async()=>{
 });
 $('connection-use-parameters').onclick=()=>wsTry(()=>uiUseConnectionParameters($('connection-parameters').value));
 $('endpoint').addEventListener('paste',e=>{const text=e.clipboardData?.getData('text/plain');if(!text)return;try{const endpoint=uiReadConnectionParameters(text);e.preventDefault();uiUseConnectionParameters(endpoint);}catch(err){e.preventDefault();error(err);}});
-setInterval(()=>{if(busy)uiConnectionStatus();},1000);
+/* /kiara-slot:desktop-connection-transfer-controls-32 */setInterval(()=>{if(busy)uiConnectionStatus();},1000);
 
 // Follow streamed output only while the reader remains at the bottom.
 const chatScrollPane=$('messages'),chatLatestButton=wsElement('button','↓ Revenir à la réponse','chat-latest');

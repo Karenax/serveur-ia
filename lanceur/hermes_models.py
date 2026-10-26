@@ -16,7 +16,7 @@ from urllib.parse import urlsplit
 
 from core import HIDDEN, health, read_json, write_json
 from workspace import Denied
-from chat_attachments import capabilities as attachment_capabilities
+from kiara_shared.attachments import capabilities as attachment_capabilities
 from hermes_reasoning import controls
 
 LOCAL = 'fred-qwen'

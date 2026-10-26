@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "cold_server_import": true,
+  "synthetic_restoration": true,
+  "isolated_document_extraction": true,
+  "schema": 2,
+  "client_directory_present": false,
+  "shared_package": "D:\\Serveur IA\\toolchain\\reconstruction-3.5.53\\.venv\\Lib\\site-packages\\kiara_shared\\__init__.py",
+  "source_archive_sha256": "3ca3a59fb56ec3bc95142c506c7b36fe88f83ae6cde3861be3067e1249c6b84d",
+  "same_host": true,
+  "physical_disaster_recovery_test": false,
+  "public_lock_sha256": "d5d9685e50ea54709709b55080603e755654502e913b652bb9551f5f715bb9bb"
+}

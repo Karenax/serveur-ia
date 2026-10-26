@@ -1,0 +1,52 @@
+[
+  {
+    "path": "maintenance/2026-10-24-vocal-workspace/ui/windows-kiara.png",
+    "restored_sha256": "303fca9022a40ef66434e05d66c547e2363507b335030bde2d60b28d20563b2c",
+    "test_capture": "ui-tests/2026-10-24-vocal-workspace/windows-kiara.png"
+  },
+  {
+    "path": "maintenance/2026-10-24-vocal-workspace/ui/windows-microphone.png",
+    "restored_sha256": "c01e6d7bbb569201772197ab26f6237fbb2966f3d598a9776bb28ce0e8e8beda",
+    "test_capture": "ui-tests/2026-10-24-vocal-workspace/windows-microphone.png"
+  },
+  {
+    "path": "maintenance/2026-10-24-vocal-workspace/ui/android-kiara.png",
+    "restored_sha256": "5b17a5b94abcf088b39224e50eb65b1da0ee1b4910554f4e22ca94bbc7c584c6",
+    "test_capture": "ui-tests/2026-10-24-vocal-workspace/android-kiara.png"
+  },
+  {
+    "path": "maintenance/2026-10-24-vocal-workspace/ui/android-microphone.png",
+    "restored_sha256": "8675840ae510928a00ba62481cb52404c21d5322f1d74bfa166567f367862bc3",
+    "test_capture": "ui-tests/2026-10-24-vocal-workspace/android-microphone.png"
+  },
+  {
+    "path": "maintenance/2026-10-25-assistant-integration/ui/windows-desktop.png",
+    "restored_sha256": "eda77b3276b1c787d6f43c8872d1eb88101d924d17fcf3b9d9eb482b69ced9b7",
+    "test_capture": "ui-tests/2026-10-25-assistant-integration/windows-desktop.png"
+  },
+  {
+    "path": "maintenance/2026-10-25-assistant-integration/ui/windows-phone.png",
+    "restored_sha256": "1d5d8064ce238a6d824cc3e4ad9c02f5ae1070e2f11e57ae8809e5bce9909024",
+    "test_capture": "ui-tests/2026-10-25-assistant-integration/windows-phone.png"
+  },
+  {
+    "path": "maintenance/2026-10-25-assistant-integration/ui/windows-tablet.png",
+    "restored_sha256": "637a053d66967835f7a73d9ae47e938204a298356bd30060266d63f7af3d863b",
+    "test_capture": "ui-tests/2026-10-25-assistant-integration/windows-tablet.png"
+  },
+  {
+    "path": "maintenance/2026-10-25-assistant-integration/ui/android-desktop.png",
+    "restored_sha256": "9ac3d5432fc53ded1b7d5e34afbba210d508d4578b0cbc3437e0e06fba672d76",
+    "test_capture": "ui-tests/2026-10-25-assistant-integration/android-desktop.png"
+  },
+  {
+    "path": "maintenance/2026-10-25-assistant-integration/ui/android-phone.png",
+    "restored_sha256": "2c6c714d6447e348f79acbba0708ae86b24e38a2cee2263702c4123f45007dd5",
+    "test_capture": "ui-tests/2026-10-25-assistant-integration/android-phone.png"
+  },
+  {
+    "path": "maintenance/2026-10-25-assistant-integration/ui/android-tablet.png",
+    "restored_sha256": "ae2e540a6d9320e5498ba5d1599fd0223e771f570e830ed01f51d23b9851d81a",
+    "test_capture": "ui-tests/2026-10-25-assistant-integration/android-tablet.png"
+  }
+]

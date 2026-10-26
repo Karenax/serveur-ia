@@ -1,0 +1,13 @@
+Fred restarted with its private secured runtime; loaded Qwen processes preserved.
+Traceback (most recent call last):
+  File "D:\Serveur IA\maintenance\2026-10-26-correctifs-audit-global\deliver.py", line 175, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "D:\Serveur IA\maintenance\2026-10-26-correctifs-audit-global\deliver.py", line 154, in main
+    publish_file(STAGE/'wireguard-bridge.exe',engine,previous/'wireguard')
+  File "D:\Serveur IA\maintenance\2026-10-26-correctifs-audit-global\deliver.py", line 66, in publish_file
+    shutil.copy2(source,pending);pending.replace(destination)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\karen\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\pathlib.py", line 1376, in replace
+    os.replace(self, target)
+PermissionError: [WinError 5] Acc�s refus�: 'D:\\Serveur IA\\client-qwen\\wireguard-bridge.exe.audit-publish.tmp' -> 'D:\\Serveur IA\\client-qwen\\wireguard-bridge.exe'

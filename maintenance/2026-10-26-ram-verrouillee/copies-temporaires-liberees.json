@@ -1,0 +1,7 @@
+{
+  "status": "reclaimed",
+  "pid": 34904,
+  "method": "EmptyWorkingSet",
+  "available_before_gib": 41.55,
+  "available_after_gib": 53.02
+}

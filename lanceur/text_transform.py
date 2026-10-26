@@ -13,7 +13,7 @@ INSTRUCTIONS = {
     'professional': 'Reformule intégralement le texte en français professionnel, clair, poli et naturel. Conserve toutes les informations et le sens exact. N’ajoute aucun fait ni engagement. Respecte les paragraphes utiles. Retourne uniquement le texte reformulé, sans explication ni introduction.',
     'friendly': 'Reformule intégralement le texte en français amical et familier, naturel et chaleureux, avec tutoiement. Corrige aussi l’orthographe et la grammaire. Conserve toutes les informations et le sens exact, sans ajouter de fait ni engagement. Retourne uniquement le texte reformulé, sans explication ni introduction.'
 }
-REQUEST = re.compile(r'[a-f0-9]{32}')
+from kiara_shared.request_ids import REQUEST
 
 
 def transform_request(value):

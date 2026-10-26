@@ -1,0 +1,79 @@
+{
+  "observed_utc": "2026-10-25T23:03:43.277630+00:00",
+  "console": {},
+  "model": {
+    "loaded": true,
+    "images": true,
+    "model": "qwen3.8-flash-next-iq4-xs",
+    "status": "ok"
+  },
+  "backups": {
+    "enabled": true,
+    "secondary_configured": true,
+    "last_success": "2026-10-25T23:13:02+01:00",
+    "last_error_present": false,
+    "catalog_count": 42,
+    "recent": [
+      {
+        "created_at": "2026-10-25T23:13:02+01:00",
+        "verified": true,
+        "size": 2859687,
+        "secondary_status": "copied"
+      },
+      {
+        "created_at": "2026-10-25T14:07:05+01:00",
+        "verified": true,
+        "size": 2859687,
+        "secondary_status": "copied"
+      },
+      {
+        "created_at": "2026-10-25T11:08:52+01:00",
+        "verified": true,
+        "size": 2860031,
+        "secondary_status": "copied"
+      }
+    ]
+  },
+  "lan": {
+    "mapping": true,
+    "conflict": false,
+    "firewall": true,
+    "listening": false
+  },
+  "listeners": [
+    {
+      "address": "127.0.0.1",
+      "port": 8768,
+      "pid": 17852
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 8643,
+      "pid": 23712
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 8765,
+      "pid": 17852
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 8766,
+      "pid": 17852
+    },
+    {
+      "address": "127.0.0.1",
+      "port": 8080,
+      "pid": 22208
+    }
+  ],
+  "windows_source_manifest": {
+    "source_commit": "75e8eb89c5ac01c08b1edca4b26ba1eadf0c35f2",
+    "source_count": 539,
+    "differences": [
+      "lanceur/assistant_commands.py",
+      "lanceur/test_assistant_commands.py",
+      "lanceur/test_hermes_tools.py"
+    ]
+  }
+}

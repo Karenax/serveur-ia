@@ -1,0 +1,12 @@
+test_actual_native_mcp_transport_carries_admitted_run_identity (test_hermes_models.NativeCloudTests.test_actual_native_mcp_transport_carries_admitted_run_identity) ... ok
+SharedModelsTests (unittest.loader._FailedTest.SharedModelsTests) ... ERROR
+
+======================================================================
+ERROR: SharedModelsTests (unittest.loader._FailedTest.SharedModelsTests)
+----------------------------------------------------------------------
+AttributeError: module 'test_hermes_models' has no attribute 'SharedModelsTests'
+
+----------------------------------------------------------------------
+Ran 2 tests in 39.233s
+
+FAILED (errors=1)

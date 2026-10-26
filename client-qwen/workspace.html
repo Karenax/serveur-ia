@@ -38,10 +38,10 @@ for(const [view,title] of [['projects','Projets'],['tasks','Tâches']]){const b=
 const originalShowView=showView;showView=function(name){originalShowView(name);if(['projects','tasks'].includes(name)){$('workspace-heading').textContent=({projects:'Projets',tasks:'Tâches'})[name];wsRefresh().catch(e=>error(e));}if(name!=='chat')$('ws-side').hidden=true;};
 const wsSettings=wsElement('section',undefined,'settings-view');wsSettings.dataset.view='settings';wsSettings.hidden=true;
 const wsSettingsNav=wsElement('nav',undefined,'ws-toolbar');wsSettingsNav.setAttribute('aria-label','Réglages du client');wsSettings.append(wsElement('h2','Réglages'),wsSettingsNav);
-for(const name of ['access','connection','updates','api']){const b=document.querySelector('[data-view-button="'+name+'"]');b.className='secondary';wsSettingsNav.append(b);const pane=document.querySelector('[data-view="'+name+'"]');pane.style.padding='0';pane.style.overflow='visible';wsSettings.append(pane);}
+for(const name of platformCapabilities.settings){const b=document.querySelector('[data-view-button="'+name+'"]');b.className='secondary';wsSettingsNav.append(b);const pane=document.querySelector('[data-view="'+name+'"]');pane.style.padding='0';pane.style.overflow='visible';wsSettings.append(pane);}
 document.querySelector('.workspace').append(wsSettings);
 const wsSettingsButton=wsElement('button','Réglages','nav-button');wsSettingsButton.dataset.viewButton='settings';document.querySelector('#client-navigation').append(wsSettingsButton);
-const wsShowViewOnce=showView;showView=function(name){const selected=name==='settings'?'access':name;wsShowViewOnce(selected);wsSettings.hidden=!['access','connection','updates','api'].includes(selected);wsSettingsButton.classList.toggle('active',!wsSettings.hidden);if(!wsSettings.hidden)$('workspace-heading').textContent='Réglages · '+({access:'Mon accès',connection:'Connexion',updates:'Mises à jour',api:'API locale'})[selected];};
+const wsShowViewOnce=showView;showView=function(name){const selected=name==='settings'?'access':name;wsShowViewOnce(selected);wsSettings.hidden=!platformCapabilities.settings.includes(selected);wsSettingsButton.classList.toggle('active',!wsSettings.hidden);if(!wsSettings.hidden)$('workspace-heading').textContent='Réglages · '+({access:'Mon accès',connection:'Connexion',updates:'Mises à jour',api:'API locale'})[selected];};
 wsSettingsButton.onclick=()=>showView('settings');
 const originalDrawLibrary=drawLibrary;drawLibrary=function(){originalDrawLibrary();wsChatSelections();};
 const wsFillProjectOnce=wsFillProject;wsFillProject=function(){wsFillProjectOnce();ws.projectRevision=ws.data?.projects.find(p=>p.id===ws.project)?.revision;};
@@ -62,21 +62,27 @@ function wsDrawMemories(project){
     let row=existing.get(memory.id);existing.delete(memory.id);
     if(!row){
       row=wsElement('div',undefined,'ws-card');row.dataset.memoryId=memory.id;
-      const input=wsElement('textarea');input.id='ws-memory-'+memory.id;input.maxLength=2000;input.value=memory.text;input.dataset.savedText=memory.text;
+      const input=wsElement('textarea');input.id='ws-memory-'+memory.id;input.maxLength=2000;input.value=memory.text;input.dataset.savedText=memory.text;input.dataset.revision=memory.revision||'';
       const label=wsElement('label','Mémoire du projet : '+memory.text.slice(0,80),'sr-only');label.htmlFor=input.id;
       input.oninput=()=>{input.dataset.dirty=String(input.value!==input.dataset.savedText);};
       const modify=wsButton('Enregistrer',async()=>{
         const text=input.value;modify.disabled=remove.disabled=true;wsMemoryStatus.textContent='Enregistrement de la mémoire…';
-        try{await wsAction('memory_save',{id:memory.id,text});input.dataset.savedText=text;input.dataset.dirty=String(input.value!==text);await wsRefresh();wsMemoryStatus.textContent='Mémoire enregistrée.';}catch(e){wsMemoryStatus.textContent='Mémoire non enregistrée : '+e.message;throw e;}finally{modify.disabled=remove.disabled=false;}
+        try{const saved=await wsAction('memory_save',{id:memory.id,text,revision:input.dataset.revision});input.dataset.revision=saved.revision;input.dataset.savedText=text;input.dataset.dirty=String(input.value!==text);reload.hidden=true;await wsRefresh();wsMemoryStatus.textContent='Mémoire enregistrée.';}catch(e){reload.hidden=e.status!==409;wsMemoryStatus.textContent='Mémoire non enregistrée : '+e.message;throw e;}finally{modify.disabled=remove.disabled=false;}
       });
       const remove=wsButton('Supprimer',async()=>{
         if(!confirm('Supprimer cette mémoire du projet ?\n\n'+input.value.slice(0,160)))return;
         modify.disabled=remove.disabled=true;wsMemoryStatus.textContent='Suppression de la mémoire…';
-        try{await wsAction('memory_delete',{id:memory.id});row.remove();$('ws-memory-text').focus();await wsRefresh();wsMemoryStatus.textContent='Mémoire supprimée.';}catch(e){wsMemoryStatus.textContent='Mémoire non supprimée : '+e.message;throw e;}finally{modify.disabled=remove.disabled=false;}
+        try{await wsAction('memory_delete',{id:memory.id,revision:input.dataset.revision});row.remove();$('ws-memory-text').focus();await wsRefresh();wsMemoryStatus.textContent='Mémoire supprimée.';}catch(e){reload.hidden=e.status!==409;wsMemoryStatus.textContent='Mémoire non supprimée : '+e.message;throw e;}finally{modify.disabled=remove.disabled=false;}
       });
-      row.append(label,input,modify,remove);list.append(row);
+      const reload=wsButton('Recharger la version du serveur',async()=>{
+        if(input.dataset.dirty==='true'&&!confirm('Remplacer votre brouillon par la version du serveur ? Copiez votre texte avant de continuer si vous souhaitez le conserver.'))return;
+        await wsRefresh();const latest=ws.data?.projects.find(p=>p.id===project.id)?.memories.find(m=>m.id===memory.id);
+        if(!latest)throw new Error('Ce souvenir a été supprimé. Votre brouillon reste affiché.');
+        input.value=latest.text;input.dataset.savedText=latest.text;input.dataset.revision=latest.revision;input.dataset.dirty='false';reload.hidden=true;input.focus();wsMemoryStatus.textContent='Version du serveur rechargée.';
+      });reload.hidden=true;
+      row.append(label,input,modify,remove,reload);list.append(row);
     }
-    const input=row.querySelector('textarea');if(input.dataset.dirty!=='true'&&input.value!==memory.text){input.value=memory.text;input.dataset.savedText=memory.text;}
+    const input=row.querySelector('textarea');if(input.dataset.dirty!=='true'){input.value=memory.text;input.dataset.savedText=memory.text;input.dataset.revision=memory.revision||'';}
   }
   for(const row of existing.values()){
     if(row.querySelector('textarea')?.dataset.dirty==='true'){wsMemoryStatus.textContent='Une mémoire a changé sur le serveur. Votre texte reste affiché ; copiez-le avant de recharger.';continue;}
@@ -129,7 +135,7 @@ $('ws-proposal-accept').onclick=()=>wsTry(async()=>{if(!ws.document||ws.document
 const originalDraw=draw;draw=function(message){const view=originalDraw(message);if(message.role==='assistant'&&message.content)view.article.append(wsButton('Enregistrer comme document',async()=>{const p=wsCurrent()?.project_id;if(!p)throw new Error('Choisissez un projet dans la discussion.');const r=await wsAction('document_create',{project:p,title:wsCurrent().title,text:message.content});await wsRefresh();await wsSelectProject(p);await wsOpenDocument(r.id);showView('projects');}));return view;};
 const originalButtons=buttons;buttons=function(){originalButtons();wsChatSelections();};
 $('ws-refresh').onclick=()=>wsTry(()=>wsRefresh());$('ws-task-refresh').onclick=()=>wsTry(()=>wsRefresh());
-async function wsPoll(){if(!connected||busy||historySyncPending||conversationActionPending||wsDraggedConversation)return;if(!ws.bootstrapDone){await wsBootstrap();return;}try{await wsRefresh();if(ws.revisionJob){const j=ws.data.jobs.find(j=>j.id===ws.revisionJob);if(j?.state==='completed'&&ws.document?.id===ws.revisionDoc?.id){const result=await wsAction('job_get',{id:j.id});$('ws-proposal-text').value=JSON.parse(result.result).text;$('ws-proposal').hidden=false;ws.revisionJob=null;}else if(j&&['failed','cancelled'].includes(j.state)){$('ws-document-status').textContent='Révision '+wsStates[j.state]+' : '+j.error;ws.revisionJob=null;}}}catch(e){$('ws-task-notice').textContent='Actualisation indisponible : '+e.message;}}
+async function wsPoll(){/* kiara-slot:platform-expression-24 */if(!connected||busy||historySyncPending||conversationActionPending||wsDraggedConversation)/* /kiara-slot:platform-expression-24 */return;if(!ws.bootstrapDone){await wsBootstrap();return;}try{await wsRefresh();if(ws.revisionJob){const j=ws.data.jobs.find(j=>j.id===ws.revisionJob);if(j?.state==='completed'&&ws.document?.id===ws.revisionDoc?.id){const result=await wsAction('job_get',{id:j.id});$('ws-proposal-text').value=JSON.parse(result.result).text;$('ws-proposal').hidden=false;ws.revisionJob=null;}else if(j&&['failed','cancelled'].includes(j.state)){$('ws-document-status').textContent='Révision '+wsStates[j.state]+' : '+j.error;ws.revisionJob=null;}}}catch(e){$('ws-task-notice').textContent='Actualisation indisponible : '+e.message;}}
 let wsBootstrapping=false;
 async function wsBootstrap(){if(wsBootstrapping||ws.bootstrapDone)return;wsBootstrapping=true;try{await clientReady;if(!connected)return;await wsRefresh();const r=await api('/client/draft');ws.bootstrapDone=true;if(r.draft){const d=r.draft;await wsSelectProject(d.project);await wsOpenDocument(d.id);$('ws-document-title').value=d.title;$('ws-document-text').value=d.text;ws.dirty=true;ws.conflict=ws.document.revision!==d.revision;ws.document.revision=d.revision;$('ws-document-status').textContent='Brouillon local récupéré'+(ws.conflict?' : comparer avec le serveur avant enregistrement.':'.');showView('projects');}render();drawLibrary();}catch(e){$('ws-task-notice').textContent=e.message;}finally{wsBootstrapping=false;}}
 wsBootstrap();setInterval(wsPoll,5000);
@@ -353,12 +359,13 @@ $('client-navigation').append(assistantNav);assistantNav.onclick=()=>showView('a
 const assistantShowView=showView;
 showView=function(name){assistantShowView(name);if(name==='assistant'){$('workspace-heading').textContent='Mémoire et rappels';assistantTry(()=>assistantLoad());}};
 function assistantScope(){return $('assistant-project').value||null;}
+function assistantRequestKey(){return clientRequestId();}
 async function assistantCommand(operation,values={}){
   const body={action:'assistant',operation,project:assistantScope(),...values};
   const signature=JSON.stringify(body);
-  if(!kiaraAssistant.pending.has(signature))kiaraAssistant.pending.set(signature,crypto.randomUUID().replaceAll('-',''));
+  if(!kiaraAssistant.pending.has(signature))kiaraAssistant.pending.set(signature,assistantRequestKey());
   body.request_key=kiaraAssistant.pending.get(signature);
-  const result=await api('/v1/workspace/action',body);
+  let result;try{result=await api('/v1/workspace/action',body);}catch(e){if(e.status===409)kiaraAssistant.pending.delete(signature);throw e;}
   kiaraAssistant.pending.delete(signature);return result;
 }
 async function assistantTry(action){

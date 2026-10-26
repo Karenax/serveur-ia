@@ -1,0 +1,2881 @@
+{
+  "head": "4ca825bf6f04e7bb906a9d4def60d69852d54fa5",
+  "tracked_files": 4451,
+  "components": {
+    ".agents": 8,
+    "(root)": 206,
+    "analyses": 46,
+    "audits": 257,
+    "client-android": 134,
+    "client-qwen": 156,
+    "client-voice": 65,
+    "comparatifs": 705,
+    "contribution-strata-p100": 3,
+    "dependances": 17,
+    "lanceur": 209,
+    "maintenance": 813,
+    "preuves": 303,
+    "recherche": 1524,
+    "resultats-premiere-config": 5
+  },
+  "source_files": [
+    {
+      "path": "lanceur/remote.py",
+      "lines": 1179,
+      "bytes": 80989,
+      "sha256": "bd2d499420974caeeabf4df7f7b9e9b5e0d86a08ff4430c0cd399bca5b5dc610"
+    },
+    {
+      "path": "lanceur/workspace.py",
+      "lines": 1099,
+      "bytes": 85453,
+      "sha256": "58f3194b9a679cbc81cf1554e2b3951ff76cd3a4644d642ad35a4cd117d7b0e0"
+    },
+    {
+      "path": "client-qwen/client.py",
+      "lines": 979,
+      "bytes": 69114,
+      "sha256": "07ea131f12e7c63ab877ab2355b9a48497db275fc6c12d2454100abf4aad4628"
+    },
+    {
+      "path": "client-qwen/conversation.js",
+      "lines": 830,
+      "bytes": 87448,
+      "sha256": "f1fe0b3015ea8681313ed5c5212c73d304b6c0239bf17ca97c65e320b42c1f72"
+    },
+    {
+      "path": "lanceur/backups.py",
+      "lines": 644,
+      "bytes": 39377,
+      "sha256": "eed59621872724d5aa1b4ba0c888c6a238ba41aa51b20a6a665dd006f07d874a"
+    },
+    {
+      "path": "lanceur/assistant_commands.py",
+      "lines": 639,
+      "bytes": 40372,
+      "sha256": "3fc48045dbb1037df7df611a1fa05d4e9268c488cad3ebfc8709f1b6d2aadfcd"
+    },
+    {
+      "path": "lanceur/hermes_conversations.py",
+      "lines": 584,
+      "bytes": 38332,
+      "sha256": "9cb7be371e384362929c409b80e6b5f0d2d5e0cfb364472cfd988010d76199af"
+    },
+    {
+      "path": "lanceur/app.py",
+      "lines": 564,
+      "bytes": 34863,
+      "sha256": "e4757f933f33eb22b3a1c736122b7d0c031fc2c36f780c8d64724708f6e1aaeb"
+    },
+    {
+      "path": "client-qwen/advanced_voice.py",
+      "lines": 527,
+      "bytes": 31437,
+      "sha256": "c2572317d0099b2d48a7ad3c281a754f6ba569402bf78ada9127582c912d8e30"
+    },
+    {
+      "path": "lanceur/hermes_models.py",
+      "lines": 465,
+      "bytes": 30359,
+      "sha256": "df61b0a8d184f91d7750b05c6eceeb5e36630c3449221bd5bde9d1bc360c3203"
+    },
+    {
+      "path": "client-qwen/workspace.html",
+      "lines": 447,
+      "bytes": 75275,
+      "sha256": "0b90a9e82d350a724fc8e7ec6363142eaf05cdd0d60316464368edae3465e9c9"
+    },
+    {
+      "path": "client-qwen/max_installation.py",
+      "lines": 437,
+      "bytes": 23653,
+      "sha256": "0ecdf07cf0927178e53ae4c4860c1b62e5add5e3fe99b307731b3c56d13c2416"
+    },
+    {
+      "path": "lanceur/operations.py",
+      "lines": 436,
+      "bytes": 27379,
+      "sha256": "248eea1a07ee6da0257e2fa7e8cee4de69f2be761ac8ceb1dbb757a1a2c52ab0"
+    },
+    {
+      "path": "client-qwen/wireguard-bridge/main.go",
+      "lines": 393,
+      "bytes": 16164,
+      "sha256": "0fca24383fd55ee899710e918dd000d7bc2bead1c88f3cf67297953951c0114b"
+    },
+    {
+      "path": "lanceur/notifications.py",
+      "lines": 391,
+      "bytes": 22825,
+      "sha256": "c7949ccf8028721a976cb4c1d5b90e8e43119ca2f5bfd77a30e820b8d33a37e3"
+    },
+    {
+      "path": "lanceur/hermes_service.py",
+      "lines": 389,
+      "bytes": 18860,
+      "sha256": "faf5597ea2b634d1770339127e65d3a45ec43b7fd8720b128632424ea0721863"
+    },
+    {
+      "path": "lanceur/web/app.js",
+      "lines": 375,
+      "bytes": 43070,
+      "sha256": "2984a6dcd0e8bee537e9f8e569caa48c2d040eb4f74dd4fd9fe28b269e05c25d"
+    },
+    {
+      "path": "client-voice/max_native.py",
+      "lines": 343,
+      "bytes": 16166,
+      "sha256": "51f13fe757af264d9696f6ff07743d95b6746c951ffee60696c9a20bb7445727"
+    },
+    {
+      "path": "lanceur/hermes_web.py",
+      "lines": 343,
+      "bytes": 17789,
+      "sha256": "5f2cfed5d0288b4132097d88821ece667f7f3397d319ff3f63006890ec331138"
+    },
+    {
+      "path": "lanceur/hermes_tools.py",
+      "lines": 340,
+      "bytes": 19703,
+      "sha256": "f665938f0c59ad3ee3d6471c63359403362204e23d0af5831740a6fdb3aa83f3"
+    },
+    {
+      "path": "lanceur/restoration.py",
+      "lines": 327,
+      "bytes": 21857,
+      "sha256": "b48f991036b2a9e603e531224cd942c54e28f47dc07d813105229b2b11e44571"
+    },
+    {
+      "path": "lanceur/hermes_accounts.py",
+      "lines": 318,
+      "bytes": 16770,
+      "sha256": "e9e2be4d2cc04dbaca5abfc34a54327d9179b1180c7971c40f803035149b88c4"
+    },
+    {
+      "path": "client-qwen/app_integrations.py",
+      "lines": 309,
+      "bytes": 17425,
+      "sha256": "2492fab00ae26048f37debe7c377965c127f160eb78609939517632bdf21ab92"
+    },
+    {
+      "path": "lanceur/client_storage.py",
+      "lines": 294,
+      "bytes": 16785,
+      "sha256": "3b3fcc48058645ce473aaee6133250abfda41518f3c04331644fbbab741da7f3"
+    },
+    {
+      "path": "client-qwen/chat.html",
+      "lines": 292,
+      "bytes": 60692,
+      "sha256": "43e40523dd95f18ac424c5917085ba1121f51572a2402d24a35544075c7ed818"
+    },
+    {
+      "path": "lanceur/core.py",
+      "lines": 284,
+      "bytes": 13151,
+      "sha256": "c3fb49de3475cce615404bddd662bd80195a97b2feb5a02aad641f215bd401af"
+    },
+    {
+      "path": "client-qwen/ui.js",
+      "lines": 282,
+      "bytes": 34490,
+      "sha256": "b452bd14013e7c70174b15837763dc782a3ed2be5bf4c6c4d3ccda46cdad33f2"
+    },
+    {
+      "path": "lanceur/knowledge.py",
+      "lines": 281,
+      "bytes": 17010,
+      "sha256": "6452901b74d6684cb6c370adda60e8c1f562bbdda1a6c592669719ea708bfd15"
+    },
+    {
+      "path": "lanceur/wireguard_access.py",
+      "lines": 279,
+      "bytes": 16269,
+      "sha256": "a8ecaee3ec1116b2495df799157f99537bf1c37aac3d7ede6b244012284f20d1"
+    },
+    {
+      "path": "lanceur/hermes_backup.py",
+      "lines": 261,
+      "bytes": 13827,
+      "sha256": "8be8b74c909ec380e73ccb0fec3b633a1c147f4578af7752a1712d7a736b888a"
+    },
+    {
+      "path": "client-qwen/updater.py",
+      "lines": 250,
+      "bytes": 14718,
+      "sha256": "1477ea22d74226aa81f407de9a58d18b4f1bc5d985b585b77c04832a21648556"
+    },
+    {
+      "path": "client-qwen/local_voice.py",
+      "lines": 245,
+      "bytes": 15038,
+      "sha256": "040b34b72938e1316b2605a944bf77079493658d17fc99d76222330288d7a341"
+    },
+    {
+      "path": "client-android/mobile-ui/android.js",
+      "lines": 223,
+      "bytes": 15432,
+      "sha256": "5ffe163295a97ba217745a5eba34ebdead9d0f031a6d640a73d45f5c225fd93e"
+    },
+    {
+      "path": "client-android/scripts/Test-Assets.cjs",
+      "lines": 215,
+      "bytes": 24952,
+      "sha256": "10139d510edd6be69d2d63cc7c8bcdd6d0038f193da5932d1c7554a0fb2bd496"
+    },
+    {
+      "path": "client-voice/fred_voice.cpp",
+      "lines": 213,
+      "bytes": 12791,
+      "sha256": "7be43dedeaf036713cca3a1a61a8db3b0b911f7acd4faa2ebfecb65438a7cb8d"
+    },
+    {
+      "path": "lanceur/hermes_inference.py",
+      "lines": 208,
+      "bytes": 13178,
+      "sha256": "a94fe1a5f3c37d1f2e4ec3d04a6c60d330f74b2ae1b040df4af9fae84f63101e"
+    },
+    {
+      "path": "lanceur/recovery_signing.py",
+      "lines": 195,
+      "bytes": 10960,
+      "sha256": "18a0b6e02ce96fc82125db2afb7a1a4fd0ad4717f3ce1107c0969b9fd3ac04b1"
+    },
+    {
+      "path": "client-qwen/conversation_service.py",
+      "lines": 193,
+      "bytes": 15067,
+      "sha256": "45c33819eb3030f8ff3082d5fd70ac6220d41f8515af2c480357aa10d390ea42"
+    },
+    {
+      "path": "client-voice/recognition.py",
+      "lines": 186,
+      "bytes": 9909,
+      "sha256": "5f4b2abbdcac658950ecb321ec7ce14498e812bd0ca90c3a8160fbc7defe50fb"
+    },
+    {
+      "path": "client-qwen/history_sync.py",
+      "lines": 184,
+      "bytes": 12307,
+      "sha256": "7cecfa61264e3e9d703594cea126a8b28b1e2aeae3f7d39be83e34a583105f75"
+    },
+    {
+      "path": "client-android/scripts/Prepare-Licenses.py",
+      "lines": 177,
+      "bytes": 9713,
+      "sha256": "6f2a3d96e590a0d19c37c266c116c2b128aeb6959cc2a44b53b47cf88b18885e"
+    },
+    {
+      "path": "client-voice/max_worker.py",
+      "lines": 175,
+      "bytes": 8048,
+      "sha256": "8b295852e6d6426883ab5d406530eb3d8286d3542e3d0e9974363a22acc4adc2"
+    },
+    {
+      "path": "lanceur/embeddings.py",
+      "lines": 173,
+      "bytes": 8933,
+      "sha256": "03c1ff28b919b406aee4137b2b4529010f61ae23f9731a97b77ccf686ac07d1c"
+    },
+    {
+      "path": "lanceur/releases.py",
+      "lines": 169,
+      "bytes": 8685,
+      "sha256": "4cad1ca1c84a1b975cf431f1e3febd7446f486ff98c5b7d68f5906254de0027b"
+    },
+    {
+      "path": "client-voice/conversation_worker.py",
+      "lines": 162,
+      "bytes": 8752,
+      "sha256": "16fd12fb85caf4c41de165069f9c599bd5f178bddffed10c4903e370079ee608"
+    },
+    {
+      "path": "lanceur/hermes_fred.py",
+      "lines": 159,
+      "bytes": 8220,
+      "sha256": "914731a5f009bb82bc6132915ae59c016e65e675efc317f856f3ecb28f60c577"
+    },
+    {
+      "path": "client-qwen/wg_bridge.py",
+      "lines": 153,
+      "bytes": 7103,
+      "sha256": "9559a64fc360f569da953f8fa62cf8fed07dc52432fcb762c37f74f2b106daa8"
+    },
+    {
+      "path": "lanceur/hermes_projects.py",
+      "lines": 152,
+      "bytes": 8190,
+      "sha256": "37771dae240923e990e13353c6a389bc345091371f3fe5f4d48a702901305a4e"
+    },
+    {
+      "path": "client-voice/fred_aec.cpp",
+      "lines": 151,
+      "bytes": 8293,
+      "sha256": "939f52d36ee15f08ea56bb1b5f31201b24b8b3876ff1a50bb351259b4a048951"
+    },
+    {
+      "path": "client-qwen/ui.css",
+      "lines": 150,
+      "bytes": 55712,
+      "sha256": "cc0ab36c19b20f4ca622c65c666197f5e9a7f794e693210b3c448d8ae2742564"
+    },
+    {
+      "path": "client-android/app/src/main/java/net/karenax/fred/AndroidUpdates.java",
+      "lines": 149,
+      "bytes": 9461,
+      "sha256": "c98785a620f77b39c0f2f8ef9cef7f2a92251fc2f279c38faa1cac4a92bab319"
+    },
+    {
+      "path": "client-voice/max_pack_worker.py",
+      "lines": 149,
+      "bytes": 6728,
+      "sha256": "340521ac2bf456d5143a261550a745e0b7c34e47579cd4f1e6869256483d1a26"
+    },
+    {
+      "path": "client-android/app/src/main/java/net/karenax/fred/LocalConversation.java",
+      "lines": 144,
+      "bytes": 14567,
+      "sha256": "d1a21cf621a14a42e0178f5cd83ba6e4796b4fd2deea1ad54f46976a4865a981"
+    },
+    {
+      "path": "client-android/scripts/Prepare-Assets.py",
+      "lines": 142,
+      "bytes": 10496,
+      "sha256": "028166adbcc6187b8c8c328e7fbc47f419f420b6593f9a7dc70ec791b0fdb43e"
+    },
+    {
+      "path": "lanceur/web/maintenance.js",
+      "lines": 140,
+      "bytes": 37028,
+      "sha256": "cb869d5b9bb575debaf98c7b8fd5c38ee08811f443ba8f78eb14051158fcb046"
+    },
+    {
+      "path": "client-voice/max_recognition.py",
+      "lines": 131,
+      "bytes": 6213,
+      "sha256": "dd4941588c4f96e50c09c6d46763cee1fa0e45fba0e911a7b7c64376077db52c"
+    },
+    {
+      "path": "client-android/scripts/Export-Profile.py",
+      "lines": 129,
+      "bytes": 5373,
+      "sha256": "46431a0f435250c6af325c3625f9b40bf188faa8497b5ef954f515a9657c14a8"
+    },
+    {
+      "path": "lanceur/voice_response.py",
+      "lines": 129,
+      "bytes": 7539,
+      "sha256": "866f93b03a2ecc7585ff48572a3c6ee99ecad9150394fe89bb31b9a43db2d233"
+    },
+    {
+      "path": "client-android/app/src/main/java/net/karenax/fred/MainActivity.java",
+      "lines": 127,
+      "bytes": 25259,
+      "sha256": "db22b7fc5c5bd046c5a6841e1b0b72dd9c7180ea1072c37a6c78361af4718649"
+    },
+    {
+      "path": "lanceur/phonon_worker.py",
+      "lines": 127,
+      "bytes": 4895,
+      "sha256": "0c19960d9eba8ba524664bdb23c56797e0b96ed8a5cc3e6edc203af38e712e71"
+    },
+    {
+      "path": "lanceur/local_network.py",
+      "lines": 126,
+      "bytes": 6802,
+      "sha256": "ac8f7f6167b96a1bea8e183c161d78606dc749b5128e84e692f234bcdd3119be"
+    },
+    {
+      "path": "client-android/app/src/main/java/net/karenax/fred/LocalVoice.java",
+      "lines": 118,
+      "bytes": 12630,
+      "sha256": "523106ae50462768fd1c4bfcb414a4cdc07e5a30591af74bfeb13d8923f4cc0e"
+    },
+    {
+      "path": "lanceur/voice.py",
+      "lines": 117,
+      "bytes": 6778,
+      "sha256": "460a69bd9a85126003cc2c0cd80bfa29dd438bead2844732efd3c7a82e5a4dcf"
+    },
+    {
+      "path": "lanceur/external_api.py",
+      "lines": 113,
+      "bytes": 6025,
+      "sha256": "e73d9ed6522a6201a22dd8ff9e3af72541b8a018a4244fba3d6ebdfe47f26dc1"
+    },
+    {
+      "path": "lanceur/runtime.py",
+      "lines": 110,
+      "bytes": 5997,
+      "sha256": "9368fa47c423f54e11ba25bac3c93abbbee1e2fb03c7104640520ac61c723d29"
+    },
+    {
+      "path": "client-voice/prepare_max.py",
+      "lines": 109,
+      "bytes": 6502,
+      "sha256": "d1445783363b85a05a63602c2b132fb7e13486a717d838bc807bbe6afaddddf7"
+    },
+    {
+      "path": "client-voice/package_max.py",
+      "lines": 108,
+      "bytes": 6564,
+      "sha256": "f28588e11db9d9c34f13f790c29e56f2e06b1737b531d71a9d1c8a4e62e9b47b"
+    },
+    {
+      "path": "lanceur/text_transform.py",
+      "lines": 107,
+      "bytes": 5386,
+      "sha256": "9bf3135ba5b5ce06289636cd7be5f1b19154d80c20091d7539c473d2d2d5d9b5"
+    },
+    {
+      "path": "client-android/app/src/main/java/net/karenax/fred/WireGuardBridge.java",
+      "lines": 106,
+      "bytes": 5290,
+      "sha256": "3e1fdc81db1b0b8174bfd27ea5a5c005703d1077e5c8e2d5e49818f04e835ae2"
+    },
+    {
+      "path": "lanceur/hermes_storage.py",
+      "lines": 105,
+      "bytes": 6503,
+      "sha256": "8a3771489f716930030cfe63559e01afb38a40b7786df044eb2ba23c845156c3"
+    },
+    {
+      "path": "lanceur/devices.py",
+      "lines": 104,
+      "bytes": 4767,
+      "sha256": "5ac3fcbcec078ea2991aa46f8f760950c04cc009e133f9e2aa61a3d6032fb663"
+    },
+    {
+      "path": "lanceur/embedding_worker.py",
+      "lines": 104,
+      "bytes": 5132,
+      "sha256": "31078c7dd3d6bb55b760647d40f59fcb5ac5c111f0d57f40775795196406f195"
+    },
+    {
+      "path": "client-qwen/history_store.py",
+      "lines": 103,
+      "bytes": 5467,
+      "sha256": "e6618a900a3069fd650aece41f01fe8e1b9ab5d37f9fb4e2aa201fe709c5c3fb"
+    },
+    {
+      "path": "client-android/app/src/main/java/net/karenax/fred/HistorySync.java",
+      "lines": 101,
+      "bytes": 18647,
+      "sha256": "ca16beb6fd59dfe64687cac685757cf7d80b4d7a26f7b60ee594188cb89bfb34"
+    },
+    {
+      "path": "lanceur/voice_web.py",
+      "lines": 99,
+      "bytes": 5024,
+      "sha256": "a9718020e610062ca214448195fb707a6c34f5f8adcdd68e855dbd49f5f76e93"
+    },
+    {
+      "path": "client-qwen/voice_workspace_checks.cjs",
+      "lines": 96,
+      "bytes": 9587,
+      "sha256": "be3b3c02fe3c83de0b8be06aec21e10c8b3741358220db781f173dcf30b3e6a7"
+    },
+    {
+      "path": "client-android/app/src/main/java/net/karenax/fred/Remote.java",
+      "lines": 94,
+      "bytes": 16533,
+      "sha256": "588281f9c3c316d6e66420137aee62727a953b60082e93e4fb89f8aab817437d"
+    },
+    {
+      "path": "client-qwen/thinking.js",
+      "lines": 94,
+      "bytes": 8378,
+      "sha256": "f580bf42908ff6b72e296f9b3e518f847af8fd3aa3ead325d2cc8655bf223901"
+    },
+    {
+      "path": "lanceur/scheduler.py",
+      "lines": 94,
+      "bytes": 4577,
+      "sha256": "161001a2c72fc19ad0c4033e6bf103aa9a0a532937848ccbc34c3b3483c9b54f"
+    },
+    {
+      "path": "client-android/scripts/Sign-Android.ps1",
+      "lines": 92,
+      "bytes": 5494,
+      "sha256": "8b248133f15bcebb4cbf88c8107ffe06b9c3749d2bc20a9bf0ea5b874a28a36b"
+    },
+    {
+      "path": "lanceur/voice_web_plan.py",
+      "lines": 92,
+      "bytes": 5076,
+      "sha256": "33b831213923b32c18bacedfb97384d18d00ea0e2a33d167bf6569099e6e56e3"
+    },
+    {
+      "path": "client-android/Build-Android.ps1",
+      "lines": 90,
+      "bytes": 5922,
+      "sha256": "1e1a895adc19de2adc82be22d13716159b05c2ab4f3719b926f80fc14b47da0e"
+    },
+    {
+      "path": "client-android/app/src/main/java/net/karenax/fred/NativeNotifications.java",
+      "lines": 89,
+      "bytes": 10160,
+      "sha256": "e5d7a29649bc73754769745a5474d23665e91fb0fa733d72586c67d3c9fcbdb8"
+    },
+    {
+      "path": "client-android/app/src/main/java/net/karenax/fred/WakeWord.java",
+      "lines": 89,
+      "bytes": 6818,
+      "sha256": "130445239cd3879b173706fb2c6113994debf8ac72f466305e5063763b41ff79"
+    },
+    {
+      "path": "lanceur/web/index.html",
+      "lines": 83,
+      "bytes": 18279,
+      "sha256": "f1b63e644c43a13e04523aa6dd1c5e24e73988d423475bee44c1d98e83279b44"
+    },
+    {
+      "path": "client-qwen/opencode_visibility.py",
+      "lines": 82,
+      "bytes": 4673,
+      "sha256": "05d651465928f5710d42d60bba20ff2c9d5f2255d47a650a260ff1ffb67cb129"
+    },
+    {
+      "path": "client-voice/max_asr.cpp",
+      "lines": 79,
+      "bytes": 4352,
+      "sha256": "b502cb13d2bd8ee88f08287d9ccb36d9346d8a84829aba8e8a2eeef9e8a464bb"
+    },
+    {
+      "path": "lanceur/accounts.py",
+      "lines": 78,
+      "bytes": 4744,
+      "sha256": "844732aed392885a99fd09511fdf5f01f3bf160ffa2d18b0f1f6168afd989fd0"
+    },
+    {
+      "path": "client-qwen/screen_capture.py",
+      "lines": 73,
+      "bytes": 4665,
+      "sha256": "f3ea5f78f04d51a9f9e11f06f73ba7cf4c83843176328318a651a12625e86fae"
+    },
+    {
+      "path": "client-voice/max_asr.py",
+      "lines": 73,
+      "bytes": 3690,
+      "sha256": "3e9a0694b026b374776815c186eec2ff533c3d04584d044a3d18f03ee1c4a5f0"
+    },
+    {
+      "path": "client-qwen/attachments.js",
+      "lines": 71,
+      "bytes": 6617,
+      "sha256": "8fb023f5c48e243b9f24d034c322a0ec53d7c391e2c73588a83c34a28a251867"
+    },
+    {
+      "path": "lanceur/server_state.py",
+      "lines": 69,
+      "bytes": 3608,
+      "sha256": "20e0cbd22616f992bc0f542a7d32c9dc39eb6320e001c3219894929dfb979ff8"
+    },
+    {
+      "path": "client-qwen/corrector.js",
+      "lines": 68,
+      "bytes": 9999,
+      "sha256": "7a9112b4f6b5c9395e7167b8a173ac57e3af257d51604e6e281a8e5f474a41ca"
+    },
+    {
+      "path": "lanceur/profiles.py",
+      "lines": 67,
+      "bytes": 4171,
+      "sha256": "cec923915127bacc4db24de0fa598eb5d48607479ca9a599a13290c78a3f4a32"
+    },
+    {
+      "path": "client-android/mobile-ui/android.css",
+      "lines": 66,
+      "bytes": 7017,
+      "sha256": "fe4eb5fe5d1b53c8a34e42b0aeb27b25f2a176ecec31df3ec1a4abcaae75f275"
+    },
+    {
+      "path": "client-qwen/chat_attachments.py",
+      "lines": 66,
+      "bytes": 4101,
+      "sha256": "ed9f13f584abad3830bb330ddaddbdd9330f44e539c5fa7eb323f90fc30c39a2"
+    },
+    {
+      "path": "lanceur/web/workspace.js",
+      "lines": 66,
+      "bytes": 17280,
+      "sha256": "f83409982aa0a98541a713f8dceb949c59b3f507355995d4ef093d26e0ab233f"
+    },
+    {
+      "path": "client-qwen/draft_store.py",
+      "lines": 64,
+      "bytes": 3502,
+      "sha256": "95363bacdbda3c7a9f941219a4ea824acdee2f2e36ac95dbb606c9be36762d41"
+    },
+    {
+      "path": "lanceur/startup_memory.py",
+      "lines": 64,
+      "bytes": 2786,
+      "sha256": "31b5df55378f4915f2c4f4c8f6fc25788754ce726b6f62277dbda44a5f923807"
+    },
+    {
+      "path": "lanceur/Configurer-Qwen-LAN.ps1",
+      "lines": 63,
+      "bytes": 4665,
+      "sha256": "9553589900bb67d43cc427b6c1734efbdc3ba31ad77718c9954d1a287bcb33be"
+    },
+    {
+      "path": "lanceur/hermes_codex_compat.py",
+      "lines": 63,
+      "bytes": 2678,
+      "sha256": "071826f2417fc35a20c25feeafc2c1d9d0e358639f2d012d0c1f1d77a9ea254c"
+    },
+    {
+      "path": "lanceur/voice_context.py",
+      "lines": 63,
+      "bytes": 3355,
+      "sha256": "4de3677573faa2be0abdc8e0b31748f146c90566c813f7229b4038c86b1a9f3a"
+    },
+    {
+      "path": "client-qwen/assistant_ui_checks.cjs",
+      "lines": 61,
+      "bytes": 6073,
+      "sha256": "2718a2f36372ce098b88286d1dab141f5728a380abb73795ec35c466bebf289c"
+    },
+    {
+      "path": "client-qwen/fred_http.py",
+      "lines": 61,
+      "bytes": 2343,
+      "sha256": "ff8a5d9ae95547c1f4ed1e3760aaa6acf5f0ee64403a26147a9545cf4d47db19"
+    },
+    {
+      "path": "client-android/app/src/main/java/net/karenax/fred/ClientBackend.java",
+      "lines": 60,
+      "bytes": 10685,
+      "sha256": "9470198406d03438c04ce85664bd9b68315b0e095bc2054ece2cd8ca09f719e9"
+    },
+    {
+      "path": "client-qwen/assistant_media_checks.cjs",
+      "lines": 60,
+      "bytes": 4989,
+      "sha256": "9856b31b09a75ff11324c6f87862e4aedc70f7491f5f9caaf74d897ed574fe06"
+    },
+    {
+      "path": "client-qwen/generate_icon.py",
+      "lines": 59,
+      "bytes": 2459,
+      "sha256": "3857896276849795447abe32ad19b93182a03d0b86e267a01637bc21f44f3c25"
+    },
+    {
+      "path": "lanceur/hermes_run_binding.py",
+      "lines": 59,
+      "bytes": 2979,
+      "sha256": "0c622219e248294225cc02c985bf2fb286ab361770856456bd80e011c9a8a53f"
+    },
+    {
+      "path": "client-qwen/voice.js",
+      "lines": 57,
+      "bytes": 6959,
+      "sha256": "9b1ff07e563008d71724a8f52fcc66227ef9795c296d50340faaf8db70606152"
+    },
+    {
+      "path": "client-qwen/selection.js",
+      "lines": 56,
+      "bytes": 5287,
+      "sha256": "fb4fab5840149a8215c6735fc47919bdc7e59e52082cb476c724c7a68e8bb506"
+    },
+    {
+      "path": "client-voice/prepare_max_pack.py",
+      "lines": 56,
+      "bytes": 2380,
+      "sha256": "f93d2b230eeb21f85631991daf21a6cfac19a321b1bb117b30e50ec9dd94f09d"
+    },
+    {
+      "path": "lanceur/hermes_reasoning.py",
+      "lines": 56,
+      "bytes": 3173,
+      "sha256": "bb34bbcb3b0a8c1d0f51237e52331a35c12f9e50d5f2624b71992b2d6098b2eb"
+    },
+    {
+      "path": "lanceur/web/local-network.js",
+      "lines": 50,
+      "bytes": 2461,
+      "sha256": "81a99a4bf38e297ae8cc80ec3c66a2cba60ee3bb0b27c3b54b8b4a1e1e7ee9b9"
+    },
+    {
+      "path": "client-android/app/src/main/java/net/karenax/fred/LoopbackServer.java",
+      "lines": 49,
+      "bytes": 11478,
+      "sha256": "c5cc7bf45c067f6a4b6fc65ae85be619243ffc8f5967ca77537e30dce863f256"
+    },
+    {
+      "path": "client-android/scripts/Build-WireGuard-Android.ps1",
+      "lines": 48,
+      "bytes": 3151,
+      "sha256": "d89cb5e38dd987d23b59319de06143047971150b7032e7550abb318c50a36747"
+    },
+    {
+      "path": "client-android/app/src/main/java/net/karenax/fred/NotificationJob.java",
+      "lines": 47,
+      "bytes": 3201,
+      "sha256": "21ee8d3dec987da9dd6b81fcb3bbd8ce93d5cf7bc594cb6280631555f82afc47"
+    },
+    {
+      "path": "client-android/app/src/main/java/net/karenax/fred/SecureStore.java",
+      "lines": 45,
+      "bytes": 3923,
+      "sha256": "77d08d14c72e526b0fde3b751c549227fe8ced2e810d68ae51c694ab89d19114"
+    },
+    {
+      "path": "client-qwen/wireguard-bridge/main_test.go",
+      "lines": 45,
+      "bytes": 1252,
+      "sha256": "4d167692f391ed204f9f5ac065acb292f0982fe76177ab5792fa479543d9dadf"
+    },
+    {
+      "path": "lanceur/Appliquer-WireGuard.py",
+      "lines": 43,
+      "bytes": 2024,
+      "sha256": "c9f6c68c703ce540b8e404b9164bea49f41fe2f7f0351b3fa27ffe395126d8c6"
+    },
+    {
+      "path": "lanceur/local_access.py",
+      "lines": 43,
+      "bytes": 1682,
+      "sha256": "9370ba7c73cf9932728d414466b8cc0732dadaa4ca7d70f977ec969b08639838"
+    },
+    {
+      "path": "client-qwen/Build-Client.ps1",
+      "lines": 42,
+      "bytes": 4036,
+      "sha256": "22d8a12666d6d0ccce9e0b24789c3b68b0ea75ba896f44402904f20b4dffb968"
+    },
+    {
+      "path": "lanceur/public_embeddings.py",
+      "lines": 42,
+      "bytes": 2174,
+      "sha256": "4a49d728a928223e4b7d7677f1c6bbf66942d9c52e22e3d7105b62a8770f2551"
+    },
+    {
+      "path": "client-qwen/connection_settings.py",
+      "lines": 41,
+      "bytes": 2004,
+      "sha256": "0defdd4e6edfce5630e3b012e98568eb99c767436d3c598514a02d880c487b96"
+    },
+    {
+      "path": "client-voice/fred_voice_jni.cpp",
+      "lines": 41,
+      "bytes": 4116,
+      "sha256": "97e6fac01e949323c1c7ef4db232256b7c77d11d769fb865f1ec6b9c0715b054"
+    },
+    {
+      "path": "lanceur/android_releases.py",
+      "lines": 41,
+      "bytes": 1898,
+      "sha256": "b8cebd9779d2e66068fcac9a6053d97d239489e19c954a6e09b69df2f3629f6b"
+    },
+    {
+      "path": "lanceur/phonon_model.py",
+      "lines": 41,
+      "bytes": 1691,
+      "sha256": "0da95b56c73cba94af133c90182d5054ceef9107a580752e4477f9d25a5759f8"
+    },
+    {
+      "path": "client-android/app/src/main/java/net/karenax/fred/Profile.java",
+      "lines": 40,
+      "bytes": 5637,
+      "sha256": "32323cec5a4dd4d9d80dfc4b9aa9cc999064514636f76cf258153e00e2b5cab9"
+    },
+    {
+      "path": "lanceur/wg_crypto.py",
+      "lines": 40,
+      "bytes": 2241,
+      "sha256": "80e8486a9dcf4a31029020dec633d2b717ac96f90b2d5ae1e897358ae21775d4"
+    },
+    {
+      "path": "client-android/app/src/main/java/net/karenax/fred/PhotoProvider.java",
+      "lines": 39,
+      "bytes": 3020,
+      "sha256": "682e0212401a540770af4d16d62e78be54591528a344c68801dc8a08d6aa22a5"
+    },
+    {
+      "path": "client-android/scripts/Protect-Signing-Directory.py",
+      "lines": 39,
+      "bytes": 1668,
+      "sha256": "aae876b9e462a875e8016c6443c0f1f9e6ed6430bbcf50aaef2a66a0f85ac1a3"
+    },
+    {
+      "path": "client-voice/max_phonon.py",
+      "lines": 38,
+      "bytes": 1968,
+      "sha256": "e2ca419cdc8598564161082a6af1a2257ca502071990c1e6acd4bfb1dcb73259"
+    },
+    {
+      "path": "client-android/mobile-ui/client-state.js",
+      "lines": 37,
+      "bytes": 2246,
+      "sha256": "10485e916f4cb52cedeeb6ea39086bbc0d7e9947d5f5795274b044e368e95995"
+    },
+    {
+      "path": "client-voice/wakeword_recognition.py",
+      "lines": 37,
+      "bytes": 1936,
+      "sha256": "37c2ee27dc84e39f6f931cddf57f14e542548283511f17bb03d5e1534ea66f06"
+    },
+    {
+      "path": "client-qwen/voice_realtime_checks.cjs",
+      "lines": 36,
+      "bytes": 3310,
+      "sha256": "47d764b442526d09530bb4b42482f75119a3d0ad00e841c0f5f3ec842797d31d"
+    },
+    {
+      "path": "client-qwen/markdown.js",
+      "lines": 35,
+      "bytes": 2163,
+      "sha256": "48dd2beb1c941fe517b472959ff669a92ffa8cb51ca19fe8771c8281f366e21d"
+    },
+    {
+      "path": "client-voice/prepare_ui_tests.py",
+      "lines": 35,
+      "bytes": 2688,
+      "sha256": "fcd647466b3df0dd994643df2717990218b1cf0d692908c4663fe0ee5ad40aab"
+    },
+    {
+      "path": "client-voice/turn_features.py",
+      "lines": 35,
+      "bytes": 1411,
+      "sha256": "cb937b7ce1ee4e0e28a8aa94f689d8e1c054995a53f8f74ef8d13ba533ea07f0"
+    },
+    {
+      "path": "lanceur/signing.py",
+      "lines": 35,
+      "bytes": 1730,
+      "sha256": "4fc4dffdf18636e503f9859f0987de04288b9371f604c9b1aa5d1b7715269e97"
+    },
+    {
+      "path": "client-voice/prepare_conversation.py",
+      "lines": 34,
+      "bytes": 1553,
+      "sha256": "2418f922f392ef6021788593e5a14269da5f9da2410ba29506a8954ec049cbe2"
+    },
+    {
+      "path": "client-voice/prepare_model.py",
+      "lines": 34,
+      "bytes": 1515,
+      "sha256": "54224f6a77d4e8822ff82cec551ca7711e2cd535ed86807225f3915080883b40"
+    },
+    {
+      "path": "lanceur/Autoriser-WireGuard.ps1",
+      "lines": 34,
+      "bytes": 2162,
+      "sha256": "c9b57bd28d0da4be13643f76448c962b1653115ede862b02bd7990fbd7fa45da"
+    },
+    {
+      "path": "lanceur/web/notifications.js",
+      "lines": 34,
+      "bytes": 8587,
+      "sha256": "6849896b5968b8b1291ae21916acaa090af984ed8d251706486fad089cb04e87"
+    },
+    {
+      "path": "client-android/app/src/main/java/net/karenax/fred/UpdateProvider.java",
+      "lines": 33,
+      "bytes": 2212,
+      "sha256": "2f91b9a44fbed34552351246b4c3e4b01a7b91e206394a32658e7e1de97733b7"
+    },
+    {
+      "path": "client-android/app/src/main/java/net/karenax/fred/BackgroundNotifications.java",
+      "lines": 31,
+      "bytes": 1553,
+      "sha256": "6d8a944cf6c26641be2a88fe1394ea5fcf60f3566c3aeed70beca9daf3b6c9df"
+    },
+    {
+      "path": "client-voice/french_voice.py",
+      "lines": 31,
+      "bytes": 1616,
+      "sha256": "b20cbfecffb14ca99afd8714499be80c4ace5c298696db8cf3be4e62ea466dd5"
+    },
+    {
+      "path": "client-voice/max_gpu.py",
+      "lines": 31,
+      "bytes": 1636,
+      "sha256": "fba95bbf0544d0b4ac00cad9902c9ba7e01c489a04163aaf772df265f451ead7"
+    },
+    {
+      "path": "client-voice/update_conversation_docs.py",
+      "lines": 30,
+      "bytes": 4397,
+      "sha256": "12cfba08962c37c7b67e90016a9024df97d84d54f167350430265bfa1fc47e13"
+    },
+    {
+      "path": "lanceur/voice_max_package.py",
+      "lines": 30,
+      "bytes": 1391,
+      "sha256": "90b0c1f062ba32e4fafed13eb56be8d924e31b05d170af551867c636da2c1927"
+    },
+    {
+      "path": "client-android/scripts/Build-Voice-Android.ps1",
+      "lines": 29,
+      "bytes": 2340,
+      "sha256": "5771235cc6d6cad75358f14db333b4ffd321d6e70d794af159c5cab12b73d9bf"
+    },
+    {
+      "path": "client-android/app/src/main/java/net/karenax/fred/Json.java",
+      "lines": 28,
+      "bytes": 2847,
+      "sha256": "285774f246a2207874d7775724226d2705d3e9211d9fe0d8842495d1fec4b1ad"
+    },
+    {
+      "path": "client-qwen/file_lock.py",
+      "lines": 28,
+      "bytes": 1177,
+      "sha256": "a9042e1877243309a262182c0af7f5dea7cff91c436f17d2f3e2b134a2fbf608"
+    },
+    {
+      "path": "client-voice/aec_capture.py",
+      "lines": 28,
+      "bytes": 1461,
+      "sha256": "dd6c5b723cfaf80c5cf2b2ca90dd1e08f724ad57ce2aa5c5ad567b9737d8cfbc"
+    },
+    {
+      "path": "client-qwen/Verifier-Connexion.py",
+      "lines": 26,
+      "bytes": 957,
+      "sha256": "751d72f7af232fcf464bec3af11d577c019a989cfe20840f9a049ed310e3591e"
+    },
+    {
+      "path": "client-qwen/hermes_catalogue.py",
+      "lines": 26,
+      "bytes": 1267,
+      "sha256": "433df8bff08fc20c5eee0b2696fa0ac661dcf77c92316cf5f7ec33c2cb422799"
+    },
+    {
+      "path": "client-voice/Prepare-Windows.ps1",
+      "lines": 25,
+      "bytes": 2513,
+      "sha256": "1efdfef913509178c609cd80dbf4652d72db56ce9167743d1a23a404d6fb73d8"
+    },
+    {
+      "path": "client-qwen/Mettre-A-Jour-Clients.py",
+      "lines": 24,
+      "bytes": 851,
+      "sha256": "db6b4db9c564fc18416d62b0aa821ab40fe06c064107f101ba105379475abe7d"
+    },
+    {
+      "path": "lanceur/hermes_model_key.py",
+      "lines": 24,
+      "bytes": 1298,
+      "sha256": "4a69caadf2fdd88b9372a11517bf6c34db1b6e8f13a698bf3a74d3a585809d61"
+    },
+    {
+      "path": "lanceur/web/interface.js",
+      "lines": 23,
+      "bytes": 7615,
+      "sha256": "203e4eba3d73cc9e5a83a4f5f69d630023c830710d7aa8deb0e38a7a0817db76"
+    },
+    {
+      "path": "client-qwen/Creer-Archive-Sources.py",
+      "lines": 22,
+      "bytes": 1670,
+      "sha256": "e33032cdfecb049ac0aef9188250d764cfcd8cdda24f9a4f00c03f762e1f6e3c"
+    },
+    {
+      "path": "client-android/scripts/Resolve-Python.ps1",
+      "lines": 21,
+      "bytes": 982,
+      "sha256": "e24ec0b59d2de90c57a2024797a508619b4f2be89ef72719aab0f4dab0d6afa9"
+    },
+    {
+      "path": "lanceur/web/interface.css",
+      "lines": 21,
+      "bytes": 17013,
+      "sha256": "1c10b8889e69dc3971090ab9ba3d1c9631621482a62597fe42050b359cc6781e"
+    },
+    {
+      "path": "client-voice/prepare_conversation_licenses.py",
+      "lines": 20,
+      "bytes": 1091,
+      "sha256": "e2e52b51caf94289786f273ee39c0a1c1f0bf1159ec7f86e2e7211bf1fcb6f78"
+    },
+    {
+      "path": "client-voice/fred_voice.h",
+      "lines": 19,
+      "bytes": 813,
+      "sha256": "107a559afcd43785afa090d0aaee05901d5311595ab38e9aa4e8f97e8744072f"
+    },
+    {
+      "path": "lanceur/web/app.css",
+      "lines": 16,
+      "bytes": 16759,
+      "sha256": "792f8111d2d69a7d078a17524100e4f961e3cce1817ce9a8b1df58d865e0bba9"
+    },
+    {
+      "path": "client-qwen/Build-WireGuard.ps1",
+      "lines": 14,
+      "bytes": 692,
+      "sha256": "c6d4212bffa4a6ec81552108c269f25312b171fcd6bafd09c008b2bf076ee476"
+    },
+    {
+      "path": "client-qwen/generate_version.py",
+      "lines": 14,
+      "bytes": 877,
+      "sha256": "508db4ac0b17488b4fa3dd44c98570c90e51eb4ae4ef6c64d5406eeb94eabe12"
+    },
+    {
+      "path": "lanceur/web/voice.js",
+      "lines": 14,
+      "bytes": 2207,
+      "sha256": "c913fa19b49de67915713c207bceab3e38ee4c2619c32060a3db89b9c872d034"
+    },
+    {
+      "path": "client-voice/Build-Conversation.ps1",
+      "lines": 13,
+      "bytes": 1369,
+      "sha256": "a11e8cbd7147853597c00c6ec13cfee7b969bdae0286e26e1a1bcc8dbf0beb60"
+    },
+    {
+      "path": "client-android/Export-Profil-Android.ps1",
+      "lines": 11,
+      "bytes": 549,
+      "sha256": "505a6aa0c5672bf7816f404cbe4086b5f9684eefb52024b76e74f3187d6024a1"
+    },
+    {
+      "path": "lanceur/install_eg2.py",
+      "lines": 11,
+      "bytes": 644,
+      "sha256": "8e14370181c96db81eb6366b3382484ef9361b1e21146557121d19c9f835ef3d"
+    },
+    {
+      "path": "client-android/mobile-ui/corrector-response.js",
+      "lines": 10,
+      "bytes": 1194,
+      "sha256": "f72de7f91645b87978efed2bcb2ee190d0113120c3c8effb1d51756f386a962f"
+    },
+    {
+      "path": "client-android/app/src/release/java/net/karenax/fred/DemoTransport.java",
+      "lines": 9,
+      "bytes": 517,
+      "sha256": "5d27d3b793150b0e61cdfb52426f9698cd4eaa0d34f72171dffacf541ecf6884"
+    },
+    {
+      "path": "client-android/mobile-ui/onboarding.html",
+      "lines": 9,
+      "bytes": 819,
+      "sha256": "319698f3f13bab6386a6498998766acbb5efcee64848dd97563160eef866143f"
+    },
+    {
+      "path": "lanceur/bound_workspace_revision.py",
+      "lines": 9,
+      "bytes": 740,
+      "sha256": "039d851123a424c3768a600c41c5a6d33a96a2e5d6dbc593091c616211bc8a61"
+    },
+    {
+      "path": "lanceur/extract_document.py",
+      "lines": 9,
+      "bytes": 390,
+      "sha256": "f56a159cea1fa10add5f46bbabe868d625a86c348cbc0841e6ec2a9005faf14b"
+    },
+    {
+      "path": "lanceur/voice_max.py",
+      "lines": 9,
+      "bytes": 397,
+      "sha256": "bd5f3a88f2cc1c841649085ee200756054bac108192333703da5af258bd4ba74"
+    },
+    {
+      "path": "client-qwen/run_ui_tests.cjs",
+      "lines": 8,
+      "bytes": 541,
+      "sha256": "a8ac47cce95fd3bfa173b4f2aa541b2d657c6e70b6bc3cac91e97eafca1ff06d"
+    },
+    {
+      "path": "lanceur/http_boundary.py",
+      "lines": 7,
+      "bytes": 331,
+      "sha256": "b31ed234af9b21044eacf118d7046c48137bd231ef182806da290208f13fdd61"
+    },
+    {
+      "path": "lanceur/web/notifications.css",
+      "lines": 7,
+      "bytes": 1673,
+      "sha256": "58384913e8d7f20307b0df69389a7899c3ba34d18b91f2bc4880d02885fec17f"
+    },
+    {
+      "path": "client-qwen/product.py",
+      "lines": 5,
+      "bytes": 197,
+      "sha256": "ae128632a790732bf004e178a2582663eef414e746c9aec5045128839784608a"
+    },
+    {
+      "path": "lanceur/voice_worker.py",
+      "lines": 5,
+      "bytes": 129,
+      "sha256": "5fb659b88e18d77853b4e9913b39e43a8c2f6b50da8ab1c2330aaec2b5108aaf"
+    },
+    {
+      "path": "lanceur/web/maintenance.css",
+      "lines": 5,
+      "bytes": 3848,
+      "sha256": "9b419aa64e20c056026fb99e8bb97a65aa38d8757cb3a16ea7e9a76ee8d06bb5"
+    },
+    {
+      "path": "client-qwen/browser_test_support.cjs",
+      "lines": 4,
+      "bytes": 328,
+      "sha256": "0b75b883ecea1108c9cb5b998880e587fd266b1fcc0604bb36af5fa162f9d865"
+    },
+    {
+      "path": "client-android/mobile-ui/access.html",
+      "lines": 3,
+      "bytes": 887,
+      "sha256": "ad85ed2dba5e3ef4c7f7681381c69f9c51c4e544b04849d73c2dea72f7385b7b"
+    },
+    {
+      "path": "client-android/mobile-ui/connection.html",
+      "lines": 3,
+      "bytes": 1147,
+      "sha256": "4e8441e4a1da13a6c9812acfccf1e4d4eefe994769c93c1f34a24c4a476063e6"
+    },
+    {
+      "path": "client-android/mobile-ui/api.html",
+      "lines": 1,
+      "bytes": 1347,
+      "sha256": "e68498b1f8c93405f66182cd8e6bf7efac709b6f81bdbd81d01faa579aa4eece"
+    }
+  ],
+  "source_lines": 25680,
+  "python_functions": 989,
+  "largest_functions": [
+    {
+      "path": "lanceur/remote.py",
+      "name": "serve_gateway",
+      "line": 422,
+      "end": 1179,
+      "lines": 758,
+      "branches": 305
+    },
+    {
+      "path": "lanceur/remote.py",
+      "name": "Handler.do_POST",
+      "line": 625,
+      "end": 1172,
+      "lines": 548,
+      "branches": 233
+    },
+    {
+      "path": "client-qwen/client.py",
+      "name": "serve_local",
+      "line": 342,
+      "end": 723,
+      "lines": 382,
+      "branches": 165
+    },
+    {
+      "path": "lanceur/app.py",
+      "name": "serve",
+      "line": 270,
+      "end": 532,
+      "lines": 263,
+      "branches": 99
+    },
+    {
+      "path": "lanceur/assistant_commands.py",
+      "name": "execute",
+      "line": 328,
+      "end": 515,
+      "lines": 188,
+      "branches": 69
+    },
+    {
+      "path": "lanceur/hermes_inference.py",
+      "name": "HermesPrivateServer.__init__",
+      "line": 14,
+      "end": 199,
+      "lines": 186,
+      "branches": 60
+    },
+    {
+      "path": "lanceur/workspace.py",
+      "name": "Workspace._action",
+      "line": 576,
+      "end": 759,
+      "lines": 184,
+      "branches": 93
+    },
+    {
+      "path": "client-qwen/client.py",
+      "name": "Handler.do_POST",
+      "line": 464,
+      "end": 613,
+      "lines": 150,
+      "branches": 83
+    },
+    {
+      "path": "client-voice/conversation_worker.py",
+      "name": "main",
+      "line": 21,
+      "end": 153,
+      "lines": 133,
+      "branches": 40
+    },
+    {
+      "path": "lanceur/hermes_inference.py",
+      "name": "Handler.do_POST",
+      "line": 62,
+      "end": 194,
+      "lines": 133,
+      "branches": 48
+    },
+    {
+      "path": "lanceur/app.py",
+      "name": "Handler.do_POST",
+      "line": 398,
+      "end": 529,
+      "lines": 132,
+      "branches": 59
+    },
+    {
+      "path": "lanceur/hermes_conversations.py",
+      "name": "HermesConversations._execute",
+      "line": 458,
+      "end": 569,
+      "lines": 112,
+      "branches": 41
+    },
+    {
+      "path": "lanceur/remote.py",
+      "name": "Handler.do_GET",
+      "line": 516,
+      "end": 623,
+      "lines": 108,
+      "branches": 43
+    },
+    {
+      "path": "lanceur/hermes_conversations.py",
+      "name": "HermesConversations._prepare",
+      "line": 253,
+      "end": 358,
+      "lines": 106,
+      "branches": 29
+    },
+    {
+      "path": "lanceur/app.py",
+      "name": "Handler.do_GET",
+      "line": 292,
+      "end": 396,
+      "lines": 105,
+      "branches": 39
+    },
+    {
+      "path": "client-qwen/client.py",
+      "name": "main",
+      "line": 865,
+      "end": 967,
+      "lines": 103,
+      "branches": 23
+    },
+    {
+      "path": "lanceur/operations.py",
+      "name": "Operations._restore_legacy",
+      "line": 325,
+      "end": 424,
+      "lines": 100,
+      "branches": 50
+    },
+    {
+      "path": "client-qwen/client.py",
+      "name": "Remote._check",
+      "line": 244,
+      "end": 340,
+      "lines": 97,
+      "branches": 46
+    },
+    {
+      "path": "lanceur/restoration.py",
+      "name": "RestoreManager._restore",
+      "line": 217,
+      "end": 311,
+      "lines": 95,
+      "branches": 20
+    },
+    {
+      "path": "client-voice/max_native.py",
+      "name": "NativeVoice.stream",
+      "line": 165,
+      "end": 255,
+      "lines": 91,
+      "branches": 18
+    },
+    {
+      "path": "client-voice/max_pack_worker.py",
+      "name": "serve",
+      "line": 37,
+      "end": 126,
+      "lines": 90,
+      "branches": 25
+    },
+    {
+      "path": "lanceur/phonon_worker.py",
+      "name": "serve",
+      "line": 21,
+      "end": 109,
+      "lines": 89,
+      "branches": 24
+    },
+    {
+      "path": "lanceur/runtime.py",
+      "name": "supervise",
+      "line": 15,
+      "end": 101,
+      "lines": 87,
+      "branches": 14
+    },
+    {
+      "path": "client-qwen/client.py",
+      "name": "Handler.forward",
+      "line": 615,
+      "end": 693,
+      "lines": 79,
+      "branches": 41
+    },
+    {
+      "path": "client-voice/package_max.py",
+      "name": "package",
+      "line": 22,
+      "end": 100,
+      "lines": 79,
+      "branches": 11
+    },
+    {
+      "path": "lanceur/core.py",
+      "name": "validate",
+      "line": 99,
+      "end": 176,
+      "lines": 78,
+      "branches": 31
+    },
+    {
+      "path": "lanceur/workspace.py",
+      "name": "Workspace.validate_backup",
+      "line": 1002,
+      "end": 1079,
+      "lines": 78,
+      "branches": 33
+    },
+    {
+      "path": "client-voice/prepare_max.py",
+      "name": "main",
+      "line": 30,
+      "end": 105,
+      "lines": 76,
+      "branches": 12
+    },
+    {
+      "path": "lanceur/embedding_worker.py",
+      "name": "serve",
+      "line": 18,
+      "end": 92,
+      "lines": 75,
+      "branches": 15
+    },
+    {
+      "path": "client-qwen/updater.py",
+      "name": "_apply",
+      "line": 143,
+      "end": 214,
+      "lines": 72,
+      "branches": 27
+    },
+    {
+      "path": "client-qwen/max_installation.py",
+      "name": "MaxInstallation._run",
+      "line": 366,
+      "end": 433,
+      "lines": 68,
+      "branches": 18
+    },
+    {
+      "path": "lanceur/operations.py",
+      "name": "Operations.hermes_quiesce",
+      "line": 63,
+      "end": 130,
+      "lines": 68,
+      "branches": 21
+    },
+    {
+      "path": "client-qwen/advanced_voice.py",
+      "name": "AdvancedVoice.frames",
+      "line": 329,
+      "end": 394,
+      "lines": 66,
+      "branches": 25
+    },
+    {
+      "path": "lanceur/app.py",
+      "name": "Controller.state",
+      "line": 203,
+      "end": 268,
+      "lines": 66,
+      "branches": 22
+    },
+    {
+      "path": "lanceur/hermes_tools.py",
+      "name": "FredTools.dispatch",
+      "line": 275,
+      "end": 340,
+      "lines": 66,
+      "branches": 18
+    },
+    {
+      "path": "lanceur/notifications.py",
+      "name": "Notifications.action",
+      "line": 305,
+      "end": 370,
+      "lines": 66,
+      "branches": 18
+    },
+    {
+      "path": "lanceur/restoration.py",
+      "name": "validate_package",
+      "line": 72,
+      "end": 137,
+      "lines": 66,
+      "branches": 35
+    },
+    {
+      "path": "client-voice/max_worker.py",
+      "name": "serve",
+      "line": 101,
+      "end": 163,
+      "lines": 63,
+      "branches": 17
+    },
+    {
+      "path": "lanceur/backups.py",
+      "name": "BackupManager._summary",
+      "line": 261,
+      "end": 323,
+      "lines": 63,
+      "branches": 16
+    },
+    {
+      "path": "lanceur/releases.py",
+      "name": "_repackage",
+      "line": 64,
+      "end": 126,
+      "lines": 63,
+      "branches": 19
+    },
+    {
+      "path": "client-android/scripts/Prepare-Licenses.py",
+      "name": "prepare",
+      "line": 85,
+      "end": 146,
+      "lines": 62,
+      "branches": 13
+    },
+    {
+      "path": "client-voice/max_native.py",
+      "name": "NativeVoice.__init__",
+      "line": 102,
+      "end": 163,
+      "lines": 62,
+      "branches": 12
+    },
+    {
+      "path": "client-qwen/advanced_voice.py",
+      "name": "AdvancedVoice.test",
+      "line": 416,
+      "end": 473,
+      "lines": 58,
+      "branches": 16
+    },
+    {
+      "path": "client-android/scripts/Prepare-Assets.py",
+      "name": "prepare",
+      "line": 44,
+      "end": 99,
+      "lines": 56,
+      "branches": 2
+    },
+    {
+      "path": "client-qwen/screen_capture.py",
+      "name": "capture",
+      "line": 19,
+      "end": 73,
+      "lines": 55,
+      "branches": 15
+    },
+    {
+      "path": "client-voice/max_native.py",
+      "name": "ProgressiveParakeet.transcribe",
+      "line": 290,
+      "end": 343,
+      "lines": 54,
+      "branches": 13
+    },
+    {
+      "path": "lanceur/hermes_tools.py",
+      "name": "FredTools._call",
+      "line": 213,
+      "end": 265,
+      "lines": 53,
+      "branches": 14
+    },
+    {
+      "path": "lanceur/workspace.py",
+      "name": "Workspace.context",
+      "line": 483,
+      "end": 534,
+      "lines": 52,
+      "branches": 25
+    },
+    {
+      "path": "lanceur/backups.py",
+      "name": "BackupManager._create",
+      "line": 440,
+      "end": 490,
+      "lines": 51,
+      "branches": 6
+    },
+    {
+      "path": "lanceur/hermes_accounts.py",
+      "name": "HermesAccounts.config",
+      "line": 140,
+      "end": 190,
+      "lines": 51,
+      "branches": 11
+    },
+    {
+      "path": "lanceur/remote.py",
+      "name": "generate",
+      "line": 428,
+      "end": 477,
+      "lines": 50,
+      "branches": 24
+    },
+    {
+      "path": "client-qwen/app_integrations.py",
+      "name": "install",
+      "line": 261,
+      "end": 309,
+      "lines": 49,
+      "branches": 25
+    },
+    {
+      "path": "client-qwen/client.py",
+      "name": "Handler.do_GET",
+      "line": 414,
+      "end": 462,
+      "lines": 49,
+      "branches": 29
+    },
+    {
+      "path": "client-qwen/conversation_service.py",
+      "name": "ConversationService._run",
+      "line": 129,
+      "end": 177,
+      "lines": 49,
+      "branches": 26
+    },
+    {
+      "path": "client-qwen/max_installation.py",
+      "name": "verify_catalogue",
+      "line": 40,
+      "end": 85,
+      "lines": 46,
+      "branches": 17
+    },
+    {
+      "path": "lanceur/backups.py",
+      "name": "BackupManager.configure",
+      "line": 172,
+      "end": 217,
+      "lines": 46,
+      "branches": 22
+    },
+    {
+      "path": "client-qwen/advanced_voice.py",
+      "name": "run",
+      "line": 426,
+      "end": 470,
+      "lines": 45,
+      "branches": 14
+    },
+    {
+      "path": "lanceur/hermes_accounts.py",
+      "name": "HermesAccounts.ensure",
+      "line": 231,
+      "end": 275,
+      "lines": 45,
+      "branches": 7
+    },
+    {
+      "path": "lanceur/hermes_models.py",
+      "name": "HermesModels.refresh",
+      "line": 302,
+      "end": 346,
+      "lines": 45,
+      "branches": 14
+    },
+    {
+      "path": "client-qwen/client.py",
+      "name": "Remote.__init__",
+      "line": 60,
+      "end": 103,
+      "lines": 44,
+      "branches": 4
+    }
+  ],
+  "exact_body_clones": [],
+  "imports": {
+    "client-android/scripts/Export-Profile.py": [
+      "__future__",
+      "argparse",
+      "json",
+      "os",
+      "pathlib",
+      "struct",
+      "sys",
+      "wg_bridge",
+      "wg_crypto"
+    ],
+    "client-android/scripts/Prepare-Assets.py": [
+      "__future__",
+      "argparse",
+      "hashlib",
+      "json",
+      "pathlib",
+      "re"
+    ],
+    "client-android/scripts/Prepare-Licenses.py": [
+      "__future__",
+      "argparse",
+      "hashlib",
+      "json",
+      "os",
+      "pathlib",
+      "re",
+      "subprocess"
+    ],
+    "client-android/scripts/Protect-Signing-Directory.py": [
+      "os",
+      "pathlib",
+      "subprocess",
+      "sys",
+      "wg_crypto"
+    ],
+    "client-qwen/Creer-Archive-Sources.py": [
+      "pathlib",
+      "subprocess",
+      "zipfile"
+    ],
+    "client-qwen/Mettre-A-Jour-Clients.py": [
+      "json",
+      "pathlib",
+      "releases",
+      "struct",
+      "sys",
+      "wg_bridge"
+    ],
+    "client-qwen/Verifier-Connexion.py": [
+      "argparse",
+      "client",
+      "json",
+      "pathlib",
+      "struct"
+    ],
+    "client-qwen/advanced_voice.py": [
+      "__future__",
+      "array",
+      "base64",
+      "file_lock",
+      "hashlib",
+      "json",
+      "max_installation",
+      "os",
+      "pathlib",
+      "queue",
+      "re",
+      "secrets",
+      "subprocess",
+      "threading",
+      "time"
+    ],
+    "client-qwen/app_integrations.py": [
+      "copy",
+      "file_lock",
+      "hermes_catalogue",
+      "history_store",
+      "json",
+      "opencode_visibility",
+      "os",
+      "pathlib",
+      "re",
+      "secrets",
+      "shutil",
+      "time",
+      "urllib",
+      "yaml"
+    ],
+    "client-qwen/chat_attachments.py": [
+      "base64",
+      "re"
+    ],
+    "client-qwen/client.py": [
+      "__future__",
+      "advanced_voice",
+      "app_integrations",
+      "collections",
+      "connection_settings",
+      "conversation_service",
+      "copy",
+      "ctypes",
+      "draft_store",
+      "file_lock",
+      "fred_http",
+      "hashlib",
+      "hermes_catalogue",
+      "history_store",
+      "history_sync",
+      "hmac",
+      "http",
+      "io",
+      "json",
+      "max_installation",
+      "os",
+      "pathlib",
+      "product",
+      "screen_capture",
+      "secrets",
+      "struct",
+      "subprocess",
+      "sys",
+      "threading",
+      "time",
+      "tkinter",
+      "updater",
+      "urllib",
+      "webview",
+      "wg_bridge"
+    ],
+    "client-qwen/connection_settings.py": [
+      "json",
+      "re",
+      "wg_bridge"
+    ],
+    "client-qwen/conversation_service.py": [
+      "file_lock",
+      "hashlib",
+      "json",
+      "local_voice",
+      "os",
+      "pathlib",
+      "secrets",
+      "shutil",
+      "subprocess",
+      "threading",
+      "urllib"
+    ],
+    "client-qwen/draft_store.py": [
+      "file_lock",
+      "history_store",
+      "json",
+      "os",
+      "pathlib",
+      "psutil",
+      "secrets"
+    ],
+    "client-qwen/file_lock.py": [
+      "contextlib",
+      "ctypes",
+      "hashlib",
+      "pathlib"
+    ],
+    "client-qwen/fred_http.py": [
+      "http",
+      "json",
+      "threading"
+    ],
+    "client-qwen/generate_icon.py": [
+      "PIL",
+      "html",
+      "pathlib",
+      "re",
+      "urllib",
+      "xml"
+    ],
+    "client-qwen/generate_version.py": [
+      "pathlib",
+      "product",
+      "updater"
+    ],
+    "client-qwen/hermes_catalogue.py": [
+      "copy",
+      "hashlib",
+      "re",
+      "unicodedata"
+    ],
+    "client-qwen/history_store.py": [
+      "chat_attachments",
+      "file_lock",
+      "hashlib",
+      "json",
+      "os",
+      "pathlib",
+      "secrets",
+      "tempfile",
+      "threading"
+    ],
+    "client-qwen/history_sync.py": [
+      "copy",
+      "hashlib",
+      "history_store",
+      "json",
+      "pathlib",
+      "secrets",
+      "threading",
+      "urllib"
+    ],
+    "client-qwen/local_voice.py": [
+      "__future__",
+      "ctypes",
+      "file_lock",
+      "hashlib",
+      "json",
+      "os",
+      "pathlib",
+      "queue",
+      "secrets",
+      "shutil",
+      "threading",
+      "time",
+      "urllib"
+    ],
+    "client-qwen/max_installation.py": [
+      "__future__",
+      "base64",
+      "cryptography",
+      "file_lock",
+      "hashlib",
+      "json",
+      "local_voice",
+      "os",
+      "pathlib",
+      "re",
+      "shutil",
+      "stat",
+      "subprocess",
+      "threading",
+      "time",
+      "urllib",
+      "zipfile"
+    ],
+    "client-qwen/opencode_visibility.py": [
+      "contextlib",
+      "file_lock",
+      "history_store",
+      "json",
+      "pathlib",
+      "psutil",
+      "secrets",
+      "sqlite3",
+      "time"
+    ],
+    "client-qwen/product.py": [],
+    "client-qwen/screen_capture.py": [
+      "PIL",
+      "System",
+      "base64",
+      "clr",
+      "ctypes",
+      "io",
+      "os"
+    ],
+    "client-qwen/updater.py": [
+      "base64",
+      "cryptography",
+      "file_lock",
+      "hashlib",
+      "json",
+      "os",
+      "pathlib",
+      "psutil",
+      "re",
+      "shutil",
+      "struct",
+      "subprocess",
+      "sys",
+      "time",
+      "wg_bridge"
+    ],
+    "client-qwen/wg_bridge.py": [
+      "base64",
+      "file_lock",
+      "hashlib",
+      "ipaddress",
+      "json",
+      "os",
+      "pathlib",
+      "queue",
+      "re",
+      "secrets",
+      "socket",
+      "subprocess",
+      "sys",
+      "tempfile",
+      "threading",
+      "urllib"
+    ],
+    "client-voice/aec_capture.py": [
+      "ctypes",
+      "pathlib",
+      "time"
+    ],
+    "client-voice/conversation_worker.py": [
+      "aec_capture",
+      "argparse",
+      "base64",
+      "collections",
+      "json",
+      "math",
+      "max_recognition",
+      "numpy",
+      "recognition",
+      "scipy",
+      "secrets",
+      "sys",
+      "threading",
+      "time",
+      "urllib",
+      "wakeword_recognition",
+      "wave"
+    ],
+    "client-voice/french_voice.py": [
+      "array",
+      "hashlib",
+      "json",
+      "pathlib",
+      "sys",
+      "wave"
+    ],
+    "client-voice/max_asr.py": [
+      "ctypes",
+      "max_gpu",
+      "numpy",
+      "os",
+      "pathlib",
+      "threading"
+    ],
+    "client-voice/max_gpu.py": [
+      "hashlib"
+    ],
+    "client-voice/max_native.py": [
+      "array",
+      "ctypes",
+      "french_voice",
+      "hashlib",
+      "math",
+      "max_gpu",
+      "numpy",
+      "os",
+      "pathlib",
+      "queue",
+      "re",
+      "sherpa_onnx",
+      "subprocess",
+      "threading",
+      "time"
+    ],
+    "client-voice/max_pack_worker.py": [
+      "argparse",
+      "base64",
+      "collections",
+      "contextlib",
+      "hashlib",
+      "json",
+      "max_asr",
+      "max_gpu",
+      "max_phonon",
+      "os",
+      "pathlib",
+      "queue",
+      "re",
+      "sys",
+      "threading",
+      "time",
+      "traceback"
+    ],
+    "client-voice/max_phonon.py": [
+      "json",
+      "numpy",
+      "pathlib",
+      "ptts",
+      "time"
+    ],
+    "client-voice/max_recognition.py": [
+      "recognition",
+      "secrets",
+      "time"
+    ],
+    "client-voice/max_worker.py": [
+      "argparse",
+      "base64",
+      "collections",
+      "contextlib",
+      "french_voice",
+      "hashlib",
+      "json",
+      "math",
+      "numpy",
+      "os",
+      "pathlib",
+      "queue",
+      "qwen_tts",
+      "scipy",
+      "sys",
+      "threading",
+      "time",
+      "torch",
+      "transformers"
+    ],
+    "client-voice/package_max.py": [
+      "argparse",
+      "base64",
+      "hashlib",
+      "importlib",
+      "json",
+      "max_installation",
+      "pathlib",
+      "phonon_model",
+      "shutil",
+      "signing",
+      "subprocess",
+      "sys",
+      "tempfile",
+      "zipfile"
+    ],
+    "client-voice/prepare_conversation.py": [
+      "argparse",
+      "hashlib",
+      "json",
+      "os",
+      "pathlib",
+      "urllib"
+    ],
+    "client-voice/prepare_conversation_licenses.py": [
+      "importlib",
+      "pathlib",
+      "shutil"
+    ],
+    "client-voice/prepare_max.py": [
+      "argparse",
+      "hashlib",
+      "json",
+      "os",
+      "pathlib",
+      "shutil",
+      "subprocess",
+      "sys",
+      "venv"
+    ],
+    "client-voice/prepare_max_pack.py": [
+      "advanced_voice",
+      "argparse",
+      "json",
+      "max_installation",
+      "os",
+      "pathlib",
+      "signing",
+      "sys"
+    ],
+    "client-voice/prepare_model.py": [
+      "hashlib",
+      "json",
+      "pathlib",
+      "urllib"
+    ],
+    "client-voice/prepare_ui_tests.py": [
+      "pathlib"
+    ],
+    "client-voice/recognition.py": [
+      "collections",
+      "numpy",
+      "onnxruntime",
+      "pathlib",
+      "sherpa_onnx",
+      "threading",
+      "time",
+      "turn_features"
+    ],
+    "client-voice/turn_features.py": [
+      "numpy"
+    ],
+    "client-voice/update_conversation_docs.py": [
+      "pathlib"
+    ],
+    "client-voice/wakeword_recognition.py": [
+      "hashlib",
+      "json",
+      "pathlib",
+      "sherpa_onnx",
+      "time"
+    ],
+    "lanceur/Appliquer-WireGuard.py": [
+      "argparse",
+      "core",
+      "html",
+      "json",
+      "remote",
+      "subprocess",
+      "urllib",
+      "wireguard_access"
+    ],
+    "lanceur/accounts.py": [
+      "core",
+      "hashlib",
+      "hmac",
+      "re",
+      "secrets",
+      "threading",
+      "time"
+    ],
+    "lanceur/android_releases.py": [
+      "core",
+      "hashlib",
+      "json",
+      "pathlib",
+      "re",
+      "threading"
+    ],
+    "lanceur/app.py": [
+      "__future__",
+      "argparse",
+      "client_storage",
+      "core",
+      "datetime",
+      "embeddings",
+      "hermes_fred",
+      "hmac",
+      "http",
+      "http_boundary",
+      "json",
+      "knowledge",
+      "local_access",
+      "local_network",
+      "operations",
+      "pathlib",
+      "psutil",
+      "releases",
+      "remote",
+      "restoration",
+      "secrets",
+      "server_state",
+      "socket",
+      "subprocess",
+      "threading",
+      "time",
+      "unicodedata",
+      "urllib",
+      "wireguard_access"
+    ],
+    "lanceur/assistant_commands.py": [
+      "__future__",
+      "datetime",
+      "hashlib",
+      "json",
+      "math",
+      "notifications",
+      "re",
+      "secrets",
+      "time",
+      "unicodedata",
+      "workspace",
+      "zoneinfo"
+    ],
+    "lanceur/backups.py": [
+      "__future__",
+      "base64",
+      "contextlib",
+      "copy",
+      "core",
+      "cryptography",
+      "datetime",
+      "devices",
+      "errno",
+      "hashlib",
+      "hmac",
+      "json",
+      "operations",
+      "os",
+      "pathlib",
+      "profiles",
+      "re",
+      "restoration",
+      "secrets",
+      "server_state",
+      "shutil",
+      "sqlite3",
+      "struct",
+      "tempfile",
+      "threading",
+      "time",
+      "wg_crypto"
+    ],
+    "lanceur/bound_workspace_revision.py": [
+      "pathlib"
+    ],
+    "lanceur/client_storage.py": [
+      "atexit",
+      "core",
+      "hashlib",
+      "json",
+      "os",
+      "pathlib",
+      "profiles",
+      "re",
+      "server_state",
+      "sqlite3",
+      "struct",
+      "tempfile",
+      "threading",
+      "time",
+      "wg_crypto",
+      "workspace"
+    ],
+    "lanceur/core.py": [
+      "__future__",
+      "copy",
+      "ipaddress",
+      "json",
+      "os",
+      "pathlib",
+      "psutil",
+      "socket",
+      "subprocess",
+      "tempfile",
+      "time",
+      "urllib"
+    ],
+    "lanceur/devices.py": [
+      "__future__",
+      "core",
+      "file_lock",
+      "math",
+      "pathlib",
+      "re",
+      "sys",
+      "threading",
+      "time",
+      "wg_crypto"
+    ],
+    "lanceur/embedding_worker.py": [
+      "argparse",
+      "hashlib",
+      "hmac",
+      "http",
+      "http_boundary",
+      "json",
+      "os",
+      "pathlib",
+      "psutil",
+      "sentence_transformers",
+      "threading",
+      "time",
+      "torch"
+    ],
+    "lanceur/embeddings.py": [
+      "atexit",
+      "collections",
+      "core",
+      "http",
+      "json",
+      "math",
+      "os",
+      "pathlib",
+      "psutil",
+      "secrets",
+      "socket",
+      "subprocess",
+      "threading",
+      "time"
+    ],
+    "lanceur/external_api.py": [
+      "core",
+      "hermes_codex_compat",
+      "hermes_service",
+      "json",
+      "subprocess",
+      "tempfile",
+      "threading",
+      "time"
+    ],
+    "lanceur/extract_document.py": [
+      "json",
+      "sys",
+      "workspace"
+    ],
+    "lanceur/hermes_accounts.py": [
+      "__future__",
+      "contextlib",
+      "core",
+      "hashlib",
+      "hermes_service",
+      "json",
+      "os",
+      "pathlib",
+      "re",
+      "secrets",
+      "sqlite3",
+      "tempfile",
+      "threading",
+      "time",
+      "urllib",
+      "wg_crypto"
+    ],
+    "lanceur/hermes_backup.py": [
+      "__future__",
+      "base64",
+      "contextlib",
+      "hashlib",
+      "os",
+      "pathlib",
+      "re",
+      "shutil",
+      "sqlite3",
+      "stat",
+      "tempfile",
+      "time",
+      "wg_crypto"
+    ],
+    "lanceur/hermes_codex_compat.py": [],
+    "lanceur/hermes_conversations.py": [
+      "__future__",
+      "assistant_commands",
+      "chat_attachments",
+      "contextlib",
+      "copy",
+      "hashlib",
+      "hermes_reasoning",
+      "hermes_storage",
+      "history_store",
+      "json",
+      "pathlib",
+      "queue",
+      "re",
+      "secrets",
+      "server_state",
+      "sqlite3",
+      "threading",
+      "time",
+      "workspace"
+    ],
+    "lanceur/hermes_fred.py": [
+      "__future__",
+      "atexit",
+      "core",
+      "hermes_accounts",
+      "hermes_conversations",
+      "hermes_inference",
+      "hermes_models",
+      "hermes_projects",
+      "hermes_service",
+      "hermes_tools",
+      "hermes_web",
+      "pathlib",
+      "sqlite3",
+      "threading",
+      "time"
+    ],
+    "lanceur/hermes_inference.py": [
+      "__future__",
+      "core",
+      "hermes_reasoning",
+      "http",
+      "http_boundary",
+      "json",
+      "socket",
+      "threading",
+      "time"
+    ],
+    "lanceur/hermes_model_key.py": [
+      "json",
+      "os",
+      "re",
+      "sys",
+      "urllib"
+    ],
+    "lanceur/hermes_models.py": [
+      "__future__",
+      "chat_attachments",
+      "core",
+      "hashlib",
+      "hermes_reasoning",
+      "hermes_service",
+      "json",
+      "pathlib",
+      "re",
+      "subprocess",
+      "threading",
+      "time",
+      "urllib",
+      "workspace"
+    ],
+    "lanceur/hermes_projects.py": [
+      "__future__",
+      "core",
+      "hermes_service",
+      "json",
+      "re",
+      "subprocess",
+      "threading",
+      "workspace"
+    ],
+    "lanceur/hermes_reasoning.py": [
+      "chat_attachments"
+    ],
+    "lanceur/hermes_run_binding.py": [],
+    "lanceur/hermes_service.py": [
+      "__future__",
+      "atexit",
+      "core",
+      "hashlib",
+      "hermes_accounts",
+      "hermes_codex_compat",
+      "hermes_web",
+      "http",
+      "json",
+      "os",
+      "pathlib",
+      "psutil",
+      "socket",
+      "subprocess",
+      "threading",
+      "time",
+      "urllib"
+    ],
+    "lanceur/hermes_storage.py": [
+      "contextlib",
+      "pathlib",
+      "sqlite3",
+      "threading",
+      "time",
+      "workspace"
+    ],
+    "lanceur/hermes_tools.py": [
+      "__future__",
+      "assistant_commands",
+      "ast",
+      "hermes_web",
+      "http",
+      "json",
+      "math",
+      "operator",
+      "re",
+      "sqlite3",
+      "threading",
+      "time",
+      "workspace"
+    ],
+    "lanceur/hermes_web.py": [
+      "__future__",
+      "core",
+      "hermes_run_binding",
+      "hermes_service",
+      "ipaddress",
+      "json",
+      "pathlib",
+      "re",
+      "subprocess",
+      "tempfile",
+      "time",
+      "urllib"
+    ],
+    "lanceur/http_boundary.py": [
+      "fred_http",
+      "pathlib",
+      "sys"
+    ],
+    "lanceur/install_eg2.py": [
+      "huggingface_hub",
+      "json",
+      "pathlib"
+    ],
+    "lanceur/knowledge.py": [
+      "array",
+      "assistant_commands",
+      "contextlib",
+      "hashlib",
+      "http",
+      "json",
+      "math",
+      "re",
+      "sqlite3",
+      "threading",
+      "time",
+      "unicodedata",
+      "workspace"
+    ],
+    "lanceur/local_access.py": [
+      "http_boundary",
+      "os",
+      "psutil"
+    ],
+    "lanceur/local_network.py": [
+      "core",
+      "ipaddress",
+      "pathlib",
+      "psutil",
+      "subprocess",
+      "threading",
+      "time",
+      "uuid",
+      "winreg"
+    ],
+    "lanceur/notifications.py": [
+      "__future__",
+      "json",
+      "math",
+      "re",
+      "secrets",
+      "server_state",
+      "sqlite3",
+      "time",
+      "workspace"
+    ],
+    "lanceur/operations.py": [
+      "backups",
+      "base64",
+      "contextlib",
+      "core",
+      "cryptography",
+      "hashlib",
+      "hermes_backup",
+      "hermes_fred",
+      "json",
+      "os",
+      "pathlib",
+      "profiles",
+      "restoration",
+      "secrets",
+      "socket",
+      "struct",
+      "sys",
+      "tempfile",
+      "threading",
+      "time",
+      "wg_crypto",
+      "winreg",
+      "wireguard_access"
+    ],
+    "lanceur/phonon_model.py": [
+      "hashlib",
+      "json",
+      "pathlib",
+      "ptts"
+    ],
+    "lanceur/phonon_worker.py": [
+      "base64",
+      "collections",
+      "json",
+      "numpy",
+      "os",
+      "phonon_model",
+      "queue",
+      "sys",
+      "threading",
+      "time"
+    ],
+    "lanceur/profiles.py": [
+      "base64",
+      "core",
+      "cryptography",
+      "devices",
+      "hashlib",
+      "hmac",
+      "ipaddress",
+      "math",
+      "re",
+      "remote",
+      "sys",
+      "wg_bridge"
+    ],
+    "lanceur/public_embeddings.py": [
+      "base64",
+      "struct"
+    ],
+    "lanceur/recovery_signing.py": [
+      "__future__",
+      "argparse",
+      "base64",
+      "core",
+      "cryptography",
+      "datetime",
+      "hashlib",
+      "json",
+      "operations",
+      "os",
+      "pathlib",
+      "secrets",
+      "tempfile",
+      "wg_crypto"
+    ],
+    "lanceur/releases.py": [
+      "core",
+      "file_lock",
+      "hashlib",
+      "json",
+      "operations",
+      "pathlib",
+      "profiles",
+      "shutil",
+      "signing",
+      "struct",
+      "tempfile",
+      "threading",
+      "time",
+      "updater",
+      "wg_crypto",
+      "wireguard_access"
+    ],
+    "lanceur/remote.py": [
+      "__future__",
+      "accounts",
+      "android_releases",
+      "assistant_commands",
+      "chat_attachments",
+      "core",
+      "datetime",
+      "devices",
+      "external_api",
+      "hashlib",
+      "hermes_models",
+      "hermes_reasoning",
+      "hmac",
+      "http",
+      "http_boundary",
+      "json",
+      "notifications",
+      "operations",
+      "os",
+      "pathlib",
+      "profiles",
+      "public_embeddings",
+      "releases",
+      "scheduler",
+      "secrets",
+      "select",
+      "shutil",
+      "signing",
+      "socket",
+      "struct",
+      "tempfile",
+      "text_transform",
+      "threading",
+      "time",
+      "urllib",
+      "voice",
+      "voice_context",
+      "voice_max",
+      "voice_max_package",
+      "voice_response",
+      "voice_web",
+      "voice_web_plan",
+      "workspace"
+    ],
+    "lanceur/restoration.py": [
+      "base64",
+      "core",
+      "cryptography",
+      "hashlib",
+      "hermes_backup",
+      "hermes_models",
+      "json",
+      "operations",
+      "os",
+      "pathlib",
+      "profiles",
+      "secrets",
+      "server_state",
+      "shutil",
+      "tempfile",
+      "threading",
+      "time",
+      "wg_crypto",
+      "wireguard_access"
+    ],
+    "lanceur/runtime.py": [
+      "__future__",
+      "argparse",
+      "core",
+      "datetime",
+      "json",
+      "os",
+      "pathlib",
+      "psutil",
+      "startup_memory",
+      "subprocess",
+      "time",
+      "urllib"
+    ],
+    "lanceur/scheduler.py": [
+      "re",
+      "secrets",
+      "threading",
+      "time"
+    ],
+    "lanceur/server_state.py": [
+      "core",
+      "pathlib",
+      "secrets",
+      "time",
+      "wg_crypto"
+    ],
+    "lanceur/signing.py": [
+      "base64",
+      "core",
+      "cryptography",
+      "file_lock",
+      "history_store",
+      "json",
+      "sys",
+      "threading",
+      "wg_crypto"
+    ],
+    "lanceur/startup_memory.py": [
+      "ctypes",
+      "os",
+      "pathlib",
+      "psutil"
+    ],
+    "lanceur/text_transform.py": [
+      "collections",
+      "http",
+      "io",
+      "re",
+      "select",
+      "threading",
+      "time"
+    ],
+    "lanceur/voice.py": [
+      "core",
+      "json",
+      "pathlib",
+      "phonon_model",
+      "queue",
+      "re",
+      "subprocess",
+      "threading",
+      "time"
+    ],
+    "lanceur/voice_context.py": [
+      "http",
+      "json"
+    ],
+    "lanceur/voice_max.py": [
+      "importlib",
+      "pathlib"
+    ],
+    "lanceur/voice_max_package.py": [
+      "core",
+      "hashlib",
+      "json",
+      "max_installation",
+      "pathlib",
+      "signing"
+    ],
+    "lanceur/voice_response.py": [
+      "assistant_commands",
+      "copy",
+      "datetime",
+      "http",
+      "json",
+      "text_transform",
+      "time"
+    ],
+    "lanceur/voice_web.py": [
+      "__future__",
+      "datetime",
+      "hermes_web",
+      "json",
+      "workspace"
+    ],
+    "lanceur/voice_web_plan.py": [
+      "__future__",
+      "datetime",
+      "http",
+      "json",
+      "text_transform",
+      "time"
+    ],
+    "lanceur/voice_worker.py": [
+      "phonon_worker"
+    ],
+    "lanceur/wg_crypto.py": [
+      "base64",
+      "cryptography",
+      "csv",
+      "ctypes",
+      "io",
+      "subprocess"
+    ],
+    "lanceur/wireguard_access.py": [
+      "atexit",
+      "base64",
+      "core",
+      "devices",
+      "ipaddress",
+      "json",
+      "os",
+      "pathlib",
+      "profiles",
+      "psutil",
+      "queue",
+      "re",
+      "secrets",
+      "signing",
+      "socket",
+      "subprocess",
+      "tempfile",
+      "threading",
+      "time",
+      "wg_crypto"
+    ],
+    "lanceur/workspace.py": [
+      "__future__",
+      "assistant_commands",
+      "base64",
+      "chat_attachments",
+      "contextlib",
+      "core",
+      "docx",
+      "hashlib",
+      "history_store",
+      "html",
+      "http",
+      "io",
+      "ipaddress",
+      "json",
+      "knowledge",
+      "math",
+      "notifications",
+      "os",
+      "pathlib",
+      "psutil",
+      "pypdf",
+      "re",
+      "secrets",
+      "server_state",
+      "socket",
+      "sqlite3",
+      "ssl",
+      "subprocess",
+      "sys",
+      "threading",
+      "time",
+      "unicodedata",
+      "urllib",
+      "voice_context",
+      "wg_crypto",
+      "zipfile",
+      "zlib"
+    ]
+  },
+  "signals": {
+    "broad_exception_handlers": 81,
+    "silent_broad_except_pass": 1
+  }
+}

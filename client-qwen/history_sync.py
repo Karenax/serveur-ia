@@ -74,18 +74,14 @@ class HistorySync:
         self.lock=threading.RLock();self.worker_lock=threading.Lock();self.worker=None
         self.reset_path=self.path.with_suffix('.reset-id')
         with history_store.LOCK,history_store.locked(self.path):
-            reset=self.reset_path.read_text(encoding='utf-8') if self.reset_path.exists() else ''
-            if reset!=history_store.HISTORY_RESET_ID:
-                # This upgrade explicitly discards the old history, without an archive.
-                self.path.unlink(missing_ok=True);self.meta_path.unlink(missing_ok=True)
-                for old in self.path.parent.glob(self.path.stem+'.unreadable-*.dpapi'):
-                    old.unlink()
-                history_store.atomic(self.reset_path,history_store.HISTORY_RESET_ID.encode())
+            from history_migrations import migrate_cache
+            quarantined=migrate_cache(self.path,self.meta_path,self.reset_path,protect)
         try:self.meta=json.loads(protect(self.meta_path.read_bytes(),decrypt=True))
         except (OSError,ValueError):self.meta={}
         if not isinstance(self.meta,dict) or not isinstance(self.meta.get('base',{}),dict):self.meta={}
-        self.meta.setdefault('reset_id',history_store.HISTORY_RESET_ID)
+        self.meta['reset_id']=history_store.HISTORY_RESET_ID
         self.result={'server_synced':False,'pending':True,'message':'Copie locale chargée · connexion au serveur nécessaire.'}
+        if quarantined:self.result['message']='Ancien historique conservé dans une copie de récupération · connexion au serveur nécessaire.'
 
     def status(self):return dict(self.result)
 

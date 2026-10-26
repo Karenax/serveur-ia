@@ -1,0 +1,6 @@
+test_authenticated_gateway_with_real_wireguard (test_workspace.GatewayWorkspaceTests.test_authenticated_gateway_with_real_wireguard) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 308.624s
+
+OK

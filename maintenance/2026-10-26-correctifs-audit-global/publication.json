@@ -1,0 +1,22 @@
+{
+  "windows": {
+    "version": "3.5.53",
+    "protocol": 3,
+    "sha256": "64da23305c4d8cf930a0d42952ba4a9742688d5ba0818b851566cadade613a6f",
+    "bytes": 115388661,
+    "signature": "BDImLsoF7lvx5PLfYHVPXYFPWGfru97eFHHPgNrafnl0LYAG7VmMCG8QJ7EkitbGd2Y3WeG7Rs3ejIOh4iOECQ==",
+    "signing_public_key": "8fSJ5YLYBVF0GvxnS5RyD6LjgMSTi39H+4YGeS2Ac/M="
+  },
+  "android": {
+    "bytes": 73727027,
+    "version": "1.0.24",
+    "version_code": 25,
+    "sha256": "f71f00aa868c51651437d6410d3a8392ccf9ec97b1102d33ff184c913f6a621e",
+    "package": "net.karenax.fred"
+  },
+  "voice_revision": "vocal-rt-de5e67a320a06b1f",
+  "personal_clients_prepared": 1,
+  "personal_identities_preserved": true,
+  "server_wireguard_replaced": true,
+  "previous_distribution": "D:\\Serveur IA\\toolchain\\releases-staging\\previous-audit-3.5.53"
+}

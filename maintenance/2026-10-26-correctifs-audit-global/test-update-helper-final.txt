@@ -1,0 +1,6 @@
+test_helper_replaces_verified_exe_preserves_profile_and_keeps_previous (test_accounts_updates.AccountsTests.test_helper_replaces_verified_exe_preserves_profile_and_keeps_previous) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 36.481s
+
+OK

@@ -1,0 +1,2 @@
+{"passed": true, "cold_server_import": true, "synthetic_restoration": true, "schema": 2, "client_directory_present": false, "shared_package": "D:\\Serveur IA\\toolchain\\reconstruction-3.5.53\\.venv\\Lib\\site-packages\\kiara_shared\\__init__.py"}
+

@@ -89,8 +89,7 @@ class Revocations:
         # file_lock also covers distinct AccessStore instances and processes.
         import sys
         from core import ROOT
-        sys.path.insert(0, str(ROOT / 'client-qwen'))
-        from file_lock import locked
+        from kiara_shared.file_lock import locked
         with self.lock, locked(self.path):
             current = self.snapshot()
             for identity, record in incoming['revocations'].items():

@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools>=84.2.1", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kiara-shared"
+version = "0.1.0"
+description = "Shared contracts and runtime primitives for Kiara server and Windows client"
+requires-python = ">=3.12"
+dependencies = ["cryptography>=50,<51"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["kiara_shared*"]

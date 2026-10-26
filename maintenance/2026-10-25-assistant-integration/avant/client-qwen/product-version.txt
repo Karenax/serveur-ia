@@ -1,0 +1,10 @@
+VSVersionInfo(ffi=FixedFileInfo(filevers=(3, 5, 51, 0), prodvers=(3, 5, 51, 0),
+mask=0x3f, flags=0x0, OS=0x40004, fileType=0x1, subtype=0x0, date=(0,0)),
+kids=[StringFileInfo([StringTable('040c04b0', [StringStruct('CompanyName', 'Kiara'),
+StringStruct('FileDescription', 'Accès serveur Kiara'),
+StringStruct('FileVersion', '3.5.51'),
+StringStruct('InternalName', 'Accès serveur Kiara'),
+StringStruct('OriginalFilename', 'Accès serveur Fred.exe'),
+StringStruct('ProductName', 'Accès serveur Kiara'),
+StringStruct('ProductVersion', '3.5.51')])]),
+VarFileInfo([VarStruct('Translation', [1036,1200])])])

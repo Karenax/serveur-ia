@@ -129,7 +129,8 @@ class KnowledgeTests(unittest.TestCase):
         with self.assertRaises(Denied):self.action('personal_memory_delete',owner='bob',id=id)
         self.k.synchronize();self.assertEqual(self.retrieve()[0]['kind'],'personal_memory')
         raw=self.w.validate_backup(self.w.backup(),{'alice'})
-        self.action('personal_memory_delete',id=id);self.w.restore(raw)
+        revision=self.w.snapshot('alice')['personal_memories'][0]['revision']
+        self.action('personal_memory_delete',id=id,revision=revision);self.w.restore(raw)
         self.assertEqual(self.w.snapshot('alice')['personal_memories'][0]['text'],'Réponses en français')
         with self.k.db() as db:self.assertEqual(db.execute('SELECT COUNT(*) FROM entries').fetchone()[0],0)
 

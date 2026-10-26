@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "apk_sha256": "f71f00aa868c51651437d6410d3a8392ccf9ec97b1102d33ff184c913f6a621e",
+  "version": "1.0.24",
+  "version_code": 25,
+  "native_bridges": {
+    "arm64-v8a": {
+      "go": "go1.27.3",
+      "bytes": 10891848,
+      "sha256": "eab5d26195f7b34b126075e89c0f65805d78976c6a276ff69112eef5e7427fae"
+    },
+    "x86_64": {
+      "go": "go1.27.3",
+      "bytes": 11705448,
+      "sha256": "b8edd9cd8503bc281e231338c5bcd148a6034db549cf5ad48a5403d058f4b0d0"
+    }
+  },
+  "private_profiles_embedded": false
+}

@@ -1,0 +1,34 @@
+test_api_failure_updates_connection_and_keeps_error_body (test_remote.RemoteTests.test_api_failure_updates_connection_and_keeps_error_body) ... ok
+test_automatic_fallback_reaches_authenticated_server (test_remote.RemoteTests.test_automatic_fallback_reaches_authenticated_server) ... ok
+test_client_discovers_models_and_tracks_inventory_changes (test_remote.RemoteTests.test_client_discovers_models_and_tracks_inventory_changes) ... ok
+test_end_to_end_local_api_hides_remote_credentials (test_remote.RemoteTests.test_end_to_end_local_api_hides_remote_credentials) ... ok
+test_https_mode_preserves_personal_access_without_starting_wireguard (test_remote.RemoteTests.test_https_mode_preserves_personal_access_without_starting_wireguard) ... C:\Users\karen\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\json\encoder.py:356: ResourceWarning: unclosed <socket.socket [closed] fd=2080, family=2, type=1, proto=0>
+  items = dct.items()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_https_redirect_never_forwards_personal_token (test_remote.RemoteTests.test_https_redirect_never_forwards_personal_token) ... ok
+test_key_never_stored_in_plaintext_and_revocation (test_remote.RemoteTests.test_key_never_stored_in_plaintext_and_revocation) ... ERROR
+test_key_never_stored_in_plaintext_and_revocation (test_remote.RemoteTests.test_key_never_stored_in_plaintext_and_revocation) ... ERROR
+test_live_backend_model_name_is_used_for_api_and_generation (test_remote.RemoteTests.test_live_backend_model_name_is_used_for_api_and_generation) ... ----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 59853)
+Traceback (most recent call last):
+  File "C:\Users\karen\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "C:\Users\karen\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "C:\Users\karen\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\socketserver.py", line 766, in __init__
+    self.handle()
+  File "C:\Users\karen\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\http\server.py", line 440, in handle
+    self.handle_one_request()
+  File "C:\Users\karen\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\http\server.py", line 428, in handle_one_request
+    method()
+  File "D:\Serveur IA\lanceur\remote.py", line 626, in do_GET
+    self.respond(200, {'object': 'list', 'data': [{'id': model, 'object': 'model', 'owned_by': 'local', 'capabilities': capabilities(live)}]+extra})
+  File "D:\Serveur IA\lanceur\remote.py", line 495, in respond
+    self.wfile.write(content)
+  File "C:\Users\karen\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\socketserver.py", line 845, in write
+    self._sock.sendall(b)
+ConnectionAbortedError: [WinError 10053] Une connexion �tablie a �t� abandonn�e par un logiciel de votre ordinateur h�te
+----------------------------------------
+ok
+test_local_network_selection_and_endpoint_validation (test_remote.RemoteTests.test_local_network_selection_and_endpoint_validation) ... 

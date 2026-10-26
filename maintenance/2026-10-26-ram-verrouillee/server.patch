@@ -1,0 +1,26 @@
+--- a/serve/server.py
++++ b/serve/server.py
+@@ -744,6 +744,23 @@
+             # through the request path's handler - a RuntimeError there left the turn with no answer (#1527)
+             raise EngineDied(why + (f" (see {log})" if log else "") +
+                              start_failure_hint(log, log_start) + start_log_tail(log, log_start))
++        # Kiara: enforce physical residency on every load, including automatic restarts.
++        if (env or os.environ).get("KIARA_REQUIRE_LOCKED_RAM") == "1":
++            try:
++                from serve.ram_residency import verify_locked_ram
++                verify_locked_ram(log, log_start, args)
++            except (OSError, ValueError, IndexError, TypeError, ImportError) as error:
++                self.max_context = 0
++                self.proc.kill()
++                try:
++                    self.proc.wait(timeout=10)
++                finally:
++                    self.proc.stdin.close()
++                    self.proc.stdout.close()
++                    if log:
++                        self.log.close()
++                raise EngineDied("Chargement en RAM refusé : " + str(error) +
++                                 " Libérez de la mémoire puis relancez le modèle.") from error
+         self.known_ctx = self.max_context   # survives a failed restart: requests keep their limit and restart it
+         # (from PR #41, midhatn) a locally built engine can sit next to another release's BUILD.json: engines that
+         # report their own version (INFO engine=, 0.1.8+) win, the manifest stays the fallback for older ones

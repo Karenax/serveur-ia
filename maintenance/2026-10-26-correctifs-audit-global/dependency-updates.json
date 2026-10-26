@@ -1,0 +1,40 @@
+[
+  {
+    "runtime": "strata",
+    "updates": [],
+    "check_passed": true
+  },
+  {
+    "runtime": "eg2",
+    "updates": [
+      "filelock==4.2.4",
+      "setuptools==84.2.1",
+      "pip==26.2.2"
+    ],
+    "check_passed": true
+  },
+  {
+    "runtime": "voix-serveur",
+    "updates": [
+      "pip==26.2.2"
+    ],
+    "check_passed": true
+  },
+  {
+    "runtime": "conversation-windows",
+    "updates": [
+      "setuptools==84.2.1",
+      "pip==26.2.2"
+    ],
+    "check_passed": true
+  },
+  {
+    "runtime": "hermes-fred",
+    "updates": [
+      "filelock==4.2.4",
+      "opentelemetry-api==1.45.1",
+      "setuptools==84.2.1"
+    ],
+    "check_passed": true
+  }
+]

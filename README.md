@@ -1,5 +1,10 @@
 # Serveur IA
 
+Référence courante : [architecture, versions et compatibilités](ARCHITECTURE-ACTUELLE.md).
+La livraison des corrections de l’audit global est **serveur/Windows 3.5.53 et
+Android 1.0.24/code 25**. Le [suivi des corrections](maintenance/2026-10-26-correctifs-audit-global/AVANCEMENT.md)
+regroupe les changements et les validations ; les dossiers datés ci-dessous décrivent les livraisons précédentes.
+
 L’application et l’assistante s’appellent **Kiara**. Les noms des EXE clients sont
 conservés. Le [rapport du renommage](maintenance/2026-10-24-kiara/README.md) décrit
 les compatibilités conservées et les paquets reconstruits.

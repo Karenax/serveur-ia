@@ -1,5 +1,5 @@
 """Exact, model-scoped reasoning controls; never silently weaken an effort."""
-from chat_attachments import CANONICAL_REASONING_EFFORTS, normalize_reasoning
+from kiara_shared.attachments import CANONICAL_REASONING_EFFORTS, normalize_reasoning
 
 LADDER=[effort for effort in CANONICAL_REASONING_EFFORTS if effort not in {'on','ultra'}]
 MISSING=object()

@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 from core import ROOT
 from signing import public
-from max_installation import verify_catalogue
+from kiara_shared.voice_packs import verify_catalogue
 
 DIRECTORY = ROOT/'toolchain/voice-max-release'
 _cache = {}

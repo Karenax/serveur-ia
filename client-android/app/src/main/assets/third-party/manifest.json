@@ -9,7 +9,7 @@
     },
     {
       "name": "Go runtime",
-      "version": "go1.27.1",
+      "version": "go1.27.3",
       "license_files": [
         "go/LICENSE"
       ]

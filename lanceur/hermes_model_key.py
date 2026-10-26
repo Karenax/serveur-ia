@@ -10,7 +10,9 @@ from urllib.parse import urlsplit
 def main():
     try:
         model=sys.argv[1]
-        if len(sys.argv)!=3 or not re.fullmatch(r'fred-model-[a-f0-9]{24}',model) or not re.fullmatch(r'[a-f0-9]{32}',sys.argv[2]):raise ValueError()
+        # Standalone helper executes in the private Hermes environment.
+        # Keep both negotiated request generations without importing Kiara.
+        if len(sys.argv)!=3 or not re.fullmatch(r'fred-model-[a-f0-9]{24}',model) or not re.fullmatch(r'(?:v2_)?[a-f0-9]{32}',sys.argv[2]):raise ValueError()
         url=os.environ['FRED_PROVIDER_URL']; parsed=urlsplit(url)
         if parsed.scheme!='http' or parsed.hostname not in {'127.0.0.1','::1'} or not parsed.port or parsed.username or parsed.password or parsed.query or parsed.fragment or parsed.path!='/v1/provider/credential':raise ValueError()
         request=urllib.request.Request(url,json.dumps({'model_id':model,'request_id':sys.argv[2]}).encode(),

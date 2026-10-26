@@ -1,6 +1,2 @@
-# Environnement séparé toolchain/phonon-server-python, CPU uniquement.
-ptts==0.4.1
-numpy==2.5.4
-psutil==7.2.2
-# Téléchargement préparatoire uniquement ; aucune connexion pendant la synthèse.
-huggingface-hub==1.18.0
+# Alias de compatibilité ; les dépendances de synthèse ont une source unique.
+-r requirements-phonon.txt

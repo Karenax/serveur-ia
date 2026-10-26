@@ -14,9 +14,9 @@ from urllib.parse import urlsplit
 import psutil
 
 ROOT = Path(__file__).resolve().parent.parent
-HOME = ROOT / 'lanceur'
+HOME = Path(os.environ.get('KIARA_DATA_DIR', ROOT / 'lanceur')).expanduser().resolve()
 BASE_PATH = ROOT / 'strata-iq4-p100-hybride.json'
-PYTHON = ROOT / 'Strata-src/.venv/Scripts/python.exe'
+PYTHON = Path(os.environ.get('KIARA_RUNTIME_PYTHON',ROOT / 'Strata-src/.venv/Scripts/python.exe')).expanduser().resolve()
 HIDDEN = getattr(subprocess, 'CREATE_NO_WINDOW', 0)
 
 def read_json(path, fallback=None):

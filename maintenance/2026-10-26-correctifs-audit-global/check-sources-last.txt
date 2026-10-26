@@ -1,0 +1,2 @@
+{"check": "sources", "command": ["D:\\Serveur IA\\Strata-src\\.venv\\Scripts\\python.exe", "maintenance/check_sources.py"], "returncode": 0, "passed": true, "seconds": 7.703, "log": "D:\\Serveur IA\\maintenance\\2026-10-26-correctifs-audit-global\\validation-final\\sources-1.txt", "sha256": "ab3b9ef9d68da7122dacea9896062b88cd78881597dd9d73945ff049aab29c8f"}
+Validation: D:\Serveur IA\maintenance\2026-10-26-correctifs-audit-global\validation-final\validation.json

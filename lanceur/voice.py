@@ -15,6 +15,8 @@ class VoiceService:
         self.lock=threading.RLock();self.write_lock=threading.Lock();self.slot=threading.Lock()
         self.process=None;self.phase='stopped';self.error='';self.ready=threading.Event()
         self.current=None;self.thread=None
+        from runtime_diagnostics import Diagnostics
+        self.diagnostics=Diagnostics(self.home)
     def settings(self):return read_json(self.path,{'enabled':False})
     def status(self):
         with self.lock:return {'enabled':self.settings()['enabled'],'phase':self.phase,'ready':self.ready.is_set(),
@@ -34,8 +36,10 @@ class VoiceService:
             if not executable.exists():raise ValueError('Le moteur vocal serveur n’est pas installé.')
             self.ready.clear();self.phase='loading';self.error=''
             self.process=subprocess.Popen([str(executable),'-X','utf8',str(ROOT/'lanceur/phonon_worker.py')],
-                stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,
+                stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,
                 text=True,encoding='utf-8',creationflags=HIDDEN)
+            from runtime_diagnostics import watch_stderr
+            watch_stderr(self.process,self.diagnostics,'voice')
             self.thread=threading.Thread(target=self._read,args=(self.process,),daemon=True);self.thread.start()
     def _write(self,value):
         with self.write_lock:
@@ -54,7 +58,8 @@ class VoiceService:
                         except queue.Full:self.current['cancel'].set();self._write({'action':'cancel','id':self.current['id']})
                         if value.get('done') or value.get('error'):self.current['finished'].set()
                     elif value.get('error'):self.phase='error';self.error=value['error']
-        except (OSError,ValueError):pass
+        except (OSError,ValueError) as error:
+            self.diagnostics.record('voice','read_frame',error)
         finally:
             with self.lock:
                 if process is self.process:

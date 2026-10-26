@@ -97,6 +97,15 @@ class ToolsTests(unittest.TestCase):
         self.assertIn('2500', document['text'])
         self.assertFalse(document['truncated'])
         self.assertTrue(self.call('fred_document_get', document_id=self.private)['isError'])
+
+    def test_timestamped_command_identity_survives_recreated_tool_context(self):
+        from command_journal import request_key
+        self.context['request_id']=request_key()
+        self.context['user_request']='Retiens ma préférence pour le français.'
+        first=self.data(self.call('fred_assistant',operation='memory_add',text='Français'))
+        self.context=dict(self.context)
+        repeated=self.data(self.call('fred_assistant',operation='memory_add',text='Français'))
+        self.assertEqual(first['id'],repeated['id'])
         scope = self.data(self.call('fred_workspace_info'))
         self.assertEqual([d['id'] for d in scope['documents']], [self.document])
 

@@ -483,7 +483,7 @@ async function main(){
     await voiceUI.click('#conversation-start');await page.waitForFunction(()=>window.conversationBusy);
     state.native.speech_id=1;state.native.turns=[{id:1,speech_id:1,text:'Une réponse qui doit aller jusqu’au bout.'}];await until(()=>state.pendingChat,'protected calculation started');
     const protectedChat=state.pendingChat,chatsProtected=state.chats.length,cancelsProtected=state.cancels.length,voicesProtected=state.voiceCancels.length;
-    const proof=path.join(root,'../maintenance/2026-10-23-fluidite-vocale');fs.mkdirSync(proof,{recursive:true});await page.screenshot({path:path.join(proof,'windows-interruptions-desactivees.png'),animations:'disabled'});
+    const proof=require('./test_artifacts.cjs').directory('conversation');await page.screenshot({path:path.join(proof,'windows-interruptions-desactivees.png'),animations:'disabled'});
     state.native.speech_id=2;state.native.partial='Stop.';state.native.turns=[{id:2,speech_id:2,text:'Un bruit transcrit pendant le calcul.'}];await until(()=>state.acks.at(-1)===2,'noise dropped while calculating');
     await sleep(250);assert.equal(state.cancels.length,cancelsProtected);assert.equal(state.chats.length,chatsProtected);assert.equal(await page.evaluate(()=>busy),true);
     state.native.partial='';state.holdChat=false;event(protectedChat.res,{choices:[{delta:{content:'Cette réponse va bien jusqu’au bout.'},finish_reason:'stop'}]});protectedChat.res.end('data: [DONE]\n\n');state.pendingChat=null;

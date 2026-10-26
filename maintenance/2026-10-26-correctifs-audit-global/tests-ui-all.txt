@@ -1,0 +1,292 @@
+
+> kiara-shared-ui-tests@3.5.52 test
+> node run_ui_tests.cjs
+
+UI artifacts: D:\Serveur IA\maintenance\2026-10-26-correctifs-audit-global\ui-final
+{"passed":true,"platform":"windows","checks":["wakeword microphone handoff","single image and oral turn","late capture cancelled","Android photo control","no spontaneous capture"],"simulation":"native event timing; real native keyword inference is tested separately"}
+{"passed":true,"platform":"android","checks":["wakeword microphone handoff","single image and oral turn","late capture cancelled","Android photo control","no spontaneous capture"],"simulation":"native event timing; real native keyword inference is tested separately"}
+{"passed":true,"platform":"windows","checks":["memory CRUD","failed save keeps draft","retry identity","scope separation","reminder cancellation","project brief","three viewports","focus"]}
+{"passed":true,"platform":"android","checks":["memory CRUD","failed save keeps draft","retry identity","scope separation","reminder cancellation","project brief","three viewports","focus"]}
+{
+  "passed": true,
+  "platform": "windows",
+  "engine": "classic Low / Phonon",
+  "realAsrTrace": false,
+  "checks": [
+    "dictation remains separate",
+    "3.5.39 recognized-turn loop",
+    "first recognized phrase",
+    "immediate one-word reply retained",
+    "Phonon PCM playback",
+    "mute/unmute",
+    "oral Qwen and history",
+    "background hangup",
+    "microphone error and retry"
+  ]
+}
+{
+  "passed": true,
+  "checks": [
+    {
+      "platform": "windows",
+      "passed": true,
+      "modes": [
+        "correct",
+        "professional",
+        "friendly"
+      ],
+      "separate_sidebar_histories": true,
+      "legacy_results_reopen_in_corrector": true,
+      "project_lists_exclude_corrections": true,
+      "scoped_search_and_archives": true,
+      "contextual_new_button": true,
+      "chat_and_corrector_drafts_preserved": true,
+      "progressive_sse": true,
+      "json_fallback": false,
+      "partial_cancel": true,
+      "close_cancel": true,
+      "failure_without_hermes_recovery": true,
+      "saved_history_survives_reload": true,
+      "ordinary_chat_stays_hermes": true,
+      "unique_request_ids": 6,
+      "simulation": "Local HTTP transport; no private user data or model"
+    },
+    {
+      "platform": "android",
+      "passed": true,
+      "modes": [
+        "correct",
+        "professional",
+        "friendly"
+      ],
+      "separate_sidebar_histories": true,
+      "legacy_results_reopen_in_corrector": true,
+      "project_lists_exclude_corrections": true,
+      "scoped_search_and_archives": true,
+      "contextual_new_button": true,
+      "chat_and_corrector_drafts_preserved": true,
+      "progressive_sse": true,
+      "json_fallback": true,
+      "partial_cancel": true,
+      "close_cancel": false,
+      "failure_without_hermes_recovery": true,
+      "saved_history_survives_reload": true,
+      "ordinary_chat_stays_hermes": true,
+      "unique_request_ids": 6,
+      "simulation": "Local HTTP transport; no private user data or model"
+    }
+  ]
+}
+Windows Hermes UI verified: final-only voice, stable turns, opaque approvals across heartbeat/disconnect/reload, once/refusal, corrector and shared scripts.
+{
+  "passed": true,
+  "source": "working-tree",
+  "reasoning": "oral none, written preference preserved",
+  "checks": [
+    "direct Qwen + delayed sync preserves session and complete text",
+    "all three PCM frames finish without automatic cancellation",
+    "second ASR turn waits for history sync and submits exactly once",
+    "same conversation with unique turn IDs",
+    "real new speech during calculation cancels original turn",
+    "speech playback barge-in cancels correct audio and scheduled sources",
+    "hangup returns controls",
+    "local requests bypass Hermes; oral reasoning disabled",
+    "short first sentence is spoken before LLM completion",
+    "hangup failure keeps completed text and offers retry",
+    "network probe failure preserves reply and microphone",
+    "offline utterance resumes exactly once after reconnection",
+    "audio transport failure preserves full text and microphone",
+    "revoked access still closes microphone",
+    "keyboard mute/unmute preserves playback and session",
+    "muted recognition never interrupts or submits",
+    "failed mute never reports microphone closed",
+    "interruptions disabled by default",
+    "noise and late transcripts neither cancel nor submit while disabled",
+    "listening resumes after playback",
+    "interruption setting survives reload both ways",
+    "first natural clause spoken before model finishes",
+    "reasoning hidden during voice and restored unchanged after hangup",
+    "speech after playback remains queued during history save"
+  ],
+  "chats": 12,
+  "acks": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    1,
+    2,
+    1,
+    1,
+    1
+  ],
+  "simulation": "native ASR and PCM timing; no hardware microphone or server models"
+}
+{"passed":true,"checks":["offer AMD pack","size before consent","progress and cancellation","slow benchmark still allows explicit PC Max","local folder and disk size","confirmation before removal","active-call protection","retry failed removal","reinstallation offered","Low remains independent"]}
+{
+  "passed": true,
+  "checks": [
+    {
+      "platform": "windows",
+      "passed": true,
+      "initial_loading_placeholder": true,
+      "long_catalogue_keyboard": true,
+      "polling_preserves_option_nodes_and_focus": true,
+      "focused_polling_suspended_and_caught_up_on_blur": true,
+      "late_library_redraw_preserves_widget_and_reasoning": true,
+      "late_catalogue_reply_deferred_until_blur": true,
+      "late_catalogue_error_deferred_until_blur": true,
+      "changed_catalogue_deferred_until_blur": true,
+      "loading_keeps_picker_usable": true,
+      "loading_accessibility_outside_native_picker": true,
+      "unavailable_unselected_hidden": true,
+      "default_model": true,
+      "per_conversation_history": true,
+      "provider_labels": true,
+      "vision_capabilities": true,
+      "context_selected_model": true,
+      "unknown_capacity_without_percentage": true,
+      "refresh_without_substitution": true,
+      "inflight_model_binding": true,
+      "unavailable_or_removed_requires_choice": true,
+      "corrector_independent": true,
+      "legacy_catalogue": true,
+      "import_reload_preserves_choice": true
+    },
+    {
+      "platform": "android",
+      "passed": true,
+      "initial_loading_placeholder": true,
+      "long_catalogue_keyboard": true,
+      "polling_preserves_option_nodes_and_focus": true,
+      "focused_polling_suspended_and_caught_up_on_blur": true,
+      "late_library_redraw_preserves_widget_and_reasoning": true,
+      "late_catalogue_reply_deferred_until_blur": true,
+      "late_catalogue_error_deferred_until_blur": true,
+      "changed_catalogue_deferred_until_blur": true,
+      "loading_keeps_picker_usable": true,
+      "loading_accessibility_outside_native_picker": true,
+      "unavailable_unselected_hidden": true,
+      "default_model": true,
+      "per_conversation_history": true,
+      "provider_labels": true,
+      "vision_capabilities": true,
+      "context_selected_model": true,
+      "unknown_capacity_without_percentage": true,
+      "refresh_without_substitution": true,
+      "inflight_model_binding": true,
+      "unavailable_or_removed_requires_choice": true,
+      "corrector_independent": true,
+      "legacy_catalogue": true,
+      "import_reload_preserves_choice": true
+    }
+  ],
+  "simulation": "Local HTTP fixture; no private providers, credentials or server models"
+}
+{
+  "platform": "windows",
+  "mutations": {
+    "messages": 0,
+    "library": 0,
+    "navigation": 0,
+    "thinking": 0
+  },
+  "renders": 1,
+  "libraryCalls": [],
+  "messageSame": true,
+  "reasoningSame": true,
+  "reasoningOpen": true,
+  "navigationSame": true,
+  "conversationSame": true,
+  "scrollBefore": 280,
+  "scrollAfter": 280,
+  "focus": "prompt",
+  "draft": "Un brouillon à conserver",
+  "selection": [
+    4,
+    12
+  ],
+  "statusTexts": [],
+  "errors": []
+}
+{
+  "passed": true,
+  "checks": [
+    {
+      "platform": "windows",
+      "passed": true,
+      "all_eight_efforts_exact_in_chat_and_context": true,
+      "model_specific_controls": true,
+      "nemotron_maximum_is_announced_high": true,
+      "per_model_choice_restored": true,
+      "toggle_on_exact": true,
+      "automatic_override_omitted": true,
+      "automatic_note_visible": true,
+      "forced_level_preserved": true,
+      "forced_on_preserved": true,
+      "late_metadata_during_turn_keeps_snapshot": true,
+      "withdrawn_level_normalized_and_persisted": true,
+      "unavailable_model_keeps_preferences": true,
+      "restored_unknown_model_keeps_preferences": true,
+      "legacy_preferences_supported": true,
+      "corrector_direct_unchanged": true,
+      "phone_controls_fit": true
+    },
+    {
+      "platform": "android",
+      "passed": true,
+      "all_eight_efforts_exact_in_chat_and_context": true,
+      "model_specific_controls": true,
+      "nemotron_maximum_is_announced_high": true,
+      "per_model_choice_restored": true,
+      "toggle_on_exact": true,
+      "automatic_override_omitted": true,
+      "automatic_note_visible": true,
+      "forced_level_preserved": true,
+      "forced_on_preserved": true,
+      "late_metadata_during_turn_keeps_snapshot": true,
+      "withdrawn_level_normalized_and_persisted": true,
+      "unavailable_model_keeps_preferences": true,
+      "restored_unknown_model_keeps_preferences": true,
+      "legacy_preferences_supported": true,
+      "corrector_direct_unchanged": true,
+      "phone_controls_fit": true
+    }
+  ],
+  "simulation": "Local catalogue, preferences and SSE fixtures; no private provider, server model or credential"
+}
+{"platform":"windows","passed":true,"scenarios":["per-conversation drafts and reload","failed persistence blocks silent reload","cleared draft stays cleared","instructions unload warning","memory edit survives refresh","delete cancel/error/success","named source dialog","drawer focus at 390 and 768","one main landmark","right-aligned send"]}
+{"platform":"android","passed":true,"scenarios":["per-conversation drafts and reload","failed persistence blocks silent reload","cleared draft stays cleared","instructions unload warning","memory edit survives refresh","delete cancel/error/success","named source dialog","drawer focus at 390 and 768","one main landmark","right-aligned send"]}
+{"passed":true,"platform":"windows","checks":["keyboard choice","one animation visible","stable stage","preference reload","listening/hearing/thinking/speaking","output PCM amplitude","pause and reduced motion","theme and overflow","switch during call","failed save and retry","paused preference reload"]}
+{"passed":true,"platform":"android","checks":["keyboard choice","one animation visible","stable stage","preference reload","listening/hearing/thinking/speaking","output PCM amplitude","pause and reduced motion","theme and overflow","switch during call","failed save and retry","paused preference reload"]}
+{"passed":true,"checks":["dedicated automatic recommendation","explicit choice and real loaded adapter","locked during a call","persistent choice across reordering and reload","save failure and retry","manual integrated choice allowed","no silent fallback if selected GPU disappears","Low/interruption/animation preserved","server has independent GPU settings","old pack update is explained"]}
+{"passed":true,"platform":"windows","quality":"low","aec":true,"checks":["option visible and disabled by default","animation keeps choice","protected calculation","complete playback without cancellation","late recognition discarded","next short reply accepted","choice survives reload","enabled interruption during calculation and playback","enabled choice survives reload"]}
+{"passed":true,"platform":"android","quality":"low","aec":true,"checks":["option visible and disabled by default","animation keeps choice","protected calculation","complete playback without cancellation","late recognition discarded","next short reply accepted","choice survives reload","enabled interruption during calculation and playback","enabled choice survives reload"]}
+{"passed":true,"platform":"android","quality":"low","aec":false,"checks":["option visible and disabled by default","animation keeps choice","protected calculation","complete playback without cancellation","late recognition discarded","next short reply accepted","choice survives reload","capture protection without AEC"]}
+{"passed":true,"platform":"windows","quality":"max","aec":true,"checks":["option visible and disabled by default","animation keeps choice","protected calculation","complete playback without cancellation","late recognition discarded","next short reply accepted","choice survives reload","enabled interruption during calculation and playback","enabled choice survives reload"]}
+{"passed":true,"checks":["no arbitrary first fragment","complete long reply without lost tail","abbreviations and decimals","immediate speech after playback","EOF drains queued sound","session survives a failed audio stream"]}
+{"passed":true,"platform":"windows","checks":["settings closed by default and Escape focus","create without losing written draft","rename and reload","archive and restore","delete confirmation and undo","save error preserves title and retry form","history stays in Vocal","mobile history focus","silence and native microphone RMS","stale and muted levels","independent actual output PCM and volume","protected replies","pause","hangup in settings","responsive and dark screenshots"]}
+{"passed":true,"platform":"android","checks":["settings closed by default and Escape focus","create without losing written draft","rename and reload","archive and restore","delete confirmation and undo","save error preserves title and retry form","history stays in Vocal","mobile history focus","silence and native microphone RMS","stale and muted levels","independent actual output PCM and volume","protected replies","pause","hangup in settings","responsive and dark screenshots"]}
+16 shared UI suites passed.
+
+> kiara-shared-ui-tests@3.5.52 posttest
+> npm run ux:check
+
+
+> kiara-shared-ui-tests@3.5.52 ux:check
+> node ../maintenance/ux-ui/run-check.cjs --changed
+
+lanceur/web/workspace.js:9: warning LONG-TEXT: Texte de 185 caractères à relire : La sauvegarde chiffrée comprend désormais les espaces, fichiers, tous les historiques de conversatio
+lanceur/web/workspace.js:10: warning LONG-TEXT: Texte de 233 caractères à relire : Les conversations utilisent la recherche web native de Hermes, selon sa configuration sur ce PC. Aut
+lanceur/web/workspace.js:10: warning LONG-TEXT: Texte de 259 caractères à relire : Ces réglages concernent les tâches web Kiara. Les recherches par sujet transmettent la question à Br
+lanceur/web/workspace.js:11: warning LONG-TEXT: Texte de 218 caractères à relire : Les tâches restent enregistrées lorsque le client est fermé. Les demandes interactives passent avant
+lanceur/web/workspace.js:39: warning LONG-TEXT: Texte de 242 caractères à relire : Les documents, souvenirs et conversations de chaque projet restent dans leur espace. Les conversatio
+lanceur/web/workspace.js:42: warning LONG-TEXT: Texte de 199 caractères à relire : Le moteur mémoire est indépendant de Qwen. L’indexation se poursuit côté serveur, même lorsque les c
+UX : 9 fichiers, 6 avertissements, 0 exclusions locales. Revue humaine requise ; aucune suppression automatique.

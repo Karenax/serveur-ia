@@ -125,6 +125,8 @@ class RemoteTests(unittest.TestCase):
         for server in (self.gateway, self.fake):
             server.shutdown()
             server.server_close()
+        self.store.workspace.shutdown()
+        self.store.voice.close()
         self.temporary.cleanup()
     def request(self, path, body=None, token=None):
         headers = {'Authorization': 'Bearer ' + (token or self.access['token']), 'Content-Type': 'application/json','X-Qwen-Session':self.session}

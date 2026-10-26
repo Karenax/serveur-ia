@@ -1,0 +1,22 @@
+test_actual_native_mcp_transport_carries_admitted_run_identity (test_hermes_models.NativeCloudTests.test_actual_native_mcp_transport_carries_admitted_run_identity) ... ERROR
+
+======================================================================
+ERROR: test_actual_native_mcp_transport_carries_admitted_run_identity (test_hermes_models.NativeCloudTests.test_actual_native_mcp_transport_carries_admitted_run_identity)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Serveur IA\lanceur\test_hermes_models.py", line 483, in test_actual_native_mcp_transport_carries_admitted_run_identity
+    list(self.facade.stream(self.owner,{'model':model,'messages':[{'role':'user','content':'Lis les informations de mon espace.'}]},request,'native-mcp'))
+  File "D:\Serveur IA\lanceur\hermes_conversations.py", line 454, in stream
+    if isinstance(value, BaseException): raise value
+                                         ^^^^^^^^^^^
+  File "D:\Serveur IA\lanceur\hermes_conversations.py", line 436, in work
+    for value in self._execute(owner, data, request, conversation, project, document, background=background): publish(value)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Serveur IA\lanceur\hermes_conversations.py", line 528, in _execute
+    raise ValueError('La demande de l�assistant a �t� interrompue.' if state != 'failed' else 'L�assistant n�a pas pu terminer la r�ponse.')
+ValueError: L�assistant n�a pas pu terminer la r�ponse.
+
+----------------------------------------------------------------------
+Ran 1 test in 53.962s
+
+FAILED (errors=1)

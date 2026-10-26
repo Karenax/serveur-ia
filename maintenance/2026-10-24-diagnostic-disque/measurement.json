@@ -1,0 +1,362 @@
+{
+  "utc": "2026-10-24T19:07:24.325863+00:00",
+  "pid": 24820,
+  "inference": {
+    "finished": true,
+    "usage": {
+      "prompt_tokens": 25,
+      "completion_tokens": 3,
+      "total_tokens": 28,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "seconds": 2.078
+  },
+  "summary": {
+    "baseline": {
+      "samples": 3,
+      "c_read": {
+        "mean": 0.0,
+        "max": 0.0
+      },
+      "d_read": {
+        "mean": 0.0,
+        "max": 0.0
+      },
+      "d_write": {
+        "mean": 5292.992,
+        "max": 15878.976
+      },
+      "d_idle": {
+        "mean": 99.973,
+        "max": 99.997
+      },
+      "d_queue": {
+        "mean": 0.0,
+        "max": 0.0
+      },
+      "pages_in": {
+        "mean": 34.302,
+        "max": 38.907
+      },
+      "page_reads": {
+        "mean": 7.123,
+        "max": 11.672
+      },
+      "available_mib": {
+        "mean": 48814.333,
+        "max": 48834.0
+      },
+      "strata_faults": {
+        "mean": 0.0,
+        "max": 0.0
+      },
+      "strata_read": {
+        "mean": 0.0,
+        "max": 0.0
+      }
+    },
+    "inference": {
+      "samples": 4,
+      "c_read": {
+        "mean": 370147.593,
+        "max": 1401593.155
+      },
+      "d_read": {
+        "mean": 685104.312,
+        "max": 1783304.369
+      },
+      "d_write": {
+        "mean": 79066.361,
+        "max": 316265.445
+      },
+      "d_idle": {
+        "mean": 81.526,
+        "max": 99.881
+      },
+      "d_queue": {
+        "mean": 0.5,
+        "max": 2.0
+      },
+      "pages_in": {
+        "mean": 195.381,
+        "max": 435.377
+      },
+      "page_reads": {
+        "mean": 53.053,
+        "max": 129.072
+      },
+      "available_mib": {
+        "mean": 49015.0,
+        "max": 49158.0
+      },
+      "strata_faults": {
+        "mean": 45990.696,
+        "max": 99856.398
+      },
+      "strata_read": {
+        "mean": 370221.877,
+        "max": 1409511.761
+      }
+    },
+    "after": {
+      "samples": 4,
+      "c_read": {
+        "mean": 138570.293,
+        "max": 435340.076
+      },
+      "d_read": {
+        "mean": 0.0,
+        "max": 0.0
+      },
+      "d_write": {
+        "mean": 106984.152,
+        "max": 253288.771
+      },
+      "d_idle": {
+        "mean": 99.862,
+        "max": 100.0
+      },
+      "d_queue": {
+        "mean": 0.0,
+        "max": 0.0
+      },
+      "pages_in": {
+        "mean": 49.804,
+        "max": 108.217
+      },
+      "page_reads": {
+        "mean": 9.188,
+        "max": 13.527
+      },
+      "available_mib": {
+        "mean": 49105.75,
+        "max": 49183.0
+      },
+      "strata_faults": {
+        "mean": 19.808,
+        "max": 79.23
+      },
+      "strata_read": {
+        "mean": 138567.293,
+        "max": 443266.944
+      }
+    }
+  },
+  "samples": [
+    {
+      "t": 0.516,
+      "phase": "baseline",
+      "c_read": 0.0,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 99.969,
+      "d_queue": 0.0,
+      "pages_in": 31.048,
+      "page_reads": 3.881,
+      "available_mib": 48834.0,
+      "strata_faults": 0.0,
+      "strata_read": 0.0
+    },
+    {
+      "t": 1.032,
+      "phase": "baseline",
+      "c_read": 0.0,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 99.997,
+      "d_queue": 0.0,
+      "pages_in": 38.907,
+      "page_reads": 11.672,
+      "available_mib": 48799.0,
+      "strata_faults": 0.0,
+      "strata_read": 0.0
+    },
+    {
+      "t": 1.547,
+      "phase": "baseline",
+      "c_read": 0.0,
+      "d_read": 0.0,
+      "d_write": 15878.976,
+      "d_idle": 99.954,
+      "d_queue": 0.0,
+      "pages_in": 32.952,
+      "page_reads": 5.815,
+      "available_mib": 48810.0,
+      "strata_faults": 0.0,
+      "strata_read": 0.0
+    },
+    {
+      "t": 2.063,
+      "phase": "inference",
+      "c_read": 0.0,
+      "d_read": 0.0,
+      "d_write": 316265.445,
+      "d_idle": 99.881,
+      "d_queue": 0.0,
+      "pages_in": 17.818,
+      "page_reads": 3.96,
+      "available_mib": 48765.0,
+      "strata_faults": 28444.171,
+      "strata_read": 269.256
+    },
+    {
+      "t": 2.578,
+      "phase": "inference",
+      "c_read": 1401593.155,
+      "d_read": 126697.686,
+      "d_write": 0.0,
+      "d_idle": 98.196,
+      "d_queue": 0.0,
+      "pages_in": 69.597,
+      "page_reads": 13.533,
+      "available_mib": 49027.0,
+      "strata_faults": 99856.398,
+      "strata_read": 1409511.761
+    },
+    {
+      "t": 3.094,
+      "phase": "inference",
+      "c_read": 39453.636,
+      "d_read": 1783304.369,
+      "d_write": 0.0,
+      "d_idle": 42.858,
+      "d_queue": 2.0,
+      "pages_in": 435.377,
+      "page_reads": 129.072,
+      "available_mib": 49110.0,
+      "strata_faults": 3.853,
+      "strata_read": 31562.909
+    },
+    {
+      "t": 3.61,
+      "phase": "inference",
+      "c_read": 39543.581,
+      "d_read": 830415.192,
+      "d_write": 0.0,
+      "d_idle": 85.168,
+      "d_queue": 0.0,
+      "pages_in": 258.732,
+      "page_reads": 65.649,
+      "available_mib": 49158.0,
+      "strata_faults": 55658.362,
+      "strata_read": 39543.581
+    },
+    {
+      "t": 4.125,
+      "phase": "after",
+      "c_read": 435340.076,
+      "d_read": 0.0,
+      "d_write": 253288.771,
+      "d_idle": 99.848,
+      "d_queue": 0.0,
+      "pages_in": 108.217,
+      "page_reads": 13.527,
+      "available_mib": 49112.0,
+      "strata_faults": 79.23,
+      "strata_read": 443266.944
+    },
+    {
+      "t": 4.641,
+      "phase": "after",
+      "c_read": 39694.338,
+      "d_read": 0.0,
+      "d_write": 166716.22,
+      "d_idle": 99.651,
+      "d_queue": 0.0,
+      "pages_in": 34.888,
+      "page_reads": 7.753,
+      "available_mib": 49183.0,
+      "strata_faults": 0.0,
+      "strata_read": 31755.47
+    },
+    {
+      "t": 5.157,
+      "phase": "after",
+      "c_read": 39588.672,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 100.0,
+      "d_queue": 0.0,
+      "pages_in": 25.13,
+      "page_reads": 11.598,
+      "available_mib": 49043.0,
+      "strata_faults": 0.0,
+      "strata_read": 39588.672
+    },
+    {
+      "t": 5.688,
+      "phase": "after",
+      "c_read": 39658.088,
+      "d_read": 0.0,
+      "d_write": 7931.618,
+      "d_idle": 99.948,
+      "d_queue": 0.0,
+      "pages_in": 30.983,
+      "page_reads": 3.873,
+      "available_mib": 49085.0,
+      "strata_faults": 0.0,
+      "strata_read": 39658.088
+    }
+  ],
+  "memory_before": {
+    "rss": 56892710912,
+    "vms": 64475250688,
+    "num_page_faults": 95870960,
+    "peak_wset": 93011390464,
+    "wset": 56892710912,
+    "peak_paged_pool": 268550648,
+    "paged_pool": 268500152,
+    "peak_nonpaged_pool": 5503776,
+    "nonpaged_pool": 5162888,
+    "pagefile": 64475250688,
+    "peak_pagefile": 65784741888,
+    "private": 64475250688
+  },
+  "memory_after": {
+    "rss": 57162944512,
+    "vms": 64506724352,
+    "num_page_faults": 95965848,
+    "peak_wset": 93011390464,
+    "wset": 57162944512,
+    "peak_paged_pool": 268550648,
+    "paged_pool": 268500152,
+    "peak_nonpaged_pool": 5503776,
+    "nonpaged_pool": 5166424,
+    "pagefile": 64506724352,
+    "peak_pagefile": 65784741888,
+    "private": 64506724352
+  },
+  "io_before": {
+    "read_count": 319204,
+    "write_count": 30341,
+    "read_bytes": 5116431077,
+    "write_bytes": 100415,
+    "other_count": 11574,
+    "other_bytes": 505394
+  },
+  "io_after": {
+    "read_count": 319457,
+    "write_count": 30516,
+    "read_bytes": 5117496179,
+    "write_bytes": 101229,
+    "other_count": 11577,
+    "other_bytes": 505486
+  },
+  "live_after": {
+    "state": "idle",
+    "queued": 0,
+    "phase": null,
+    "prompt_tokens": null,
+    "prompt_read": null,
+    "prompt_total": null,
+    "generated": null,
+    "max_tokens": null,
+    "elapsed_s": null,
+    "tok_s": null,
+    "tok_s_mean": null,
+    "prefill_tok_s_mean": null,
+    "tok_s_window_s": null
+  }
+}

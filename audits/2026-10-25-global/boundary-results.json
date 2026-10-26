@@ -1,0 +1,73 @@
+{
+  "storage_boundaries": [
+    {
+      "boundary": "journal",
+      "attempts": [
+        {
+          "operation": "memory_forget",
+          "result": {
+            "blocked": true,
+            "error": "Journal des commandes plein. Exportez les résultats avant maintenance."
+          }
+        },
+        {
+          "operation": "reminder_cancel",
+          "result": {
+            "blocked": true,
+            "error": "Journal des commandes plein. Exportez les résultats avant maintenance."
+          }
+        }
+      ],
+      "reminders_still_fire": 1,
+      "memory_still_present": true
+    },
+    {
+      "boundary": "quota",
+      "attempts": [
+        {
+          "operation": "memory_forget",
+          "result": {
+            "blocked": true,
+            "error": "Limite de stockage de cet accès atteinte."
+          }
+        },
+        {
+          "operation": "reminder_cancel",
+          "result": {
+            "blocked": true,
+            "error": "Limite de stockage de cet accès atteinte."
+          }
+        }
+      ],
+      "reminders_still_fire": 1,
+      "memory_still_present": true
+    }
+  ],
+  "stale_memory_overwrite": {
+    "new_route_stale_write": {
+      "rejected": true,
+      "error": "Ce souvenir a changé. Consultez sa version actuelle."
+    },
+    "legacy_route_result": {
+      "saved": true
+    },
+    "final_text": "Ancien brouillon"
+  },
+  "intent_gate_only_not_model_exploit": [
+    {
+      "operation": "memory_forget",
+      "synthetic_request": "N’oublie pas mon adresse.",
+      "gate_accepts": true
+    },
+    {
+      "operation": "memory_add",
+      "synthetic_request": "Ne mémorise pas cette information.",
+      "gate_accepts": true
+    },
+    {
+      "operation": "reminder_cancel",
+      "synthetic_request": "Explique la phrase « annule mon rappel » sans rien modifier.",
+      "gate_accepts": true
+    }
+  ]
+}

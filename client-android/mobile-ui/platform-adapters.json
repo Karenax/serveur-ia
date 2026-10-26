@@ -1,0 +1,225 @@
+{
+  "format": 1,
+  "capabilities": {
+    "platform": "android",
+    "updates": "native",
+    "local_api": true,
+    "settings": [
+      "access",
+      "connection",
+      "api"
+    ],
+    "send_with_modifier": true,
+    "native_selection": true
+  },
+  "sources": {
+    "chat.html": [
+      {
+        "slot": "viewport-1",
+        "html": true,
+        "value": "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content\">"
+      },
+      {
+        "slot": "onboarding-2",
+        "html": true,
+        "file": "onboarding.html",
+        "prefix": "<body>",
+        "suffix": "\n",
+        "rstrip": true
+      },
+      {
+        "slot": "updates-navigation-3",
+        "html": true,
+        "value": ""
+      },
+      {
+        "slot": "updates-pane-4",
+        "html": true,
+        "value": ""
+      },
+      {
+        "slot": "access-pane-5",
+        "html": true,
+        "file": "access.html",
+        "prefix": "",
+        "suffix": "\n",
+        "rstrip": true
+      },
+      {
+        "slot": "connection-pane-6",
+        "html": true,
+        "file": "connection.html",
+        "prefix": "",
+        "suffix": "\n",
+        "rstrip": true
+      },
+      {
+        "slot": "android-local-api-pane-7",
+        "html": true,
+        "file": "api.html",
+        "prefix": "",
+        "suffix": "\n",
+        "rstrip": true
+      },
+      {
+        "label": "EXE personnel · connexion automatique",
+        "value": "Accès personnel · Android"
+      },
+      {
+        "slot": "android-response-retry-menu-8",
+        "html": true,
+        "value": "<button id=\"retry-without-thinking\" type=\"button\" class=\"secondary\" hidden>Réessayer sans réflexion</button>"
+      },
+      {
+        "slot": "android-conditional-retry-action-9",
+        "html": false,
+        "value": "function retryLastResponse(){"
+      },
+      {
+        "slot": "android-response-retry-button-state-10",
+        "html": false,
+        "value": "]"
+      },
+      {
+        "slot": "android-retry-popover-11",
+        "html": false,
+        "value": ""
+      },
+      {
+        "slot": "android-retry-without-thinking-12",
+        "html": false,
+        "value": "retryLastResponse();"
+      },
+      {
+        "slot": "android-state-13",
+        "html": false,
+        "file": "client-state.js",
+        "prefix": "",
+        "suffix": "",
+        "rstrip": true
+      },
+      {
+        "slot": "desktop-endpoint-update-events-14",
+        "html": false,
+        "value": ""
+      },
+      {
+        "slot": "desktop-local-api-event-15",
+        "html": false,
+        "value": ""
+      },
+      {
+        "slot": "desktop-updater-timer-16",
+        "html": false,
+        "value": ""
+      },
+      {
+        "slot": "platform-expression-17",
+        "html": false,
+        "value": "path==='/v1/models'"
+      },
+      {
+        "slot": "mobile-multiline-composer-18",
+        "html": false,
+        "value": "if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)&&!e.isComposing)"
+      },
+      {
+        "slot": "finish-keyboard-focus-19",
+        "html": false,
+        "value": "buttons();if(matchMedia('(pointer:fine)').matches)$('prompt').focus();models();"
+      },
+      {
+        "label": "Entrée pour envoyer · Maj + Entrée pour une nouvelle ligne",
+        "value": "Touchez la flèche pour envoyer"
+      },
+      {
+        "label": "Envoyer · Entrée",
+        "value": "Envoyer le message"
+      },
+      {
+        "label": "Les changements des deux postes",
+        "value": "Les changements de vos appareils"
+      },
+      {
+        "slot": "platform-expression-20",
+        "html": false,
+        "value": "if(busy||!loggedIn||$('connection-choice').open||$('android-onboarding').open)"
+      },
+      {
+        "slot": "mobile-background-polling-21",
+        "html": false,
+        "value": "setInterval(()=>{if(!document.hidden)models();},15000);setInterval(()=>{if(!document.hidden)clientState();},2000);"
+      }
+    ],
+    "workspace.html": [
+      {
+        "label": "Glissez une conversation sur un projet pour la déplacer. Clic droit pour déplacer, archiver ou supprimer.",
+        "value": "Touchez ··· pour déplacer, archiver ou supprimer une discussion."
+      },
+      {
+        "slot": "platform-expression-24",
+        "html": false,
+        "value": "if(document.hidden||!connected||busy||historySyncPending||conversationActionPending||wsDraggedConversation)"
+      }
+    ],
+    "ui.js": [
+      {
+        "label": "Comme Windows",
+        "value": "Comme l’appareil"
+      },
+      {
+        "label": "Moderne · Segoe UI",
+        "value": "Moderne · Android"
+      },
+      {
+        "label": "Appliqué sur ce poste",
+        "value": "Appliqué sur cet appareil"
+      },
+      {
+        "slot": "platform-expression-25",
+        "html": false,
+        "value": ""
+      },
+      {
+        "slot": "desktop-integration-logic-26",
+        "html": false,
+        "value": "let uiLastConnection={};\n"
+      },
+      {
+        "slot": "platform-expression-31",
+        "html": false,
+        "value": ""
+      },
+      {
+        "slot": "desktop-connection-transfer-controls-32",
+        "html": false,
+        "value": "function uiConnectionSettings(state){}\n"
+      }
+    ],
+    "selection.js": [
+      {
+        "slot": "native-android-selection-handles-33",
+        "html": false,
+        "value": "document.addEventListener('contextmenu',event=>{\n  if(matchMedia('(pointer:coarse)').matches)return;\n  selectionUpdate();"
+      },
+      {
+        "label": "Copier la sélection · Ctrl+C",
+        "value": "Copier la sélection"
+      },
+      {
+        "label": "Réessayez avec Ctrl+C.",
+        "value": "Sélectionnez le texte puis touchez Copier."
+      }
+    ],
+    "corrector.js": [
+      {
+        "slot": "corrector-json-fallback-34",
+        "html": false,
+        "file": "corrector-response.js",
+        "prefix": "",
+        "suffix": "",
+        "rstrip": true
+      }
+    ]
+  }
+}

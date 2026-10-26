@@ -41,7 +41,7 @@ class AssistantCommandsTests(unittest.TestCase):
     def test_cancellation_rolls_back_and_legacy_edits_invalidate_revision(self):
         m=self.command('memory_add',text='Français')
         original=self.command('list')['memories'][0]
-        self.w.action('a',{'action':'personal_memory_save','id':m['id'],'text':'Anglais'})
+        self.w.action('a',{'action':'personal_memory_save','id':m['id'],'text':'Anglais','revision':original['revision']})
         with self.assertRaises(Conflict):self.command('memory_update',id=m['id'],revision=original['revision'],text='Italien')
         calls=[]
         def valid():

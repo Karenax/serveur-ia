@@ -66,7 +66,7 @@ async function check(browser,platform){
     assert.deepEqual(await listIds(),[legacyId]);assert.equal(await page.isVisible('#ws-sidebar-projects'),false);assert.equal(await page.textContent('#new'),'Nouveau texte');
     const legacy=page.locator('#conversation-list [data-conversation-id="'+legacyId+'"]');await legacy.focus();await page.keyboard.press('Enter');
     assert.equal(await page.isVisible('[data-view="corrector"]'),true);assert.equal(await page.inputValue('#corrector-text'),'Ancien texte à préserver.');assert.equal((await page.textContent('#corrector-result')).trim(),'Ancien résultat conservé.');
-    await sidebar();const evidence=path.join(root,'../maintenance/2026-10-23-listes-correcteur');fs.mkdirSync(evidence,{recursive:true});await page.screenshot({path:path.join(evidence,platform+'-correcteur.png'),animations:'disabled'});await page.evaluate(()=>uiCloseSidebar(false));
+    await sidebar();const evidence=require('./test_artifacts.cjs').directory('corrector');await page.screenshot({path:path.join(evidence,platform+'-correcteur.png'),animations:'disabled'});await page.evaluate(()=>uiCloseSidebar(false));
     await page.fill('#corrector-text','Brouillon de correction à préserver.');await page.evaluate(()=>showView('chat'));assert.equal(await page.inputValue('#prompt'),'Brouillon de conversation à préserver.');assert.deepEqual(await listIds(),[chatId]);
     await sidebar();await page.screenshot({path:path.join(evidence,platform+'-conversations.png'),animations:'disabled'});await page.evaluate(()=>uiCloseSidebar(false));
     await page.evaluate(()=>showView('corrector'));assert.equal(await page.inputValue('#corrector-text'),'Brouillon de correction à préserver.');await sidebar();

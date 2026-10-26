@@ -1,0 +1,6 @@
+test_windows_protection_and_preconfigured_exe_startup (test_remote.RemoteTests.test_windows_protection_and_preconfigured_exe_startup) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 41.608s
+
+OK

@@ -1,0 +1,10 @@
+test_source_cannot_authorize_unrequested_memory_mutation (test_assistant_voice.AssistantVoiceHTTPTests.test_source_cannot_authorize_unrequested_memory_mutation) ... ok
+test_timestamped_voice_command_survives_full_legacy_journal_and_retry (test_assistant_voice.AssistantVoiceHTTPTests.test_timestamped_voice_command_survives_full_legacy_journal_and_retry) ... ok
+test_voice_command_commits_once_and_does_not_speak_internal_json (test_assistant_voice.AssistantVoiceHTTPTests.test_voice_command_commits_once_and_does_not_speak_internal_json) ... ok
+test_command_payload_never_reaches_speech_even_fragmented (test_assistant_voice.AssistantVoiceTests.test_command_payload_never_reaches_speech_even_fragmented) ... ok
+test_commands_are_opt_in_and_plain_french_still_streams (test_assistant_voice.AssistantVoiceTests.test_commands_are_opt_in_and_plain_french_still_streams) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 5.458s
+
+OK

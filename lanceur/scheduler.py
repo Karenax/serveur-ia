@@ -3,6 +3,7 @@ import secrets
 import re
 import threading
 import time
+from kiara_shared.request_ids import validate_request_id
 
 class Scheduler:
     def __init__(self, capacity=16):
@@ -17,7 +18,7 @@ class Scheduler:
         self.last_tokens_per_second = None
 
     def submit(self, owner, request_id=None, background=False):
-        if request_id is not None and not re.fullmatch("[a-f0-9]{32}",request_id):raise ValueError("Identifiant de demande invalide.")
+        if request_id is not None:validate_request_id(request_id)
         with self.condition:
             if any(r['owner'] == owner and (not r.get('background') or r['started'] is not None or background) for r in self.requests):
                 raise ValueError('Une demande de ce client est déjà en cours ou en attente.')

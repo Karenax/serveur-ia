@@ -1,0 +1,49 @@
+{
+  "captured_at": "2026-10-24T15:14:38.6323797+02:00",
+  "cpu": [
+    {
+      "Name": "AMD Ryzen Threadripper PRO 3955WX 16-Cores     ",
+      "NumberOfCores": 16,
+      "NumberOfLogicalProcessors": 32
+    }
+  ],
+  "os": "Microsoft Windows 10 Professionnel",
+  "ram_total_gib": 127.857,
+  "ram_free_gib": 67.297,
+  "gpu": [
+    "Quadro P2200, 5120 MiB, 2681 MiB, 528.89, 00000000:41:00.0",
+    "Tesla P100-PCIE-16GB, 16384 MiB, 14442 MiB, 528.89, 00000000:42:00.0",
+    "Tesla P100-PCIE-16GB, 16384 MiB, 14562 MiB, 528.89, 00000000:61:00.0"
+  ],
+  "disks": [
+    {
+      "FriendlyName": "ST5000DM000-1FK178",
+      "MediaType": "HDD",
+      "BusType": "SATA",
+      "Size": 5000981078016
+    },
+    {
+      "FriendlyName": "KINGSTON SA400S37240G",
+      "MediaType": "SSD",
+      "BusType": "SATA",
+      "Size": 240057409536
+    }
+  ],
+  "volumes": [
+    {
+      "DriveLetter": "E",
+      "Size": 0,
+      "SizeRemaining": 0
+    },
+    {
+      "DriveLetter": "C",
+      "Size": 238885531648,
+      "SizeRemaining": 33133981696
+    },
+    {
+      "DriveLetter": "D",
+      "Size": 5000979800064,
+      "SizeRemaining": 4495380004864
+    }
+  ]
+}

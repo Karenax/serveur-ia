@@ -1,0 +1,110 @@
+{
+  "results": [
+    {
+      "mode": "baseline",
+      "input_tokens": 281,
+      "repeats": 2,
+      "prefill_seconds": 2.817202,
+      "prefill_tokens_per_second": 99.77964451045399,
+      "first_content_seconds": 2.819264800004021,
+      "generation_tokens_per_second": 15.510980042910928,
+      "total_seconds_128_output": 11.00742044999788,
+      "max_working_set_gib": 5.504108428955078,
+      "all_prompts_fully_evaluated": true,
+      "all_outputs_128_tokens": true
+    },
+    {
+      "mode": "baseline",
+      "input_tokens": 907,
+      "repeats": 2,
+      "prefill_seconds": 8.5080615,
+      "prefill_tokens_per_second": 106.60635618796641,
+      "first_content_seconds": 8.528982000003452,
+      "generation_tokens_per_second": 15.15774548127975,
+      "total_seconds_128_output": 16.908021850002115,
+      "max_working_set_gib": 5.568840026855469,
+      "all_prompts_fully_evaluated": true,
+      "all_outputs_128_tokens": true
+    },
+    {
+      "mode": "baseline",
+      "input_tokens": 3437,
+      "repeats": 2,
+      "prefill_seconds": 31.489732,
+      "prefill_tokens_per_second": 109.14959682036336,
+      "first_content_seconds": 31.49771360000159,
+      "generation_tokens_per_second": 14.758487432158237,
+      "total_seconds_128_output": 40.1036294000005,
+      "max_working_set_gib": 5.576000213623047,
+      "all_prompts_fully_evaluated": true,
+      "all_outputs_128_tokens": true
+    },
+    {
+      "mode": "dflash",
+      "input_tokens": 281,
+      "repeats": 2,
+      "prefill_seconds": 2.8477215000000005,
+      "prefill_tokens_per_second": 98.69435515581027,
+      "first_content_seconds": 2.8667751499961014,
+      "generation_tokens_per_second": 18.952356283273904,
+      "total_seconds_128_output": 9.568094599992037,
+      "max_working_set_gib": 6.474082946777344,
+      "all_prompts_fully_evaluated": true,
+      "all_outputs_128_tokens": true
+    },
+    {
+      "mode": "dflash",
+      "input_tokens": 907,
+      "repeats": 2,
+      "prefill_seconds": 8.4585615,
+      "prefill_tokens_per_second": 107.22926264830755,
+      "first_content_seconds": 8.460262650005461,
+      "generation_tokens_per_second": 12.355550992468643,
+      "total_seconds_128_output": 18.740913300011016,
+      "max_working_set_gib": 6.5989227294921875,
+      "all_prompts_fully_evaluated": true,
+      "all_outputs_128_tokens": true
+    }
+  ],
+  "conversation": [
+    {
+      "mode": "baseline",
+      "prompt": "Bonjour Kiara, tu m’entends ?",
+      "answer": "Oui, je t'entends très bien. Comment puis-je t'aider aujourd'hui ?",
+      "first_content_seconds": 0.888352499998291,
+      "first_sentence_seconds": 1.454953899999964,
+      "total_seconds": 2.1867770999961067,
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 63,
+        "prompt_ms": 860.933,
+        "prompt_per_token_ms": 13.665603174603174,
+        "prompt_per_second": 73.1764260401216,
+        "predicted_n": 22,
+        "predicted_ms": 1298.269,
+        "predicted_per_token_ms": 61.82233333333333,
+        "predicted_per_second": 16.175384300172
+      }
+    },
+    {
+      "mode": "baseline",
+      "prompt": "À quelle heure faut-il partir pour arriver à une réunion à neuf heures si le trajet dure trente minutes ?",
+      "answer": "Il faut partir à huit heures et demie. Cela te permettra d'arriver à l'heure.",
+      "first_content_seconds": 0.9940460999932839,
+      "first_sentence_seconds": 1.483327800000552,
+      "total_seconds": 2.3386341000004904,
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 76,
+        "prompt_ms": 964.424,
+        "prompt_per_token_ms": 12.68978947368421,
+        "prompt_per_second": 78.80351380720512,
+        "predicted_n": 22,
+        "predicted_ms": 1344.49,
+        "predicted_per_token_ms": 64.02333333333334,
+        "predicted_per_second": 15.619305461550477
+      }
+    }
+  ],
+  "limits": "Two repeats per fixed prompt; warm model, prompt cache disabled; CPU only, 16 threads; short conversations tested once per mode. No microphone, ASR or TTS."
+}

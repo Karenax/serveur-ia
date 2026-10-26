@@ -8,7 +8,7 @@ peuvent concerner uniquement la variante Windows de ce même bridge.
 Accès serveur Kiara
   application/LICENSE.txt
 
-Go runtime go1.27.1
+Go runtime go1.27.3
   go/LICENSE
 
 markdown-it 15.0.2

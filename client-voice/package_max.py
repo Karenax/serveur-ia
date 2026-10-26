@@ -28,7 +28,7 @@ def package(output, sign_home=None):
     if not (build/'kiara-asr.dll').is_file():
         raise ValueError('Build-Max-ASR.cmd must succeed first.')
     staging = Path(tempfile.mkdtemp(prefix='voice-max-pack-', dir=ROOT/'toolchain'))
-    python = ROOT/'toolchain/max-realtime-python/Scripts/python.exe'
+    python = ROOT/'toolchain/build-python/Scripts/python.exe'
     subprocess.run([str(python), '-m', 'PyInstaller', '--noconfirm', '--onedir', '--console', '--name', 'max-worker',
                     '--collect-all', 'ptts', '--exclude-module', 'torch', '--exclude-module', 'scipy', '--exclude-module', 'sherpa_onnx', '--exclude-module', 'onnxruntime',
                     '--distpath', str(staging), '--workpath', str(ROOT/'toolchain/max-pack-pyinstaller'),

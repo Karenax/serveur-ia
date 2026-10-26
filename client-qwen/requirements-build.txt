@@ -7,3 +7,6 @@ psutil==7.2.2
 PyYAML==6.0.3
 certifi==2026.10.19
 Pillow==13.0.0
+# Shared Windows constructor also builds the optional CPU voice runtime.
+ptts==0.4.1
+numpy==2.5.4

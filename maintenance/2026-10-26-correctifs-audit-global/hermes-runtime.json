@@ -1,0 +1,14 @@
+{
+  "format": 1,
+  "validated": true,
+  "source": "C:\\Users\\karen\\AppData\\Local\\Fred\\runtime-security\\hermes-20261021\\source",
+  "python": "C:\\Users\\karen\\AppData\\Local\\Fred\\runtime-security\\hermes-20261021\\venv\\Scripts\\python.exe",
+  "source_commit": "79651b71bd56efd76d06f3de1df64dde09b58ff3",
+  "patch_sha256": "5e5f5727fff51f7412d5ab3252858d6df05cd9e9fc7b91bdb583c7c4d4c4b220",
+  "requirements_sha256": "ef390cd621c505be5925d703b90698d40c28a9b92413ef80fb8f8e4899f0d060",
+  "original_runtime_unchanged": true,
+  "dependencies": "C:\\Users\\karen\\AppData\\Local\\hermes\\installs",
+  "tools": "C:\\Users\\karen\\AppData\\Local\\hermes\\tools",
+  "runtime_lock": "dependances/verrous/hermes-fred.requirements.txt",
+  "runtime_lock_sha256": "da3acb2bbddcb9f5483c145246fb6bc2584743ad41d8d19dd98df60bca9c76e9"
+}

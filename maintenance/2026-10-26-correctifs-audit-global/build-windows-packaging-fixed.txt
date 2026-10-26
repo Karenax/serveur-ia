@@ -1,0 +1,46 @@
+Pinned wakeword resources prepared; French acoustic validation is still required.
+K icon generated in 9 Windows sizes from the console favicon.
+CMake Deprecation Warning at D:/Serveur IA/toolchain/whisper.cpp-1.9.5/CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+-- whisper.cpp version: 1.9.5-dev
+-- Warning: ccache not found - consider installing it for faster compilation or disable this warning with GGML_CCACHE=OFF
+-- CMAKE_SYSTEM_PROCESSOR: AMD64
+-- CMAKE_GENERATOR_PLATFORM: 
+-- GGML_SYSTEM_ARCH: x86
+-- Including CPU backend
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu-x64:  
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu-sse42: /arch:SSE4.2 GGML_SSE42
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu-sandybridge: /arch:AVX GGML_AVX
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu-haswell: /arch:AVX2 GGML_AVX2;GGML_FMA;GGML_F16C;__BMI2__;GGML_BMI2
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu-skylakex: /arch:AVX512 GGML_AVX512;__BMI2__;GGML_BMI2
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu-cannonlake: /arch:AVX512 GGML_AVX512;__AVX512VBMI__;__BMI2__;GGML_BMI2
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu-cascadelake: /arch:AVX512 GGML_AVX512;__AVX512VNNI__;GGML_AVX512_VNNI;__BMI2__;GGML_BMI2
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu-icelake: /arch:AVX512 GGML_AVX512;__AVX512VBMI__;__AVX512VNNI__;GGML_AVX512_VNNI;__BMI2__;GGML_BMI2
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu-alderlake: /arch:AVX2 GGML_AVX2;GGML_FMA;GGML_F16C;__AVXVNNI__;GGML_AVX_VNNI;__BMI2__;GGML_BMI2
+-- ggml version: 0.26.0
+-- ggml commit:  4ca825b
+-- Configuring done (78.6s)
+-- Generating done (21.1s)
+-- Build files have been written to: D:/Serveur IA/toolchain/voice-build-windows
+ninja: no work to do.
+38856 INFO: PyInstaller: 6.16.0, contrib hooks: 2026.8
+38856 INFO: Python: 3.12.14
+38893 INFO: Platform: Windows-10-10.0.19045-SP0
+38893 INFO: Python environment: D:\Serveur IA\toolchain\conversation-client-python
+39756 INFO: wrote D:\Serveur IA\toolchain\conversation-build\conversation-worker.spec

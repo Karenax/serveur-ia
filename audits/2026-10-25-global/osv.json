@@ -1,0 +1,2364 @@
+[
+  {
+    "package": "agent-client-protocol",
+    "version": "0.9.0",
+    "advisories": []
+  },
+  {
+    "package": "aiohappyeyeballs",
+    "version": "2.7.1",
+    "advisories": []
+  },
+  {
+    "package": "aiohttp",
+    "version": "3.14.4",
+    "advisories": []
+  },
+  {
+    "package": "aiosignal",
+    "version": "1.4.0",
+    "advisories": []
+  },
+  {
+    "package": "altgraph",
+    "version": "0.17.5",
+    "advisories": []
+  },
+  {
+    "package": "annotated-doc",
+    "version": "0.0.5",
+    "advisories": []
+  },
+  {
+    "package": "annotated-types",
+    "version": "0.8.0",
+    "advisories": []
+  },
+  {
+    "package": "anyio",
+    "version": "4.14.2",
+    "advisories": []
+  },
+  {
+    "package": "anyio",
+    "version": "4.15.1",
+    "advisories": []
+  },
+  {
+    "package": "attrs",
+    "version": "26.1.0",
+    "advisories": []
+  },
+  {
+    "package": "av",
+    "version": "18.1.0",
+    "advisories": []
+  },
+  {
+    "package": "boto3",
+    "version": "1.42.89",
+    "advisories": []
+  },
+  {
+    "package": "botocore",
+    "version": "1.42.97",
+    "advisories": []
+  },
+  {
+    "package": "bottle",
+    "version": "0.13.4",
+    "advisories": []
+  },
+  {
+    "package": "cdp-use",
+    "version": "1.4.5",
+    "advisories": []
+  },
+  {
+    "package": "certifi",
+    "version": "2026.10.19",
+    "advisories": []
+  },
+  {
+    "package": "cffi",
+    "version": "2.1.1",
+    "advisories": []
+  },
+  {
+    "package": "charset-normalizer",
+    "version": "3.5.1",
+    "advisories": []
+  },
+  {
+    "package": "charset-normalizer",
+    "version": "3.5.2",
+    "advisories": []
+  },
+  {
+    "package": "click",
+    "version": "8.4.2",
+    "advisories": []
+  },
+  {
+    "package": "click",
+    "version": "8.5.0",
+    "advisories": []
+  },
+  {
+    "package": "cloudpickle",
+    "version": "3.1.2",
+    "advisories": []
+  },
+  {
+    "package": "clr-loader",
+    "version": "0.3.1",
+    "advisories": []
+  },
+  {
+    "package": "colorama",
+    "version": "0.4.6",
+    "advisories": []
+  },
+  {
+    "package": "concurrent-log-handler",
+    "version": "0.9.29",
+    "advisories": []
+  },
+  {
+    "package": "croniter",
+    "version": "6.0.0",
+    "advisories": []
+  },
+  {
+    "package": "cryptography",
+    "version": "50.0.1",
+    "advisories": []
+  },
+  {
+    "package": "cryptography",
+    "version": "50.0.2",
+    "advisories": []
+  },
+  {
+    "package": "ctranslate2",
+    "version": "4.8.1",
+    "advisories": []
+  },
+  {
+    "package": "defusedxml",
+    "version": "0.7.1",
+    "advisories": []
+  },
+  {
+    "package": "distro",
+    "version": "1.9.0",
+    "advisories": []
+  },
+  {
+    "package": "et-xmlfile",
+    "version": "2.0.0",
+    "advisories": []
+  },
+  {
+    "package": "fal-client",
+    "version": "0.13.1",
+    "advisories": []
+  },
+  {
+    "package": "fastapi",
+    "version": "0.133.1",
+    "advisories": []
+  },
+  {
+    "package": "faster-whisper",
+    "version": "1.2.1",
+    "advisories": []
+  },
+  {
+    "package": "fetch-use",
+    "version": "0.4.0",
+    "advisories": []
+  },
+  {
+    "package": "filelock",
+    "version": "3.32.4",
+    "advisories": [
+      {
+        "id": "GHSA-567q-5qvw-pf92",
+        "summary": "filelock: On Windows an oplock on a soft lock's marker holds SoftFileLock.acquire() past its timeout and blocks the stale break",
+        "aliases": [
+          "CVE-2026-112907"
+        ],
+        "references": [
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/security/advisories/GHSA-567q-5qvw-pf92"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/pull/835"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/commit/e1e825b1992f69fb6b346dc395d5ae4893536c0a"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/tox-dev/filelock"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/releases/tag/4.2.1"
+          }
+        ]
+      },
+      {
+        "id": "GHSA-9vhv-jxww-xfm5",
+        "summary": "filelock: ReadWriteLock on Windows acts on SQLite side files another local user places beside its database",
+        "aliases": [
+          "CVE-2026-112913"
+        ],
+        "references": [
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/security/advisories/GHSA-9vhv-jxww-xfm5"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/pull/834"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/commit/5e3f2ec0c5fb17cb2635b60b2b68bc63ab81ca2d"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/tox-dev/filelock"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/releases/tag/4.2.1"
+          }
+        ]
+      },
+      {
+        "id": "GHSA-v4x8-3wr5-3wq8",
+        "summary": "filelock ReadWriteLock: SQLite reopens the lock database by name, so a planted symlink or journal file makes the lock user's process overwrite or unlink its own files",
+        "aliases": [
+          "CVE-2026-112940"
+        ],
+        "references": [
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/security/advisories/GHSA-v4x8-3wr5-3wq8"
+          },
+          {
+            "type": "ADVISORY",
+            "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-112940"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/pull/834"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/commit/5e3f2ec0c5fb17cb2635b60b2b68bc63ab81ca2d"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/tox-dev/filelock"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/releases/tag/4.2.1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "package": "filelock",
+    "version": "4.1.0",
+    "advisories": [
+      {
+        "id": "GHSA-2g95-wg33-c5x2",
+        "summary": "filelock: SoftFileLock evicts a fresh lock file whose watched age another local user's pre-dated file passed on through inode reuse",
+        "aliases": [
+          "CVE-2026-112906"
+        ],
+        "references": [
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/security/advisories/GHSA-2g95-wg33-c5x2"
+          },
+          {
+            "type": "ADVISORY",
+            "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-112906"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/pull/843"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/commit/740ff666b62a88496c8d7394e4e6230605e4d62b"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/tox-dev/filelock"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/releases/tag/4.2.1"
+          }
+        ]
+      },
+      {
+        "id": "GHSA-567q-5qvw-pf92",
+        "summary": "filelock: On Windows an oplock on a soft lock's marker holds SoftFileLock.acquire() past its timeout and blocks the stale break",
+        "aliases": [
+          "CVE-2026-112907"
+        ],
+        "references": [
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/security/advisories/GHSA-567q-5qvw-pf92"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/pull/835"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/commit/e1e825b1992f69fb6b346dc395d5ae4893536c0a"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/tox-dev/filelock"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/releases/tag/4.2.1"
+          }
+        ]
+      },
+      {
+        "id": "GHSA-9vhv-jxww-xfm5",
+        "summary": "filelock: ReadWriteLock on Windows acts on SQLite side files another local user places beside its database",
+        "aliases": [
+          "CVE-2026-112913"
+        ],
+        "references": [
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/security/advisories/GHSA-9vhv-jxww-xfm5"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/pull/834"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/commit/5e3f2ec0c5fb17cb2635b60b2b68bc63ab81ca2d"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/tox-dev/filelock"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/releases/tag/4.2.1"
+          }
+        ]
+      },
+      {
+        "id": "GHSA-crv4-6mhj-j5jh",
+        "summary": "filelock: SoftFileLock stale-break restore follows a swapped-in symbolic link and hard-links a file of the user running the lock into the lock directory",
+        "aliases": [
+          "CVE-2026-112914"
+        ],
+        "references": [
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/security/advisories/GHSA-crv4-6mhj-j5jh"
+          },
+          {
+            "type": "ADVISORY",
+            "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-112914"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/pull/843"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/commit/740ff666b62a88496c8d7394e4e6230605e4d62b"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/tox-dev/filelock"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/releases/tag/4.2.1"
+          }
+        ]
+      },
+      {
+        "id": "GHSA-jqc4-5cvw-7w85",
+        "summary": "filelock: ReadWriteLock on the hard-link route deletes any directory another user renames onto its .filelock-* link directory name",
+        "aliases": [
+          "CVE-2026-112937"
+        ],
+        "references": [
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/security/advisories/GHSA-jqc4-5cvw-7w85"
+          },
+          {
+            "type": "ADVISORY",
+            "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-112937"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/pull/834"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/commit/5e3f2ec0c5fb17cb2635b60b2b68bc63ab81ca2d"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/tox-dev/filelock"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/releases/tag/4.2.1"
+          }
+        ]
+      },
+      {
+        "id": "GHSA-v4x8-3wr5-3wq8",
+        "summary": "filelock ReadWriteLock: SQLite reopens the lock database by name, so a planted symlink or journal file makes the lock user's process overwrite or unlink its own files",
+        "aliases": [
+          "CVE-2026-112940"
+        ],
+        "references": [
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/security/advisories/GHSA-v4x8-3wr5-3wq8"
+          },
+          {
+            "type": "ADVISORY",
+            "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-112940"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/pull/834"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/commit/5e3f2ec0c5fb17cb2635b60b2b68bc63ab81ca2d"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/tox-dev/filelock"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/tox-dev/filelock/releases/tag/4.2.1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "package": "filelock",
+    "version": "4.2.4",
+    "advisories": []
+  },
+  {
+    "package": "fire",
+    "version": "0.7.1",
+    "advisories": []
+  },
+  {
+    "package": "firecrawl-anydoc",
+    "version": "0.2.4",
+    "advisories": []
+  },
+  {
+    "package": "firecrawl-py",
+    "version": "4.17.0",
+    "advisories": []
+  },
+  {
+    "package": "flatbuffers",
+    "version": "25.12.19",
+    "advisories": []
+  },
+  {
+    "package": "frozenlist",
+    "version": "1.8.0",
+    "advisories": []
+  },
+  {
+    "package": "fsspec",
+    "version": "2026.7.0",
+    "advisories": []
+  },
+  {
+    "package": "fsspec",
+    "version": "2026.9.0",
+    "advisories": []
+  },
+  {
+    "package": "google-api-core",
+    "version": "2.34.0",
+    "advisories": []
+  },
+  {
+    "package": "google-api-python-client",
+    "version": "2.194.0",
+    "advisories": []
+  },
+  {
+    "package": "google-auth",
+    "version": "2.55.1",
+    "advisories": []
+  },
+  {
+    "package": "google-auth-httplib2",
+    "version": "0.3.1",
+    "advisories": []
+  },
+  {
+    "package": "google-auth-oauthlib",
+    "version": "1.3.1",
+    "advisories": []
+  },
+  {
+    "package": "googleapis-common-protos",
+    "version": "1.75.1",
+    "advisories": []
+  },
+  {
+    "package": "h11",
+    "version": "0.16.0",
+    "advisories": []
+  },
+  {
+    "package": "hf-xet",
+    "version": "1.6.0",
+    "advisories": []
+  },
+  {
+    "package": "hf-xet",
+    "version": "1.7.0",
+    "advisories": []
+  },
+  {
+    "package": "httpcore",
+    "version": "1.0.9",
+    "advisories": []
+  },
+  {
+    "package": "httpcore2",
+    "version": "2.12.0",
+    "advisories": []
+  },
+  {
+    "package": "httplib2",
+    "version": "0.32.0",
+    "advisories": []
+  },
+  {
+    "package": "httptools",
+    "version": "0.8.0",
+    "advisories": []
+  },
+  {
+    "package": "httpx",
+    "version": "0.28.1",
+    "advisories": []
+  },
+  {
+    "package": "httpx-sse",
+    "version": "0.4.3",
+    "advisories": []
+  },
+  {
+    "package": "httpx2",
+    "version": "2.12.0",
+    "advisories": []
+  },
+  {
+    "package": "huggingface-hub",
+    "version": "1.18.0",
+    "advisories": []
+  },
+  {
+    "package": "huggingface-hub",
+    "version": "1.24.0",
+    "advisories": []
+  },
+  {
+    "package": "huggingface-hub",
+    "version": "1.33.0",
+    "advisories": []
+  },
+  {
+    "package": "idna",
+    "version": "3.19",
+    "advisories": []
+  },
+  {
+    "package": "idna",
+    "version": "3.20",
+    "advisories": []
+  },
+  {
+    "package": "importlib-metadata",
+    "version": "8.7.1",
+    "advisories": []
+  },
+  {
+    "package": "jinja2",
+    "version": "3.1.6",
+    "advisories": []
+  },
+  {
+    "package": "jiter",
+    "version": "0.16.0",
+    "advisories": []
+  },
+  {
+    "package": "jmespath",
+    "version": "1.1.0",
+    "advisories": []
+  },
+  {
+    "package": "joblib",
+    "version": "1.6.0",
+    "advisories": []
+  },
+  {
+    "package": "jsonschema",
+    "version": "4.26.0",
+    "advisories": []
+  },
+  {
+    "package": "jsonschema-specifications",
+    "version": "2025.9.1",
+    "advisories": []
+  },
+  {
+    "package": "lxml",
+    "version": "6.1.1",
+    "advisories": []
+  },
+  {
+    "package": "markdown",
+    "version": "3.10.2",
+    "advisories": []
+  },
+  {
+    "package": "markdown-it-py",
+    "version": "4.2.0",
+    "advisories": []
+  },
+  {
+    "package": "markupsafe",
+    "version": "3.0.3",
+    "advisories": []
+  },
+  {
+    "package": "markupsafe",
+    "version": "3.0.4",
+    "advisories": []
+  },
+  {
+    "package": "mcp",
+    "version": "2.2.0",
+    "advisories": []
+  },
+  {
+    "package": "mcp-types",
+    "version": "2.2.0",
+    "advisories": []
+  },
+  {
+    "package": "mdurl",
+    "version": "0.1.2",
+    "advisories": []
+  },
+  {
+    "package": "mpmath",
+    "version": "1.3.0",
+    "advisories": []
+  },
+  {
+    "package": "msgpack",
+    "version": "1.2.1",
+    "advisories": []
+  },
+  {
+    "package": "multidict",
+    "version": "6.9.1",
+    "advisories": []
+  },
+  {
+    "package": "narwhals",
+    "version": "2.27.1",
+    "advisories": []
+  },
+  {
+    "package": "nemo-relay",
+    "version": "0.10.0",
+    "advisories": []
+  },
+  {
+    "package": "nest-asyncio",
+    "version": "1.6.0",
+    "advisories": []
+  },
+  {
+    "package": "networkx",
+    "version": "3.7",
+    "advisories": []
+  },
+  {
+    "package": "numpy",
+    "version": "2.2.6",
+    "advisories": []
+  },
+  {
+    "package": "numpy",
+    "version": "2.4.3",
+    "advisories": []
+  },
+  {
+    "package": "numpy",
+    "version": "2.5.3",
+    "advisories": []
+  },
+  {
+    "package": "numpy",
+    "version": "2.5.4",
+    "advisories": []
+  },
+  {
+    "package": "oauthlib",
+    "version": "4.0.0",
+    "advisories": []
+  },
+  {
+    "package": "onnxruntime",
+    "version": "1.24.4",
+    "advisories": []
+  },
+  {
+    "package": "onnxruntime",
+    "version": "1.29.0",
+    "advisories": []
+  },
+  {
+    "package": "openai",
+    "version": "2.24.0",
+    "advisories": []
+  },
+  {
+    "package": "openpyxl",
+    "version": "3.1.5",
+    "advisories": []
+  },
+  {
+    "package": "opentelemetry-api",
+    "version": "1.39.1",
+    "advisories": [
+      {
+        "id": "GHSA-xcq7-p3pf-p88h",
+        "summary": "OpenTelemetry Python: Unbounded tracestate parsing in opentelemetry-api",
+        "aliases": [
+          "CVE-2026-114603"
+        ],
+        "references": [
+          {
+            "type": "WEB",
+            "url": "https://github.com/open-telemetry/opentelemetry-python/security/advisories/GHSA-xcq7-p3pf-p88h"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/open-telemetry/opentelemetry-python/pull/5749"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/open-telemetry/opentelemetry-python/commit/d5224bf4ffdf2aee1b592ad238dcc32ca957f26b"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/open-telemetry/opentelemetry-python"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/open-telemetry/opentelemetry-python/blob/main/CHANGELOG.md#version-1451066b1-2026-10-06"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/open-telemetry/opentelemetry-python/releases/tag/v1.45.1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "package": "packaging",
+    "version": "26.0",
+    "advisories": []
+  },
+  {
+    "package": "packaging",
+    "version": "26.3",
+    "advisories": []
+  },
+  {
+    "package": "pandas",
+    "version": "3.0.1",
+    "advisories": []
+  },
+  {
+    "package": "pathspec",
+    "version": "1.1.1",
+    "advisories": []
+  },
+  {
+    "package": "pdf2image",
+    "version": "1.17.0",
+    "advisories": []
+  },
+  {
+    "package": "pdfminer.six",
+    "version": "20251230",
+    "advisories": []
+  },
+  {
+    "package": "pdfplumber",
+    "version": "0.11.9",
+    "advisories": []
+  },
+  {
+    "package": "pefile",
+    "version": "2023.2.7",
+    "advisories": []
+  },
+  {
+    "package": "pefile",
+    "version": "2024.8.26",
+    "advisories": []
+  },
+  {
+    "package": "pillow",
+    "version": "13.0.0",
+    "advisories": []
+  },
+  {
+    "package": "pillow-heif",
+    "version": "1.6.0",
+    "advisories": []
+  },
+  {
+    "package": "pip",
+    "version": "25.0.1",
+    "advisories": [
+      {
+        "id": "GHSA-4xh5-x5gv-qwph",
+        "summary": "pip's fallback tar extraction doesn't check symbolic links point to extraction directory",
+        "aliases": [
+          "CVE-2025-8869",
+          "PYSEC-2026-1795"
+        ],
+        "references": [
+          {
+            "type": "ADVISORY",
+            "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-8869"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/pypa/pip/pull/13550"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/pypa/pip/commit/f2b92314da012b9fffa36b3f3e67748a37ef464a"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/pypa/pip"
+          },
+          {
+            "type": "WEB",
+            "url": "https://lists.debian.org/debian-lts-announce/2025/10/msg00028.html"
+          },
+          {
+            "type": "WEB",
+            "url": "https://mail.python.org/archives/list/security-announce@python.org/thread/IF5A3GCJY3VH7BVHJKOWOJFKTW7VFQEN"
+          },
+          {
+            "type": "WEB",
+            "url": "https://pip.pypa.io/en/stable/news/#v25-2"
+          }
+        ]
+      },
+      {
+        "id": "GHSA-58qw-9mgm-455v",
+        "summary": "pip has an interpretation conflict due to handling both concatenated tar and ZIP files as ZIP files",
+        "aliases": [
+          "CVE-2026-3219",
+          "PYSEC-2026-2875"
+        ],
+        "references": [
+          {
+            "type": "ADVISORY",
+            "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3219"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/pypa/pip/issues/13867"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/pypa/pip/pull/13870"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/pypa/pip"
+          },
+          {
+            "type": "WEB",
+            "url": "https://mail.python.org/archives/list/security-announce@python.org/thread/QAJ5JIVWWCAJ4EZL2FP5MOOW35JS7LRJ"
+          },
+          {
+            "type": "WEB",
+            "url": "http://www.openwall.com/lists/oss-security/2026/04/20/8"
+          }
+        ]
+      },
+      {
+        "id": "GHSA-6vgw-5pg2-w6jp",
+        "summary": "pip Path Traversal vulnerability",
+        "aliases": [
+          "CVE-2026-1703",
+          "PYSEC-2026-1796"
+        ],
+        "references": [
+          {
+            "type": "ADVISORY",
+            "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1703"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/pypa/pip/pull/13777"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/pypa/pip/commit/8e227a9be4faa9594e05d02ca05a413a2a4e7735"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/pypa/pip"
+          },
+          {
+            "type": "WEB",
+            "url": "https://mail.python.org/archives/list/security-announce@python.org/thread/WIEA34D4TABF2UNQJAOMXKCICSPBE2DJ"
+          }
+        ]
+      },
+      {
+        "id": "GHSA-jp4c-xjxw-mgf9",
+        "summary": "pip Vulnerable to Inclusion of Functionality from Untrusted Control Sphere",
+        "aliases": [
+          "CVE-2026-6357",
+          "PYSEC-2026-2876"
+        ],
+        "references": [
+          {
+            "type": "ADVISORY",
+            "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-6357"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/pypa/pip/pull/13923"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/pypa/pip/commit/b369bfc96cc524e00c267e1693290e6599c36bad"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/pypa/pip"
+          },
+          {
+            "type": "WEB",
+            "url": "https://ichard26.github.io/blog/2026/04/whats-new-in-pip-26.1/#security-fixes"
+          },
+          {
+            "type": "WEB",
+            "url": "http://www.openwall.com/lists/oss-security/2026/04/27/7"
+          }
+        ]
+      },
+      {
+        "id": "GHSA-qwm4-qh6w-59xr",
+        "summary": "pip would incorrectly handle doubly-encoded package URLs from indexes",
+        "aliases": [
+          "CVE-2026-13346",
+          "PYSEC-2026-3721"
+        ],
+        "references": [
+          {
+            "type": "ADVISORY",
+            "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-13346"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/pypa/pip/pull/14110"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/pypa/pip/commit/10dfb6b9005484578b386f64b9f36982e3dc6679"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/pypa/advisory-database/tree/main/vulns/pip/PYSEC-2026-3721.yaml"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/pypa/pip"
+          },
+          {
+            "type": "WEB",
+            "url": "https://mail.python.org/archives/list/security-announce@python.org/thread/L2BNQGGVQCEV7DROOORQ7WFKKFF2OOQX"
+          },
+          {
+            "type": "WEB",
+            "url": "http://www.openwall.com/lists/oss-security/2026/07/29/7"
+          }
+        ]
+      },
+      {
+        "id": "GHSA-wf93-45jw-7689",
+        "summary": " pip: Path traversal in console_scripts/gui_scripts entry point names allows installing scripts outside of target directory",
+        "aliases": [
+          "CVE-2026-8643",
+          "PYSEC-2026-196"
+        ],
+        "references": [
+          {
+            "type": "ADVISORY",
+            "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-8643"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/pypa/pip/pull/14000"
+          },
+          {
+            "type": "WEB",
+            "url": "https://access.redhat.com/errata/RHSA-2026:33313"
+          },
+          {
+            "type": "WEB",
+            "url": "https://access.redhat.com/errata/RHSA-2026:34776"
+          },
+          {
+            "type": "WEB",
+            "url": "https://access.redhat.com/errata/RHSA-2026:34777"
+          },
+          {
+            "type": "WEB",
+            "url": "https://access.redhat.com/errata/RHSA-2026:34778"
+          },
+          {
+            "type": "WEB",
+            "url": "https://access.redhat.com/errata/RHSA-2026:34780"
+          },
+          {
+            "type": "WEB",
+            "url": "https://access.redhat.com/errata/RHSA-2026:34891"
+          },
+          {
+            "type": "WEB",
+            "url": "https://access.redhat.com/errata/RHSA-2026:36193"
+          },
+          {
+            "type": "WEB",
+            "url": "https://access.redhat.com/errata/RHSA-2026:36315"
+          },
+          {
+            "type": "WEB",
+            "url": "https://access.redhat.com/errata/RHSA-2026:37275"
+          },
+          {
+            "type": "WEB",
+            "url": "https://access.redhat.com/errata/RHSA-2026:37283"
+          },
+          {
+            "type": "WEB",
+            "url": "https://access.redhat.com/security/cve/CVE-2026-8643"
+          },
+          {
+            "type": "WEB",
+            "url": "https://bugzilla.redhat.com/show_bug.cgi?id=2460927"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/pypa/advisory-database/tree/main/vulns/pip/PYSEC-2026-196.yaml"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/pypa/pip"
+          },
+          {
+            "type": "WEB",
+            "url": "https://mail.python.org/archives/list/security-announce@python.org/thread/YV63UET5D3OOJY7O4M5XCVYO2YM4NBYJ"
+          },
+          {
+            "type": "WEB",
+            "url": "https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-8643.json"
+          },
+          {
+            "type": "WEB",
+            "url": "https://access.redhat.com/errata/RHSA-2026:34374"
+          },
+          {
+            "type": "WEB",
+            "url": "https://access.redhat.com/errata/RHSA-2026:34456"
+          },
+          {
+            "type": "WEB",
+            "url": "https://access.redhat.com/errata/RHSA-2026:34739"
+          },
+          {
+            "type": "WEB",
+            "url": "https://access.redhat.com/errata/RHSA-2026:34740"
+          },
+          {
+            "type": "WEB",
+            "url": "https://access.redhat.com/errata/RHSA-2026:34741"
+          },
+          {
+            "type": "WEB",
+            "url": "https://access.redhat.com/errata/RHSA-2026:34748"
+          },
+          {
+            "type": "WEB",
+            "url": "https://access.redhat.com/errata/RHSA-2026:34749"
+          },
+          {
+            "type": "WEB",
+            "url": "https://access.redhat.com/errata/RHSA-2026:34750"
+          },
+          {
+            "type": "WEB",
+            "url": "https://access.redhat.com/errata/RHSA-2026:34752"
+          },
+          {
+            "type": "WEB",
+            "url": "https://access.redhat.com/errata/RHSA-2026:34756"
+          },
+          {
+            "type": "WEB",
+            "url": "https://access.redhat.com/errata/RHSA-2026:34758"
+          },
+          {
+            "type": "WEB",
+            "url": "https://access.redhat.com/errata/RHSA-2026:34760"
+          },
+          {
+            "type": "WEB",
+            "url": "https://access.redhat.com/errata/RHSA-2026:34765"
+          },
+          {
+            "type": "WEB",
+            "url": "https://access.redhat.com/errata/RHSA-2026:34772"
+          },
+          {
+            "type": "WEB",
+            "url": "https://access.redhat.com/errata/RHSA-2026:34773"
+          },
+          {
+            "type": "WEB",
+            "url": "https://access.redhat.com/errata/RHSA-2026:34774"
+          },
+          {
+            "type": "WEB",
+            "url": "https://access.redhat.com/errata/RHSA-2026:34775"
+          },
+          {
+            "type": "WEB",
+            "url": "http://www.openwall.com/lists/oss-security/2026/06/01/5"
+          }
+        ]
+      },
+      {
+        "id": "PYSEC-2026-1795",
+        "summary": "pip's fallback tar extraction doesn't check symbolic links point to extraction directory",
+        "aliases": [
+          "CVE-2025-8869",
+          "GHSA-4xh5-x5gv-qwph"
+        ],
+        "references": [
+          {
+            "type": "ADVISORY",
+            "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-8869"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/pypa/pip/pull/13550"
+          },
+          {
+            "type": "FIX",
+            "url": "https://github.com/pypa/pip/commit/f2b92314da012b9fffa36b3f3e67748a37ef464a"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/pypa/pip"
+          },
+          {
+            "type": "WEB",
+            "url": "https://lists.debian.org/debian-lts-announce/2025/10/msg00028.html"
+          },
+          {
+            "type": "WEB",
+            "url": "https://mail.python.org/archives/list/security-announce@python.org/thread/IF5A3GCJY3VH7BVHJKOWOJFKTW7VFQEN"
+          },
+          {
+            "type": "WEB",
+            "url": "https://pip.pypa.io/en/stable/news/#v25-2"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://pypi.org/project/pip"
+          },
+          {
+            "type": "ADVISORY",
+            "url": "https://github.com/advisories/GHSA-4xh5-x5gv-qwph"
+          }
+        ]
+      },
+      {
+        "id": "PYSEC-2026-1796",
+        "summary": "pip Path Traversal vulnerability",
+        "aliases": [
+          "CVE-2026-1703",
+          "GHSA-6vgw-5pg2-w6jp"
+        ],
+        "references": [
+          {
+            "type": "ADVISORY",
+            "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1703"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/pypa/pip/pull/13777"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/pypa/pip/commit/8e227a9be4faa9594e05d02ca05a413a2a4e7735"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/pypa/pip"
+          },
+          {
+            "type": "WEB",
+            "url": "https://mail.python.org/archives/list/security-announce@python.org/thread/WIEA34D4TABF2UNQJAOMXKCICSPBE2DJ"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://pypi.org/project/pip"
+          },
+          {
+            "type": "ADVISORY",
+            "url": "https://github.com/advisories/GHSA-6vgw-5pg2-w6jp"
+          }
+        ]
+      },
+      {
+        "id": "PYSEC-2026-196",
+        "summary": null,
+        "aliases": [
+          "CVE-2026-8643",
+          "GHSA-wf93-45jw-7689"
+        ],
+        "references": [
+          {
+            "type": "ADVISORY",
+            "url": "http://www.openwall.com/lists/oss-security/2026/06/01/5"
+          },
+          {
+            "type": "ADVISORY",
+            "url": "https://mail.python.org/archives/list/security-announce@python.org/thread/YV63UET5D3OOJY7O4M5XCVYO2YM4NBYJ/"
+          },
+          {
+            "type": "FIX",
+            "url": "https://github.com/pypa/pip/pull/14000"
+          },
+          {
+            "type": "ADVISORY",
+            "url": "https://github.com/advisories/GHSA-wf93-45jw-7689"
+          }
+        ]
+      },
+      {
+        "id": "PYSEC-2026-2875",
+        "summary": "pip has an interpretation conflict due to handling both concatenated tar and ZIP files as ZIP files",
+        "aliases": [
+          "CVE-2026-3219",
+          "GHSA-58qw-9mgm-455v"
+        ],
+        "references": [
+          {
+            "type": "ADVISORY",
+            "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3219"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/pypa/pip/issues/13867"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/pypa/pip/pull/13870"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/pypa/pip"
+          },
+          {
+            "type": "WEB",
+            "url": "https://mail.python.org/archives/list/security-announce@python.org/thread/QAJ5JIVWWCAJ4EZL2FP5MOOW35JS7LRJ"
+          },
+          {
+            "type": "WEB",
+            "url": "http://www.openwall.com/lists/oss-security/2026/04/20/8"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://pypi.org/project/pip"
+          },
+          {
+            "type": "ADVISORY",
+            "url": "https://github.com/advisories/GHSA-58qw-9mgm-455v"
+          }
+        ]
+      },
+      {
+        "id": "PYSEC-2026-2876",
+        "summary": "pip Vulnerable to Inclusion of Functionality from Untrusted Control Sphere",
+        "aliases": [
+          "CVE-2026-6357",
+          "GHSA-jp4c-xjxw-mgf9"
+        ],
+        "references": [
+          {
+            "type": "ADVISORY",
+            "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-6357"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/pypa/pip/pull/13923"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/pypa/pip/commit/b369bfc96cc524e00c267e1693290e6599c36bad"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/pypa/pip"
+          },
+          {
+            "type": "WEB",
+            "url": "https://ichard26.github.io/blog/2026/04/whats-new-in-pip-26.1/#security-fixes"
+          },
+          {
+            "type": "WEB",
+            "url": "http://www.openwall.com/lists/oss-security/2026/04/27/7"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://pypi.org/project/pip"
+          },
+          {
+            "type": "ADVISORY",
+            "url": "https://github.com/advisories/GHSA-jp4c-xjxw-mgf9"
+          }
+        ]
+      },
+      {
+        "id": "PYSEC-2026-3721",
+        "summary": null,
+        "aliases": [
+          "CVE-2026-13346",
+          "GHSA-qwm4-qh6w-59xr"
+        ],
+        "references": [
+          {
+            "type": "ADVISORY",
+            "url": "http://www.openwall.com/lists/oss-security/2026/07/29/7"
+          },
+          {
+            "type": "ADVISORY",
+            "url": "https://mail.python.org/archives/list/security-announce@python.org/thread/L2BNQGGVQCEV7DROOORQ7WFKKFF2OOQX/"
+          },
+          {
+            "type": "FIX",
+            "url": "https://github.com/pypa/pip/pull/14110"
+          },
+          {
+            "type": "ADVISORY",
+            "url": "https://github.com/advisories/GHSA-qwm4-qh6w-59xr"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "package": "pip",
+    "version": "26.2.1",
+    "advisories": []
+  },
+  {
+    "package": "portalocker",
+    "version": "3.2.0",
+    "advisories": []
+  },
+  {
+    "package": "prompt-toolkit",
+    "version": "3.0.52",
+    "advisories": []
+  },
+  {
+    "package": "propcache",
+    "version": "0.5.2",
+    "advisories": []
+  },
+  {
+    "package": "proto-plus",
+    "version": "1.28.3",
+    "advisories": []
+  },
+  {
+    "package": "protobuf",
+    "version": "6.33.6",
+    "advisories": []
+  },
+  {
+    "package": "protobuf",
+    "version": "7.36.2",
+    "advisories": []
+  },
+  {
+    "package": "proxy-tools",
+    "version": "0.1.0",
+    "advisories": []
+  },
+  {
+    "package": "psutil",
+    "version": "7.2.2",
+    "advisories": []
+  },
+  {
+    "package": "ptts",
+    "version": "0.4.1",
+    "advisories": []
+  },
+  {
+    "package": "pvporcupine",
+    "version": "4.0.3",
+    "advisories": []
+  },
+  {
+    "package": "pyasn1",
+    "version": "0.6.4",
+    "advisories": []
+  },
+  {
+    "package": "pyasn1-modules",
+    "version": "0.4.2",
+    "advisories": []
+  },
+  {
+    "package": "pycparser",
+    "version": "3.0",
+    "advisories": []
+  },
+  {
+    "package": "pycparser",
+    "version": "3.11",
+    "advisories": []
+  },
+  {
+    "package": "pydantic",
+    "version": "2.13.4",
+    "advisories": []
+  },
+  {
+    "package": "pydantic",
+    "version": "2.13.5",
+    "advisories": []
+  },
+  {
+    "package": "pydantic-core",
+    "version": "2.46.4",
+    "advisories": []
+  },
+  {
+    "package": "pydantic-core",
+    "version": "2.46.5",
+    "advisories": []
+  },
+  {
+    "package": "pygments",
+    "version": "2.21.0",
+    "advisories": []
+  },
+  {
+    "package": "pyhumps",
+    "version": "3.8.0",
+    "advisories": []
+  },
+  {
+    "package": "pyinstaller",
+    "version": "6.16.0",
+    "advisories": []
+  },
+  {
+    "package": "pyinstaller",
+    "version": "6.22.3",
+    "advisories": []
+  },
+  {
+    "package": "pyinstaller-hooks-contrib",
+    "version": "2026.8",
+    "advisories": []
+  },
+  {
+    "package": "pyinstaller-hooks-contrib",
+    "version": "2026.9",
+    "advisories": []
+  },
+  {
+    "package": "pyjwt",
+    "version": "2.15.0",
+    "advisories": []
+  },
+  {
+    "package": "pyparsing",
+    "version": "3.3.2",
+    "advisories": []
+  },
+  {
+    "package": "pypdf",
+    "version": "6.19.0",
+    "advisories": [
+      {
+        "id": "GHSA-39mj-jf6j-2qj3",
+        "summary": "pypdf: Possible infinite loop when hitting EOF in standard xref table",
+        "aliases": [
+          "CVE-2026-113794"
+        ],
+        "references": [
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/security/advisories/GHSA-39mj-jf6j-2qj3"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/issues/4169"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/pull/4170"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/commit/37e1cd681744bac38b159f7e1c614eee8d639c58"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/py-pdf/pypdf"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/releases/tag/6.20.0"
+          }
+        ]
+      },
+      {
+        "id": "GHSA-5hx5-vpf9-5wcv",
+        "summary": "pypdf: Unvalidated JPEG image data loading",
+        "aliases": [
+          "CVE-2026-113786"
+        ],
+        "references": [
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/security/advisories/GHSA-5hx5-vpf9-5wcv"
+          },
+          {
+            "type": "ADVISORY",
+            "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-113786"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/pull/4222"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/commit/512d8eb94eb04be1d1c90504e6da2dcef8679e07"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/py-pdf/pypdf"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/releases/tag/6.21.1"
+          }
+        ]
+      },
+      {
+        "id": "GHSA-6c7f-9265-g8fw",
+        "summary": "pypdf: Possible long runtimes for repeated references to the same missing object",
+        "aliases": [
+          "CVE-2026-115572"
+        ],
+        "references": [
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/security/advisories/GHSA-6c7f-9265-g8fw"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/pull/4240"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/commit/68a0e5046cc9e14a6c24a21a713f3c7fbde18b4b"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/py-pdf/pypdf"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/releases/tag/6.21.2"
+          }
+        ]
+      },
+      {
+        "id": "GHSA-6vvc-x485-93v7",
+        "summary": "pypdf: Possible long runtimes/large memory usage when retrieving form fields",
+        "aliases": [
+          "CVE-2026-113789"
+        ],
+        "references": [
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/security/advisories/GHSA-6vvc-x485-93v7"
+          },
+          {
+            "type": "ADVISORY",
+            "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-113789"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/pull/4219"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/commit/5ef728f0e16d225c853e89f861ba0a67402fe3f2"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/py-pdf/pypdf"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/releases/tag/6.21.0"
+          }
+        ]
+      },
+      {
+        "id": "GHSA-7mh2-4gg2-979f",
+        "summary": "pypdf: Possible large memory usage for streams with multiple filters",
+        "aliases": [
+          "CVE-2026-113795"
+        ],
+        "references": [
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/security/advisories/GHSA-7mh2-4gg2-979f"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/pull/4173"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/commit/80a84d4be6022d910874ccb0d2365400f3f0e185"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/py-pdf/pypdf"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/releases/tag/6.20.0"
+          }
+        ]
+      },
+      {
+        "id": "GHSA-9mx8-4j7g-633p",
+        "summary": "pypdf: Possible infinite loop when removing tree items",
+        "aliases": [
+          "CVE-2026-113793"
+        ],
+        "references": [
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/security/advisories/GHSA-9mx8-4j7g-633p"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/pull/4188"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/commit/c9c35b4471c2eb5fe078094f6c816e69d4ed25a0"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/py-pdf/pypdf"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/releases/tag/6.20.1"
+          }
+        ]
+      },
+      {
+        "id": "GHSA-cgf9-327m-v77c",
+        "summary": "pypdf: Possible large memory usage when parsing content streams",
+        "aliases": [
+          "CVE-2026-113791"
+        ],
+        "references": [
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/security/advisories/GHSA-cgf9-327m-v77c"
+          },
+          {
+            "type": "ADVISORY",
+            "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-113791"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/pull/4218"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/commit/18bd2981a74479483a0b9507602c58a63d6c9b12"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/py-pdf/pypdf"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/releases/tag/6.21.0"
+          }
+        ]
+      },
+      {
+        "id": "GHSA-f54x-cmq8-qg57",
+        "summary": "pypdf: Possible large memory usage when parsing arrays and dictionaries",
+        "aliases": [
+          "CVE-2026-113790"
+        ],
+        "references": [
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/security/advisories/GHSA-f54x-cmq8-qg57"
+          },
+          {
+            "type": "ADVISORY",
+            "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-113790"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/pull/4218"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/commit/18bd2981a74479483a0b9507602c58a63d6c9b12"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/py-pdf/pypdf"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/releases/tag/6.21.0"
+          }
+        ]
+      },
+      {
+        "id": "GHSA-gmh7-3g9r-mjh5",
+        "summary": "pypdf: Possible long runtimes for large xref table header limits",
+        "aliases": [
+          "CVE-2026-115580"
+        ],
+        "references": [
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/security/advisories/GHSA-gmh7-3g9r-mjh5"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/pull/4239"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/commit/a3061e34b169d34478d520f5f049c53cfb1482b2"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/py-pdf/pypdf"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/releases/tag/6.21.2"
+          }
+        ]
+      },
+      {
+        "id": "GHSA-jr96-gvgh-j3r4",
+        "summary": "pypdf: Possible long runtimes for repeated malformed cross-reference entries (Follow-up)",
+        "aliases": [
+          "CVE-2026-115585"
+        ],
+        "references": [
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/security/advisories/GHSA-jr96-gvgh-j3r4"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/pull/4240"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/commit/68a0e5046cc9e14a6c24a21a713f3c7fbde18b4b"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/py-pdf/pypdf"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/releases/tag/6.21.2"
+          }
+        ]
+      },
+      {
+        "id": "GHSA-qfv9-64jg-mh7p",
+        "summary": "pypdf: Possible infinite loop in PdfWriter.find_outline_item",
+        "aliases": [
+          "CVE-2026-113792"
+        ],
+        "references": [
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/security/advisories/GHSA-qfv9-64jg-mh7p"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/pull/4188"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/commit/c9c35b4471c2eb5fe078094f6c816e69d4ed25a0"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/py-pdf/pypdf"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/py-pdf/pypdf/releases/tag/6.20.1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "package": "pypdfium2",
+    "version": "5.14.0",
+    "advisories": []
+  },
+  {
+    "package": "pypinyin",
+    "version": "0.55.0",
+    "advisories": []
+  },
+  {
+    "package": "python-dateutil",
+    "version": "2.9.0.post0",
+    "advisories": []
+  },
+  {
+    "package": "python-docx",
+    "version": "1.2.0",
+    "advisories": []
+  },
+  {
+    "package": "python-dotenv",
+    "version": "1.2.2",
+    "advisories": []
+  },
+  {
+    "package": "python-multipart",
+    "version": "0.0.32",
+    "advisories": []
+  },
+  {
+    "package": "python-pptx",
+    "version": "1.0.2",
+    "advisories": []
+  },
+  {
+    "package": "pythonnet",
+    "version": "3.2.0",
+    "advisories": []
+  },
+  {
+    "package": "pytz",
+    "version": "2026.3.post1",
+    "advisories": []
+  },
+  {
+    "package": "pywebview",
+    "version": "6.2.1",
+    "advisories": []
+  },
+  {
+    "package": "pywin32",
+    "version": "311",
+    "advisories": []
+  },
+  {
+    "package": "pywin32-ctypes",
+    "version": "0.2.3",
+    "advisories": []
+  },
+  {
+    "package": "pywinpty",
+    "version": "3.0.5",
+    "advisories": []
+  },
+  {
+    "package": "pyyaml",
+    "version": "6.0.3",
+    "advisories": []
+  },
+  {
+    "package": "referencing",
+    "version": "0.37.0",
+    "advisories": []
+  },
+  {
+    "package": "regex",
+    "version": "2026.9.29",
+    "advisories": []
+  },
+  {
+    "package": "reportlab",
+    "version": "4.4.9",
+    "advisories": []
+  },
+  {
+    "package": "requests",
+    "version": "2.33.0",
+    "advisories": []
+  },
+  {
+    "package": "requests",
+    "version": "2.34.2",
+    "advisories": []
+  },
+  {
+    "package": "requests-oauthlib",
+    "version": "2.0.0",
+    "advisories": []
+  },
+  {
+    "package": "resvg-py",
+    "version": "0.4.0",
+    "advisories": []
+  },
+  {
+    "package": "rich",
+    "version": "14.3.3",
+    "advisories": []
+  },
+  {
+    "package": "rich",
+    "version": "15.0.0",
+    "advisories": []
+  },
+  {
+    "package": "rpds-py",
+    "version": "2026.6.3",
+    "advisories": []
+  },
+  {
+    "package": "ruamel.yaml",
+    "version": "0.18.16",
+    "advisories": []
+  },
+  {
+    "package": "s3transfer",
+    "version": "0.16.1",
+    "advisories": []
+  },
+  {
+    "package": "safetensors",
+    "version": "0.8.0",
+    "advisories": []
+  },
+  {
+    "package": "scikit-learn",
+    "version": "1.9.1",
+    "advisories": []
+  },
+  {
+    "package": "scipy",
+    "version": "1.15.3",
+    "advisories": []
+  },
+  {
+    "package": "scipy",
+    "version": "1.18.1",
+    "advisories": []
+  },
+  {
+    "package": "sentence-transformers",
+    "version": "6.1.0",
+    "advisories": []
+  },
+  {
+    "package": "sentencepiece",
+    "version": "0.2.2",
+    "advisories": []
+  },
+  {
+    "package": "setuptools",
+    "version": "83.0.0",
+    "advisories": [
+      {
+        "id": "GHSA-xmj3-9gf7-h52w",
+        "summary": "setuptools: Windows path escape via namespace_packages.txt during legacy wheel installation  Description",
+        "aliases": [],
+        "references": [
+          {
+            "type": "WEB",
+            "url": "https://github.com/pypa/setuptools/security/advisories/GHSA-xmj3-9gf7-h52w"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/pypa/setuptools/pull/5329"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/pypa/setuptools/commit/6d07b8d17890dda58d944ac51e58f54af92d52af"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/pypa/setuptools"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/pypa/setuptools/releases/tag/v84.1.0"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "package": "setuptools",
+    "version": "84.0.0",
+    "advisories": [
+      {
+        "id": "GHSA-xmj3-9gf7-h52w",
+        "summary": "setuptools: Windows path escape via namespace_packages.txt during legacy wheel installation  Description",
+        "aliases": [],
+        "references": [
+          {
+            "type": "WEB",
+            "url": "https://github.com/pypa/setuptools/security/advisories/GHSA-xmj3-9gf7-h52w"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/pypa/setuptools/pull/5329"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/pypa/setuptools/commit/6d07b8d17890dda58d944ac51e58f54af92d52af"
+          },
+          {
+            "type": "PACKAGE",
+            "url": "https://github.com/pypa/setuptools"
+          },
+          {
+            "type": "WEB",
+            "url": "https://github.com/pypa/setuptools/releases/tag/v84.1.0"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "package": "shellingham",
+    "version": "1.5.4",
+    "advisories": []
+  },
+  {
+    "package": "sherpa-onnx",
+    "version": "1.13.8",
+    "advisories": []
+  },
+  {
+    "package": "sherpa-onnx-core",
+    "version": "1.13.8",
+    "advisories": []
+  },
+  {
+    "package": "six",
+    "version": "1.17.0",
+    "advisories": []
+  },
+  {
+    "package": "sniffio",
+    "version": "1.3.1",
+    "advisories": []
+  },
+  {
+    "package": "snowballstemmer",
+    "version": "3.1.1",
+    "advisories": []
+  },
+  {
+    "package": "socksio",
+    "version": "1.0.0",
+    "advisories": []
+  },
+  {
+    "package": "sounddevice",
+    "version": "0.5.5",
+    "advisories": []
+  },
+  {
+    "package": "soundfile",
+    "version": "0.14.0",
+    "advisories": []
+  },
+  {
+    "package": "sse-starlette",
+    "version": "3.4.8",
+    "advisories": []
+  },
+  {
+    "package": "starlette",
+    "version": "1.3.1",
+    "advisories": []
+  },
+  {
+    "package": "sympy",
+    "version": "1.14.0",
+    "advisories": []
+  },
+  {
+    "package": "tenacity",
+    "version": "9.1.4",
+    "advisories": []
+  },
+  {
+    "package": "termcolor",
+    "version": "3.3.0",
+    "advisories": []
+  },
+  {
+    "package": "threadpoolctl",
+    "version": "3.7.0",
+    "advisories": []
+  },
+  {
+    "package": "tokenizers",
+    "version": "0.23.1",
+    "advisories": []
+  },
+  {
+    "package": "tokenizers",
+    "version": "0.23.3",
+    "advisories": []
+  },
+  {
+    "package": "tomli-w",
+    "version": "1.2.0",
+    "advisories": []
+  },
+  {
+    "package": "torch",
+    "version": "2.14.1",
+    "advisories": []
+  },
+  {
+    "package": "torchcodec",
+    "version": "0.17.0",
+    "advisories": []
+  },
+  {
+    "package": "torchvision",
+    "version": "0.29.1",
+    "advisories": []
+  },
+  {
+    "package": "tqdm",
+    "version": "4.70.0",
+    "advisories": []
+  },
+  {
+    "package": "tqdm",
+    "version": "4.70.1",
+    "advisories": []
+  },
+  {
+    "package": "transformers",
+    "version": "5.19.0",
+    "advisories": []
+  },
+  {
+    "package": "truststore",
+    "version": "0.10.4",
+    "advisories": []
+  },
+  {
+    "package": "typer",
+    "version": "0.25.1",
+    "advisories": []
+  },
+  {
+    "package": "typer",
+    "version": "0.27.3",
+    "advisories": []
+  },
+  {
+    "package": "typing-extensions",
+    "version": "4.16.0",
+    "advisories": []
+  },
+  {
+    "package": "typing-inspection",
+    "version": "0.4.4",
+    "advisories": []
+  },
+  {
+    "package": "tzdata",
+    "version": "2025.3",
+    "advisories": []
+  },
+  {
+    "package": "tzdata",
+    "version": "2026.5",
+    "advisories": []
+  },
+  {
+    "package": "uritemplate",
+    "version": "4.2.0",
+    "advisories": []
+  },
+  {
+    "package": "urllib3",
+    "version": "2.8.0",
+    "advisories": []
+  },
+  {
+    "package": "uvicorn",
+    "version": "0.41.0",
+    "advisories": []
+  },
+  {
+    "package": "watchfiles",
+    "version": "1.2.0",
+    "advisories": []
+  },
+  {
+    "package": "wcwidth",
+    "version": "0.8.2",
+    "advisories": []
+  },
+  {
+    "package": "websockets",
+    "version": "15.0.1",
+    "advisories": []
+  },
+  {
+    "package": "wheel",
+    "version": "0.48.0",
+    "advisories": []
+  },
+  {
+    "package": "winrt-runtime",
+    "version": "3.2.1",
+    "advisories": []
+  },
+  {
+    "package": "winrt-windows.applicationmodel",
+    "version": "3.2.1",
+    "advisories": []
+  },
+  {
+    "package": "winrt-windows.foundation",
+    "version": "3.2.1",
+    "advisories": []
+  },
+  {
+    "package": "winrt-windows.foundation.collections",
+    "version": "3.2.1",
+    "advisories": []
+  },
+  {
+    "package": "winrt-windows.services.store",
+    "version": "3.2.1",
+    "advisories": []
+  },
+  {
+    "package": "xlsxwriter",
+    "version": "3.2.9",
+    "advisories": []
+  },
+  {
+    "package": "yarl",
+    "version": "1.25.1",
+    "advisories": []
+  },
+  {
+    "package": "youtube-transcript-api",
+    "version": "1.2.4",
+    "advisories": []
+  },
+  {
+    "package": "zipp",
+    "version": "4.1.0",
+    "advisories": []
+  }
+]

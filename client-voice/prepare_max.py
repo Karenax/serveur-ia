@@ -47,6 +47,7 @@ def main():
     if shutil.disk_usage(home).free < 30*1024**3:
         raise ValueError('Au moins 30 Go libres sont nécessaires pour préparer le mode Max.')
     worker = Path(__file__).with_name('max_worker.py')
+    shutil.copy2(worker.with_name('worker_protocol.py'),home/'worker_protocol.py')
     for name in ('python', 'tts-python'):
         folder = home/name
         if not (folder/'Scripts/python.exe').is_file():

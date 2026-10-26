@@ -1,0 +1,8 @@
+test_compacted_nonce_cannot_replay_a_mutation_after_restart (test_command_boundaries.CommandBoundariesTests.test_compacted_nonce_cannot_replay_a_mutation_after_restart) ... ok
+test_cross_protocol_stale_update_and_delete_preserve_recent_memory (test_command_boundaries.CommandBoundariesTests.test_cross_protocol_stale_update_and_delete_preserve_recent_memory) ... ok
+test_forget_and_cancel_remain_durable_at_both_limits (test_command_boundaries.CommandBoundariesTests.test_forget_and_cancel_remain_durable_at_both_limits) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 1.038s
+
+OK

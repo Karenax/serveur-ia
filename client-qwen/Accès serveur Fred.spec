@@ -2,8 +2,10 @@
 from PyInstaller.utils.hooks import collect_all
 
 datas = [('D:/Serveur IA/client-qwen/voice', 'voice'), ('D:/Serveur IA/client-qwen/voice.js', '.'), ('D:/Serveur IA/client-qwen/conversation.js', '.'), ('D:/Serveur IA/client-qwen/workspace.html', '.'), ('D:/Serveur IA/client-qwen/ui.css', '.'), ('D:/Serveur IA/client-qwen/ui.js', '.'), ('D:/Serveur IA/client-qwen/attachments.js', '.'), ('D:/Serveur IA/client-qwen/selection.js', '.'), ('D:/Serveur IA/client-qwen/thinking.js', '.'), ('D:/Serveur IA/client-qwen/markdown.js', '.'), ('D:/Serveur IA/client-qwen/corrector.js', '.'), ('D:/Serveur IA/client-qwen/vendor', 'vendor'), ('D:/Serveur IA/client-qwen/chat.html', '.'), ('D:/Serveur IA/client-qwen/LICENSE.txt', '.'), ('D:/Serveur IA/client-qwen/THIRD-PARTY.txt', '.')]
-binaries = [('D:/Serveur IA/client-qwen/wireguard-bridge.exe', '.')]
+binaries = [('D:/Serveur IA/toolchain/releases-staging/wireguard-bridge.exe', '.')]
 hiddenimports = []
+tmp_ret = collect_all('kiara_shared')
+datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 tmp_ret = collect_all('webview')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 tmp_ret = collect_all('pythonnet')
@@ -14,7 +16,7 @@ datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 
 a = Analysis(
     ['D:/Serveur IA/client-qwen/client.py'],
-    pathex=[],
+    pathex=['D:/Serveur IA/shared'],
     binaries=binaries,
     datas=datas,
     hiddenimports=hiddenimports,
