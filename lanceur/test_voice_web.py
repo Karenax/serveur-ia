@@ -100,14 +100,14 @@ class VoiceWebHTTPTests(unittest.TestCase):
         data = self.captured[0][1]
         self.assertEqual(data['model'], 'actual-local')
         self.assertEqual(data['reasoning_effort'], 'none')
-        self.assertEqual(data['max_tokens'], 512)
+        self.assertEqual(data['max_tokens'], 100000)
         self.assertFalse(data['strata_mcp'])
         self.assertNotIn('tools', data)
         prompt = json.dumps(data, ensure_ascii=False)
         self.assertIn('FAIT-PUBLIC-4200', prompt)
         self.assertIn('retrieved', prompt)
         self.assertNotIn('PRIVATE-', prompt + raw.decode())
-        self.assertLessEqual(sum(len(json.dumps(m)) for m in data['messages']) // 4 + 20, 15872)
+        self.assertLessEqual(sum(len(json.dumps(m)) for m in data['messages']) // 4 + 20, 162144)
         self.settle()
 
     def test_ordinary_oral_turn_does_not_call_any_web_provider(self):
@@ -125,7 +125,7 @@ class VoiceWebHTTPTests(unittest.TestCase):
         self.assertEqual(self.web.calls[0][1]['query'],self.voice_plan['query'])
         self.assertEqual(len(self.plan_captured),1)
         self.assertEqual(self.plan_captured[0]['reasoning_effort'],'none')
-        self.assertEqual(self.plan_captured[0]['max_tokens'],128)
+        self.assertEqual(self.plan_captured[0]['max_tokens'],-1)
         self.settle()
 
     def test_missing_subject_requests_clarification_without_search(self):

@@ -125,7 +125,7 @@ async function main(){
       assert.equal(body.reasoning_effort,'none','Oral replies disable thinking without changing the written-chat preference');
       assert.equal(body.turn_id,req.headers['x-qwen-request']);state.chats.push(body);if(!body.voice_conversation)state.runs.set(body.turn_id,{request_id:body.turn_id,conversation_id:body.conversation_id,status:'running',text:''});
       res.writeHead(200,{'Content-Type':'text/event-stream; charset=utf-8'});event(res,{hermes_status:{phase:'working',message:'Hermes prépare la réponse'}});
-      event(res,{voice_context:{capacity:16384,input_tokens:480,output_tokens:512,omitted_messages:0}});
+      event(res,{voice_context:{capacity:262144,input_tokens:480,output_tokens:100000,omitted_messages:0}});
       if(webEvents){event(res,{hermes_status:{phase:'tool',message:'Recherche sur Internet…'}});event(res,{workspace_sources:[{url:'https://example.org/source',title:'Source publique',text:'Passage vérifié.',origin:'hermes-web',retrieved:true}]});}
       if(state.holdChat){state.pendingChat={body,res};return;}
       if(state.prefixReply){event(res,{choices:[{delta:{content:'Je vous propose une courte réponse pour commencer, '}}]});later(()=>{event(res,{choices:[{delta:{content:'puis nous préciserons les détails.'},finish_reason:'stop'}]});if(!res.destroyed&&!res.writableEnded)res.end('data: [DONE]\n\n');},1800);return;}
@@ -418,7 +418,7 @@ async function main(){
       await voiceUI.click('#voice-transcript > summary');
     }
     assert.equal(await page.isVisible('#conversation-mute'),true);assert.equal(await page.isVisible('#thinking'),false,'Written reasoning is hidden during the voice call');
-    assert.equal(await page.isVisible('.context-gauge'),false);assert.match(await page.textContent('#conversation-context'),/16 384/);assert.match(await page.textContent('#model'),/16/);
+    assert.equal(await page.isVisible('.context-gauge'),false);assert.match(await page.textContent('#conversation-context'),/capacité du modèle/);
     assert.equal(await page.getAttribute('#conversation-mute','aria-pressed'),'false');
     assert.equal(await page.isChecked('#conversation-interruptions'),false,'Vocal interruption is opt-in');
     state.failMute=true;await voiceUI.click('#conversation-mute');
@@ -431,7 +431,7 @@ async function main(){
     snapshot=await page.evaluate(()=>({active:window.conversationBusy,busy,historySyncPending,text:messages.at(-1).content,status:document.getElementById('conversation-status').textContent}));
     assert.equal(snapshot.active,true,'A routine history sync must keep the voice session open');assert.equal(state.stops,0);assert.equal(state.cancels.length,0);assert.equal(state.voiceCancels.length,0);assert.equal(state.native.speech_id,1,'No new speech onset occurred');
     await page.waitForFunction(()=>window.__audio.ended===3&&!busy&&!historySyncPending);assert.equal(await page.evaluate(()=>messages.at(-1).content),'La livraison du projet Orion est prévue le 23 novembre.');assert.equal(await page.evaluate(()=>messages.at(-1).interrupted),undefined);assert.equal(state.acks.filter(id=>id===1).length,1);
-    assert.match(await page.textContent('#conversation-context'),/480.*16 384/);
+    assert.match(await page.textContent('#conversation-context'),/480.*262\s144/);
     if(webEvents){await page.waitForSelector(baseline?'.context-details':'#voice-sources');assert.equal(await page.evaluate(()=>ws.lastSources[0].url),'https://example.org/source');assert(state.speech.length>0,'Web sources and progress must preserve spoken output');if(!baseline){await voiceUI.click('#voice-sources');assert.equal(await page.isVisible('#ws-side'),true);await voiceUI.click('#ws-side-close');}}
 
     // An idle history refresh blocks submission: acknowledge once, keep the turn queued.

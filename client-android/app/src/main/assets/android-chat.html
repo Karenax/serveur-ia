@@ -1649,8 +1649,9 @@ contextRefresh();
   const interruptionLabel=document.createElement('label'),allowInterruptions=document.createElement('input');allowInterruptions.id='conversation-interruptions';allowInterruptions.type='checkbox';
   interruptionLabel.className='voice-check';interruptionLabel.append(allowInterruptions,document.createTextNode('Interrompre Kiara en parlant'));options.append(interruptionLabel);$('voice-interruptions-slot').append(options);
   const interruptionNote=wsElement('p',undefined,'muted');interruptionNote.id='voice-interruptions-note';options.append(interruptionNote);allowInterruptions.setAttribute('aria-describedby',interruptionNote.id);
-  const contextNote=document.createElement('span');contextNote.id='conversation-context';contextNote.textContent='Contexte vocal · 16 384 tokens';contextNote.hidden=true;$('voice-context-slot').append(contextNote);
-  window.conversationContext=value=>{if(active&&value?.capacity===16384&&Number.isInteger(value.input_tokens))contextNote.textContent='Contexte vocal · '+value.input_tokens.toLocaleString('fr-FR')+' / 16 384 tokens';};
+  let voiceCapacity=null;
+  const contextNote=document.createElement('span');contextNote.id='conversation-context';contextNote.textContent='Contexte vocal · capacité du modèle';contextNote.hidden=true;$('voice-context-slot').append(contextNote);
+  window.conversationContext=value=>{if(active&&Number.isInteger(value?.capacity)&&value.capacity>0&&Number.isInteger(value.input_tokens)){voiceCapacity=value.capacity;contextNote.textContent='Contexte vocal · '+value.input_tokens.toLocaleString('fr-FR')+' / '+voiceCapacity.toLocaleString('fr-FR')+' tokens';}};
   async function persistVoice(){try{await uiPersistPreferences();$('voice-preferences-status').textContent='Réglages enregistrés';$('voice-preferences-retry').hidden=true;}catch(e){$('voice-preferences-status').textContent='Réglages non enregistrés. Réessayez.';$('voice-preferences-retry').hidden=false;error(e);}}
   allowInterruptions.onchange=()=>{syncAndroidPlayback();persistVoice();};$('voice-preferences-retry').onclick=persistVoice;
   const volume=$('voice-volume'),animation=$('voice-animation'),animationStyle=$('voice-animation-style');
@@ -1831,7 +1832,7 @@ contextRefresh();
   volume.oninput=()=>{$('voice-volume-value').value=volume.value+' %';if(outputGain)outputGain.gain.value=Number(volume.value)/100;};
   volume.onchange=persistVoice;animation.onchange=()=>{drawVoice();persistVoice();};
   animationStyle.onchange=()=>{drawVoice();persistVoice();};
-  window.conversationContextCapacity=()=>active?16384:null;
+  window.conversationContextCapacity=()=>active?voiceCapacity:null;
   window.conversationPreferences=()=>({voice_interruptions:allowInterruptions.checked,voice_volume:Number(volume.value),voice_animation:animation.checked,voice_animation_style:animationStyle.value,voice_visual_version:2,voice_quality:quality.value,voice_execution:execution.value});
   window.conversationApplyPreferences=value=>{allowInterruptions.checked=value?.voice_interruptions===true;volume.value=Number.isInteger(value?.voice_volume)?value.voice_volume:100;volume.oninput();animation.checked=value?.voice_animation!==false;animationStyle.value=value?.voice_visual_version===2&&['waves','orb','constellation'].includes(value?.voice_animation_style)?value.voice_animation_style:'waves';quality.value=!android&&value?.voice_quality==='max'?'max':'low';execution.value=android?'pc':['pc','server'].includes(value?.voice_execution)?value.voice_execution:'auto';drawVoice();};
   let native={phase:'idle',installed:false},session='',active=false,acting=false,polling=false,seenSpeech=0,seenTurn=0;
@@ -2092,7 +2093,6 @@ contextRefresh();
       if(speechQueue.length>=24){
         const last=speechQueue.at(-1);if(last&&last.length+part.length+1<=600){speechQueue[speechQueue.length-1]=last+' '+part;continue;}
       }
-      if(speechQueue.length>=64){stop('Réponse trop longue pour la lecture vocale. Le texte reste disponible.').catch(error);return;}
       speechQueue.push(part);
     }
     pump();
@@ -2122,8 +2122,8 @@ contextRefresh();
     const reader=response.body.getReader(),decoder=new TextDecoder();let pending='',done=false;
     try{
       while(active&&epoch===token){const value=await reader.read();pending+=value.done?decoder.decode():decoder.decode(value.value,{stream:true});
-        if(pending.length>100000)throw new Error('Trame vocale trop volumineuse.');
         const frames=pending.split(/\r?\n\r?\n/);pending=frames.pop();
+        if(pending.length>100000)throw new Error('Trame vocale trop volumineuse.');
         for(const event of frames){const line=event.split(/\r?\n/).find(l=>l.startsWith('data: '));if(!line)continue;const frame=JSON.parse(line.slice(6));if(frame.id!==id)throw new Error('Session audio invalide.');if(frame.error)throw new Error(frame.error);if(frame.pcm)await pcm(frame,token);if(frame.done){done=true;if(frame.cancelled&&epoch===token)throw new Error('Synthèse interrompue sur le serveur.');}}
         if(value.done)break;
       }
@@ -2228,8 +2228,8 @@ contextRefresh();
     const reader=response.body.getReader(),decoder=new TextDecoder();let pending='',done=false;
     try{
       while(active&&epoch===token){const value=await reader.read();pending+=value.done?decoder.decode():decoder.decode(value.value,{stream:true});
-        if(pending.length>100000)throw new Error('Trame vocale trop volumineuse.');
         const frames=pending.split(/\r?\n\r?\n/);pending=frames.pop();
+        if(pending.length>100000)throw new Error('Trame vocale trop volumineuse.');
         for(const event of frames){const line=event.split(/\r?\n/).find(l=>l.startsWith('data: '));if(!line)continue;const frame=JSON.parse(line.slice(6));if(frame.id!==id)throw new Error('Session audio invalide.');if(frame.error)throw new Error(frame.error);if(frame.pcm)await pcm(frame,token);if(native.quality==='max'&&maxLatency&&Number.isFinite(frame.metrics?.first_audio_ms)&&maxLatency.tts_first_audio_ms===undefined){maxLatency.tts_first_audio_ms=frame.metrics.first_audio_ms;updateLatency();}if(frame.done){done=true;if(frame.cancelled&&epoch===token)throw new Error('Synthèse interrompue sur le serveur.');}}
         if(value.done)break;
       }
@@ -2248,7 +2248,7 @@ contextRefresh();
     try{while(active&&speechQueue.length){const token=epoch,text=speechQueue.shift();try{await speak(text,token);}catch(e){if(e.name==='AbortError'||token!==epoch)continue;speechFailed=true;speechQueue=[];speechBuffer='';if(!e.audioIncomplete)stopAudio();error(e);status.textContent='Lecture interrompue · le texte reste disponible';break;}}}
     finally{speechRunning=false;syncAndroidPlayback();if(active&&llmDone&&!sources.size)status.textContent=native.muted?'Microphone coupé · vous entendez Kiara':'Je vous écoute · microphone actif';}
   }
-  window.conversationOnReplyStart=answer=>{if(!active)return;clearTimeout(speechTimer);speechTimer=null;firstSpeechQueued=false;speechFailed=false;contextNote.textContent='Contexte vocal · 16 384 tokens';answerRef=answer;voiceRequestId=answer.turn_id;heard='';heardCompletions=[];if(native.quality==='max'&&maxLatency)maxLatency.request_started=performance.now();interrupted=false;llmDone=false;speechBuffer='';status.textContent=native.quality!=='max'?'Kiara prépare sa réponse':allowInterruptions.checked?'Vous pouvez l’interrompre en parlant':'L’écoute reprend après la réponse';};
+  window.conversationOnReplyStart=answer=>{if(!active)return;clearTimeout(speechTimer);speechTimer=null;firstSpeechQueued=false;speechFailed=false;contextNote.textContent='Contexte vocal · capacité du modèle';answerRef=answer;voiceRequestId=answer.turn_id;heard='';heardCompletions=[];if(native.quality==='max'&&maxLatency)maxLatency.request_started=performance.now();interrupted=false;llmDone=false;speechBuffer='';status.textContent=native.quality!=='max'?'Kiara prépare sa réponse':allowInterruptions.checked?'Vous pouvez l’interrompre en parlant':'L’écoute reprend après la réponse';};
   window.conversationDelta=text=>{if(active&&!interrupted&&!speechFailed){if(native.quality==='max'&&maxLatency&&text&&maxLatency.first_text_ms===undefined){maxLatency.first_text_ms=performance.now()-maxLatency.request_started;updateLatency();}speechBuffer+=text;splitSpeech();}};
   window.conversationOnReplyEnd=answer=>{
     if(answer!==answerRef)return;

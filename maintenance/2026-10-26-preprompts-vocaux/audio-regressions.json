@@ -1,0 +1,13 @@
+{
+  "low": {
+    "groupedValidFrames": 8,
+    "networkChunkBytes": 103029
+  },
+  "max": {
+    "groupedValidFrames": 8,
+    "networkChunkBytes": 103029
+  },
+  "longSpeech": {
+    "queuedFragments": 182
+  }
+}

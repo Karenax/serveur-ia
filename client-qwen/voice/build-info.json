@@ -1,20 +1,20 @@
 {
+  "engine": "sherpa-onnx",
+  "asr": "Parakeet v3",
   "sources": {
-    "fred_voice.cpp": "7be43dedeaf036713cca3a1a61a8db3b0b911f7acd4faa2ebfecb65438a7cb8d",
-    "conversation_worker.py": "16fd12fb85caf4c41de165069f9c599bd5f178bddffed10c4903e370079ee608",
-    "turn_features.py": "cb937b7ce1ee4e0e28a8aa94f689d8e1c054995a53f8f74ef8d13ba533ea07f0",
-    "model.json": "5dde5e5c0d565557189d8e81f261cd3e1588358e0d1906fb46aa97f53bbe0690",
-    "fred_voice_jni.cpp": "97e6fac01e949323c1c7ef4db232256b7c77d11d769fb865f1ec6b9c0715b054",
-    "fred_aec.cpp": "939f52d36ee15f08ea56bb1b5f31201b24b8b3876ff1a50bb351259b4a048951",
-    "aec_capture.py": "dd6c5b723cfaf80c5cf2b2ca90dd1e08f724ad57ce2aa5c5ad567b9737d8cfbc",
-    "fred_voice.h": "107a559afcd43785afa090d0aaee05901d5311595ab38e9aa4e8f97e8744072f",
-    "conversation-models.json": "adcc97067c7c50274f1ff68b45bda4957dea43335e8fd77174b68aba8b14586f",
-    "max_recognition.py": "dd4941588c4f96e50c09c6d46763cee1fa0e45fba0e911a7b7c64376077db52c",
     "recognition.py": "5f4b2abbdcac658950ecb321ec7ce14498e812bd0ca90c3a8160fbc7defe50fb",
-    "CMakeLists.txt": "1baeb84022f196640771e3106d8895821aa9a79534c19ae4f017da54f3b5912b"
+    "fred_aec.cpp": "939f52d36ee15f08ea56bb1b5f31201b24b8b3876ff1a50bb351259b4a048951",
+    "fred_voice.cpp": "7be43dedeaf036713cca3a1a61a8db3b0b911f7acd4faa2ebfecb65438a7cb8d",
+    "max_recognition.py": "dd4941588c4f96e50c09c6d46763cee1fa0e45fba0e911a7b7c64376077db52c",
+    "model.json": "5dde5e5c0d565557189d8e81f261cd3e1588358e0d1906fb46aa97f53bbe0690",
+    "conversation-models.json": "adcc97067c7c50274f1ff68b45bda4957dea43335e8fd77174b68aba8b14586f",
+    "fred_voice_jni.cpp": "97e6fac01e949323c1c7ef4db232256b7c77d11d769fb865f1ec6b9c0715b054",
+    "conversation_worker.py": "16fd12fb85caf4c41de165069f9c599bd5f178bddffed10c4903e370079ee608",
+    "aec_capture.py": "dd6c5b723cfaf80c5cf2b2ca90dd1e08f724ad57ce2aa5c5ad567b9737d8cfbc",
+    "turn_features.py": "cb937b7ce1ee4e0e28a8aa94f689d8e1c054995a53f8f74ef8d13ba533ea07f0",
+    "CMakeLists.txt": "1baeb84022f196640771e3106d8895821aa9a79534c19ae4f017da54f3b5912b",
+    "fred_voice.h": "107a559afcd43785afa090d0aaee05901d5311595ab38e9aa4e8f97e8744072f"
   },
   "cpu_only": true,
-  "version": "1.13.8",
-  "engine": "sherpa-onnx",
-  "asr": "Parakeet v3"
+  "version": "1.13.8"
 }

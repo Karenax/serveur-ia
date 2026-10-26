@@ -1,13 +1,13 @@
 # Kiara — architecture et versions actuelles
 
-Référence courante au 26 octobre 2026. Les rapports datés conservent leur valeur historique ; cette page décrit le code et les procédures de la livraison 3.5.53 / Android 1.0.24.
+Référence courante au 26 octobre 2026. Les rapports datés conservent leur valeur historique ; cette page décrit le code et les procédures de la livraison 3.5.54 / Android 1.0.25.
 
 ## Versions et responsabilités
 
 | Composant | Version ou contrat | Rôle |
 |---|---|---|
-| Serveur et Windows | 3.5.53, dans `shared/kiara_shared/version.py` | Application et distribution Windows |
-| Android | 1.0.24, code 25 | Enveloppe Java/WebView et interface partagée |
+| Serveur et Windows | 3.5.54, dans `shared/kiara_shared/version.py` | Application et distribution Windows |
+| Android | 1.0.25, code 26 | Enveloppe Java/WebView et interface partagée |
 | Contrat agent | 4 | Conversation, outils et approbations existants |
 | Identifiants de commandes | Version 2 négociée par `/v1/status` | Rétention bornée et refus du rejeu après expiration |
 | Base Workspace | Schéma 2 | Données canoniques et migrations versionnées |

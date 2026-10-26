@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "model_processes_preserved": true,
+  "configuration_and_keys_preserved": true,
+  "low_ready": true,
+  "launcher_exit_code": 0,
+  "sources": {
+    "lanceur/remote.py": "4eecf21216e4d3da68229f6fb5aba3442c9a5869625496b875b77885d7634910",
+    "lanceur/voice_response.py": "9288a96f09f41d3fcb1b3f4efcdb34110b0814ee10afc320551167e7f1454ccd",
+    "lanceur/voice_web.py": "d27162e451b50102b67014f795f04dee1d7012d4d2d76f88c356bca65f88023c",
+    "lanceur/voice_context.py": "ee7dbefde23aa8cf0fa06d2323ca19c7156b346a336e77c1f38f881618d7d37d",
+    "lanceur/voice_web_plan.py": "495367b515db2e8c94311c9a6314b84c55ef0b67a50749f37cf6c55c96a9aed7"
+  }
+}

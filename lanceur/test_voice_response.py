@@ -2,6 +2,14 @@ import unittest
 from voice_response import Decoder,configure
 
 class VoiceResponseTests(unittest.TestCase):
+    def test_long_spoken_answers_have_no_character_ceiling(self):
+        answer='Une histoire complète. '*20000
+        decoder=Decoder();emitted=[]
+        for offset in range(0,len(answer),1000):
+            emitted.append(decoder.feed(('R:' if offset==0 else '')+answer[offset:offset+1000]))
+        self.assertEqual(''.join(emitted),answer)
+        self.assertEqual(decoder.finish()['answer'],answer)
+
     def test_answer_streams_after_two_characters_at_every_fragment_boundary(self):
         answer='Bonjour ! L’été arrive. Une citation : "oui". À bientôt 👋'
         for size in (1,2,3,7,23,1000):

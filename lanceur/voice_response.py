@@ -8,13 +8,13 @@ from text_transform import CancellableResponse
 
 INSTRUCTION=(
     '\nProtocole vocal : commence exactement par R: suivi directement de ta réponse orale '
-    'courte et naturelle, ou par W: suivi uniquement de la recherche publique à effectuer. '
+    'naturelle, ou par W: suivi uniquement de la recherche publique à effectuer. '
     'Utilise W: si la dernière demande implique une recherche publique ou des faits actuels '
     '(actualités, météo, prix, horaires), même sans mot précis. La recherche doit être autonome '
     'et porter seulement sur le sujet public demandé ; aucun secret ni document privé. '
     'Utilise R: pour discuter, expliquer, calculer, reformuler, ou si Internet est refusé. '
     'Pour une question sur ta capacité à chercher ou une recherche sans sujet, réponds R: '
-    'et demande brièvement le sujet. Ne recherche pas les anciens sujets. '
+    'et demande le sujet. Ne recherche pas les anciens sujets. '
     'N’ajoute aucun JSON, bloc Markdown ou préambule avant R: ou W:. '
 )
 
@@ -67,7 +67,7 @@ class Decoder:
                 self.mode='R';text=self.pending
             self.pending=''
         self.text+=text
-        if len(self.text)>32000 or self.mode=='W' and len(self.text)>502:raise ValueError(ERROR)
+        if self.mode=='C' and len(self.text)>32000 or self.mode=='W' and len(self.text)>502:raise ValueError(ERROR)
         return text if self.mode=='R' else ''
     def finish(self):
         value=self.text.strip()
@@ -120,7 +120,7 @@ def respond(port,model,key,body,valid,heartbeat,emit,commands=False):
             for choice in event.get('choices',[]):
                 text=decoder.feed(choice.get('delta',{}).get('content',''))
                 if text:emit(text)
-                if choice.get('finish_reason')=='length':raise ValueError('La réponse vocale est trop longue. Demandez une réponse plus courte.')
+                if choice.get('finish_reason')=='length':raise ValueError('La réponse a atteint la capacité disponible du modèle.')
         if not done:raise ValueError(ERROR)
         return decoder.finish()
     except (OSError,ValueError,KeyError,TypeError,http.client.HTTPException):

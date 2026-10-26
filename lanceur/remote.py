@@ -697,12 +697,13 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 if voice_conversation:
                     if any(field in raw for field in ('tools','tool_choice','parallel_tool_calls','response_format')):
                         raise ValueError('Les outils ne sont pas disponibles en conversation vocale directe.')
-                    data['max_tokens']=1024 if voice_realtime else 512
+                    from voice_context import OUTPUT_TOKENS
+                    data['max_tokens']=OUTPUT_TOKENS
                     data['reasoning_effort']='none'
                     data['strata_checkpoint']=True
                     data['chat_template_kwargs']={'enable_thinking':False}
                     data['messages']=[{k:v for k,v in message.items() if k!='reasoning_content'} for message in data['messages']]
-                    data['messages'].insert(0,{'role':'system','content':'Tu es Kiara, une assistante en conversation orale. Réponds en français naturel, avec des phrases courtes, généralement en deux à quatre phrases. Évite les tableaux, le Markdown et les longs préambules. Si une transcription est ambiguë, demande une précision sans inventer ce qui a été dit.'})
+                    data['messages'].insert(0,{'role':'system','content':'Tu es Kiara, une assistante en conversation orale. Réponds en français naturel. Respecte le contenu, le format et la longueur demandés par la personne. Si une transcription est ambiguë, demande une précision sans inventer ce qui a été dit.'})
                 web_query = None
                 routing_messages = data['messages'] if voice_conversation else None
                 if voice_conversation:data['messages'][0]['content'] += ' ' + VOICE_WEB_CAPABILITIES
@@ -736,12 +737,13 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
             oral_context=None
             if voice_conversation:
                 if voice_realtime:data=configure_oral_response(data,commands=True)
-                from voice_context import bounded_messages,token_count,CAPACITY,OUTPUT_TOKENS
+                from voice_context import bounded_messages,token_count,context_budget
                 try:
-                    data['messages'],tokens,removed=bounded_messages(data['messages'],lambda values:token_count(upstream_port,data['model'],key,values),limit=CAPACITY-data['max_tokens'])
+                    voice_capacity,data['max_tokens']=context_budget(live)
+                    data['messages'],tokens,removed=bounded_messages(data['messages'],lambda values:token_count(upstream_port,data['model'],key,values),limit=voice_capacity-data['max_tokens'])
                     if voice_realtime:data['strata_prefix']={'messages':1}
                     from voice_context import image_budget,IMAGE_TOKENS
-                    oral_context={'capacity':CAPACITY,'input_tokens':tokens,'output_tokens':data['max_tokens'],'omitted_messages':removed,
+                    oral_context={'capacity':voice_capacity,'input_tokens':tokens,'output_tokens':data['max_tokens'],'omitted_messages':removed,
                                   'estimated':bool(image_budget(data['messages'])),'image_tokens_reserved':image_budget(data['messages'])}
                 except (OSError,ValueError,http.client.HTTPException) as error:
                     return self.respond(400,{'error':{'code':'voice_context_limit','message':str(error)}})
@@ -896,8 +898,8 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                     route=plan_voice_web(upstream_port,data['model'],key,routing_messages,request_valid,lambda:heartbeat(0))
                     if route['action']=='search':web_query=route['query']
                     elif route['action']=='clarify':
-                        data['messages'].insert(-1,{'role':'system','content':'La personne souhaite une recherche Internet mais son sujet manque. Confirme que tu peux rechercher et demande sur quel sujet, en une phrase.'})
-                        data['messages'],tokens,removed=bounded_messages(data['messages'],lambda values:token_count(upstream_port,data['model'],key,values),limit=CAPACITY-data['max_tokens'])
+                        data['messages'].insert(-1,{'role':'system','content':'La personne souhaite une recherche Internet mais son sujet manque. Confirme que tu peux rechercher et demande sur quel sujet.'})
+                        data['messages'],tokens,removed=bounded_messages(data['messages'],lambda values:token_count(upstream_port,data['model'],key,values),limit=voice_capacity-data['max_tokens'])
                         if voice_realtime:data['strata_prefix']={'messages':1}
                         oral_context.update(input_tokens=tokens,omitted_messages=oral_context['omitted_messages']+removed)
                         if headers_sent:
@@ -919,7 +921,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                             self.wfile.write(('data: '+json.dumps({'hermes_status':{'phase':'tool','message':message}},ensure_ascii=False)+'\n\n').encode());self.wfile.flush()
                     data['messages'],web_sources=store.voice_web.prepare(self.identity,web_query,data['messages'],web_valid,web_progress)
                     # Apply the same oral budget after adding external passages.
-                    data['messages'],tokens,removed=bounded_messages(data['messages'],lambda values:token_count(upstream_port,data['model'],key,values),limit=CAPACITY-data['max_tokens'])
+                    data['messages'],tokens,removed=bounded_messages(data['messages'],lambda values:token_count(upstream_port,data['model'],key,values),limit=voice_capacity-data['max_tokens'])
                     if voice_realtime:data['strata_prefix']={'messages':1}
                     oral_context.update(input_tokens=tokens,omitted_messages=oral_context['omitted_messages']+removed)
                     if not web_valid():raise Denied('Recherche arrêtée : demande annulée ou accès désactivé.')

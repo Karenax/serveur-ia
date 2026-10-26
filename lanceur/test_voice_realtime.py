@@ -30,6 +30,36 @@ class VoiceRealtimeHTTPTests(unittest.TestCase):
         self.assertEqual(status,200);self.assertNotIn(b'error',raw)
         self.assertIn(b'42',raw);self.assertEqual(len(self.captured),1);self.settle()
 
+    def test_answer_beyond_old_token_and_character_limits_streams_completely(self):
+        answer='Une histoire qui continue. '*2000
+        self.oral_reply='R:'+answer;request=secrets.token_hex(16)
+        status,raw=self.post(self.body(request),request)
+        self.assertEqual(status,200);self.assertNotIn(b'error',raw);self.assertIn(b'[DONE]',raw)
+        self.assertEqual(self.captured[0][1]['max_tokens'],100000)
+        events=[json.loads(line[6:]) for line in raw.splitlines() if line.startswith(b'data: {')]
+        context=next(event['voice_context'] for event in events if 'voice_context' in event)
+        self.assertEqual(context['capacity'],262144)
+        self.assertEqual(context['output_tokens'],100000)
+        text=''.join(event['choices'][0]['delta'].get('content','') for event in events if 'choices' in event)
+        self.assertEqual(text,answer);self.settle()
+
+    def test_requested_story_length_reaches_model_without_short_answer_instructions(self):
+        request=secrets.token_hex(16);body=self.body(request)
+        question='Raconte une histoire de 100 mots en dix phrases sur un petit garçon super-héros.'
+        body['messages'][-1]['content']=question
+        answer=' '.join('Léo aide ses amis avec ses pouvoirs.' for _ in range(10))
+        self.oral_reply='R:'+answer
+        status,raw=self.post(body,request)
+        self.assertEqual(status,200);self.assertNotIn(b'error',raw)
+        sent=self.captured[0][1]
+        self.assertEqual(sent['messages'][-1]['content'],question)
+        instructions='\n'.join(m['content'] for m in sent['messages'] if m['role']=='system')
+        for unwanted in ('réponse orale courte','phrases courtes','deux à quatre phrases','Évite les tableaux','longs préambules'):
+            self.assertNotIn(unwanted,instructions)
+        self.assertIn('Respecte le contenu, le format et la longueur demandés',instructions)
+        text=''.join(json.loads(line[6:])['choices'][0]['delta'].get('content','') for line in raw.splitlines() if line.startswith(b'data: {') and 'choices' in json.loads(line[6:]))
+        self.assertEqual(text,answer);self.settle()
+
     def test_web_runs_only_after_the_complete_decision_and_then_uses_normal_answering(self):
         self.oral_reply={'action':'search','query':'actualité publique du jour','answer':''}
         self.voice_plan={'action':'search','query':'actualité publique du jour'}

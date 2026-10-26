@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "live_gateway": true,
+  "context": {
+    "capacity": 262144,
+    "input_tokens": 696,
+    "output_tokens": 100000,
+    "omitted_messages": 0,
+    "estimated": false,
+    "image_tokens_reserved": 0
+  },
+  "reply_completed": true,
+  "reply_chars": 5,
+  "history_written": false
+}

@@ -1,10 +1,16 @@
 """The oral context limit preserves instructions, the current turn and stored data."""
 from copy import deepcopy
 import unittest
-from voice_context import bounded_messages,compact_sources,CAPACITY,INPUT_TOKENS,OUTPUT_TOKENS
+from voice_context import bounded_messages,compact_sources,context_budget,CAPACITY,INPUT_TOKENS,OUTPUT_TOKENS
 
 
 class VoiceContextTests(unittest.TestCase):
+    def test_context_uses_loaded_capacity_and_allows_100k_output(self):
+        self.assertEqual(context_budget({'max_context':262144}),(262144,100000))
+        self.assertEqual(context_budget({'max_context':131072}),(131072,65536))
+        messages=[{'role':'user','content':'Une longue demande.'}]
+        self.assertEqual(bounded_messages(messages,lambda _:100000),(messages,100000,0))
+
     def test_images_reserve_the_pinned_encoder_budget(self):
         from voice_context import image_budget,IMAGE_TOKENS
         messages=[{'role':'user','content':[{'type':'text','text':'Photo'},{'type':'image_url','image_url':{'url':'data:image/png;base64,fixture'}}]}]
@@ -30,7 +36,7 @@ class VoiceContextTests(unittest.TestCase):
     def test_oversized_current_question_or_instructions_fail_without_truncation(self):
         messages=[{'role':'system','content':'Consigne indispensable.'},{'role':'user','content':'Question complète.'}]
         before=deepcopy(messages)
-        with self.assertRaisesRegex(ValueError,'16 384'):bounded_messages(messages,lambda _:20000)
+        with self.assertRaisesRegex(ValueError,'162 144'):bounded_messages(messages,lambda _:200000)
         self.assertEqual(before,messages)
 
     def test_source_prompt_has_one_passage_and_preserves_the_complete_reference(self):

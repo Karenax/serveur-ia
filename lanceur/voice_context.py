@@ -2,12 +2,21 @@
 import http.client
 import json
 
-CAPACITY=16384
-OUTPUT_TOKENS=512
+CAPACITY=262144
+OUTPUT_TOKENS=100000
 INPUT_TOKENS=CAPACITY-OUTPUT_TOKENS
 # The pinned P2200 encoder caps each image at 1024 tokens. The text counter
 # does not count its visual embeddings, so reserve that upper bound explicitly.
 IMAGE_TOKENS=1024
+
+
+def context_budget(health):
+    """Use the loaded model's real context, with up to 100k output tokens."""
+    capacity=health.get('max_context',CAPACITY)
+    if type(capacity) is not int or capacity<2:
+        raise ValueError('Capacité du modèle vocal indisponible. Réessayez.')
+    # A smaller engine still needs room for the request and its instructions.
+    return capacity,min(OUTPUT_TOKENS,capacity//2)
 
 
 def image_budget(messages):
@@ -54,7 +63,7 @@ def bounded_messages(messages,count,limit=INPUT_TOKENS):
         skipped={index for group in groups[:removed] for index in group}
         return [message for i,message in enumerate(messages) if i not in skipped]
     minimum=candidate(len(groups));minimum_tokens=count(minimum)
-    if minimum_tokens>limit:raise ValueError('La demande et les consignes dépassent le contexte vocal de 16 384 tokens. Raccourcissez le texte ou utilisez la conversation écrite.')
+    if minimum_tokens>limit:raise ValueError('La demande et les consignes dépassent les '+format(limit,',').replace(',',' ')+' tokens disponibles en entrée du modèle. Raccourcissez le contexte de la demande.')
     low=1;high=len(groups);best=minimum;best_tokens=minimum_tokens
     while low<=high:
         middle=(low+high)//2;value=candidate(middle);size=count(value)

@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "windows": "3.5.54",
+  "android": "1.0.25",
+  "output_tokens": 100000,
+  "model_context": 262144,
+  "low_ready": true,
+  "model_processes_preserved": true,
+  "keys_settings_and_user_data_preserved": true,
+  "backup_schedule_preserved": true,
+  "downloads_verified": true,
+  "personal_clients": 2
+}

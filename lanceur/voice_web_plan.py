@@ -67,7 +67,7 @@ def plan(port, model, key, messages, valid, heartbeat):
     body = {'model': model, 'messages': [
         {'role': 'system', 'content': INSTRUCTIONS + ' Date locale : ' + dt.datetime.now().astimezone().date().isoformat()},
         {'role': 'user', 'content': json.dumps({'dialogue': recent_dialogue(messages)}, ensure_ascii=False)}],
-        'stream': False, 'max_tokens': 128, 'temperature': 0, 'reasoning_effort': 'none',
+        'stream': False, 'max_tokens': -1, 'temperature': 0, 'reasoning_effort': 'none',
         'chat_template_kwargs': {'enable_thinking': False}, 'strata_mcp': False, 'strata_checkpoint':False,
         'response_format': {'type': 'json_schema', 'json_schema': {
             'name': 'voice_web_decision', 'strict': True, 'schema': SCHEMA}}}
