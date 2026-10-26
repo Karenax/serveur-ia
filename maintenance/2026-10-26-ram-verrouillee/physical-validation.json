@@ -1,0 +1,14 @@
+{
+  "engine_pid": 34904,
+  "server_pid": 37304,
+  "ram_used_gib": 76.21,
+  "ram_available_gib": 51.64,
+  "token_file_mappings": [
+    {
+      "mapped_bytes": 337772544,
+      "pages": 82464,
+      "resident_pages": 82451,
+      "locked_pages": 82451
+    }
+  ]
+}
