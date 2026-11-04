@@ -1,0 +1,56 @@
+[
+  {
+    "label": "warmup",
+    "elapsed_s": 2.6400000000001,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 32,
+      "prompt_ms": 2516.4,
+      "prompt_per_token_ms": 78.638,
+      "prompt_per_second": 12.7,
+      "predicted_n": 4,
+      "predicted_ms": 96.5,
+      "predicted_per_token_ms": 24.125,
+      "predicted_per_second": 41.5,
+      "draft_n": 2,
+      "draft_n_accepted": 2
+    },
+    "usage": {
+      "prompt_tokens": 32,
+      "completion_tokens": 4,
+      "total_tokens": 36,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "301",
+    "quality_pass": true
+  },
+  {
+    "label": "vision",
+    "elapsed_s": 4.859000000000151,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 281,
+      "prompt_ms": 3294.2,
+      "prompt_per_token_ms": 11.723,
+      "prompt_per_second": 85.3,
+      "predicted_n": 39,
+      "predicted_ms": 629.0,
+      "predicted_per_token_ms": 16.128,
+      "predicted_per_second": 62.0,
+      "draft_n": 33,
+      "draft_n_accepted": 24
+    },
+    "usage": {
+      "prompt_tokens": 281,
+      "completion_tokens": 39,
+      "total_tokens": 320,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "Le code en haut de l’image est **VISION 47**.\n\nLa forme rouge est un **cercle**.  \nLa forme bleue est un **carré**.",
+    "quality_pass": true
+  }
+]

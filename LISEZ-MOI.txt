@@ -1,4 +1,8 @@
-﻿Qwen3.8 Flash Next Q4 — deux Tesla P100 — 2 octobre 2026
+﻿ARCHIVE — mesures et configuration du 2 octobre 2026.
+Pour l’état courant, lire README.md et ARCHITECTURE-ACTUELLE.md.
+Ce document conserve les commandes et résultats de cette campagne historique.
+
+Qwen3.8 Flash Next Q4 — deux Tesla P100 — 2 octobre 2026
 
 Le serveur actuellement validé et laissé actif est Strata CPU+GPU, adapté pour les P100.
 Interface : http://127.0.0.1:8080/ ; API : http://127.0.0.1:8080/v1

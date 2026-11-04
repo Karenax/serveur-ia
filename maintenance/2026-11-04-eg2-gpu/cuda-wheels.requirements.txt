@@ -1,0 +1,2 @@
+https://download-r2.pytorch.org/whl/cu126/torch-2.14.1%2Bcu126-cp312-cp312-win_amd64.whl#sha256=97e3bc87ea74367518b740d912a7f5259c25a3c8115bf5916abee1d53ff115a4
+https://download-r2.pytorch.org/whl/cu126/torchvision-0.29.1%2Bcu126-cp312-cp312-win_amd64.whl#sha256=ab045bfb0ac014b80afb478190d14c6f7d3b57ade0d1fcd6ffc07414a0266b96

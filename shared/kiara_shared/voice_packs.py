@@ -21,6 +21,18 @@ PACK_FORMAT = 2
 LIMIT = 4 * 1024**3
 
 
+def max_home(default):
+    """Keep the machine-wide location outside the removable Max directory."""
+    default = Path(default)
+    pointer = default.with_name('voice-max-location.json')
+    if not pointer.exists():return default
+    value = json.loads(pointer.read_text(encoding='utf-8'))
+    path = Path(value['path'])
+    if not path.is_absolute() or path.name != 'Kiara-Max':
+        raise ValueError('Le dossier Max enregistré est invalide.')
+    return path
+
+
 def canonical(value):
     return json.dumps({k: v for k, v in value.items() if k != 'signature'},
                       ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode()
@@ -130,11 +142,12 @@ def hardware():
 
 
 class MaxInstallation:
-    def __init__(self, home, remote, runtime, shared_asr):
+    def __init__(self, home, remote, runtime, shared_asr, location_file=None):
         self.home = Path(home)
         self.remote = remote
         self.runtime = runtime
         self.shared_asr = Path(shared_asr)
+        self.location_file = Path(location_file) if location_file else None
         self.lock = threading.RLock()
         self.cancelled = threading.Event()
         self.closed = False
@@ -217,6 +230,66 @@ class MaxInstallation:
         if not root.is_dir():raise ValueError('Aucun fichier Max n’est installé sur ce PC.')
         os.startfile(str(root))
         return {'opened':True}
+
+    def choose_folder(self):
+        with self.lock:
+            if self.closed or self.thread and self.thread.is_alive():
+                raise ValueError('Attendez la fin de l’installation Max avant de changer de dossier.')
+            self.runtime.begin_maintenance()
+            previous = dict(self.value)
+            self.value.update(phase='choosing', message='Choisissez un dossier dans la fenêtre ouverte.')
+            self.thread = threading.Thread(target=self._choose_folder, args=(previous,), daemon=True)
+            self.thread.start()
+        return self.status()
+
+    def _choose_folder(self, previous):
+        changed = False
+        try:
+            from tkinter import Tk, filedialog
+            window = Tk()
+            try:
+                window.withdraw();window.attributes('-topmost', True)
+                selected = filedialog.askdirectory(parent=window, title='Choisir où enregistrer les fichiers Max', mustexist=True)
+            finally:window.destroy()
+            with self.lock:
+                if selected and not self.closed:
+                    old = self.home
+                    self.set_folder(selected)
+                    changed = self.home != old
+                if not changed:self.value = previous
+        except Exception as error:
+            with self.lock:
+                self.value = {**previous, 'message':str(error) if isinstance(error, ValueError) else
+                              'Dossier non modifié. Vérifiez les autorisations et l’espace disponible, puis réessayez.'}
+        finally:self.runtime.end_maintenance(changed)
+
+    def set_folder(self, selected):
+        """Use an empty dedicated child; never adopt unrelated files for removal."""
+        if not self.location_file:raise ValueError('Le choix du dossier Max est indisponible.')
+        target = Path(selected).resolve()/'Kiara-Max'
+        old = self.home
+        if target == old.resolve():return
+        if target.is_relative_to(old.resolve()) or old.resolve().is_relative_to(target):
+            raise ValueError('Choisissez un dossier séparé du dossier Max actuel.')
+        safe_directory(target, target)
+        shared = self.shared_asr.resolve()
+        if target.is_relative_to(shared) or shared.is_relative_to(target):
+            raise ValueError('Le dossier Max doit rester séparé des fichiers Low.')
+        if target.exists() and (not target.is_dir() or any(target.iterdir())):
+            raise ValueError('Le sous-dossier Kiara-Max existe déjà et contient des fichiers. Choisissez un autre emplacement.')
+        target.mkdir(parents=True, exist_ok=True)
+        probe = target/('.write-'+os.urandom(8).hex())
+        with probe.open('xb'):pass
+        probe.unlink()
+        self.runtime.unload()
+        self.location_file.parent.mkdir(parents=True, exist_ok=True)
+        temporary = self.location_file.with_suffix('.part')
+        temporary.write_text(json.dumps({'path':str(target)}, ensure_ascii=False), encoding='utf-8')
+        temporary.replace(self.location_file)
+        self.home = self.runtime.home = target
+        self.catalogue = self.plan_id = self.storage_cache = None
+        self.value = {'phase':'idle', 'downloaded_bytes':0,
+                      'message':'Dossier enregistré. Installez Max dans ce dossier. Les fichiers de l’ancien dossier sont conservés.'}
 
     def remove(self):
         with self.lock:

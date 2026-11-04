@@ -1,0 +1,84 @@
+{
+  "name": "cpu_sdpa",
+  "device": "cpu",
+  "gpu_uuid": "",
+  "dtype": "float32",
+  "attention": "sdpa",
+  "batch": 4,
+  "cpu_threads": 2,
+  "torch": "2.14.1+cpu",
+  "cuda_build": null,
+  "cases": [
+    {
+      "case": "query_short",
+      "texts": 1,
+      "characters": 43,
+      "tokens": 16,
+      "seconds": [
+        0.11,
+        0.094,
+        0.093
+      ],
+      "median_seconds": 0.094,
+      "memory": {
+        "rss_mib": 1694.1
+      },
+      "minimum_cosine_vs_cpu": 1.0,
+      "maximum_absolute_delta": 5.960464477539063e-08
+    },
+    {
+      "case": "documents_32",
+      "texts": 32,
+      "characters": 62,
+      "tokens": 566,
+      "seconds": [
+        1.781,
+        1.625,
+        1.641
+      ],
+      "median_seconds": 1.641,
+      "memory": {
+        "rss_mib": 1712.5
+      },
+      "minimum_cosine_vs_cpu": 0.9999998807907104,
+      "maximum_absolute_delta": 8.940696716308594e-08
+    },
+    {
+      "case": "long_4",
+      "texts": 4,
+      "characters": 4200,
+      "tokens": 3212,
+      "seconds": [
+        10.735
+      ],
+      "median_seconds": 10.735,
+      "memory": {
+        "rss_mib": 1768.1
+      },
+      "minimum_cosine_vs_cpu": 0.9999998807907104,
+      "maximum_absolute_delta": 8.940696716308594e-08
+    },
+    {
+      "case": "long_32",
+      "texts": 32,
+      "characters": 4200,
+      "tokens": 25718,
+      "seconds": [
+        74.578
+      ],
+      "median_seconds": 74.578,
+      "memory": {
+        "rss_mib": 1807.9
+      },
+      "minimum_cosine_vs_cpu": 0.9999998807907104,
+      "maximum_absolute_delta": 1.1920928955078125e-07
+    }
+  ],
+  "synthetic_only": true,
+  "load_seconds": 2.735,
+  "parameters": 271002624,
+  "after_load": {
+    "rss_mib": 1667.7
+  },
+  "passed": true
+}

@@ -1,0 +1,18 @@
+{
+  "pid": 34264,
+  "created": 1793735272.2128177,
+  "command": [
+    "D:\\Serveur IA\\Strata-src\\.venv\\Scripts\\python.exe",
+    "-u",
+    "-m",
+    "serve.server",
+    "--engine",
+    "strata",
+    "--config",
+    "D:\\Serveur IA\\maintenance\\2026-11-03-rtx4080\\diagnostic-cpu\\extra-p2200-profile\\config.json",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "18080"
+  ]
+}

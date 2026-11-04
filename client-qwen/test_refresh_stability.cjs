@@ -13,7 +13,7 @@ const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
     await page.goto(url);await page.waitForFunction(()=>connected&&historyReady&&!historySyncPending&&ws.bootstrapDone);
     await sleep(500);
     await page.evaluate(async()=>{
-      window.__workspaceFixture={projects:[{id:'orion',title:'Projet Orion',instructions:'Préparer la livraison',revision:1,archived:false,documents:[{id:'note',title:'Note de préparation'}],memories:[],conversations:[]}],jobs:[{id:'task',project:'orion',title:'Préparation de la livraison',state:'queued',due:1800000000,repeat_hours:0}],personal_memories:[]};
+      window.__workspaceFixture={projects:[{id:'orion',title:'Projet Orion',instructions:'Préparer la livraison',revision:1,archived:false,documents:[{id:'note',title:'Note de préparation'}],memories:[],conversations:[]}],personal_memories:[]};
       await api('/__fixture',{workspace:window.__workspaceFixture});await wsRefresh();await wsSelectProject('orion');
       uiConnectionStatus({checking:true,transport:'https'});if(!$('connection').classList.contains('online')||!$('connection').textContent.includes('Connecté'))throw new Error('Healthy connection must stay visible during a probe');
     });
@@ -22,7 +22,7 @@ const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
       for(let i=0;i<40;i++)library.push({id:'fixture-'+i,title:'Discussion '+i,messages:[]});
       render();drawLibrary();document.querySelector('.message details').open=true;
       const scroller=$('messages');scroller.scrollTop=280;
-      window.__stable={message:document.querySelector('.message'),reasoning:document.querySelector('.message details'),nav:document.querySelector('[data-view-button="chat"] .nav-text'),conversation:document.querySelector('#conversation-list button'),documentButton:$('ws-documents').firstChild,job:$('ws-jobs').firstChild,scroll:scroller.scrollTop,mutations:{messages:0,library:0,navigation:0,thinking:0},statusTexts:new Set(),renders:0};
+      window.__stable={message:document.querySelector('.message'),reasoning:document.querySelector('.message details'),nav:document.querySelector('[data-view-button="chat"] .nav-text'),conversation:document.querySelector('#conversation-list button'),documentButton:$('ws-documents').firstChild,scroll:scroller.scrollTop,mutations:{messages:0,library:0,navigation:0,thinking:0},statusTexts:new Set(),renders:0};
       const old=render;render=function(){window.__stable.renders++;return old();};window.__stable.libraryCalls=[];const oldLibrary=drawLibrary;drawLibrary=function(){window.__stable.libraryCalls.push(new Error().stack.split('\n').slice(1,5));return oldLibrary();};
       for(const [name,node]of Object.entries({messages:$('messages'),library:$('conversation-list'),navigation:$('client-navigation'),thinking:$('thinking-bar')}))new MutationObserver(list=>window.__stable.mutations[name]+=list.filter(m=>m.type==='childList').length).observe(node,{childList:true,subtree:true});
       new MutationObserver(()=>window.__stable.statusTexts.add($('model').textContent)).observe($('model'),{childList:true,subtree:true});
@@ -37,8 +37,7 @@ const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
     if(measure)return;
     assert.deepEqual(errors,[]);assert(result.messageSame&&result.reasoningSame&&result.reasoningOpen);assert(result.navigationSame&&result.conversationSame,'Background checks must preserve navigation nodes');assert.equal(result.scrollAfter,result.scrollBefore);assert.equal(result.focus,'prompt');assert.deepEqual(result.selection,[4,12]);assert.equal(result.draft,'Un brouillon à conserver');assert(!result.statusTexts.includes('Actualisation des modèles…'),'Healthy background checks must not flash a loading label');assert.equal(result.mutations.library,0);assert.equal(result.mutations.navigation,0);
     assert(catalogueRequests>=3,'Initial request and two catalogue checks ran');
-    assert(await page.evaluate(()=>$('ws-documents').firstChild===window.__stable.documentButton&&$('ws-jobs').firstChild===window.__stable.job),'Unchanged project documents and tasks preserve their controls');
-    await page.evaluate(async()=>{window.__workspaceFixture.jobs[0].state='completed';await api('/__fixture',{workspace:window.__workspaceFixture});await wsRefresh();});
-    assert((await page.textContent('#ws-jobs')).includes('Terminé'),'Real task changes still refresh');
+    assert(await page.evaluate(()=>$('ws-documents').firstChild===window.__stable.documentButton),'Unchanged project documents preserve their controls');
+    assert.equal(await page.locator('[data-view-button="tasks"], [data-view="tasks"], #ws-jobs').count(),0);
   }finally{await browser?.close();child.kill();}
 })().catch(error=>{console.error(error);process.exitCode=1;});

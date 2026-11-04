@@ -1,0 +1,23 @@
+{
+  "phase": "reference_loading_after_trials",
+  "started": "2026-10-31T10:36:55.432807+01:00",
+  "runs": [
+    {
+      "tag": "opt3-fp16-headalias-mtpq4-cache1",
+      "exit_code": 1
+    },
+    {
+      "tag": "opt3-int8-p2048-cache1",
+      "exit_code": 0
+    }
+  ],
+  "stop": {
+    "status": "arrete"
+  },
+  "current": "opt3-int8-p2048-cache1",
+  "benchmark_pid": 15936,
+  "restore": {
+    "status": "chargement",
+    "worker_pid": 27512
+  }
+}

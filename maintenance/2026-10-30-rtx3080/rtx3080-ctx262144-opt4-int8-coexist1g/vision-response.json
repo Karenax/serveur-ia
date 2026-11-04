@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-b11d4138fd2c45e8bf9ee272",
+  "object": "chat.completion",
+  "created": 1793439794,
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Le code en haut de l'image est **VISION 47**.\n\nLa forme rouge est un **cercle** et la forme bleue est un **carré**."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 299,
+    "completion_tokens": 38,
+    "total_tokens": 337,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 299,
+    "prompt_ms": 2822.5,
+    "prompt_per_token_ms": 9.44,
+    "prompt_per_second": 105.9,
+    "predicted_n": 38,
+    "predicted_ms": 554.3,
+    "predicted_per_token_ms": 14.587,
+    "predicted_per_second": 68.6,
+    "draft_n": 29,
+    "draft_n_accepted": 23
+  }
+}

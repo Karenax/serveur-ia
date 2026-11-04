@@ -40,6 +40,7 @@ class EmbeddingService:
         self.state = 'arrete'; self.error = ''; self.started = 0
         self.ready = {}; self.query_cache = OrderedDict()
         self.last_seconds = None; self.failures = 0; self.retry_at = 0
+        self.gpu_failed=False;self.launch_device='cpu';self.runtime_options={};self.start_fallback_reason=''
         atexit.register(self.stop)
 
     def enabled(self):
@@ -52,7 +53,7 @@ class EmbeddingService:
         with self.workspace.db() as db:
             db.execute("INSERT OR REPLACE INTO settings VALUES('eg2_enabled',?)", ('true' if enabled else 'false',))
         if enabled:
-            self.failures = 0; self.retry_at = 0; self.start()
+            self.failures = 0; self.retry_at = 0; self.gpu_failed=False;self.start()
         else: self.stop()
         return self.status()
 
@@ -62,25 +63,41 @@ class EmbeddingService:
             headers = {'Authorization': 'Bearer ' + self.token, 'Content-Type': 'application/json'}
             connection.request('POST' if body is not None else 'GET', path,
                 json.dumps(body, ensure_ascii=False).encode() if body is not None else None, headers)
-            response = connection.getresponse(); raw = response.read(512 * 1024 + 1)
-            if len(raw) > 512 * 1024 or response.status != 200: raise ValueError('Moteur EG2 indisponible ou occupé.')
+            response = connection.getresponse(); raw = response.read(2 * 1024 * 1024 + 1)
+            if len(raw) > 2 * 1024 * 1024 or response.status != 200: raise ValueError('Moteur EG2 indisponible ou occupé.')
             return json.loads(raw)
         finally: connection.close()
 
     def start(self):
         with self.lock:
             if self.process and self.process.poll() is None: return
-            if not PYTHON.is_file() or not (MODEL / 'model.safetensors').is_file():
+            from eg2_runtime import configuration
+            options=configuration();self.runtime_options=options
+            requested=options['device'];reason=''
+            python=Path(options.get('python',PYTHON)) if requested=='cuda' else PYTHON
+            if requested=='cuda' and (self.gpu_failed or not python.is_file()):
+                if not options['cpu_fallback']:
+                    self.state='erreur';self.error='Runtime GPU EG2 indisponible.';return
+                requested='cpu';python=PYTHON;reason='Runtime GPU indisponible ; moteur CPU de secours.'
+            if not python.is_file() or not (MODEL / 'model.safetensors').is_file():
                 self.state = 'non_installe'; self.error = 'Installer le moteur et les poids avec Install-EG2.ps1.'; return
             with socket.socket() as listener:
                 listener.bind(('127.0.0.1', 0)); self.port = listener.getsockname()[1]
             self.token = secrets.token_urlsafe(32)
-            env = dict(os.environ, FRED_EG2_TOKEN=self.token, CUDA_VISIBLE_DEVICES='',
+            self.launch_device=requested;self.start_fallback_reason=reason
+            env = dict(os.environ, FRED_EG2_TOKEN=self.token, CUDA_VISIBLE_DEVICES=options.get('gpu_uuid','') if requested=='cuda' else '',
                 HF_HUB_DISABLE_TELEMETRY='1', OMP_NUM_THREADS='2', MKL_NUM_THREADS='2')
             import psutil
-            self.process = subprocess.Popen([str(PYTHON), str(Path(__file__).with_name('embedding_worker.py')),
+            command=[str(python), str(Path(__file__).with_name('embedding_worker.py')),
                 '--model', str(MODEL), '--port', str(self.port), '--threads', '2',
-                '--parent',str(os.getpid()),'--parent-created',str(psutil.Process().create_time())],
+                '--parent',str(os.getpid()),'--parent-created',str(psutil.Process().create_time()),
+                '--device',requested,'--batch-size',str(options['batch_size'])]
+            if reason:command+=['--fallback-reason',reason]
+            if requested=='cuda':
+                command+=['--gpu-uuid',options['gpu_uuid'],'--memory-limit-mib',str(options['memory_limit_mib']),
+                    '--minimum-free-mib',str(options['minimum_free_mib'])]
+                if options['cpu_fallback']:command+=['--cpu-fallback']
+            self.process = subprocess.Popen(command,
                 stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
                 cwd=ROOT, env=env, creationflags=HIDDEN)
             self.started = time.monotonic(); self.state = 'chargement'; self.error = ''; self.ready = {}
@@ -94,6 +111,8 @@ class EmbeddingService:
             if self.process and self.process.poll() is not None:
                 self.process = None; self.state = 'erreur'; self.error = 'Le moteur EG2 s’est arrêté.'
                 self.failures += 1; self.retry_at = time.monotonic() + 30
+                if self.launch_device=='cuda' and self.runtime_options.get('cpu_fallback'):
+                    self.gpu_failed=True;self.retry_at=0
             if self.process is None:
                 if self.failures >= 3 or time.monotonic() < self.retry_at: return
                 self.start()
@@ -107,6 +126,8 @@ class EmbeddingService:
                 if time.monotonic() - self.started > 180:
                     self.stop(); self.state = 'erreur'; self.error = 'Chargement EG2 trop long.'
                     self.failures += 1; self.retry_at = time.monotonic() + 30
+                    if self.launch_device=='cuda' and self.runtime_options.get('cpu_fallback'):
+                        self.gpu_failed=True;self.retry_at=0
 
     def stop(self):
         with self.lock:
@@ -131,14 +152,15 @@ class EmbeddingService:
         if self.state != 'pret' or not self.enabled() or self.workspace.maintenance:
             raise ValueError('EG2 indisponible.')
         key = texts[0] if mode == 'query' and len(texts) == 1 and not include_usage else None
+        interactive = key is not None or include_usage
         if key is not None:
             with self.lock:
                 if key in self.query_cache: return [list(self.query_cache[key])]
                 if self.query_failures.get(key,0)>time.monotonic():raise ValueError('EG2 temporairement indisponible pour cette question.')
-            self.query_waiting.set()
+        if interactive:self.query_waiting.set()
         elif self.query_waiting.is_set():raise ValueError('Demande interactive prioritaire.')
-        if not self.slot.acquire(timeout=2 if key is not None else .15):
-            if key is not None:self.query_waiting.clear()
+        if not self.slot.acquire(timeout=5 if include_usage else 2 if key is not None else .15):
+            if interactive:self.query_waiting.clear()
             raise ValueError('EG2 occupé.')
         try:
             result = self.call('/embeddings', {'texts': texts, 'mode': mode}, timeout)
@@ -161,13 +183,17 @@ class EmbeddingService:
             raise
         finally:
             self.slot.release()
-            if key is not None:self.query_waiting.clear()
+            if interactive:self.query_waiting.clear()
 
     def status(self):
         enabled=self.enabled()
         with self.lock:
             return {'model': 'EmbeddingGemma 2', 'engine': 'Sentence Transformers / PyTorch',
                 'enabled': enabled, 'status': self.state, 'error': self.error,
-                'device': 'cpu', 'precision': 'float32', 'threads': 2, 'dimensions': DIMENSIONS,
+                'device': self.ready.get('device',self.launch_device), 'precision': 'float32', 'threads': 2, 'dimensions': DIMENSIONS,
+                'requested_device':self.runtime_options.get('device','cpu'),
+                'gpu_uuid':self.ready.get('gpu_uuid',self.runtime_options.get('gpu_uuid','')),
+                'gpu_name':self.ready.get('gpu_name',''),
+                'fallback_reason':self.ready.get('fallback_reason',self.start_fallback_reason),
                 'pid': (self.ready.get('pid') or self.process.pid) if self.process and self.process.poll() is None else None,
                 'last_seconds': self.last_seconds, 'parameters': self.ready.get('parameters')}

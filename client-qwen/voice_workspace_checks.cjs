@@ -1,7 +1,7 @@
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 module.exports=async({page,state,android,errors,until,sleep,event})=>{
-  const control=selector=>page.locator(selector),click=selector=>control(selector).click();
+  const control=selector=>page.locator(selector),click=async selector=>{if(selector==='[data-view-button="chat"]'&&await page.evaluate(()=>matchMedia('(max-width:850px)').matches&&!document.body.classList.contains('sidebar-open')))await control('#ui-sidebar-toggle').click();return control(selector).click();};
   const ready=()=>page.waitForFunction(()=>!conversationLocked());
   const enter=async()=>{if(android)await click('#ui-sidebar-toggle');await click('[data-view-button="voice"]');};
   const settings=()=>click('#voice-settings-toggle');
@@ -12,6 +12,17 @@ module.exports=async({page,state,android,errors,until,sleep,event})=>{
   const proof=require('./test_artifacts.cjs').directory('voice-workspace');
   await control('#prompt').fill('Brouillon écrit à conserver');await page.evaluate(()=>uiPersistPreferences());
   const before=await current();await enter();
+  assert.equal(await control('#voice-back').count(),0);
+  assert.equal(await control('#voice-transcript').evaluate(el=>el.open),false);
+  await control('#voice-transcript>summary').focus();await page.keyboard.press('Enter');
+  await page.waitForFunction(()=>document.getElementById('voice-transcript').open);
+  assert.equal(await control('#voice-transcript-empty').isVisible(),true);
+  const stage=await control('.voice-stage').boundingBox(),panel=await control('#voice-transcript').boundingBox();
+  if(android)assert(panel.y>=stage.y+stage.height-1,'On a narrow screen the panel follows the animation');
+  else assert(panel.x>=stage.x+stage.width,'Written exchanges sit beside the animation');
+  await page.keyboard.press('Escape');
+  assert.equal(await control('#voice-transcript').evaluate(el=>el.open),false);
+  assert.equal(await page.evaluate(()=>document.activeElement.parentElement.id),'voice-transcript');
   assert.equal(await control('#voice-settings-dialog').evaluate(el=>el.open),false);
   assert.equal(await page.isVisible('#voice-waves'),true);assert.equal(await page.isVisible('#conversation-interruptions'),true);
   await settings();assert.equal(await control('#voice-settings-toggle').getAttribute('aria-expanded'),'true');
@@ -44,7 +55,7 @@ module.exports=async({page,state,android,errors,until,sleep,event})=>{
   await click('#voice-history');assert.equal(await page.evaluate(()=>document.activeElement.id),'search-conversations');
   await click('[data-conversation-id="'+before.id+'"]');await ready();
   assert.equal(await page.isVisible('.voice-view'),true);assert.equal((await current()).id,before.id);
-  await click('#voice-back');assert.equal(await page.inputValue('#prompt'),'Brouillon écrit à conserver');
+  await click('[data-view-button="chat"]');assert.equal(await page.inputValue('#prompt'),'Brouillon écrit à conserver');
   await control('#prompt').fill('');await page.evaluate(()=>uiPersistPreferences());
   await page.evaluate(()=>showView('voice'));
   await click('#voice-history');if(android){await page.keyboard.press('Escape');assert.equal(await page.evaluate(()=>document.activeElement.id),'voice-history');}
@@ -83,6 +94,8 @@ module.exports=async({page,state,android,errors,until,sleep,event})=>{
   await settings();await control('#voice-volume').fill('0');await control('#voice-volume').dispatchEvent('input');
   await page.waitForFunction(()=>document.getElementById('voice-ai-level').value<.01);
   await click('#voice-settings-stop');await page.waitForFunction(()=>!window.conversationBusy);await closeSettings();await ready();
+  await click('#voice-transcript>summary');
+  await page.waitForFunction(()=>document.getElementById('voice-transcript-content').textContent.includes('livraison'));
   await page.evaluate(()=>uiSetTheme('dark'));
   for(const size of (android?[{width:390,height:844},{width:768,height:1024}]:[{width:1440,height:1000},{width:2551,height:1390}])){
     await page.setViewportSize(size);await sleep(150);

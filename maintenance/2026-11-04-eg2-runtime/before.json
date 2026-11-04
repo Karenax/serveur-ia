@@ -1,0 +1,26 @@
+{
+  "models": [
+    {
+      "pid": 19216,
+      "created": 1793775290.6163623
+    },
+    {
+      "pid": 21696,
+      "created": 1793775290.6867845
+    }
+  ],
+  "engine": {
+    "model": "EmbeddingGemma 2",
+    "engine": "Sentence Transformers / PyTorch",
+    "enabled": true,
+    "status": "erreur",
+    "error": "Le moteur EG2 s\u2019est arr\u00eat\u00e9.",
+    "device": "cpu",
+    "precision": "float32",
+    "threads": 2,
+    "dimensions": 768,
+    "pid": null,
+    "last_seconds": null,
+    "parameters": null
+  }
+}

@@ -58,7 +58,7 @@ class PrivateInferenceTests(unittest.TestCase):
             with urllib.request.urlopen(request, timeout=5) as response: return response.status, response.read()
         except urllib.error.HTTPError as response: return response.code, response.read()
     def activate(self):
-        return self.manager._prepare(self.a, {'messages': [{'role': 'user', 'content': 'Question'}]}, secrets.token_hex(16), 'test', None, None, False)[1]
+        return self.manager._prepare(self.a, {'messages': [{'role': 'user', 'content': 'Question'}]}, secrets.token_hex(16), 'test', None, None)[1]
     def test_provider_requires_own_active_run_and_forces_local_model_credentials(self):
         body = {'messages': [{'role': 'user', 'content': 'Question'}], 'model': 'attacker', 'base_url': 'http://outside', 'api_key': 'leak', 'stream': True, 'max_tokens': 999999}
         self.assertEqual(self.post('/v1/chat/completions', body, 'key-A')[0], 401)
@@ -95,7 +95,7 @@ class PrivateInferenceTests(unittest.TestCase):
             with self.subTest(effort=effort):
                 self.manager.active.clear();self.store.active=0
                 self.manager._prepare(self.a,{'messages':[{'role':'user','content':'Q'}],'reasoning_effort':effort},
-                    secrets.token_hex(16),'thinking-'+effort,None,None,False)
+                    secrets.token_hex(16),'thinking-'+effort,None,None)
                 status,_=self.post('/v1/chat/completions',{'messages':[{'role':'user','content':'Q'}],
                     'reasoning_effort':'low','chat_template_kwargs':{'enable_thinking':False},'stream':True},'key-A')
                 self.assertEqual(status,200);body=self.captured[-1][1]

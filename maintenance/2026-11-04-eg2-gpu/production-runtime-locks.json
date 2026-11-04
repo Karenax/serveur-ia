@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "environments": [
+    {
+      "runtime": "strata",
+      "passed": true,
+      "mismatch": {},
+      "extra": []
+    },
+    {
+      "runtime": "eg2",
+      "passed": true,
+      "mismatch": {},
+      "extra": []
+    },
+    {
+      "runtime": "voix-serveur",
+      "passed": true,
+      "mismatch": {},
+      "extra": []
+    },
+    {
+      "runtime": "conversation-windows",
+      "passed": true,
+      "mismatch": {},
+      "extra": []
+    },
+    {
+      "runtime": "hermes-fred",
+      "passed": true,
+      "mismatch": {},
+      "extra": []
+    },
+    {
+      "runtime": "construction-windows",
+      "passed": true,
+      "mismatch": {},
+      "extra": []
+    }
+  ]
+}

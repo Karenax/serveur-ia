@@ -1,0 +1,34 @@
+{
+  "phase": "active_verified",
+  "time": "2026-10-31T10:50:26.187020+01:00",
+  "session": "D:\\Serveur IA\\lanceur\\sessions\\20261031-104644-100032",
+  "selected_run": "rtx3080-ctx262144-opt3-int8-p2048-cache1",
+  "production_validation_run": "rtx3080-ctx262144-opt4-int8-coexist1g",
+  "context": 262144,
+  "kv": "int8",
+  "kv_resident": 20480,
+  "primary_expert_cache": 1,
+  "mtp": true,
+  "spec": 3,
+  "prefill": 2048,
+  "extra_vram_allocation_tested_mib": 1024,
+  "coexistence_min_free_mib": 141.0,
+  "recommended_initial_other_model_budget_mib": 512,
+  "autoload": {
+    "autoload": true,
+    "restart": true
+  },
+  "managed_state": "pret",
+  "production_image_passed": true,
+  "long_prompt_tokens": 27702,
+  "all_quality_checks_passed": true,
+  "memory_snapshot_csv": "name, memory.used [MiB], memory.free [MiB], driver_version\nTesla P100-PCIE-16GB, 15883 MiB, 406 MiB, 581.80\nTesla P100-PCIE-16GB, 15883 MiB, 406 MiB, 581.80\nNVIDIA GeForce RTX 3080, 8531 MiB, 1523 MiB, 581.80\nQuadro P2200, 1156 MiB, 3853 MiB, 581.80\n",
+  "sha256": {
+    "lanceur/base-strata.json": "bf96ca95ec9db3ce2e9040cfa51e981f0229419c02863ed53731106b58f5c895",
+    "strata-iq4-p100-hybride.json": "bf96ca95ec9db3ce2e9040cfa51e981f0229419c02863ed53731106b58f5c895",
+    "lanceur/reglages.json": "ab3486d05b61ba9d786a7bbc0b81f8f02b8f7e2b1f8591e9a06c1f10d1dc4ba5",
+    "lanceur/reglages-par-defaut.json": "30ea788d8411aea0ceb8a3696514fa1f772ca3d055d805dedf0806200c0b9984",
+    "lanceur/derniers-reglages-valides.json": "30ea788d8411aea0ceb8a3696514fa1f772ca3d055d805dedf0806200c0b9984",
+    "lanceur/exploitation.json": "2a56a8b1a5612be6e1fd6d4e5e9f098302abeeb22ad7fb0a2f91de249c448e1b"
+  }
+}

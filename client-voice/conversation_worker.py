@@ -26,6 +26,8 @@ def main():
     parser.add_argument('--fixture')
     parser.add_argument('--quality', choices=('low', 'max'), default='low')
     args = parser.parse_args()
+    linux = sys.platform.startswith('linux')
+    aec = not linux
     bridge = None
     if args.quality == 'max':
         # Fixed loopback address and ephemeral token come from the owning client,
@@ -49,8 +51,8 @@ def main():
                     acks.append(value['turn'])
                 if value.get('action') == 'mute' and type(value.get('muted')) is bool and args.mode=='conversation':
                     muted.set() if value['muted'] else muted.clear()
-                if value.get('action')=='playback' and args.quality=='max' and args.mode=='conversation' and type(value.get('playing')) is bool and type(value.get('interruptions')) is bool:
-                    paused.set() if value['playing'] and not value['interruptions'] else paused.clear()
+                if value.get('action')=='playback' and (args.quality=='max' or linux) and args.mode=='conversation' and type(value.get('playing')) is bool and type(value.get('interruptions')) is bool:
+                    paused.set() if value['playing'] and not (value['interruptions'] and aec) else paused.clear()
         finally:
             stop.set()
 
@@ -110,9 +112,20 @@ def main():
                 if not was_muted:
                     recognizer.reset_capture(); was_muted = True
                 if not listening or time.monotonic()-last_emit>=.1:
-                    emit({'phase':'listening','muted':True,'microphone_closed':True,'aec':True,
+                    emit({'phase':'listening','muted':True,'microphone_closed':True,'aec':aec,
                           'captured_samples':captured,'seconds':captured//16000,
                           'message':'Microphone coupé',**recognizer.status()})
+                    listening = True; last_emit = time.monotonic()
+                stop.wait(.05); continue
+            if linux and paused.is_set():
+                if microphone:
+                    microphone.close(); microphone = None
+                if not was_paused:
+                    recognizer.reset_capture(); was_paused = True
+                if not listening or time.monotonic()-last_emit >= .1:
+                    emit({'phase':'listening','muted':False,'microphone_closed':True,'aec':False,
+                          'capture_paused':True,'captured_samples':captured,'seconds':captured//16000,
+                          'message':'L’écoute reprend après la réponse de Kiara.',**recognizer.status()})
                     listening = True; last_emit = time.monotonic()
                 stop.wait(.05); continue
             if microphone is None:
@@ -122,7 +135,7 @@ def main():
             if muted.is_set():continue
             if not pcm:
                 if time.monotonic() - last_audio > 5:
-                    raise OSError('Le microphone ne fournit aucun son. Vérifiez les périphériques Windows par défaut.')
+                    raise OSError('Le microphone ne fournit aucun son. Vérifiez les périphériques audio par défaut.')
                 continue
             last_audio = time.monotonic(); captured += len(pcm) // 2
             audio = np.frombuffer(pcm, dtype='<i2').astype(np.float32) / 32768
@@ -131,7 +144,7 @@ def main():
                 recognizer.reset_capture();was_paused=capture_paused
             if not capture_paused:recognizer.accept(audio)
             if not listening or time.monotonic() - last_emit >= .1:
-                emit({'phase': 'listening', 'aec': True, 'muted':False, 'microphone_closed':False, 'loading_seconds': time.monotonic()-started,
+                emit({'phase': 'listening', 'aec': aec, 'muted':False, 'microphone_closed':False, 'loading_seconds': time.monotonic()-started,
                       'message': 'Dictée locale · français' if args.mode=='dictation' else 'Conversation locale · français',
                       'captured_samples': captured, 'seconds': captured // 16000,'capture_paused':capture_paused,
                       'audio_level': round(float(np.sqrt(np.mean(audio*audio))), 5), 'audio_level_at':time.time(), **recognizer.status()})

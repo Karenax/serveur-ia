@@ -1,0 +1,11 @@
+{
+  "runs": 5,
+  "requests": 40,
+  "checks_pass": true,
+  "profiles_unchanged": true,
+  "all_cache_tokens_zero": true,
+  "test_processes_stopped": true,
+  "test_port_released": true,
+  "v100_tested": false,
+  "split_porting_continued": false
+}

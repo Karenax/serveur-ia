@@ -86,11 +86,7 @@ def main():
         foreign_project = workspace.action(foreign_owner, {"action": "project_create", "title": "Autre propriétaire"})["id"]
         foreign_document = workspace.action(foreign_owner, {"action": "document_create", "project": foreign_project, "title": "Privé", "text": "Secret isolé"})["id"]
         source = workspace.action(owner, {"action": "search", "project": project, "query": "ORCHIDEE"})["sources"][0]
-        job = workspace.action(owner, {"action": "job_create", "project": project, "title": "Résultat Android", "prompt": "Vérifier ORCHIDEE", "request_key": secrets.token_hex(16)})["id"]
-        with workspace.db() as db:
-            db.execute("UPDATE jobs SET state='completed',result=? WHERE id=?", (json.dumps({"text": "Résultat avec une citation fidèle : ORCHIDEE.", "sources": [source]}), job))
-        notifications.publish(owner, "job_completed", "android-seed-job", {"kind": "job", "id": job, "project": project})
-        state["fixture"] = {"project": project, "document": document, "pdf_document": pdf_document, "job": job, "foreign_document": foreign_document}
+        state["fixture"] = {"project": project, "document": document, "pdf_document": pdf_document, "foreign_document": foreign_document}
         (output / "fixture-public.json").write_text(json.dumps(state["fixture"]), encoding="utf-8")
 
     class API(BaseHTTPRequestHandler):
@@ -241,7 +237,7 @@ def main():
             elif self.path == "/v1/cancel":
                 self.json_reply({"cancelled": True})
             elif self.path == "/v1/workspace":
-                self.json_reply(workspace.snapshot(owner) if workspace else {"projects": [], "documents": [], "jobs": []})
+                self.json_reply(workspace.snapshot(owner) if workspace else {"projects": [], "documents": []})
             elif self.path in ("/v1/workspace/action", "/v1/notifications", "/v1/notifications/action") and workspace:
                 try:
                     if self.path == "/v1/workspace/action": result = workspace.action(owner, body)

@@ -1,0 +1,16 @@
+{
+  "name": "rtx4080_fp16",
+  "before": {
+    "free_mib": 1560,
+    "utilization": 6
+  },
+  "allocator_budget_mib": 720,
+  "stop_below_free_mib": 512,
+  "minimum_observed_free_mib": 605,
+  "exit_code": 0,
+  "seconds": 27.74,
+  "after": {
+    "free_mib": 1562,
+    "utilization": 4
+  }
+}

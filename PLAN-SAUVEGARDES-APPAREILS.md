@@ -2,7 +2,7 @@
 
 Date : 10 octobre 2026. Statut : lots globaux **0 à 4 achevés, validés et mis en service** — 191 tests de régression réussis et preuves liées ci-dessous. Les spécifications ci-dessous conservent le détail du plan initial.
 
-Programmation réelle : tous les jours à 03 h, conservation 7 jours / 4 semaines / 6 mois, dossier serveur `D:\Serveur IA\lanceur\sauvegardes`, deuxième copie désactivée selon le choix du demandeur. Voir le [guide](lanceur/SAUVEGARDES-APPAREILS.md), la [récupération des signatures](lanceur/RECUPERATION-SIGNATURES.md) et les [preuves](preuves/lots-0-4/VALIDATION.md).
+Programmation vérifiée au 4 novembre 2026 : tous les jours à 03 h, conservation 7 jours / 4 semaines / 6 mois, dossier serveur `D:\Serveur IA\lanceur\sauvegardes`, deuxième copie configurée sur le NAS `\\DS218\home\Sauvegarde\Serveur IA`. La copie préalable à la publication Windows a été vérifiée. Voir le [guide](lanceur/SAUVEGARDES-APPAREILS.md), la [récupération des signatures](lanceur/RECUPERATION-SIGNATURES.md) et les [preuves](preuves/lots-0-4/VALIDATION.md).
 
 ## Objectif et périmètre
 

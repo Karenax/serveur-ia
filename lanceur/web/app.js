@@ -20,11 +20,11 @@ const definitions = {
     ['spec_min_p','Seuil des propositions MTP','number','Valeur entre 0 et 1. Réglage actuel : 0,5.',0,1,.05],
   ],
   'advanced-fields': [
-    ['layer_split','Première couche du GPU 2','number','24 répartit les 48 couches en deux moitiés.',1,47],
+    ['layer_split','Première couche du GPU 2','number','Avec deux GPU : 24 répartit les couches en deux moitiés. Sans effet avec trois GPU.',1,47],
     ['expert_cache','Cache d’experts GPU','text','auto adapte le cache à la VRAM disponible. Une valeur numérique fixe le cache du GPU principal.'],
     ['short_read','Lecture courte via la génération','number','0 utilise toujours le traitement par blocs. Sinon, seuil de nouveaux tokens.',0,256],
     ['min_free_ram_gib','Marge RAM pendant le chargement','number','Le lanceur arrête un nouveau chargement si la RAM disponible reste sous ce seuil pendant 8 secondes.',2,32,.5],
-    ['gpus','GPU visibles, dans leur ordre','text','Deux indices ou UUID NVIDIA séparés par une virgule. Le profil par défaut utilise uniquement les deux P100.'],
+    ['gpus','GPU visibles, dans leur ordre','text','Deux ou trois indices ou UUID NVIDIA séparés par une virgule. Avec trois GPU : couches denses sur le premier, experts sur les deux suivants.'],
   ],
   'network-fields': [
     ['host','Adresse d’écoute','text','127.0.0.1 : ce PC. 0.0.0.0 : toutes les interfaces IPv4.'],
@@ -42,7 +42,7 @@ const definitions = {
     ['tokenizer','Dossier du tokenizer','text','Doit contenir vocab.json.'],
     ['expert_profile','Profil des experts','text','Profil de fréquence utilisé pour remplir la VRAM.'],
     ['mtp_path','Pack MTP','text','Utilisé lorsque l’accélération MTP est activée.'],
-    ['exe','Moteur Strata','text','Binaire CUDA adapté aux Tesla P100.'],
+    ['exe','Moteur Strata','text','Binaire CUDA compatible avec les cartes sélectionnées.'],
   ],
 };
 const flat = Object.values(definitions).flat();
@@ -78,6 +78,7 @@ function updatePreview(){
   const s=form();$('context-value').replaceChildren(document.createTextNode(number(s.context)+' '));const unit=document.createElement('em');unit.textContent='tokens';$('context-value').append(unit);
   $('profile-detail').textContent=`${s.workers+1} threads de calcul · ${s.mtp_enabled?'MTP actif':'MTP désactivé'} · ${s.history_enabled?'historique réutilisé':'historique relu'}`;
   $('history_slots').disabled=!s.history_enabled;$('history_every').disabled=!s.history_enabled;$('spec').disabled=!s.mtp_enabled;$('spec_min_p').disabled=!s.mtp_enabled;
+  $('layer_split').disabled=s.gpus.split(',').filter(part=>part.trim()).length===3;
   const host=s.host==='0.0.0.0'?(liveState.lan_ips?.[0]||'ADRESSE_DU_PC'):s.host;
   $('api-address').value=`http://${host}:${s.port}/v1`;$('model-alias').textContent=liveState.health?.model||s.model_name;
   $('network-addresses').textContent=s.host==='0.0.0.0'?(liveState.lan_ips||[]).map(ip=>`http://${ip}:${s.port}/v1`).join('\n'):'Accès limité à ce PC.';
@@ -153,10 +154,10 @@ function renderState(s){
   liveState=s;$('queue-status').textContent=`Demandes : ${s.queue?.active||0} active · ${s.queue?.waiting||0} en attente · ${s.queue?.completed||0} terminées · ${s.queue?.tokens_per_second??"—"} tokens/s`;$('ops-status').textContent=`Version ${s.operations?.version||'—'} · ${s.operations?.error||'Surveillance disponible'}`;const names={pret:'Prêt',chargement:'Chargement',validation_cuda:'Validation CUDA',arrete:'Arrêté',erreur:'Erreur'};const name=names[s.status]||s.status;
   $('server-state').textContent=name;$('status-badge').className='badge'+(s.status==='pret'?'':s.status==='erreur'?' error':s.running?' loading':' off');$('status-badge').querySelector('span').textContent=name;
   const duration=s.elapsed_seconds==null?'':`${Math.floor(s.elapsed_seconds/60)} min ${Math.floor(s.elapsed_seconds%60)} s`;
-  $('server-description').textContent=s.error||(s.status==='pret'?(s.managed?'Modèle chargé et validation terminée.':'Serveur déjà actif, reconnu par le lanceur.'):s.running?`Le chargement peut être long depuis D:. ${duration}`:'Le modèle est déchargé. Vos réglages sont conservés.');
+  $('server-description').textContent=s.error||(s.status==='pret'?(s.managed?'Modèle chargé et validation terminée.':'Serveur déjà actif, reconnu par le lanceur.'):s.running?`Chargement du modèle en cours. ${duration}`:'Le modèle est déchargé. Vos réglages sont conservés.');
   $('ram-value').textContent=`${number(s.ram.available_gib)} Go`;$('ram-detail').textContent=`${number(s.ram.total_gib)} Go au total · ${s.ram.percent}% utilisés`;$('ram-meter').style.width=s.ram.percent+'%';$('ram-meter').style.background=s.ram.available_gib<6?'#f2a477':'var(--green)';
-  const gpu=s.gpus.filter(g=>g.name.includes('P100'));$('gpu-value').textContent=gpu.length?`${number(gpu.reduce((n,g)=>n+g.used_mib,0)/1024).split(',')[0]} / ${Math.round(gpu.reduce((n,g)=>n+g.total_mib,0)/1024)} Go`:'—';
-  $('gpu-lines').replaceChildren(...gpu.map((g,i)=>{const span=document.createElement('span');span.textContent=`P100 ${i+1} · ${g.utilization}% · ${g.temperature??'—'} °C · ${(g.used_mib/1024).toFixed(1)} Go`;return span;}));
+  const gpu=s.gpus;$('gpu-value').textContent=gpu.length?`${number(gpu.reduce((n,g)=>n+g.used_mib,0)/1024).split(',')[0]} / ${Math.round(gpu.reduce((n,g)=>n+g.total_mib,0)/1024)} Go`:'—';
+  $('gpu-lines').replaceChildren(...gpu.map((g,i)=>{const span=document.createElement('span');span.textContent=`${g.name.replace('NVIDIA ', '').replace('Tesla ', '')} · ${g.utilization}% · ${g.temperature??'—'} °C · ${(g.used_mib/1024).toFixed(1)} Go`;return span;}));
   $('active-details').replaceChildren();if(s.running){for(const [label,value]of [['Contexte',number(s.active.context)+' tokens'],['Calcul CPU',`${s.active.workers+1} threads`],['MTP',s.active.mtp?'Activé':'Désactivé'],['Historique',s.active.history?`${s.active.history} sauvegardes`:'Désactivé'],['Écoute',`${s.active.host}:${s.active.port}`]]){const row=document.createElement('div');const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;dd.textContent=value;row.append(dt,dd);$('active-details').append(row);}}
   $('disk-stats').replaceChildren(...s.disks.map(d=>{const row=document.createElement('div');const title=document.createElement('span'),data=document.createElement('span');title.textContent=d.name;data.textContent=`↓ ${d.read_mib_s} · ↑ ${d.write_mib_s} Mo/s`;row.append(title,data);return row;}));
   $('open-chat').disabled=s.status!=='pret';const log=$('engine-log'),nearEnd=log.scrollTop+log.clientHeight>=log.scrollHeight-50;log.textContent=s.logs||'Aucun journal disponible.';if(nearEnd)log.scrollTop=log.scrollHeight;
@@ -178,7 +179,7 @@ function openTopic(id){
 document.querySelectorAll('.tab').forEach(tab=>{tab.onclick=()=>openTopic(tab.dataset.tab);});
 document.querySelector('.tabs').addEventListener('keydown',e=>{const tab=e.target.closest('.tab');if(!tab||!['ArrowDown','ArrowUp','Home','End'].includes(e.key))return;e.preventDefault();e.stopPropagation();const tabs=[...document.querySelectorAll('.tab')];const next=e.key==='Home'?0:e.key==='End'?tabs.length-1:(tabs.indexOf(tab)+(e.key==='ArrowDown'?1:-1)+tabs.length)%tabs.length;openTopic(tabs[next].dataset.tab,true);tabs[next].focus();},true);
 document.querySelectorAll('[data-open]').forEach(button=>button.onclick=()=>openTopic(button.dataset.open));
-window.addEventListener('hashchange',()=>openTopic(location.hash.slice(1)));if(!['spaces','tools','tasks','knowledge','devices','notifications'].includes(location.hash.slice(1)))openTopic(location.hash.slice(1));
+window.addEventListener('hashchange',()=>openTopic(location.hash.slice(1)));if(!['spaces','tools','knowledge','devices','notifications'].includes(location.hash.slice(1)))openTopic(location.hash.slice(1));
 let clientsFingerprint='';
 let hermesModelsState=null, hermesModelsBusy=false;
 function element(tag,text,className){const node=document.createElement(tag);if(text)node.textContent=text;if(className)node.className=className;return node;}

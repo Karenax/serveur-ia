@@ -1,0 +1,366 @@
+[
+  {
+    "label": "warmup",
+    "elapsed_s": 2.0149999999998727,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 32,
+      "prompt_ms": 1919.7,
+      "prompt_per_token_ms": 59.991,
+      "prompt_per_second": 16.7,
+      "predicted_n": 4,
+      "predicted_ms": 87.9,
+      "predicted_per_token_ms": 21.975,
+      "predicted_per_second": 45.5,
+      "draft_n": 2,
+      "draft_n_accepted": 2
+    },
+    "usage": {
+      "prompt_tokens": 32,
+      "completion_tokens": 4,
+      "total_tokens": 36,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "301",
+    "quality_pass": true,
+    "gpu_after": "0, GPU-a39f1b57-5a26-b53d-e943-44ef8042a438, Tesla P100-PCIE-16GB, 15883, 44, 5, 1189, 33.56, 0x0000000000000000\n1, GPU-486d5352-582e-2880-78bf-3dec4688e142, Tesla P100-PCIE-16GB, 15883, 43, 5, 1189, 33.59, 0x0000000000000000\n2, GPU-c7ec5bca-5502-9e99-2ede-30270b7bde2f, NVIDIA GeForce RTX 3080, 8249, 52, 50, 1935, 126.88, 0x0000000000000000\n3, GPU-97ca6406-8625-b829-b053-191c238ff046, Quadro P2200, 1156, 40, 0, 139, 5.47, 0x0000000000000001"
+  },
+  {
+    "label": "quality-multiply",
+    "elapsed_s": 1.1720000000000255,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 33,
+      "prompt_ms": 1031.3,
+      "prompt_per_token_ms": 31.252,
+      "prompt_per_second": 32.0,
+      "predicted_n": 4,
+      "predicted_ms": 103.1,
+      "predicted_per_token_ms": 25.775,
+      "predicted_per_second": 38.8,
+      "draft_n": 4,
+      "draft_n_accepted": 3
+    },
+    "usage": {
+      "prompt_tokens": 33,
+      "completion_tokens": 4,
+      "total_tokens": 37,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "323",
+    "quality_pass": true,
+    "gpu_after": "0, GPU-a39f1b57-5a26-b53d-e943-44ef8042a438, Tesla P100-PCIE-16GB, 15883, 44, 4, 1189, 33.56, 0x0000000000000000\n1, GPU-486d5352-582e-2880-78bf-3dec4688e142, Tesla P100-PCIE-16GB, 15883, 44, 6, 1189, 33.35, 0x0000000000000000\n2, GPU-c7ec5bca-5502-9e99-2ede-30270b7bde2f, NVIDIA GeForce RTX 3080, 8249, 55, 39, 1950, 148.48, 0x0000000000000000\n3, GPU-97ca6406-8625-b829-b053-191c238ff046, Quadro P2200, 1156, 40, 0, 139, 5.37, 0x0000000000000001"
+  },
+  {
+    "label": "quality-divide",
+    "elapsed_s": 1.155999999999949,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 35,
+      "prompt_ms": 1082.0,
+      "prompt_per_token_ms": 30.914,
+      "prompt_per_second": 32.3,
+      "predicted_n": 3,
+      "predicted_ms": 55.7,
+      "predicted_per_token_ms": 18.567,
+      "predicted_per_second": 53.9,
+      "draft_n": 2,
+      "draft_n_accepted": 2
+    },
+    "usage": {
+      "prompt_tokens": 35,
+      "completion_tokens": 3,
+      "total_tokens": 38,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "64",
+    "quality_pass": true,
+    "gpu_after": "0, GPU-a39f1b57-5a26-b53d-e943-44ef8042a438, Tesla P100-PCIE-16GB, 15883, 44, 4, 1189, 33.32, 0x0000000000000000\n1, GPU-486d5352-582e-2880-78bf-3dec4688e142, Tesla P100-PCIE-16GB, 15883, 44, 6, 1189, 33.59, 0x0000000000000000\n2, GPU-c7ec5bca-5502-9e99-2ede-30270b7bde2f, NVIDIA GeForce RTX 3080, 8251, 54, 62, 1950, 142.83, 0x0000000000000000\n3, GPU-97ca6406-8625-b829-b053-191c238ff046, Quadro P2200, 1156, 40, 0, 139, 4.98, 0x0000000000000001"
+  },
+  {
+    "label": "quality-json",
+    "elapsed_s": 1.530999999999949,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 38,
+      "prompt_ms": 1339.4,
+      "prompt_per_token_ms": 35.247,
+      "prompt_per_second": 28.4,
+      "predicted_n": 11,
+      "predicted_ms": 171.8,
+      "predicted_per_token_ms": 15.618,
+      "predicted_per_second": 64.0,
+      "draft_n": 8,
+      "draft_n_accepted": 7
+    },
+    "usage": {
+      "prompt_tokens": 38,
+      "completion_tokens": 11,
+      "total_tokens": 49,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "{\"ville\":\"Lyon\",\"stock\":7}",
+    "quality_pass": true,
+    "gpu_after": "0, GPU-a39f1b57-5a26-b53d-e943-44ef8042a438, Tesla P100-PCIE-16GB, 15883, 44, 13, 1189, 33.56, 0x0000000000000000\n1, GPU-486d5352-582e-2880-78bf-3dec4688e142, Tesla P100-PCIE-16GB, 15883, 44, 12, 1189, 33.59, 0x0000000000000000\n2, GPU-c7ec5bca-5502-9e99-2ede-30270b7bde2f, NVIDIA GeForce RTX 3080, 8253, 54, 46, 1950, 143.54, 0x0000000000000000\n3, GPU-97ca6406-8625-b829-b053-191c238ff046, Quadro P2200, 1156, 40, 0, 139, 4.89, 0x0000000000000001"
+  },
+  {
+    "label": "quality-negation",
+    "elapsed_s": 1.3279999999999745,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 42,
+      "prompt_ms": 1248.6,
+      "prompt_per_token_ms": 29.729,
+      "prompt_per_second": 33.6,
+      "predicted_n": 3,
+      "predicted_ms": 60.6,
+      "predicted_per_token_ms": 20.2,
+      "predicted_per_second": 49.5,
+      "draft_n": 2,
+      "draft_n_accepted": 2
+    },
+    "usage": {
+      "prompt_tokens": 42,
+      "completion_tokens": 3,
+      "total_tokens": 45,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "bleu",
+    "quality_pass": true,
+    "gpu_after": "0, GPU-a39f1b57-5a26-b53d-e943-44ef8042a438, Tesla P100-PCIE-16GB, 15883, 44, 5, 1189, 33.56, 0x0000000000000000\n1, GPU-486d5352-582e-2880-78bf-3dec4688e142, Tesla P100-PCIE-16GB, 15883, 44, 5, 1189, 33.59, 0x0000000000000000\n2, GPU-c7ec5bca-5502-9e99-2ede-30270b7bde2f, NVIDIA GeForce RTX 3080, 8253, 55, 52, 1950, 142.06, 0x0000000000000000\n3, GPU-97ca6406-8625-b829-b053-191c238ff046, Quadro P2200, 1156, 40, 0, 139, 4.98, 0x0000000000000001"
+  },
+  {
+    "label": "vision",
+    "elapsed_s": 3.9529999999999745,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 281,
+      "prompt_ms": 2429.3,
+      "prompt_per_token_ms": 8.645,
+      "prompt_per_second": 115.7,
+      "predicted_n": 39,
+      "predicted_ms": 596.4,
+      "predicted_per_token_ms": 15.292,
+      "predicted_per_second": 65.4,
+      "draft_n": 32,
+      "draft_n_accepted": 24
+    },
+    "usage": {
+      "prompt_tokens": 281,
+      "completion_tokens": 39,
+      "total_tokens": 320,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "Le code en haut de l’image est **VISION 47**.\n\nLa forme rouge est un **cercle**.  \nLa forme bleue est un **carré**.",
+    "quality_pass": true,
+    "gpu_after": "0, GPU-a39f1b57-5a26-b53d-e943-44ef8042a438, Tesla P100-PCIE-16GB, 15883, 44, 14, 1189, 33.56, 0x0000000000000000\n1, GPU-486d5352-582e-2880-78bf-3dec4688e142, Tesla P100-PCIE-16GB, 15883, 44, 13, 1189, 33.59, 0x0000000000000000\n2, GPU-c7ec5bca-5502-9e99-2ede-30270b7bde2f, NVIDIA GeForce RTX 3080, 8320, 58, 87, 1935, 184.74, 0x0000000000000000\n3, GPU-97ca6406-8625-b829-b053-191c238ff046, Quadro P2200, 1156, 42, 0, 1594, 24.66, 0x0000000000000001"
+  },
+  {
+    "label": "decode-r1",
+    "elapsed_s": 6.438000000000102,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 43,
+      "prompt_ms": 1240.1,
+      "prompt_per_token_ms": 28.84,
+      "prompt_per_second": 34.7,
+      "predicted_n": 256,
+      "predicted_ms": 5169.8,
+      "predicted_per_token_ms": 20.195,
+      "predicted_per_second": 49.5,
+      "draft_n": 192,
+      "draft_n_accepted": 113
+    },
+    "usage": {
+      "prompt_tokens": 43,
+      "completion_tokens": 256,
+      "total_tokens": 299,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "La couleur du ciel est principalement déterminée par la manière dont la lumière du soleil interagit avec l'atmosphère terrestre, un phénomène physique connu sous le nom de diffusion de Rayleigh. La lumière blanche du soleil est en réalité composée de toutes les couleurs de l'arc-en-ciel, chacune correspondant à une longueur d'onde différente. Lorsque cette lumière pénètre dans l'atmosphère, elle entre en collision avec les molécules de gaz (principalement l'azote et l'oxygène) qui sont beaucoup plus petites que la longueur d'onde de la lumière visible. Selon les lois de la physique, la diffusion est inversement proportionnelle à la puissance quatrième de la longueur d'onde. Cela signifie que les longueurs d'onde courtes, comme le bleu et le violet, sont diffusées beaucoup plus fortement que les longueurs d'onde longues, comme le rouge ou l'orange. C'est pourquoi, lorsque nous regardons le ciel en plein jour, nous voyons cette lumière bleue diffusée dans toutes les directions, donnant au ciel sa couleur caractéristique.\n\nCependant, si le violet est encore plus court que le bleu et devrait théoriquement être diffusé davantage, nous percevons le ciel",
+    "quality_pass": true,
+    "gpu_after": "0, GPU-a39f1b57-5a26-b53d-e943-44ef8042a438, Tesla P100-PCIE-16GB, 15883, 44, 15, 1189, 33.56, 0x0000000000000000\n1, GPU-486d5352-582e-2880-78bf-3dec4688e142, Tesla P100-PCIE-16GB, 15883, 44, 15, 1189, 33.59, 0x0000000000000000\n2, GPU-c7ec5bca-5502-9e99-2ede-30270b7bde2f, NVIDIA GeForce RTX 3080, 8316, 59, 80, 1935, 206.75, 0x0000000000000000\n3, GPU-97ca6406-8625-b829-b053-191c238ff046, Quadro P2200, 1156, 43, 0, 1594, 24.67, 0x0000000000000001"
+  },
+  {
+    "label": "decode-r2",
+    "elapsed_s": 6.125,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 43,
+      "prompt_ms": 1234.6,
+      "prompt_per_token_ms": 28.712,
+      "prompt_per_second": 34.8,
+      "predicted_n": 256,
+      "predicted_ms": 4886.4,
+      "predicted_per_token_ms": 19.087,
+      "predicted_per_second": 52.4,
+      "draft_n": 186,
+      "draft_n_accepted": 115
+    },
+    "usage": {
+      "prompt_tokens": 43,
+      "completion_tokens": 256,
+      "total_tokens": 299,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "La couleur du ciel est principalement déterminée par la manière dont la lumière du soleil interagit avec l'atmosphère terrestre, un phénomène physique connu sous le nom de diffusion de Rayleigh. La lumière blanche du soleil est en réalité composée de toutes les couleurs de l'arc-en-ciel, chacune correspondant à une longueur d'onde différente. Lorsque cette lumière pénètre dans l'atmosphère, elle entre en collision avec les molécules de gaz (principalement l'azote et l'oxygène) qui sont beaucoup plus petites que la longueur d'onde de la lumière visible. Selon les lois de la physique, la diffusion est inversement proportionnelle à la puissance quatrième de la longueur d'onde. Cela signifie que les longueurs d'onde courtes, comme le bleu et le violet, sont diffusées beaucoup plus efficacement que les longueurs d'onde longues, comme le rouge ou l'orange. C'est pourquoi, lorsque le soleil est haut dans le ciel, nous voyons le bleu diffusé dans toutes les directions, donnant au ciel sa couleur caractéristique.\n\nCependant, il est intéressant de noter que bien que le violet soit diffusé encore plus que le bleu, nous ne voyons pas le ciel violet. Cela",
+    "quality_pass": true,
+    "gpu_after": "0, GPU-a39f1b57-5a26-b53d-e943-44ef8042a438, Tesla P100-PCIE-16GB, 15883, 44, 10, 1189, 33.56, 0x0000000000000000\n1, GPU-486d5352-582e-2880-78bf-3dec4688e142, Tesla P100-PCIE-16GB, 15883, 44, 8, 1189, 33.59, 0x0000000000000000\n2, GPU-c7ec5bca-5502-9e99-2ede-30270b7bde2f, NVIDIA GeForce RTX 3080, 8317, 59, 99, 1935, 206.94, 0x0000000000000000\n3, GPU-97ca6406-8625-b829-b053-191c238ff046, Quadro P2200, 1156, 44, 0, 1594, 24.77, 0x0000000000000001"
+  },
+  {
+    "label": "decode-r3",
+    "elapsed_s": 6.030999999999949,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 43,
+      "prompt_ms": 1228.3,
+      "prompt_per_token_ms": 28.565,
+      "prompt_per_second": 35.0,
+      "predicted_n": 256,
+      "predicted_ms": 4781.6,
+      "predicted_per_token_ms": 18.678,
+      "predicted_per_second": 53.5,
+      "draft_n": 185,
+      "draft_n_accepted": 115
+    },
+    "usage": {
+      "prompt_tokens": 43,
+      "completion_tokens": 256,
+      "total_tokens": 299,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "La couleur du ciel est principalement déterminée par la manière dont la lumière du soleil interagit avec l'atmosphère terrestre, un phénomène physique connu sous le nom de diffusion de Rayleigh. La lumière blanche du soleil est en réalité composée de toutes les couleurs de l'arc-en-ciel, chacune correspondant à une longueur d'onde différente. Lorsque cette lumière pénètre dans l'atmosphère, elle entre en collision avec les molécules de gaz (principalement l'azote et l'oxygène) qui sont beaucoup plus petites que la longueur d'onde de la lumière visible. Selon les lois de la physique, la diffusion est inversement proportionnelle à la puissance quatrième de la longueur d'onde. Cela signifie que les longueurs d'onde courtes, comme le bleu et le violet, sont diffusées beaucoup plus efficacement que les longueurs d'onde longues, comme le rouge ou l'orange. C'est pourquoi, lorsque le soleil est haut dans le ciel, nous voyons le bleu diffusé dans toutes les directions, donnant au ciel sa couleur caractéristique.\n\nCependant, il est intéressant de noter que bien que le violet soit diffusé encore plus que le bleu, nous ne voyons pas le ciel violet. Cela",
+    "quality_pass": true,
+    "gpu_after": "0, GPU-a39f1b57-5a26-b53d-e943-44ef8042a438, Tesla P100-PCIE-16GB, 15883, 44, 8, 1189, 33.56, 0x0000000000000000\n1, GPU-486d5352-582e-2880-78bf-3dec4688e142, Tesla P100-PCIE-16GB, 15883, 44, 15, 1189, 33.59, 0x0000000000000000\n2, GPU-c7ec5bca-5502-9e99-2ede-30270b7bde2f, NVIDIA GeForce RTX 3080, 8313, 59, 99, 1935, 207.52, 0x0000000000000000\n3, GPU-97ca6406-8625-b829-b053-191c238ff046, Quadro P2200, 1156, 45, 0, 1594, 24.75, 0x0000000000000001"
+  },
+  {
+    "label": "prefill-64-r1",
+    "elapsed_s": 3.1720000000000255,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 1516,
+      "prompt_ms": 2990.4,
+      "prompt_per_token_ms": 1.973,
+      "prompt_per_second": 507.0,
+      "predicted_n": 10,
+      "predicted_ms": 146.4,
+      "predicted_per_token_ms": 14.64,
+      "predicted_per_second": 68.3,
+      "draft_n": 6,
+      "draft_n_accepted": 6
+    },
+    "usage": {
+      "prompt_tokens": 1516,
+      "completion_tokens": 10,
+      "total_tokens": 1526,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "LUMIERE-7429",
+    "quality_pass": true,
+    "gpu_after": "0, GPU-a39f1b57-5a26-b53d-e943-44ef8042a438, Tesla P100-PCIE-16GB, 15883, 44, 11, 1189, 33.32, 0x0000000000000000\n1, GPU-486d5352-582e-2880-78bf-3dec4688e142, Tesla P100-PCIE-16GB, 15883, 44, 13, 1189, 33.59, 0x0000000000000000\n2, GPU-c7ec5bca-5502-9e99-2ede-30270b7bde2f, NVIDIA GeForce RTX 3080, 8317, 58, 97, 1935, 202.34, 0x0000000000000000\n3, GPU-97ca6406-8625-b829-b053-191c238ff046, Quadro P2200, 1156, 45, 0, 1594, 24.75, 0x0000000000000001"
+  },
+  {
+    "label": "prefill-64-r2",
+    "elapsed_s": 3.188000000000102,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 1516,
+      "prompt_ms": 3047.3,
+      "prompt_per_token_ms": 2.01,
+      "prompt_per_second": 497.5,
+      "predicted_n": 10,
+      "predicted_ms": 126.1,
+      "predicted_per_token_ms": 12.61,
+      "predicted_per_second": 79.3,
+      "draft_n": 6,
+      "draft_n_accepted": 6
+    },
+    "usage": {
+      "prompt_tokens": 1516,
+      "completion_tokens": 10,
+      "total_tokens": 1526,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "LUMIERE-7429",
+    "quality_pass": true,
+    "gpu_after": "0, GPU-a39f1b57-5a26-b53d-e943-44ef8042a438, Tesla P100-PCIE-16GB, 15883, 44, 12, 1189, 33.56, 0x0000000000000000\n1, GPU-486d5352-582e-2880-78bf-3dec4688e142, Tesla P100-PCIE-16GB, 15883, 44, 14, 1189, 33.59, 0x0000000000000000\n2, GPU-c7ec5bca-5502-9e99-2ede-30270b7bde2f, NVIDIA GeForce RTX 3080, 8317, 58, 100, 1935, 200.96, 0x0000000000000000\n3, GPU-97ca6406-8625-b829-b053-191c238ff046, Quadro P2200, 1156, 44, 0, 721, 6.34, 0x0000000000000001"
+  },
+  {
+    "label": "prefill-256-r1",
+    "elapsed_s": 9.702999999999975,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 5932,
+      "prompt_ms": 9532.5,
+      "prompt_per_token_ms": 1.607,
+      "prompt_per_second": 622.3,
+      "predicted_n": 10,
+      "predicted_ms": 125.5,
+      "predicted_per_token_ms": 12.55,
+      "predicted_per_second": 79.7,
+      "draft_n": 6,
+      "draft_n_accepted": 6
+    },
+    "usage": {
+      "prompt_tokens": 5932,
+      "completion_tokens": 10,
+      "total_tokens": 5942,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "LUMIERE-7429",
+    "quality_pass": true,
+    "gpu_after": "0, GPU-a39f1b57-5a26-b53d-e943-44ef8042a438, Tesla P100-PCIE-16GB, 15883, 44, 13, 1189, 33.56, 0x0000000000000000\n1, GPU-486d5352-582e-2880-78bf-3dec4688e142, Tesla P100-PCIE-16GB, 15883, 44, 12, 1189, 33.59, 0x0000000000000000\n2, GPU-c7ec5bca-5502-9e99-2ede-30270b7bde2f, NVIDIA GeForce RTX 3080, 8312, 59, 96, 1935, 210.04, 0x0000000000000000\n3, GPU-97ca6406-8625-b829-b053-191c238ff046, Quadro P2200, 1156, 42, 0, 139, 5.47, 0x0000000000000001"
+  },
+  {
+    "label": "prefill-256-r2",
+    "elapsed_s": 9.686999999999898,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 5932,
+      "prompt_ms": 9534.2,
+      "prompt_per_token_ms": 1.607,
+      "prompt_per_second": 622.2,
+      "predicted_n": 10,
+      "predicted_ms": 128.8,
+      "predicted_per_token_ms": 12.88,
+      "predicted_per_second": 77.6,
+      "draft_n": 6,
+      "draft_n_accepted": 6
+    },
+    "usage": {
+      "prompt_tokens": 5932,
+      "completion_tokens": 10,
+      "total_tokens": 5942,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "LUMIERE-7429",
+    "quality_pass": true,
+    "gpu_after": "0, GPU-a39f1b57-5a26-b53d-e943-44ef8042a438, Tesla P100-PCIE-16GB, 15883, 44, 9, 1189, 33.56, 0x0000000000000000\n1, GPU-486d5352-582e-2880-78bf-3dec4688e142, Tesla P100-PCIE-16GB, 15883, 44, 7, 1189, 33.59, 0x0000000000000000\n2, GPU-c7ec5bca-5502-9e99-2ede-30270b7bde2f, NVIDIA GeForce RTX 3080, 8317, 58, 97, 1935, 210.30, 0x0000000000000000\n3, GPU-97ca6406-8625-b829-b053-191c238ff046, Quadro P2200, 1156, 41, 0, 139, 5.37, 0x0000000000000001"
+  }
+]

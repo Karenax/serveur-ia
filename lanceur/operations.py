@@ -83,7 +83,7 @@ class Operations:
                 if not restoring:
                     c = self.controller
                     # Preserve the Kiara lock order: revocation holds remote's
-                    # lock before updating Workspace jobs.
+                    # lock before updating Workspace permissions.
                     for lock in (c.lock, c.wireguard.lock, c.remote.lock, c.remote.accounts.lock):
                         lock.acquire(); token['snapshot_locks'].append(lock)
                     # Native project mirroring writes files outside Hermes runs.
@@ -91,8 +91,6 @@ class Operations:
                     projects = getattr(facade, 'projects', None)
                     for lock in ([projects.lock] if projects else []) + [c.remote.workspace.lock]:
                         lock.acquire(); token['snapshot_locks'].append(lock)
-                    if c.remote.workspace.running:
-                        raise ValueError('Attendez la fin des tâches avant de sauvegarder Hermes.')
                 # The native supervisor takes service -> accounts while
                 # rebuilding its profiles, so a snapshot follows that order.
                 service_lock = getattr(facade.service, 'lock', None)

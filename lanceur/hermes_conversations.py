@@ -250,7 +250,7 @@ class HermesConversations:
         for owner in owners: self.cancel(owner)
         self.closed = True
 
-    def _prepare(self, owner, data, request, conversation, project, document, background):
+    def _prepare(self, owner, data, request, conversation, project, document):
         if not self.valid(owner): raise Denied('Accès désactivé.')
         if self.admission_paused: raise Denied('Sauvegarde de l’assistant en cours.')
         if not REQUEST.fullmatch(request or ''): raise ValueError('Identifiant de demande invalide.')
@@ -303,7 +303,7 @@ class HermesConversations:
                 session = previous['session'] if continuation else 'fred-' + secrets.token_hex(16)
                 context = {'request_id': request, 'conversation_id': conversation, 'project': project,
                            'document': document, 'project_id': project, 'document_id': document,
-                           'cancelled': threading.Event(), 'sources': [], 'background': background,
+                           'cancelled': threading.Event(), 'sources': [],
                            'remote': '', 'remote_ready': threading.Event(), 'created': time.monotonic(), 'model_calls': 0, 'tokens': 0,
                            'inference_phase': '', 'reasoning_content': ''}
                 context['model_selection']=selection
@@ -417,7 +417,7 @@ class HermesConversations:
                     break
         return history
 
-    def stream(self, owner, data, request, conversation, project=None, document=None, *, background=False):
+    def stream(self, owner, data, request, conversation, project=None, document=None):
         # The agent continues after a transport disconnect. Its accepted result
         # is durable and can be reconciled without replaying tool side effects.
         events = queue.Queue(maxsize=128)
@@ -433,7 +433,7 @@ class HermesConversations:
 
         def work():
             try:
-                for value in self._execute(owner, data, request, conversation, project, document, background=background): publish(value)
+                for value in self._execute(owner, data, request, conversation, project, document): publish(value)
             except BaseException as error: publish(error)
             finally:
                 publish(done)
@@ -455,8 +455,8 @@ class HermesConversations:
                 yield value
         finally: detached.set()
 
-    def _execute(self, owner, data, request, conversation, project=None, document=None, *, background=False):
-        record, context = self._prepare(owner, data, request, conversation, project, document, background)
+    def _execute(self, owner, data, request, conversation, project=None, document=None):
+        record, context = self._prepare(owner, data, request, conversation, project, document)
         if context is None:
             if record['state'] != 'completed': raise Conflict('Cette demande est terminée sans réponse ; commencez un nouvel envoi.')
             if json.loads(record['sources']): yield frame({'workspace_sources': json.loads(record['sources'])})
@@ -567,18 +567,3 @@ class HermesConversations:
                 if self.active.get(owner) is context: self.active.pop(owner, None)
             with self.store.lock: self.store.active -= 1
             self.storage.release(owner)
-
-    def generate(self, owner, messages, cancel, project=None):
-        request = secrets.token_hex(16)
-        conversation = 'task-' + request
-        data = {'messages': messages, 'reasoning_effort': 'none'}
-        stream = self.stream(owner, data, request, conversation, project=project, background=True)
-        result = []
-        try:
-            for raw in stream:
-                if cancel.is_set(): self.cancel(owner, request); raise ValueError('Tâche annulée.')
-                if raw.startswith(b'data: ') and raw.strip() != b'data: [DONE]':
-                    event = json.loads(raw[6:])
-                    for choice in event.get('choices', []): result.append(choice.get('delta', {}).get('content', ''))
-            return ''.join(result)
-        finally: stream.close()

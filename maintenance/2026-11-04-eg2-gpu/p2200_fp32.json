@@ -1,0 +1,125 @@
+{
+  "name": "p2200_fp32",
+  "device": "cuda:0",
+  "gpu_uuid": "GPU-97ca6406-8625-b829-b053-191c238ff046",
+  "dtype": "float32",
+  "attention": "sdpa",
+  "batch": 1,
+  "cpu_threads": 2,
+  "torch": "2.14.1+cu126",
+  "cuda_build": "12.6",
+  "cases": [
+    {
+      "case": "query_short",
+      "texts": 1,
+      "characters": 43,
+      "tokens": 16,
+      "seconds": [
+        0.047,
+        0.031,
+        0.047
+      ],
+      "median_seconds": 0.047,
+      "memory": {
+        "rss_mib": 2479.1,
+        "allocated_mib": 1041.9,
+        "reserved_mib": 1056.0,
+        "peak_allocated_mib": 1044.2,
+        "peak_reserved_mib": 1056.0,
+        "driver_free_mib": 3118.8
+      },
+      "minimum_cosine_vs_cpu": 1.0,
+      "maximum_absolute_delta": 5.681067705154419e-08
+    },
+    {
+      "case": "documents_32",
+      "texts": 32,
+      "characters": 62,
+      "tokens": 566,
+      "seconds": [
+        1.125,
+        1.109,
+        1.094
+      ],
+      "median_seconds": 1.109,
+      "memory": {
+        "rss_mib": 2480.4,
+        "allocated_mib": 1041.9,
+        "reserved_mib": 1056.0,
+        "peak_allocated_mib": 1044.6,
+        "peak_reserved_mib": 1056.0,
+        "driver_free_mib": 3118.8
+      },
+      "minimum_cosine_vs_cpu": 0.9999998807907104,
+      "maximum_absolute_delta": 1.4528632164001465e-07
+    },
+    {
+      "case": "long_4",
+      "texts": 4,
+      "characters": 4200,
+      "tokens": 3212,
+      "seconds": [
+        0.766
+      ],
+      "median_seconds": 0.766,
+      "memory": {
+        "rss_mib": 2519.2,
+        "allocated_mib": 1041.9,
+        "reserved_mib": 1210.0,
+        "peak_allocated_mib": 1160.1,
+        "peak_reserved_mib": 1210.0,
+        "driver_free_mib": 2964.8
+      },
+      "minimum_cosine_vs_cpu": 1.0,
+      "maximum_absolute_delta": 1.5273690223693848e-07
+    },
+    {
+      "case": "long_32",
+      "texts": 32,
+      "characters": 4200,
+      "tokens": 25718,
+      "seconds": [
+        5.938
+      ],
+      "median_seconds": 5.938,
+      "memory": {
+        "rss_mib": 2523.4,
+        "allocated_mib": 1041.9,
+        "reserved_mib": 1210.0,
+        "peak_allocated_mib": 1160.1,
+        "peak_reserved_mib": 1210.0,
+        "driver_free_mib": 2964.8
+      },
+      "minimum_cosine_vs_cpu": 0.9999999403953552,
+      "maximum_absolute_delta": 2.5331974029541016e-07
+    }
+  ],
+  "synthetic_only": true,
+  "gpu_name": "Quadro P2200",
+  "capability": [
+    6,
+    1
+  ],
+  "compiled_architectures": [
+    "sm_50",
+    "sm_60",
+    "sm_61",
+    "sm_70",
+    "sm_75",
+    "sm_80",
+    "sm_86",
+    "sm_90"
+  ],
+  "allocator_budget_mib": 2200,
+  "load_seconds": 3.797,
+  "parameters": 271002624,
+  "after_load": {
+    "rss_mib": 2063.8,
+    "allocated_mib": 1033.8,
+    "reserved_mib": 1054.0,
+    "peak_allocated_mib": 1033.8,
+    "peak_reserved_mib": 1054.0,
+    "driver_free_mib": 3138.8
+  },
+  "passed": true
+}

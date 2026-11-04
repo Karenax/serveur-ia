@@ -1,4 +1,4 @@
-"""Bounded FIFO inference queue, at most one request per identity."""
+"""Bounded FIFO inference queue; chat is exclusive, Codex permits four queued calls."""
 import secrets
 import re
 import threading
@@ -17,16 +17,18 @@ class Scheduler:
         self.last_seconds = None
         self.last_tokens_per_second = None
 
-    def submit(self, owner, request_id=None, background=False):
+    def submit(self, owner, request_id=None, concurrent=False):
         if request_id is not None:validate_request_id(request_id)
         with self.condition:
-            if any(r['owner'] == owner and (not r.get('background') or r['started'] is not None or background) for r in self.requests):
+            owned = [r for r in self.requests if r['owner'] == owner]
+            if owned and (not concurrent or len(owned) >= 4 or any(not r.get('concurrent') for r in owned)):
                 raise ValueError('Une demande de ce client est déjà en cours ou en attente.')
             if len(self.requests) >= self.capacity:
                 raise ValueError('La file est pleine. Réessayer plus tard.')
-            item = {'id': request_id or secrets.token_hex(16), 'owner': owner, 'created': time.time(), 'started': None, 'cancelled': False, 'background':background}
-            position=next((i for i,r in enumerate(self.requests) if r.get('background') and r['started'] is None),len(self.requests)) if not background else len(self.requests)
-            self.requests.insert(position,item)
+            if request_id and any(r['id'] == request_id and r['owner'] == owner for r in self.requests):
+                raise ValueError('Identifiant de demande déjà utilisé.')
+            item = {'id': request_id or secrets.token_hex(16), 'owner': owner, 'created': time.time(), 'started': None, 'cancelled': False, 'concurrent':concurrent}
+            self.requests.append(item)
             return item
 
     def position(self, item):

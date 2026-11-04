@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "version": "3.5.57",
+  "signed_update_served": true,
+  "download_verified": true,
+  "bytes": 115436508,
+  "sha256": "7a8b39e25cc9b867cd5ea53948ff4468c73282356eb4aa09a72ed89240c9114e",
+  "personal_access_preserved": true,
+  "model_processes_preserved": true,
+  "user_data_keys_settings_preserved": true,
+  "backup_policy_preserved": true,
+  "personal_clients": 4,
+  "voice_pack_unchanged": true,
+  "android_unchanged": true
+}

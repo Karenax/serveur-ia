@@ -1,0 +1,36 @@
+{
+  "health": {
+    "status": "ok",
+    "max_context": 262144,
+    "model": "qwen3.8-flash-next-iq4-xs",
+    "images": true,
+    "api_key": false,
+    "loaded": true,
+    "service": "strata"
+  },
+  "seconds": 48.45400000000018,
+  "answer": "JARDIN-5832",
+  "passed": true,
+  "usage": {
+    "prompt_tokens": 27646,
+    "completion_tokens": 9,
+    "total_tokens": 27655,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 27646,
+    "prompt_ms": 48277.4,
+    "prompt_per_token_ms": 1.746,
+    "prompt_per_second": 572.6,
+    "predicted_n": 9,
+    "predicted_ms": 145.2,
+    "predicted_per_token_ms": 16.133,
+    "predicted_per_second": 62.0,
+    "draft_n": 8,
+    "draft_n_accepted": 5
+  },
+  "scope": "Configured capacity 262144; exercised prompt beyond 20480 resident cells, not full-capacity stress test"
+}

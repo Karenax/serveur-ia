@@ -1,19 +1,19 @@
 # Kiara — architecture et versions actuelles
 
-Référence courante au 26 octobre 2026. Les rapports datés conservent leur valeur historique ; cette page décrit le code et les procédures de la livraison 3.5.54 / Android 1.0.25.
+Référence courante au 4 novembre 2026 : serveur/Windows 3.5.60, APK Android 1.0.25/code 26 publié le 26 octobre. Les rapports datés conservent leur valeur historique. Les modifications Android postérieures à cet APK restent dans les sources ; elles ne sont pas déclarées livrées.
 
 ## Versions et responsabilités
 
 | Composant | Version ou contrat | Rôle |
 |---|---|---|
-| Serveur et Windows | 3.5.54, dans `shared/kiara_shared/version.py` | Application et distribution Windows |
+| Serveur et Windows | 3.5.60, dans `shared/kiara_shared/version.py` | Application et distribution Windows |
 | Android | 1.0.25, code 26 | Enveloppe Java/WebView et interface partagée |
 | Contrat agent | 4 | Conversation, outils et approbations existants |
 | Identifiants de commandes | Version 2 négociée par `/v1/status` | Rétention bornée et refus du rejeu après expiration |
 | Base Workspace | Schéma 2 | Données canoniques et migrations versionnées |
 | Paquet partagé | `kiara-shared` 0.1.0 | Validation, HTTP, fichiers protégés, signatures et contrôleur vocal |
 | Go du pont | 1.27.3 | Transport WireGuard et proxies bornés |
-| Moteur de production | Strata 0.1.45.3 | Moteur CUDA ; serveur Python 0.1.43.1 corrigé et encodeur P2200 conservés |
+| Moteur de production | Strata 0.1.56 CUDA 12.9 | Couches denses et DFlash2 sur RTX 4080, experts sur deux P100 ; serveur Python 0.1.43.1 corrigé et encodeur P2200 conservés |
 | Hermes privé | Commit `79651b71bd56efd76d06f3de1df64dde09b58ff3`, patch et verrous locaux | Agent natif et outils autorisés |
 | Synthèse | Phonon 0.4.1, voix Tiphaine | Voix française sur CPU |
 | Reconnaissance Low Windows | Parakeet v3 | Dictée et conversation locales |
@@ -21,6 +21,17 @@ Référence courante au 26 octobre 2026. Les rapports datés conservent leur val
 | Pack Max actuel | Format 2, `runtime_api` 6 | Whisper Turbo Q5 Vulkan et Phonon CPU |
 
 L’état effectivement installé et les empreintes des livrables sont dans les manifestes de construction et de déploiement. Cette table ne remplace pas leurs preuves de publication.
+
+Le [profil GPU par défaut du 3 novembre](maintenance/2026-11-03-rtx4080/default-mode/README.md)
+utilise NVIDIA 581.80 sur les quatre cartes. Le modèle IQ4_XS et la table PLE/Ngram
+sont sur F:, ainsi que le moteur permanent sous `F:/Kiara/moteurs/strata-0.1.56-cuda12`.
+Le contexte maximal reste 262144 tokens, avec cache KV INT8 : le KV complet réside en RAM avec
+20480 cellules par couche d'attention conservées en VRAM. Le cache d'experts du
+GPU principal et ceux des deux P100 sont automatiques. DFlash2 remplace la couche
+MTP, avec fenêtre 6 et seuil 0,8 ; son pack vérifié est sous `F:/Kiara/modeles/dflash2/`.
+Les [essais de performance](maintenance/2026-11-03-rtx4080/ESSAIS-0156.md)
+documentent ce choix. La P2200 encode les images ; les sauvegardes de prompt et
+le cache de conversation restent actifs.
 
 ## Organisation du code
 
@@ -34,7 +45,7 @@ Les sources HTML/CSS/JS Windows restent la base de l’interface. Android fourni
 
 ## Autorités des données
 
-- Workspace SQLite : projets, documents, souvenirs, conversations publiées, tâches, commandes et notifications.
+- Workspace SQLite : projets, documents, souvenirs, conversations publiées, commandes et notifications.
 - Historique protégé du client : copie locale et brouillons pour le fonctionnement hors ligne ; les conflits se résolvent par synchronisation.
 - Sessions Hermes : état natif du moteur et projection liée au périmètre Kiara.
 - Index EG2, chunks et exports : données dérivées, invalidables ou reconstructibles.
@@ -54,7 +65,7 @@ Le schéma 2 ajoute les index de lecture et le registre de migration. L’absenc
 
 ## Environnements et déploiement
 
-Six profils sont verrouillés : Strata, EG2, voix serveur, conversation Windows, Hermes privé et construction Windows. Le constructeur est dans `toolchain/build-python` ; PyInstaller n’est plus nécessaire dans le runtime Strata. Strata n’hérite plus des bibliothèques de l’outillage Codex.
+Sept profils sont verrouillés : Strata, EG2 CPU de secours, EG2 CUDA, voix serveur, conversation Windows, Hermes privé et construction Windows. EG2 utilise la P2200 en float32/SDPA, avec choix explicite de carte et repli CPU visible ; `lanceur/eg2-runtime.json` déclare le runtime et les budgets. La vision partage cette carte ; Qwen conserve la RTX 4080 et les deux P100. Le constructeur est dans `toolchain/build-python` ; PyInstaller n’est plus nécessaire dans le runtime Strata. Strata n’hérite plus des bibliothèques de l’outillage Codex.
 
 Le runtime Hermes privé est sélectionné avant toute consultation de l’installation personnelle. Le pointeur déclare ses sources, Python, dépendances et outils. Les répertoires de dépendances partagés conservés lors de la migration restent des prérequis explicites ; retirer l’installation personnelle ne doit pas entraîner la suppression de ces répertoires tant qu’ils sont référencés.
 

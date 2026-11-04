@@ -126,21 +126,6 @@ class DocumentResearchTests(unittest.TestCase):
         _,sources=self.workspace.context('alice',[{'role':'user','content':'Résume ce document'}],self.project,identity)
         self.assertEqual(sources[0]['document'],identity)
 
-    def test_job_citations_survive_restart_document_deletion_and_catalogue_eviction(self):
-        identity=self.document('Factures','La durée de conservation des factures est de 13 ans.')
-        job=self.action('job_create',project=self.project,prompt='Quelle durée de conservation des factures ?',request_key=secrets.token_hex(16))['id']
-        self.workspace.generation=lambda owner,messages,cancel:'Conservation : 13 ans, selon Factures v1.'
-        self.assertTrue(self.workspace.run_one())
-        saved=json.loads(self.action('job_get',id=job)['result']);source=saved['sources'][0]
-        self.assertEqual(source['revision'],1);self.assertIn('13 ans',source['text'])
-        self.action('document_delete',id=identity,revision=1)
-        with self.workspace.db() as db:db.execute('DELETE FROM document_sources')
-        reopened=Workspace(self.home)
-        try:
-            passage=reopened.action('alice',{'action':'source_get','source_id':source['source_id']})
-            self.assertEqual(passage['status'],'unavailable');self.assertEqual(passage['text'],source['text'])
-            with self.assertRaises(Denied):reopened.action('bob',{'action':'source_get','source_id':source['source_id']})
-        finally:reopened.shutdown()
 
     def test_legacy_schema_migration_keeps_documents_and_rebuilds_unindexed_notes(self):
         old=sqlite3.connect(':memory:');old.executescript(PRE_DOCUMENT_SCHEMA)

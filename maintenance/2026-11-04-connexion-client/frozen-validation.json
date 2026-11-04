@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "version": "3.5.60",
+  "ui_matches_sources": true,
+  "client_bytecode_matches_sources": true,
+  "wireguard_matches_published": true,
+  "resources": [
+    "chat.html",
+    "workspace.html",
+    "ui.js",
+    "ui.css",
+    "conversation.js",
+    "attachments.js",
+    "selection.js",
+    "thinking.js",
+    "markdown.js",
+    "corrector.js",
+    "voice.js"
+  ]
+}

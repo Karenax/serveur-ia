@@ -1,0 +1,8 @@
+{
+  "archive": "client-linux\\dist\\Kiara-linux-amd64-3.5.55.tar.gz",
+  "bytes": 4383116,
+  "sha256": "6f74289803a84c38b474bebef5e141b13a3a46cd7753b14af50433faf390e773",
+  "files_verified": 54,
+  "elf": "Linux x86_64",
+  "native_linux_validated": false
+}

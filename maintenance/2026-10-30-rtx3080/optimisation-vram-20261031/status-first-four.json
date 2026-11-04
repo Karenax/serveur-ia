@@ -1,0 +1,31 @@
+{
+  "phase": "reference_loading_after_trials",
+  "started": "2026-10-31T10:27:46.650354+01:00",
+  "runs": [
+    {
+      "tag": "opt2-ref-fp16",
+      "exit_code": 0
+    },
+    {
+      "tag": "opt2-fp16-p1024-cache1",
+      "exit_code": 0
+    },
+    {
+      "tag": "opt2-int8-p1024-cache1",
+      "exit_code": 0
+    },
+    {
+      "tag": "opt2-int8-p1024-cache1-mtp4",
+      "exit_code": 0
+    }
+  ],
+  "stop": {
+    "status": "arrete"
+  },
+  "current": "opt2-int8-p1024-cache1-mtp4",
+  "benchmark_pid": 5056,
+  "restore": {
+    "status": "chargement",
+    "worker_pid": 32332
+  }
+}

@@ -1,6 +1,6 @@
 # Reconstruire et vérifier Kiara
 
-Les constructions Windows/serveur 3.5.54 et Android 1.0.25/code 26 utilisent les
+Les constructions Windows/serveur 3.5.60 et Android 1.0.25/code 26 utilisent les
 sources locales et les clés de signature existantes. Chaque construction produit
 `build-manifest.json` : empreintes des sources, empreinte du binaire, versions des
 paquets Python, Go, CMake, JDK, SDK/NDK Android et commit Hermes réellement utilisés.
@@ -14,9 +14,9 @@ et compatibilités courantes.
 
 1. Extraire le dépôt sur Windows, avec Git, PowerShell 7 ou Windows PowerShell 5.1,
    Node.js ≥ 20 et Chrome. Le moteur de production Flash-Next est Strata officiel
-   **0.1.45.3**, sous `dependances/strata-0.1.45.3/engine-cuda12`, avec le serveur
+   **0.1.56 CUDA 12.9**, sous `F:/Kiara/moteurs/strata-0.1.56-cuda12`, avec le serveur
    Python corrigé conservé sous `dependances/strata-0.1.43.1/source` : suivre
-   [sa configuration de production](maintenance/2026-10-19-strata-0.1.45.3/README.md).
+   [sa configuration de production RTX 4080/DFlash2](maintenance/2026-11-03-rtx4080/default-mode/README.md).
    [dependances/moteurs.json](dependances/moteurs.json) conserve les références des
    dépôts historiques et de leurs patchs, décrites dans
    [dependances/README.md](dependances/README.md).
@@ -65,7 +65,7 @@ pour la phrase française ; voir le [rapport et ses limites](maintenance/2026-10
 
 ## Exécuter les vérifications
 
-Les cinq runtimes applicatifs et le constructeur Windows disposent de six
+Les runtimes applicatifs, dont EG2 CPU et CUDA, et le constructeur Windows disposent de sept
 [verrous avec empreintes](dependances/verrous/README.md). Vérifier leur conformité
 avec `maintenance/verrous_runtime.py check`. Reconstruire dans des environnements
 neufs à partir des verrous ; ne pas modifier le runtime personnel Hermes. Kiara
@@ -85,6 +85,28 @@ sous `toolchain/test-results`. `--output` permet un emplacement explicite et
 Les captures UI restent dans ce répertoire et ne remplacent aucune preuve historique.
 
 Les commandes individuelles restent disponibles :
+
+Le runtime EG2 doit recevoir son verrou `dependances/verrous/eg2.requirements.txt`
+puis le paquet local partagé, comme Strata :
+
+```powershell
+& '.\toolchain\eg2-python\Scripts\python.exe' -m pip install --require-hashes -r dependances/verrous/eg2.requirements.txt
+& '.\toolchain\eg2-python\Scripts\python.exe' -m pip install --no-index --no-deps --no-build-isolation -e shared
+& '.\toolchain\eg2-python\Scripts\python.exe' -m pip check
+```
+
+`Install-EG2.ps1` installe également ce paquet local. Après une réparation,
+**Activer EG2** remet à zéro les essais de démarrage sans redémarrer Qwen.
+
+Depuis le 4 novembre, `lanceur/eg2-runtime.json` sélectionne la P2200 pour EG2.
+Préparer d’abord le runtime CPU de secours, puis le runtime CUDA verrouillé avec
+`maintenance/prepare_eg2_gpu.py`. Le runtime CUDA validé conserve son chemin
+historique `toolchain/eg2-gpu-benchmark-python-20261104` : ce dossier est désormais
+un prérequis de production et ne doit pas être nettoyé comme un résultat de test.
+Il partage les dépendances publiques verrouillées du runtime CPU et charge ses
+propres roues PyTorch/torchvision CUDA 12.6. Les sources locales `shared` restent
+référencées explicitement. Le verrou `eg2-gpu.requirements.txt` permet aussi une
+reconstruction autonome avec toutes les dépendances.
 
 ```powershell
 & '.\Strata-src\.venv\Scripts\python.exe' -m pip check
@@ -156,3 +178,34 @@ Le runtime actif est `toolchain/phonon-server-python` (Python 3.12), isolé de S
 
 
 Depuis le 23 octobre 2026, la voix serveur est Tiphaine (français de France). Le moteur Phonon et son checkpoint restent identiques ; l’embedding de voix est vérifié et épinglé dans `lanceur/phonon-model.json`. Voir [la sélection et les preuves](maintenance/2026-10-23-tiphaine/README.md).
+
+## Client Linux avec vocal
+
+Le [guide Linux](client-linux/README.md) décrit l’installation Ubuntu/Debian,
+l’import d’un accès personnel, le trousseau, la dictée et la conversation vocale.
+Construire une archive sans données privées avec :
+
+```powershell
+& '.\toolchain\build-python\Scripts\python.exe' maintenance/package_linux_client.py
+```
+
+Le moteur WireGuard est compilé nativement pour Linux avec le Go épinglé ;
+le paquet utilise les sources partagées du client et un environnement Python/Qt
+installé sur le poste Linux. Le manifeste Linux est indépendant des manifestes
+de publication Windows/Android/serveur. Ne pas l’ajouter à leur publication comme
+un livrable natif déjà validé : le premier lancement, le trousseau et les échanges
+avec un accès de test doivent encore être vérifiés sur une machine Linux.
+La révision Linux 2 produit une archive `*-vocal.tar.gz` avec le worker Python
+de reconnaissance et le modèle public du mot d’appel. Le microphone utilise
+`parec` (PipeWire/PulseAudio) ; installer `pulseaudio-utils`. Les modèles Low
+sont téléchargés et vérifiés par le client. Max utilise le serveur Kiara ; les
+compléments Windows ne sont pas exécutés sous Linux. L’écoute se suspend pendant
+la réponse puis reprend automatiquement. Voir le [rapport vocal Linux](maintenance/2026-11-01-client-linux/VOCAL.md).
+
+## Codex avec Qwen via Kiara
+
+Le [guide Codex](maintenance/codex/README.md) décrit le profil client, le stockage
+Windows chiffré de la clé, les sous-agents et les qualifications Responses.
+Les scripts de mise en service conservent le modèle chargé, les accès et les
+historiques ; les EXE personnels restent utilisables sans reconstruction pour
+les connexions Codex directes en HTTPS.

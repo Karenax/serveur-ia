@@ -2,9 +2,13 @@
 
 La console locale est disponible sur <http://127.0.0.1:8765>. Ces fonctions sont exécutées par le serveur et administrées dans les rubriques **Sauvegardes** et **Appareils**.
 
+État vérifié au 4 novembre 2026 : serveur/Windows **3.5.60**, APK Android
+**1.0.25/code 26**. Les versions citées dans les preuves finales décrivent la
+livraison initiale de cette fonction.
+
 ## Sauvegardes en service
 
-Depuis le 10 octobre 2026, une sauvegarde chiffrée est programmée **chaque jour à 03 h**, heure du serveur, dans `D:\Serveur IA\lanceur\sauvegardes`. La conservation des points automatiques est de **7 jours, 4 semaines et 6 mois** : un même point peut satisfaire plusieurs catégories. Les points manuels sont conservés hors de ce nettoyage. Les points de retour de restauration et le dernier point vérifié sont protégés. La deuxième copie est disponible dans la console ; son emplacement reste vide selon le choix de l’utilisateur de commencer sur le serveur.
+Depuis le 10 octobre 2026, une sauvegarde chiffrée est programmée **chaque jour à 03 h**, heure du serveur, dans `D:\Serveur IA\lanceur\sauvegardes`. La conservation des points automatiques est de **7 jours, 4 semaines et 6 mois** : un même point peut satisfaire plusieurs catégories. Les points manuels sont conservés hors de ce nettoyage. Les points de retour de restauration et le dernier point vérifié sont protégés. La deuxième copie est configurée sur `\\DS218\home\Sauvegarde\Serveur IA` ; la copie préalable à la publication du 4 novembre est vérifiée.
 
 Une sauvegarde initiale a été créée et déchiffrée pour vérifier son contenu après la mise à jour. Le modèle déjà chargé a conservé les mêmes processus pendant cette opération. Le rapport `preuves/lots-0-4/production-validation.json` contient les dates, tailles et empreintes, sans les valeurs secrètes.
 
@@ -16,7 +20,7 @@ Le processus de la console serveur doit fonctionner à l’échéance. Une éch�
 
 ## Données couvertes
 
-Les archives contiennent les conversations et préférences synchronisées, projets, documents et originaux, mémoire, tâches, quotas, comptes, réglages du serveur, configuration des accès, secrets WireGuard, profils personnels disponibles et clé de signature des mises à jour Windows. La programmation est incluse ; le secret DPAPI de la machine est conservé localement et la programmation est désactivée après restauration pour permettre sa vérification.
+Les archives contiennent les conversations et préférences synchronisées, projets, documents et originaux, mémoire, rappels, tables historiques des tâches, quotas, comptes, réglages du serveur, configuration des accès, secrets WireGuard, profils personnels disponibles et clé de signature des mises à jour Windows. La programmation est incluse ; le secret DPAPI de la machine est conservé localement et la programmation est désactivée après restauration pour permettre sa vérification.
 
 Les brouillons et réglages qui sont restés uniquement sur un client ne sont pas présents sur le serveur. Les modèles, caches, environnements de compilation, exécutables reconstructibles et sauvegardes sont exclus. Les clés de signature Android sont récupérables dans un paquet chiffré séparé ; voir `RECUPERATION-SIGNATURES.md`.
 

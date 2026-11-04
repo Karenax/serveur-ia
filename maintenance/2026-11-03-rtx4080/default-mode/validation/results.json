@@ -1,0 +1,198 @@
+[
+  {
+    "label": "warmup",
+    "elapsed_s": 2.875,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 51,
+      "prompt_ms": 2703.1,
+      "prompt_per_token_ms": 53.002,
+      "prompt_per_second": 18.9,
+      "predicted_n": 4,
+      "predicted_ms": 131.0,
+      "predicted_per_token_ms": 32.75,
+      "predicted_per_second": 30.5,
+      "draft_n": 5,
+      "draft_n_accepted": 2
+    },
+    "usage": {
+      "prompt_tokens": 51,
+      "completion_tokens": 4,
+      "total_tokens": 55,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "301",
+    "quality_pass": true,
+    "gpu_after": "0, GPU-a39f1b57-5a26-b53d-e943-44ef8042a438, Tesla P100-PCIE-16GB, 15901, 43, 6, 1189, 33.56, 0x0000000000000000\n1, GPU-486d5352-582e-2880-78bf-3dec4688e142, Tesla P100-PCIE-16GB, 15901, 43, 5, 1189, 33.33, 0x0000000000000000\n2, GPU-7d35736d-3ef5-1304-0e9e-1d26021be1a0, NVIDIA GeForce RTX 4080, 14241, 45, 62, 2820, 67.30, 0x0000000000000000\n3, GPU-97ca6406-8625-b829-b053-191c238ff046, Quadro P2200, 1162, 32, 0, 139, 5.18, 0x0000000000000001"
+  },
+  {
+    "label": "quality-multiply",
+    "elapsed_s": 1.6719999999995707,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 53,
+      "prompt_ms": 1574.9,
+      "prompt_per_token_ms": 29.715,
+      "prompt_per_second": 33.7,
+      "predicted_n": 4,
+      "predicted_ms": 78.7,
+      "predicted_per_token_ms": 19.675,
+      "predicted_per_second": 50.8,
+      "draft_n": 5,
+      "draft_n_accepted": 2
+    },
+    "usage": {
+      "prompt_tokens": 53,
+      "completion_tokens": 4,
+      "total_tokens": 57,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "323",
+    "quality_pass": true,
+    "gpu_after": "0, GPU-a39f1b57-5a26-b53d-e943-44ef8042a438, Tesla P100-PCIE-16GB, 15901, 44, 10, 1189, 33.54, 0x0000000000000000\n1, GPU-486d5352-582e-2880-78bf-3dec4688e142, Tesla P100-PCIE-16GB, 15901, 43, 9, 1189, 33.09, 0x0000000000000000\n2, GPU-7d35736d-3ef5-1304-0e9e-1d26021be1a0, NVIDIA GeForce RTX 4080, 14234, 46, 63, 2820, 78.64, 0x0000000000000000\n3, GPU-97ca6406-8625-b829-b053-191c238ff046, Quadro P2200, 1162, 32, 0, 139, 5.37, 0x0000000000000001"
+  },
+  {
+    "label": "quality-divide",
+    "elapsed_s": 1.7030000000004293,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 55,
+      "prompt_ms": 1628.7,
+      "prompt_per_token_ms": 29.613,
+      "prompt_per_second": 33.8,
+      "predicted_n": 3,
+      "predicted_ms": 62.0,
+      "predicted_per_token_ms": 20.667,
+      "predicted_per_second": 48.4,
+      "draft_n": 2,
+      "draft_n_accepted": 2
+    },
+    "usage": {
+      "prompt_tokens": 55,
+      "completion_tokens": 3,
+      "total_tokens": 58,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "64",
+    "quality_pass": true,
+    "gpu_after": "0, GPU-a39f1b57-5a26-b53d-e943-44ef8042a438, Tesla P100-PCIE-16GB, 15901, 44, 6, 1189, 33.56, 0x0000000000000000\n1, GPU-486d5352-582e-2880-78bf-3dec4688e142, Tesla P100-PCIE-16GB, 15901, 43, 5, 1189, 33.33, 0x0000000000000000\n2, GPU-7d35736d-3ef5-1304-0e9e-1d26021be1a0, NVIDIA GeForce RTX 4080, 14254, 46, 64, 2805, 80.00, 0x0000000000000000\n3, GPU-97ca6406-8625-b829-b053-191c238ff046, Quadro P2200, 1162, 32, 0, 139, 5.18, 0x0000000000000001"
+  },
+  {
+    "label": "quality-json",
+    "elapsed_s": 1.969000000000051,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 57,
+      "prompt_ms": 1698.4,
+      "prompt_per_token_ms": 29.796,
+      "prompt_per_second": 33.6,
+      "predicted_n": 20,
+      "predicted_ms": 235.1,
+      "predicted_per_token_ms": 11.755,
+      "predicted_per_second": 85.1,
+      "draft_n": 18,
+      "draft_n_accepted": 16
+    },
+    "usage": {
+      "prompt_tokens": 57,
+      "completion_tokens": 20,
+      "total_tokens": 77,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "{\n  \"ville\": \"Lyon\",\n  \"stock\": 7\n}",
+    "quality_pass": true,
+    "gpu_after": "0, GPU-a39f1b57-5a26-b53d-e943-44ef8042a438, Tesla P100-PCIE-16GB, 15901, 44, 16, 1189, 33.56, 0x0000000000000000\n1, GPU-486d5352-582e-2880-78bf-3dec4688e142, Tesla P100-PCIE-16GB, 15901, 43, 15, 1189, 33.35, 0x0000000000000000\n2, GPU-7d35736d-3ef5-1304-0e9e-1d26021be1a0, NVIDIA GeForce RTX 4080, 14275, 47, 64, 2805, 81.87, 0x0000000000000000\n3, GPU-97ca6406-8625-b829-b053-191c238ff046, Quadro P2200, 1162, 32, 0, 139, 5.08, 0x0000000000000001"
+  },
+  {
+    "label": "quality-negation",
+    "elapsed_s": 1.7820000000001528,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 63,
+      "prompt_ms": 1698.8,
+      "prompt_per_token_ms": 26.965,
+      "prompt_per_second": 37.1,
+      "predicted_n": 3,
+      "predicted_ms": 56.3,
+      "predicted_per_token_ms": 18.767,
+      "predicted_per_second": 53.3,
+      "draft_n": 4,
+      "draft_n_accepted": 2
+    },
+    "usage": {
+      "prompt_tokens": 63,
+      "completion_tokens": 3,
+      "total_tokens": 66,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "bleu",
+    "quality_pass": true,
+    "gpu_after": "0, GPU-a39f1b57-5a26-b53d-e943-44ef8042a438, Tesla P100-PCIE-16GB, 15901, 44, 7, 1189, 33.80, 0x0000000000000000\n1, GPU-486d5352-582e-2880-78bf-3dec4688e142, Tesla P100-PCIE-16GB, 15901, 43, 7, 1189, 33.10, 0x0000000000000000\n2, GPU-7d35736d-3ef5-1304-0e9e-1d26021be1a0, NVIDIA GeForce RTX 4080, 14409, 47, 64, 2805, 80.58, 0x0000000000000000\n3, GPU-97ca6406-8625-b829-b053-191c238ff046, Quadro P2200, 1162, 32, 0, 139, 5.08, 0x0000000000000001"
+  },
+  {
+    "label": "vision",
+    "elapsed_s": 4.265000000000327,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 299,
+      "prompt_ms": 2879.4,
+      "prompt_per_token_ms": 9.63,
+      "prompt_per_second": 103.8,
+      "predicted_n": 38,
+      "predicted_ms": 428.6,
+      "predicted_per_token_ms": 11.279,
+      "predicted_per_second": 88.7,
+      "draft_n": 30,
+      "draft_n_accepted": 24
+    },
+    "usage": {
+      "prompt_tokens": 299,
+      "completion_tokens": 38,
+      "total_tokens": 337,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "Le code en haut de l'image est **VISION 47**.\n\nLa forme rouge est un **cercle** et la forme bleue est un **carré**.",
+    "quality_pass": true,
+    "gpu_after": "0, GPU-a39f1b57-5a26-b53d-e943-44ef8042a438, Tesla P100-PCIE-16GB, 15901, 44, 17, 1189, 33.56, 0x0000000000000000\n1, GPU-486d5352-582e-2880-78bf-3dec4688e142, Tesla P100-PCIE-16GB, 15901, 43, 17, 1189, 33.33, 0x0000000000000000\n2, GPU-7d35736d-3ef5-1304-0e9e-1d26021be1a0, NVIDIA GeForce RTX 4080, 14519, 51, 99, 2805, 106.83, 0x0000000000000000\n3, GPU-97ca6406-8625-b829-b053-191c238ff046, Quadro P2200, 1162, 34, 0, 1556, 23.89, 0x0000000000000001"
+  },
+  {
+    "label": "long-context",
+    "elapsed_s": 39.04700000000048,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 27702,
+      "prompt_ms": 38516.0,
+      "prompt_per_token_ms": 1.39,
+      "prompt_per_second": 719.2,
+      "predicted_n": 49,
+      "predicted_ms": 462.6,
+      "predicted_per_token_ms": 9.441,
+      "predicted_per_second": 105.9,
+      "draft_n": 42,
+      "draft_n_accepted": 38
+    },
+    "usage": {
+      "prompt_tokens": 27702,
+      "completion_tokens": 49,
+      "total_tokens": 27751,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "{\n  \"debut\": \"AMBRE-2718\",\n  \"milieu\": \"CEDRE-6402\",\n  \"fin\": \"NACRE-9157\"\n}",
+    "quality_pass": true,
+    "gpu_after": "0, GPU-a39f1b57-5a26-b53d-e943-44ef8042a438, Tesla P100-PCIE-16GB, 15901, 45, 18, 1189, 33.56, 0x0000000000000000\n1, GPU-486d5352-582e-2880-78bf-3dec4688e142, Tesla P100-PCIE-16GB, 15901, 44, 17, 1189, 33.57, 0x0000000000000000\n2, GPU-7d35736d-3ef5-1304-0e9e-1d26021be1a0, NVIDIA GeForce RTX 4080, 14553, 52, 98, 2805, 104.92, 0x0000000000000000\n3, GPU-97ca6406-8625-b829-b053-191c238ff046, Quadro P2200, 1162, 33, 0, 139, 4.69, 0x0000000000000001"
+  }
+]

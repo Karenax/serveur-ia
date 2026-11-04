@@ -1,0 +1,55 @@
+{
+  "checks": [
+    {
+      "mode": "p2200",
+      "engine": {
+        "model": "EmbeddingGemma 2",
+        "engine": "Sentence Transformers / PyTorch",
+        "enabled": true,
+        "status": "pret",
+        "error": "",
+        "device": "cuda:0",
+        "precision": "float32",
+        "threads": 2,
+        "dimensions": 768,
+        "requested_device": "cuda",
+        "gpu_uuid": "GPU-97ca6406-8625-b829-b053-191c238ff046",
+        "gpu_name": "Quadro P2200",
+        "fallback_reason": "",
+        "pid": 33704,
+        "last_seconds": null,
+        "parameters": 271002624
+      },
+      "vectors": 32,
+      "prompt_tokens": 25440,
+      "seconds": 5.547
+    },
+    {
+      "mode": "cpu_fallback",
+      "engine": {
+        "model": "EmbeddingGemma 2",
+        "engine": "Sentence Transformers / PyTorch",
+        "enabled": true,
+        "status": "pret",
+        "error": "",
+        "device": "cpu",
+        "precision": "float32",
+        "threads": 2,
+        "dimensions": 768,
+        "requested_device": "cuda",
+        "gpu_uuid": "GPU-97ca6406-8625-b829-b053-191c238ff046",
+        "gpu_name": "",
+        "fallback_reason": "Mémoire GPU insuffisante au démarrage.",
+        "pid": 29728,
+        "last_seconds": null,
+        "parameters": 271002624
+      },
+      "vectors": 1,
+      "prompt_tokens": 10,
+      "seconds": 0.157
+    }
+  ],
+  "synthetic_only": true,
+  "qwen_processes_preserved": true,
+  "passed": true
+}

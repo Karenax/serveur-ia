@@ -1,5 +1,11 @@
 # Plan d’intégration de l’assistant Kiara
 
+État au 4 novembre 2026 : ce plan conserve les objectifs et preuves historiques.
+Les tâches, révisions automatiques et synthèses programmées décrites ci-dessous
+ont depuis été retirées. Les rappels et le bilan consultable restent disponibles.
+L’[architecture courante](ARCHITECTURE-ACTUELLE.md) et le
+[guide utilisateur](GUIDE-ASSISTANT-KIARA.md) décrivent le périmètre actuel.
+
 Date : 25 octobre 2026. Statut : **première intégration publiée — serveur/Windows
 3.5.52, Android 1.0.23/code 24 ; validations matérielles et compléments en cours**.
 

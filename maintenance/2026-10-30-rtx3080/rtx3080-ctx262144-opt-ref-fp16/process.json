@@ -1,0 +1,18 @@
+{
+  "pid": 27604,
+  "created": 1793438691.0288432,
+  "command": [
+    "D:\\Serveur IA\\Strata-src\\.venv\\Scripts\\python.exe",
+    "-u",
+    "-m",
+    "serve.server",
+    "--engine",
+    "strata",
+    "--config",
+    "D:\\Serveur IA\\maintenance\\2026-10-30-rtx3080\\rtx3080-ctx262144-opt-ref-fp16\\config.json",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "18080"
+  ]
+}

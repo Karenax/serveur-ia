@@ -1,0 +1,170 @@
+{
+  "runtime": "0.4.1",
+  "voice": "Tiphaine",
+  "language": "fr",
+  "pack": "vocal-rt-de5e67a320a06b1f",
+  "device": "CPU",
+  "method": "Synthetic audio and automatic retranscription; not a human pronunciation rating.",
+  "rows": [
+    {
+      "id": "courant",
+      "variant": "whole",
+      "input": [
+        "Bonjour, je vous écoute. Vous pouvez enregistrer les fichiers dans le dossier de votre choix."
+      ],
+      "normalized": [
+        "Bonjour, je vous écoute. Vous pouvez enregistrer les fichiers dans le dossier de votre choix."
+      ],
+      "recognized": "Bonjour, je vous écoute. Vous pouvez enregistrer les fichiers dans le dossier de votre choix.",
+      "audio_seconds": 4.88,
+      "generation_seconds": 1.082215599999472,
+      "file": "courant-whole.wav"
+    },
+    {
+      "id": "courant",
+      "variant": "conversation",
+      "input": [
+        "Bonjour, je vous écoute.",
+        "Vous pouvez enregistrer les fichiers dans le dossier de votre choix."
+      ],
+      "normalized": [
+        "Bonjour, je vous écoute.",
+        "Vous pouvez enregistrer les fichiers dans le dossier de votre choix."
+      ],
+      "recognized": "Bonjour, je vous écoute. Vous pouvez enregistrer les fichiers dans le dossier de votre choix.",
+      "audio_seconds": 5.36,
+      "generation_seconds": 1.1192646999988938,
+      "file": "courant-conversation.wav"
+    },
+    {
+      "id": "noms",
+      "variant": "whole",
+      "input": [
+        "Le client Kiara utilise Windows et une carte AMD Radeon RX 7800 XT."
+      ],
+      "normalized": [
+        "Le client Kiara utilise Windows et une carte AMD Radeon RX 7 mille 800 XT."
+      ],
+      "recognized": "Le client Chiara utilise Windows et une carte AMD Radeon RX 7-1800 XT.",
+      "audio_seconds": 5.76,
+      "generation_seconds": 1.1514540999996825,
+      "file": "noms-whole.wav"
+    },
+    {
+      "id": "date",
+      "variant": "whole",
+      "input": [
+        "Le rendez-vous avec M. Dupont est prévu le 31 octobre 2026 à 14 h 30."
+      ],
+      "normalized": [
+        "Le rendez-vous avec M. Dupont est prévu le 31 octobre 2026 à 14 h 30."
+      ],
+      "recognized": "Le rendez-vous avec M. Dupont est prévu le 31 octobre 2026 à 14h30.",
+      "audio_seconds": 5.28,
+      "generation_seconds": 1.0339329999987967,
+      "file": "date-whole.wav"
+    },
+    {
+      "id": "homographes",
+      "variant": "whole",
+      "input": [
+        "Les poules du couvent couvent. Les fils du tailleur coupent les fils."
+      ],
+      "normalized": [
+        "Les poules du couvent couvent. Les fils du tailleur coupent les fils."
+      ],
+      "recognized": "Les poules du couv'en couv'en couv'en, les fils du tailleur coupent les fils.",
+      "audio_seconds": 3.6,
+      "generation_seconds": 0.695428200000606,
+      "file": "homographes-whole.wav"
+    },
+    {
+      "id": "homographes",
+      "variant": "conversation",
+      "input": [
+        "Les poules du couvent couvent.",
+        "Les fils du tailleur coupent les fils."
+      ],
+      "normalized": [
+        "Les poules du couvent couvent.",
+        "Les fils du tailleur coupent les fils."
+      ],
+      "recognized": "Les poules du couvent couvent. Les fils du tailleur coupent les fils.",
+      "audio_seconds": 4.0,
+      "generation_seconds": 0.720508800000971,
+      "file": "homographes-conversation.wav"
+    },
+    {
+      "id": "markdown",
+      "variant": "whole",
+      "input": [
+        "L’ assistant vous permet d’ enregistrer vos fichiers."
+      ],
+      "normalized": [
+        "L' assistant vous permet d' enregistrer vos fichiers."
+      ],
+      "recognized": "L'assistant vous permet d'enregistrer vos fichiers. L'assistant vous permet d'enregistrer vos fichiers.",
+      "audio_seconds": 2.72,
+      "generation_seconds": 0.4976227999977709,
+      "file": "markdown-whole.wav"
+    },
+    {
+      "id": "markdown",
+      "variant": "sans_espaces_artificiels",
+      "input": [
+        "L’assistant vous permet d’enregistrer vos fichiers."
+      ],
+      "normalized": [
+        "L'assistant vous permet d'enregistrer vos fichiers."
+      ],
+      "recognized": "L'assistant vous permet d'enregistrer vos fichiers. L'assistant vous permet d'enregistrer vos fichiers.",
+      "audio_seconds": 2.72,
+      "generation_seconds": 0.5078258000030473,
+      "file": "markdown-sans_espaces_artificiels.wav"
+    },
+    {
+      "id": "nombres",
+      "variant": "whole",
+      "input": [
+        "Le montant à payer est de 12,50 €, soit une remise de 5 %."
+      ],
+      "normalized": [
+        "Le montant à payer est de 12 euros et 50 centimes, soit une remise de 5 %."
+      ],
+      "recognized": "Le montant à payer est de 12,50 €, soit une remise de 5%.",
+      "audio_seconds": 4.8,
+      "generation_seconds": 0.953508899998269,
+      "file": "nombres-whole.wav"
+    },
+    {
+      "id": "lettres",
+      "variant": "whole",
+      "input": [
+        "Le cœur du problème concerne les œufs, les écureuils et les géraniums."
+      ],
+      "normalized": [
+        "Le cœur du problème concerne les œufs, les écureuils et les géraniums."
+      ],
+      "recognized": "Le cœur du problème concerne les œufs, les écureuils et les géraniums.",
+      "audio_seconds": 4.08,
+      "generation_seconds": 0.7841074999996636,
+      "file": "lettres-whole.wav"
+    },
+    {
+      "id": "lettres",
+      "variant": "conversation",
+      "input": [
+        "Le cœur du problème concerne les œufs,",
+        "les écureuils et les géraniums."
+      ],
+      "normalized": [
+        "Le cœur du problème concerne les œufs,",
+        "les écureuils et les géraniums."
+      ],
+      "recognized": "Le cœur du problème concerne les œufs, les écureuils et les géraniums.",
+      "audio_seconds": 4.56,
+      "generation_seconds": 0.9419234999986656,
+      "file": "lettres-conversation.wav"
+    }
+  ]
+}

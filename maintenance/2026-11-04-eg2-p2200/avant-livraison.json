@@ -1,0 +1,106 @@
+{
+  "models": [
+    {
+      "pid": 19216,
+      "created": 1793775290.6163623
+    },
+    {
+      "pid": 21696,
+      "created": 1793775290.6867845
+    }
+  ],
+  "files": {
+    "acces-distants.json": "d3dda1dc62a754e709838352fc72c790d8d7003ae60ddda7ce38f17b5ff62b58",
+    "wireguard.json": "6cbd6b81bd61645cce770ac2a7e03cdb99f86b800c95d4f05e0a425e3a6aa7dd",
+    "reglages.json": "413d93a2221bfe6645d9a10824df8c217cd7adb3a481a49cf85be75a2ade39fd",
+    "wireguard-prive/secrets.dpapi": "a0adc553eddaa654430cf69edbcc2d068ed43c695d11b2444a082f96bdd40241",
+    "wireguard-prive/signature.dpapi": "240cd390a95972957889009bfabb7e54942f33d7f99d9ebb9a211ab1f9754a4a"
+  },
+  "users": {
+    "client_histories": {
+      "count": 2,
+      "sha256": "966222d75498a7166b5636b92eac7ffd30ce89330b448e2c59b29c22240251d2"
+    },
+    "projects": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "documents": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "memories": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "conversations": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "policies": {
+      "count": 1,
+      "sha256": "aa7aff0b13d59517f121a32e8db4de83ac93d7e112cf407376be53b5b5f7dc46"
+    },
+    "jobs": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "personal_memories": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "assistant_items": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "assistant_commands": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "knowledge_exclusions": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "assistant_settings": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  },
+  "backups": {
+    "enabled": true,
+    "time": "03:00",
+    "frequency": "daily",
+    "weekday": 0,
+    "destination": "D:\\Serveur IA\\lanceur\\sauvegardes",
+    "secondary_destination": "\\\\DS218\\home\\Sauvegarde\\Serveur IA",
+    "retention": {
+      "daily": 7,
+      "weekly": 4,
+      "monthly": 6
+    },
+    "secret_configured": true
+  },
+  "model_running": true,
+  "engine": {
+    "model": "EmbeddingGemma 2",
+    "engine": "Sentence Transformers / PyTorch",
+    "enabled": true,
+    "status": "pret",
+    "error": "",
+    "device": "cpu",
+    "precision": "float32",
+    "threads": 2,
+    "dimensions": 768,
+    "pid": 16000,
+    "last_seconds": 5.313000000001921,
+    "parameters": 271002624
+  },
+  "release": {
+    "version": "3.5.60",
+    "protocol": 3,
+    "sha256": "617b1d018c774508285ec846d5b138555be632ad73ec51503e852737b201f2cf",
+    "bytes": 115431069,
+    "signature": "EMzBEHmsJepjCl8WLAmVLjUCGP/2w5/NDGr2MAmZFT2xq0PpmC3gq87Vt6SWZtAAN4PRnIjdhdBjAaNfXpmDAQ==",
+    "signing_public_key": "8fSJ5YLYBVF0GvxnS5RyD6LjgMSTi39H+4YGeS2Ac/M="
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-0d7d94dfd3ae456bad05f6ae",
+  "object": "chat.completion",
+  "created": 1793439346,
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "La couleur du ciel est le résultat d'un phénomène optique fondamental appelé la diffusion de Rayleigh. La lumière du soleil, bien qu'elle nous apparaisse blanche, est en réalité composée de toutes les couleurs de l'arc-en-ciel, chacune correspondant à une longueur d'onde spécifique. Lorsque cette lumière traverse l'atmosphère terrestre, elle entre en collision avec les molécules de gaz (principalement l'azote et l'oxygène) et les petites particules en suspension. La physique de cette interaction est cruciale : la diffusion est inversement proportionnelle à la puissance quatrième de la longueur d'onde. Cela signifie que les ondes courtes, comme le bleu et le violet, sont diffusées beaucoup plus fortement que les ondes longues, comme le rouge ou l'orange.\n\nEn journée, lorsque le soleil est haut dans le ciel, la lumière traverse une couche relativement mince de l'atmosphère avant d'atteindre nos yeux. À ce moment-là, la lumière bleue est diffusée dans toutes les directions par les molécules d'air, créant ce que nous percevons comme un ciel bleu uniforme. Bien que le violet ait une longueur d'onde encore plus courte et soit donc diffus"
+      },
+      "finish_reason": "length"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 43,
+    "completion_tokens": 256,
+    "total_tokens": 299,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 43,
+    "prompt_ms": 1230.4,
+    "prompt_per_token_ms": 28.614,
+    "prompt_per_second": 34.9,
+    "predicted_n": 256,
+    "predicted_ms": 4834.2,
+    "predicted_per_token_ms": 18.884,
+    "predicted_per_second": 53.0,
+    "draft_n": 224,
+    "draft_n_accepted": 121
+  }
+}

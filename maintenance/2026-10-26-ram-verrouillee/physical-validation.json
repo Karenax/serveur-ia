@@ -1,14 +1,13 @@
 {
+  "utc": "2026-10-26T11:49:42.135909+00:00",
   "engine_pid": 34904,
   "server_pid": 37304,
-  "ram_used_gib": 76.21,
-  "ram_available_gib": 51.64,
-  "token_file_mappings": [
-    {
-      "mapped_bytes": 337772544,
-      "pages": 82464,
-      "resident_pages": 82451,
-      "locked_pages": 82451
-    }
-  ]
+  "ram_used_gib": 76.6,
+  "ram_available_gib": 51.26,
+  "token_tensor_bytes": 337715200,
+  "token_tensor_offset": 29336198304,
+  "expected_pages": 82451,
+  "resident_pages": 82451,
+  "locked_pages": 82451,
+  "strict_guard": true
 }

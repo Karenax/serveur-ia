@@ -12,9 +12,9 @@ def request(value):
         raise ValueError('Modèle embeddings attendu : '+MODEL_ID)
     texts=value.get('input')
     if isinstance(texts,str):texts=[texts]
-    if not isinstance(texts,list) or not 1<=len(texts)<=8 or any(
+    if not isinstance(texts,list) or not 1<=len(texts)<=32 or any(
             not isinstance(text,str) or not text.strip() or len(text)>4500 for text in texts):
-        raise ValueError('Fournir un texte ou un lot de 1 à 8 textes, de 1 à 4500 caractères chacun.')
+        raise ValueError('Fournir un texte ou un lot de 1 à 32 textes, de 1 à 4500 caractères chacun.')
     encoding=value.get('encoding_format','float')
     if encoding not in ('float','base64') or type(value.get('dimensions',768)) is not int or value.get('dimensions',768)!=768:
         raise ValueError('Encodage float/base64 et dimensions 768 attendus.')
@@ -34,7 +34,7 @@ def catalogue(service):
 
 
 def response(service,texts,encoding,mode):
-    result=service.encode(texts,mode=mode,timeout=30,include_usage=True)
+    result=service.encode(texts,mode=mode,timeout=45,include_usage=True)
     vectors=result['vectors'];tokens=result['prompt_tokens']
     return {'object':'list','model':MODEL_ID,'data':[
         {'object':'embedding','index':index,'embedding':vector if encoding=='float' else

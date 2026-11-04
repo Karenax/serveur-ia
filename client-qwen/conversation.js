@@ -1,22 +1,22 @@
 /* Explicit conversation session, local microphone, server speech. */
 (()=>{
-  const android=!!window.AndroidClient;
+  const android=!!window.AndroidClient,linux=config.platform==='linux';
   const row=document.querySelector('.send-row'),prompt=$('prompt');if(!row||!prompt)return;
   // The written composer remains the submission transport, with dictation in chat.
   const page=wsElement('section',undefined,'voice-view');page.dataset.view='voice';page.hidden=true;
   page.setAttribute('aria-labelledby','voice-title');
-  page.innerHTML=`<header class="voice-heading"><div class="voice-heading-name"><h2 id="voice-title">Vocal</h2><p id="voice-conversation-name"></p></div><div class="voice-heading-actions"><button id="voice-new" type="button" class="secondary">Nouvelle conversation</button><button id="voice-history" type="button" class="secondary">Historique</button><details class="menu" id="voice-conversation-menu"><summary aria-label="Actions de la conversation vocale">···</summary><div class="menu-body"><button id="voice-rename" type="button" class="secondary">Renommer</button><button id="voice-archive" type="button" class="secondary">Archiver</button><button id="voice-delete" type="button" class="secondary danger">Supprimer</button></div></details><button id="voice-settings-toggle" type="button" class="secondary" aria-controls="voice-settings-dialog" aria-expanded="false">Réglages</button><button id="voice-back" type="button" class="secondary">Ouvrir le chat</button></div></header>
+  page.innerHTML=`<header class="voice-heading"><div class="voice-heading-name"><h2 id="voice-title">Vocal</h2><p id="voice-conversation-name"></p></div><div class="voice-heading-actions"><button id="voice-new" type="button" class="secondary">Nouvelle conversation</button><button id="voice-history" type="button" class="secondary">Historique</button><details class="menu" id="voice-conversation-menu"><summary aria-label="Actions de la conversation vocale">···</summary><div class="menu-body"><button id="voice-rename" type="button" class="secondary">Renommer</button><button id="voice-archive" type="button" class="secondary">Archiver</button><button id="voice-delete" type="button" class="secondary danger">Supprimer</button></div></details><button id="voice-settings-toggle" type="button" class="secondary" aria-controls="voice-settings-dialog" aria-expanded="false">Réglages</button></div></header>
     <form id="voice-rename-form" class="voice-rename-form" hidden><label for="voice-rename-input">Nom de la conversation</label><input id="voice-rename-input" maxlength="120" required><button type="submit" class="secondary primary">Enregistrer</button><button id="voice-rename-cancel" type="button" class="secondary">Annuler</button></form>
     <div class="voice-context-bar"><span id="voice-session-summary"></span><span id="voice-archived" hidden>Conversation archivée</span><button id="voice-update-notice" class="voice-text-button" type="button" hidden>Mettre le complément Max à jour</button></div><p id="voice-management-status" role="status" aria-live="polite"></p>
     <div class="voice-layout"><div class="voice-main"><div class="voice-stage">
       <div class="voice-orb" aria-hidden="true"><svg viewBox="0 0 320 320"><defs><radialGradient id="voice-orb-fill"><stop offset="0" stop-color="currentColor" stop-opacity=".12"/><stop offset="1" stop-color="currentColor" stop-opacity=".025"/></radialGradient></defs><circle cx="160" cy="160" r="98" fill="url(#voice-orb-fill)"/><g fill="none" stroke="currentColor"><path class="voice-contour"/><path class="voice-contour"/><path class="voice-contour"/></g></svg><canvas id="voice-constellation" width="320" height="320" hidden></canvas><canvas id="voice-waves" width="960" height="360" hidden></canvas></div>
       <div id="voice-wave-legend" class="voice-wave-legend"><span class="voice-wave-user"><i aria-hidden="true"></i>Votre micro <meter id="voice-mic-level" min="0" max="1" value="0" aria-label="Niveau de votre microphone"></meter></span><span class="voice-wave-ai"><i aria-hidden="true"></i>Voix de Kiara <meter id="voice-ai-level" min="0" max="1" value="0" aria-label="Niveau de la voix de Kiara"></meter></span></div>
       <h3 id="voice-state" role="status" aria-live="polite">Prêt à discuter</h3><div id="voice-status-slot"></div><div id="voice-actions" class="voice-actions"></div><div id="voice-quick-interruptions"></div>
-    </div><details id="voice-transcript" class="voice-transcript"><summary>Échanges écrits</summary><p id="voice-transcript-empty" class="muted">Vos échanges apparaîtront ici pendant la conversation.</p><div id="voice-transcript-content"></div><button id="voice-sources" type="button" class="secondary" hidden>Voir les sources</button></details></div>
+    </div></div><details id="voice-transcript" class="voice-transcript"><summary title="Ouvrir ou fermer les échanges écrits"><span>Échanges écrits</span><svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18"><path d="m14 6-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></summary><div class="voice-transcript-body"><p id="voice-transcript-empty" class="muted">Vos échanges apparaîtront ici pendant la conversation.</p><div id="voice-transcript-content"></div><button id="voice-sources" type="button" class="secondary" hidden>Voir les sources</button></div></details>
     <aside class="voice-settings" aria-labelledby="voice-settings-title"><h3 id="voice-settings-title">Réglages du vocal</h3>
       <fieldset><legend>Qualité</legend><label for="voice-quality" class="sr-only">Qualité vocale</label><select id="voice-quality"><option value="low">Low · Léger</option><option value="max">Max · Vocal avancé</option></select><p id="voice-quality-description" class="muted">Moteur léger sur le PC, voix sur le serveur.</p><div id="voice-execution-options" hidden><label for="voice-execution">Traiter le vocal sur</label><select id="voice-execution"><option value="auto">Automatique · PC ou serveur</option><option value="pc">Ce PC</option><option value="server">Serveur Kiara</option></select><button id="voice-test-max" type="button" class="secondary">Tester le PC et le serveur</button><p id="voice-max-status" role="status"></p><small>Si le serveur est choisi, le son du micro lui est transmis pour transcription.</small></div></fieldset>
-      <fieldset><legend>Microphone</legend><p class="muted">Microphone choisi dans les réglages Windows.</p><div id="voice-interruptions-slot"></div></fieldset>
-      <fieldset><legend>Voix de Kiara</legend><label for="voice-volume">Volume <output id="voice-volume-value" for="voice-volume">100 %</output></label><input id="voice-volume" type="range" min="0" max="100" value="100"><p class="muted">La voix française utilise la sortie audio de Windows.</p></fieldset>
+      <fieldset><legend>Microphone</legend><p class="muted">Microphone choisi dans les réglages ${linux?'Linux':android?'Android':'Windows'}.</p><div id="voice-interruptions-slot"></div></fieldset>
+      <fieldset><legend>Voix de Kiara</legend><label for="voice-volume">Volume <output id="voice-volume-value" for="voice-volume">100 %</output></label><input id="voice-volume" type="range" min="0" max="100" value="100"><p class="muted">La voix française utilise la sortie audio de ${linux?'Linux':android?'Android':'Windows'}.</p></fieldset>
       <fieldset><legend>Affichage</legend><label for="voice-animation-style">Animation</label><select id="voice-animation-style"><option value="waves">Ondes vocales 3D</option><option value="orb">Orbe</option><option value="constellation">Constellation</option></select><label class="voice-check voice-motion"><input id="voice-animation" type="checkbox" checked> Activer les mouvements</label><p class="muted" id="voice-motion-note">Les mouvements réduits de votre appareil sont respectés.</p></fieldset>
       <details class="voice-diagnostics"><summary>Informations vocales</summary><p>La conversation vocale utilise Qwen local.</p><p id="voice-engine-location"></p><p id="voice-last-latency" hidden></p><div id="voice-context-slot"></div></details>
       <p id="voice-preferences-status" role="status"></p><button id="voice-preferences-retry" type="button" class="secondary" hidden>Réessayer l’enregistrement</button>
@@ -28,7 +28,6 @@
   navigation.onclick=()=>showView('voice');
   const ongoing=wsElement('button','Vocal en cours','secondary');ongoing.id='voice-ongoing';ongoing.type='button';ongoing.hidden=true;
   ongoing.onclick=()=>{showView('voice');$('voice-title').tabIndex=-1;$('voice-title').focus();};document.querySelector('.workspace-top').append(ongoing);
-  $('voice-back').onclick=()=>{showView('chat');prompt.focus();};
   const showPreviousView=showView;showView=function(name){if(name==='voice'&&isCorrection(library.find(c=>c.id===currentId))){if(conversationLocked()){error('Terminez la correction avant d’ouvrir le vocal.');return;}showPreviousView('chat');}showPreviousView(name);if(!page.hidden){$('workspace-heading').textContent='Vocal';if(!android&&!maxInfo&&!maxChecking)refreshMax();}else if(settingsDialog.open)settingsDialog.close();drawVoice();};
   const button=document.createElement('button');button.id='conversation-start';button.type='button';button.className='secondary voice-button';button.textContent='Conversation';
   const muteButton=document.createElement('button');muteButton.id='conversation-mute';muteButton.type='button';muteButton.className='secondary voice-button';muteButton.textContent='Muet';muteButton.hidden=true;muteButton.setAttribute('aria-pressed','false');
@@ -58,7 +57,7 @@
   installPanel.innerHTML=`<p id="voice-max-install-description" class="muted"></p><button id="voice-max-plan" type="button" class="secondary">Installer Max sur ce PC</button><div id="voice-max-confirm" hidden><p id="voice-max-size"></p><button id="voice-max-install" type="button" class="secondary primary">Télécharger et installer</button><button id="voice-max-decline" type="button" class="secondary">Plus tard</button></div><progress id="voice-max-progress" max="100" value="0" aria-label="Installation de Max" hidden></progress><p id="voice-max-install-status" role="status" aria-live="polite"></p><button id="voice-max-install-cancel" type="button" class="secondary" hidden>Arrêter l’installation Max</button>`;
   $('voice-execution-options').append(installPanel);
   const storagePanel=wsElement('fieldset');storagePanel.id='voice-max-storage';storagePanel.hidden=true;
-  storagePanel.innerHTML=`<legend>Fichiers Max sur ce PC</legend><p id="voice-max-disk" class="muted"></p><p id="voice-max-folder" class="voice-folder"></p><div class="voice-actions"><button id="voice-max-open-folder" type="button" class="secondary">Ouvrir le dossier</button><button id="voice-max-remove" type="button" class="secondary danger">Supprimer Max de ce PC</button></div><p id="voice-max-storage-status" role="status" aria-live="polite"></p>`;
+  storagePanel.innerHTML=`<legend>Fichiers Max sur ce PC</legend><p id="voice-max-disk" class="muted"></p><p id="voice-max-folder" class="voice-folder"></p><p class="muted">Un sous-dossier Kiara-Max sera créé à l’emplacement choisi. Les fichiers déjà téléchargés restent dans l’ancien dossier.</p><div class="voice-actions"><button id="voice-max-choose-folder" type="button" class="secondary">Choisir le dossier</button><button id="voice-max-open-folder" type="button" class="secondary">Ouvrir le dossier</button><button id="voice-max-remove" type="button" class="secondary danger">Supprimer Max de ce PC</button></div><p id="voice-max-storage-status" role="status" aria-live="polite"></p>`;
   $('voice-execution-options').closest('fieldset').after(storagePanel);
   $('voice-quick-interruptions').append(options);
   const settingsDialog=wsElement('dialog',undefined,'voice-settings-dialog');settingsDialog.id='voice-settings-dialog';settingsDialog.setAttribute('aria-labelledby','voice-settings-title');
@@ -89,11 +88,12 @@
   $('voice-archive').onclick=()=>voiceAction(async()=>{const archived=!!library.find(c=>c.id===currentId)?.archived;await wsArchiveConversation(currentId);$('conversation-filter').value=archived?'active':'archived';drawLibrary();managementStatus.textContent=archived?'Conversation restaurée.':'Conversation archivée. Retrouvez-la dans l’historique, filtre Archivées.';});
   $('voice-delete').onclick=()=>{if(conversationLocked())return;const title=library.find(c=>c.id===currentId)?.title||'cette conversation';if(!confirm('Supprimer « '+title+' » et ses échanges ?'))return;voiceAction(async()=>{await wsDeleteConversation(currentId);managementStatus.textContent='Conversation supprimée. Vous pouvez annuler la suppression.';});};
   let maxInfo=null,maxChecking=false,maxTestTimer=null,maxPlan=null,maxPlanning=false,maxRemoving=false;
+  const maxChoosing=()=>maxInfo?.installation?.phase==='choosing';
   const maxInstalling=()=>['downloading','verifying','testing'].includes(maxInfo?.installation?.phase);
   function downloadSize(bytes){return new Intl.NumberFormat('fr-FR',{maximumFractionDigits:1}).format(bytes/(bytes<1000**3?1000**2:1000**3))+(bytes<1000**3?' Mo':' Go');}
   function drawInstallation(locked){
     const info=maxInfo?.installation,device=info?.hardware;
-    installPanel.hidden=!info||quality.value!=='max'||execution.value==='server'||!device?.eligible&&!maxInfo?.pc?.installed;
+    installPanel.hidden=linux||!info||quality.value!=='max'||execution.value==='server'||!device?.eligible&&!maxInfo?.pc?.installed;
     if(installPanel.hidden)return;
     const installing=maxInstalling(),installed=maxInfo.pc?.installed;
     $('voice-max-install-description').textContent='Max se télécharge séparément. Carte détectée : '+((device?.cards||[]).map(card=>card.name).join(', ')||'détection indisponible')+'. AMD et NVIDIA utilisent le moteur Vulkan.';
@@ -109,7 +109,7 @@
     else if(installing)progress.removeAttribute('value');
   }
   function drawQuality(){
-    const locked=active||window.conversationBusy||acting||native.phase==='installing';
+    const locked=active||window.conversationBusy||acting||native.phase==='installing'||maxChoosing();
     options.hidden=false;
     quality.disabled=execution.disabled=locked||maxRemoving||!!gpuWorking;$('voice-test-max').disabled=locked||maxRemoving||!!gpuWorking||maxInstalling()||maxChecking||!!(maxInfo?.pc?.testing||maxInfo?.server?.testing);
     $('voice-execution-options').hidden=quality.value!=='max';
@@ -121,12 +121,12 @@
       if($('voice-max-status').textContent!==message)$('voice-max-status').textContent=message;
     }
     $('voice-engine-location').textContent=android?'Low · reconnaissance française sur cet appareil, voix sur le serveur':native.quality==='max'?'Max · '+(native.execution==='server'?'traitement sur le serveur Kiara':'traitement sur ce PC'):'Low · écoute sur ce PC, voix sur le serveur';
-    if(android){allowInterruptions.disabled=!!native.installed&&native.aec_supported!==true;if(allowInterruptions.disabled)allowInterruptions.checked=false;}
+    if(android||linux){allowInterruptions.disabled=linux||!!native.installed&&native.aec_supported!==true;if(allowInterruptions.disabled)allowInterruptions.checked=false;}
     const interruptionHelp=allowInterruptions.disabled?'Cet appareil reprend l’écoute après la réponse de Kiara.':allowInterruptions.checked?'Vous pouvez couper sa réponse en parlant.':'Kiara termine sa réponse avant de vous écouter.';
     if(interruptionNote.textContent!==interruptionHelp)interruptionNote.textContent=interruptionHelp;
     $('voice-last-latency').hidden=(active?native.quality:quality.value)!=='max'||!maxLatency;
     drawInstallation(locked);
-    gpuPanel.hidden=android||quality.value!=='max'||execution.value==='server';
+    gpuPanel.hidden=android||linux||quality.value!=='max'||execution.value==='server';
     if(!gpuPanel.hidden){
       const gpu=maxInfo?.pc?.gpu,cards=gpu?.cards||[],choice=gpuPendingSelection??gpu?.selection??'auto';
       const values=[['auto','Automatique · carte dédiée en priorité'],...cards.map(card=>[card.id,card.description+(card.kind==='dedicated'?' · dédiée · '+Math.round(card.total_bytes/2**30)+' Go':card.kind==='integrated'?' · intégrée · mémoire partagée':'')])];
@@ -145,10 +145,13 @@
       if($('voice-gpu-status').textContent!==message)$('voice-gpu-status').textContent=message;
     }
     const storage=maxInfo?.installation?.storage;
-    storagePanel.hidden=android||quality.value!=='max';
+    storagePanel.hidden=android||linux||quality.value!=='max';
     if(!storagePanel.hidden){
+      if(maxChoosing())$('voice-max-storage-status').textContent=maxInfo.installation.message||'';
       $('voice-max-folder').textContent=storage?.path||'Dossier en cours de recherche…';
       $('voice-max-disk').textContent=!storage?'Recherche des fichiers Max…':storage.message|| (storage.exists?(Number.isFinite(storage.bytes)?downloadSize(storage.bytes)+' utilisés sur ce PC.':'Taille du dossier indisponible.'):'Aucun fichier Max sur ce PC.');
+      $('voice-max-choose-folder').disabled=locked||maxInstalling()||maxRemoving||!!gpuWorking||maxChecking||!!maxInfo?.pc?.testing;
+      $('voice-max-choose-folder').textContent=maxChoosing()?'Choix du dossier…':'Choisir le dossier';
       $('voice-max-open-folder').disabled=!storage?.exists||maxRemoving;
       $('voice-max-remove').disabled=locked||maxInstalling()||maxRemoving||!!gpuWorking||maxChecking||!!maxInfo?.pc?.testing||!storage?.exists||storage?.removable===false;
       $('voice-max-remove').textContent=maxRemoving?'Suppression en cours…':'Supprimer Max de ce PC';
@@ -157,12 +160,13 @@
   async function refreshMax(){
     if(android)return;
     if(maxChecking)return;maxChecking=true;
-    try{maxInfo=await api('/client/voice/max');}
+    const choosing=maxChoosing();
+    try{maxInfo=await api('/client/voice/max');if(choosing&&!maxChoosing()){$('voice-max-storage-status').textContent=maxInfo.installation?.message||'Choix du dossier annulé.';if(!page.hidden)$('voice-max-choose-folder').focus();}}
     catch{maxInfo={pc:{available:false,message:'État Max indisponible'},server:{available:false,message:'État Max indisponible'}};}
     finally{maxChecking=false;drawQuality();}
-    clearTimeout(maxTestTimer);if(maxInfo?.pc?.testing||maxInfo?.server?.testing||maxInstalling()||maxInfo?.installation?.hardware?.checked===false)maxTestTimer=setTimeout(refreshMax,2000);
+    clearTimeout(maxTestTimer);if(maxInfo?.pc?.testing||maxInfo?.server?.testing||maxInstalling()||maxChoosing()||maxInfo?.installation?.hardware?.checked===false)maxTestTimer=setTimeout(refreshMax,2000);
     else if(active&&native.quality==='max'&&native.execution==='pc'&&!maxInfo?.pc?.device_loaded)maxTestTimer=setTimeout(refreshMax,1000);
-    if(quality.value==='max'&&execution.value!=='server'&&maxInfo?.pc?.gpu?.supported&&!maxInfo.pc.gpu.checked&&!maxInfo.pc.gpu.error&&!maxInfo.pc.testing&&!gpuWorking&&!active&&!acting&&!maxInstalling())refreshGpu();
+    if(quality.value==='max'&&execution.value!=='server'&&maxInfo?.pc?.gpu?.supported&&!maxInfo.pc.gpu.checked&&!maxInfo.pc.gpu.error&&!maxInfo.pc.testing&&!gpuWorking&&!active&&!acting&&!maxInstalling()&&!maxChoosing())refreshGpu();
   }
   async function refreshGpu(){
     if(active||acting||gpuWorking||maxRemoving||maxInstalling()||maxInfo?.pc?.testing||window.conversationBusy)return;
@@ -198,6 +202,13 @@
     catch(e){if(maxInfo?.installation)maxInfo.installation.message=e.message;drawQuality();}
   };
   $('voice-max-install-cancel').onclick=async()=>{try{maxInfo.installation=await api('/client/voice/max/install-cancel',{});await refreshMax();}catch(e){error(e);}};
+  $('voice-max-choose-folder').onclick=async()=>{
+    if(active||acting||gpuWorking||maxRemoving||maxInstalling()||maxChoosing()||window.conversationBusy)return;
+    maxRemoving=true;drawQuality();
+    try{maxInfo.installation=await api('/client/voice/max/choose-folder',{});maxPlan=null;$('voice-max-storage-status').textContent=maxInfo.installation.message||'';await refreshMax();}
+    catch(e){$('voice-max-storage-status').textContent=e.message;}
+    finally{maxRemoving=false;drawQuality();}
+  };
   $('voice-max-open-folder').onclick=async()=>{try{await api('/client/voice/max/open-folder',{});$('voice-max-storage-status').textContent='Dossier ouvert.';}catch(e){$('voice-max-storage-status').textContent=e.message;}};
   $('voice-max-remove').onclick=async()=>{
     if(active||acting||gpuWorking||maxRemoving||maxInstalling()||window.conversationBusy)return;
@@ -212,7 +223,7 @@
   $('voice-test-max').onclick=async()=>{
     if(active||window.conversationBusy||acting)return;
     await refreshMax();const failures=[];
-    for(const target of ['pc','server']){
+    for(const target of (linux?['server']:['pc','server'])){
       if(!maxInfo[target]?.installed){failures.push((target==='pc'?'PC':'Serveur')+' : moteur Max non installé');continue;}
       try{await api('/client/voice/max/test',{execution:target});}catch(e){failures.push(e.message);}
     }
@@ -223,7 +234,7 @@
   animationStyle.onchange=()=>{drawVoice();persistVoice();};
   window.conversationContextCapacity=()=>active?voiceCapacity:null;
   window.conversationPreferences=()=>({voice_interruptions:allowInterruptions.checked,voice_volume:Number(volume.value),voice_animation:animation.checked,voice_animation_style:animationStyle.value,voice_visual_version:2,voice_quality:quality.value,voice_execution:execution.value});
-  window.conversationApplyPreferences=value=>{allowInterruptions.checked=value?.voice_interruptions===true;volume.value=Number.isInteger(value?.voice_volume)?value.voice_volume:100;volume.oninput();animation.checked=value?.voice_animation!==false;animationStyle.value=value?.voice_visual_version===2&&['waves','orb','constellation'].includes(value?.voice_animation_style)?value.voice_animation_style:'waves';quality.value=!android&&value?.voice_quality==='max'?'max':'low';execution.value=android?'pc':['pc','server'].includes(value?.voice_execution)?value.voice_execution:'auto';drawVoice();};
+  window.conversationApplyPreferences=value=>{allowInterruptions.checked=value?.voice_interruptions===true;volume.value=Number.isInteger(value?.voice_volume)?value.voice_volume:100;volume.oninput();animation.checked=value?.voice_animation!==false;animationStyle.value=value?.voice_visual_version===2&&['waves','orb','constellation'].includes(value?.voice_animation_style)?value.voice_animation_style:'waves';quality.value=!android&&value?.voice_quality==='max'?'max':'low';execution.value=linux?'server':android?'pc':['pc','server'].includes(value?.voice_execution)?value.voice_execution:'auto';drawVoice();};
   let native={phase:'idle',installed:false},session='',active=false,acting=false,polling=false,seenSpeech=0,seenTurn=0;
   let context=null,sources=new Set(),nextAudio=0,epoch=0,speechQueue=[],speechBuffer='',speechRunning=false,currentSpeech='',speechAbort=null;
   let answerRef=null,heard='',interrupted=false,llmDone=false,pendingTurns=[],voiceRequestId='';
@@ -390,6 +401,7 @@
     if(!moving&&animationFrame!==null){cancelAnimationFrame(animationFrame);animationFrame=null;}
     if(moving&&animationFrame===null)animationFrame=requestAnimationFrame(animateOrb);
   }
+  $('voice-transcript').addEventListener('keydown',event=>{if(event.key==='Escape'&&$('voice-transcript').open){event.preventDefault();event.stopPropagation();$('voice-transcript').open=false;$('voice-transcript').querySelector('summary').focus();}});
   $('voice-transcript').ontoggle=drawVoice;$('voice-sources').onclick=()=>uiOriginalSources(ws.lastSources||[]);
   reducedMotion.addEventListener('change',drawVoice);document.addEventListener('visibilitychange',drawVoice);
   function responding(){return busy&&!llmDone||speechRunning||sources.size||speechQueue.length||speechBuffer.trim();}
@@ -408,9 +420,9 @@
   async function command(action,extra={}){return transportConversation({action,...(['stop','ack','mute','playback'].includes(action)?{session}:{}),...extra});}
   let playbackState='';
   function syncAndroidPlayback(){
-    if((!android&&native.quality!=='max')||!active||!session)return;
+    if((!android&&!linux&&native.quality!=='max')||!active||!session)return;
     const interruptions=allowInterruptions.checked;
-    const playing=!!responding(),key=session+':'+playing+':'+interruptions;
+    const playing=!!responding()||linux&&Date.now()<listenAfter,key=session+':'+playing+':'+interruptions;
     if(key===playbackState)return;playbackState=key;
     command('playback',{playing,interruptions}).catch(e=>{playbackState='';stop(e.message).catch(error);});
   }
@@ -698,7 +710,7 @@
     finally{polling=false;}
   }
   button.onclick=async()=>{
-    if(acting||maxRemoving||gpuWorking)return;if(active||window.conversationBusy||native.phase==='installing'){await stop().catch(error);return;}
+    if(acting||maxRemoving||gpuWorking||maxChoosing())return;if(active||window.conversationBusy||native.phase==='installing'){await stop().catch(error);return;}
     if(conversationLocked()||!connected||!conversationModelAvailable())return;
     if(!localModel()){status.textContent='Choisissez Qwen local pour la conversation orale.';return;}
     if(prompt.value.trim()||chatAttachments.length){status.textContent='Envoyez ou conservez votre brouillon avant de démarrer une conversation vocale.';return;}
@@ -706,7 +718,7 @@
     try{
       if(quality.value==='max'&&maxInstalling())throw new Error('Attendez la fin de l’installation Max.');
       const localMaxReady=quality.value==='max'&&maxInfo?.pc?.available&&(maxInfo.pc.progressive||native.installed)&&execution.value!=='server',serverMaxReady=quality.value==='max'&&maxInfo?.server?.available&&execution.value!=='pc';
-      if(quality.value==='max'&&!localMaxReady&&!serverMaxReady){openSettings();status.textContent='Installez Max sur ce PC ou choisissez un serveur disponible.';$('voice-max-plan').focus();return;}
+      if(quality.value==='max'&&!localMaxReady&&!serverMaxReady){openSettings();status.textContent=linux?'Activez Max sur le serveur Kiara ou choisissez Low.':'Installez Max sur ce PC ou choisissez un serveur disponible.';$(linux?'voice-test-max':'voice-max-plan').focus();return;}
       if((!native.installed&&!localMaxReady&&!(serverMaxReady&&native.max_tools_installed))||needsRepair()){if(android&&!confirm('Installer la reconnaissance française sur cet appareil ? '+Math.ceil((native.model_bytes||487601967)/1000000)+' Mo à télécharger. Le modèle de dictée est réutilisé.'))return;native=await command('install',quality.value==='max'?{quality:'max'}:{});session=native.session;status.textContent='Installation des modèles de conversation…';return;}
       context=new AudioContext({sampleRate:24000});nextAudio=0;await context.resume();
       outputGain=context.createGain?.()||null;analyser=context.createAnalyser?.()||null;

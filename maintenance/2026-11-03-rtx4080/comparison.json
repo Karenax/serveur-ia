@@ -1,0 +1,282 @@
+{
+  "comparison": {
+    "decode": {
+      "rtx3080_tokens_per_second": 52.4,
+      "rtx4080_tokens_per_second": 57.7,
+      "change_percent": 10.114503816793906
+    },
+    "prefill-64": {
+      "rtx3080_tokens_per_second": 502.25,
+      "rtx4080_tokens_per_second": 522.7,
+      "change_percent": 4.071677451468392
+    },
+    "prefill-256": {
+      "rtx3080_tokens_per_second": 622.25,
+      "rtx4080_tokens_per_second": 667.7,
+      "change_percent": 7.304138208115707
+    }
+  },
+  "same_engine_binary": true,
+  "same_compute_arguments": true,
+  "limits": [
+    "Historical reference, not a simultaneous hardware comparison.",
+    "Vision disabled on RTX 4080; enabled in the historical reference.",
+    "Three decode and two prefill repetitions per length.",
+    "Maximum configured context is not a full-context stress test.",
+    "Primary expert cache remains limited to one entry."
+  ],
+  "long_context": [
+    {
+      "label": "long-context",
+      "elapsed_s": 42.139999999999986,
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 27683,
+        "prompt_ms": 41472.7,
+        "prompt_per_token_ms": 1.498,
+        "prompt_per_second": 667.5,
+        "predicted_n": 49,
+        "predicted_ms": 613.9,
+        "predicted_per_token_ms": 12.529,
+        "predicted_per_second": 79.8,
+        "draft_n": 35,
+        "draft_n_accepted": 31
+      },
+      "usage": {
+        "prompt_tokens": 27683,
+        "completion_tokens": 49,
+        "total_tokens": 27732,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "content": "{\n  \"debut\": \"AMBRE-2718\",\n  \"milieu\": \"CEDRE-6402\",\n  \"fin\": \"NACRE-9157\"\n}",
+      "quality_pass": true,
+      "gpu_after": "0, GPU-a39f1b57-5a26-b53d-e943-44ef8042a438, Tesla P100-PCIE-16GB, 15883, 43, 6, 1189, 33.30, 0x0000000000000000\n1, GPU-486d5352-582e-2880-78bf-3dec4688e142, Tesla P100-PCIE-16GB, 15883, 43, 14, 1189, 33.33, 0x0000000000000000\n2, GPU-7d35736d-3ef5-1304-0e9e-1d26021be1a0, NVIDIA GeForce RTX 4080, 8325, 44, 98, 2820, 105.59, 0x0000000000000000\n3, GPU-97ca6406-8625-b829-b053-191c238ff046, Quadro P2200, 18, 31, 0, 139, 4.69, 0x0000000000000001"
+    }
+  ],
+  "arms": {
+    "rtx3080": {
+      "path": "D:\\Serveur IA\\maintenance\\2026-10-30-rtx3080\\rtx3080-ctx262144-opt3-int8-p2048-cache1",
+      "groups": {
+        "decode": {
+          "repeats": 3,
+          "median_tokens_per_second": 52.4,
+          "median_ms": 4886.4,
+          "prompt_tokens": [
+            43,
+            43,
+            43
+          ],
+          "generated_tokens": [
+            256,
+            256,
+            256
+          ]
+        },
+        "prefill-64": {
+          "repeats": 2,
+          "median_tokens_per_second": 502.25,
+          "median_ms": 3018.8500000000004,
+          "prompt_tokens": [
+            1516,
+            1516
+          ],
+          "generated_tokens": [
+            10,
+            10
+          ]
+        },
+        "prefill-256": {
+          "repeats": 2,
+          "median_tokens_per_second": 622.25,
+          "median_ms": 9533.35,
+          "prompt_tokens": [
+            5932,
+            5932
+          ],
+          "generated_tokens": [
+            10,
+            10
+          ]
+        }
+      },
+      "gpus": {
+        "GPU-a39f1b57-5a26-b53d-e943-44ef8042a438": {
+          "name": "Tesla P100-PCIE-16GB",
+          "max_temp_c": 44.0,
+          "max_vram_mib": 15883.0,
+          "max_utilization": 14.0,
+          "thermal_throttle_samples": 0,
+          "median_sm_mhz": 1189.0
+        },
+        "GPU-486d5352-582e-2880-78bf-3dec4688e142": {
+          "name": "Tesla P100-PCIE-16GB",
+          "max_temp_c": 44.0,
+          "max_vram_mib": 15883.0,
+          "max_utilization": 14.0,
+          "thermal_throttle_samples": 0,
+          "median_sm_mhz": 1189.0
+        },
+        "GPU-c7ec5bca-5502-9e99-2ede-30270b7bde2f": {
+          "name": "NVIDIA GeForce RTX 3080",
+          "max_temp_c": 60.0,
+          "max_vram_mib": 8319.0,
+          "max_utilization": 99.0,
+          "thermal_throttle_samples": 0,
+          "median_sm_mhz": 1935.0
+        },
+        "GPU-97ca6406-8625-b829-b053-191c238ff046": {
+          "name": "Quadro P2200",
+          "max_temp_c": 45.0,
+          "max_vram_mib": 1156.0,
+          "max_utilization": 100.0,
+          "thermal_throttle_samples": 0,
+          "median_sm_mhz": 911.0
+        }
+      },
+      "all_quality_checks_pass": true,
+      "cache_tokens": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "final": {
+        "error": null,
+        "fingerprints_identical": true,
+        "fingerprints_after": {
+          "lanceur/base-strata.json": "068658fea3208acb5c91125280f1ba546af8ac78c2dcdd960590074dae1430be",
+          "strata-iq4-p100-hybride.json": "068658fea3208acb5c91125280f1ba546af8ac78c2dcdd960590074dae1430be",
+          "lanceur/reglages.json": "678313902c0d738ba9ae0a1a8c5b658a0a9189b549aabccfe29706f9188976a2",
+          "lanceur/reglages-par-defaut.json": "678313902c0d738ba9ae0a1a8c5b658a0a9189b549aabccfe29706f9188976a2",
+          "lanceur/exploitation.json": "2a56a8b1a5612be6e1fd6d4e5e9f098302abeeb22ad7fb0a2f91de249c448e1b",
+          "lanceur/session.json": "bb7a8d8a55940a7c289d78c727d54367cc58459ab5d7e834bdebfd1ffe8981d3",
+          "lanceur/derniers-reglages-valides.json": "36ba418b84220d9c642c39e115a9f1e1a77a47d1c35c3d5fbb16eae46b7369b4"
+        },
+        "gpu": "0, GPU-a39f1b57-5a26-b53d-e943-44ef8042a438, Tesla P100-PCIE-16GB, 9, 44, 0, 405, 27.30, 0x0000000000000001\n1, GPU-486d5352-582e-2880-78bf-3dec4688e142, Tesla P100-PCIE-16GB, 9, 43, 0, 405, 27.32, 0x0000000000000001\n2, GPU-c7ec5bca-5502-9e99-2ede-30270b7bde2f, NVIDIA GeForce RTX 3080, 664, 41, 4, 210, 28.30, 0x0000000000000001\n3, GPU-97ca6406-8625-b829-b053-191c238ff046, Quadro P2200, 0, 40, 0, 139, 5.47, 0x0000000000000001",
+        "duration_s": 120.9369999999999
+      }
+    },
+    "rtx4080": {
+      "path": "D:\\Serveur IA\\maintenance\\2026-11-03-rtx4080\\int8-cache1",
+      "groups": {
+        "decode": {
+          "repeats": 3,
+          "median_tokens_per_second": 57.7,
+          "median_ms": 4434.0,
+          "prompt_tokens": [
+            43,
+            43,
+            43
+          ],
+          "generated_tokens": [
+            256,
+            256,
+            256
+          ]
+        },
+        "prefill-64": {
+          "repeats": 2,
+          "median_tokens_per_second": 522.7,
+          "median_ms": 2900.6499999999996,
+          "prompt_tokens": [
+            1516,
+            1516
+          ],
+          "generated_tokens": [
+            10,
+            10
+          ]
+        },
+        "prefill-256": {
+          "repeats": 2,
+          "median_tokens_per_second": 667.7,
+          "median_ms": 8884.45,
+          "prompt_tokens": [
+            5932,
+            5932
+          ],
+          "generated_tokens": [
+            10,
+            10
+          ]
+        }
+      },
+      "gpus": {
+        "GPU-a39f1b57-5a26-b53d-e943-44ef8042a438": {
+          "name": "Tesla P100-PCIE-16GB",
+          "max_temp_c": 43.0,
+          "max_vram_mib": 15883.0,
+          "max_utilization": 18.0,
+          "thermal_throttle_samples": 0,
+          "median_sm_mhz": 1189.0
+        },
+        "GPU-486d5352-582e-2880-78bf-3dec4688e142": {
+          "name": "Tesla P100-PCIE-16GB",
+          "max_temp_c": 43.0,
+          "max_vram_mib": 15883.0,
+          "max_utilization": 19.0,
+          "thermal_throttle_samples": 0,
+          "median_sm_mhz": 1189.0
+        },
+        "GPU-7d35736d-3ef5-1304-0e9e-1d26021be1a0": {
+          "name": "NVIDIA GeForce RTX 4080",
+          "max_temp_c": 50.0,
+          "max_vram_mib": 8405.0,
+          "max_utilization": 99.0,
+          "thermal_throttle_samples": 0,
+          "median_sm_mhz": 2820.0
+        },
+        "GPU-97ca6406-8625-b829-b053-191c238ff046": {
+          "name": "Quadro P2200",
+          "max_temp_c": 31.0,
+          "max_vram_mib": 32.0,
+          "max_utilization": 0,
+          "thermal_throttle_samples": 0,
+          "median_sm_mhz": 139.0
+        }
+      },
+      "all_quality_checks_pass": true,
+      "cache_tokens": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "final": {
+        "error": null,
+        "fingerprints_identical": true,
+        "fingerprints_after": {
+          "lanceur/base-strata.json": "bf96ca95ec9db3ce2e9040cfa51e981f0229419c02863ed53731106b58f5c895",
+          "strata-iq4-p100-hybride.json": "bf96ca95ec9db3ce2e9040cfa51e981f0229419c02863ed53731106b58f5c895",
+          "lanceur/reglages.json": "ab3486d05b61ba9d786a7bbc0b81f8f02b8f7e2b1f8591e9a06c1f10d1dc4ba5",
+          "lanceur/reglages-par-defaut.json": "30ea788d8411aea0ceb8a3696514fa1f772ca3d055d805dedf0806200c0b9984",
+          "lanceur/exploitation.json": "2a56a8b1a5612be6e1fd6d4e5e9f098302abeeb22ad7fb0a2f91de249c448e1b",
+          "lanceur/session.json": "c51bb852bee947462784e970ca99a27ee215ef6660d794674f84edfa4323ff87",
+          "lanceur/derniers-reglages-valides.json": "30ea788d8411aea0ceb8a3696514fa1f772ca3d055d805dedf0806200c0b9984"
+        },
+        "gpu": "0, GPU-a39f1b57-5a26-b53d-e943-44ef8042a438, Tesla P100-PCIE-16GB, 9, 43, 0, 405, 27.28, 0x0000000000000001\n1, GPU-486d5352-582e-2880-78bf-3dec4688e142, Tesla P100-PCIE-16GB, 9, 42, 0, 405, 27.30, 0x0000000000000001\n2, GPU-7d35736d-3ef5-1304-0e9e-1d26021be1a0, NVIDIA GeForce RTX 4080, 642, 32, 1, 210, 12.86, 0x0000000000000001\n3, GPU-97ca6406-8625-b829-b053-191c238ff046, Quadro P2200, 18, 32, 0, 139, 5.08, 0x0000000000000001",
+        "duration_s": 253.35999999999996
+      }
+    }
+  }
+}

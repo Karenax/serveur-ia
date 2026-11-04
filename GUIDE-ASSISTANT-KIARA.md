@@ -1,9 +1,15 @@
 # Utiliser l’assistant Kiara
 
-Version publiée : **serveur/Windows 3.5.52**, **Android 1.0.23, code 24**.
+Versions publiées au 4 novembre 2026 : **serveur/Windows 3.5.60**, **Android 1.0.25, code 26**.
 Mettre le client à jour pour retrouver les nouvelles commandes et la rubrique
 **Mémoire et rappels**. Sur Android, installer la mise à jour par-dessus
 l’application existante pour conserver son profil et ses conversations.
+
+Les tâches, comptes rendus programmés et synthèses automatiques ont été retirés
+du serveur et du client Windows. Les rappels et **Faire le point** restent
+disponibles. L’APK Android publié le 26 octobre peut encore afficher les anciennes
+actions : elles ne sont plus prises en charge par le serveur. Leurs retraits
+d’interface sont dans les sources Android, en attente d’un nouvel APK.
 
 ## Choisir son espace
 
@@ -32,34 +38,27 @@ contexte ; ce filtrage ne garantit pas l’effacement de toute paraphrase. Les
 anciens fichiers de mémoire Hermes, s’il en existe, restent proposés à la
 consultation pour une reprise manuelle.
 
-## Créer une note ou une tâche en parlant
+## Créer une note en parlant
 
 Ouvrir **Vocal** avec **Qwen local**, puis démarrer la conversation. Dans un
-projet, demander « Crée une note avec ces points » ou « Crée une tâche pour
-analyser ce dossier ». La note rejoint les documents du projet ; la tâche et son
-résultat se retrouvent dans **Tâches**. Il est aussi possible de consulter les
-tâches ou de demander la pause ou l’annulation d’une tâche clairement désignée.
+projet, demander « Crée une note avec ces points ». La note rejoint les documents
+du projet.
 
 Les commandes écrites et orales utilisent les mêmes données et droits. Une
 opération déjà enregistrée ne peut pas être annulée simplement en raccrochant.
 Les conversations écrites passent par Hermes ; le vocal utilise directement
 Qwen local avec les commandes Kiara contrôlées.
 
-## Programmer un rappel ou un compte rendu
+## Programmer un rappel
 
 Demander « Rappelle-moi demain à 18 heures de reprendre ce dossier » ou ouvrir
-**Nouveau rappel ou compte rendu**. Vérifier date, heure, fuseau et répétition :
+**Nouveau rappel**. Vérifier date, heure, fuseau et répétition :
 une fois, chaque jour, chaque semaine ou du lundi au vendredi.
 
-**Me rappeler** fonctionne sans modèle et sans projet obligatoire.
-**Préparer un compte rendu du projet** demande un projet et utilise la file
-d’analyse du serveur. Les rappels à venir peuvent être modifiés ou annulés.
-La pause/reprise dédiée d’un rappel reste à ajouter.
-
-Le serveur doit fonctionner pour traiter l’échéance. Après un arrêt, un rappel
-manqué est signalé une fois ; les comptes rendus retardés ne sont pas lancés en
-rafale. Une heure locale ambiguë au changement d’heure doit être précisée ; une
-heure récurrente absente au passage d’été est sautée.
+**Me rappeler** fonctionne sans modèle et sans projet obligatoire. Les rappels
+à venir peuvent être modifiés ou annulés. Le serveur doit fonctionner pour
+traiter l’échéance. Un rappel manqué est signalé une fois. Les répétitions suivent
+le calendrier local et le fuseau choisi.
 
 Les alertes se retrouvent dans **Notifications**. Leur ouverture affiche le
 rappel et son heure prévue. Sur Android, l’option **Relever les alertes même
@@ -71,14 +70,8 @@ application forcée à l’arrêt, retrouver les événements à la prochaine co
 ## Reprendre un projet
 
 Choisir un projet dans **Mémoire et rappels**. **Faire le point** retrouve ses
-décisions confirmées, souvenirs, tâches, documents et discussions récentes.
-**Préparer une synthèse** demande un résumé au modèle et laisse travailler le
-serveur pendant que l’on poursuit sa navigation.
-
+décisions confirmées, souvenirs, documents et discussions récentes.
 Vérifier les sources et distinguer une décision confirmée d’une proposition.
-Un projet modifié rend sa synthèse précédente périmée. L’option **Actualiser la
-synthèse après les changements du projet** est désactivée initialement ; elle
-peut utiliser le modèle en arrière-plan et doit être activée selon les besoins.
 
 ## Joindre une image au vocal
 

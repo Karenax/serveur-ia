@@ -1,0 +1,72 @@
+{
+  "passed": true,
+  "production_changed": false,
+  "engine_pid_preserved": true,
+  "qwen_processes_preserved": true,
+  "production_device": "cpu",
+  "production_runtime": {
+    "torch": "2.14.1+cpu",
+    "cuda_build": null
+  },
+  "production_http_check": {
+    "http": 200,
+    "dimensions": 768,
+    "seconds": 7.938
+  },
+  "measurements": [
+    {
+      "configuration": "cpu_eager",
+      "dtype": "float32",
+      "attention": "eager",
+      "microbatch": 4,
+      "short_32_seconds": 2.156,
+      "long_32_seconds": 84.39,
+      "long_32_speedup_vs_production_cpu": 1.0
+    },
+    {
+      "configuration": "cpu_sdpa",
+      "dtype": "float32",
+      "attention": "sdpa",
+      "microbatch": 4,
+      "short_32_seconds": 1.641,
+      "long_32_seconds": 74.578,
+      "long_32_speedup_vs_production_cpu": 1.13
+    },
+    {
+      "configuration": "p2200_fp32",
+      "dtype": "float32",
+      "attention": "sdpa",
+      "microbatch": 1,
+      "short_32_seconds": 1.109,
+      "long_32_seconds": 5.938,
+      "long_32_speedup_vs_production_cpu": 14.21,
+      "minimum_free_vram_mib": 2560,
+      "max_reserved_torch_mib": 1210.0,
+      "minimum_cosine_vs_cpu": 0.9999998807907104
+    },
+    {
+      "configuration": "rtx4080_fp16",
+      "dtype": "float16",
+      "attention": "sdpa",
+      "microbatch": 1,
+      "short_32_seconds": 1.453,
+      "long_32_seconds": 1.61,
+      "long_32_speedup_vs_production_cpu": 52.42,
+      "minimum_free_vram_mib": 605,
+      "max_reserved_torch_mib": 666.0,
+      "minimum_cosine_vs_cpu": 0.9999991655349731
+    },
+    {
+      "configuration": "p2200_fp32_batch4",
+      "dtype": "float32",
+      "attention": "sdpa",
+      "microbatch": 4,
+      "short_32_seconds": 0.297,
+      "long_32_seconds": 5.297,
+      "long_32_speedup_vs_production_cpu": 15.93,
+      "minimum_free_vram_mib": 2084,
+      "max_reserved_torch_mib": 1686.0,
+      "minimum_cosine_vs_cpu": 0.9999998807907104
+    }
+  ]
+}

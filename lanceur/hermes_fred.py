@@ -132,7 +132,6 @@ class HermesFred:
         return result
     def action(self, owner, value): return self.conversations.action(owner, value)
     def stream(self, *args, **kwargs): return self.conversations.stream(*args, **kwargs)
-    def generate(self, *args, **kwargs): return self.conversations.generate(*args, **kwargs)
     def merge_completed(self, *args): return self.conversations.merge_completed(*args)
 
     def synchronize_projects(self, owner):

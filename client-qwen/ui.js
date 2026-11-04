@@ -5,12 +5,12 @@ function uiLoadedModel(name,code=''){
   const text=name?'Modèle : '+name:['model_unloaded','no_models'].includes(code)?'Aucun modèle disponible':'Modèle : connexion requise';if(label.textContent!==text)label.textContent=text;
   label.title=label.textContent;
 }
-const uiPaths={notifications:'M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4',chat:'M3 4h18v12H8l-5 4V4',projects:'M3 7V5h6l2 2h10v13H3V7',tasks:'M9 3h6v3H9V3m-3 2H4v16h16V5h-2M8 11l2 2 5-5M8 17h8',settings:'M4 6h16M4 12h16M4 18h16M8 3v6m8 0v6m-6 0v6',new:'M15 4l5 5M4 20l4-1L21 6l-3-3L5 16l-1 4',sidebar:'M3 4h18v16H3V4m5 0v16',project:'M3 7V5h6l2 2h10v13H3V7',writing:'M4 20l4-1L21 6l-3-3L5 16l-1 4',code:'M8 6l-6 6 6 6m8-12 6 6-6 6m-3-14-2 16',analysis:'M4 20h16M7 16v-5m5 5V4m5 12V8',research:'M15 15l6 6M17 9a8 8 0 1 1-16 0 8 8 0 0 1 16 0',general:'M12 3v18M3 12h18M5.6 5.6l12.8 12.8m0-12.8L5.6 18.4'};
+const uiPaths={notifications:'M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4',chat:'M3 4h18v12H8l-5 4V4',projects:'M3 7V5h6l2 2h10v13H3V7',settings:'M4 6h16M4 12h16M4 18h16M8 3v6m8 0v6m-6 0v6',new:'M15 4l5 5M4 20l4-1L21 6l-3-3L5 16l-1 4',sidebar:'M3 4h18v16H3V4m5 0v16',project:'M3 7V5h6l2 2h10v13H3V7',writing:'M4 20l4-1L21 6l-3-3L5 16l-1 4',code:'M8 6l-6 6 6 6m8-12 6 6-6 6m-3-14-2 16',analysis:'M4 20h16M7 16v-5m5 5V4m5 12V8',research:'M15 15l6 6M17 9a8 8 0 1 1-16 0 8 8 0 0 1 16 0',general:'M12 3v18M3 12h18M5.6 5.6l12.8 12.8m0-12.8L5.6 18.4'};
 function uiIcon(name){const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('fill','none');svg.setAttribute('stroke','currentColor');svg.setAttribute('stroke-width','1.5');svg.setAttribute('stroke-linecap','round');svg.setAttribute('stroke-linejoin','round');svg.setAttribute('aria-hidden','true');svg.classList.add('icon');const path=document.createElementNS(svg.namespaceURI,'path');path.setAttribute('d',uiPaths[name]||uiPaths.general);svg.append(path);return svg;}
-const uiNavTitles={notifications:'Notifications',chat:'Conversations',projects:'Projets',tasks:'Tâches',settings:'Réglages'};
+const uiNavTitles={notifications:'Notifications',chat:'Conversations',projects:'Projets',settings:'Réglages'};
 const uiNavigationLabels=new WeakMap();
 uiNavTitles.assistant='Mémoire et rappels';uiPaths.assistant='M4 4h7v16H4V4m9 0h7v16h-7V4M7 8h1m8 0h1M7 12h1m8 0h1';
-function uiDecorateNavigation(){for(const button of document.querySelectorAll('[data-view-button]')){button.removeAttribute('aria-selected');if(button.classList.contains('active'))button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');}for(const b of document.querySelectorAll('.nav-button')){const name=b.dataset.viewButton;if(!uiNavTitles[name])continue;const unchangedSignature=JSON.stringify([name,uiNavTitles[name],b.dataset.unreadCount||0,b.dataset.unread==='true'||b.textContent.includes('résultats disponibles')]);if(uiNavigationLabels.get(b)===unchangedSignature&&b.querySelector('.nav-text'))continue;uiNavigationLabels.set(b,unchangedSignature);if(name==='notifications'){const count=Number(b.dataset.unreadCount||0);b.replaceChildren(uiIcon(name),wsElement('span',uiNavTitles[name],'nav-text'));if(count)b.append(wsElement('span',String(count),'fred-nav-count'));b.title='Notifications'+(count?' · '+count+' non lues':'');continue;}const notification=name==='tasks'&&(b.textContent.includes('résultats disponibles')||b.dataset.unread==='true');if(name==='tasks')b.dataset.unread=String(notification);b.replaceChildren(uiIcon(name),wsElement('span',uiNavTitles[name],'nav-text'));if(notification){b.append(wsElement('span',undefined,'nav-dot'));b.title='Tâches · nouveaux résultats';}else b.title=uiNavTitles[name];}}
+function uiDecorateNavigation(){for(const button of document.querySelectorAll('[data-view-button]')){button.removeAttribute('aria-selected');if(button.classList.contains('active'))button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');}for(const b of document.querySelectorAll('.nav-button')){const name=b.dataset.viewButton;if(!uiNavTitles[name])continue;const unchangedSignature=JSON.stringify([name,uiNavTitles[name],b.dataset.unreadCount||0,b.dataset.unread==='true'||b.textContent.includes('résultats disponibles')]);if(uiNavigationLabels.get(b)===unchangedSignature&&b.querySelector('.nav-text'))continue;uiNavigationLabels.set(b,unchangedSignature);if(name==='notifications'){const count=Number(b.dataset.unreadCount||0);b.replaceChildren(uiIcon(name),wsElement('span',uiNavTitles[name],'nav-text'));if(count)b.append(wsElement('span',String(count),'fred-nav-count'));b.title='Notifications'+(count?' · '+count+' non lues':'');continue;}b.replaceChildren(uiIcon(name),wsElement('span',uiNavTitles[name],'nav-text'));b.title=uiNavTitles[name];}}
 $('new').prepend(uiIcon('new'));$('ui-sidebar-toggle').append(uiIcon('sidebar'));
 document.querySelector('.sidebar-settings').append(document.querySelector('[data-view-button="settings"]'));
 $('workspace-heading').after($('undo-delete'));
@@ -55,7 +55,7 @@ let uiComposerId=currentId,uiComposerDrafts=Object.create(null),uiDraftsLoaded=f
 const uiDraftChanges=new Map();
 function uiRemoveComposerDraft(id){uiComposerSync();const text=uiComposerDrafts[id]||'';if(uiComposerId===id)$('prompt').value='';uiComposerRemember(id,'');return text;}
 function uiRestoreComposerDraft(id,text){if(text)uiComposerRemember(id,text);}
-window.uiCheckPendingEdits=()=>{if(uiMemoryEditsPending())throw new Error('Enregistrez les mémoires modifiées avant de fermer.');if($('ws-task-prompt').value.trim())throw new Error('Lancez la tâche en préparation ou effacez sa demande avant de fermer.');};
+window.uiCheckPendingEdits=()=>{if(uiMemoryEditsPending())throw new Error('Enregistrez les mémoires modifiées avant de fermer.');};
 const uiDraftStatus=wsElement('span',undefined,'draft-status');uiDraftStatus.id='ui-draft-status';uiDraftStatus.setAttribute('role','status');uiDraftStatus.hidden=true;document.querySelector('.composer').append(uiDraftStatus);
 const uiDraftRetry=wsElement('button','Réessayer l’enregistrement','secondary draft-retry');uiDraftRetry.id='ui-draft-retry';uiDraftRetry.type='button';uiDraftRetry.hidden=true;uiDraftStatus.after(uiDraftRetry);
 uiDraftRetry.onclick=async()=>{uiDraftRetry.disabled=true;try{await uiPersistPreferences();}catch(e){error(e);}finally{uiDraftRetry.disabled=false;}};
@@ -120,23 +120,22 @@ const uiSelectProject=wsSelectProject;wsSelectProject=async function(id){await u
 const uiOpenDocument=wsOpenDocument;wsOpenDocument=async function(id){await uiOpenDocument(id);$('ui-document-empty').hidden=true;uiProjectTab('documents');for(const b of $('ws-documents').querySelectorAll('button'))b.classList.toggle('selected',b.textContent===$('ws-document-title').value);};
 $('ui-upload-label').onkeydown=e=>{if(['Enter',' '].includes(e.key)){e.preventDefault();$('ws-upload').click();}};
 
-let uiJobFilter='all';function uiFilterJobs(){let visible=0;[...$('ws-jobs').children].forEach((card,i)=>{const j=ws.data.jobs[i];const groups={all:true,active:['queued','running'].includes(j.state),completed:j.state==='completed',attention:['failed','paused','cancelled'].includes(j.state)};card.hidden=!groups[uiJobFilter];if(!card.hidden)visible++;});$('ui-jobs-empty').hidden=visible>0;for(const b of document.querySelectorAll('[data-job-filter]')){const selected=b.dataset.jobFilter===uiJobFilter;b.classList.toggle('active',selected);b.setAttribute('aria-pressed',String(selected));}}
-for(const b of document.querySelectorAll('[data-job-filter]'))b.onclick=()=>{uiJobFilter=b.dataset.jobFilter;uiFilterJobs();};
-const uiDrawJobs=wsDrawJobs;wsDrawJobs=function(){uiDrawJobs();uiFilterJobs();};
-const uiOpenJob=wsOpenJob;wsOpenJob=async function(id){await uiOpenJob(id);document.querySelector('[data-view-button="tasks"]').dataset.unread='false';uiDecorateNavigation();};
-$('ws-task-kind').addEventListener('change',()=>{$('ui-task-web').hidden=$('ws-task-kind').value!=='web';});
 const uiRefresh=wsRefresh;wsRefresh=async function(){await uiRefresh();uiDecorateNavigation();};
 uiDecorateNavigation();render();uiProjectTab('documents');
-window.addEventListener('beforeunload',e=>{if(uiDraftDirty||uiPreferencesPending||ws.projectDirty||ws.dirty||uiMemoryEditsPending()||$('ws-task-prompt').value.trim()||typeof correctorDirty!=='undefined'&&correctorDirty){e.preventDefault();e.returnValue='';}});
+window.addEventListener('beforeunload',e=>{if(uiDraftDirty||uiPreferencesPending||ws.projectDirty||ws.dirty||uiMemoryEditsPending()||typeof correctorDirty!=='undefined'&&correctorDirty){e.preventDefault();e.returnValue='';}});
 
 /* kiara-slot:desktop-integration-logic-26 */let uiLastConnection={},uiIntegrations=null,uiIntegrationsLoading=false,uiIntegrationPending=false;
 function uiIntegrationButtons(){
   const model=connected&&conversationModelAvailable()?conversationModel():'';
   $('integration-model').textContent=model?'Modèle à ajouter : '+conversationModelLabel():'Connectez le client au serveur et chargez un modèle pour l’ajouter.';
-  for(const name of ['opencode','hermes']){
+  for(const name of ['opencode','hermes','codex']){
     const app=uiIntegrations?.[name],button=$('integration-'+name);
-    button.disabled=uiIntegrationPending||uiIntegrationsLoading||!app?.installed||!model;
+    button.disabled=uiIntegrationPending||uiIntegrationsLoading||!app?.installed||!model||(name==='codex'&&(model!=='fred-qwen'||app?.supported===false));
     $('integration-'+name+'-state').textContent=uiIntegrationsLoading?'Détection en cours…':app?(app.installed?'Détecté sur ce PC':'Non détecté sur ce PC'):'Détection indisponible';
+    if(name==='codex'&&app&& !uiIntegrationsLoading){
+      if(app.supported===false)$('integration-codex-state').textContent='Ajout automatique disponible sous Windows';
+      else if(app.installed&&model&&model!=='fred-qwen')$('integration-codex-state').textContent='Sélectionnez Qwen local pour l’ajouter';
+    }
   }
 }
 async function uiRefreshIntegrations(){
@@ -146,15 +145,16 @@ async function uiRefreshIntegrations(){
   catch(e){uiIntegrations=null;$('integration-result').textContent=e.message;}
   finally{uiIntegrationsLoading=false;uiIntegrationButtons();}
 }
-for(const name of ['opencode','hermes'])$('integration-'+name).onclick=async()=>{
+for(const name of ['opencode','hermes','codex'])$('integration-'+name).onclick=async()=>{
   if(uiIntegrationPending)return;
   uiIntegrationPending=true;uiIntegrationButtons();$('integration-backup').hidden=true;$('integration-result').textContent='Ajout du modèle en cours…';
+  if(name==='codex')$('integration-result').textContent='Téléchargement et configuration de Codex…';
   try{
     const result=await api('/client/integrations/apply',{app:name,model:conversationModel()});
     $('integration-result').textContent=result.message;
     const backups=result.backups||(result.backup?[result.backup]:[]);
     if(backups.length){$('integration-backup-path').textContent=backups.join(' ; ');$('integration-backup').hidden=false;}
-  }catch(e){$('integration-result').textContent=e.message;}
+  }catch(e){$('integration-result').textContent=e.message;if(name==='codex')$('integration-codex-guide').open=true;}
   finally{uiIntegrationPending=false;uiIntegrationButtons();}
 };
 /* /kiara-slot:desktop-integration-logic-26 */const uiConnectionPhases={requesting:'Envoi de la demande',queued:'En attente du moteur',waiting_model:'Calcul en cours',thinking:'Réflexion en cours',answering:'Rédaction de la réponse',working:'Préparation de la réponse',tool:'Utilisation des outils',approval:'Accord nécessaire',stopping:'Arrêt en cours',complete:'Réponse terminée',interrupted:'Réponse interrompue'};

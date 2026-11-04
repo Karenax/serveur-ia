@@ -4,6 +4,7 @@ import time
 from pathlib import Path
 
 class EchoMicrophone:
+    aec = True
     def __init__(self, resources):
         self.dll=ctypes.CDLL(str(Path(resources)/'fredaec.dll'))
         self.dll.fred_aec_open.argtypes=[];self.dll.fred_aec_open.restype=ctypes.c_void_p
@@ -26,3 +27,8 @@ class EchoMicrophone:
         if not hasattr(self.dll,'fred_aec_last_error'):return ''
         self.dll.fred_aec_last_error.restype=ctypes.c_long
         return ' Code Windows : 0x%08X.'%(self.dll.fred_aec_last_error()&0xffffffff)
+
+
+import sys
+if sys.platform.startswith('linux'):
+    from linux_audio import PulseMicrophone as EchoMicrophone

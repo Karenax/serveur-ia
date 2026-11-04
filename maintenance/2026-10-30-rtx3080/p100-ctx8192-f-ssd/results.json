@@ -1,0 +1,218 @@
+[
+  {
+    "label": "warmup",
+    "elapsed_s": 1.6869999999998981,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 32,
+      "prompt_ms": 1425.6,
+      "prompt_per_token_ms": 44.55,
+      "prompt_per_second": 22.4,
+      "predicted_n": 4,
+      "predicted_ms": 169.7,
+      "predicted_per_token_ms": 42.425,
+      "predicted_per_second": 23.6,
+      "draft_n": 2,
+      "draft_n_accepted": 2
+    },
+    "usage": {
+      "prompt_tokens": 32,
+      "completion_tokens": 4,
+      "total_tokens": 36,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "301",
+    "quality_pass": true
+  },
+  {
+    "label": "decode-r1",
+    "elapsed_s": 8.625,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 43,
+      "prompt_ms": 1079.9,
+      "prompt_per_token_ms": 25.114,
+      "prompt_per_second": 39.8,
+      "predicted_n": 256,
+      "predicted_ms": 7517.8,
+      "predicted_per_token_ms": 29.366,
+      "predicted_per_second": 34.1,
+      "draft_n": 187,
+      "draft_n_accepted": 115
+    },
+    "usage": {
+      "prompt_tokens": 43,
+      "completion_tokens": 256,
+      "total_tokens": 299,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "La couleur du ciel est principalement déterminée par la manière dont la lumière du soleil interagit avec l'atmosphère terrestre, un phénomène physique connu sous le nom de diffusion de Rayleigh. La lumière blanche du soleil est en réalité composée de toutes les couleurs de l'arc-en-ciel, chacune correspondant à une longueur d'onde différente. Lorsque cette lumière pénètre dans l'atmosphère, elle entre en collision avec les molécules de gaz (principalement l'azote et l'oxygène) qui sont beaucoup plus petites que la longueur d'onde de la lumière visible. Selon les lois de la physique, la diffusion est inversement proportionnelle à la puissance quatrième de la longueur d'onde. Cela signifie que les longueurs d'onde courtes, comme le bleu et le violet, sont diffusées beaucoup plus fortement que les longueurs d'onde longues, comme le rouge ou l'orange. C'est pourquoi, lorsque nous regardons le ciel en plein jour, nous voyons principalement la lumière bleue qui a été redirigée dans toutes les directions par ces molécules, créant cette teinte azurée caractéristique.\n\nCependant, si le violet est encore plus court que le bleu et devrait thé",
+    "quality_pass": true
+  },
+  {
+    "label": "decode-r2",
+    "elapsed_s": 8.438000000000102,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 43,
+      "prompt_ms": 1089.4,
+      "prompt_per_token_ms": 25.335,
+      "prompt_per_second": 39.5,
+      "predicted_n": 256,
+      "predicted_ms": 7326.2,
+      "predicted_per_token_ms": 28.618,
+      "predicted_per_second": 34.9,
+      "draft_n": 184,
+      "draft_n_accepted": 117
+    },
+    "usage": {
+      "prompt_tokens": 43,
+      "completion_tokens": 256,
+      "total_tokens": 299,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "La couleur du ciel est principalement déterminée par la manière dont la lumière du soleil interagit avec l'atmosphère terrestre, un phénomène physique connu sous le nom de diffusion de Rayleigh. La lumière blanche du soleil est en réalité composée de toutes les couleurs de l'arc-en-ciel, chacune correspondant à une longueur d'onde différente. Lorsque cette lumière pénètre dans l'atmosphère, elle entre en collision avec les molécules de gaz (principalement l'azote et l'oxygène) qui sont beaucoup plus petites que la longueur d'onde de la lumière visible. Selon les lois de la physique, la diffusion est inversement proportionnelle à la puissance quatrième de la longueur d'onde. Cela signifie que les longueurs d'onde courtes, comme le bleu et le violet, sont diffusées beaucoup plus fortement que les longueurs d'onde longues, comme le rouge ou l'orange. C'est pourquoi, lorsque nous regardons le ciel en plein jour, nous voyons principalement la lumière bleue qui a été redirigée dans toutes les directions par ces molécules, créant cette teinte azurée caractéristique.\n\nCependant, si le violet est encore plus court que le bleu et devrait thé",
+    "quality_pass": true
+  },
+  {
+    "label": "decode-r3",
+    "elapsed_s": 8.375,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 43,
+      "prompt_ms": 1079.8,
+      "prompt_per_token_ms": 25.112,
+      "prompt_per_second": 39.8,
+      "predicted_n": 256,
+      "predicted_ms": 7277.6,
+      "predicted_per_token_ms": 28.428,
+      "predicted_per_second": 35.2,
+      "draft_n": 184,
+      "draft_n_accepted": 117
+    },
+    "usage": {
+      "prompt_tokens": 43,
+      "completion_tokens": 256,
+      "total_tokens": 299,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "La couleur du ciel est principalement déterminée par la manière dont la lumière du soleil interagit avec l'atmosphère terrestre, un phénomène physique connu sous le nom de diffusion de Rayleigh. La lumière blanche du soleil est en réalité composée de toutes les couleurs de l'arc-en-ciel, chacune correspondant à une longueur d'onde différente. Lorsque cette lumière pénètre dans l'atmosphère, elle entre en collision avec les molécules de gaz (principalement l'azote et l'oxygène) qui sont beaucoup plus petites que la longueur d'onde de la lumière visible. Selon les lois de la physique, la diffusion est inversement proportionnelle à la puissance quatrième de la longueur d'onde. Cela signifie que les longueurs d'onde courtes, comme le bleu et le violet, sont diffusées beaucoup plus fortement que les longueurs d'onde longues, comme le rouge ou l'orange. C'est pourquoi, lorsque nous regardons le ciel en plein jour, nous voyons principalement la lumière bleue qui a été redirigée dans toutes les directions par ces molécules, créant cette teinte azurée caractéristique.\n\nCependant, si le violet est encore plus court que le bleu et devrait thé",
+    "quality_pass": true
+  },
+  {
+    "label": "prefill-64-r1",
+    "elapsed_s": 6.389999999999873,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 1516,
+      "prompt_ms": 6158.8,
+      "prompt_per_token_ms": 4.063,
+      "prompt_per_second": 246.2,
+      "predicted_n": 10,
+      "predicted_ms": 229.7,
+      "predicted_per_token_ms": 22.97,
+      "predicted_per_second": 43.5,
+      "draft_n": 6,
+      "draft_n_accepted": 6
+    },
+    "usage": {
+      "prompt_tokens": 1516,
+      "completion_tokens": 10,
+      "total_tokens": 1526,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "LUMIERE-7429",
+    "quality_pass": true
+  },
+  {
+    "label": "prefill-64-r2",
+    "elapsed_s": 6.313000000000102,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 1516,
+      "prompt_ms": 6087.6,
+      "prompt_per_token_ms": 4.016,
+      "prompt_per_second": 249.0,
+      "predicted_n": 10,
+      "predicted_ms": 211.3,
+      "predicted_per_token_ms": 21.13,
+      "predicted_per_second": 47.3,
+      "draft_n": 6,
+      "draft_n_accepted": 6
+    },
+    "usage": {
+      "prompt_tokens": 1516,
+      "completion_tokens": 10,
+      "total_tokens": 1526,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "LUMIERE-7429",
+    "quality_pass": true
+  },
+  {
+    "label": "prefill-256-r1",
+    "elapsed_s": 15.092999999999847,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 5932,
+      "prompt_ms": 14865.8,
+      "prompt_per_token_ms": 2.506,
+      "prompt_per_second": 399.0,
+      "predicted_n": 10,
+      "predicted_ms": 215.9,
+      "predicted_per_token_ms": 21.59,
+      "predicted_per_second": 46.3,
+      "draft_n": 6,
+      "draft_n_accepted": 6
+    },
+    "usage": {
+      "prompt_tokens": 5932,
+      "completion_tokens": 10,
+      "total_tokens": 5942,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "LUMIERE-7429",
+    "quality_pass": true
+  },
+  {
+    "label": "prefill-256-r2",
+    "elapsed_s": 15.110000000000127,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 5932,
+      "prompt_ms": 14871.7,
+      "prompt_per_token_ms": 2.507,
+      "prompt_per_second": 398.9,
+      "predicted_n": 10,
+      "predicted_ms": 219.9,
+      "predicted_per_token_ms": 21.99,
+      "predicted_per_second": 45.5,
+      "draft_n": 6,
+      "draft_n_accepted": 6
+    },
+    "usage": {
+      "prompt_tokens": 5932,
+      "completion_tokens": 10,
+      "total_tokens": 5942,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "content": "LUMIERE-7429",
+    "quality_pass": true
+  }
+]

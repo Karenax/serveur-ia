@@ -89,7 +89,7 @@ def validate(html: str) -> None:
     assert 'id="retry"' not in html and "$('retry')" not in html
     assert "Réessayer la réponse" not in html
     for item in ("android-onboarding", "AndroidClient", "exportFile", "ws-project-list", "ws-document-editor",
-                 "ws-jobs", "corrector-text", "thinking-bar", "chat-file-input", "/v1/chat/completions",
+                 "corrector-text", "thinking-bar", "chat-file-input", "/v1/chat/completions",
                  "/client/history/sync", "stream:true", "reader.read()"):
         assert item in html, f"Required Android feature missing: {item}"
     for name in ("token", "private_key", "session"):

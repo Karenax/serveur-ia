@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-8195065874734053bf14d8c0",
+  "object": "chat.completion",
+  "created": 1793439805,
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Le ciel nous apparaît bleu en journée principalement en raison d'un phénomène physique appelé la diffusion de Rayleigh. La lumière du soleil, bien qu'elle paraisse blanche à l'œil nu, est en réalité composée de toutes les couleurs de l'arc-en-ciel, chacune correspondant à une longueur d'onde différente. Lorsque cette lumière traverse l'atmosphère terrestre, elle entre en collision avec les molécules de gaz (principalement l'azote et l'oxygène) qui sont beaucoup plus petites que la longueur d'onde de la lumière visible. Selon la loi de Rayleigh, l'intensité de la diffusion est inversement proportionnelle à la puissance quatrième de la longueur d'onde. Cela signifie que les courtes longueurs d'onde, comme le bleu et le violet, sont diffusées beaucoup plus efficacement que les longues longueurs d'onde, comme le rouge ou l'orange.\n\nCependant, si le violet est encore plus court que le bleu, pourquoi ne voyons-nous pas un ciel violet ? Il y a deux raisons principales à cela. Premièrement, le soleil émet moins de lumière violette que de lumière bleue dans son spectre. Deuxièmement, l'œil humain est beaucoup plus"
+      },
+      "finish_reason": "length"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 63,
+    "completion_tokens": 256,
+    "total_tokens": 319,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 63,
+    "prompt_ms": 1882.4,
+    "prompt_per_token_ms": 29.879,
+    "prompt_per_second": 33.5,
+    "predicted_n": 256,
+    "predicted_ms": 4482.5,
+    "predicted_per_token_ms": 17.51,
+    "predicted_per_second": 57.1,
+    "draft_n": 181,
+    "draft_n_accepted": 121
+  }
+}

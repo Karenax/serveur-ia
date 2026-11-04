@@ -34,6 +34,9 @@ class Blob(ctypes.Structure):
     _fields_ = [('cbData', wintypes.DWORD), ('pbData', ctypes.POINTER(ctypes.c_ubyte))]
 
 def protect(value, decrypt=False):
+    if sys.platform.startswith('linux'):
+        from linux_support import protect as linux_protect
+        return linux_protect(value, decrypt=decrypt)
     raw = value if isinstance(value, bytes) else value.encode()
     buffer = ctypes.create_string_buffer(raw)
     source = Blob(len(raw), ctypes.cast(buffer, ctypes.POINTER(ctypes.c_ubyte)))
@@ -183,9 +186,9 @@ class Remote:
             opener=self.https_opener if https else self.opener
         # Capture the URL and its matching secret together; a reconnect may replace the bridge.
         request = urllib.request.Request(url + path, data=data,
-            headers={**headers, 'User-Agent':'AccesServeurKiara/'+VERSION+' (Windows; '+('HTTPS' if https else 'WireGuard')+')', 'Content-Type': 'application/json','X-Qwen-Session':self.session,'X-Fred-Agent-Protocol':str(AGENT_PROTOCOL),**({'X-Qwen-Request':request_id} if request_id else {})})
+            headers={**headers, 'User-Agent':'AccesServeurKiara/'+VERSION+' ('+('Linux' if sys.platform.startswith('linux') else 'Windows')+'; '+('HTTPS' if https else 'WireGuard')+')', 'Content-Type': 'application/json','X-Qwen-Session':self.session,'X-Fred-Agent-Protocol':str(AGENT_PROTOCOL),**({'X-Qwen-Request':request_id} if request_id else {})})
         try:
-            response=opener.open(request, timeout=900 if path=="/v1/chat/completions" else 120 if path=="/v1/client/download" else 90 if path in ('/v1/voice/max/transcribe','/v1/voice/max/speech') else 60 if path in ("/v1/workspace/action","/v1/history") else 3 if path=="/v1/device" else 30)
+            response=opener.open(request, timeout=900 if path in ("/v1/chat/completions","/v1/responses") else 120 if path=="/v1/client/download" else 90 if path in ('/v1/voice/max/transcribe','/v1/voice/max/speech') else 60 if path in ("/v1/workspace/action","/v1/history") else 3 if path=="/v1/device" else 90 if path=="/v1/embeddings" else 30)
             with self.activity_lock:self.last_contact=time.time();self.response_count+=1
             self.event('server_response',route=path,status=getattr(response,'status',200))
             return response
@@ -204,6 +207,10 @@ class Remote:
             raise
 
     def update(self,apply=False):
+        if sys.platform.startswith('linux'):
+            self.update_state={'busy':False,'available':False,'current':VERSION,
+                               'message':'Pour mettre Kiara à jour, installez le nouveau paquet Linux fourni par votre administrateur.'}
+            return self.update_state
         with self.activity_lock:
             if self.applying_update:raise ValueError('Installation en cours. Attendre le redémarrage du client.')
             if not self.update_lock.acquire(blocking=False):raise ValueError('Une mise à jour est déjà en cours.')
@@ -342,12 +349,17 @@ class Remote:
 def serve_local(remote, key, port=LOCAL_API_PORT):
     from conversation_service import ConversationService, DictationService
     from advanced_voice import AdvancedVoice, choose_execution
-    advanced=AdvancedVoice(Path(os.environ.get('LOCALAPPDATA',str(Path.home())))/'QwenClient/voice-max')
-    voice=DictationService(Path(getattr(sys, "_MEIPASS", Path(__file__).parent))/"voice")
-    conversation=ConversationService(Path(getattr(sys, "_MEIPASS", Path(__file__).parent))/"voice")
-    wakeword=ConversationService(Path(getattr(sys, "_MEIPASS", Path(__file__).parent))/"voice",mode='wakeword')
-    from max_installation import MaxInstallation
-    max_installation=MaxInstallation(advanced.home,remote,advanced,conversation.cache)
+    from max_installation import MaxInstallation, max_home
+    default_max_home=Path(os.environ.get('LOCALAPPDATA',str(Path.home())))/'QwenClient/voice-max'
+    if sys.platform.startswith('linux'):
+        from linux_support import services
+        advanced,voice,conversation,wakeword,max_installation=services()
+    else:
+        advanced=AdvancedVoice(max_home(default_max_home))
+        voice=DictationService(Path(getattr(sys, "_MEIPASS", Path(__file__).parent))/"voice")
+        conversation=ConversationService(Path(getattr(sys, "_MEIPASS", Path(__file__).parent))/"voice")
+        wakeword=ConversationService(Path(getattr(sys, "_MEIPASS", Path(__file__).parent))/"voice",mode='wakeword')
+        max_installation=MaxInstallation(advanced.home,remote,advanced,conversation.cache,default_max_home.with_name('voice-max-location.json'))
     voice_control=threading.RLock()
     def max_server_status():
         try:
@@ -397,9 +409,10 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
             if not self.local_request():
                 return self.reply(403, {'error': {'message': 'Le chat est accessible sur localhost uniquement.'}})
             nonce = secrets.token_urlsafe(24)
-            config = json.dumps({'key':key, 'model':remote.model, 'version':VERSION, 'storage':hashlib.sha256(key.encode()).hexdigest()[:20]}, ensure_ascii=False).replace('<', '\\u003c')
+            config = json.dumps({'key':key, 'model':remote.model, 'version':VERSION, 'storage':hashlib.sha256(key.encode()).hexdigest()[:20], 'platform':'linux' if sys.platform.startswith('linux') else 'windows'}, ensure_ascii=False).replace('<', '\\u003c')
             template = Path(getattr(sys, '_MEIPASS', Path(__file__).parent)) / 'chat.html'
-            presentation = ''.join('<script nonce="__NONCE__">'+(template.parent/name).read_text(encoding='utf-8')+'</script>' for name in ('ui.js','attachments.js','corrector.js','selection.js','thinking.js','voice.js','conversation.js'))
+            scripts=('ui.js','attachments.js','corrector.js','selection.js','thinking.js','voice.js','conversation.js')+ (('linux_features.js',) if sys.platform.startswith('linux') else ())
+            presentation = ''.join('<script nonce="__NONCE__">'+(template.parent/name).read_text(encoding='utf-8')+'</script>' for name in scripts)
             markdown=''.join('<script nonce="__NONCE__">'+path.read_text(encoding='utf-8').replace('</script','<\\/script')+'</script>' for path in (template.parent/'vendor/markdown-it.min.js',template.parent/'markdown.js'))
             content = template.read_text(encoding='utf-8').replace('</head>',markdown+'</head>').replace('</body>',(template.parent/'workspace.html').read_text(encoding='utf-8')+presentation+'</body>').replace('__UI_CSS__',(template.parent/'ui.css').read_text(encoding='utf-8')).replace('__CONFIG__', config).replace('__NONCE__', nonce).encode()
             self.send_response(200)
@@ -427,7 +440,10 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
                 if not self.authorized():return
                 return self.reply(200,conversation.status())
             if self.path in ('/', '/chat'):
-                return self.chat()
+                try:
+                    return self.chat()
+                except (FileNotFoundError, UnicodeError):
+                    return self.reply(503, {'error': {'message': 'Impossible de charger l’interface. Réinstallez le paquet complet de Kiara.'}})
             if self.path == '/client/voice':
                 if not self.authorized():return
                 return self.reply(200,voice.status())
@@ -464,12 +480,12 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
         def do_POST(self):
             hermes_request=self.path=='/hermes/v1/chat/completions'
             if hermes_request:self.path='/v1/chat/completions'
-            if self.path not in ('/client/wakeword','/client/capture') and self.path not in ('/v1/embeddings','/v1/chat/completions','/v1/context', '/v1/cancel','/v1/workspace/action','/v1/notifications/action','/v1/agent/action','/v1/voice/speech','/v1/voice/cancel','/client/conversation','/client/draft','/client/endpoint','/client/preferences','/client/update/check','/client/update/apply','/client/history','/client/history/sync','/client/history/restore-ack','/client/history/flush','/client/history/recover','/client/integrations/apply','/client/voice','/client/voice/max/test','/client/voice/max/transcribe','/client/voice/max/speech','/client/voice/max/cancel','/client/voice/max/plan','/client/voice/max/install','/client/voice/max/install-cancel','/client/voice/max/detect','/client/voice/max/remove','/client/voice/max/open-folder','/client/voice/max/devices','/client/voice/max/gpu'):
+            if self.path not in ('/client/wakeword','/client/capture') and self.path not in ('/v1/embeddings','/v1/chat/completions','/v1/responses','/v1/context', '/v1/cancel','/v1/workspace/action','/v1/notifications/action','/v1/agent/action','/v1/voice/speech','/v1/voice/cancel','/client/conversation','/client/draft','/client/endpoint','/client/preferences','/client/update/check','/client/update/apply','/client/history','/client/history/sync','/client/history/restore-ack','/client/history/flush','/client/history/recover','/client/integrations/apply','/client/voice','/client/voice/max/test','/client/voice/max/transcribe','/client/voice/max/speech','/client/voice/max/cancel','/client/voice/max/plan','/client/voice/max/install','/client/voice/max/install-cancel','/client/voice/max/detect','/client/voice/max/remove','/client/voice/max/open-folder','/client/voice/max/choose-folder','/client/voice/max/devices','/client/voice/max/gpu'):
                 return self.reply(404, {'error': {'message': 'Route non disponible.'}})
             if not self.authorized():
                 return
             try:
-                maximum = 65536 if self.path=='/v1/embeddings' else 10*1024*1024 if self.path.startswith('/client/history') or self.path in ('/v1/chat/completions','/v1/context') else 8*1024*1024 if self.path=='/v1/workspace/action' else 2*1024*1024
+                maximum = 10*1024*1024 if self.path.startswith('/client/history') or self.path in ('/v1/chat/completions','/v1/responses','/v1/context') else 8*1024*1024 if self.path=='/v1/workspace/action' else 2*1024*1024
                 values = json_body(self, maximum)
                 if hermes_request:
                     state=remote.check()
@@ -486,7 +502,7 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
                 frames=None;sent=False
                 try:
                     suffix=self.path.rsplit('/',1)[1]
-                    if suffix in ('plan','install','install-cancel','detect','remove','open-folder','devices','gpu'):
+                    if suffix in ('plan','install','install-cancel','detect','remove','open-folder','choose-folder','devices','gpu'):
                         if not isinstance(values,dict):raise ValueError('Paramètres d’installation Max invalides.')
                         with voice_control:
                             if suffix!='open-folder' and (conversation.status()['phase'] in ('loading','listening','stopping') or voice.status()['phase'] in ('loading','listening','finishing')):
@@ -496,6 +512,7 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
                             if suffix=='install-cancel' and not values:return self.reply(200,max_installation.cancel())
                             if suffix=='remove' and set(values)=={'confirm'} and values['confirm'] is True:return self.reply(200,max_installation.remove())
                             if suffix=='open-folder' and not values:return self.reply(200,max_installation.open_folder())
+                            if suffix=='choose-folder' and not values:return self.reply(200,max_installation.choose_folder())
                             if suffix in ('devices','gpu'):
                                 if max_installation.status()['phase'] in ('downloading','verifying','testing'):raise ValueError('Attendez la fin de l’installation Max.')
                                 if suffix=='devices' and not values:return self.reply(200,advanced.detect_devices())
@@ -585,7 +602,7 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
                         if not state['connected']:raise ValueError('Connectez le client au serveur et chargez un modèle avant de l’ajouter.')
                         model=values.get('model') or state['model']
                         if model not in state['models']:raise ValueError('Ce modèle n’est plus disponible sur le serveur. Actualisez la liste.')
-                        result=app_integrations.install(values.get('app'),f'http://127.0.0.1:{self.server.server_port}/v1',key,model,catalogue=copy.deepcopy(remote.models_catalogue))
+                        result=app_integrations.install(values.get('app'),f'http://127.0.0.1:{self.server.server_port}/v1',key,model,catalogue=copy.deepcopy(remote.models_catalogue),remote=remote)
                     elif self.path=='/client/endpoint':
                         endpoint=values.get('endpoint') or None
                         if endpoint:endpoint=parse_connection_settings(endpoint)
@@ -614,7 +631,7 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
 
         def forward(self, body=None, streaming=False):
             sent = False
-            inference=self.path in ('/v1/embeddings','/v1/chat/completions','/v1/workspace/action')
+            inference=self.path in ('/v1/embeddings','/v1/chat/completions','/v1/responses','/v1/workspace/action')
             tracked=self.path!='/v1/cancel'
             chat_stream=streaming and self.path=='/v1/chat/completions'
             if chat_stream:remote.stream={'phase':'requesting','started':time.time(),'last_event':time.time(),'reasoning_chars':0,'answer_chars':0}
@@ -640,7 +657,12 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
                         for line in response:
                             if line.strip()==b'data: [DONE]':done=True
                             if line.startswith(b'data: ') and line.strip()!=b'data: [DONE]':
-                                try:stream_error=stream_error or bool(json.loads(line[6:]).get('error'))
+                                try:
+                                    event=json.loads(line[6:])
+                                    stream_error=stream_error or bool(event.get('error'))
+                                    if self.path=='/v1/responses':
+                                        done=done or event.get('type') in ('response.completed','response.incomplete','response.failed')
+                                        stream_error=stream_error or event.get('type') in ('response.failed','error')
                                 except (ValueError,AttributeError):pass
                             if self.path in ('/v1/voice/speech','/v1/voice/max/speech') and line.startswith(b'data: '):
                                 try:done=done or bool(json.loads(line[6:]).get('done'))
@@ -736,6 +758,9 @@ class LocalHTTPServer(BoundedHTTPServer):
         super().server_close()
 
 def read_profile():
+    if sys.platform.startswith('linux'):
+        from linux_support import read_profile as linux_profile
+        return linux_profile()
     if getattr(sys, 'frozen', False):
         with open(sys.executable, 'rb') as stream:
             stream.seek(-16, 2)
@@ -757,6 +782,9 @@ def read_profile():
     return profile
 
 def settings_path(profile):
+    if sys.platform.startswith('linux'):
+        from linux_support import settings_path as linux_settings_path
+        return linux_settings_path(profile)
     identity = hashlib.sha256((profile['url'] + profile['token']).encode()).hexdigest()[:20]
     return Path(os.environ.get('LOCALAPPDATA', str(Path.home()))) / 'QwenClient' / (identity + '.dpapi')
 
@@ -873,8 +901,8 @@ def main():
         assert (Path(getattr(sys, '_MEIPASS', Path(__file__).parent)) / 'chat.html').is_file()
         assert (Path(getattr(sys, '_MEIPASS', Path(__file__).parent)) / 'workspace.html').is_file()
         assert all((Path(getattr(sys, '_MEIPASS', Path(__file__).parent)) / name).is_file() for name in ('ui.css','ui.js'))
-        engine=Path(getattr(sys,'_MEIPASS',Path(__file__).parent))/'wireguard-bridge.exe'
-        assert subprocess.run([str(engine),'--self-test'],capture_output=True,timeout=10,creationflags=0x08000000).returncode==0
+        engine=Path(getattr(sys,'_MEIPASS',Path(__file__).parent))/('wireguard-bridge' if sys.platform.startswith('linux') else 'wireguard-bridge.exe')
+        assert subprocess.run([str(engine),'--self-test'],capture_output=True,timeout=10,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0)).returncode==0
         if '--voice-self-test' in sys.argv:
             from conversation_service import DictationService
             resources=Path(getattr(sys,'_MEIPASS',Path(__file__).parent))/'voice'
@@ -895,7 +923,7 @@ def main():
             try:
                 status=conversation.action({'action':'start'});deadline=time.monotonic()+30
                 while conversation.status()['phase']=='loading' and time.monotonic()<deadline:time.sleep(.1)
-                assert conversation.status()['phase']=='listening' and conversation.status().get('aec'),conversation.status()
+                assert conversation.status()['phase']=='listening' and (sys.platform.startswith('linux') or conversation.status().get('aec')),conversation.status()
                 conversation.action({'action':'mute','session':status['session'],'muted':True})
                 while not conversation.status().get('muted') and time.monotonic()<deadline:time.sleep(.05)
                 paused=conversation.status();assert paused.get('muted') and paused.get('microphone_closed'),paused
@@ -950,18 +978,19 @@ def main():
             def verify_window():
                 time.sleep(1)
                 try:
-                    result=window.evaluate_js("JSON.stringify({title:document.title,login:!!document.getElementById('client-navigation'),update:!!document.getElementById('update-apply'),chat:!!document.getElementById('composer'),state:document.getElementById('account-status').textContent,history:typeof bootstrap==='function',projects:!!document.getElementById('ws-project-list'),tasks:!!document.getElementById('ws-jobs'),assistants:!!document.getElementById('ws-assistants'),textSelection:getComputedStyle(document.body).userSelect,copySelection:!!document.getElementById('copy-selection'),thinkingModes:document.querySelectorAll('#thinking-bar input[type=radio]').length,thinkingInline:document.querySelector('.send-row').contains(document.getElementById('thinking')),documentMenu:!!document.getElementById('ui-context-panel'),attachmentPlus:document.getElementById('attach-file').textContent==='+'})")
+                    result=window.evaluate_js("JSON.stringify({title:document.title,login:!!document.getElementById('client-navigation'),update:!!document.getElementById('update-apply'),chat:!!document.getElementById('composer'),state:document.getElementById('account-status').textContent,history:typeof bootstrap==='function',projects:!!document.getElementById('ws-project-list'),assistants:!!document.getElementById('ws-assistants'),textSelection:getComputedStyle(document.body).userSelect,copySelection:!!document.getElementById('copy-selection'),thinkingModes:document.querySelectorAll('#thinking-bar input[type=radio]').length,thinkingInline:document.querySelector('.send-row').contains(document.getElementById('thinking')),documentMenu:!!document.getElementById('ui-context-panel'),attachmentPlus:document.getElementById('attach-file').textContent==='+'})")
                     if isinstance(result,str):result=json.loads(result)
                     assert result['login'] and result['update'] and result['chat'] and result['history'],result
-                    assert result['projects'] and result['tasks'] and not result['assistants'],result
+                    assert result['projects'] and not result['assistants'],result
                     assert window.text_select and result['textSelection']!='none' and result['copySelection'],result
                     assert result['thinkingModes']>=1 and result['thinkingInline'] and not result['documentMenu'] and result['attachmentPlus'],result
                     Path(sys.argv[sys.argv.index('--result')+1]).write_text(json.dumps({'ok':True,**result}),encoding='utf-8')
                 finally:window.destroy()
             window.events.loaded+=verify_window
-        webview.start(gui='edgechromium',private_mode=False,storage_path=str(storage))
+        webview.start(gui='qt' if sys.platform.startswith('linux') else 'edgechromium',private_mode=False,storage_path=str(storage))
     except Exception as error:
-        root=tk.Tk();root.withdraw();messagebox.showerror(APP_NAME,str(error)+'\nSi WebView2 manque, installer Microsoft Edge WebView2 Runtime.',parent=root);root.destroy()
+        hint='\nVérifiez les dépendances Linux et le trousseau de votre session.' if sys.platform.startswith('linux') else '\nSi WebView2 manque, installer Microsoft Edge WebView2 Runtime.'
+        root=tk.Tk();root.withdraw();messagebox.showerror(APP_NAME,str(error)+hint,parent=root);root.destroy()
     finally:
         if remote:remote.close()
         if server:server.shutdown();server.server_close()

@@ -1,0 +1,195 @@
+[
+  {
+    "folder": "rtx3080-ctx262144-opt2-fp16-p1024-cache1",
+    "throughput": {
+      "decode": 55.5,
+      "prefill-64": 283.4,
+      "prefill-256": 332.8
+    },
+    "quality_passed": true,
+    "error": null,
+    "profiles_unchanged": true,
+    "peak_rtx_total_used_mib": 8465.0,
+    "min_rtx_free_mib": 1588.0,
+    "max_temp_c": 59.0,
+    "thermal_throttle_samples": 0,
+    "cache_tokens": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "change_percent": {
+      "decode": 2.777777777777768,
+      "prefill-64": -43.87007328183798,
+      "prefill-256": -44.51021258857857
+    },
+    "extra_headroom_mib": 645.0
+  },
+  {
+    "folder": "rtx3080-ctx262144-opt2-int8-p1024-cache1",
+    "throughput": {
+      "decode": 52.2,
+      "prefill-64": 288.8,
+      "prefill-256": 337.4
+    },
+    "quality_passed": true,
+    "error": null,
+    "profiles_unchanged": true,
+    "peak_rtx_total_used_mib": 7956.0,
+    "min_rtx_free_mib": 2097.0,
+    "max_temp_c": 59.0,
+    "thermal_throttle_samples": 0,
+    "cache_tokens": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "change_percent": {
+      "decode": -3.3333333333333326,
+      "prefill-64": -42.80055456526044,
+      "prefill-256": -43.74322634431014
+    },
+    "extra_headroom_mib": 1154.0
+  },
+  {
+    "folder": "rtx3080-ctx262144-opt2-int8-p1024-cache1-mtp4",
+    "throughput": {
+      "decode": 52.6,
+      "prefill-64": 286.7,
+      "prefill-256": 339.2
+    },
+    "quality_passed": true,
+    "error": null,
+    "profiles_unchanged": true,
+    "peak_rtx_total_used_mib": 7951.0,
+    "min_rtx_free_mib": 2102.0,
+    "max_temp_c": 58.0,
+    "thermal_throttle_samples": 1,
+    "cache_tokens": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "change_percent": {
+      "decode": -2.592592592592591,
+      "prefill-64": -43.216478510596154,
+      "prefill-256": -43.443101292205085
+    },
+    "extra_headroom_mib": 1159.0
+  },
+  {
+    "folder": "rtx3080-ctx262144-opt2-ref-fp16",
+    "throughput": {
+      "decode": 54.0,
+      "prefill-64": 504.9,
+      "prefill-256": 599.75
+    },
+    "quality_passed": true,
+    "error": null,
+    "profiles_unchanged": true,
+    "peak_rtx_total_used_mib": 9110.0,
+    "min_rtx_free_mib": 943.0,
+    "max_temp_c": 59.0,
+    "thermal_throttle_samples": 0,
+    "cache_tokens": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "change_percent": {
+      "decode": 0.0,
+      "prefill-64": 0.0,
+      "prefill-256": 0.0
+    },
+    "extra_headroom_mib": 0.0
+  },
+  {
+    "folder": "rtx3080-ctx262144-opt3-fp16-headalias-mtpq4-cache1",
+    "throughput": {},
+    "quality_passed": false,
+    "error": "RuntimeError('Server exited: 1')",
+    "profiles_unchanged": true,
+    "peak_rtx_total_used_mib": null,
+    "min_rtx_free_mib": null,
+    "max_temp_c": null,
+    "thermal_throttle_samples": 0,
+    "cache_tokens": [],
+    "change_percent": {}
+  },
+  {
+    "folder": "rtx3080-ctx262144-opt3-int8-p2048-cache1",
+    "throughput": {
+      "decode": 52.4,
+      "prefill-64": 502.25,
+      "prefill-256": 622.25
+    },
+    "quality_passed": true,
+    "error": null,
+    "profiles_unchanged": true,
+    "peak_rtx_total_used_mib": 8320.0,
+    "min_rtx_free_mib": 1733.0,
+    "max_temp_c": 60.0,
+    "thermal_throttle_samples": 0,
+    "cache_tokens": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "change_percent": {
+      "decode": -2.9629629629629672,
+      "prefill-64": -0.5248564072093398,
+      "prefill-256": 3.751563151313042
+    },
+    "extra_headroom_mib": 790.0
+  }
+]

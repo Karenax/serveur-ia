@@ -87,10 +87,10 @@ def verify_locked_ram(log_path, offset, args):
     ple_mode = args[args.index('--ple-io') + 1]
     if ple_mode == 'direct':
         if '--ple-gguf' not in args:
-            raise ValueError('Le fichier PLE sur le SSD C: doit être explicite.')
+            raise ValueError('Le fichier PLE sur le SSD C: ou F: doit être explicite.')
         ple_path = Path(args[args.index('--ple-gguf') + 1]).resolve(strict=True)
-        if ple_path.drive.upper() != 'C:':
-            raise ValueError('La table PLE doit rester sur le SSD C:, hors du disque D:.')
+        if ple_path.drive.upper() not in ('C:', 'F:'):
+            raise ValueError('La table PLE doit rester sur le SSD C: ou F:, hors du disque D:.')
     elif ple_mode != 'ram':
         raise ValueError('Mode PLE non pris en charge par la protection du disque D:.')
     # Inspect only this startup, never evidence from an earlier engine process.

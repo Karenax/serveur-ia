@@ -1,0 +1,87 @@
+{
+  "name": "geforce",
+  "url": "https://us.download.nvidia.com/Windows/581.80/581.80-desktop-win10-win11-64bit-international-dch-whql.exe",
+  "installer": "F:\\Kiara-tests\\pilotes-581.80\\geforce\\581.80-desktop-win10-win11-64bit-international-dch-whql.exe",
+  "sha256": "0a08462764f4d36eeecb8da6abfc01a6e32c94359b9e1e3287399f057c1d2839",
+  "matching_infs": [
+    {
+      "inf": "F:\\Kiara-tests\\pilotes-581.80\\geforce\\extracted\\Display.Driver\\nvaei.inf",
+      "hardware_matches": {
+        "2216": [
+          "%NVIDIA_DEV.2216.A612.174B% = Section024, PCI\\VEN_10DE&DEV_2216&SUBSYS_A612174B"
+        ],
+        "15F8": [],
+        "1C31": []
+      }
+    },
+    {
+      "inf": "F:\\Kiara-tests\\pilotes-581.80\\geforce\\extracted\\Display.Driver\\nvaki.inf",
+      "hardware_matches": {
+        "2216": [
+          "%NVIDIA_DEV.2216.882B.1043% = Section027, PCI\\VEN_10DE&DEV_2216&SUBSYS_882B1043",
+          "%NVIDIA_DEV.2216.8845.1043% = Section027, PCI\\VEN_10DE&DEV_2216&SUBSYS_88451043"
+        ],
+        "15F8": [],
+        "1C31": []
+      }
+    },
+    {
+      "inf": "F:\\Kiara-tests\\pilotes-581.80\\geforce\\extracted\\Display.Driver\\nvddi.inf",
+      "hardware_matches": {
+        "2216": [
+          "%NVIDIA_DEV.2216.C890.1028% = Section048, PCI\\VEN_10DE&DEV_2216&SUBSYS_C8901028"
+        ],
+        "15F8": [],
+        "1C31": []
+      }
+    },
+    {
+      "inf": "F:\\Kiara-tests\\pilotes-581.80\\geforce\\extracted\\Display.Driver\\nvhdci.inf",
+      "hardware_matches": {
+        "2216": [
+          "%NVIDIA_DEV.2216.8771.103C% = Section058, PCI\\VEN_10DE&DEV_2216&SUBSYS_8771103C",
+          "%NVIDIA_DEV.2216.88D7.103C% = Section057, PCI\\VEN_10DE&DEV_2216&SUBSYS_88D7103C"
+        ],
+        "15F8": [],
+        "1C31": []
+      }
+    },
+    {
+      "inf": "F:\\Kiara-tests\\pilotes-581.80\\geforce\\extracted\\Display.Driver\\nvlei.inf",
+      "hardware_matches": {
+        "2216": [
+          "%NVIDIA_DEV.2216.C891.17AA% = Section015, PCI\\VEN_10DE&DEV_2216&SUBSYS_C89117AA"
+        ],
+        "15F8": [],
+        "1C31": []
+      }
+    },
+    {
+      "inf": "F:\\Kiara-tests\\pilotes-581.80\\geforce\\extracted\\Display.Driver\\nvmdi.inf",
+      "hardware_matches": {
+        "2216": [
+          "%NVIDIA_DEV.2216.3896.1462% = Section029, PCI\\VEN_10DE&DEV_2216&SUBSYS_38961462"
+        ],
+        "15F8": [],
+        "1C31": []
+      }
+    },
+    {
+      "inf": "F:\\Kiara-tests\\pilotes-581.80\\geforce\\extracted\\Display.Driver\\nv_dispi.inf",
+      "hardware_matches": {
+        "2216": [
+          "%NVIDIA_DEV.2216%           = Section062, PCI\\VEN_10DE&DEV_2216"
+        ],
+        "15F8": [],
+        "1C31": [
+          "%NVIDIA_DEV.1C31%           = Section023, PCI\\VEN_10DE&DEV_1C31"
+        ]
+      }
+    }
+  ],
+  "payloads": {
+    "nvcuda64.dll": "a3799e40e99acbe3d4b26fb9ca2e42955bcbf0dfa03e042d26f7ed0a485a1d47",
+    "nvlddmkm.sys": "f2c2a13c47f4cae5dc91aa245b99a2a7794b5c77be1d12276adc3ae2e55cf9c3"
+  },
+  "elapsed_s": 26.812999999999988
+}

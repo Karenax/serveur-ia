@@ -1,0 +1,35 @@
+{
+  "name": "quadro",
+  "url": "https://us.download.nvidia.com/Windows/Quadro_Certified/581.80/581.80-quadro-rtx-desktop-notebook-win10-win11-64bit-international-dch-whql.exe",
+  "installer": "F:\\Kiara-tests\\pilotes-581.80\\quadro\\581.80-quadro-rtx-desktop-notebook-win10-win11-64bit-international-dch-whql.exe",
+  "sha256": "cfe62fb91fe2c258dd0fbe38b3b8941b1c039e4422bf2e08f9ea0e8a577bfa44",
+  "matching_infs": [
+    {
+      "inf": "F:\\Kiara-tests\\pilotes-581.80\\quadro\\extracted\\Display.Driver\\nvlwwi.inf",
+      "hardware_matches": {
+        "2216": [],
+        "15F8": [],
+        "1C31": [
+          "%NVIDIA_DEV.1C31.131B.10DE% = Section005, PCI\\VEN_10DE&DEV_1C31&SUBSYS_131B10DE"
+        ]
+      }
+    },
+    {
+      "inf": "F:\\Kiara-tests\\pilotes-581.80\\quadro\\extracted\\Display.Driver\\nv_dispwi.inf",
+      "hardware_matches": {
+        "2216": [],
+        "15F8": [
+          "%NVIDIA_DEV.15F8.118F.10DE% = Section026, PCI\\VEN_10DE&DEV_15F8&SUBSYS_118F10DE"
+        ],
+        "1C31": [
+          "%NVIDIA_DEV.1C31%           = Section023, PCI\\VEN_10DE&DEV_1C31"
+        ]
+      }
+    }
+  ],
+  "payloads": {
+    "nvcuda64.dll": "a3799e40e99acbe3d4b26fb9ca2e42955bcbf0dfa03e042d26f7ed0a485a1d47",
+    "nvlddmkm.sys": "f2c2a13c47f4cae5dc91aa245b99a2a7794b5c77be1d12276adc3ae2e55cf9c3"
+  },
+  "elapsed_s": 44.07800000000009
+}

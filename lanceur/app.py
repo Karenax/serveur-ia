@@ -194,7 +194,8 @@ class Controller:
             for line in output.stdout.splitlines():
                 name, uuid, used, total, utilization, temperature = [part.strip() for part in line.split(',')]
                 values.append({'name': name, 'uuid': uuid, 'used_mib': int(used), 'total_mib': int(total),
-                               'utilization': int(utilization), 'temperature': int(temperature), 'selected_by_default': 'P100' in name})
+                               'utilization': int(utilization), 'temperature': int(temperature),
+                               'selected_by_default': uuid in self.defaults().get('gpus', '').split(',')})
         except (OSError, ValueError, subprocess.TimeoutExpired):
             pass
         self.gpu_cache = (time.monotonic(), values)
@@ -313,6 +314,15 @@ def serve(port=8765, controller=None):
                 return self.respond(200, inventory(controller))
             if path == '/api/devices':
                 return self.respond(200, controller.remote.metadata())
+            if path == '/api/clients/activity':
+                if not hmac.compare_digest(self.headers.get('X-Launcher-Token', ''), token):
+                    return self.respond(403, {'error':'Rechargez la page du lanceur.'})
+                from urllib.parse import parse_qs
+                period = parse_qs(urlsplit(self.path).query).get('period',['day'])[0]
+                try:
+                    return self.respond(200, controller.remote.usage_summary(period))
+                except ValueError as error:
+                    return self.respond(400, {'error':str(error)})
             if path == '/api/local-network':
                 return self.respond(200, controller.local_network.status())
             if path == '/api/hermes/models':
@@ -393,7 +403,7 @@ def serve(port=8765, controller=None):
                     return self.respond(200, controller.state())
                 except Exception as error:
                     return self.respond(500, {'error': str(error)})
-            if path in ('/', '/app.css', '/app.js','/workspace.js','/interface.css','/interface.js','/maintenance.js','/maintenance.css','/notifications.js','/notifications.css','/voice.js','/local-network.js'):
+            if path in ('/', '/app.css', '/app.js','/workspace.js','/interface.css','/interface.js','/maintenance.js','/maintenance.css','/notifications.js','/notifications.css','/voice.js','/local-network.js','/client-usage.js','/client-usage.css'):
                 filename = 'index.html' if path == '/' else path[1:]
                 data = (HOME / 'web' / filename).read_bytes()
                 if filename == 'index.html':

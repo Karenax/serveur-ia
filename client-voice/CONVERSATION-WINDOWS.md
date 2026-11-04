@@ -1,6 +1,6 @@
-# Conversation vocale Windows — version 3.5.52
+# Conversation vocale Windows — version 3.5.60
 
-La version actuelle ajoute les commandes de mémoire, notes, tâches et rappels,
+La version actuelle permet les commandes de mémoire, notes et rappels,
 les bilans de projet, une image choisie pour le tour oral et la sélection d’une
 région du bureau. Le [guide commun de l’assistant](../GUIDE-ASSISTANT-KIARA.md)
 décrit ces parcours. L’attente de **« Bonjour Kiara »** reste un essai local
@@ -18,7 +18,7 @@ Les descriptions des anciens moteurs ci-dessous restent historiques.
 
 ## Utilisation
 
-### Page Vocal (sources du 24 octobre 2026)
+### Page Vocal actuelle
 
 La conversation orale possède désormais son entrée **Vocal** dans la navigation Windows.
 Dans le chat, choisir Qwen local et le projet, puis ouvrir **Vocal** et sélectionner
@@ -33,8 +33,8 @@ l’écoute, la parole détectée, la préparation, la lecture et le microphone 
 Pendant la lecture, ses déformations suivent le niveau de sortie audio. Les
 mouvements réduits de l’appareil et l’option **Animer l’orbe** sont respectés.
 
-**Échanges écrits** permet de consulter les textes et leurs sources. **Ouvrir le
-chat** conserve l’appel ; **Vocal en cours** permet d’y revenir. **Raccrocher**
+**Échanges écrits** ouvre les textes et leurs sources à droite de l’animation,
+ou sous celle-ci sur petit écran. **Raccrocher**
 ferme le microphone. Android propose aussi la conversation Low et conserve la
 dictée manuelle ; voir le [guide Android](../client-android/README.md).
 Installer la mise à jour du client pour retrouver les fonctions publiées.
@@ -81,7 +81,7 @@ Whisper Small pour la dictée et la conversation Low.
 | --- | --- |
 | Microphone ; DSP Windows d’annulation d’écho, réduction du bruit et contrôle du niveau ; flux de sortie silencieux maintenu pendant l’écoute | Accès personnel, session, droits et gestion des appareils |
 | Sherpa-ONNX Parakeet v3 int8, aperçus par fenêtres et transcription finale sur CPU | Qwen/Strata direct, projets, documents et mémoire EG2 locale |
-| Silero VAD et Smart Turn v3.2, décision de fin de tour | Phonon 0.4.1, modèle français 40m q8, voix fournie default, CPU uniquement |
+| Silero VAD et Smart Turn v3.2, décision de fin de tour | Phonon 0.4.1, modèle français 40m q8, voix Tiphaine, CPU uniquement |
 | Envoi du texte et des paramètres habituels du chat | Audio de réponse PCM mono 24 kHz, transmis progressivement |
 | Lecture Web Audio, détection d’une reprise de parole, arrêt local immédiat | Annulation limitée à la demande et à l’accès concernés |
 

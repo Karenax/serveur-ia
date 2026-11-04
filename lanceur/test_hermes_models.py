@@ -74,7 +74,7 @@ class ModelsTests(unittest.TestCase):
         return self.models.catalog(self.a)['data'][1:]
     def prepare(self, model, request=None, conversation='discussion'):
         return self.manager._prepare(self.a,{'model':model,'messages':[{'role':'user','content':'Question'}]},
-            request or secrets.token_hex(16),conversation,None,None,False)[1]
+            request or secrets.token_hex(16),conversation,None,None)[1]
     def clear(self):self.manager.active.clear();self.store.active=0
     def post(self, value, owner=None, token=None, path='/v1/provider/credential'):
         context=self.manager.context(owner or self.a)
@@ -160,22 +160,22 @@ class ModelsTests(unittest.TestCase):
     def test_reasoning_is_exact_and_invalid_level_is_refused_before_profile_or_run(self):
         selected=self.shared()[0]['id']
         data={'model':selected,'messages':[{'role':'user','content':'Q'}],'reasoning_effort':'max'}
-        context=self.manager._prepare(self.a,data,secrets.token_hex(16),'effort',None,None,False)[1]
+        context=self.manager._prepare(self.a,data,secrets.token_hex(16),'effort',None,None)[1]
         self.assertEqual(context['body']['model_options'],{'reasoning_effort':'max'})
         self.clear()
         with self.accounts._db() as db:before=db.execute('SELECT COUNT(*) FROM hermes_bindings').fetchone()[0]
         with self.assertRaises(ValueError):self.manager._prepare(self.a,{**data,'reasoning_effort':'xhigh'},
-            secrets.token_hex(16),'invalid-effort',None,None,False)
+            secrets.token_hex(16),'invalid-effort',None,None)
         self.assertEqual(self.manager.active,{})
         with self.accounts._db() as db:self.assertEqual(db.execute('SELECT COUNT(*) FROM hermes_bindings').fetchone()[0],before)
         self.assertEqual(self.service.calls,[])
     def test_toggle_is_structured_and_omission_keeps_native_default(self):
         self.source.rows[0]['models'][0]['capabilities'].update(reasoning_mode='toggle',reasoning_efforts=['none','on'])
         selected=self.shared()[0]['id'];data={'model':selected,'messages':[{'role':'user','content':'Q'}]}
-        context=self.manager._prepare(self.a,{**data,'reasoning_effort':'on'},secrets.token_hex(16),'toggle',None,None,False)[1]
+        context=self.manager._prepare(self.a,{**data,'reasoning_effort':'on'},secrets.token_hex(16),'toggle',None,None)[1]
         self.assertEqual(context['body']['model_options'],{'reasoning':{'enabled':True}})
         self.clear()
-        context=self.manager._prepare(self.a,data,secrets.token_hex(16),'default',None,None,False)[1]
+        context=self.manager._prepare(self.a,data,secrets.token_hex(16),'default',None,None)[1]
         self.assertEqual(context['body']['model_options'],{})
         self.assertIsNone(context['reasoning_request']['enabled'])
     def test_history_projection_keeps_selected_model_and_does_not_merge_other_model(self):
@@ -513,7 +513,7 @@ print(json.dumps(result))
         for item in self.facade.model_catalog(self.owner)['data'][1:]:
             with self.subTest(model=item['name']):
                 context=self.facade.conversations._prepare(self.owner,{'model':item['id'],'messages':[{'role':'user','content':'Q'}]},
-                    secrets.token_hex(16),'aux-'+item['name'],None,None,False)[1]
+                    secrets.token_hex(16),'aux-'+item['name'],None,None)[1]
                 try:
                     selection=context['model_selection'];profile=self.facade.accounts.root/'profiles'/profile_name(self.owner)
                     result=subprocess.run([str(runtime['python']),'-c',script],input=json.dumps({

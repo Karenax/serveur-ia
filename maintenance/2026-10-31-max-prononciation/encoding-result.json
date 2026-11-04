@@ -1,0 +1,17 @@
+{
+  "text": "Léa posa le plateau sur la table. Les dés colorés attendaient patiemment. Elle lança les dés, espérant un six. Son pion avança d’une case, puis d’une autre.",
+  "parts": [
+    "Léa posa le plateau sur la table.",
+    "Les dés colorés attendaient patiemment.",
+    "Elle lança les dés, espérant un six.",
+    "Son pion avança d’une case, puis d’une autre."
+  ],
+  "pack": "vocal-rt-de5e67a320a06b1f",
+  "installed_worker_unchanged": true,
+  "worker_input_encoding": "cp1252 (forced for regression)",
+  "writer": "AdvancedVoice._write from corrected source",
+  "audio_seconds": 10.08,
+  "recognized": "Léa posa le plateau sur la table. Les dés colorés attendaient patiemment. Elle lança les dés, espérant un six. Son pion avança d'une case, puis d'une autre. Léa posa le plateau sur la table.",
+  "file": "lea-client-corrige.wav",
+  "mojibake_example": "avanÃ§a"
+}

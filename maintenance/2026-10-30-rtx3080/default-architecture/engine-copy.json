@@ -1,0 +1,14 @@
+{
+  "source": "F:\\Kiara-tests\\strata-0.1.54-cuda12\\package",
+  "target": "F:\\Kiara\\moteurs\\strata-0.1.54-cuda12",
+  "all_sha256_identical": {
+    "BUILD.json": true,
+    "cublas64_12.dll": true,
+    "cublasLt64_12.dll": true,
+    "cudart64_12.dll": true,
+    "engine-component.json": true,
+    "strata-vision.exe": true,
+    "strata.exe": true,
+    "strata_kq.dll": true
+  }
+}

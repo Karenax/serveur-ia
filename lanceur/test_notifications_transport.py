@@ -45,7 +45,7 @@ class NotificationTransportTests(unittest.TestCase):
         error.exception.close()
 
     def test_real_get_list_get_by_id_read_and_preferences(self):
-        identity = self.store.notifications.publish(self.first['id'], 'job_completed', 'http:one')['id']
+        identity = self.store.notifications.publish(self.first['id'], 'document_indexed', 'http:one')['id']
         state = self.request(); self.assertEqual(identity, state['items'][0]['id'])
         self.assertEqual(identity, self.action({'action': 'get', 'id': identity})['notification']['id'])
         self.assertEqual(identity, self.action({'action': 'list', 'after': 0})['items'][0]['id'])
@@ -53,13 +53,13 @@ class NotificationTransportTests(unittest.TestCase):
         self.assertEqual(0, read['unread_count']); self.assertIn(identity, read['read_ids'])
         synchronized = self.action({'action': 'list', 'after': state['cursor']})
         self.assertEqual([], synchronized['items']); self.assertIn(identity, synchronized['read_ids'])
-        prefs = self.action({'action': 'preferences', 'revision': 0, 'types': {'job_completed': False}})
+        prefs = self.action({'action': 'preferences', 'revision': 0, 'types': {'document_indexed': False}})
         self.assertFalse(prefs['items'][0]['enabled'])
         self.denied(409, '/v1/notifications/action', {'action': 'preferences', 'revision': 0, 'types': {}})
 
     def test_two_authenticated_owners_and_admin_remain_isolated(self):
-        first = self.store.notifications.publish(self.first['id'], 'job_completed', 'first')['id']
-        second = self.store.notifications.publish(self.second['id'], 'job_failed', 'second')['id']
+        first = self.store.notifications.publish(self.first['id'], 'document_indexed', 'first')['id']
+        second = self.store.notifications.publish(self.second['id'], 'transcription_ready', 'second')['id']
         self.store.notifications.publish('admin', 'backup_failed', 'admin')
         self.assertEqual([second], [row['id'] for row in self.request(identity=self.second)['items']])
         self.denied(403, '/v1/notifications/action', {'action': 'get', 'id': first}, identity=self.second)
@@ -80,7 +80,7 @@ class NotificationTransportTests(unittest.TestCase):
         self.denied(401, headers={'Authorization': 'Bearer qwen_invalid'})
 
     def test_revocation_removes_subscription_and_receipts_then_denies_auth(self):
-        notification = self.store.notifications.publish(self.first['id'], 'job_completed', 'before-revoke')['id']
+        notification = self.store.notifications.publish(self.first['id'], 'document_indexed', 'before-revoke')['id']
         self.action({'action': 'subscribe', 'enabled': True})
         self.action({'action': 'delivered', 'ids': [notification]})
         self.action({'action': 'subscribe', 'enabled': False}, identity=self.second)

@@ -1,4 +1,4 @@
-"""Private, offline EG2 CPU worker. Only Kiara's parent process can call it."""
+"""Private, offline EG2 worker with explicit GPU selection and CPU recovery."""
 import argparse
 import hashlib
 import hmac
@@ -9,14 +9,16 @@ import threading
 import time
 from http.server import BaseHTTPRequestHandler
 from http_boundary import BoundedHTTPServer, json_body
+from eg2_runtime import ModelRuntime
 
 
 class EmbeddingHTTPServer(BoundedHTTPServer):
     request_timeout = 15
 
 
-def serve(model_path, token, port, threads, parent, parent_created):
-    os.environ['CUDA_VISIBLE_DEVICES'] = ''
+def serve(model_path, token, port, threads, parent, parent_created,device='cpu',gpu_uuid='',
+          batch_size=4,memory_limit_mib=2200,minimum_free_mib=1024,cpu_fallback=False,fallback_reason=''):
+    os.environ['CUDA_VISIBLE_DEVICES'] = gpu_uuid if device=='cuda' else ''
     os.environ['HF_HUB_OFFLINE'] = '1'
     os.environ['HF_HUB_DISABLE_TELEMETRY'] = '1'
     os.environ['TOKENIZERS_PARALLELISM'] = 'false'
@@ -36,8 +38,9 @@ def serve(model_path, token, port, threads, parent, parent_created):
     torch.set_num_interop_threads(1)
     model = SentenceTransformer(str(model_path), device='cpu', local_files_only=True,
         trust_remote_code=False, config_kwargs={'vision_config': None, 'audio_config': None},
-        model_kwargs={'torch_dtype': torch.float32, 'attn_implementation': 'eager'})
+        model_kwargs={'torch_dtype': torch.float32, 'attn_implementation': 'sdpa' if device=='cuda' else 'eager'})
     model.max_seq_length = 2048
+    runtime=ModelRuntime(model,torch,device,gpu_uuid,memory_limit_mib,minimum_free_mib,cpu_fallback,fallback_reason)
     config_hash = hashlib.sha256((Path(model_path) / 'config.json').read_bytes()).hexdigest()
     guard = threading.Lock()
 
@@ -60,7 +63,7 @@ def serve(model_path, token, port, threads, parent, parent_created):
             if not self.authorized(): return self.reply(403, {'error': 'Accès privé.'})
             if self.path != '/health': return self.reply(404, {'error': 'Route inconnue.'})
             self.reply(200, {'service': 'fred-eg2', 'model': 'google/embeddinggemma-2',
-                'device': 'cpu', 'precision': 'float32', 'dimensions': 768, 'config_hash': config_hash,
+                **runtime.status(), 'precision': 'float32', 'dimensions': 768, 'config_hash': config_hash,
                 'parameters': sum(p.numel() for p in model.parameters()), 'threads': threads,'pid':os.getpid()})
 
         def do_POST(self):
@@ -68,9 +71,9 @@ def serve(model_path, token, port, threads, parent, parent_created):
             if self.path != '/embeddings': return self.reply(404, {'error': 'Route inconnue.'})
             if not guard.acquire(blocking=False): return self.reply(429, {'error': 'Moteur occupé.'})
             try:
-                data = json_body(self, 65536)
+                data = json_body(self, 2 * 1024 * 1024)
                 texts = data.get('texts'); mode = data.get('mode')
-                if mode not in ('query', 'document') or not isinstance(texts, list) or not 1 <= len(texts) <= 8:
+                if mode not in ('query', 'document') or not isinstance(texts, list) or not 1 <= len(texts) <= 32:
                     raise ValueError('Lot invalide.')
                 if any(not isinstance(s, str) or not s.strip() or len(s) > 4500 for s in texts):
                     raise ValueError('Texte invalide.')
@@ -79,7 +82,7 @@ def serve(model_path, token, port, threads, parent, parent_created):
                 prompt = 'task: search result | query: ' if mode == 'query' else ''
                 with torch.inference_mode():
                     tokens = int(model.tokenize([prompt+text for text in texts])['attention_mask'].sum().item())
-                    vectors = model.encode(texts, prompt=prompt, batch_size=4,
+                    vectors = runtime.encode(texts, prompt=prompt, batch_size=batch_size,
                         normalize_embeddings=True, show_progress_bar=False).tolist()
                 if not all(len(v) == 768 for v in vectors): raise ValueError('Dimensions invalides.')
                 self.reply(200, {'vectors': vectors, 'seconds': time.monotonic() - start,'prompt_tokens':tokens})
@@ -99,6 +102,15 @@ if __name__ == '__main__':
     parser.add_argument('--threads', type=int, default=2)
     parser.add_argument('--parent',type=int,required=True)
     parser.add_argument('--parent-created',type=float,required=True)
+    parser.add_argument('--device',choices=('cpu','cuda'),default='cpu')
+    parser.add_argument('--gpu-uuid',default='')
+    parser.add_argument('--batch-size',type=int,choices=range(1,5),default=4)
+    parser.add_argument('--memory-limit-mib',type=int,default=2200)
+    parser.add_argument('--minimum-free-mib',type=int,default=1024)
+    parser.add_argument('--cpu-fallback',action='store_true')
+    parser.add_argument('--fallback-reason',default='')
     args = parser.parse_args()
     token = os.environ.pop('FRED_EG2_TOKEN')
-    serve(Path(args.model), token, args.port, args.threads,args.parent,args.parent_created)
+    serve(Path(args.model), token, args.port, args.threads,args.parent,args.parent_created,
+          args.device,args.gpu_uuid,args.batch_size,args.memory_limit_mib,args.minimum_free_mib,
+          args.cpu_fallback,args.fallback_reason)

@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "endpoint": "https://ia.karenax.net/v1/client/codex",
+  "pinned_signature_verified": true,
+  "resources_match_sources": true,
+  "provider_catalogue_available": true,
+  "bytes": 8769,
+  "sha256": "7237db099ce4a13f46168f0b1708f8a20f55d3633fc505843299835753074093",
+  "no_user_codex_configuration_changed": true
+}

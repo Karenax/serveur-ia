@@ -7,8 +7,16 @@ Les appareils Android limités aux applications 32 bits ne sont pas pris en char
 ## Installer et ouvrir
 
 Le fichier à installer est `dist/Acces-serveur-Kiara-Android.apk`, version
-**1.0.23** (`versionCode=24`). Installer le nouvel APK par-dessus l’application
+**1.0.25** (`versionCode=26`), publié le 26 octobre 2026. Installer le nouvel APK par-dessus l’application
 existante pour conserver le profil et les conversations.
+
+Les changements d’interface présents dans les sources depuis cette livraison
+ne sont pas encore inclus dans cet APK. Le serveur actuel a retiré les tâches,
+comptes rendus programmés et synthèses automatiques ; les anciennes actions
+éventuellement visibles dans l’APK ne sont plus prises en charge. Les rappels et
+le bilan **Faire le point** restent disponibles. La publication Windows du
+4 novembre ne reconstruit pas Android.
+
 Transférer cet APK sur l’appareil puis l’ouvrir et autoriser son installation
 depuis l’application utilisée pour ouvrir le fichier.
 
@@ -43,7 +51,7 @@ Le mode Max reste destiné aux PC compatibles.
 ## Mémoire, rappels et images
 
 La rubrique **Mémoire et rappels** permet de gérer les souvenirs personnels ou
-de projet, programmer les rappels et comptes rendus, puis consulter le bilan
+de projet, programmer les rappels, puis consulter le bilan
 d’un projet. Ces commandes sont aussi disponibles dans les conversations écrites
 et orales. Le [guide commun](../GUIDE-ASSISTANT-KIARA.md) détaille les parcours.
 
@@ -62,7 +70,7 @@ Dans un projet, ouvrir **Rechercher un passage dans les documents** puis
 **Ouvrir le passage cité**. Kiara affiche le texte utilisé, sa révision et
 la page réelle lorsqu’elle existe. Une note n’affiche aucune page inventée.
 Une citation ancienne conserve son extrait et signale un document modifié
-ou supprimé. Les résultats des tâches conservent également leurs sources.
+ou supprimé.
 Le geste Retour ferme d’abord le passage consulté.
 
 La rubrique **Notifications** retrouve les événements conservés sur le serveur,
@@ -149,7 +157,7 @@ source reste à l’emplacement choisi dans les fichiers de l’appareil.
 | Historique | Copie locale chiffrée, synchronisation avec le serveur, import/export |
 | Restauration serveur | Confirmation explicite avant de reprendre la synchronisation ; copie chiffrée de l’ancien historique local conservée |
 | Documents et pièces jointes | Sélecteur de fichiers Android et enregistrement dans un emplacement choisi |
-| Espaces de travail | Projets, documents, correcteur et tâches côté serveur |
+| Espaces de travail | Projets, documents et correcteur |
 | Mémoire et rappels | Souvenirs personnels/de projet, rappels récurrents et bilans ; commandes écrites et orales |
 | Vocal et images | Conversation Low, galerie/photo choisie ; mot d’appel expérimental en application visible |
 | Alertes hors application | Relevé facultatif géré par Android, intervalle minimal de 15 minutes ; horaire non garanti |
@@ -340,8 +348,7 @@ Les trois actions **Corriger**, **Reformuler professionnel** et **Reformuler
 amical** du correcteur utilisent directement le Qwen local sur le serveur.
 Le serveur choisit la consigne d’après l’action ; le texte fourni est traité
 comme un texte à transformer. Le résultat reste dans le correcteur, avec
-les actions de copie et de reprise habituelles. Les conversations et les
-tâches continuent d’utiliser Hermes et ses outils autorisés.
+les actions de copie et de reprise habituelles. Les conversations continuent d’utiliser Hermes et ses outils autorisés.
 
 Le profil importé, l’historique chiffré, la dictée locale Whisper Small et
 les mises à jour automatiques sont conservés. Installer cette version
@@ -362,7 +369,6 @@ d’envoyer ; il ne remplace pas silencieusement le modèle. Un fournisseur dist
 peut répondre lorsque le Qwen local est déchargé.
 
 Les trois boutons du correcteur continuent d’utiliser directement le Qwen local.
-Les tâches utilisent le modèle par défaut du serveur via Hermes.
 La [validation Android 1.0.8](../preuves/model-selector-20261011/ANDROID.md)
 consigne le transport natif, l’historique chiffré, le correcteur et les contrôles
 de mise à jour exécutés sur le Release signé.

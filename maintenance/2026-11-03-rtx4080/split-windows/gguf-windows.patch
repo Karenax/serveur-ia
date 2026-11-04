@@ -1,0 +1,66 @@
+diff --git a/src/split/src/gguf.cpp b/src/split/src/gguf.cpp
+index 917c5ff..f530d2a 100644
+--- a/src/split/src/gguf.cpp
++++ b/src/split/src/gguf.cpp
+@@ -1,9 +1,13 @@
+ #include "gguf.hpp"
+ 
++#ifdef _WIN32
++#include "win32_io.hpp"
++#else
+ #include <fcntl.h>
+ #include <sys/mman.h>
+ #include <sys/stat.h>
+ #include <unistd.h>
++#endif
+ 
+ #include <algorithm>
+ #include <cerrno>
+@@ -16,6 +20,26 @@
+ 
+ #include "tensor_convert.hpp"
+ 
++#ifdef _WIN32
++#define open fnx_open
++#define close _close
++#define stat _stat64
++#define fstat _fstat64
++#define O_DIRECT 0x40000000
++#define PROT_READ 0
++#define MAP_SHARED 0
++#define MAP_FAILED ((void*)-1)
++#define mmap(a,n,p,f,d,o) fnx_map(d,n)
++#define munmap fnx_unmap
++#define mincore fnx_mincore
++#define posix_memalign fnx_aligned
++#define pread fnx_pread
++#define __builtin_mul_overflow fnx_mul_overflow
++#define __builtin_add_overflow fnx_add_overflow
++using ssize_t = int64_t;
++#define off_t int64_t
++#endif
++
+ namespace fnx {
+ 
+ TypeInfo type_info(uint32_t t) {
+@@ -358,8 +382,18 @@ Stager::~Stager() {
+     }
+     cv_.notify_all();
+     reader_.join();
+-    for (G& gr : groups_) std::free(gr.buf);
+-    for (uint8_t* b : free_) std::free(b);
++    for (G& gr : groups_) 
++#ifdef _WIN32
++        _aligned_free(gr.buf);
++#else
++        std::free(gr.buf);
++#endif
++    for (uint8_t* b : free_) 
++#ifdef _WIN32
++        _aligned_free(b);
++#else
++        std::free(b);
++#endif
+     for (int fd : plain_fd_) ::close(fd);
+     for (int fd : direct_fd_)
+         if (fd >= 0) ::close(fd);

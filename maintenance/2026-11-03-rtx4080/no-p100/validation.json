@@ -1,0 +1,16 @@
+{
+  "checks_pass": true,
+  "request_count": 13,
+  "zero_prompt_cache_reuse": true,
+  "expert_ram_gib": 54.7705078125,
+  "both_p100_max_vram_mib": 9,
+  "both_p100_max_utilization": 0,
+  "default_restored": true,
+  "managed_status": "pret",
+  "session": "D:\\Serveur IA\\lanceur\\sessions\\20261103-213311-720148",
+  "source_checks": {
+    "python": 517,
+    "javascript": 94,
+    "powershell_each": 98
+  }
+}

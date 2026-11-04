@@ -33,7 +33,6 @@ try:
     p=w.action(owner,{'action':'project_create','title':'Préparer notre lancement'})['id']
     w.action(owner,{'action':'document_create','project':p,'title':'Note de cadrage','text':'Objectif : préparer une présentation claire de notre service.\nBudget : 2 500 euros.\nLivrables : synthèse, calendrier et liste des questions ouvertes.'})
     w.action(owner,{'action':'memory_create','project':p,'text':'Utiliser le français et expliquer les termes techniques.'})
-    w.action(owner,{'action':'job_create','project':p,'prompt':'Préparer une synthèse de la note de cadrage.','title':'Synthèse du lancement','request_key':secrets.token_hex(16)})
     engine=Engine({'role':'server','wireguard':{'private_key':fixture.wireguard.vault()['private_key']},'listen_port':0,'upstream_port':fixture.gateway.server_port,'peers':fixture.wireguard.peers()})
     fixture.profile['wireguard']['endpoint']=f'127.0.0.1:{engine.port}'
     remote=client.Remote(fixture.profile,connection_required=True)

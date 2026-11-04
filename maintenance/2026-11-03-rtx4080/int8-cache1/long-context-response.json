@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-0b15f78d9b764abd98cfa86f",
+  "object": "chat.completion",
+  "created": 1793733279,
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"debut\": \"AMBRE-2718\",\n  \"milieu\": \"CEDRE-6402\",\n  \"fin\": \"NACRE-9157\"\n}"
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 27683,
+    "completion_tokens": 49,
+    "total_tokens": 27732,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 27683,
+    "prompt_ms": 41472.7,
+    "prompt_per_token_ms": 1.498,
+    "prompt_per_second": 667.5,
+    "predicted_n": 49,
+    "predicted_ms": 613.9,
+    "predicted_per_token_ms": 12.529,
+    "predicted_per_second": 79.8,
+    "draft_n": 35,
+    "draft_n_accepted": 31
+  }
+}

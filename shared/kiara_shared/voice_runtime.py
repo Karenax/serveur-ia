@@ -260,7 +260,9 @@ class AdvancedVoice:
             process = self.processes.get(engine)
             if not process or process.poll() is not None:
                 raise OSError('Le moteur Max s’est arrêté. Testez-le à nouveau.')
-            process.stdin.write(json.dumps(value, ensure_ascii=False)+'\n')
+            # Older frozen Windows workers read stdin with the system code page.
+            # JSON escapes preserve Unicode even with those already-installed packs.
+            process.stdin.write(json.dumps(value, ensure_ascii=True)+'\n')
             process.stdin.flush()
 
     def start(self, engine):

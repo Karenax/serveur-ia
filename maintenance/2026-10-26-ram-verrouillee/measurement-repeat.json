@@ -1,0 +1,550 @@
+{
+  "utc": "2026-10-26T11:48:18.477795+00:00",
+  "pid": 34904,
+  "outcomes": [
+    {
+      "phase": "inference_1",
+      "seconds": 2.109,
+      "usage": {
+        "prompt_tokens": 36,
+        "completion_tokens": 15,
+        "total_tokens": 51,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "answer": "143 + 158 = 301."
+    },
+    {
+      "phase": "inference_2",
+      "seconds": 4.438,
+      "usage": {
+        "prompt_tokens": 469,
+        "completion_tokens": 32,
+        "total_tokens": 501,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "answer": "Les lots 1 et 2 contiennent ensemble 7 pièces, car il suffit d'additionner les 3 pièces du lot 1 aux "
+    }
+  ],
+  "summary": {
+    "baseline": {
+      "samples": 7,
+      "c_read": {
+        "mean": 16572.425,
+        "max": 95972.389
+      },
+      "d_read": {
+        "mean": 2283.564,
+        "max": 7997.699
+      },
+      "d_write": {
+        "mean": 82412.318,
+        "max": 287917.168
+      },
+      "d_idle": {
+        "mean": 99.148,
+        "max": 100.0
+      },
+      "pages_in": {
+        "mean": 48.447,
+        "max": 74.197
+      },
+      "strata_read": {
+        "mean": 0.0,
+        "max": 0.0
+      }
+    },
+    "inference_1": {
+      "samples": 4,
+      "c_read": {
+        "mean": 269331.689,
+        "max": 1005324.502
+      },
+      "d_read": {
+        "mean": 0.0,
+        "max": 0.0
+      },
+      "d_write": {
+        "mean": 1996.179,
+        "max": 7984.715
+      },
+      "d_idle": {
+        "mean": 99.987,
+        "max": 100.0
+      },
+      "pages_in": {
+        "mean": 34.546,
+        "max": 50.684
+      },
+      "strata_read": {
+        "mean": 269415.53,
+        "max": 1005324.502
+      }
+    },
+    "after_1": {
+      "samples": 6,
+      "c_read": {
+        "mean": 717493.398,
+        "max": 4074278.503
+      },
+      "d_read": {
+        "mean": 0.0,
+        "max": 0.0
+      },
+      "d_write": {
+        "mean": 57599.563,
+        "max": 329783.86
+      },
+      "d_idle": {
+        "mean": 99.961,
+        "max": 100.0
+      },
+      "pages_in": {
+        "mean": 220.585,
+        "max": 1064.911
+      },
+      "strata_read": {
+        "mean": 38516.407,
+        "max": 40217.544
+      }
+    },
+    "inference_2": {
+      "samples": 9,
+      "c_read": {
+        "mean": 76690.521,
+        "max": 395180.877
+      },
+      "d_read": {
+        "mean": 0.0,
+        "max": 0.0
+      },
+      "d_write": {
+        "mean": 186293.6,
+        "max": 719148.539
+      },
+      "d_idle": {
+        "mean": 99.845,
+        "max": 100.0
+      },
+      "pages_in": {
+        "mean": 47.95,
+        "max": 87.503
+      },
+      "strata_read": {
+        "mean": 72742.664,
+        "max": 355662.79
+      }
+    },
+    "after_2": {
+      "samples": 6,
+      "c_read": {
+        "mean": 43974.192,
+        "max": 79576.566
+      },
+      "d_read": {
+        "mean": 1350.046,
+        "max": 8100.276
+      },
+      "d_write": {
+        "mean": 27970.514,
+        "max": 151857.515
+      },
+      "d_idle": {
+        "mean": 99.476,
+        "max": 99.99
+      },
+      "pages_in": {
+        "mean": 42.241,
+        "max": 71.883
+      },
+      "strata_read": {
+        "mean": 37342.812,
+        "max": 40501.379
+      }
+    }
+  },
+  "samples": [
+    {
+      "t": 0.781,
+      "phase": "baseline",
+      "c_read": 0.0,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 99.996,
+      "pages_in": 15.668,
+      "strata_read": 0.0
+    },
+    {
+      "t": 1.297,
+      "phase": "baseline",
+      "c_read": 0.0,
+      "d_read": 0.0,
+      "d_write": 16008.473,
+      "d_idle": 99.96,
+      "pages_in": 56.671,
+      "strata_read": 0.0
+    },
+    {
+      "t": 1.797,
+      "phase": "baseline",
+      "c_read": 0.0,
+      "d_read": 0.0,
+      "d_write": 272960.587,
+      "d_idle": 99.842,
+      "pages_in": 33.32,
+      "strata_read": 0.0
+    },
+    {
+      "t": 2.313,
+      "phase": "baseline",
+      "c_read": 20034.583,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 100.0,
+      "pages_in": 62.608,
+      "strata_read": 0.0
+    },
+    {
+      "t": 2.828,
+      "phase": "baseline",
+      "c_read": 0.0,
+      "d_read": 7987.25,
+      "d_write": 0.0,
+      "d_idle": 97.08,
+      "pages_in": 33.15,
+      "strata_read": 0.0
+    },
+    {
+      "t": 3.344,
+      "phase": "baseline",
+      "c_read": 0.0,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 100.0,
+      "pages_in": 63.512,
+      "strata_read": 0.0
+    },
+    {
+      "t": 3.86,
+      "phase": "baseline",
+      "c_read": 95972.389,
+      "d_read": 7997.699,
+      "d_write": 287917.168,
+      "d_idle": 97.159,
+      "pages_in": 74.197,
+      "strata_read": 0.0
+    },
+    {
+      "t": 4.375,
+      "phase": "inference_1",
+      "c_read": 0.0,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 99.994,
+      "pages_in": 48.463,
+      "strata_read": 335.362
+    },
+    {
+      "t": 4.891,
+      "phase": "inference_1",
+      "c_read": 1005324.502,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 100.0,
+      "pages_in": 23.375,
+      "strata_read": 1005324.502
+    },
+    {
+      "t": 5.406,
+      "phase": "inference_1",
+      "c_read": 39923.576,
+      "d_read": 0.0,
+      "d_write": 7984.715,
+      "d_idle": 99.956,
+      "pages_in": 50.684,
+      "strata_read": 39923.576
+    },
+    {
+      "t": 5.906,
+      "phase": "inference_1",
+      "c_read": 32078.68,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 100.0,
+      "pages_in": 15.663,
+      "strata_read": 32078.68
+    },
+    {
+      "t": 6.422,
+      "phase": "after_1",
+      "c_read": 79067.589,
+      "d_read": 0.0,
+      "d_write": 15813.518,
+      "d_idle": 99.945,
+      "pages_in": 63.702,
+      "strata_read": 39545.377
+    },
+    {
+      "t": 6.938,
+      "phase": "after_1",
+      "c_read": 40217.544,
+      "d_read": 0.0,
+      "d_write": 329783.86,
+      "d_idle": 99.829,
+      "pages_in": 49.094,
+      "strata_read": 40217.544
+    },
+    {
+      "t": 7.453,
+      "phase": "after_1",
+      "c_read": 31934.584,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 100.0,
+      "pages_in": 40.932,
+      "strata_read": 39918.23
+    },
+    {
+      "t": 7.969,
+      "phase": "after_1",
+      "c_read": 4074278.503,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 99.992,
+      "pages_in": 1064.911,
+      "strata_read": 31955.126
+    },
+    {
+      "t": 8.485,
+      "phase": "after_1",
+      "c_read": 39651.539,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 100.0,
+      "pages_in": 25.169,
+      "strata_read": 39651.539
+    },
+    {
+      "t": 9.0,
+      "phase": "after_1",
+      "c_read": 39810.627,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 99.997,
+      "pages_in": 79.699,
+      "strata_read": 39810.627
+    },
+    {
+      "t": 9.5,
+      "phase": "inference_2",
+      "c_read": 31991.39,
+      "d_read": 0.0,
+      "d_write": 359903.135,
+      "d_idle": 99.718,
+      "pages_in": 15.621,
+      "strata_read": 36029.366
+    },
+    {
+      "t": 10.031,
+      "phase": "inference_2",
+      "c_read": 395180.877,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 100.0,
+      "pages_in": 67.536,
+      "strata_read": 355662.79
+    },
+    {
+      "t": 10.547,
+      "phase": "inference_2",
+      "c_read": 39751.26,
+      "d_read": 0.0,
+      "d_write": 7950.252,
+      "d_idle": 99.948,
+      "pages_in": 15.528,
+      "strata_read": 39751.26
+    },
+    {
+      "t": 11.063,
+      "phase": "inference_2",
+      "c_read": 31764.699,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 100.0,
+      "pages_in": 54.285,
+      "strata_read": 31764.699
+    },
+    {
+      "t": 11.578,
+      "phase": "inference_2",
+      "c_read": 39864.818,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 99.996,
+      "pages_in": 19.465,
+      "strata_read": 39864.818
+    },
+    {
+      "t": 12.078,
+      "phase": "inference_2",
+      "c_read": 39773.686,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 100.0,
+      "pages_in": 67.973,
+      "strata_read": 39773.686
+    },
+    {
+      "t": 12.594,
+      "phase": "inference_2",
+      "c_read": 31858.782,
+      "d_read": 0.0,
+      "d_write": 549563.993,
+      "d_idle": 99.42,
+      "pages_in": 87.503,
+      "strata_read": 39823.478
+    },
+    {
+      "t": 13.11,
+      "phase": "inference_2",
+      "c_read": 40076.482,
+      "d_read": 0.0,
+      "d_write": 40076.482,
+      "d_idle": 99.909,
+      "pages_in": 80.231,
+      "strata_read": 32061.186
+    },
+    {
+      "t": 13.625,
+      "phase": "inference_2",
+      "c_read": 39952.697,
+      "d_read": 0.0,
+      "d_write": 719148.539,
+      "d_idle": 99.618,
+      "pages_in": 23.41,
+      "strata_read": 39952.697
+    },
+    {
+      "t": 14.141,
+      "phase": "after_2",
+      "c_read": 79576.566,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 99.965,
+      "pages_in": 71.883,
+      "strata_read": 39788.283
+    },
+    {
+      "t": 14.656,
+      "phase": "after_2",
+      "c_read": 31973.185,
+      "d_read": 0.0,
+      "d_write": 7993.296,
+      "d_idle": 99.967,
+      "pages_in": 40.981,
+      "strata_read": 31973.185
+    },
+    {
+      "t": 15.156,
+      "phase": "after_2",
+      "c_read": 39962.504,
+      "d_read": 0.0,
+      "d_write": 151857.515,
+      "d_idle": 99.845,
+      "pages_in": 50.734,
+      "strata_read": 39962.504
+    },
+    {
+      "t": 15.672,
+      "phase": "after_2",
+      "c_read": 40501.379,
+      "d_read": 8100.276,
+      "d_write": 0.0,
+      "d_idle": 97.204,
+      "pages_in": 17.798,
+      "strata_read": 40501.379
+    },
+    {
+      "t": 16.188,
+      "phase": "after_2",
+      "c_read": 31889.092,
+      "d_read": 0.0,
+      "d_write": 7972.273,
+      "d_idle": 99.883,
+      "pages_in": 56.444,
+      "strata_read": 31889.092
+    },
+    {
+      "t": 16.688,
+      "phase": "after_2",
+      "c_read": 39942.427,
+      "d_read": 0.0,
+      "d_write": 0.0,
+      "d_idle": 99.99,
+      "pages_in": 15.603,
+      "strata_read": 39942.427
+    }
+  ],
+  "memory_before": {
+    "rss": 38607720448,
+    "vms": 59634733056,
+    "num_page_faults": 44069761,
+    "peak_wset": 68307771392,
+    "wset": 38607720448,
+    "peak_paged_pool": 268516216,
+    "paged_pool": 268500376,
+    "peak_nonpaged_pool": 5378096,
+    "nonpaged_pool": 5138816,
+    "pagefile": 59634733056,
+    "peak_pagefile": 59634782208,
+    "private": 59634733056
+  },
+  "memory_after": {
+    "rss": 39430762496,
+    "vms": 60125130752,
+    "num_page_faults": 44328504,
+    "peak_wset": 68307771392,
+    "wset": 39430762496,
+    "peak_paged_pool": 268516216,
+    "paged_pool": 268500376,
+    "peak_nonpaged_pool": 5378096,
+    "nonpaged_pool": 5140176,
+    "pagefile": 60125130752,
+    "peak_pagefile": 60125192192,
+    "private": 60125130752
+  },
+  "io_before": {
+    "read_count": 11960,
+    "write_count": 1382,
+    "read_bytes": 3834006784,
+    "write_bytes": 10069,
+    "other_count": 11395,
+    "other_bytes": 502598
+  },
+  "io_after": {
+    "read_count": 12237,
+    "write_count": 1999,
+    "read_bytes": 3835139527,
+    "write_bytes": 12006,
+    "other_count": 11437,
+    "other_bytes": 504222
+  },
+  "live_after": {
+    "state": "idle",
+    "queued": 0,
+    "phase": null,
+    "prompt_tokens": null,
+    "prompt_read": null,
+    "prompt_total": null,
+    "generated": null,
+    "max_tokens": null,
+    "elapsed_s": null,
+    "tok_s": null,
+    "tok_s_mean": null,
+    "prefill_tok_s_mean": null,
+    "tok_s_window_s": null
+  }
+}

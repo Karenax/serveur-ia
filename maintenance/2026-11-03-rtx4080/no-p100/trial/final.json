@@ -1,0 +1,15 @@
+{
+  "error": null,
+  "fingerprints_identical": true,
+  "fingerprints_after": {
+    "lanceur/base-strata.json": "b9815772778312719c12024284c92905a44b3aa69eb784d7982542d3da1b37ee",
+    "strata-iq4-p100-hybride.json": "b9815772778312719c12024284c92905a44b3aa69eb784d7982542d3da1b37ee",
+    "lanceur/reglages.json": "0d826281e640852f46ee6337031188b3c96b9461d6a330f24189b6349acbc6ee",
+    "lanceur/reglages-par-defaut.json": "0d826281e640852f46ee6337031188b3c96b9461d6a330f24189b6349acbc6ee",
+    "lanceur/exploitation.json": "2a56a8b1a5612be6e1fd6d4e5e9f098302abeeb22ad7fb0a2f91de249c448e1b",
+    "lanceur/session.json": "5d777ae59fcf8f88391265c7cccff5a7c341237e041f429de34e7169d1d10efd",
+    "lanceur/derniers-reglages-valides.json": "2df41aa3ecb343fd1f4719ad582218ef83ce14cf0557da34cea4f929419ab4ae"
+  },
+  "gpu": "0, GPU-a39f1b57-5a26-b53d-e943-44ef8042a438, Tesla P100-PCIE-16GB, 9, 45, 0, 405, 27.52, 0x0000000000000001\n1, GPU-486d5352-582e-2880-78bf-3dec4688e142, Tesla P100-PCIE-16GB, 9, 44, 0, 405, 27.55, 0x0000000000000001\n2, GPU-7d35736d-3ef5-1304-0e9e-1d26021be1a0, NVIDIA GeForce RTX 4080, 755, 33, 6, 210, 12.94, 0x0000000000000001\n3, GPU-97ca6406-8625-b829-b053-191c238ff046, Quadro P2200, 7, 32, 0, 139, 4.79, 0x0000000000000001",
+  "duration_s": 173.28099999999995
+}

@@ -6,6 +6,7 @@ from pathlib import Path
 import secrets
 import shutil
 import subprocess
+import sys
 import threading
 import urllib.request
 from local_voice import HTTPSRedirect
@@ -17,6 +18,9 @@ class ConversationService:
         self.resources=Path(resources)
         spec=self.resources/('wakeword/manifest.json' if mode=='wakeword' else 'conversation-models.json')
         self.spec=json.loads(spec.read_text(encoding='utf-8')) if spec.is_file() or mode!='wakeword' else {'files':[],'asr':'Activation vocale indisponible'}
+        if cache is None and sys.platform.startswith('linux'):
+            from linux_support import data_home
+            cache = data_home()/'voice/asr'
         self.cache=Path(cache) if cache else Path(os.environ.get('LOCALAPPDATA',str(Path.home())))/'QwenClient/asr'
         if mode=='wakeword':self.cache=self.resources/'wakeword'
         self.lock=threading.RLock();self.process=None;self.thread=None;self.cancelled=threading.Event()
@@ -30,6 +34,12 @@ class ConversationService:
     def install_files(self):
         return [f for f in self.spec['files'] if self.value.get('quality')!='max' or f['name'] in ('silero-vad.onnx','smart-turn.onnx')]
     def status(self):
+        if sys.platform.startswith('linux'):
+            with self.lock:
+                return {**self._status(), 'aec_supported':False}
+        return self._status()
+
+    def _status(self):
         with self.lock:return {**self.value,'installed':self.installed(),'max_tools_bytes':sum(f['bytes'] for f in self.spec['files'] if f['name'] in ('silero-vad.onnx','smart-turn.onnx')),'max_tools_installed':all((self.cache/f['name']).is_file() and (self.cache/f['name']).stat().st_size==f['bytes'] for f in self.spec['files'] if f['name'] in ('silero-vad.onnx','smart-turn.onnx')),'model':(self.max_bridge.get('recognizer','Parakeet v3 · progressif') if self.max_bridge and self.max_bridge.get('progressive') else 'Voxtral Realtime') if self.value.get('quality')=='max' else self.spec.get('asr','Parakeet v3'),'model_bytes':sum(f['bytes'] for f in self.install_files()),'local':self.value.get('execution','pc')=='pc'}
     def _verify(self, models=None):
         for item in self.spec['files']:
@@ -53,7 +63,7 @@ class ConversationService:
             if command in ('stop','cancel','ack','mute','playback'):
                 if not value.get('session') or value['session']!=self.value['session']:raise ValueError('Cette session vocale est terminée.')
                 if command=='playback':
-                    if self.mode!='conversation' or self.value.get('quality')!='max' or self.value.get('phase') not in ('loading','listening') or type(value.get('playing')) is not bool or type(value.get('interruptions')) is not bool:
+                    if self.mode!='conversation' or (self.value.get('quality')!='max' and not sys.platform.startswith('linux')) or self.value.get('phase') not in ('loading','listening') or type(value.get('playing')) is not bool or type(value.get('interruptions')) is not bool:
                         raise ValueError('Commande de lecture invalide.')
                     self.playback_requested=value['playing'];self.interruptions_requested=value['interruptions']
                     self._send({'action':'playback','playing':self.playback_requested,'interruptions':self.interruptions_requested})
@@ -136,7 +146,9 @@ class ConversationService:
             self._verify(models)
             if self.cancelled.is_set():return
             executable=self.resources/'conversation-worker/conversation-worker.exe'
-            if executable.exists():command=[str(executable)]
+            if sys.platform.startswith('linux'):
+                command=[sys.executable,'-X','utf8',str(self.resources/'conversation-worker/conversation_worker.py')]
+            elif executable.exists():command=[str(executable)]
             else:
                 root=Path(__file__).resolve().parent.parent
                 command=[str(root/'toolchain/conversation-client-python/Scripts/python.exe'),'-X','utf8',str(root/'client-voice/conversation_worker.py')]

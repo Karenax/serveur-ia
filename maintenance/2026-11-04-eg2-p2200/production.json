@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "engine": {
+    "model": "EmbeddingGemma 2",
+    "engine": "Sentence Transformers / PyTorch",
+    "enabled": true,
+    "status": "pret",
+    "error": "",
+    "device": "cuda:0",
+    "precision": "float32",
+    "threads": 2,
+    "dimensions": 768,
+    "requested_device": "cuda",
+    "gpu_uuid": "GPU-97ca6406-8625-b829-b053-191c238ff046",
+    "gpu_name": "Quadro P2200",
+    "fallback_reason": "",
+    "pid": 5228,
+    "last_seconds": null,
+    "parameters": 271002624
+  },
+  "qwen_processes_preserved": true,
+  "user_data_keys_settings_preserved": true,
+  "backup_policy_preserved": true,
+  "client_release_unchanged": true,
+  "client_update_required": false
+}

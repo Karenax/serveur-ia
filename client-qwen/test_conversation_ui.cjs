@@ -3,13 +3,13 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http'),{execFileSync}=require('node:child_process');
 const voiceSource=process.argv.find(value=>value.startsWith('--voice-source='))?.slice(15);
 const root=__dirname,read=name=>fs.readFileSync(name==='conversation.js'&&voiceSource?voiceSource:path.join(root,name),'utf8');
-const android=process.argv.includes('--android');
+const android=process.argv.includes('--android'),linux=process.argv.includes('--linux');
 const preRestoreLow=process.argv.includes('--pre-restore-low');
-const baseline=process.argv.includes('--baseline'),automaticReasoning=process.argv.includes('--automatic-reasoning'),config={key:'conversation-regression-local',model:'Kiara-test',version:'Windows-test',storage:'conversation-regression'};
+const baseline=process.argv.includes('--baseline'),automaticReasoning=process.argv.includes('--automatic-reasoning'),config={key:'conversation-regression-local',model:'Kiara-test',version:'Windows-test',storage:'conversation-regression',...(linux?{platform:'linux'}:{})};
 const script=name=>{let source=baseline&&name==='conversation.js'?execFileSync('git',['show','0354e91:client-qwen/conversation.js'],{cwd:root,encoding:'utf8'}):read(name);if(preRestoreLow&&name==='conversation.js')source=source.replace("if(native.quality!=='max')return classicLowSplitSpeech(final);",'').replace("if(native.quality!=='max')return classicLowSpeak(text,token);",'').replace("if(quality.value==='low')return classicLowRefresh();",'').replace("options.hidden=quality.value==='low';",'');if(!baseline&&name==='conversation.js')source=source.replace('setInterval(refresh,200);refresh();','window.__qaVoice=()=>({listening:!responding()&&!native.capture_paused,ignoredSpeech,pendingTurns,firstSpeechQueued,speechBuffer,speechRunning,listenAfter});setInterval(refresh,200);refresh();');return '<script nonce="qa">'+source.replaceAll('</script','<\\/script')+'</script>';};
 const renderHtml=()=>android?fs.readFileSync(path.join(root,'../client-android/app/src/main/assets/android-chat.html'),'utf8').replace('__CONFIG__',JSON.stringify({...config,platform:'android'})).replaceAll('__NONCE__','qa').replace('setInterval(refresh,200);refresh();','window.__qaVoice=()=>({listening:!responding()&&!native.capture_paused,ignoredSpeech,pendingTurns,speechRunning});setInterval(refresh,200);refresh();').replace('</head>',`<script nonce="qa">window.AndroidClient={conversationStatus(){return this.request()},conversationAction(body){return this.request(body)},request(body){const xhr=new XMLHttpRequest();xhr.open(body?'POST':'GET','/client/conversation',false);xhr.setRequestHeader('Authorization','Bearer ${config.key}');xhr.setRequestHeader('Content-Type','application/json');xhr.send(body||null);return xhr.responseText;},notificationReady(){},voiceStatus(){return JSON.stringify({phase:'idle',installed:true})},voiceAction(){return '{}'}};</script></head>`):read('chat.html').replace('__UI_CSS__',read('ui.css')).replace('__CONFIG__',JSON.stringify(config)).replaceAll('__NONCE__','qa')
   .replace('</head>',()=>script('vendor/markdown-it.min.js')+script('markdown.js')+'</head>')
-  .replace('</body>',()=>read('workspace.html')+['ui.js','attachments.js','corrector.js','selection.js','thinking.js','voice.js','conversation.js'].map(script).join('')+'</body>');
+  .replace('</body>',()=>read('workspace.html')+['ui.js','attachments.js','corrector.js','selection.js','thinking.js','voice.js','conversation.js',...(linux?['linux_features.js']:[])].map(script).join('')+'</body>');
 const html=renderHtml();
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 const webEvents=process.argv.includes('--web-events');
@@ -22,7 +22,7 @@ async function until(work,label){for(let i=0;i<400;i++){if(await work())return;a
 async function main(){
   const {chromium,options}=require('./browser_test_support.cjs');
   const browser=process.argv.includes('--preview')?null:await chromium.launch(options);
-  const state={history:null,revision:'1',preferences:{},native:{phase:'idle',installed:true,aec_supported:!process.argv.includes('--no-aec'),session:'',speech_id:0,partial:'',turns:[]},calls:[],chats:[],runs:new Map(),syncDelay:0,syncActive:0,acks:[],stops:0,cancels:[],voiceCancels:[],speech:[],timers:new Set(),holdChat:false,longVoice:false,pendingChat:null,delayedReply:false,failStop:false};
+  const state={history:null,revision:'1',preferences:{},native:{phase:'idle',installed:true,aec_supported:!linux&&!process.argv.includes('--no-aec'),session:'',speech_id:0,partial:'',turns:[]},calls:[],chats:[],runs:new Map(),syncDelay:0,syncActive:0,acks:[],stops:0,cancels:[],voiceCancels:[],speech:[],timers:new Set(),holdChat:false,longVoice:false,pendingChat:null,delayedReply:false,failStop:false};
   if(process.argv.includes('--voice-workspace'))state.preferences={voice_animation_style:'constellation'};
   if(maxGpu){
     state.installation={phase:'ready',hardware:{checked:true,eligible:true,cards:[{vendor:'amd',name:'AMD Radeon Graphics'},{vendor:'amd',name:'AMD Radeon RX 7800 XT'}]}};
@@ -59,6 +59,12 @@ async function main(){
       state.preferences={...state.preferences,...body,conversation_drafts:drafts};return json(res,{saved:true});
     }
     if(req.url==='/client/voice/max'&&maxInstall)return json(res,{pc:{installed:state.installation?.phase==='ready',available:state.installation?.phase==='ready',progressive:true,message:'Mode Max non installé',...state.maxPC},server:{installed:false,available:false,message:'Mode Max non installé'},installation:state.installation||{phase:'idle',hardware:{checked:true,eligible:true,cards:[{vendor:'amd',name:'AMD Radeon RX 7800 XT'}]}}});
+    if(req.url==='/client/voice/max/choose-folder'){
+      assert.deepEqual(body,{});
+      state.installation={...state.installation,phase:'choosing',message:'Choisissez un dossier dans la fenêtre ouverte.'};
+      setTimeout(()=>{state.installation={...state.installation,phase:'idle',message:'Dossier enregistré.',storage:{path:'D:\\Voix\\Kiara-Max',exists:true,bytes:0,removable:true}};state.maxPC={installed:false,available:false,message:'Mode Max non installé'};},250);
+      return json(res,state.installation);
+    }
     if(req.url==='/client/voice/max/open-folder'){assert.deepEqual(body,{});return json(res,{opened:true});}
     if(req.url==='/client/voice/max/remove'){
       assert.deepEqual(body,{confirm:true});
@@ -85,7 +91,7 @@ async function main(){
     if(req.url==='/client/integrations')return json(res,{apps:[]});
     if(req.url==='/client/voice')return json(res,{phase:'idle',installed:false});
     if(req.url==='/client/conversation'){
-      if(body.action==='playback'){assert.equal(body.session,state.native.session);assert.equal(typeof body.playing,'boolean');state.native.playback_paused=body.playing&&!body.interruptions;if(android)state.native.microphone_closed=state.native.muted||state.native.playback_paused;else state.native.capture_paused=state.native.playback_paused;}
+      if(body.action==='playback'){assert.equal(body.session,state.native.session);assert.equal(typeof body.playing,'boolean');state.native.playback_paused=body.playing&&!body.interruptions;if(android||linux)state.native.microphone_closed=state.native.muted||state.native.playback_paused;else state.native.capture_paused=state.native.playback_paused;}
       if(body.action==='start')state.native={...state.native,phase:'listening',session:'qa-conversation',turns:[],speech_id:0,muted:false,microphone_closed:false,mute_pending:false,quality:body.quality||'low',execution:body.execution==='auto'?'server':body.execution||'pc'};
       if(body.action==='start'&&body.quality==='max'&&maxGpu){state.maxPC.device=state.gpuCards.find(card=>card.id===(state.maxPC.gpu.selection==='auto'?state.maxPC.gpu.recommended:state.maxPC.gpu.selection));state.maxPC.device_loaded=true;}
       if(body.action==='mute'){
@@ -163,9 +169,12 @@ async function main(){
       if(!inside&&opened)await page.locator('#voice-settings-close').click();
     }
     for(const name of ['click','selectOption','check','uncheck','focus','fill'])voiceUI[name]=async(selector,...args)=>{
-      await revealVoiceControl(selector);return page.locator(selector)[name](...args);
+      await revealVoiceControl(selector);
+      if(selector==='[data-view-button="chat"]'&&await page.evaluate(()=>matchMedia('(max-width:850px)').matches&&!document.body.classList.contains('sidebar-open')))await page.locator('#ui-sidebar-toggle').click();
+      return page.locator(selector)[name](...args);
     };
     await page.goto('http://127.0.0.1:'+server.address().port);await page.waitForFunction(()=>!document.getElementById('conversation-start')?.disabled);
+    if(linux)return await require('./linux_voice_checks.cjs')({page,state,errors,until,sleep,voiceUI});
     if(process.argv.includes('--realtime-loop'))return await require('./voice_realtime_checks.cjs')({page,state,errors,until,sleep,event,voiceUI});
     if(process.argv.includes('--assistant-integration'))return await require('./assistant_ui_checks.cjs')({page,state,android,errors});
     if(process.argv.includes('--assistant-media'))return await require('./assistant_media_checks.cjs')({page,state,android,errors,voiceUI});
@@ -263,7 +272,7 @@ async function main(){
       await voiceUI.click('#conversation-start');await page.waitForFunction(()=>document.querySelector('.voice-view').dataset.state==='listening');
       const listen=await picture();await sleep(150);assert.notEqual(await picture(),listen,'Constellation moves during listening');
       await page.evaluate(()=>{window.__paintFrames=0;const clear=CanvasRenderingContext2D.prototype.clearRect;CanvasRenderingContext2D.prototype.clearRect=function(...args){window.__paintFrames++;return clear.apply(this,args);};});
-      await voiceUI.click('#voice-back');const hiddenFrames=await page.evaluate(()=>window.__paintFrames);await sleep(400);assert.equal(await page.evaluate(()=>window.__paintFrames),hiddenFrames,'Leaving Vocal stops rendering');await voiceUI.click('#voice-ongoing');
+      await voiceUI.click('[data-view-button="chat"]');const hiddenFrames=await page.evaluate(()=>window.__paintFrames);await sleep(400);assert.equal(await page.evaluate(()=>window.__paintFrames),hiddenFrames,'Leaving Vocal stops rendering');await voiceUI.click('#voice-ongoing');
       await voiceUI.uncheck('#voice-animation');await page.evaluate(()=>uiPreferencesWrites);const paused=await picture();await sleep(250);assert.equal(await picture(),paused,'Disabled movement freezes the canvas');
       await voiceUI.check('#voice-animation');await page.evaluate(()=>uiPreferencesWrites);await page.emulateMedia({reducedMotion:'reduce'});await sleep(100);
       const reduced=await picture();await sleep(250);assert.equal(await picture(),reduced,'Reduced motion freezes the canvas');
@@ -376,6 +385,7 @@ async function main(){
       await voiceUI.click('#conversation-start');await page.waitForFunction(()=>window.conversationBusy);
       assert.equal(state.native.quality,'max');assert.equal(state.native.execution,'pc');
       assert.equal(await page.isDisabled('#voice-max-remove'),true,'An active call protects its Max files');
+      assert.equal(await page.isDisabled('#voice-max-choose-folder'),true,'An active call protects its folder');
       await voiceUI.click('#conversation-start');await page.waitForFunction(()=>!window.conversationBusy);
       page.once('dialog',dialog=>dialog.dismiss());await voiceUI.click('#voice-max-remove');
       assert(!state.calls.some(call=>call.path==='/client/voice/max/remove'));
@@ -387,8 +397,13 @@ async function main(){
       assert.equal(await page.isDisabled('#voice-max-remove'),true);assert.equal(await page.isDisabled('#voice-max-open-folder'),true);
       assert.equal(await page.inputValue('#voice-quality'),'max','Removal never silently changes the chosen quality');
       assert.equal(await page.textContent('#voice-max-plan'),'Installer Max sur ce PC');
+      await voiceUI.click('#voice-max-choose-folder');
+      await page.waitForFunction(()=>document.getElementById('voice-max-choose-folder').disabled);
+      await page.waitForFunction(()=>document.getElementById('voice-max-folder').textContent==='D:\\Voix\\Kiara-Max');
+      assert.equal(await page.textContent('#voice-max-storage-status'),'Dossier enregistré.');
+      assert.equal(await page.isDisabled('#voice-max-choose-folder'),false);
       await voiceUI.selectOption('#voice-quality','low');assert.equal(await page.isVisible('#voice-max-storage'),false);
-      assert.deepEqual(errors,[]);console.log(JSON.stringify({passed:true,checks:['offer AMD pack','size before consent','progress and cancellation','slow benchmark still allows explicit PC Max','local folder and disk size','confirmation before removal','active-call protection','retry failed removal','reinstallation offered','Low remains independent']}));return;
+      assert.deepEqual(errors,[]);console.log(JSON.stringify({passed:true,checks:['offer AMD pack','size before consent','progress and cancellation','slow benchmark still allows explicit PC Max','local folder and disk size','confirmation before removal','active-call protection','retry failed removal','reinstallation offered','folder selection and polling','Low remains independent']}));return;
     }
     if(!baseline){
       assert.equal(await page.isVisible('#voice-start'),true,'Dictation stays in chat');
@@ -396,16 +411,16 @@ async function main(){
       await voiceUI.fill('#prompt','Un brouillon à conserver');await page.evaluate(()=>uiPersistPreferences());
       await voiceUI.click('[data-view-button="voice"]');await voiceUI.click('#conversation-start');
       assert.match(await page.textContent('#conversation-status'),/brouillon/);
-      await voiceUI.click('#voice-back');assert.equal(await page.inputValue('#prompt'),'Un brouillon à conserver');
+      await voiceUI.click('[data-view-button="chat"]');assert.equal(await page.inputValue('#prompt'),'Un brouillon à conserver');
       await voiceUI.fill('#prompt','');await page.evaluate(()=>uiPersistPreferences());
     }
     await voiceUI.selectOption('#conversation-model','fred-test-cloud');if(!baseline)await voiceUI.click('[data-view-button="voice"]');if(maxVoice){await voiceUI.selectOption('#voice-quality','max');await page.evaluate(()=>uiPreferencesWrites);}await voiceUI.click('#conversation-start');await page.waitForFunction(()=>document.getElementById('conversation-status').textContent.includes('Qwen local'));assert.equal(await page.evaluate(()=>window.conversationBusy),false);
-    if(!baseline)await voiceUI.click('#voice-back');await voiceUI.selectOption('#conversation-model','Kiara-test');if(!automaticReasoning)await page.locator('.thinking-segment:has(#thinking-high)').click();if(!baseline)await voiceUI.click('[data-view-button="voice"]');await voiceUI.click('#conversation-start');await page.waitForFunction(()=>window.conversationBusy);assert.equal(await page.isDisabled('#conversation-model'),true,'Model choice stays bound during a voice session');
+    if(!baseline)await voiceUI.click('[data-view-button="chat"]');await voiceUI.selectOption('#conversation-model','Kiara-test');if(!automaticReasoning)await page.locator('.thinking-segment:has(#thinking-high)').click();if(!baseline)await voiceUI.click('[data-view-button="voice"]');await voiceUI.click('#conversation-start');await page.waitForFunction(()=>window.conversationBusy);assert.equal(await page.isDisabled('#conversation-model'),true,'Model choice stays bound during a voice session');
     if(!baseline){
       await page.waitForFunction(()=>document.querySelector('.voice-view').dataset.state==='listening');
       assert.equal(await page.isDisabled('#voice-quality'),true,'Quality cannot switch mid-call');
       if(maxVoice){assert.equal(state.native.execution,'server');assert.match(await page.textContent('#voice-engine-location'),/serveur Kiara/);}
-      await voiceUI.click('#voice-back');assert.equal(await page.isVisible('#voice-ongoing'),true);assert.equal(await page.isVisible('#voice-start'),true);assert.equal(await page.isDisabled('#voice-start'),true);
+      await voiceUI.click('[data-view-button="chat"]');assert.equal(await page.isVisible('#voice-ongoing'),true);assert.equal(await page.isVisible('#voice-start'),true);assert.equal(await page.isDisabled('#voice-start'),true);
       await voiceUI.click('#voice-ongoing');assert.equal(await page.getAttribute('[data-view-button="voice"]','aria-current'),'page');
       await voiceUI.fill('#voice-volume','35');await page.locator('#voice-volume').dispatchEvent('change');await page.evaluate(()=>uiPreferencesWrites);
       assert.equal(state.preferences.voice_volume,35);assert.equal(await page.evaluate(()=>window.__audio.gain),.35);

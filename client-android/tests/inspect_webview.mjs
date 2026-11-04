@@ -85,17 +85,7 @@ try{
   assert((await evaluate("document.getElementById('ws-document-text').value")).includes('é, è, à, ç'),'Saved document should reload with UTF-8 text');
   checks.push('projects/documents');
   await screenshot('projet-document');
-  await show('tasks');
-  await evaluate("document.getElementById('ui-task-create').open=true");
-  await evaluate(`document.getElementById('ws-task-project').value=${JSON.stringify(projectId)}`);
-  await fill('ws-task-prompt','Préparer une tâche locale de vérification Android.');
-  await click('#ws-task-form button[type=submit], #ws-task-form > .ws-toolbar button:first-child');
-  await until("ws.data.jobs.some(job=>job.project==="+JSON.stringify(projectId)+"&&job.state==='completed')",'completed local job');
-  const jobId=await evaluate("ws.data.jobs.find(job=>job.project==="+JSON.stringify(projectId)+").id");
-  await evaluate(`wsOpenJob(${JSON.stringify(jobId)})`);
-  assert((await evaluate("document.getElementById('ws-job-content').textContent")).includes('démonstration'),'Job result should be accessible');
-  checks.push('tasks/results');
-  await screenshot('taches');
+  assert.equal(await evaluate(`document.querySelector('[data-view-button="tasks"]')===null`),true);
   await show('corrector');
   await fill('corrector-text','Je veut vérifier le correcteur sur Android.');
   await click('#corrector-correct');

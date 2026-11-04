@@ -1,0 +1,4 @@
+{
+  "reason": "Conversation cache reused identical requests despite API cache_prompt false; protocol changed to disable caches for fair comparison",
+  "valid_comparison": false
+}

@@ -1,7 +1,7 @@
-Accès serveur Kiara — version 3.5.52
+Accès serveur Kiara — version 3.5.60
 
 Nouveautés : souvenirs gérés en conversation, commandes vocales de notes et
-tâches, rappels récurrents, bilans de projet et image jointe à une question orale.
+rappels récurrents, bilans de projet et image jointe à une question orale.
 Ouvrir Mémoire et rappels et choisir Personnel ou un projet. Guide commun :
 ../GUIDE-ASSISTANT-KIARA.md ; preuves et limites :
 ../maintenance/2026-10-25-assistant-integration/README.md.
@@ -42,7 +42,6 @@ La fenêtre est organisée par fonction :
 - Mémoire et rappels : souvenirs personnels ou de projet, rappels et bilans.
 - Correcteur : texte français, correction grammaticale et orthographique, reformulations
   professionnelle ou amicale, copie et conservation des résultats.
-- Tâches : travail serveur client fermé, résultats, pause, annulation et planification.
 - Réglages : accès personnel, connexion, mises à jour et API locale pour les autres applications.
 
 Sélectionnez le texte affiché ou le contenu d’un champ, puis utilisez Ctrl+C,
@@ -63,14 +62,10 @@ et se synchronise à la reconnexion, sans écraser les changements d'un autre po
 Projets accepte TXT, Markdown, DOCX et PDF texte, jusqu'à 2 Mo. Les PDF scannés
 demandent un OCR préalable. Les notes s'enregistrent automatiquement avec contrôle
 de révision ; les brouillons sont chiffrés localement. Comparez avec le serveur en
-cas de conflit. Une révision proposée par l'IA doit être acceptée avant de remplacer
-le document. Les fichiers et projets du serveur sont accessibles à son administrateur.
+cas de conflit. Les fichiers et projets du serveur sont accessibles à son administrateur.
 
-Les tâches restent disponibles client fermé. Les tâches interrompues par une panne
-attendent une relance explicite. La recherche web nécessite une autorisation serveur ;
-avec une URL HTTPS publique, aucune clé de recherche n'est nécessaire. La recherche
-par sujet utilise une clé Brave configurée sur le serveur. Les exports sont en texte
-ou Markdown. Voir ../lanceur/ESPACES-FRED.txt pour les limites et réglages.
+Les exports sont en texte ou Markdown. La recherche web des conversations utilise
+les outils Hermes, selon les autorisations serveur.
 
 Dans Réglages > Connexion, choisissez WireGuard ou HTTPS Cloudflare, puis
 Appliquer la connexion. HTTPS utilise https://ia.karenax.net et le même accès personnel.
@@ -85,6 +80,11 @@ paramètres prépare l’adresse ; Appliquer l’adresse la valide et se reconne
 Le collage manuel avec Ctrl+V fonctionne également dans l’adresse ou dans la zone
 des paramètres. L’accès personnel intégré à l’EXE reste nécessaire.
 Le nom annoncé par le modèle chargé reste visible dans l’en-tête de toutes les vues.
+Dans Réglages > API locale, Ajouter à Codex configure le fournisseur optionnel
+Kiara et le profil kiara, sans changer le modèle ou fournisseur par défaut de
+Codex. Utiliser codex --profile kiara pour une session Qwen. Les ressources sont
+téléchargées et leur signature est vérifiée. Guide : ../maintenance/codex/README.md.
+
 Dans Réglages > API locale, Ajouter à OpenCode 2 et Ajouter à Hermes détectent
 les applications installées sur ce PC et ajoutent le fournisseur Serveur Kiara.
 Choisissez ensuite ce fournisseur et le modèle dans l’application concernée.
@@ -142,7 +142,7 @@ Audit et vérifications : ../lanceur/AUDIT-FRED.txt.
 
 Interface 3.5.0 : mise en page Markdown, choix de police et taille du texte,
 correcteur et diagnostic de connexion dans le voyant supérieur. Navigation compacte, thèmes clair/sombre/Windows, menus contextuels,
-projets par onglets et filtres de tâches. Voir ../lanceur/REFONTE-INTERFACE.txt.
+projets par onglets. Voir ../lanceur/REFONTE-INTERFACE.txt.
 
 Un EXE distinct par personne ou PC utilisé simultanément. Copier le même EXE
 partage la même identité WireGuard et peut détourner les réponses vers l’autre poste.
@@ -167,7 +167,7 @@ hauteur disponibles, texte et résultat côte à côte sur grand écran et empil
 sur petite fenêtre. La fenêtre initiale respecte la zone de travail de Windows.
 
 Version 3.5.21 : conversation vocale Windows. Installer la conversation une fois
-(environ 138 Mo), puis Conversation : parler, attendre la fin du tour, Kiara répond
+(environ 680 Mo pour le catalogue Windows actuel), puis Conversation : parler, attendre la fin du tour, Kiara répond
 à voix haute. Reprendre la parole interrompt la réponse ; Raccrocher ferme le
 microphone. La voix serveur se pilote dans Démarrage et surveillance.
 Guide et limites : ../client-voice/CONVERSATION-WINDOWS.md.
@@ -176,8 +176,8 @@ Version 3.5.18 : sources consultables et notifications.
 Dans Projets, développez « Rechercher un passage dans les documents », puis
 cliquez « Ouvrir le passage cité » pour vérifier le texte exact, sa révision
 et sa page lorsqu'elle est connue. Une ancienne citation signale si le document
-a été modifié ou supprimé. Les résultats de tâches conservent leurs sources.
-La rubrique Notifications retrouve vos alertes de tâches et documents sur le
+a été modifié ou supprimé.
+La rubrique Notifications retrouve vos alertes de rappels et documents sur le
 serveur. Lecture, préférences par type et rattrapage sont synchronisés.
 Les sauvegardes du serveur incluent cette boîte. Voir le mode d'emploi
 ../lanceur/RECHERCHE-NOTIFICATIONS.md et les preuves ../preuves/lots-6-8/VALIDATION.md.
@@ -185,7 +185,7 @@ Les sauvegardes du serveur incluent cette boîte. Voir le mode d'emploi
 Version 3.5.24 : les trois actions du correcteur — Corriger, Reformuler
 professionnel et Reformuler amical — utilisent directement le Qwen local
 sur le serveur. Le texte retravaillé reste dans le correcteur, avec ses
-actions Copier et Reprendre. Les conversations et tâches conservent Hermes.
+actions Copier et Reprendre. Les conversations conservent Hermes.
 
 Version 3.5.23 : la synchronisation automatique de l'historique conserve
 la conversation vocale et la lecture de la réponse. Le tour suivant attend
@@ -209,4 +209,8 @@ chiffrées et les mécanismes de mise à jour sont conservés.
 
 Embeddings pour les autres applications : Réglages > API locale, même adresse et
 clé locale ; modèle google/embeddinggemma-2, 768 dimensions, POST /v1/embeddings.
+Depuis 3.5.59 : lots de 32 textes maximum, 4500 caractères par texte, corps de
+2 Mio maximum. Le serveur calcule sur CPU, avec une file de 16 demandes en attente
+et un seul calcul actif. Prévoir une nouvelle tentative progressive sur HTTP 429
+(file pleine ou attente de plus de 30 secondes) ou 503 (moteur indisponible).
 Le calcul est réalisé sur le serveur. Voir ../maintenance/2026-10-21-api-embeddings/README.md.

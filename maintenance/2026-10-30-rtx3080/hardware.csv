@@ -1,0 +1,5 @@
+index, name, uuid, memory.total [MiB], driver_version, driver_model.current, pcie.link.gen.current, pcie.link.width.current
+0, Tesla P100-PCIE-16GB, GPU-a39f1b57-5a26-b53d-e943-44ef8042a438, 16384 MiB, 560.94, TCC, 3, 16
+1, Tesla P100-PCIE-16GB, GPU-486d5352-582e-2880-78bf-3dec4688e142, 16384 MiB, 560.94, TCC, 3, 16
+2, NVIDIA GeForce RTX 3080, GPU-c7ec5bca-5502-9e99-2ede-30270b7bde2f, 10240 MiB, 560.94, WDDM, 4, 16
+3, Quadro P2200, GPU-97ca6406-8625-b829-b053-191c238ff046, 5120 MiB, 560.94, WDDM, 1, 16

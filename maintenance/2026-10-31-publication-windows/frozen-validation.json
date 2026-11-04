@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "version": "3.5.55",
+  "ui_matches_sources": true,
+  "folder_choice_included": true,
+  "frozen_writer_tested": true,
+  "accented_text_preserved": [
+    "utf-8",
+    "cp1252",
+    "cp850"
+  ],
+  "text": "Léa posa le plateau sur la table. Les dés colorés attendaient patiemment. Elle lança les dés, espérant un six. Son pion avança d’une case, puis d’une autre.",
+  "removed_open_chat_button": true
+}

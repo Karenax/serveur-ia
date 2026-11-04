@@ -1,0 +1,13 @@
+{
+  "name": "geforce",
+  "version": "582.78",
+  "url": "https://us.download.nvidia.com/Windows/582.78/582.78-desktop-win10-win11-64bit-international-dch-whql.exe",
+  "installer": "F:\\Kiara-tests\\pilotes-582.78\\geforce\\582.78-desktop-win10-win11-64bit-international-dch-whql.exe",
+  "sha256": "b1e687cc29392de4338831fab23d66b4a331fb2ee0f4ca1e4901d38fd48e8dae",
+  "matching_infs": [],
+  "payloads": {
+    "nvcuda64.dll": "af853a5b0f3ce3eedc297c66cf5e03307112aa31c714b82479a2ae841c92d407",
+    "nvlddmkm.sys": "ae93846067fbb17327d0fc970ce23c533922e811199830d5ac469523c9ca78a3"
+  },
+  "elapsed_s": 15.985000000000014
+}

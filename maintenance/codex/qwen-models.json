@@ -1,0 +1,33 @@
+{
+  "models": [
+    {
+      "slug": "fred-qwen",
+      "display_name": "Qwen via Kiara",
+      "description": "Qwen local, conversations et outils exécutés sur le PC Codex.",
+      "default_reasoning_level": "none",
+      "supported_reasoning_levels": [
+        {"effort": "none", "description": "Réponse directe"},
+        {"effort": "low", "description": "Réflexion courte"},
+        {"effort": "medium", "description": "Réflexion standard"},
+        {"effort": "high", "description": "Réflexion approfondie"}
+      ],
+      "shell_type": "unified_exec",
+      "visibility": "list",
+      "supported_in_api": true,
+      "priority": 1,
+      "upgrade": null,
+      "base_instructions": "Tu es Kiara, un assistant de programmation utilisant Qwen local. Réponds en français sauf demande contraire. Respecte les instructions du projet et les autorisations Codex. Utilise les outils disponibles pour vérifier les faits et accomplir la tâche. Ne prétends jamais avoir exécuté une action sans résultat d’outil. Pour lire ou modifier des fichiers du PC, appelle les outils du client. Délègue aux sous-agents uniquement lorsque la demande le justifie et que leurs outils sont disponibles.",
+      "default_reasoning_summary": "none",
+      "support_verbosity": false,
+      "apply_patch_tool_type": "freeform",
+      "truncation_policy": {"mode": "tokens", "limit": 10000},
+      "context_window": 262144,
+      "effective_context_window_percent": 90,
+      "input_modalities": ["text", "image"],
+      "supports_search_tool": false,
+      "experimental_supported_tools": [],
+      "use_responses_lite": false,
+      "supports_reasoning_effort_updates": false
+    }
+  ]
+}

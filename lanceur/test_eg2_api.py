@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import struct
 import threading
+from concurrent.futures import ThreadPoolExecutor
 from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
@@ -47,7 +48,7 @@ class EmbeddingsAPITests(unittest.TestCase):
 
     def test_limits_and_unknown_fields_rejected_before_computation(self):
         self.prepare()
-        for patch_value in ({'input':[]},{'input':[1]},{'input':['a']*9},{'input':' '},{'input':'a'*4501},
+        for patch_value in ({'input':[]},{'input':[1]},{'input':['a']*33},{'input':' '},{'input':'a'*4501},
                             {'dimensions':True},{'dimensions':512},{'model':'qwen'},{'encoding_format':'unknown'},
                             {'stream':True},{'input_type':'bad'},{'user':{}}):
             with self.subTest(value=patch_value),self.assertRaises(urllib.error.HTTPError) as error:
@@ -60,11 +61,9 @@ class EmbeddingsAPITests(unittest.TestCase):
         for kwargs,status in [({'token':'invalid'},401),({'headers':{'Origin':'https://evil.test'}},403)]:
             with self.assertRaises(urllib.error.HTTPError) as error:self.call(**kwargs)
             self.assertEqual(error.exception.code,status);error.exception.close()
-        self.store.embedding_slot.acquire()
-        try:
+        with patch.object(self.store.embedding_queue, 'acquire', return_value=False):
             with self.assertRaises(urllib.error.HTTPError) as error:self.call()
             self.assertEqual(error.exception.code,429);error.exception.close()
-        finally:self.store.embedding_slot.release()
         original=self.engine.encode
         def revoked(*args,**kwargs):
             result=original(*args,**kwargs);self.store.revoke(self.access['id']);return result
@@ -97,9 +96,12 @@ class EmbeddingsAPITests(unittest.TestCase):
             remote.check();self.assertNotIn(MODEL_ID,remote.models)
             self.assertIn(MODEL_ID,[row['id'] for row in remote.models_catalogue['data']])
             req=urllib.request.Request('http://127.0.0.1:'+str(server.server_port)+'/v1/embeddings',
-                json.dumps({'model':MODEL_ID,'input':'exemple'}).encode(),
+                json.dumps({'model':MODEL_ID,'input':['é'*2500]*32},ensure_ascii=False).encode(),
                 {'Authorization':'Bearer local-fixture','Content-Type':'application/json'})
-            with urllib.request.urlopen(req,timeout=10) as response:self.assertEqual(json.load(response)['usage']['prompt_tokens'],3)
+            with urllib.request.urlopen(req,timeout=10) as response:
+                result=json.load(response)
+                self.assertEqual(result['usage']['prompt_tokens'],96)
+                self.assertEqual(len(result['data']),32)
         finally:server.shutdown();server.server_close();remote.close();bridge.close()
 
     def test_request_rejects_token_arrays_and_wrong_payload_types(self):
@@ -116,6 +118,43 @@ class EmbeddingsAPITests(unittest.TestCase):
         self.store.hermes=SimpleNamespace(model_catalog=lambda owner:{'object':'list','source':'hermes','data':[{'id':'chat'}]})
         with urllib.request.urlopen(req) as response:rows=json.load(response)['data']
         self.assertEqual([row['id'] for row in rows],['chat',MODEL_ID])
+
+    def test_requests_wait_and_revoked_waiter_does_not_reach_model(self):
+        self.prepare()
+        entered=threading.Event();finish=threading.Event()
+        original=self.engine.encode
+        def blocked(*args,**kwargs):
+            entered.set()
+            if not finish.wait(5):raise TimeoutError('test engine not released')
+            return original(*args,**kwargs)
+        self.engine.encode=blocked
+        def invoke():
+            try:
+                with self.call() as response:return response.status
+            except urllib.error.HTTPError as error:
+                code=error.code;error.close();return code
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            first=pool.submit(invoke)
+            try:
+                self.assertTrue(entered.wait(2))
+                second=pool.submit(invoke)
+                queue=self.store.embedding_queue
+                with queue.condition:
+                    self.assertTrue(queue.condition.wait_for(lambda:len(queue.waiters)==1,2))
+                self.assertFalse(second.done())
+                self.store.revoke(self.access['id'])
+            finally:finish.set()
+            self.assertEqual(first.result(3),403)
+            self.assertEqual(second.result(3),403)
+        self.assertEqual(len(self.calls),1)
+        self.assertFalse(self.store.embedding_queue.active)
+
+    def test_32_texts_accepted_and_encoded_in_order(self):
+        self.prepare()
+        texts=['Texte '+str(i) for i in range(32)]
+        with self.call({'model':MODEL_ID,'input':texts}) as response:result=json.load(response)
+        self.assertEqual(self.calls[0][0],texts)
+        self.assertEqual([row['index'] for row in result['data']],list(range(32)))
 
 
 if __name__=='__main__':unittest.main()

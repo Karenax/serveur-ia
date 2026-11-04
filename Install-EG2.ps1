@@ -7,8 +7,14 @@ if (!(Test-Path -LiteralPath $eg2Python)) {
     & $eg2BasePython -m venv $eg2Env
     if ($LASTEXITCODE -ne 0) { throw "Création de l'environnement EG2 impossible." }
 }
-& $eg2Python -m pip install -r (Join-Path $eg2Root 'lanceur\requirements-eg2.txt')
+& $eg2Python -m pip install --require-hashes -r (Join-Path $eg2Root 'dependances\verrous\eg2.requirements.txt')
 if ($LASTEXITCODE -ne 0) { throw 'Installation des dépendances EG2 impossible.' }
+& $eg2Python -m pip install --no-index --no-deps --no-build-isolation -e (Join-Path $eg2Root 'shared')
+if ($LASTEXITCODE -ne 0) { throw 'Installation du paquet partagé Kiara dans EG2 impossible.' }
+& $eg2Python -m pip check
+if ($LASTEXITCODE -ne 0) { throw 'Dépendances du runtime EG2 incohérentes.' }
+& $eg2Python (Join-Path $eg2Root 'lanceur\embedding_worker.py') --help > $null
+if ($LASTEXITCODE -ne 0) { throw 'Chargement du serveur HTTP EG2 impossible.' }
 $env:HF_HUB_DISABLE_TELEMETRY = '1'
 & $eg2Python (Join-Path $eg2Root 'lanceur\install_eg2.py')
 if ($LASTEXITCODE -ne 0) { throw 'Téléchargement du modèle EG2 impossible.' }

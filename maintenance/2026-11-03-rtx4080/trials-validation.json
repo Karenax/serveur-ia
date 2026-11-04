@@ -1,0 +1,17 @@
+{
+  "runs": 7,
+  "requests": 91,
+  "all_targeted_checks_pass": true,
+  "all_cache_tokens_zero": true,
+  "persistent_files_unchanged": true,
+  "benchmark_processes_stopped": true,
+  "port_18080_released": true,
+  "source_check": {
+    "python": 511,
+    "javascript": 94,
+    "powershell_each": 98
+  },
+  "max_rtx_temperature_c": 53.0,
+  "thermal_throttle_samples": 0,
+  "split_engine_model_inference_validated": false
+}

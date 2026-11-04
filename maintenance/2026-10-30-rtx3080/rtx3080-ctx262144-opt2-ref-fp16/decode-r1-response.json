@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-5b0e55177a264473b4a18c6b",
+  "object": "chat.completion",
+  "created": 1793438930,
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "La couleur du ciel est principalement déterminée par un phénomène optique appelé la diffusion de Rayleigh. La lumière du soleil, bien qu'elle nous apparaisse blanche, est en réalité composée de toutes les couleurs de l'arc-en-ciel, chacune correspondant à une longueur d'onde différente. Lorsque cette lumière traverse l'atmosphère terrestre, elle entre en collision avec les molécules de gaz (principalement l'azote et l'oxygène) qui sont beaucoup plus petites que la longueur d'onde de la lumière visible. Selon les lois de la physique, la diffusion est inversement proportionnelle à la puissance quatrième de la longueur d'onde. Cela signifie que les courtes longueurs d'onde, comme le bleu et le violet, sont diffusées beaucoup plus efficacement que les longues longueurs d'onde, comme le rouge ou l'orange. C'est pourquoi, lorsque le soleil est haut dans le ciel, la lumière bleue est dispersée dans toutes les directions par l'atmosphère, atteignant nos yeux depuis n'importe quel point du ciel, ce qui nous donne cette impression d'un dôme bleu uniforme.\n\nCependant, il existe une nuance importante concernant la couleur violette. Bien que le violet ait une longueur"
+      },
+      "finish_reason": "length"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 43,
+    "completion_tokens": 256,
+    "total_tokens": 299,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 43,
+    "prompt_ms": 1229.7,
+    "prompt_per_token_ms": 28.598,
+    "prompt_per_second": 35.0,
+    "predicted_n": 256,
+    "predicted_ms": 4737.2,
+    "predicted_per_token_ms": 18.505,
+    "predicted_per_second": 54.0,
+    "draft_n": 187,
+    "draft_n_accepted": 116
+  }
+}

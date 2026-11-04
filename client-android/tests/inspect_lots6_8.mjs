@@ -37,9 +37,9 @@ try{
   }else if(mode==='clear-read'){
     await evaluate('fredInboxRead([...fredInbox.items.values()].filter(n=>!n.read_at).map(n=>n.id))');assert(await evaluate('[...fredInbox.items.values()].every(n=>n.read_at)'),'All fixture events read');checks.push('synthetic fixture read state synchronized before system click test');
   }else if(mode==='system-click'){
-    await until("!document.querySelector('[data-view=tasks]').hidden&&!$('ws-job-result').hidden&&$('ws-job-title').textContent==='Résultat Android'",'system notification opens corresponding job');
-    await until(`(async()=>{const v=await api('/v1/notifications');return v.items.filter(n=>n.target?.id===${JSON.stringify(fixture.job)}).sort((a,b)=>b.sequence-a.sequence)[0]?.read_at>0;})()`,'click marks latest matching notification read on server');
-    await screenshot('system-click-job');checks.push('real system notification click opens authorized matching job and marks read');
+    await until("!document.querySelector('[data-view=projects]').hidden&&!!ws.document",'system notification opens corresponding document');
+    await until(`(async()=>{const v=await api('/v1/notifications');return v.items.filter(n=>n.target?.id===${JSON.stringify(fixture.document)}).sort((a,b)=>b.sequence-a.sequence)[0]?.read_at>0;})()`,'click marks latest matching notification read on server');
+    await screenshot('system-click-document');checks.push('real system notification click opens authorized matching document and marks read');
   }else if(mode==='ui'){
     await evaluate(`showView('projects');wsSelectProject(${JSON.stringify(fixture.project)})`);
     await evaluate("$('ws-search-form').closest('details').open=true;$('ws-search-query').value='ORCHIDEEPDF'");await click('#ws-search-form button');
@@ -60,7 +60,6 @@ try{
     await screenshot('source-unavailable');await evaluate("$('fred-source-dialog').close()");checks.push('deleted source visibly signaled with citation retained');
     const foreign=await evaluate(`wsAction('document_get',{id:${JSON.stringify(fixture.foreign_document)}}).then(()=>200).catch(e=>e.status)`);assert.equal(foreign,403,'Other owner document denied');checks.push('owner-scoped consultation enforced');
     await evaluate("$('ws-search-query').value='ZZZZUNFINDABLEANSWER'");await click('#ws-search-form button');await until("$('ws-sources').textContent.includes('Aucun passage')",'no-result message');checks.push('search without results explicitly shown');
-    await evaluate(`showView('tasks');wsOpenJob(${JSON.stringify(fixture.job)})`);assert(await evaluate("$('ws-job-sources').textContent.includes('révision 1')&&$('ws-job-sources').querySelector('button')"),'Durable job includes structured citation');await click('#ws-job-sources button');await until("$('fred-source-dialog').open",'job citation');await screenshot('job-source');await evaluate("$('fred-source-dialog').close()");checks.push('task result retains clickable sources');
     await evaluate("showView('notifications');fredInboxLoad()");await until("!fredInbox.busy&&document.querySelectorAll('#fred-inbox-list article').length>0",'inbox');
     const before=await evaluate('fredInbox.items.size');await evaluate('fredInboxLoad()');await until('!fredInbox.busy','inbox dedup');assert.equal(await evaluate('fredInbox.items.size'),before,'Repeated polling does not duplicate inbox');checks.push('persistent inbox and repeated polling deduplication');
     const row=await evaluate("[...fredInbox.items.values()].find(n=>n.type==='document_indexed'&&!n.read_at)?.id");if(row){await evaluate(`fredInboxRead([${JSON.stringify(row)}])`);assert(await evaluate(`fredInbox.items.get(${JSON.stringify(row)}).read_at>0`),'Read synchronized in inbox');checks.push('read state refreshed from server');}
@@ -70,7 +69,7 @@ try{
     await screenshot('inbox');assert(!(await evaluate('document.documentElement.scrollWidth>innerWidth+1')),'No horizontal overflow');checks.push('phone/tablet layout without overflow');
     await evaluate("api('/v1/notifications/action',{action:'preferences',revision:fredInbox.preferences.revision,types:{document_indexed:true},discreet:true}).then(()=>{fredInbox.dirty=false;return fredInboxLoad();})");
   }else if(mode==='reconnected'){
-    assert(await evaluate(`fredInbox.loaded&&[...fredInbox.items.values()].sort((a,b)=>b.sequence-a.sequence)[0]?.target.id===${JSON.stringify(fixture.job)}&&![...fredInbox.items.values()].sort((a,b)=>b.sequence-a.sequence)[0]?.read_at`),'Completed event generated while client closed appears after reconnection');await screenshot('reconnected');checks.push('closed/reopened client catches up persistent event generated while stopped');
+    assert(await evaluate(`fredInbox.loaded&&[...fredInbox.items.values()].sort((a,b)=>b.sequence-a.sequence)[0]?.target.id===${JSON.stringify(fixture.document)}&&![...fredInbox.items.values()].sort((a,b)=>b.sequence-a.sequence)[0]?.read_at`),'Completed event generated while client closed appears after reconnection');await screenshot('reconnected');checks.push('closed/reopened client catches up persistent event generated while stopped');
   }else throw new Error('Unknown test mode');
   assert.equal(errors.length,0,'No unhandled WebView exception');const report={passed:true,form,mode,checks,exceptions:0,transport:'real Android WireGuard UDP',backend:'actual isolated Workspace and Notifications'};
   await fs.writeFile(path.join(output,`${form}-${mode}.json`),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report));

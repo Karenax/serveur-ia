@@ -15,7 +15,7 @@ import urllib.request
 import urllib.error
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 sys.path.insert(0,str(Path(__file__).resolve().parent.parent/'client-qwen'))
-from workspace import Workspace,Denied,Conflict,extract,public_url,DEFAULT_LIMITS,HISTORY_RESET_ID
+from workspace import Workspace,Denied,Conflict,extract,DEFAULT_LIMITS,HISTORY_RESET_ID
 from scheduler import Scheduler
 
 class WorkspaceTests(unittest.TestCase):
@@ -26,13 +26,12 @@ class WorkspaceTests(unittest.TestCase):
     def act(self,action,**values):return self.w.action('a',{'action':action,'reset_id':HISTORY_RESET_ID,**values})
     def document(self,content='Le budget approuvé est de 2500 euros.'):
         return self.act('document_create',project=self.p,title='Budget',text=content)['id']
-    def job(self,**kwargs):return self.act('job_create',project=self.p,prompt='Résume le budget',request_key=secrets.token_hex(16),**kwargs)['id']
 
     def test_owner_isolation_on_all_objects(self):
-        d=self.document();m=self.act('memory_create',project=self.p,text='Préférer le français')['id'];j=self.job()
-        for action,v in [('document_get',{'id':d}),('document_download',{'id':d}),('document_delete',{'id':d}),('memory_delete',{'id':m}),('job_get',{'id':j}),('job_retry',{'id':j}),('project_save',{'id':self.p}),('search',{'project':self.p,'query':'budget'}),('document_create',{'project':self.p,'title':'attack','text':'x'})]:
+        d=self.document();m=self.act('memory_create',project=self.p,text='Préférer le français')['id']
+        for action,v in [('document_get',{'id':d}),('document_download',{'id':d}),('document_delete',{'id':d}),('memory_delete',{'id':m}),('project_save',{'id':self.p}),('search',{'project':self.p,'query':'budget'}),('document_create',{'project':self.p,'title':'attack','text':'x'})]:
             with self.subTest(action=action),self.assertRaises(Denied):self.w.action('b',{'action':action,**v})
-        self.assertEqual(self.w.snapshot('b')['projects'],[]);self.assertEqual(self.w.snapshot('b')['jobs'],[])
+        self.assertEqual(self.w.snapshot('b')['projects'],[])
 
     def test_revision_conflicts_retain_original(self):
         d=self.document();self.act('document_save',id=d,project=self.p,title='Budget',text='budget 3500',revision=1)
@@ -134,60 +133,13 @@ class WorkspaceTests(unittest.TestCase):
         with self.assertRaises(ValueError):self.document('x'*500000)
         self.assertEqual(self.w.snapshot('a')['projects'][0]['documents'],[])
 
-    def test_job_idempotency_priority_and_restart(self):
-        request_key=secrets.token_hex(16);args={'action':'job_create','project':self.p,'prompt':'Analyse','request_key':request_key}
-        first=self.w.action('a',args);self.assertEqual(first,self.w.action('a',args))
-        scheduler=Scheduler();active=scheduler.submit('x');scheduler.wait(active,lambda:True,lambda _:None)
-        background=scheduler.submit('a',background=True);interactive=scheduler.submit('b');same_owner=scheduler.submit('a')
-        self.assertEqual(scheduler.requests,[active,interactive,same_owner,background])
-        with self.w.db() as db:db.execute("UPDATE jobs SET state='running'")
-        reloaded=Workspace(self.home);self.assertEqual(reloaded.snapshot('a')['jobs'][0]['state'],'failed')
 
-    def test_background_results_persist_and_recurrence(self):
-        j=self.job(repeat_hours=24);self.w.valid=lambda owner:True;self.w.generation=lambda owner,messages,cancel:'Résultat sourcé'
-        self.assertTrue(self.w.run_one());result=self.act('job_get',id=j)
-        self.assertEqual(result['state'],'completed');self.assertEqual(json.loads(result['result'])['text'],'Résultat sourcé')
-        jobs=self.w.snapshot('a')['jobs'];self.assertEqual(len(jobs),2);next_job=next(j for j in jobs if j['state']=='queued');self.assertEqual(next_job['parent'],j)
-        self.assertGreater(next_job['due'],time.time()+23*3600)
-        reloaded=Workspace(self.home);self.assertEqual(reloaded.action('a',{'action':'job_get','id':j})['state'],'completed')
 
-    def test_cancel_running_job_prevents_publication(self):
-        j=self.job();ready=threading.Event();release=threading.Event()
-        def generate(owner,messages,cancel):ready.set();release.wait(3);return 'do not publish'
-        self.w.generation=generate;thread=threading.Thread(target=self.w.run_one);thread.start();self.assertTrue(ready.wait(3))
-        self.act('job_cancel',id=j);release.set();thread.join(4)
-        result=self.act('job_get',id=j);self.assertEqual(result['state'],'cancelled');self.assertEqual(result['result'],'')
 
-    def test_failure_pause_retry_and_disabled_access(self):
-        j=self.job();self.act('job_pause',id=j);self.assertFalse(self.w.run_one());self.act('job_retry',id=j)
-        self.w.valid=lambda owner:False;self.w.generation=lambda *args:self.fail('Inference must not execute')
-        self.w.run_one();self.assertEqual(self.act('job_get',id=j)['state'],'failed')
-        self.w.cancel_owner('a');self.assertEqual(self.act('job_get',id=j)['state'],'failed')
 
-    def test_schedule_delay(self):
-        j=self.job(delay_minutes=60);self.w.generation=lambda *args:self.fail('Scheduled job ran early')
-        self.assertFalse(self.w.run_one());self.assertGreater(self.act('job_get',id=j)['due'],time.time()+3500)
 
-    def test_empty_results_fail_and_code_indentation_is_preserved(self):
-        d=self.document('    value = 1\n')
-        self.assertEqual(self.act('document_get',id=d)['text'],'    value = 1\n')
-        j=self.job();self.w.generation=lambda *args:'';self.w.run_one()
-        self.assertEqual(self.act('job_get',id=j)['state'],'failed')
 
-    def test_web_is_checked_per_client_and_server_without_profiles(self):
-        with self.assertRaises(Denied):self.job(kind='web',url='https://example.com')
-        self.w.admin_action({'action':'web_config','enabled':True},{'a'})
-        with self.assertRaises(Denied):self.job(kind='web',url='https://example.com')
-        self.w.admin_action({'action':'policy','owner':'a','limits':{**DEFAULT_LIMITS,'web':True}},{'a'})
-        j=self.job(kind='web',url='https://example.com')
-        with patch('workspace.fetch_public',return_value={'url':'https://example.com','text':'public facts'}):
-            self.w.generation=lambda owner,messages,cancel:messages[0]['content'];self.w.run_one()
-        self.assertIn('public facts',self.act('job_get',id=j)['result'])
 
-    def test_ssrf_public_validation(self):
-        for url in ['http://example.com','https://localhost','https://127.0.0.1','https://user:secret@example.com','https://example.com:8765','https://[::1]']:
-            with self.subTest(url=url),self.assertRaises((ValueError,OSError)):public_url(url)
-        with patch('workspace.socket.getaddrinfo',return_value=[(2,1,6,'',('10.0.0.1',443))]),self.assertRaises(ValueError):public_url('https://public.example')
 
     def test_bounded_parsers_utf8_pdf_and_docx(self):
         self.assertEqual(extract('note.txt','Résumé français'.encode()),['Résumé français'])
@@ -200,16 +152,6 @@ class WorkspaceTests(unittest.TestCase):
         writer=PdfWriter();writer.add_blank_page(200,200);data=io.BytesIO();writer.write(data)
         with self.assertRaisesRegex(ValueError,'OCR'):extract('scan.pdf',data.getvalue())
 
-    def test_web_decompression_bombs_and_truncated_gzip(self):
-        import gzip
-        from workspace import bounded_body
-        class Response:
-            def __init__(self,data):self.data=data
-            def read(self,n):return self.data[:n]
-            def getheader(self,*args):return 'gzip'
-        self.assertEqual(bounded_body(Response(gzip.compress(b'public text'))),b'public text')
-        with self.assertRaises(ValueError):bounded_body(Response(gzip.compress(b'x'*(2*1024*1024))))
-        with self.assertRaises(ValueError):bounded_body(Response(gzip.compress(b'public text')[:-5]))
 
     def test_real_extraction_subprocess_upload(self):
         raw='Le budget est de 2500 euros.'.encode();d=self.act('document_upload',project=self.p,title='budget.txt',data=base64.b64encode(raw).decode())['id']
@@ -217,11 +159,10 @@ class WorkspaceTests(unittest.TestCase):
         self.assertEqual(base64.b64decode(self.act('document_download',id=d)['data']),raw)
 
     def test_backup_roundtrip_and_foreign_owner_rejection(self):
-        d=self.document();j=self.job();value=self.w.backup()
+        d=self.document();value=self.w.backup()
         with self.assertRaises(ValueError):self.w.validate_backup(value,{'b'})
         raw=self.w.validate_backup(value,{'a'});self.w.restore(raw)
         self.assertEqual(self.act('document_get',id=d)['text'],'Le budget approuvé est de 2500 euros.')
-        self.assertEqual(self.act('job_get',id=j)['state'],'failed')
         self.assertTrue(self.act('search',project=self.p,query='budget')['sources'])
 
     def test_backup_rejects_modified_schema(self):
@@ -263,19 +204,8 @@ class GatewayWorkspaceTests(unittest.TestCase):
                 with remote.open('/v1/workspace') as response:self.assertEqual(json.load(response)['projects'][0]['id'],p)
                 d=post({'action':'document_create','project':p,'title':'note','text':'Texte privé'})['id']
                 self.assertEqual(post({'action':'document_get','id':d})['text'],'Texte privé')
-                j=post({'action':'job_create','project':p,'prompt':'Résume le texte','request_key':secrets.token_hex(16)})['id']
-                # The client tunnel is closed while the server completes the work.
                 remote.close()
-                # Functional completion, including slow Windows filesystem sync;
-                # performance thresholds belong to the separate volume benchmark.
-                deadline=time.monotonic()+60
-                while time.monotonic()<deadline:
-                    row=fixture.store.workspace.action(fixture.access['id'],{'action':'job_get','id':j})
-                    if row['state'] in ('completed','failed'):break
-                    time.sleep(.1)
-                self.assertEqual(row['state'],'completed',row['error'])
-                result=post({'action':'job_get','id':j})
-                self.assertEqual(json.loads(result['result'])['text'],'Bonjour')
+                self.assertEqual(post({'action':'document_get','id':d})['text'],'Texte privé')
                 fixture.store.revoke(fixture.access['id'])
                 with self.assertRaises(urllib.error.HTTPError) as error:remote.open('/v1/workspace')
                 self.assertEqual(error.exception.code,401)

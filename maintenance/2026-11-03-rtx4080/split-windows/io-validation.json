@@ -1,0 +1,29 @@
+[
+  {
+    "fixture": "fixture.gguf",
+    "bytes": 352,
+    "returncode": 0,
+    "expected_returncode": 0,
+    "passed": true,
+    "stdout": "PASS: upstream GGUF mapping and threaded staged reads on Windows (64 floats), overflow guards\n",
+    "stderr": "gguf: the model's file system refuses O_DIRECT: read through the page cache\n"
+  },
+  {
+    "fixture": "fixture-large.gguf",
+    "bytes": 33554528,
+    "returncode": 0,
+    "expected_returncode": 0,
+    "passed": true,
+    "stdout": "PASS: upstream GGUF mapping and threaded staged reads on Windows (8388608 floats), overflow guards\n",
+    "stderr": "gguf: the model's file system refuses O_DIRECT: read through the page cache\n"
+  },
+  {
+    "fixture": "fixture-invalid.gguf",
+    "bytes": 96,
+    "returncode": 1,
+    "expected_returncode": 1,
+    "passed": true,
+    "stdout": "",
+    "stderr": "gguf: bad magic in D:\\Serveur IA\\maintenance\\2026-11-03-rtx4080\\split-windows\\fixture-invalid.gguf\n"
+  }
+]

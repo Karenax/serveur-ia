@@ -1,5 +1,11 @@
 # Plan global du serveur Kiara et de ses clients
 
+État au 4 novembre 2026 : ce plan conserve les objectifs et preuves historiques.
+Les tâches, révisions automatiques et synthèses programmées décrites ci-dessous
+ont depuis été retirées. Les rappels et le bilan consultable restent disponibles.
+L’[architecture courante](ARCHITECTURE-ACTUELLE.md) et le
+[guide utilisateur](GUIDE-ASSISTANT-KIARA.md) décrivent le périmètre actuel.
+
 L’[extension de l’assistant Kiara du 25 octobre 2026](PLAN-INTEGRATION-ASSISTANT-KIARA.md)
 intègre la mémoire en conversation, les actions vocales, les rappels, les bilans,
 l’activation expérimentale « Bonjour Kiara » et les images pendant le vocal.

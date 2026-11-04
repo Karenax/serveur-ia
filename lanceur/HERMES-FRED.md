@@ -1,10 +1,10 @@
 # Conversations Kiara avec Hermes
 
-Versions publiées : **serveur/Windows 3.5.52**, **Android 1.0.23/code 24**.
+Versions publiées au 4 novembre 2026 : **serveur/Windows 3.5.60**, **Android 1.0.25/code 26**.
 Le serveur confie les conversations écrites à Hermes avec le modèle sélectionné
 et les outils autorisés. Le modèle Qwen local reste disponible ; les fournisseurs
 connectés dans Hermes sur le serveur peuvent être partagés entre les comptes
-Kiara. Les tâches rédactionnelles gardent le modèle serveur par défaut.
+Kiara.
 Le vocal direct et les trois actions du correcteur — Corriger, Reformuler
 professionnel et Reformuler amical — utilisent Qwen local.
 
@@ -44,7 +44,7 @@ La politique sans secrets `hermes-models.json` est incluse dans les sauvegardes 
 Hermes dispose des recherches documentaires Kiara, de la mémoire sémantique EG2,
 de la lecture des passages cités, du calcul arithmétique borné et de la
 recherche/lecture web selon les autorisations Kiara. Le nouvel outil
-`fred_assistant` consulte et modifie les souvenirs, crée les notes et tâches,
+`fred_assistant` consulte et modifie les souvenirs, crée les notes,
 gère les rappels et prépare les bilans dans le périmètre fixé par le serveur.
 Le vocal appelle les mêmes services métier. Voir le
 [guide de l’assistant](../GUIDE-ASSISTANT-KIARA.md).
@@ -60,7 +60,7 @@ reste désactivée : les recherches Kiara appliquent le périmètre du projet.
 
 Dans les conversations, Hermes recherche et lit les pages avec ses outils natifs `web_search` et `web_extract`. Ils utilisent les connexions web du profil Hermes actif sur le serveur, y compris ses accès gérés. Aucune clé Brave Kiara n’est nécessaire et les secrets web ne sont pas copiés dans les profils clients. Le droit **Web** de chaque compte Kiara autorise ces appels ; le serveur le contrôle pendant leur exécution et interrompt l’outil si ce droit est retiré ou si la conversation est annulée. Chaque appel reste lié à son tour Hermes : un appel retardé d’un tour annulé ne peut pas rejoindre le message suivant. Les liens et extraits retournés restent visibles dans les sources de la réponse et dans son historique. Les pages privées, les identifiants dans les URL et les redirections vers le réseau privé sont refusés, même si le profil personnel Hermes autorise ces adresses.
 
-Les anciennes tâches de type **Web** conservent leur recherche Brave ou leur lecture d’URL publique. Le réglage Brave de la console concerne ces tâches. Leurs droits par compte restent communs aux outils web des conversations. Cette distinction est indiquée dans la console ; les connexions utilisées par les conversations se règlent dans Hermes sur le serveur.
+Les connexions utilisées par les conversations se règlent dans Hermes sur le serveur. Les autorisations web se définissent par accès dans la console Kiara.
 
 Depuis le 24 octobre, Qwen interprète localement le sens de la demande vocale pour choisir entre répondre, rechercher des informations publiques ou demander le sujet manquant. Aucun mot-clé précis n’est requis. La recherche utilise les outils web natifs du serveur, sans lancer de run Hermes, et seule sa requête publique reformulée est transmise au service externe. La réponse reste générée directement par Qwen et lue progressivement. Le droit Web, l’annulation et la révocation restent contrôlés pendant la recherche et la réponse. Les passages ajoutés respectent le plafond vocal de 16k. [Fonctionnement, coût et validation](../maintenance/2026-10-24-web-vocal/README.md).
 

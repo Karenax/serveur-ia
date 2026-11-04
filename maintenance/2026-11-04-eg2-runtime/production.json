@@ -1,0 +1,54 @@
+{
+  "synthetic_text_only": true,
+  "checks": [
+    {
+      "path": "authenticated_gateway_batch",
+      "http": 200,
+      "encoding": "float",
+      "mode": "document",
+      "vectors": 2,
+      "dimensions": 768,
+      "normalized": true,
+      "prompt_tokens": 18,
+      "seconds": 0.219
+    },
+    {
+      "path": "public_https_query",
+      "http": 200,
+      "encoding": "base64",
+      "mode": "query",
+      "vectors": 1,
+      "dimensions": 768,
+      "normalized": true,
+      "prompt_tokens": 16,
+      "seconds": 0.328
+    },
+    {
+      "path": "windows_local_api_over_https",
+      "http": 200,
+      "encoding": "float",
+      "mode": "document",
+      "vectors": 1,
+      "dimensions": 768,
+      "normalized": true,
+      "prompt_tokens": 9,
+      "seconds": 0.25
+    }
+  ],
+  "engine": {
+    "model": "EmbeddingGemma 2",
+    "engine": "Sentence Transformers / PyTorch",
+    "enabled": true,
+    "status": "pret",
+    "error": "",
+    "device": "cpu",
+    "precision": "float32",
+    "threads": 2,
+    "dimensions": 768,
+    "pid": 4596,
+    "last_seconds": 0.0929999999998472,
+    "parameters": 271002624
+  },
+  "qwen_processes_preserved": true,
+  "passed": true
+}

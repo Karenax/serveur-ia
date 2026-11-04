@@ -139,8 +139,8 @@ class ToolsTests(unittest.TestCase):
         self.assertEqual(self.native_call()['error']['code'], -32003)
         self.assertFalse(calls)
         self.enable_web()
-        with patch.object(self.workspace, 'web_sources', side_effect=AssertionError('Legacy web must never be invoked')):
-            self.assertTrue(self.native_call()['result']['success'])
+        self.assertFalse(hasattr(self.workspace, 'web_sources'))
+        self.assertTrue(self.native_call()['result']['success'])
         self.assertEqual(len(calls), 1)
         self.assertIs(calls[0][2], self.context['cancel'])
         self.assertTrue(calls[0][3]())

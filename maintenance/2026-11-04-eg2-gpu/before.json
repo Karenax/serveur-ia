@@ -1,0 +1,26 @@
+{
+  "models": [
+    {
+      "pid": 19216,
+      "created": 1793775290.6163623
+    },
+    {
+      "pid": 21696,
+      "created": 1793775290.6867845
+    }
+  ],
+  "engine": {
+    "model": "EmbeddingGemma 2",
+    "engine": "Sentence Transformers / PyTorch",
+    "enabled": true,
+    "status": "pret",
+    "error": "",
+    "device": "cpu",
+    "precision": "float32",
+    "threads": 2,
+    "dimensions": 768,
+    "pid": 16000,
+    "last_seconds": 5.562999999998283,
+    "parameters": 271002624
+  }
+}

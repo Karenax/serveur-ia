@@ -18,10 +18,10 @@ from file_lock import locked
 
 def bridge_executable():
     """Keep Windows firewall identity stable across one-file client launches."""
-    source=Path(getattr(sys,'_MEIPASS',Path(__file__).parent))/'wireguard-bridge.exe'
+    source=Path(getattr(sys,'_MEIPASS',Path(__file__).parent))/('wireguard-bridge' if sys.platform.startswith('linux') else 'wireguard-bridge.exe')
     if not source.is_file():
         raise ValueError('Le moteur WireGuard intégré est absent.')
-    if not getattr(sys,'frozen',False):
+    if sys.platform.startswith('linux') or not getattr(sys,'frozen',False):
         return source
     data=source.read_bytes()
     digest=hashlib.sha256(data).hexdigest()
@@ -65,7 +65,7 @@ class Bridge:
         executable=bridge_executable()
         self.key=secrets.token_urlsafe(32)
         self.process=subprocess.Popen([str(executable)],stdin=subprocess.PIPE,stdout=subprocess.PIPE,
-                                      stderr=subprocess.DEVNULL,creationflags=0x08000000)
+                                      stderr=subprocess.DEVNULL,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
         try:
             self.process.stdin.write(json.dumps({'wireguard':profile['wireguard'],'api_token':profile['token'],'bridge_token':self.key}).encode()+b'\n')
             self.process.stdin.flush()

@@ -1,6 +1,11 @@
-Console Qwen / Strata pour les deux Tesla P100
+Console Kiara / Qwen — RTX 4080 et deux Tesla P100
 
-Version publiée : serveur/Windows 3.5.52 et Android 1.0.23/code 24.
+Version publiée au 4 novembre 2026 : serveur/Windows 3.5.60 et Android 1.0.25/code 26.
+Strata 0.1.56 CUDA 12.9, DFlash2, RTX 4080 principale et caches d’experts sur les
+deux P100 : ../maintenance/2026-11-03-rtx4080/default-mode/README.md.
+Les tâches et synthèses programmées sont retirées ; notes, rappels et bilan de
+projet restent disponibles. L’APK Android conserve sa livraison du 26 octobre ;
+les sources d’interface plus récentes ne sont pas encore dans cet APK.
 La mémoire en conversation, les actions vocales, rappels, bilans et images sont
 décrits dans ../GUIDE-ASSISTANT-KIARA.md. Les preuves et limites de la livraison
 sont dans ../maintenance/2026-10-25-assistant-integration/README.md.
@@ -14,15 +19,15 @@ Elle reconnaît le serveur existant. Dans Exploitation, le chargement au démarr
 et la relance automatique sont configurables ; ils sont activés sur ce PC.
 Fermer le navigateur laisse l'interface et le modèle fonctionner.
 
-Espaces de travail — version 3.5.0
-La console regroupe désormais Espaces et fichiers, Assistants et outils, et Tâches.
-Chaque EXE personnel possède ses projets, documents, mémoire et travaux planifiés.
+Espaces de travail
+La console regroupe Espaces et fichiers, et Assistants et outils.
+Chaque EXE personnel possède ses projets, documents, mémoire et rappels.
 Les quotas et le droit de recherche web se règlent dans Espaces et fichiers ;
 les profils d'assistants et la clé Brave dans Assistants et outils.
 Guide détaillé : ESPACES-FRED.txt. Contrôles : AUDIT-ESPACES-FRED.txt.
 Cette mise à jour conserve l'état du modèle et les options de démarrage existantes.
 
-Profil initial par défaut :
+Profil historique initial (remplacé par le profil du 3 novembre cité plus haut) :
 - Qwen3.8-Flash-Next Uncensored IQ4_XS complet, pack iq4-xs-local et GGUF sur D: ;
 - deux P100, séparation des couches à 24, réserve GPU de 2048 Mo ;
 - 15 travailleurs CPU et le thread principal (16 cœurs), sans changement SMT ;
@@ -53,8 +58,9 @@ le nom du modèle affiché et la clé API (Authorization: Bearer CLE).
 L'API Anthropic est également disponible sous /v1/messages.
 La console d'administration reste locale, sur le port 8765.
 Les clés sont stockées dans les JSON locaux : ne pas partager ces fichiers.
-L'interface ne change pas le pare-feu, le routeur ou les règles de ports.
-Si nécessaire, autoriser Python dans le pare-feu Windows sur les réseaux privés.
+La rubrique API et réseau permet aussi de gérer l’accès Qwen sur le réseau local,
+avec validation administrateur Windows pour la redirection et le pare-feu.
+Voir ../maintenance/2026-10-22-api-qwen-lan/README.md.
 Pour un accès Internet chiffré, utiliser WireGuard dans Accès distant.
 Les origines CORS concernent les clients web ; les origines de confiance permettent
 au chat Strata situé derrière un proxy d'utiliser ses fonctions d'administration.
@@ -88,7 +94,8 @@ Le programme ne crée pas de redirection sur la box automatiquement.
 Côté client : lancer l'EXE personnel, garder sa fenêtre ouverte et attendre
 Connecté. Le chatbot est intégré dans la fenêtre native « Accès serveur Kiara ».
 La rubrique API locale affiche l’adresse et la clé pour vos autres applications.
-Aucun réglage de tunnel, import de profil ou installation WireGuard à effectuer.
+L’EXE personnel contient le profil ; aucune installation WireGuard séparée n’est nécessaire.
+Au premier lancement, choisir WireGuard ou HTTPS dans Réglages > Connexion.
 Le client choisit l'adresse locale sur le même sous-réseau, puis l'adresse
 Internet. La rubrique Connexion au serveur accepte une adresse IP-ou-DNS:port pour
 dépanner. Les paramètres de la rubrique API locale sont des valeurs à copier.
@@ -125,7 +132,8 @@ Le code applicatif est sous licence MIT (LICENSE.txt dans chaque dossier).
 Les licences des dépendances restent applicables (client-qwen/THIRD-PARTY.txt).
 La source du moteur et les versions exactes sont dans client-qwen/wireguard-bridge
 avec go.mod et go.sum. Build-WireGuard.ps1 puis Build-Client.ps1 reconstruisent
-le client. Python 3.12 avec Tk et PyInstaller est nécessaire à la compilation ;
+le client. Le constructeur Python 3.12 isolé et PyInstaller sont décrits dans
+../RECONSTRUIRE-FRED.md ;
 le serveur utilise aussi psutil et cryptography. Le modèle Strata et ses poids
 restent des composants distincts, soumis à leurs propres licences.
 Après une nouvelle compilation, Mettre-A-Jour-Clients.py remplace les EXE

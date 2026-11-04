@@ -1,5 +1,6 @@
 """Disk/page-fault counters during two synthetic text calculations, written afterwards."""
 import ctypes as c
+import argparse
 import datetime
 import json
 from pathlib import Path
@@ -23,6 +24,10 @@ class Value(c.Structure):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--output', default='measurement.json')
+    parser.add_argument('--prefix', default='')
+    options = parser.parse_args()
     state = live()
     if state['state'] != 'idle' or state.get('queued'):
         raise RuntimeError('Le moteur est occupé ; mesure différée.')
@@ -75,6 +80,7 @@ def main():
                    'Voici un inventaire fictif. ' + ' '.join(f"Le lot {i} contient {i + 2} pièces." for i in range(1, 41)) +
                    ' Combien de pièces contiennent les lots 1 et 2 ensemble ? Explique en une phrase.']
         for index, prompt in enumerate(prompts):
+            prompt = options.prefix + prompt
             state = live()
             if state['state'] != 'idle' or state.get('queued'):
                 raise RuntimeError('Une conversation a commencé ; mesure interrompue.')
@@ -105,7 +111,8 @@ def main():
                   'outcomes': outcomes, 'summary': summary, 'samples': samples,
                   'memory_before': before, 'memory_after': engine.memory_info()._asdict(),
                   'io_before': io_before, 'io_after': engine.io_counters()._asdict(), 'live_after': live()}
-        (OUT / 'measurement.json').write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
+        (OUT / options.output).write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n',
+                                          encoding='utf-8', newline='\n')
         print(json.dumps({'outcomes': outcomes, 'summary': summary, 'live_after': report['live_after']}), flush=True)
     finally:
         stop.set()

@@ -1,0 +1,72 @@
+[
+  {
+    "id": "lea",
+    "text": "Léa posa le plateau sur la table. Les dés colorés attendaient patiemment. Elle lança les dés, espérant un six. Son pion avança d’une case, puis d’une autre.",
+    "whole": "Léa posa le plateau sur la table. Les dés colorés attendaient patiemment. Elle lança les dés, espérant un six. Son pion avança d’une case, puis d’une autre.",
+    "parts": [
+      "Léa posa le plateau sur la table.",
+      "Les dés colorés attendaient patiemment.",
+      "Elle lança les dés, espérant un six.",
+      "Son pion avança d’une case, puis d’une autre."
+    ]
+  },
+  {
+    "id": "courant",
+    "text": "Bonjour, je vous écoute. Vous pouvez enregistrer les fichiers dans le dossier de votre choix.",
+    "whole": "Bonjour, je vous écoute. Vous pouvez enregistrer les fichiers dans le dossier de votre choix.",
+    "parts": [
+      "Bonjour, je vous écoute.",
+      "Vous pouvez enregistrer les fichiers dans le dossier de votre choix."
+    ]
+  },
+  {
+    "id": "noms",
+    "text": "Le client Kiara utilise Windows et une carte AMD Radeon RX 7800 XT.",
+    "whole": "Le client Kiara utilise Windows et une carte AMD Radeon RX 7800 XT.",
+    "parts": [
+      "Le client Kiara utilise Windows et une carte AMD Radeon RX 7800 XT."
+    ]
+  },
+  {
+    "id": "date",
+    "text": "Le rendez-vous avec M. Dupont est prévu le 31 octobre 2026 à 14 h 30.",
+    "whole": "Le rendez-vous avec M. Dupont est prévu le 31 octobre 2026 à 14 h 30.",
+    "parts": [
+      "Le rendez-vous avec M. Dupont est prévu le 31 octobre 2026 à 14 h 30."
+    ]
+  },
+  {
+    "id": "homographes",
+    "text": "Les poules du couvent couvent. Les fils du tailleur coupent les fils.",
+    "whole": "Les poules du couvent couvent. Les fils du tailleur coupent les fils.",
+    "parts": [
+      "Les poules du couvent couvent.",
+      "Les fils du tailleur coupent les fils."
+    ]
+  },
+  {
+    "id": "markdown",
+    "text": "L’**assistant** vous permet d’**enregistrer** vos fichiers.",
+    "whole": "L’ assistant vous permet d’ enregistrer vos fichiers.",
+    "parts": [
+      "L’ assistant vous permet d’ enregistrer vos fichiers."
+    ]
+  },
+  {
+    "id": "nombres",
+    "text": "Le montant à payer est de 12,50 €, soit une remise de 5 %.",
+    "whole": "Le montant à payer est de 12,50 €, soit une remise de 5 %.",
+    "parts": [
+      "Le montant à payer est de 12,50 €, soit une remise de 5 %."
+    ]
+  },
+  {
+    "id": "lettres",
+    "text": "Le cœur du problème concerne les œufs, les écureuils et les géraniums.",
+    "whole": "Le cœur du problème concerne les œufs, les écureuils et les géraniums.",
+    "parts": [
+      "Le cœur du problème concerne les œufs,",
+      "les écureuils et les géraniums."
+    ]
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "path": "lanceur/base-strata.json",
+    "changed": true,
+    "before_sha256": "ac927707189343f56ccbe545fffef70ebc94aad2341efca2db921bbc71141c25",
+    "after_sha256": "0641bcf3dff206b61d41b8976be5e09159cab704b48298a4132c063bb6ebd9dd"
+  },
+  {
+    "path": "strata-iq4-p100-hybride.json",
+    "changed": true,
+    "before_sha256": "ac927707189343f56ccbe545fffef70ebc94aad2341efca2db921bbc71141c25",
+    "after_sha256": "0641bcf3dff206b61d41b8976be5e09159cab704b48298a4132c063bb6ebd9dd"
+  },
+  {
+    "path": "lanceur/reglages.json",
+    "changed": true,
+    "before_sha256": "5d83df35283ecc7ded316d110c4756f73cfe223a2cf6ae74ca6a581fb2602fcd",
+    "after_sha256": "797c8e50129bd1812dd70eee2d29a9385f8e03ee5d32b8c809b60db11f630a31"
+  },
+  {
+    "path": "lanceur/reglages-par-defaut.json",
+    "changed": true,
+    "before_sha256": "5d83df35283ecc7ded316d110c4756f73cfe223a2cf6ae74ca6a581fb2602fcd",
+    "after_sha256": "797c8e50129bd1812dd70eee2d29a9385f8e03ee5d32b8c809b60db11f630a31"
+  },
+  {
+    "path": "lanceur/derniers-reglages-valides.json",
+    "changed": true,
+    "before_sha256": "ed40cf088f22d3e946fdc5b11d66dff8706ab9e72cc1474f62f91c822fe13ba2",
+    "after_sha256": "ae2843d3c065b4b1e6d01229a4635eed67862617c5486b1648042d9b1d9e53d8"
+  }
+]

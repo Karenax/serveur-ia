@@ -28,7 +28,7 @@ def main():
         for kind in ('backup_failed', 'backup_copy_failed', 'storage_low', 'restore_failed'):
             inbox.publish('admin', kind, 'fixture:' + kind)
         owner = controller.remote.issue('Appareil isolé')['id']
-        inbox.publish(owner, 'job_completed', 'private-not-visible')
+        inbox.publish(owner, 'document_indexed', 'private-not-visible')
         with socket.socket() as probe:
             probe.bind(('127.0.0.1', 0)); port = probe.getsockname()[1]
         server = serve(port, controller)

@@ -1,0 +1,21 @@
+{
+  "fingerprints": {
+    "lanceur/base-strata.json": "ac927707189343f56ccbe545fffef70ebc94aad2341efca2db921bbc71141c25",
+    "strata-iq4-p100-hybride.json": "ac927707189343f56ccbe545fffef70ebc94aad2341efca2db921bbc71141c25",
+    "lanceur/reglages.json": "5d83df35283ecc7ded316d110c4756f73cfe223a2cf6ae74ca6a581fb2602fcd",
+    "lanceur/reglages-par-defaut.json": "5d83df35283ecc7ded316d110c4756f73cfe223a2cf6ae74ca6a581fb2602fcd",
+    "lanceur/exploitation.json": "2a56a8b1a5612be6e1fd6d4e5e9f098302abeeb22ad7fb0a2f91de249c448e1b",
+    "lanceur/session.json": "3a776baae3df2eec14acb91ce7ca898c8127995d385f0e8f764f7f9aadb9ea99",
+    "lanceur/derniers-reglages-valides.json": "ed40cf088f22d3e946fdc5b11d66dff8706ab9e72cc1474f62f91c822fe13ba2"
+  },
+  "gpu": "0, GPU-a39f1b57-5a26-b53d-e943-44ef8042a438, Tesla P100-PCIE-16GB, 9, 47, 0, 405, 28.03, 0x0000000000000001\n1, GPU-486d5352-582e-2880-78bf-3dec4688e142, Tesla P100-PCIE-16GB, 9, 46, 0, 405, 27.79, 0x0000000000000001\n2, GPU-c7ec5bca-5502-9e99-2ede-30270b7bde2f, NVIDIA GeForce RTX 3080, 1, 35, 0, 0, 13.78, 0x0000000000000001\n3, GPU-97ca6406-8625-b829-b053-191c238ff046, Quadro P2200, 862, 38, 4, 607, 5.76, 0x0000000000000001",
+  "utc": "2026-10-30T21:06:53.705642+00:00",
+  "memory": {
+    "total": 137284874240,
+    "available": 119615819776,
+    "percent": 12.9,
+    "used": 17669054464,
+    "free": 119615819776
+  },
+  "engine_sha256": "c97c3e84228c928c46bb2727c1753cbfe76c31c3eb0a9edc7bdd3cd78871cac3"
+}

@@ -1,0 +1,125 @@
+{
+  "name": "rtx4080_fp16",
+  "device": "cuda:0",
+  "gpu_uuid": "GPU-7d35736d-3ef5-1304-0e9e-1d26021be1a0",
+  "dtype": "float16",
+  "attention": "sdpa",
+  "batch": 1,
+  "cpu_threads": 2,
+  "torch": "2.14.1+cu126",
+  "cuda_build": "12.6",
+  "cases": [
+    {
+      "case": "query_short",
+      "texts": 1,
+      "characters": 43,
+      "tokens": 16,
+      "seconds": [
+        0.062,
+        0.063,
+        0.062
+      ],
+      "median_seconds": 0.062,
+      "memory": {
+        "rss_mib": 2217.7,
+        "allocated_mib": 525.0,
+        "reserved_mib": 540.0,
+        "peak_allocated_mib": 526.9,
+        "peak_reserved_mib": 540.0,
+        "driver_free_mib": 13594.9
+      },
+      "minimum_cosine_vs_cpu": 0.9999995827674866,
+      "maximum_absolute_delta": 0.0002938807010650635
+    },
+    {
+      "case": "documents_32",
+      "texts": 32,
+      "characters": 62,
+      "tokens": 566,
+      "seconds": [
+        1.547,
+        1.453,
+        1.438
+      ],
+      "median_seconds": 1.453,
+      "memory": {
+        "rss_mib": 2218.7,
+        "allocated_mib": 525.0,
+        "reserved_mib": 542.0,
+        "peak_allocated_mib": 527.2,
+        "peak_reserved_mib": 542.0,
+        "driver_free_mib": 13571.8
+      },
+      "minimum_cosine_vs_cpu": 0.9999992847442627,
+      "maximum_absolute_delta": 0.00033223628997802734
+    },
+    {
+      "case": "long_4",
+      "texts": 4,
+      "characters": 4200,
+      "tokens": 3212,
+      "seconds": [
+        0.234
+      ],
+      "median_seconds": 0.234,
+      "memory": {
+        "rss_mib": 2257.7,
+        "allocated_mib": 525.0,
+        "reserved_mib": 666.0,
+        "peak_allocated_mib": 622.0,
+        "peak_reserved_mib": 666.0,
+        "driver_free_mib": 13308.5
+      },
+      "minimum_cosine_vs_cpu": 0.9999992847442627,
+      "maximum_absolute_delta": 0.0002925395965576172
+    },
+    {
+      "case": "long_32",
+      "texts": 32,
+      "characters": 4200,
+      "tokens": 25718,
+      "seconds": [
+        1.61
+      ],
+      "median_seconds": 1.61,
+      "memory": {
+        "rss_mib": 2262.9,
+        "allocated_mib": 525.0,
+        "reserved_mib": 666.0,
+        "peak_allocated_mib": 622.0,
+        "peak_reserved_mib": 666.0,
+        "driver_free_mib": 13311.7
+      },
+      "minimum_cosine_vs_cpu": 0.9999991655349731,
+      "maximum_absolute_delta": 0.0002925395965576172
+    }
+  ],
+  "synthetic_only": true,
+  "gpu_name": "NVIDIA GeForce RTX 4080",
+  "capability": [
+    8,
+    9
+  ],
+  "compiled_architectures": [
+    "sm_50",
+    "sm_60",
+    "sm_61",
+    "sm_70",
+    "sm_75",
+    "sm_80",
+    "sm_86",
+    "sm_90"
+  ],
+  "allocator_budget_mib": 720,
+  "load_seconds": 4.328,
+  "parameters": 271002624,
+  "after_load": {
+    "rss_mib": 1551.1,
+    "allocated_mib": 516.9,
+    "reserved_mib": 518.0,
+    "peak_allocated_mib": 516.9,
+    "peak_reserved_mib": 518.0,
+    "driver_free_mib": 13708.9
+  },
+  "passed": true
+}

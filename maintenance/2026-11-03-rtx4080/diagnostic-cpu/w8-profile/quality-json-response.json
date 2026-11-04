@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-016d0f63e8f34b58a421e2ce",
+  "object": "chat.completion",
+  "created": 1793735241,
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\"ville\": \"Lyon\", \"stock\": 7}"
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 38,
+    "completion_tokens": 14,
+    "total_tokens": 52,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 38,
+    "prompt_ms": 1232.5,
+    "prompt_per_token_ms": 32.434,
+    "prompt_per_second": 30.8,
+    "predicted_n": 14,
+    "predicted_ms": 223.8,
+    "predicted_per_token_ms": 15.986,
+    "predicted_per_second": 62.6,
+    "draft_n": 10,
+    "draft_n_accepted": 10
+  }
+}

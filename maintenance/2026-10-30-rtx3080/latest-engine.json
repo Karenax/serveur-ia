@@ -1,0 +1,18 @@
+{
+  "release": "v0.2.8",
+  "engine_version": "0.1.54",
+  "url": "https://github.com/Niko1221/Strata/releases/download/v0.2.8/strata-engine-0.1.54-windows-x86_64-cuda-cuda12.tar.gz",
+  "archive_sha256": "d9bb160fc73599bb1eeee64a74ea8a7eede4843b76c8fa1750335f1504811517",
+  "archive_bytes": 902226219,
+  "directory": "F:\\Kiara-tests\\strata-0.1.54-cuda12\\package",
+  "files": {
+    "BUILD.json": "2c7c73873f689db29d96d367d1a5aaed6c4fd65c9da8856434981bd478dd163b",
+    "cublas64_12.dll": "90052a83efd1b57a8e3616a6590b335855f81b814a4f16eecb7b5bf6d1b1d4eb",
+    "cublasLt64_12.dll": "c3a05ea244c937314afec09f87b91f814c7e27977681f6c67eb51bb06ced3a4a",
+    "cudart64_12.dll": "760c38928bbe5759f7b31ed6692599eb7ec83cedd5702e84c2b72028a89837e1",
+    "engine-component.json": "cea529bc12ab23ae6efd157bb7a5133e89954920a4f4dd4417f52a41140dc935",
+    "strata-vision.exe": "8db014eb8c4697810eca0cf7b30e42427680ae7e746228a6c61b1e8527208369",
+    "strata.exe": "53b22657c08456b8101eac987fae2c8232d737758c687586ca5e571b78afe6e2",
+    "strata_kq.dll": "eebc244c8b9c272646a4fbc15ed0e64886bcbebe960252feaf8c25106911680c"
+  }
+}

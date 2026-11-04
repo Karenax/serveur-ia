@@ -1,7 +1,8 @@
 # Environnements Kiara verrouillés
 
-Les six fichiers `*.requirements.txt` enregistrent les versions effectivement
-résolues par Python et les empreintes SHA-256 des distributions publiques PyPI.
+Les sept fichiers `*.requirements.txt` enregistrent les versions effectivement
+résolues par Python et les empreintes SHA-256 des distributions publiques PyPI
+et des roues CUDA officielles PyTorch.
 `manifest.json` enregistre aussi l’empreinte de chaque verrou.
 
 Vérification sans accès réseau :
@@ -16,6 +17,11 @@ Les verrous ne doivent pas être synchronisés aveuglément dans un environnemen
 partagé ou dans l’installation personnelle Hermes.
 
 Strata, EG2 et la voix utilisent Python 3.12 ; Hermes Fred utilise Python 3.14.
+EG2 possède deux profils : `eg2` pour le secours CPU et `eg2-gpu` pour CUDA 12.6.
+Le second est résolu depuis `lanceur/eg2-runtime.json` et préparé par
+`maintenance/prepare_eg2_gpu.py`. L’installation courante superpose ses deux roues
+CUDA aux dépendances verrouillées du runtime CPU, qui doit donc être conservé.
+Le verrou complet permet de reconstruire un runtime GPU autonome si nécessaire.
 Les SDK et poids restent séparés. `artifact-tool-v2` est un outil du poste et
 n’appartient pas à l’application. `hermes-agent` provient du commit et du patch
 locaux, pas d’un paquet PyPI versionné `0.0.0` : installer ses dépendances publiques

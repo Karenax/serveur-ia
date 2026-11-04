@@ -14,7 +14,7 @@ SOURCE_DIRS=('lanceur','client-qwen','client-android','client-voice','maintenanc
 COMPONENT_DIRS={
     'windows':('client-qwen','client-voice','shared','maintenance/2026-10-25-assistant-integration'),
     'android':('client-android','client-qwen','maintenance/2026-10-25-assistant-integration'),
-    'server':('lanceur','shared'),
+    'server':('lanceur','shared','maintenance/codex'),
     'voice':('client-voice','shared'),
 }
 SUFFIXES={'.py','.js','.cjs','.html','.css','.ps1','.cmd','.go','.mod','.sum','.java','.gradle','.xml','.toml','.properties','.cpp','.h','.cmake','.json'}

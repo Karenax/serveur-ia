@@ -78,11 +78,8 @@ def main():
                     doc=workspace.action(owner,{'action':'document_get','id':document})
                     workspace.action(owner,{'action':'document_delete','id':document,'revision':doc['revision']})
                     print('{"deleted":true}',flush=True)
-                elif action=='publish_job':
-                    job=workspace.action(owner,{'action':'job_create','project':project,'prompt':'Quelle est la date de livraison Orion ?','request_key':secrets.token_hex(16)})
-                    print(json.dumps({'job':job['id']}),flush=True)
                 elif action=='publish_many':
-                    for i in range(110): store.notifications.publish(owner,'job_completed','fixture:'+str(i))
+                    for i in range(110): store.notifications.publish(owner,'document_indexed','fixture:'+str(i))
                     print('{"published":110}',flush=True)
                 elif action=='admin_alert':
                     store.notifications.publish('admin','backup_failed','fixture:backup')
@@ -97,7 +94,7 @@ def main():
                         db.execute('DELETE FROM notifications WHERE id=? AND owner=?',(command['id'],owner))
                     print('{"expired":true}',flush=True)
                 elif action=='publish_receipt_race':
-                    event=store.notifications.publish(owner,'job_completed','fixture:receipt-race')
+                    event=store.notifications.publish(owner,'document_indexed','fixture:receipt-race')
                     print(json.dumps({'id':event['id']}),flush=True)
                 elif action=='rotate_generation':
                     from server_state import new_generation

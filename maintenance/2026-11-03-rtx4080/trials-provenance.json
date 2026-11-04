@@ -1,0 +1,28 @@
+{
+  "release": "https://github.com/Niko1221/Strata/releases/tag/v0.2.10",
+  "source_commit": "ffa80d73133ea5c548aefe57889a16e8085a938f",
+  "engine_build": {
+    "version": "0.1.56",
+    "source": "f-0291-rc1",
+    "commit": "06698c674673",
+    "archs": [
+      60,
+      61,
+      70,
+      75,
+      80,
+      86,
+      89
+    ],
+    "ptx": true,
+    "cuda": "12.9",
+    "vision": "gpu-cuda12",
+    "portable": true,
+    "experimental_sm60": true,
+    "vision_archs": "60;61;70;75;80;86;89"
+  },
+  "pack": {
+    "path": "F:/Kiara-tests/dflash2-0156/dflash2/qwen3.8-flash-next-dflash2.q4_0-selq4.pack",
+    "sha256": "4a42b98220ea7880664002c8edda1563aecbae754b762a2e2f31b2b91ee93ecd"
+  }
+}

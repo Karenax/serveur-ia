@@ -1,0 +1,7 @@
+{
+  "pid": 1072,
+  "committed_mib": 1024,
+  "cuda_free_mib_after": 6810.32421875,
+  "cuda_total_mib": 10239.5,
+  "scope": "Memory allocation only; does not simulate concurrent model compute"
+}

@@ -57,7 +57,8 @@ class AccessStore:
         self.path = home / 'acces-distants.json'
         self.lock = threading.RLock()
         self.active = 0
-        self.embedding_slot = threading.BoundedSemaphore(1)
+        from gateway_embeddings import EmbeddingQueue
+        self.embedding_queue = EmbeddingQueue()
         self.maintenance = False
         self.on_access_changed = None
         self.storage = None
@@ -77,6 +78,8 @@ class AccessStore:
         self.seen = read_json(home / 'connexions.json', {})
         self.activity_path = home / 'appareils-activite.json'
         self.activity = read_json(self.activity_path, {})
+        from client_usage import ClientUsage
+        self.usage = ClientUsage(home)
         self.seen_saved_at = 0
         if not self.path.exists():
             write_json(self.path, {'enabled': False, 'url': '', 'clients': []})
@@ -132,7 +135,6 @@ class AccessStore:
             if not values['enabled']:
                 for client in data['clients']:
                     self.scheduler.cancel(client['id']);self.accounts.invalidate(client['id'])
-                    self.workspace.cancel_owner(client['id'])
             self.audit('remote_enabled' if values['enabled'] else 'remote_disabled')
         self._access_changed()
         return self.metadata()
@@ -201,6 +203,12 @@ class AccessStore:
             self.seen_saved_at = now
             if self.storage:self.storage.changed(identity or None)
             return {'id': identity, 'server_epoch': now, 'declared': declaration}
+
+    def usage_summary(self, period='day'):
+        with self.lock:
+            data = read_json(self.path,{})
+            records = data.get('clients',[]) + [{**row,'deleted':True} for row in data.get('deleted_clients',[])]
+        return self.usage.summary(records,period)
 
     def valid_owner(self, identity):
         with self.lock:
@@ -297,7 +305,6 @@ class AccessStore:
                 committed = True
                 self.scheduler.cancel(identity)
                 self.accounts.invalidate(identity)
-                self.workspace.cancel_owner(identity)
                 self.notifications.revoke(identity)
                 for client in data['clients']:
                     if client['id'] == identity:client['revoked'] = True
@@ -322,7 +329,6 @@ class AccessStore:
             write_json(self.path, data)
             self.scheduler.cancel(identity)
             if suspended or (days is not None and days):self.accounts.invalidate(identity)
-            if suspended:self.workspace.cancel_owner(identity)
             self.audit('policy', identity)
         self._access_changed()
         return self.metadata()
@@ -372,6 +378,7 @@ class AccessStore:
                 if client['id'] not in revoked and not client['revoked'] and not client.get('suspended', False) and not client.get('hermes_pending') and (not client.get('expires_epoch') or client['expires_epoch'] > time.time()) and hmac.compare_digest(client['hash'], digest):
                     now = time.time()
                     self.seen[client['id']] = now
+                    self.usage.touch(client['id'],now)
                     if now-self.seen_saved_at >= 30:
                         write_json(self.home/'connexions.json', self.seen)
                         self.seen_saved_at = now
@@ -425,56 +432,6 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
     from hermes_models import ModelUnavailable
     def valid_owner(owner):
         return store.valid_owner(owner)
-    def generate(owner,messages,cancel):
-        if store.hermes:return store.hermes.generate(owner,messages,cancel)
-        item=None;connection=None;deadline=time.monotonic()+900
-        try:
-            while item is None:
-                if cancel.is_set() or not valid_owner(owner):raise ValueError('Tâche annulée ou accès désactivé.')
-                try:item=scheduler.submit(owner,background=True)
-                except ValueError:
-                    if time.monotonic()>deadline:raise ValueError('File occupée pendant 15 minutes.')
-                    cancel.wait(1)
-            scheduler.wait(item,lambda:valid_owner(owner) and not cancel.is_set(),lambda position:None)
-            upstream_port,model,key=backend()
-            if not health('127.0.0.1',upstream_port).get('loaded'):raise ValueError('Modèle arrêté : relancer la tâche après chargement.')
-            data=chat_request({'messages':messages,'stream':True,'chat_template_kwargs':{'enable_thinking':False}},model)
-            connection=http.client.HTTPConnection('127.0.0.1',upstream_port,timeout=120)
-            headers={'Content-Type':'application/json',**({'Authorization':'Bearer '+key} if key else {})}
-            connection.request('POST','/v1/chat/completions',json.dumps(data).encode(),headers)
-            upstream_socket=connection.sock
-            def abort():
-                try:upstream_socket.shutdown(socket.SHUT_RDWR)
-                except OSError:pass
-            with scheduler.condition:
-                item['abort']=abort
-                if item['cancelled']:abort()
-            # Cancellation also closes a blocked read when the model emits no tokens.
-            def monitor():
-                while not cancel.wait(.5):
-                    if item.get('finished'):return
-                    if not valid_owner(owner) or time.monotonic()>deadline:cancel.set();break
-                if not item.get('finished'):abort()
-            threading.Thread(target=monitor,daemon=True).start()
-            response=connection.getresponse()
-            if response.status!=200:raise ValueError('Moteur indisponible ('+str(response.status)+').')
-            result='';complete=False
-            for line in iter(lambda:response.readline(2*1024*1024),b''):
-                if cancel.is_set() or item['cancelled']:raise ValueError('Tâche annulée.')
-                scheduler.progress(item)
-                if line.strip()==b'data: [DONE]':complete=True;break
-                if line.startswith(b'data: '):
-                    value=json.loads(line[6:])
-                    if value.get('error'):raise ValueError('Erreur du moteur pendant la tâche.')
-                    part=value.get('choices',[{}])[0].get('delta',{}).get('content','')
-                    if isinstance(part,str):result+=part
-                    if len(result)>500000:raise ValueError('Résultat trop volumineux.')
-            if not complete:raise ValueError('Génération interrompue avant confirmation de fin.')
-            item['succeeded']=True
-            return result
-        finally:
-            if item:item['finished']=True;scheduler.finish(item)
-            if connection:connection.close()
     class Handler(BaseHTTPRequestHandler):
         def setup(self):
             super().setup()
@@ -514,6 +471,25 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
             return True
 
         def do_GET(self):
+            if urlsplit(self.path).path == '/v1/client/codex/models':
+                if not self.authorized():return
+                from urllib.parse import parse_qs
+                if set(parse_qs(urlsplit(self.path).query))-{'client_version'}:
+                    return self.respond(400,{'error':{'message':'Paramètre de catalogue inconnu.'}})
+                try:
+                    value=read_json(ROOT/'maintenance/codex/qwen-models.json')
+                    if not isinstance(value,dict) or not isinstance(value.get('models'),list):raise ValueError()
+                    if store.authenticate(self.access_token)!=self.identity:return self.respond(403,{'error':{'message':'Accès désactivé.'}})
+                    return self.respond(200,value)
+                except (OSError,ValueError):return self.respond(503,{'error':{'message':'Catalogue Qwen indisponible.'}})
+            if self.path == '/v1/client/codex':
+                if not self.authorized():return
+                from codex_assets import payload as codex_payload
+                try:
+                    value=codex_payload(store.home)
+                    if store.authenticate(self.access_token)!=self.identity:return self.respond(403,{'error':{'message':'Accès désactivé.'}})
+                    return self.respond(200,value)
+                except (OSError,ValueError):return self.respond(503,{'error':{'message':'Les fichiers Codex sont indisponibles. Réessayez plus tard.'}})
             if self.path == '/v1/agent/state':
                 if not self.authorized():return
                 return self.respond(200,store.hermes.status(self.identity) if store.hermes else {'enabled':False,'available':False,'runs':[]})
@@ -626,6 +602,9 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
             self.respond(200, {'object': 'list', 'data': [{'id': model, 'object': 'model', 'owned_by': 'local', 'capabilities': capabilities(live)}]+extra})
 
         def do_POST(self):
+            if self.path == '/v1/responses':
+                from gateway_responses import handle as responses
+                return responses(self, store, backend)
             from gateway_commands import ROUTES as COMMAND_ROUTES, handle as command
             from gateway_voice import MAX_ROUTES, LOW_ROUTES, max_voice, low_voice
             from gateway_embeddings import handle as embeddings
@@ -1059,6 +1038,6 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
     server.workspace=store.workspace
     server.voice=store.voice
     server.voice_max=store.voice_max
-    store.workspace.start(generate,valid_owner)
+    store.workspace.start(valid_owner)
     server.daemon_threads = True
     return server

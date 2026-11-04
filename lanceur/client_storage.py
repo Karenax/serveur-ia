@@ -185,12 +185,12 @@ class ClientStorage:
         json_file('client.json', client)
         policy = json.loads(rows['policies'][0]['settings']) if rows['policies'] else {}
         from workspace import DEFAULT_LIMITS
-        json_file('configuration.json', {'client': client, 'limites': {**DEFAULT_LIMITS, **policy},
+        json_file('configuration.json', {'client': client, 'limites': {key:policy.get(key,value) for key,value in DEFAULT_LIMITS.items()},
             'preferences_notifications': rows['notification_preferences'], 'abonnements': rows['notification_subscriptions'],
             'configuration_locale': 'Les réglages et brouillons non synchronisés restent sur l’appareil.'})
         history = rows['client_histories'][0] if rows['client_histories'] else {'owner': owner, 'revision': 0, 'updated': None, 'history': '{"conversations":[],"currentId":""}'}
         json_file('historique.json', {**history, 'history': json.loads(history['history'])})
-        for name, tables in [('memoires.json', ('memories', 'personal_memories')), ('taches.json', ('jobs',)),
+        for name, tables in [('memoires.json', ('memories', 'personal_memories')),
             ('assistant.json', ('assistant_items', 'assistant_commands')),
             ('notifications.json', ('notifications', 'notification_deliveries')), ('evenements.json', ('events',)),
             ('references.json', ('document_sources', 'document_index', 'knowledge_exclusions'))]:

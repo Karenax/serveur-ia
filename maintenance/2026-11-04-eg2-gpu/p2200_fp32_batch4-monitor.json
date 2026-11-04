@@ -1,0 +1,16 @@
+{
+  "name": "p2200_fp32_batch4",
+  "before": {
+    "free_mib": 3853,
+    "utilization": 0
+  },
+  "allocator_budget_mib": 2200,
+  "stop_below_free_mib": 1024,
+  "minimum_observed_free_mib": 2084,
+  "exit_code": 0,
+  "seconds": 30.0,
+  "after": {
+    "free_mib": 3853,
+    "utilization": 0
+  }
+}

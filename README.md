@@ -1,9 +1,18 @@
 # Serveur IA
 
 Référence courante : [architecture, versions et compatibilités](ARCHITECTURE-ACTUELLE.md).
-La livraison des corrections de l’audit global est **serveur/Windows 3.5.53 et
-Android 1.0.24/code 25**. Le [suivi des corrections](maintenance/2026-10-26-correctifs-audit-global/AVANCEMENT.md)
-regroupe les changements et les validations ; les dossiers datés ci-dessous décrivent les livraisons précédentes.
+Version publiée au 4 novembre 2026 : **serveur/Windows 3.5.60 et Android 1.0.25/code 26**.
+La [publication Windows](maintenance/2026-11-04-connexion-client/README.md)
+efface le message temporaire de connexion dès que le catalogue est retrouvé.
+Les lots EG2 de 32 textes et la file de 16 demandes en attente sont conservés.
+Le retrait des tâches et synthèses programmées est conservé.
+EG2 utilise désormais la **P2200**, avec secours CPU ; cette
+[mise en service](maintenance/2026-11-04-eg2-p2200/README.md) ne demande aucune
+mise à jour des clients.
+L’APK Android conserve sa livraison du 26 octobre ; les
+sources Android plus récentes ne sont pas encore dans cet APK.
+Le [suivi de l’audit global](maintenance/2026-10-26-correctifs-audit-global/AVANCEMENT.md)
+et les dossiers datés ci-dessous conservent les livraisons précédentes.
 
 L’application et l’assistante s’appellent **Kiara**. Les noms des EXE clients sont
 conservés. Le [rapport du renommage](maintenance/2026-10-24-kiara/README.md) décrit
@@ -33,6 +42,7 @@ Le [plan global](PLAN-GLOBAL-SERVEUR-FRED.md) découpe en lots les sauvegardes, 
 
 - `lanceur/` : pilotage du serveur, interface web, comptes, espaces de travail et accès distant.
 - `client-qwen/` : client Windows, interface de conversation, historique et mises à jour.
+- `client-linux/` : première version Ubuntu/Debian 64 bits, installation et limites dans [son guide](client-linux/README.md).
 - `client-android/` : client Android téléphone/tablette, APK signé, guide et validation.
 - Les scripts `Start-*.ps1`, `Stop-*.ps1`, `Build-*.cmd` et les scripts Python à la racine servent au lancement, à la compilation et aux comparatifs.
 - `analyses/`, `comparatifs/`, `recherche/` et les rapports à la racine conservent les protocoles et résultats.
@@ -47,7 +57,7 @@ Le poste d'origine utilise Windows et le dossier `D:\Serveur IA`. Certains scrip
 
 Sur le PC serveur, le [chat Strata](http://127.0.0.1:8080/) permet de discuter directement avec Qwen local ; la [console Kiara](http://127.0.0.1:8765/) propose aussi **Ouvrir le chat**. Ces interfaces écoutent sur `127.0.0.1`. Le PC est configuré en IP fixe **192.168.1.41/24**, DHCP IPv4 désactivé, passerelle et DNS `192.168.1.1`. WireGuard utilise le port UDP **51820** ; les profils corrigés privilégient `192.168.1.41:51820` sur le réseau local. [Configuration et vérification](maintenance/2026-10-13-ip-fixe/README.md).
 
-Le moteur actuel est Strata officiel **0.1.45.3**, installé dans `dependances/strata-0.1.45.3/engine-cuda12`, avec le **serveur Python 0.1.43.1 corrigé et l’encodeur P2200 conservés** dans `dependances/strata-0.1.43.1`. Ne pas supprimer ce dernier dossier. Les réglages et la preuve de mise en service sont dans [le dossier de maintenance du 19 octobre](maintenance/2026-10-19-strata-0.1.45.3/README.md). L’ancien moteur personnalisé et ses références restent conservés.
+Le moteur actuel est Strata officiel **0.1.56 CUDA 12.9**, installé dans `F:/Kiara/moteurs/strata-0.1.56-cuda12`, avec RTX 4080 principale, deux P100 pour les experts et DFlash2. Le **serveur Python 0.1.43.1 corrigé et l’encodeur P2200** restent conservés dans `dependances/strata-0.1.43.1`. Les réglages et preuves sont dans [le profil de production du 3 novembre](maintenance/2026-11-03-rtx4080/default-mode/README.md). Les anciens moteurs et leurs références restent conservés.
 
 Les moteurs Strata et llama.cpp restent des dépôts distincts. Leurs sources, outils CUDA et environnements Python doivent être installés séparément. Les références et patchs enregistrés dans `dependances/` permettent de retrouver les versions et modifications locales.
 
@@ -73,7 +83,7 @@ La mémoire sémantique **EmbeddingGemma 2** est installée et activée sur le s
 
 Les données connues du serveur sont également regroupées dans un dossier privé par client, sous `lanceur/donnees-clients/<identifiant>/` : base individuelle, historiques, conversations, documents, souvenirs et configuration. Les chemins et dates de mise à jour sont affichés dans la console. [Organisation et fonctionnement](lanceur/DOSSIERS-CLIENTS.md).
 
-Les conversations Windows/Android et les tâches rédactionnelles sont intégrées à **Hermes** : profil créé automatiquement pour chaque accès, session par conversation et projet natif associé à chaque projet Kiara. Les trois actions du correcteur utilisent directement Qwen, avec une consigne imposée côté serveur. Le Qwen local est partagé ; les recherches documentaires EG2 et outils web conservent les droits Kiara. La recherche web des conversations utilise les outils et connexions natifs Hermes du serveur. Coupures, annulation, sauvegarde et restauration sont raccordées. [Fonctionnement et limites](lanceur/HERMES-FRED.md), [preuves](preuves/hermes-fred/VALIDATION.md).
+Les conversations Windows/Android sont intégrées à **Hermes** : profil créé automatiquement pour chaque accès, session par conversation et projet natif associé à chaque projet Kiara. Les trois actions du correcteur utilisent directement Qwen, avec une consigne imposée côté serveur. Le Qwen local est partagé ; les recherches documentaires EG2 et outils web conservent les droits Kiara. La recherche web des conversations utilise les outils et connexions natifs Hermes du serveur. Coupures, annulation, sauvegarde et restauration sont raccordées. [Fonctionnement et limites](lanceur/HERMES-FRED.md), [preuves](preuves/hermes-fred/VALIDATION.md).
 
 Windows **3.5.23** corrige l’arrêt de la conversation vocale pendant la synchronisation normale de l’historique ; la lecture et le microphone restent actifs, et le tour suivant attend la fin de l’enregistrement. [Validation](preuves/conversation-fix-20261011/VALIDATION.md).
 

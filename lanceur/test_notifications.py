@@ -24,21 +24,21 @@ class NotificationTests(unittest.TestCase):
         self.workspace.shutdown()
         self.directory.cleanup()
 
-    def publish(self, key='result:1', owner=None, kind='job_completed'):
+    def publish(self, key='result:1', owner=None, kind='document_indexed'):
         return self.inbox.publish(owner or self.owner, kind, key)['id']
 
     def test_notification_survives_restart_and_deduplicates(self):
         identity = self.publish()
         restarted = Notifications(Workspace(self.directory.name))
-        repeated = restarted.publish(self.owner, 'job_completed', 'result:1')
+        repeated = restarted.publish(self.owner, 'document_indexed', 'result:1')
         self.assertEqual(repeated, {'id': identity, 'created': False})
         self.assertEqual([identity], [row['id'] for row in restarted.snapshot(self.owner)['items']])
         restarted.workspace.shutdown()
 
     def test_order_uses_durable_sequence_even_if_clock_moves_back(self):
         with self.workspace.db() as db:
-            first = publish(db, self.owner, 'job_completed', 'first', now=time.time())['id']
-            second = publish(db, self.owner, 'job_completed', 'second', now=time.time()-30)['id']
+            first = publish(db, self.owner, 'document_indexed', 'first', now=time.time())['id']
+            second = publish(db, self.owner, 'document_indexed', 'second', now=time.time()-30)['id']
         rows = self.inbox.snapshot(self.owner)['items']
         self.assertEqual([first, second], [row['id'] for row in rows])
         self.assertLess(rows[0]['sequence'], rows[1]['sequence'])
@@ -80,14 +80,14 @@ class NotificationTests(unittest.TestCase):
     def test_preferences_persist_and_disable_delivery_without_hiding_inbox(self):
         identity = self.publish()
         updated = self.inbox.action(self.owner, {'action': 'preferences', 'revision': 0,
-                                                'types': {'job_completed': False}, 'discreet': True})
+                                                'types': {'document_indexed': False}, 'discreet': True})
         self.assertEqual(1, updated['preferences']['revision'])
         self.assertFalse(updated['items'][0]['enabled'])
         self.inbox.action(self.owner, {'action': 'delivered', 'ids': [identity]})
         with self.workspace.db() as db:
             self.assertEqual(0, db.execute('SELECT COUNT(*) FROM notification_deliveries').fetchone()[0])
         restarted = Notifications(Workspace(self.directory.name))
-        self.assertFalse(restarted.snapshot(self.owner)['preferences']['types']['job_completed'])
+        self.assertFalse(restarted.snapshot(self.owner)['preferences']['types']['document_indexed'])
         with self.assertRaises(Conflict):
             restarted.action(self.owner, {'action': 'preferences', 'revision': 0, 'types': {}})
         restarted.workspace.shutdown()
@@ -132,34 +132,13 @@ class NotificationTests(unittest.TestCase):
         with self.assertRaises(Denied):
             self.inbox.snapshot(self.owner, device=self.other)
         with self.assertRaises(ValueError):
-            self.inbox.publish(self.owner, 'job_completed', 'url', {'kind': 'url', 'url': 'https://example.org'})
+            self.inbox.publish(self.owner, 'document_indexed', 'url', {'kind': 'url', 'url': 'https://example.org'})
 
-    def test_job_and_document_notifications_publish_atomically_without_private_text(self):
-        project = self.workspace.action(self.owner, {'action': 'project_create', 'title': 'Titre secret'})['id']
-        document = self.workspace.action(self.owner, {'action': 'document_create', 'project': project,
-                                                      'title': 'Document secret', 'text': 'Texte confidentiel'})['id']
-        rows = self.inbox.snapshot(self.owner)['items']
-        self.assertEqual('document_indexed', rows[0]['type'])
-        self.assertEqual({'kind': 'document', 'id': document, 'project': project}, rows[0]['target'])
-        self.assertNotIn('secret', json.dumps(rows).lower())
-        self.assertNotIn('confidentiel', json.dumps(rows).lower())
-        self.workspace.action(self.owner, {'action': 'document_save', 'id': document, 'project': project,
-                                          'title': 'Document secret', 'text': 'Révision suivante', 'revision': 1})
-        self.assertEqual(2, len(self.inbox.snapshot(self.owner)['items']))
-        job = self.workspace.action(self.owner, {'action': 'job_create', 'project': project,
-                                                'title': 'Question privée', 'prompt': 'Répondre secret',
-                                                'kind': 'analysis', 'request_key': 'c' * 32})['id']
-        self.workspace.generation = lambda *args: 'Résultat privé'
-        self.workspace.run_one()
-        completed = self.inbox.snapshot(self.owner)['items'][-1]
-        self.assertEqual('job_completed', completed['type'])
-        self.assertEqual(job, completed['target']['id'])
-        self.assertNotIn('privé', json.dumps(completed))
 
     def test_transaction_rolls_back_notification_with_failed_document_write(self):
         with self.assertRaises(RuntimeError):
             with self.workspace.db() as db:
-                publish(db, self.owner, 'job_completed', 'rolled-back')
+                publish(db, self.owner, 'document_indexed', 'rolled-back')
                 raise RuntimeError('simulated transaction failure')
         result = self.inbox.snapshot(self.owner)
         self.assertEqual([], result['items'])
@@ -177,7 +156,7 @@ class NotificationTests(unittest.TestCase):
     def test_notifications_and_read_preferences_restore_with_workspace_backup(self):
         identity = self.publish()
         self.inbox.action(self.owner, {'action': 'read', 'ids': [identity]})
-        self.inbox.action(self.owner, {'action': 'preferences', 'revision': 0, 'types': {'job_failed': False}})
+        self.inbox.action(self.owner, {'action': 'preferences', 'revision': 0, 'types': {'transcription_ready': False}})
         saved = self.workspace.backup()
         raw = self.workspace.validate_backup(saved, {self.owner})
         self.publish('after-snapshot')
@@ -185,7 +164,7 @@ class NotificationTests(unittest.TestCase):
         restored = self.inbox.snapshot(self.owner)
         self.assertEqual([identity], [row['id'] for row in restored['items']])
         self.assertEqual([identity], restored['read_ids'])
-        self.assertFalse(restored['preferences']['types']['job_failed'])
+        self.assertFalse(restored['preferences']['types']['transcription_ready'])
 
     def test_validation_rejects_foreign_owner_and_invalid_preferences_with_tuple_db(self):
         self.publish()
@@ -197,7 +176,7 @@ class NotificationTests(unittest.TestCase):
             validate(db, {self.other})
         self.assertIsNone(db.row_factory)
         validate(db, {self.owner})
-        db.execute('INSERT INTO notification_preferences VALUES(?,?,1,?)', (self.owner, json.dumps({'types': {'job_completed': 'yes'}, 'discreet': True}), time.time()))
+        db.execute('INSERT INTO notification_preferences VALUES(?,?,1,?)', (self.owner, json.dumps({'types': {'document_indexed': 'yes'}, 'discreet': True}), time.time()))
         with self.assertRaises(ValueError):
             validate(db, {self.owner})
         db.close()
@@ -234,7 +213,7 @@ class NotificationTests(unittest.TestCase):
         with self.workspace.db() as db:
             db.execute('UPDATE notifications SET created=? WHERE id=?', (time.time()-(RETENTION_DAYS+1)*86400, old))
             for index in range(MAX_OWNER + 5):
-                publish(db, self.owner, 'job_completed', 'bounded:' + str(index))
+                publish(db, self.owner, 'document_indexed', 'bounded:' + str(index))
             self.assertEqual(MAX_OWNER, db.execute('SELECT COUNT(*) FROM notifications WHERE owner=?', (self.owner,)).fetchone()[0])
             self.assertEqual(0, db.execute('SELECT COUNT(*) FROM notification_deliveries').fetchone()[0])
         self.assertEqual(MAX_OWNER, self.inbox.snapshot(self.owner)['unread_count'])
@@ -244,7 +223,7 @@ class NotificationTests(unittest.TestCase):
         self.workspace.maintenance = True
         with self.assertRaises(Denied):
             self.inbox.action(self.owner, {'action': 'read', 'ids': [identity]})
-        self.assertEqual({'created': False, 'maintenance': True}, self.inbox.publish(self.owner, 'job_completed', 'during-maintenance'))
+        self.assertEqual({'created': False, 'maintenance': True}, self.inbox.publish(self.owner, 'document_indexed', 'during-maintenance'))
 
     def test_retention_runs_when_consulting_a_quiet_inbox(self):
         identity = self.publish()
@@ -265,7 +244,7 @@ class NotificationTests(unittest.TestCase):
     def test_invalid_inputs_do_not_change_preferences_or_notifications(self):
         for body in ({'action': 'list', 'after': True}, {'action': 'list', 'limit': 101},
                      {'action': 'read', 'ids': ['bad']}, {'action': 'subscribe', 'enabled': 1},
-                     {'action': 'preferences', 'revision': 0, 'types': {'job_failed': 1}}):
+                     {'action': 'preferences', 'revision': 0, 'types': {'transcription_ready': 1}}):
             with self.assertRaises(ValueError):
                 self.inbox.action(self.owner, body)
         self.assertEqual(0, self.inbox.snapshot(self.owner)['preferences']['revision'])

@@ -53,6 +53,18 @@ class ResidencyTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'SSD C:'):
                 self.verify(self.pinned, args=args)
 
+    def test_ple_can_use_new_f_ssd(self):
+        args = self.args[:-1] + ['direct', '--ple-gguf', 'F:/synthetic.gguf']
+        with patch('ram_residency.Path.resolve', return_value=Path('F:/synthetic.gguf')):
+            result = self.verify(self.pinned, args=args)
+        self.assertFalse(result['ple_locked'])
+
+    def test_f_link_resolving_to_d_is_rejected(self):
+        args = self.args[:-1] + ['direct', '--ple-gguf', 'F:/synthetic.gguf']
+        with patch('ram_residency.Path.resolve', return_value=Path('D:/synthetic.gguf')):
+            with self.assertRaisesRegex(ValueError, 'SSD C: ou F:'):
+                self.verify(self.pinned, args=args)
+
     def test_disk_fallback_is_rejected(self):
         with self.assertRaisesRegex(ValueError, 'disque'):
             self.verify(self.ple + self.pinned + 'WARNING: the whole resident RAM mode does not fit')

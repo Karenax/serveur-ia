@@ -1,0 +1,21 @@
+{
+  "fingerprints": {
+    "lanceur/base-strata.json": "b9815772778312719c12024284c92905a44b3aa69eb784d7982542d3da1b37ee",
+    "strata-iq4-p100-hybride.json": "b9815772778312719c12024284c92905a44b3aa69eb784d7982542d3da1b37ee",
+    "lanceur/reglages.json": "0d826281e640852f46ee6337031188b3c96b9461d6a330f24189b6349acbc6ee",
+    "lanceur/reglages-par-defaut.json": "0d826281e640852f46ee6337031188b3c96b9461d6a330f24189b6349acbc6ee",
+    "lanceur/exploitation.json": "2a56a8b1a5612be6e1fd6d4e5e9f098302abeeb22ad7fb0a2f91de249c448e1b",
+    "lanceur/session.json": "427722f11d279fc1789cdffcc1df6479836d49e7cf7a33a9109efed8bfcba771",
+    "lanceur/derniers-reglages-valides.json": "30ea788d8411aea0ceb8a3696514fa1f772ca3d055d805dedf0806200c0b9984"
+  },
+  "gpu": "0, GPU-a39f1b57-5a26-b53d-e943-44ef8042a438, Tesla P100-PCIE-16GB, 9, 43, 0, 405, 27.28, 0x0000000000000001\n1, GPU-486d5352-582e-2880-78bf-3dec4688e142, Tesla P100-PCIE-16GB, 9, 42, 0, 405, 27.06, 0x0000000000000001\n2, GPU-7d35736d-3ef5-1304-0e9e-1d26021be1a0, NVIDIA GeForce RTX 4080, 734, 39, 2, 210, 12.53, 0x0000000000000001\n3, GPU-97ca6406-8625-b829-b053-191c238ff046, Quadro P2200, 7, 30, 0, 139, 4.69, 0x0000000000000001",
+  "utc": "2026-11-03T20:15:56.754669+00:00",
+  "memory": {
+    "total": 137284874240,
+    "available": 122151309312,
+    "percent": 11.0,
+    "used": 15133564928,
+    "free": 122151309312
+  },
+  "engine_sha256": "c8bb79a8fefd847aa9166ac822e3a8f8c1dac6b028e41d3ac14945e8d5403d94"
+}

@@ -1,6 +1,29 @@
 # Contexte de reprise — serveur Kiara
 
-Mise à jour : 25 octobre 2026.
+Mise à jour : 4 novembre 2026.
+
+État courant : **serveur/Windows 3.5.60**, **APK Android 1.0.25/code 26**.
+Les quatre EXE personnels actifs ont été reconditionnés et testés ; signature et
+téléchargement authentifié sont vérifiés. Données, clés, réglages, sauvegardes et
+processus Qwen sont conservés. Voir la
+[publication Windows](maintenance/2026-11-04-connexion-client/README.md).
+
+Le moteur de production est Strata **0.1.56 CUDA 12.9**, RTX 4080 principale,
+deux P100 pour les experts et DFlash2 ; le serveur Python corrigé 0.1.43.1 et
+l’encodeur P2200 sont conservés. Le
+[profil du 3 novembre](maintenance/2026-11-03-rtx4080/default-mode/README.md)
+décrit les réglages. Les sauvegardes quotidiennes à 03 h ont une seconde copie
+sur le NAS, vérifiée lors de cette publication.
+
+Les tâches, révisions automatiques de documents et synthèses programmées ont
+été retirées. Souvenirs, notes, rappels et bilan **Faire le point** restent
+disponibles. Les sources Android ont aussi évolué depuis l’APK du 26 octobre ;
+ces changements ne sont pas encore livrés dans cet APK. Linux conserve son
+archive précédente et ses limites de qualification matérielle.
+L’[architecture actuelle](ARCHITECTURE-ACTUELLE.md) fait référence pour les
+versions et responsabilités ; les sections suivantes conservent la chronologie.
+
+## Historique au 25 octobre 2026
 
 L’[assistant étendu](maintenance/2026-10-25-assistant-integration/README.md) est
 intégré et publié en **serveur/Windows 3.5.52, Android 1.0.23/code 24** : mémoire

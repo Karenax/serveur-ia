@@ -122,7 +122,7 @@ class HermesPrivateServer:
                     with outer.conversations.lock:
                         context['model_calls'] += 1
                         if context['model_calls'] > 24: raise ValueError('Limite d’appels au modèle atteinte.')
-                    item = outer.store.scheduler.submit(owner, background=context.get('background', False))
+                    item = outer.store.scheduler.submit(owner)
                     outer.store.scheduler.wait(item,
                         lambda: outer.conversations.valid(owner, context),
                         lambda position: context.update(inference_phase='queued' if position else 'thinking'))

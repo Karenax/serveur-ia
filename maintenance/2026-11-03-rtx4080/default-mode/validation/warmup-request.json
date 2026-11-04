@@ -1,0 +1,21 @@
+{
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "messages": [
+    {
+      "role": "system",
+      "content": "warmup\nRéponds à la demande de l’utilisateur."
+    },
+    {
+      "role": "user",
+      "content": "Calcule 143 + 158. Réponds uniquement avec le résultat."
+    }
+  ],
+  "max_tokens": 32,
+  "temperature": 0,
+  "seed": 42,
+  "stream": false,
+  "cache_prompt": false,
+  "chat_template_kwargs": {
+    "enable_thinking": false
+  }
+}

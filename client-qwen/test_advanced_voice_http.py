@@ -126,6 +126,17 @@ class AdvancedVoiceHTTPTests(unittest.TestCase):
             self.assertEqual(self.request('/client/voice/max/open-folder',{})[0],200)
             folder.assert_called_once_with()
 
+    def test_folder_choice_requires_authentication_and_an_idle_client(self):
+        with patch.object(self.server.max_installation,'choose_folder',return_value={'phase':'choosing'}) as choose:
+            self.assertEqual(self.request('/client/voice/max/choose-folder',{},key='wrong')[0],401)
+            self.assertEqual(self.request('/client/voice/max/choose-folder',{'path':'C:/arbitrary'})[0],400)
+            self.active()
+            self.assertEqual(self.request('/client/voice/max/choose-folder',{})[0],400)
+            choose.assert_not_called()
+            self.server.conversation.value['phase']='idle'
+            self.assertEqual(self.request('/client/voice/max/choose-folder',{})[0],200)
+            choose.assert_called_once_with()
+
     def test_gpu_routes_are_local_authenticated_and_protect_an_active_call(self):
         with patch.object(self.server.advanced_voice,'detect_devices',return_value={'gpu':{'cards':[]}}) as detect,patch.object(self.server.advanced_voice,'set_gpu',return_value={'gpu':{'selection':'b'*24}}) as select:
             self.assertEqual(self.request('/client/voice/max/devices',{},key='wrong')[0],401)

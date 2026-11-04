@@ -1,0 +1,21 @@
+{
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "messages": [
+    {
+      "role": "system",
+      "content": "quality-json\nRéponds à la demande de l’utilisateur."
+    },
+    {
+      "role": "user",
+      "content": "Réponds uniquement avec un objet JSON ayant ville égale à Lyon et stock égal au nombre 7. Sans balises."
+    }
+  ],
+  "max_tokens": 64,
+  "temperature": 0,
+  "seed": 42,
+  "stream": false,
+  "cache_prompt": false,
+  "chat_template_kwargs": {
+    "enable_thinking": false
+  }
+}

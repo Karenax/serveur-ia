@@ -1,0 +1,21 @@
+{
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "messages": [
+    {
+      "role": "system",
+      "content": "decode-r2\nRéponds à la demande de l’utilisateur."
+    },
+    {
+      "role": "user",
+      "content": "Explique en français pourquoi le ciel est bleu puis rouge au coucher du soleil. Développe les phénomènes physiques en plusieurs paragraphes, avec des exemples."
+    }
+  ],
+  "max_tokens": 256,
+  "temperature": 0,
+  "seed": 42,
+  "stream": false,
+  "cache_prompt": false,
+  "chat_template_kwargs": {
+    "enable_thinking": false
+  }
+}

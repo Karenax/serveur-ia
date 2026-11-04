@@ -2,6 +2,7 @@
 import base64
 import hashlib
 import json
+import io
 from pathlib import Path
 import queue
 import tempfile
@@ -9,6 +10,7 @@ import threading
 import unittest
 import time
 from unittest.mock import patch
+from types import SimpleNamespace
 from advanced_voice import AdvancedVoice, audio_request, choose_execution
 
 
@@ -16,6 +18,21 @@ class AdvancedVoiceTests(unittest.TestCase):
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory();self.addCleanup(self.temp.cleanup)
         self.service=AdvancedVoice(self.temp.name);self.addCleanup(self.service.close)
+
+    def test_french_text_survives_legacy_windows_worker_code_page(self):
+        text='Léa posa le plateau. Les dés colorés. Elle lança les dés. Son pion avança d’une case.'
+        output=io.BytesIO()
+        stdin=io.TextIOWrapper(output,encoding='utf-8')
+        process=SimpleNamespace(stdin=stdin,poll=lambda:None)
+        self.service.processes['tts']=process
+        try:
+            self.service._write({'action':'speak','id':'a'*32,'text':text},'tts')
+            wire=output.getvalue()
+            self.assertTrue(wire.isascii())
+            for encoding in ('cp1252','cp850','utf-8'):
+                self.assertEqual(json.loads(wire.decode(encoding))['text'],text)
+        finally:
+            self.service.processes.clear();stdin.close()
 
     def install_fixture(self,passed=True):
         for file in self.service.paths():

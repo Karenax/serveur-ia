@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "files": [
+    {
+      "file": "torch/__init__.py",
+      "hash_verified": true,
+      "bytes": 134069
+    },
+    {
+      "file": "torch/lib/torch_cpu.dll",
+      "hash_verified": true,
+      "bytes": 305994752
+    },
+    {
+      "file": "torch/lib/torch_cuda.dll",
+      "hash_verified": true,
+      "bytes": 1060440576
+    }
+  ]
+}

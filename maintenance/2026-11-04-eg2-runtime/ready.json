@@ -1,0 +1,14 @@
+{
+  "model": "EmbeddingGemma 2",
+  "engine": "Sentence Transformers / PyTorch",
+  "enabled": true,
+  "status": "pret",
+  "error": "",
+  "device": "cpu",
+  "precision": "float32",
+  "threads": 2,
+  "dimensions": 768,
+  "pid": 4596,
+  "last_seconds": null,
+  "parameters": 271002624
+}

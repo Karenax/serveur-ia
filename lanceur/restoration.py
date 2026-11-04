@@ -235,8 +235,9 @@ class RestoreManager:
                 c.remote.maintenance=True;c.remote.workspace.maintenance=True
                 c.operations.desired=False
             workspace=c.remote.workspace
-            generation_callback,valid_callback=workspace.generation,workspace.valid
-            self.callbacks=(generation_callback,valid_callback)
+            restart_reminders=bool(workspace.thread and workspace.thread.is_alive())
+            valid_callback=workspace.valid
+            self.callbacks=(valid_callback,) if restart_reminders else None
             journal=c.home/'securite'/'restauration.json'
             staging=c.home/'securite'/'retour-restauration.dpapi'
             private_directory(journal.parent)
@@ -302,7 +303,7 @@ class RestoreManager:
             finally:
                 hermes_token = hermes_token or c.operations.hermes_pause
                 if self.job.get('state')!='applying':c.remote.maintenance=False;workspace.maintenance=False
-                if generation_callback and not self.job.get('state')=='applying':workspace.start(generation_callback,valid_callback)
+                if restart_reminders and not self.job.get('state')=='applying':workspace.start(valid_callback)
                 if self.job.get('state') != 'applying':
                     c.operations.hermes_resume(hermes_token, restored=bool(hermes_token and hermes_token['restoring']) or self.job.get('state') in ('completed', 'recovered'))
                 else:

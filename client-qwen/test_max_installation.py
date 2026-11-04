@@ -11,7 +11,7 @@ from unittest.mock import patch
 import zipfile
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
-from max_installation import MaxInstallation, canonical, relative_path, verify_catalogue
+from max_installation import MaxInstallation, canonical, relative_path, verify_catalogue, max_home
 
 
 class MaxInstallationTests(unittest.TestCase):
@@ -51,6 +51,65 @@ class MaxInstallationTests(unittest.TestCase):
 
     def sign(self):
         self.catalogue['signature'] = base64.b64encode(self.key.sign(canonical(self.catalogue))).decode()
+
+    def test_folder_choice_persists_without_touching_previous_files(self):
+        old = self.install.home
+        old.mkdir();(old/'keep.bin').write_bytes(b'previous download')
+        self.install.location_file = self.root/'voice-max-location.json'
+        self.install.plan()
+        self.install.set_folder(self.root/'autre disque')
+        target = self.root/'autre disque/Kiara-Max'
+        self.assertEqual(self.install.home, target)
+        self.assertEqual(self.install.runtime.home, target)
+        self.assertEqual(max_home(self.root/'voice-max'), target)
+        self.assertEqual((old/'keep.bin').read_bytes(), b'previous download')
+        self.assertIsNone(self.install.plan_id)
+        self.assertEqual(self.install.storage()['path'], str(target))
+        with self.assertRaises(ValueError):self.install.install('old plan')
+        self.assertEqual(max_home(self.root/'elsewhere/voice-max'), self.root/'elsewhere/voice-max')
+
+    def test_folder_choice_rejects_owned_files_low_and_nested_target(self):
+        self.install.location_file = self.root/'voice-max-location.json'
+        occupied = self.root/'occupied/Kiara-Max';occupied.mkdir(parents=True)
+        (occupied/'personal.txt').write_text('keep')
+        old = self.install.home
+        for parent in (occupied.parent, self.install.shared_asr, old):
+            with self.subTest(parent=parent), self.assertRaises(ValueError):self.install.set_folder(parent)
+            self.assertEqual(self.install.home, old)
+            self.assertFalse(self.install.location_file.exists())
+        self.assertEqual((occupied/'personal.txt').read_text(), 'keep')
+
+    def test_cancelled_folder_dialog_keeps_location_and_runtime(self):
+        self.install.location_file = self.root/'voice-max-location.json'
+        old = self.install.home
+        with patch('tkinter.Tk'), patch('tkinter.filedialog.askdirectory', return_value=''):
+            self.install.choose_folder();self.install.thread.join(5)
+        self.assertEqual(self.install.home, old)
+        self.assertEqual(self.install.status()['phase'], 'idle')
+        self.assertFalse(self.install.runtime.maintenance)
+        self.assertFalse(self.install.location_file.exists())
+
+    def test_folder_dialog_cannot_interrupt_runtime_or_installation(self):
+        with patch.object(self.install.runtime, 'begin_maintenance', side_effect=ValueError('occupé')):
+            with self.assertRaises(ValueError):self.install.choose_folder()
+        with patch.object(self.install, 'thread') as thread:
+            thread.is_alive.return_value = True
+            with self.assertRaises(ValueError):self.install.choose_folder()
+
+    def test_folder_dialog_success_and_save_failure_release_runtime(self):
+        self.install.location_file = self.root/'voice-max-location.json'
+        with patch('tkinter.Tk'), patch('tkinter.filedialog.askdirectory', return_value=str(self.root/'chosen')):
+            self.install.choose_folder();self.install.thread.join(5)
+        self.assertEqual(self.install.home, self.root/'chosen/Kiara-Max')
+        self.assertFalse(self.install.runtime.maintenance)
+        old = self.install.home
+        previous_pointer = self.install.location_file.read_bytes()
+        with patch('tkinter.Tk'), patch('tkinter.filedialog.askdirectory', return_value=str(self.root/'denied')), patch.object(Path,'replace',side_effect=PermissionError()):
+            self.install.choose_folder();self.install.thread.join(5)
+        self.assertEqual(self.install.home, old)
+        self.assertEqual(self.install.location_file.read_bytes(), previous_pointer)
+        self.assertFalse(self.install.runtime.maintenance)
+        self.assertIn('Dossier non modifié', self.install.status()['message'])
 
     @staticmethod
     def make_archive(files):

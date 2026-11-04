@@ -10,4 +10,4 @@ Installer ce paquet local après les dépendances publiques verrouillées :
 
 Le constructeur Windows est préparé par `maintenance/prepare_build_environment.py`, qui installe aussi ce paquet. PyInstaller suit les imports du paquet. Les anciens modules `fred_http`, `chat_attachments`, `history_store`, `file_lock`, `advanced_voice` et `max_installation` sont des alias de compatibilité.
 
-Une règle de transport ou une validation partagée se modifie ici, puis se vérifie dans les tests serveur et Windows. Les règles métier de mémoire, tâches et documents restent dans leurs services du serveur. Les composants natifs Android conservent leurs contrôles de plateforme ; les contrats communs sont vérifiés par les tests et les manifestes.
+Une règle de transport ou une validation partagée se modifie ici, puis se vérifie dans les tests serveur et Windows. Les règles métier de mémoire, rappels et documents restent dans leurs services du serveur. Les tâches ont été retirées ; leurs tables historiques restent reconnues pour les sauvegardes. Les composants natifs Android conservent leurs contrôles de plateforme ; les contrats communs sont vérifiés par les tests et les manifestes.

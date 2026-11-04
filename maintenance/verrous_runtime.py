@@ -15,8 +15,10 @@ sys.path[:0]=[str(ROOT/'lanceur'),str(ROOT/'client-qwen')]
 from hermes_service import installation
 
 def environments():
+    from eg2_runtime import configuration
     return {'strata':ROOT/'Strata-src/.venv/Scripts/python.exe',
         'eg2':ROOT/'toolchain/eg2-python/Scripts/python.exe',
+        'eg2-gpu':ROOT/Path(configuration().get('python','toolchain/eg2-gpu-benchmark-python-20261104/Scripts/python.exe')),
         'voix-serveur':ROOT/'toolchain/phonon-server-python/Scripts/python.exe',
         'conversation-windows':ROOT/'toolchain/conversation-client-python/Scripts/python.exe',
         'hermes-fred':installation()['python'],

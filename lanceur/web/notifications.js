@@ -10,7 +10,7 @@
  const panel=node('section',null,'panel');panel.id='notifications';panel.hidden=true;document.querySelector('.panel-content').append(panel);
  function button(text,action,cls='secondary'){const value=node('button',text,'button '+cls);value.type='button';value.onclick=action;return value;}
  const heading=node('div',null,'section-title'),refresh=button('Actualiser',()=>load());heading.append(node('h2','Alertes du serveur'),refresh);panel.append(heading);
- panel.append(node('p','Cette boîte contient les alertes d’exploitation réservées à l’administration. Les clients consultent uniquement leurs propres tâches et documents.','muted'));
+ panel.append(node('p','Cette boîte contient les alertes d’exploitation réservées à l’administration. Les clients consultent uniquement leurs propres rappels et documents.','muted'));
  const delivery=node('p','La console ouverte reçoit les alertes et les retrouve à la reconnexion.','notifications-delivery');panel.append(delivery);
  const feedback=node('p','Lecture des notifications…','notifications-feedback');feedback.id='notifications-feedback';feedback.setAttribute('role','status');feedback.setAttribute('aria-live','polite');panel.append(feedback);
  const bar=node('div',null,'notifications-toolbar'),onlyUnread=node('input');onlyUnread.type='checkbox';onlyUnread.id='notifications-only-unread';const filter=node('label');filter.append(onlyUnread,document.createTextNode('Afficher seulement les non lues'));const readVisible=button('Marquer les alertes affichées comme lues',()=>readAll());readVisible.id='notifications-read-visible';bar.append(filter,readVisible);panel.append(bar);

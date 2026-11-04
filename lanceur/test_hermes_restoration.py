@@ -173,18 +173,9 @@ class HermesRestorationTests(unittest.TestCase):
         self.assertFalse(self.facade.conversations.admission_paused)
         self.assertIsNone(self.controller.operations.hermes_pause)
 
-    def test_background_preparation_defers_snapshot_without_stopping_service(self):
-        workspace = self.controller.remote.workspace
-        workspace.running['fixture-preparing-job'] = threading.Event()
-        try:
-            with self.assertRaises(ValueError): self.backup()
-        finally: workspace.running.clear()
-        self.assertEqual(self.facade.stops, 0)
-        self.assertFalse(self.facade.conversations.admission_paused)
-        self.assertIsNone(self.controller.operations.hermes_pause)
 
     def test_snapshot_can_coexist_with_remote_revocation_lock_order(self):
-        # Revocation owns remote before cancelling Workspace jobs. A snapshot
+        # Revocation owns remote before consulting Workspace data. A snapshot
         # must never retain Workspace while waiting for that remote lock.
         waiting = threading.Event(); held = threading.Event(); release = threading.Event()
         errors = []
@@ -208,7 +199,7 @@ class HermesRestorationTests(unittest.TestCase):
                 with c.remote.lock:
                     held.set()
                     if not release.wait(5): raise RuntimeError('Fixture did not release revocation')
-                    c.remote.workspace.cancel_owner(self.owner)
+                    c.remote.workspace.snapshot(self.owner)
             except Exception as error: errors.append(error)
 
         def snapshot():

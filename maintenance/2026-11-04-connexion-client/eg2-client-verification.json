@@ -1,0 +1,111 @@
+{
+  "version": "3.5.60",
+  "client_entrypoint": "bytecode extracted from published EXE",
+  "dependencies_match_build_manifest": true,
+  "remote_pc_not_observed": true,
+  "synthetic_text_only": true,
+  "engine_before": {
+    "model": "EmbeddingGemma 2",
+    "engine": "Sentence Transformers / PyTorch",
+    "enabled": true,
+    "status": "pret",
+    "error": "",
+    "device": "cpu",
+    "precision": "float32",
+    "threads": 2,
+    "dimensions": 768,
+    "pid": 32476,
+    "last_seconds": 0.1569999999992433,
+    "parameters": 271002624
+  },
+  "checks": [
+    {
+      "transport": "HTTPS",
+      "http": 200,
+      "texts": 1,
+      "encoding": "float",
+      "mode": "query",
+      "dimensions": 768,
+      "normalized": true,
+      "prompt_tokens": 25,
+      "response_bytes": 17181,
+      "seconds": 0.266
+    },
+    {
+      "transport": "HTTPS",
+      "http": 200,
+      "texts": 2,
+      "encoding": "base64",
+      "mode": "document",
+      "dimensions": 768,
+      "normalized": true,
+      "prompt_tokens": 36,
+      "response_bytes": 8416,
+      "seconds": 0.312
+    },
+    {
+      "transport": "HTTPS",
+      "http": 200,
+      "texts": 32,
+      "encoding": "float",
+      "mode": "document",
+      "dimensions": 768,
+      "normalized": true,
+      "prompt_tokens": 598,
+      "response_bytes": 546813,
+      "seconds": 2.125
+    },
+    {
+      "transport": "WireGuard (disposable loopback tunnel)",
+      "http": 200,
+      "texts": 1,
+      "encoding": "float",
+      "mode": "query",
+      "dimensions": 768,
+      "normalized": true,
+      "prompt_tokens": 25,
+      "response_bytes": 17181,
+      "seconds": 0.156
+    },
+    {
+      "transport": "WireGuard (disposable loopback tunnel)",
+      "http": 200,
+      "texts": 2,
+      "encoding": "base64",
+      "mode": "document",
+      "dimensions": 768,
+      "normalized": true,
+      "prompt_tokens": 36,
+      "response_bytes": 8416,
+      "seconds": 0.219
+    },
+    {
+      "transport": "WireGuard (disposable loopback tunnel)",
+      "http": 200,
+      "texts": 32,
+      "encoding": "float",
+      "mode": "document",
+      "dimensions": 768,
+      "normalized": true,
+      "prompt_tokens": 598,
+      "response_bytes": 546813,
+      "seconds": 1.922
+    }
+  ],
+  "engine_after": {
+    "model": "EmbeddingGemma 2",
+    "engine": "Sentence Transformers / PyTorch",
+    "enabled": true,
+    "status": "pret",
+    "error": "",
+    "device": "cpu",
+    "precision": "float32",
+    "threads": 2,
+    "dimensions": 768,
+    "pid": 32476,
+    "last_seconds": 1.8280000000013388,
+    "parameters": 271002624
+  },
+  "qwen_processes_preserved": true,
+  "passed": true
+}

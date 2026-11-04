@@ -1,0 +1,7 @@
+{
+  "passed": true,
+  "version": "3.5.56",
+  "ui_matches_sources": true,
+  "codex_download_verifier_executed": true,
+  "wireguard_matches_staged": true
+}

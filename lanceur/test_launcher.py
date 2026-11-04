@@ -31,7 +31,8 @@ class LaunchTests(unittest.TestCase):
         s = validate(self.settings, True)
         self.assertEqual((s['context'], s['workers'], s['history_slots']), (262144, 15, 8))
         self.assertEqual(s['model_name'], 'qwen3.8-flash-next-iq4-xs')
-        self.assertTrue(s['mtp_enabled'])
+        self.assertFalse(s['mtp_enabled'])
+        self.assertEqual(self.base['args'][self.base['args'].index('--draft') + 1], 'dflash2')
         self.assertTrue(s['history_enabled'])
         cfg = build_config(self.base, s)
         for flag in ['--resident-cpu-experts', '--mmap-experts', '--no-prefill-borrow']:
@@ -52,11 +53,42 @@ class LaunchTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate({**s, 'context': 262145})
 
+    def test_three_gpu_dense_and_experts_survive_settings_roundtrip(self):
+        settings = {**self.settings, 'gpus': 'GPU-dense,GPU-experts-a,GPU-experts-b'}
+        cfg = build_config(self.base, settings)
+        self.assertNotIn('--layer-split', cfg['args'])
+        self.assertNotIn('--split-device', cfg['args'])
+        self.assertIn('--remote-expert-opt', cfg['args'])
+        for option in ('--expert-cache-device1', '--expert-cache-device2'):
+            self.assertEqual(cfg['args'][cfg['args'].index(option) + 1], 'auto')
+        again = build_config(cfg, defaults_from_config(cfg))
+        self.assertEqual(again['args'], cfg['args'])
+        self.assertEqual(again['env']['CUDA_VISIBLE_DEVICES'], settings['gpus'])
+        fallback = build_config(cfg, {**self.settings, 'gpus': 'GPU-a,GPU-b', 'layer_split': 24})
+        self.assertNotIn('--remote-expert-opt', fallback['args'])
+        self.assertNotIn('--expert-cache-device2', fallback['args'])
+        self.assertEqual(fallback['args'][fallback['args'].index('--layer-split') + 1], '24')
+        for invalid in ('GPU-a,GPU-a,GPU-b', '0,1,2,3', '0'):
+            with self.subTest(gpus=invalid), self.assertRaises(ValueError):
+                validate({**settings, 'gpus': invalid})
+
     def test_mtp_and_history_can_be_disabled_without_changing_sources(self):
-        cfg = build_config(self.base, {**self.settings, 'mtp_enabled': False, 'history_enabled': False})
+        mtp = build_config(self.base, {**self.settings, 'mtp_enabled': True, 'mtp_path': 'mtp-fixture'})
+        cfg = build_config(mtp, {**self.settings, 'mtp_enabled': False, 'history_enabled': False})
         self.assertNotIn('--mtp', cfg['args'])
         self.assertEqual(cfg['args'][cfg['args'].index('--spec') + 1], '1')
         self.assertEqual(cfg['args'][cfg['args'].index('--prompt-cache') + 1], '0')
+
+    def test_dflash_window_survives_roundtrip_without_loading_mtp(self):
+        cfg = build_config(self.base, {**self.settings, 'mtp_enabled': False, 'spec': 6})
+        self.assertNotIn('--mtp', cfg['args'])
+        self.assertEqual(cfg['args'][cfg['args'].index('--spec') + 1], '6')
+        again = build_config(cfg, defaults_from_config(cfg))
+        self.assertEqual(again['args'], cfg['args'])
+        mtp = build_config(cfg, {**self.settings, 'mtp_enabled': True, 'mtp_path': 'mtp-fixture'})
+        self.assertIn('--mtp', mtp['args'])
+        for flag in ('--draft', '--draft-model', '--draft-fallback', '--draft-conf', '--mtp-draft-vocab'):
+            self.assertNotIn(flag, mtp['args'])
 
     def test_second_start_is_blocked_before_worker_writes_state(self):
         with tempfile.TemporaryDirectory(dir=HOME) as temporary:

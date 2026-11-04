@@ -1,0 +1,105 @@
+{
+  "installed_home": "C:\\Users\\karen\\AppData\\Local\\QwenClient\\voice-max",
+  "root": "C:\\Users\\karen\\AppData\\Local\\QwenClient\\voice-max\\packs\\vocal-rt-de5e67a320a06b1f",
+  "pack": "vocal-rt-de5e67a320a06b1f",
+  "spec": {
+    "repository": "gradium/phonon-40m-fr",
+    "revision": "b0e916ef8d2a9034902c449d113c3b2d4f081651",
+    "language": "fr",
+    "voice": "Tiphaine",
+    "runtime": "0.4.1",
+    "quant": "q8_0"
+  },
+  "verified_files": {
+    "_internal/ptts/_ptts.pyd": "afe2f0f8d1a054d339e282b2f8695ae44ad270c4fb1d948f40ec827dd408baae",
+    "max-worker.exe": "2b62e447c751ea7079dee704f8875b3a152ae0e880a8e2cc3e292ded32802c36",
+    "tts/config.json": "57a441f60dfa379692f31e6c47ecbddabb92b602c2b35fc39a897e6d315b6e60",
+    "tts/default-voice.safetensors": "f739e8c4c76ee7f92e7c94a82002748c8cd22e99582ac49f7b9b94cd63786e18",
+    "tts/model.q8.gguf": "e56a68900c0b3883a81e66f2506167f2e48ba7bdd3ce36b5195e24009d484dcb",
+    "tts/phonon-model.json": "cfd7d96fa7adc31bad60f9ef4b4d58ea3d25db55c34b382fcb03020c370bcf75",
+    "tts/README.md": "7a07117b9ca587bfef6b439ac810658f9c9eda012aaa87a64e3d249a564ae52c",
+    "tts/tokenizer.json": "a5e8c6060bf927ed367314f21355148fdf4acff6fadb94e49c86bc7182449433",
+    "tts/voices/Tiphaine.safetensors": "5646677e9cf4a517e8cc316f94a34e18fa987e224925d916d6fe13396579b95b"
+  },
+  "text": "Léa posa le plateau sur la table. Les dés colorés attendaient patiemment. Elle lança les dés, espérant un six. Son pion avança d’une case, puis d’une autre.",
+  "parts": [
+    "Léa posa le plateau sur la table.",
+    "Les dés colorés attendaient patiemment.",
+    "Elle lança les dés, espérant un six.",
+    "Son pion avança d’une case, puis d’une autre."
+  ],
+  "rows": [
+    {
+      "name": "lea-client-entier",
+      "file": "lea-client-entier.wav",
+      "audio_seconds": 12.56,
+      "generation_seconds": 1.7163065999993705,
+      "normalized": "Léa posa le plateau sur la table. Les dés colorés attendaient patiemment. Elle lança les dés, espérant un six. Son pion avança d'une case, puis d'une autre.",
+      "recognized": "Loa posa le plateau sur la table. Les D.A. coloraos attendaient patiemment. Elle l'annequa les D.A. esporant un 6. Son pion avannequa da dire 05-15, puis da 2-roga-sunoutre."
+    },
+    {
+      "name": "lea-client-conversation",
+      "file": "lea-client-conversation.wav",
+      "audio_seconds": 13.04,
+      "generation_seconds": 1.7635220000011032,
+      "normalized": "Léa posa le plateau sur la table. Les dés colorés attendaient patiemment. Elle lança les dés, espérant un six. Son pion avança d'une case, puis d'une autre.",
+      "recognized": "Lioa posa le plateau sur la table. Les Dioedilio colorauses attendaient patiemment. Elle l'anaca les Dio, espérant un 6. Son pion avanaca dadroguer s'une case, puis dadroguer s'une autre."
+    },
+    {
+      "name": "lea-reference-tiphaine",
+      "file": "lea-reference-tiphaine.wav",
+      "audio_seconds": 8.96,
+      "generation_seconds": 1.3102110999971046,
+      "normalized": "Léa posa le plateau sur la table. Les dés colorés attendaient patiemment. Elle lança les dés, espérant un six. Son pion avança d'une case, puis d'une autre.",
+      "model_languages": [
+        "fr"
+      ],
+      "voice": "Tiphaine",
+      "quant": "q8_0",
+      "temperature": 0.3,
+      "recognized": "Léa posa le plateau sur la table. Les dés colorés attendaient patiemment. Elle lança les dés, espérant un 6. Son pion avança d'une case, puis d'une autre."
+    },
+    {
+      "name": "lea-voix-origine",
+      "file": "lea-voix-origine.wav",
+      "audio_seconds": 9.6,
+      "generation_seconds": 1.3458501999994041,
+      "normalized": "Léa posa le plateau sur la table. Les dés colorés attendaient patiemment. Elle lança les dés, espérant un six. Son pion avança d'une case, puis d'une autre.",
+      "model_languages": [
+        "fr"
+      ],
+      "voice": "default",
+      "quant": "q8_0",
+      "temperature": 0.3,
+      "recognized": "Léa posa le plateau sur la table. Les dés colorés attendaient patiemment. Elle lança les dés, espérant un six. Son pion avança d'une case, puis d'une autre. Son pion avança d'une case, puis d'une autre."
+    },
+    {
+      "name": "lea-temperature08",
+      "file": "lea-temperature08.wav",
+      "audio_seconds": 8.88,
+      "generation_seconds": 1.2290530999998737,
+      "normalized": "Léa posa le plateau sur la table. Les dés colorés attendaient patiemment. Elle lança les dés, espérant un six. Son pion avança d'une case, puis d'une autre.",
+      "model_languages": [
+        "fr"
+      ],
+      "voice": "Tiphaine",
+      "quant": "q8_0",
+      "temperature": 0.8,
+      "recognized": "Léa posa le plateau sur la table. Les décolorés attendaient patiemment. Elle lança les dés, espérant un 6. Son pion avança d'une case, puis d'une autre."
+    },
+    {
+      "name": "lea-f32",
+      "file": "lea-f32.wav",
+      "audio_seconds": 8.96,
+      "generation_seconds": 1.3774406999982602,
+      "normalized": "Léa posa le plateau sur la table. Les dés colorés attendaient patiemment. Elle lança les dés, espérant un six. Son pion avança d'une case, puis d'une autre.",
+      "model_languages": [
+        "fr"
+      ],
+      "voice": "Tiphaine",
+      "quant": "f32",
+      "temperature": 0.3,
+      "recognized": "Léa posa le plateau sur la table. Les décolorés attendaient patiemment. Elle lança les dés, espérant un six. Son pion avança d'une case, puis d'une autre. Léa posa le plateau sur la table. Les décolorés attendaient patiemment. Elle lança les dés, espérant un six. Son pion avança d'une case, puis d'une autre."
+    }
+  ]
+}

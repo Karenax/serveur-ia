@@ -1,0 +1,4 @@
+{
+  "reason": "Measurements deferred until a clean reboot after driver installation, following user question.",
+  "cuda_failure": false
+}

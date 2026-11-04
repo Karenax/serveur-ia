@@ -17,8 +17,7 @@ final class DemoWorkspace {
             JSONObject project=project("Projet de démonstration");
             JSONObject note=Json.object("id",Json.id(),"project",project.getString("id"),"title","Bienvenue sur Android","text","Ce document de démonstration permet de vérifier l’édition sur téléphone et tablette.\n\nLes données de ce mode de test restent locales.","revision",1,"kind","note");
             JSONObject documents=Json.object(note.getString("id"),note);
-            JSONObject job=Json.object("id",Json.id(),"project",project.getString("id"),"title","Vérifier la version mobile","state","completed","due",now(),"repeat_hours",0,"error","","result",Json.object("text","Les conversations, les projets et les documents sont disponibles dans cette démonstration locale.","sources",new JSONArray()).toString());
-            data=Json.object("projects",new JSONArray().put(project),"documents",documents,"jobs",new JSONArray().put(job));
+            data=Json.object("projects",new JSONArray().put(project),"documents",documents);
             save();
         }
     }
@@ -107,14 +106,6 @@ final class DemoWorkspace {
                 JSONObject conversation=findConversation(request.getString("id"));conversation.put("archived",request.optBoolean("archived"));bump(conversation);result=Json.object("revision",conversation.getInt("revision"));break;
             }
             case "conversation_delete":removeConversation(request.getString("id"));result=Json.object("deleted",true);break;
-            case "job_create":{
-                String project=request.getString("project");findProject(project);int delay=request.optInt("delay_minutes");String title=request.optString("title",request.optString("prompt","Tâche de démonstration"));title=title.substring(0,Math.min(120,title.length()));String id=Json.id();
-                JSONObject job=Json.object("id",id,"project",project,"title",title,"state",delay>0?"queued":"completed","due",now()+delay*60L,"repeat_hours",request.optInt("repeat_hours"),"error","","result",Json.object("text","Résultat local de démonstration.\n\nDemande : "+request.optString("prompt"),"sources",new JSONArray()).toString());data.getJSONArray("jobs").put(job);result=Json.object("id",id);break;
-            }
-            case "job_get":return Json.copy(findJob(request.getString("id")));
-            case "job_pause":case "job_cancel":case "job_retry":{
-                JSONObject job=findJob(request.getString("id"));job.put("state",name.equals("job_pause")?"paused":name.equals("job_cancel")?"cancelled":"completed");result=Json.object("saved",true);break;
-            }
             default:throw new IllegalArgumentException("Action de démonstration indisponible : "+name);
         }
         save();return result;
@@ -125,7 +116,6 @@ final class DemoWorkspace {
     private static JSONObject project(String title){return Json.object("id",Json.id(),"title",title,"instructions","","archived",false,"revision",1,"documents",new JSONArray(),"memories",new JSONArray(),"conversations",new JSONArray());}
     private JSONObject findProject(String id) throws JSONException {JSONArray projects=data.getJSONArray("projects");for(int i=0;i<projects.length();i++)if(id.equals(projects.getJSONObject(i).getString("id")))return projects.getJSONObject(i);throw new IllegalArgumentException("Projet introuvable.");}
     private JSONObject document(String id) throws JSONException {JSONObject document=data.getJSONObject("documents").optJSONObject(id);if(document==null)throw new IllegalArgumentException("Document introuvable.");return document;}
-    private JSONObject findJob(String id) throws JSONException {JSONArray jobs=data.getJSONArray("jobs");for(int i=0;i<jobs.length();i++)if(id.equals(jobs.getJSONObject(i).getString("id")))return jobs.getJSONObject(i);throw new IllegalArgumentException("Tâche introuvable.");}
     private JSONObject findConversation(String id) throws JSONException {JSONArray projects=data.getJSONArray("projects");for(int i=0;i<projects.length();i++){JSONArray rows=projects.getJSONObject(i).getJSONArray("conversations");for(int j=0;j<rows.length();j++)if(id.equals(rows.getJSONObject(j).getString("id")))return rows.getJSONObject(j);}throw new IllegalArgumentException("Conversation introuvable.");}
     private void removeConversation(String id) throws JSONException {JSONArray projects=data.getJSONArray("projects");for(int i=0;i<projects.length();i++){JSONArray rows=projects.getJSONObject(i).getJSONArray("conversations");for(int j=rows.length()-1;j>=0;j--)if(id.equals(rows.getJSONObject(j).getString("id")))rows.remove(j);}}
     private static void revision(JSONObject value,JSONObject request){if(request.optInt("revision",value.optInt("revision"))!=value.optInt("revision"))throw new IllegalArgumentException("La version de démonstration a changé. Comparez puis réessayez.");}

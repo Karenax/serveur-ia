@@ -1,90 +1,39 @@
-ACCÈS SERVEUR KIARA 3.5.5 — ESPACES DE TRAVAIL
+ESPACES DE TRAVAIL KIARA
 
-Fonctions intégrées
+Fonctions disponibles
 - Projets : création, recherche, consignes, archivage et restauration.
-- Un seul modèle chargé pour les conversations et les tâches.
-- Documents : notes éditables et fichiers TXT, MD, DOCX et PDF texte ; import 2 Mo,
-  extraction bornée dans un processus distinct, index textuel et passages sourcés.
-- Révisions par l'IA : préparation dans une tâche, brouillon à examiner, acceptation
-  explicite ; une révision concurrente empêche de remplacer un texte plus récent.
-  La révision complète est limitée à 7 500 caractères ; les documents plus longs
-  se travaillent par passages dans le chat, sans suppression silencieuse du reste.
-- Discussions : choix du projet et du document, publication explicite dans le projet,
-  récupération depuis le serveur. L'historique local DPAPI est conservé séparément.
-- Mémoire : préférences choisies, modifiables et supprimables par projet.
-- Tâches : analyse/rédaction/recherche web, travail serveur client fermé, résultat,
-  pause, annulation, relance, départ différé, récurrence quotidienne ou hebdomadaire.
-- Outils : consultation des documents et de la mémoire du projet ; recherche
-  web selon le droit du client et l'activation globale du serveur.
-- Console : Espaces et fichiers / Recherche web / Tâches.
+- Documents : notes éditables et fichiers TXT, MD, DOCX et PDF texte ; import
+  limité à 2 Mo, extraction isolée et recherche de passages sourcés.
+- Discussions : projet et document de référence, synchronisation de l’historique.
+- Mémoire : préférences et faits choisis, modifiables et supprimables.
+- Rappels : échéances simples ou récurrentes, notifications et calendrier local.
+- Bilan du projet : décisions confirmées, souvenirs, documents et discussions.
+- Recherche web des conversations : outils Hermes et autorisation par accès.
 
-Accès
-Toujours un EXE personnel par destinataire, sans compte ni mot de passe à saisir.
-L'identité est dérivée de la clé vérifiée côté serveur. Chaque requête contrôle
-le propriétaire ; un identifiant de projet seul ne donne pas accès à ses données.
-Les copies du même EXE partagent la même identité. Révoquer ou suspendre un accès
-annule ses tâches et refuse les nouvelles demandes.
+Accès et stockage
+Chaque accès personnel possède une identité vérifiée côté serveur. Les copies du
+même accès partagent cette identité. Un identifiant de projet ne donne pas accès
+aux données d’un autre propriétaire. Une suspension ou révocation bloque l’accès.
 
-Stockage et sauvegardes
-SQLite, fourni avec Python, stocke les données et fichiers dans espaces-prives,
-dossier protégé par les droits Windows du propriétaire du serveur et administrateurs.
-Ce stockage n'est pas chiffré de bout en bout ; l'administrateur du serveur y a accès.
-Par défaut : 20 Mo, 50 projets et 5 tâches actives par accès ; plafond global 128 Mo.
-La console permet de changer les limites. Les brouillons de documents sont chiffrés
-sur le PC client par DPAPI et récupérables après réouverture. Les conflits demandent
-une comparaison avant enregistrement. Les imports PDF scannés demandent un OCR préalable.
+SQLite stocke les données sous espaces-prives. Le stockage n’est pas chiffré de
+bout en bout ; l’administrateur du serveur peut le consulter. Limites par défaut :
+20 Mo et 50 projets par accès ; plafond global de 128 Mo. La console permet de
+modifier les limites. Les brouillons locaux et les conflits de version restent
+pris en charge. Les PDF scannés nécessitent un OCR préalable.
 
-Les sauvegardes chiffrées comprennent les espaces, fichiers originaux, conversations
-publiées, index, tâches et clé de recherche. Le schéma, l'intégrité et les
-propriétaires sont contrôlés avant restauration. Les tâches restaurées et celles
-interrompues en cours d'exécution attendent une relance manuelle, pour éviter un rejeu
-silencieux. Les tâches en attente survivent à un redémarrage ordinaire du serveur.
+Sauvegardes
+Les sauvegardes chiffrées comprennent les projets, fichiers, conversations,
+mémoires, rappels et notifications. Schéma, intégrité et propriétaires sont
+vérifiés avant restauration.
 
-Recherche web
-Dans Recherche web : activer la recherche ; autoriser également le client
-dans Espaces et fichiers.
-Dans le client, créer une tâche Recherche web :
-- Avec une URL HTTPS publique : lecture du site, sans clé de fournisseur.
-- Sans URL : recherche Brave Search, nécessitant sa clé API sur le serveur.
-La clé est chiffrée avec Windows DPAPI et n'est jamais retournée dans les états API.
-La recherche par sujet accepte 600 caractères et 75 mots. La question est transmise
-à Brave ; les fichiers et mémoires du projet ne lui sont pas envoyés automatiquement.
-Les résultats présentent des liens et extraits ; une lecture directe est bornée à
-1 Mo. Les adresses privées, ports autres que 443, identifiants dans les URL et
-redirections vers des adresses privées sont refusés. Le certificat HTTPS reste vérifié.
-API de référence : https://api-dashboard.search.brave.com/app/documentation/web-search/codes
+La rubrique Tâches et son moteur ont été supprimés des sources le 3 novembre 2026,
+avec les révisions de documents et synthèses programmées qui en dépendaient.
+Les tables historiques sont conservées uniquement pour lire et restaurer les
+anciennes sauvegardes ; aucun ancien travail n’est exécuté ni exposé par les API.
+Les données et preuves historiques ne sont pas effacées par cette modification.
 
-Le moteur ne reçoit aucun accès au terminal Windows. Les capacités d'outils sont
-vérifiées par le serveur ; l'exécution MCP de l'hôte reste désactivée sur la passerelle.
-Les PDF et textes constituent des sources ; leurs instructions ne donnent pas de droits.
-
-Exploitation
-Les requêtes interactives passent avant les tâches encore en attente, sans interrompre
-automatiquement une génération déjà commencée. Le modèle doit être chargé pour travailler.
-Une tâche annulée ne publie pas son résultat. Les erreurs restent visibles et relançables.
-Récurrence : la prochaine exécution est créée après une réussite ; une erreur demande
-une relance manuelle. Annuler la prochaine tâche arrête la chaîne de récurrence.
-
-Technologies
-Python et serveur HTTP existant ; SQLite avec recherche FTS5 et schéma versionné.
-Client pywebview/WebView2, HTML/CSS/JavaScript, WireGuard Go et mises à jour Ed25519.
-Pas de MariaDB, Alembic ni FastAPI installés. pypdf et python-docx étaient déjà présents
-dans l'environnement ; leurs versions sont désormais déclarées dans requirements.txt.
-OpenDots a servi de référence fonctionnelle ; aucun de ses services cloud n'est ajouté.
-
-Livraison vérifiée
-Console et EXE personnel : 3.4.0. Les 72 tests passent, ainsi que l'ouverture native
-WebView2 et la mise à jour depuis l'ancien EXE 3.1.0. Les clés sont conservées et
-le téléchargement signé est vérifié. Voir AUDIT-ESPACES-FRED.txt pour les limites
-des essais. Le modèle de production était arrêté ; la livraison conserve cet état.
-
-Périmètre ultérieur du plan
-La voix, l'OCR intégré, les espaces partagés, les connecteurs de messagerie,
-la coordination automatique d'agents et l'exécution de code dans des conteneurs
-restent des extensions futures. Elles n'étaient pas les lots retenus pour cette version.
-
-Interface 3.4.0 : voir REFONTE-INTERFACE.txt pour la nouvelle navigation et ses contrôles.
-
-Version 3.5.5 : les cinq profils sont supprimés. Les anciennes discussions du
-serveur et des caches locaux sont effacées sans archive. Une ancienne copie locale
-ne peut plus republier cet historique. Les nouvelles discussions se synchronisent.
+Construction et validation
+Suivre RECONSTRUIRE-FRED.md à la racine. Android reprend les sources partagées via
+client-android/scripts/Prepare-Assets.py. Les ressources générées doivent être
+régénérées avant compilation. Une modification des sources ne met pas à jour
+les exécutables et APK déjà distribués.

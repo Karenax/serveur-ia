@@ -10,6 +10,8 @@ import threading
 class CommandInbox:
     def __init__(self,engine,stream=None):
         self.engine=engine
+        if stream is None:
+            sys.stdin.reconfigure(encoding='utf-8')
         self.stream=stream if stream is not None else sys.stdin
         self.commands=queue.Queue(maxsize=1)
         self.cancelled=OrderedDict()

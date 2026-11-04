@@ -71,6 +71,7 @@
 !/lanceur/reglages-par-defaut.json
 !/lanceur/derniers-reglages-valides.json
 !/lanceur/phonon-model.json
+!/lanceur/eg2-runtime.json
 /lanceur/apercu-*.jpg
 /lanceur/client-*.png
 **/configuration-active.json
@@ -138,3 +139,6 @@
 *.pt
 *.pth
 *.ckpt
+
+# Historique privé de présence des clients.
+/lanceur/activite-clients.json

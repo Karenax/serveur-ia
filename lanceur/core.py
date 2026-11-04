@@ -142,8 +142,8 @@ def validate(settings, check_paths=False):
     if not host.is_loopback and len(s['api_key']) < 24:
         raise ValueError('Pour le réseau, générer une clé API d’au moins 24 caractères.')
     gpus = [part.strip() for part in s['gpus'].split(',')]
-    if len(gpus) != 2 or len(set(gpus)) != 2 or not all(part and (part.isdecimal() or part.startswith('GPU-')) for part in gpus):
-        raise ValueError('Ce profil P100 nécessite exactement deux GPU distincts, dans leur ordre de calcul.')
+    if len(gpus) not in (2, 3) or len(set(gpus)) != len(gpus) or not all(part and (part.isdecimal() or part.startswith('GPU-')) for part in gpus):
+        raise ValueError('Indiquer deux ou trois GPU distincts, dans leur ordre de calcul ; avec trois GPU, le premier calcule les couches denses.')
     s['gpus'] = ','.join(gpus)
     if s['expert_cache'] != 'auto':
         try:
@@ -188,11 +188,32 @@ def build_config(base, settings, log_path=None):
     for flag, name in [('--pack', 'pack'), ('--native', 'native'), ('--expert-profile', 'expert_profile'),
                        ('--max-context', 'context'), ('--pool-workers', 'workers'), ('--prefill', 'prefill'),
                        ('--vram-reserve-mib', 'vram_reserve'), ('--expert-cache', 'expert_cache'),
-                       ('--layer-split', 'layer_split'), ('--short-read', 'short_read'),
+                       ('--short-read', 'short_read'),
                        ('--prompt-cache-every', 'history_every'), ('--spec-min-p', 'spec_min_p')]:
         set_arg(flag, s[name])
+    def remove_arg(flag, valued=True):
+        while flag in args:
+            i = args.index(flag)
+            del args[i:i + (2 if valued else 1)]
+    if len(s['gpus'].split(',')) == 3:
+        remove_arg('--layer-split')
+        remove_arg('--split-device')
+        set_arg('--expert-cache-device1', 'auto')
+        set_arg('--expert-cache-device2', 'auto')
+        if '--remote-expert-opt' not in args:
+            args.append('--remote-expert-opt')
+    else:
+        remove_arg('--expert-cache-device1')
+        remove_arg('--expert-cache-device2')
+        remove_arg('--remote-expert-opt', False)
+        set_arg('--layer-split', s['layer_split'])
+        set_arg('--split-device', 1)
     set_arg('--prompt-cache', s['history_slots'] if s['history_enabled'] else 0)
-    set_arg('--spec', s['spec'] if s['mtp_enabled'] else 1)
+    dflash_enabled = arg(cfg, '--draft') == 'dflash2' and not s['mtp_enabled']
+    if s['mtp_enabled']:
+        for flag in ('--draft', '--draft-model', '--draft-fallback', '--draft-conf', '--mtp-draft-vocab'):
+            remove_arg(flag)
+    set_arg('--spec', s['spec'] if s['mtp_enabled'] or dflash_enabled else 1)
     if s['mtp_enabled']:
         set_arg('--mtp', s['mtp_path'])
     elif '--mtp' in args:

@@ -1,0 +1,9 @@
+{
+  "device": "cuda",
+  "gpu_uuid": "GPU-97ca6406-8625-b829-b053-191c238ff046",
+  "python": "toolchain/eg2-gpu-benchmark-python-20261104/Scripts/python.exe",
+  "batch_size": 4,
+  "memory_limit_mib": 2200,
+  "minimum_free_mib": 1024,
+  "cpu_fallback": true
+}

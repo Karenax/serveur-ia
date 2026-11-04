@@ -36,12 +36,15 @@ def detect(home=None,environ=None,which=None):
     binaries={
         'opencode':[local/'Programs/@opencodedesktop/OpenCode.exe',local/'Programs/OpenCode/OpenCode.exe',home/'.opencode/bin/opencode.exe'],
         'hermes':[local/'hermes/bin/hermes.exe',home/'.hermes/bin/hermes.exe'],
+        'codex':[local/'OpenAI/Codex/Codex.exe',local/'Programs/Codex/Codex.exe'],
     }
-    configs={'opencode':opencode,'hermes':hermes}
+    binaries['codex'].extend((local/'OpenAI/Codex/bin').glob('*/codex.exe'))
+    configs={'opencode':opencode,'hermes':hermes,'codex':Path(env.get('CODEX_HOME',str(home/'.codex')))/'config.toml'}
     result={name:{'installed':bool(configs[name].is_file() or any(p.is_file() for p in binaries[name]) or which(name) or (name=='opencode' and which('opencode2'))),
                   'config_path':str(configs[name].expanduser().absolute())} for name in configs}
     # The Electron distribution is OpenCode 2; the v1 desktop uses another store.
     desktop=binaries['opencode'][0]
+    result['codex']['supported']=os.name=='nt'
     if desktop.is_file():
         roaming=Path(env.get('APPDATA',str(home/'AppData/Roaming')))/'ai.opencode.desktop'
         database=roaming/'drafts.sqlite'
@@ -258,8 +261,15 @@ def hermes_text(text,base_url,key,model,catalogue=None):
     return updated
 
 
-def install(app,base_url,key,model,apps=None,catalogue=None):
-    if app not in ('opencode','hermes'):raise ValueError('Application inconnue.')
+def install(app,base_url,key,model,apps=None,catalogue=None,remote=None):
+    if app not in ('opencode','hermes','codex'):raise ValueError('Application inconnue.')
+    if app=='codex':
+        apps=detect() if apps is None else apps
+        if not apps['codex']['installed']:raise ValueError('Codex non détecté sur ce PC. Installez Codex, puis réessayez.')
+        if model!='fred-qwen':raise ValueError('Choisissez Qwen local pour l’ajouter à Codex.')
+        if remote is None:raise ValueError('Connectez le client au serveur pour télécharger les fichiers Codex.')
+        from codex_integration import install as install_codex
+        return install_codex(remote,apps['codex']['config_path'])
     url=urlsplit(base_url)
     if url.scheme!='http' or url.hostname!='127.0.0.1' or not url.port or url.path!='/v1' or url.query or url.fragment or url.username:raise ValueError('API locale attendue.')
     if not isinstance(model,str) or not model.strip() or len(model)>512 or any(ord(c)<32 for c in model):raise ValueError('Modèle chargé invalide.')

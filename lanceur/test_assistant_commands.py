@@ -80,23 +80,6 @@ class AssistantCommandsTests(unittest.TestCase):
         p.update(due=local_instant('2026-03-28T02:30','Europe/Paris'),clock='02:30:00')
         self.assertEqual(dt.datetime.fromtimestamp(next_due(p,p['due']+1),dt.timezone.utc).date(),dt.date(2026,3,30))
 
-    def test_a_full_account_cannot_delay_another_accounts_reminder(self):
-        from unittest.mock import patch
-        at=dt.datetime.fromtimestamp(time.time()+60,dt.timezone.utc).isoformat()
-        analysis=self.command('reminder_create',project=self.p,text='Compte rendu fictif',kind='analysis',at=at)
-        other=execute(self.w,'b',{'operation':'reminder_create','text':'Rappel indépendant','at':at},request_key=secrets.token_hex(16))
-        quota=self.w.quota
-        def full(db,owner,extra=0):
-            if owner=='a':raise ValueError('Quota fictif atteint.')
-            return quota(db,owner,extra)
-        with patch.object(self.w,'quota',side_effect=full):
-            self.assertEqual(tick(self.w,analysis['due']+1),1)
-        self.assertEqual(self.command('list',project=self.p)['reminders'][0]['state'],'scheduled')
-        self.assertEqual(tick(self.w,analysis['due']+2),1)
-        self.assertEqual(tick(self.w,analysis['due']+3),0)
-        with self.w.db() as db:
-            self.assertEqual(db.execute('SELECT COUNT(*) FROM notifications').fetchone()[0],2)
-            self.assertEqual(db.execute('SELECT COUNT(*) FROM jobs').fetchone()[0],1)
 
     def test_backup_restores_commands_and_upgrades_old_archive(self):
         self.command('memory_add',text='À sauvegarder')
@@ -119,48 +102,8 @@ class AssistantCommandsTests(unittest.TestCase):
         independent=self.w.action('b',{'action':'voice_claim','request_key':secrets.token_hex(16)})
         self.assertTrue(first['accepted']);self.assertFalse(second['accepted']);self.assertTrue(independent['accepted'])
 
-    def test_generated_brief_is_not_reused_after_sources_change(self):
-        self.command('note_create',project=self.p,title='Budget',text='Proposition : 2500 euros.')
-        self.command('brief_generate',project=self.p)
-        self.w.generation=lambda owner,messages,cancel:'Bilan fictif : proposition de budget, à confirmer.'
-        self.assertTrue(self.w.run_one())
-        result=self.command('brief_get',project=self.p)
-        self.assertIn('narrative',result)
-        self.assertEqual(result['narrative'],'Bilan fictif : proposition de budget, à confirmer.')
-        self.command('brief_settings',project=self.p,enabled=True)
-        self.command('memory_add',project=self.p,text='Décision : budget de 2400 euros.',category='decision')
-        result=self.command('brief_get',project=self.p)
-        self.assertNotIn('narrative',result);self.assertEqual(result['generated_state'],'outdated');self.assertTrue(result['automatic'])
 
-    def test_global_preference_change_invalidates_generated_brief(self):
-        self.command('brief_generate',project=self.p)
-        self.w.generation=lambda owner,messages,cancel:'Synthèse avant changement.'
-        self.w.run_one()
-        self.assertIn('narrative',self.command('brief_get',project=self.p))
-        self.command('memory_add',text='Réponds en français.',category='preference',scope='global')
-        self.assertEqual(self.command('brief_get',project=self.p)['generated_state'],'outdated')
 
-    def test_reminder_delivery_does_not_wait_for_slow_analysis(self):
-        import threading
-        began=threading.Event();release=threading.Event()
-        def generation(owner,messages,cancel):
-            began.set();release.wait(8);return 'Analyse terminée.'
-        self.command('task_create',project=self.p,text='Analyse fictive lente')
-        reminder=self.command('reminder_create',text='Rappel indépendant',at=dt.datetime.fromtimestamp(time.time()+60,dt.timezone.utc).isoformat())
-        with self.w.db() as db:
-            row=db.execute('SELECT payload FROM assistant_items WHERE id=?',(reminder['id'],)).fetchone()
-            payload=json.loads(row[0]);payload['due']=time.time()+1.5
-            db.execute('UPDATE assistant_items SET payload=? WHERE id=?',(json.dumps(payload),reminder['id']))
-        self.w.start(generation,lambda owner:True)
-        try:
-            self.assertTrue(began.wait(4),'Analysis should already be running')
-            deadline=time.monotonic()+4;count=0
-            while time.monotonic()<deadline:
-                with self.w.db() as db:count=db.execute("SELECT COUNT(*) FROM notifications WHERE type='assistant_reminder'").fetchone()[0]
-                if count:break
-                time.sleep(.05)
-            self.assertEqual(count,1);self.assertFalse(release.is_set())
-        finally:release.set()
 
     def test_forgotten_fact_is_not_sent_back_as_old_context(self):
         from assistant_commands import model_history

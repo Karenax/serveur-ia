@@ -52,7 +52,7 @@ body.android-keyboard .composer{max-height:67%}
  main#messages{padding:18px 14px;scrollbar-gutter:auto}#messages::-webkit-scrollbar{width:5px}#messages::-webkit-scrollbar-thumb{border:0}
  .conversation-top{padding:8px 14px 0}.conversation-title{gap:4px}#conversation-title{max-width:75vw;font-size:15px}
  .message.user{max-width:92%}.content,.reasoning{line-height:1.7}.settings-view{padding:20px 16px 28px}
- .ws-toolbar{gap:8px}.project-tabs{gap:16px}.task-filter{overflow:auto;white-space:nowrap}
+ .ws-toolbar{gap:8px}.project-tabs{gap:16px}
  .ws-editor{min-height:230px;font-size:16px;line-height:1.65}.corrector-view{padding:14px}
  .conversation-context-menu{left:8px!important;right:8px!important;top:auto!important;bottom:max(8px,env(safe-area-inset-bottom));width:auto;border-radius:16px;padding:12px;max-height:70dvh}
  .conversation-context-menu>strong{font-size:14px;padding:10px 8px}

@@ -1,0 +1,58 @@
+{
+  "passed": true,
+  "documents": [
+    "README.md",
+    "ARCHITECTURE-ACTUELLE.md",
+    "RECONSTRUIRE-FRED.md",
+    "CONTEXTE-PROJET.md",
+    "ARCHIVES-ET-PREUVES.md",
+    "GUIDE-ASSISTANT-KIARA.md",
+    "LISEZ-MOI.txt",
+    "client-qwen/LISEZ-MOI.txt",
+    "client-android/README.md",
+    "client-linux/README.md",
+    "client-voice/README.md",
+    "client-voice/COMPATIBILITE.md",
+    "client-voice/CONVERSATION-WINDOWS.md",
+    "shared/README.md",
+    "lanceur/LISEZ-MOI.txt",
+    "lanceur/HERMES-FRED.md",
+    "lanceur/ESPACES-FRED.txt",
+    "lanceur/RECHERCHE-NOTIFICATIONS.md",
+    "PLAN-INTEGRATION-ASSISTANT-KIARA.md",
+    "lanceur/SAUVEGARDES-APPAREILS.md",
+    "lanceur/MEMOIRE-EG2.md",
+    "PLAN-GLOBAL-SERVEUR-FRED.md",
+    "PLAN-SAUVEGARDES-APPAREILS.md",
+    "maintenance/codex/README.md",
+    "maintenance/2026-11-04-eg2-queue/README.md"
+  ],
+  "local_link_targets_checked": 207,
+  "broken_links": [],
+  "missing_current_version": [],
+  "windows_published": "3.5.59",
+  "windows_source_drift": [],
+  "windows_binary_matches_release": true,
+  "android_published": {
+    "version": "1.0.25",
+    "code": 26
+  },
+  "android_source_drift": [
+    "client-android/app/src/main/assets/android-chat.html",
+    "client-android/app/src/main/assets/ui-package.json",
+    "client-android/mobile-ui/android.css",
+    "client-android/scripts/Prepare-Assets.py",
+    "client-qwen/chat.html",
+    "client-qwen/conversation.js",
+    "client-qwen/ui.css",
+    "client-qwen/ui.js",
+    "client-qwen/workspace.html",
+    "maintenance/build_manifest.py"
+  ],
+  "limits": [
+    "External URLs and Markdown anchors not checked.",
+    "Historical reports retain their original versions and measurements.",
+    "Documentation audit does not qualify physical microphone/camera or Linux hardware.",
+    "Android APK and Linux archive were not rebuilt by this Windows publication."
+  ]
+}

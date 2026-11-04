@@ -21,9 +21,8 @@ JOB_ATTEMPT_PREFIX = 'job_attempt:'
 MAX_JOB_ATTEMPT = 2 ** 63 - 1
 
 CLIENT_TYPES = {
-    'assistant_reminder': ('Rappel', 'Un rappel ou un travail programmé est arrivé à échéance.'),
-    'job_completed': ('Tâche terminée', 'Un résultat est disponible dans vos tâches.'),
-    'job_failed': ('Tâche interrompue', 'Consultez votre tâche pour connaître son état.'),
+    'assistant_reminder': ('Rappel', 'Un rappel est arrivé à échéance.'),
+
     'document_indexed': ('Document prêt', 'Le document peut être recherché et consulté.'),
     'transcription_ready': ('Transcription disponible', 'Un texte transcrit est prêt à être consulté.'),
 }
@@ -50,8 +49,8 @@ def migrate(db):
             db.execute(statement)
 
 
-def job_attempt(db, identity):
-    """The durable retry number survives clock changes and event-log pruning."""
+def _legacy_job_attempt(db, identity):
+    """Validate retry metadata in archives created before tasks were removed."""
     row = db.execute('SELECT value FROM settings WHERE key=?', (JOB_ATTEMPT_PREFIX + identity,)).fetchone()
     if row is None:
         return 0
@@ -59,21 +58,6 @@ def job_attempt(db, identity):
     if not isinstance(value, str) or not re.fullmatch('[1-9][0-9]{0,18}', value) or int(value) > MAX_JOB_ATTEMPT:
         raise ValueError('Numéro de tentative sauvegardé invalide.')
     return int(value)
-
-
-def advance_job_attempt(db, identity):
-    _id(identity)
-    attempt = job_attempt(db, identity)
-    if attempt >= MAX_JOB_ATTEMPT:
-        raise ValueError('Nombre maximal de relances atteint.')
-    db.execute('INSERT OR REPLACE INTO settings(key,value) VALUES(?,?)',
-               (JOB_ATTEMPT_PREFIX + identity, str(attempt + 1)))
-    return attempt + 1
-
-
-def prune_job_attempts(db):
-    db.execute('DELETE FROM settings WHERE substr(key,1,?)=? AND substr(key,?) NOT IN (SELECT id FROM jobs)',
-               (len(JOB_ATTEMPT_PREFIX), JOB_ATTEMPT_PREFIX, len(JOB_ATTEMPT_PREFIX) + 1))
 
 
 def _owner(value):
@@ -94,7 +78,7 @@ def _types(owner):
     return ADMIN_TYPES if owner == 'admin' else CLIENT_TYPES
 
 
-def _target(value, owner):
+def _target(value, owner, *, legacy=False):
     if value is None:
         return {'kind': 'notifications'}
     if not isinstance(value, dict) or set(value) - {'kind', 'id', 'project'}:
@@ -103,7 +87,7 @@ def _target(value, owner):
     if kind == 'notifications':
         if set(value) != {'kind'}:
             raise ValueError('Destination de notification invalide.')
-    elif kind in ('job', 'document', 'assistant') and owner != 'admin':
+    elif (kind in ('document', 'assistant') or legacy and kind == 'job') and owner != 'admin':
         _id(value.get('id'))
         if 'project' in value:
             _id(value['project'])
@@ -117,7 +101,7 @@ def _preferences(db, owner):
     defaults = {'types': {kind: True for kind in _types(owner)}, 'discreet': True}
     if row:
         stored = json.loads(row['settings'])
-        defaults['types'].update(stored['types'])
+        defaults['types'].update({k:v for k,v in stored['types'].items() if k in defaults['types']})
         defaults['discreet'] = stored['discreet']
     return {**defaults, 'revision': row['revision'] if row else 0}
 
@@ -130,7 +114,7 @@ def _subscription(db, owner, device):
 
 def _prune(db, owner, now):
     db.execute('DELETE FROM notifications WHERE created<?', (now - RETENTION_DAYS * 86400,))
-    db.execute('DELETE FROM notifications WHERE owner=? AND seq NOT IN (SELECT seq FROM notifications WHERE owner=? ORDER BY seq DESC LIMIT ?)', (owner, owner, MAX_OWNER))
+    db.execute("DELETE FROM notifications WHERE owner=? AND seq NOT IN (SELECT seq FROM notifications WHERE owner=? ORDER BY seq DESC LIMIT ?)", (owner, owner, MAX_OWNER))
     db.execute('DELETE FROM notifications WHERE seq NOT IN (SELECT seq FROM notifications ORDER BY seq DESC LIMIT ?)', (MAX_GLOBAL,))
 
 
@@ -142,7 +126,7 @@ def publish(db, owner, kind, source_key, target=None, now=None):
     if not isinstance(source_key, str) or not 1 <= len(source_key) <= 180 or any(ord(c) < 32 for c in source_key):
         raise ValueError('Clé d’événement invalide.')
     destination = _target(target, owner)
-    table = {'job': 'jobs', 'document': 'documents'}.get(destination['kind'])
+    table = {'document': 'documents'}.get(destination['kind'])
     if table:
         source = db.execute('SELECT owner,project FROM ' + table + ' WHERE id=?', (destination['id'],)).fetchone()
         if source and (source['owner'] != owner or destination.get('project', source['project']) != source['project']):
@@ -159,14 +143,7 @@ def publish(db, owner, kind, source_key, target=None, now=None):
 
 
 def publish_workspace_event(db, owner, action, identity):
-    """Atomic job/index hooks. Generic texts are resolved only during reading."""
-    if action in ('job_completed', 'job_failed'):
-        job = db.execute('SELECT project FROM jobs WHERE id=? AND owner=?', (identity, owner)).fetchone()
-        if job:
-            attempt = job_attempt(db, identity)
-            source_key = action + ':' + identity + (':attempt:' + str(attempt) if attempt else '')
-            return publish(db, owner, action, source_key,
-                           {'kind': 'job', 'id': identity, 'project': job['project']})
+    """Publish document indexing notices in the caller transaction."""
     if action in ('document_create', 'document_upload', 'document_save'):
         document = db.execute('SELECT project,revision FROM documents WHERE id=? AND owner=?', (identity, owner)).fetchone()
         if document:
@@ -209,7 +186,7 @@ def _validate(db, owners):
     allowed = set(owners) | {'admin'}
     for row in db.execute('SELECT key FROM settings WHERE substr(key,1,?)=?', (len(JOB_ATTEMPT_PREFIX), JOB_ATTEMPT_PREFIX)):
         identity = _id(row['key'][len(JOB_ATTEMPT_PREFIX):])
-        job_attempt(db, identity)
+        _legacy_job_attempt(db, identity)
         if not db.execute('SELECT 1 FROM jobs WHERE id=?', (identity,)).fetchone():
             raise ValueError('Tentative sans tâche correspondante.')
     for table in ('notifications', 'notification_preferences', 'notification_subscriptions', 'notification_deliveries'):
@@ -221,11 +198,11 @@ def _validate(db, owners):
         raise ValueError('Trop de notifications pour un destinataire.')
     for row in db.execute('SELECT * FROM notifications'):
         _id(row['id']); _owner(row['owner'])
-        if row['type'] not in _types(row['owner']):
+        if row['type'] not in _types(row['owner']) and not (row['owner'] != 'admin' and row['type'] in ('job_completed','job_failed')):
             raise ValueError('Type de notification sauvegardée invalide.')
         if not isinstance(row['source_key'], str) or not 1 <= len(row['source_key']) <= 180 or any(ord(c) < 32 for c in row['source_key']):
             raise ValueError('Événement de notification sauvegardé invalide.')
-        target = _target(json.loads(row['target']), row['owner'])
+        target = _target(json.loads(row['target']), row['owner'], legacy=True)
         if type(row['seq']) is not int or row['seq'] < 1 or not isinstance(row['created'], (float, int)) or not math.isfinite(row['created']) or row['created'] <= 0:
             raise ValueError('Date de notification sauvegardée invalide.')
         if row['read_at'] is not None and (not isinstance(row['read_at'], (float, int)) or not math.isfinite(row['read_at']) or row['read_at'] < row['created']):
@@ -237,7 +214,7 @@ def _validate(db, owners):
                 raise ValueError('Destination de notification dans un autre espace.')
     for row in db.execute('SELECT * FROM notification_preferences'):
         prefs = json.loads(row['settings'])
-        if not isinstance(prefs, dict) or set(prefs) != {'types', 'discreet'} or not isinstance(prefs['types'], dict) or set(prefs['types']) - set(_types(row['owner'])) or any(type(value) is not bool for value in prefs['types'].values()) or type(prefs['discreet']) is not bool or type(row['revision']) is not int or row['revision'] < 1:
+        if not isinstance(prefs, dict) or set(prefs) != {'types', 'discreet'} or not isinstance(prefs['types'], dict) or set(prefs['types']) - set(_types(row['owner'])) - ({'job_completed','job_failed'} if row['owner'] != 'admin' else set()) or any(type(value) is not bool for value in prefs['types'].values()) or type(prefs['discreet']) is not bool or type(row['revision']) is not int or row['revision'] < 1:
             raise ValueError('Préférences de notification sauvegardées invalides.')
     for row in db.execute('SELECT * FROM notification_subscriptions'):
         if row['device'] != row['owner'] or row['enabled'] not in (0, 1) or row['discreet'] not in (0, 1):
@@ -283,20 +260,20 @@ class Notifications:
                 _prune(db, owner, time.time())
             preferences = _preferences(db, owner)
             if cursor is None:
-                rows = db.execute('SELECT * FROM notifications WHERE owner=? ORDER BY seq DESC LIMIT ?', (owner, limit + 1)).fetchall()
+                rows = db.execute("SELECT * FROM notifications WHERE owner=? AND type NOT IN ('job_completed','job_failed') ORDER BY seq DESC LIMIT ?", (owner, limit + 1)).fetchall()
                 has_more = len(rows) > limit
                 rows = list(reversed(rows[:limit]))
             else:
-                rows = db.execute('SELECT * FROM notifications WHERE owner=? AND seq>? ORDER BY seq LIMIT ?', (owner, cursor, limit + 1)).fetchall()
+                rows = db.execute("SELECT * FROM notifications WHERE owner=? AND type NOT IN ('job_completed','job_failed') AND seq>? ORDER BY seq LIMIT ?", (owner, cursor, limit + 1)).fetchall()
                 has_more = len(rows) > limit
                 rows = rows[:limit]
             latest = db.execute('SELECT MAX(seq) FROM notifications WHERE owner=?', (owner,)).fetchone()[0] or 0
             marker = generation(self.workspace.home)
             return {'items': [self._public(row, preferences) for row in rows],
                     'cursor': rows[-1]['seq'] if rows else max(cursor or 0, latest), 'has_more': has_more,
-                    'unread_count': db.execute('SELECT COUNT(*) FROM notifications WHERE owner=? AND read_at IS NULL', (owner,)).fetchone()[0],
-                    'read_ids': [row[0] for row in db.execute('SELECT id FROM notifications WHERE owner=? AND read_at IS NOT NULL ORDER BY seq', (owner,))],
-                    'retained_ids': [row[0] for row in db.execute('SELECT id FROM notifications WHERE owner=? ORDER BY seq', (owner,))],
+                    'unread_count': db.execute("SELECT COUNT(*) FROM notifications WHERE owner=? AND type NOT IN ('job_completed','job_failed') AND read_at IS NULL", (owner,)).fetchone()[0],
+                    'read_ids': [row[0] for row in db.execute("SELECT id FROM notifications WHERE owner=? AND type NOT IN ('job_completed','job_failed') AND read_at IS NOT NULL ORDER BY seq", (owner,))],
+                    'retained_ids': [row[0] for row in db.execute("SELECT id FROM notifications WHERE owner=? AND type NOT IN ('job_completed','job_failed') ORDER BY seq", (owner,))],
                     'preferences': preferences, 'subscription': _subscription(db, owner, device),
                     'generation': marker['id'], 'restored': marker['restored'],
                     'delivery': {'mode': 'connected', 'push': False},
@@ -324,7 +301,7 @@ class Notifications:
             if action == 'get':
                 identity = _id(body.get('id'))
                 row = db.execute('SELECT * FROM notifications WHERE id=? AND owner=?', (identity, owner)).fetchone()
-                if row is None:
+                if row is None or row['type'] not in _types(owner):
                     from workspace import Denied
                     raise Denied('Notification absente ou accès interdit.')
                 from server_state import generation

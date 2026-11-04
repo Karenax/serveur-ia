@@ -21,5 +21,5 @@ sys.path.insert(0, str(root / 'lanceur'))
 from workspace import Workspace
 from notifications import Notifications
 workspace = Workspace(fixture / 'isolated-server')
-result = Notifications(workspace).publish(profile['token'].split('_')[1], 'job_completed', 'android-click-' + secrets.token_hex(16), {'kind': 'job', 'id': ids['job'], 'project': ids['project']})
+result = Notifications(workspace).publish(profile['token'].split('_')[1], 'document_indexed', 'android-click-' + secrets.token_hex(16), {'kind': 'document', 'id': ids['document'], 'project': ids['project']})
 print(json.dumps({'published': result.get('created'), 'fixture': True}))

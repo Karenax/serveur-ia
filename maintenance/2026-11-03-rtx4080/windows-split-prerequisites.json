@@ -1,0 +1,262 @@
+[
+  {
+    "device": 0,
+    "name": "NVIDIA GeForce RTX 4080",
+    "attributes": {
+      "cc_major": {
+        "value": 8,
+        "code": 0,
+        "name": "CUDA_SUCCESS"
+      },
+      "cc_minor": {
+        "value": 9,
+        "code": 0,
+        "name": "CUDA_SUCCESS"
+      },
+      "mapped_host_memory": {
+        "value": 1,
+        "code": 0,
+        "name": "CUDA_SUCCESS"
+      },
+      "stream_memops_v1": {
+        "value": 0,
+        "code": 0,
+        "name": "CUDA_SUCCESS"
+      },
+      "virtual_memory": {
+        "value": 1,
+        "code": 0,
+        "name": "CUDA_SUCCESS"
+      },
+      "tcc": {
+        "value": 0,
+        "code": 0,
+        "name": "CUDA_SUCCESS"
+      }
+    },
+    "context": {
+      "code": 0,
+      "name": "CUDA_SUCCESS"
+    },
+    "mapped_allocation": {
+      "code": 0,
+      "name": "CUDA_SUCCESS"
+    },
+    "device_pointer": {
+      "code": 0,
+      "name": "CUDA_SUCCESS"
+    },
+    "stream_write": {
+      "code": 0,
+      "name": "CUDA_SUCCESS"
+    },
+    "write_sync": {
+      "code": 0,
+      "name": "CUDA_SUCCESS"
+    },
+    "written_value": 123,
+    "stream_wait": {
+      "code": 0,
+      "name": "CUDA_SUCCESS"
+    },
+    "wait_sync": {
+      "code": 0,
+      "name": "CUDA_SUCCESS"
+    }
+  },
+  {
+    "device": 1,
+    "name": "Tesla P100-PCIE-16GB",
+    "attributes": {
+      "cc_major": {
+        "value": 6,
+        "code": 0,
+        "name": "CUDA_SUCCESS"
+      },
+      "cc_minor": {
+        "value": 0,
+        "code": 0,
+        "name": "CUDA_SUCCESS"
+      },
+      "mapped_host_memory": {
+        "value": 1,
+        "code": 0,
+        "name": "CUDA_SUCCESS"
+      },
+      "stream_memops_v1": {
+        "value": 0,
+        "code": 0,
+        "name": "CUDA_SUCCESS"
+      },
+      "virtual_memory": {
+        "value": 0,
+        "code": 0,
+        "name": "CUDA_SUCCESS"
+      },
+      "tcc": {
+        "value": 1,
+        "code": 0,
+        "name": "CUDA_SUCCESS"
+      }
+    },
+    "context": {
+      "code": 0,
+      "name": "CUDA_SUCCESS"
+    },
+    "mapped_allocation": {
+      "code": 0,
+      "name": "CUDA_SUCCESS"
+    },
+    "device_pointer": {
+      "code": 0,
+      "name": "CUDA_SUCCESS"
+    },
+    "stream_write": {
+      "code": 0,
+      "name": "CUDA_SUCCESS"
+    },
+    "write_sync": {
+      "code": 0,
+      "name": "CUDA_SUCCESS"
+    },
+    "written_value": 123,
+    "stream_wait": {
+      "code": 0,
+      "name": "CUDA_SUCCESS"
+    },
+    "wait_sync": {
+      "code": 0,
+      "name": "CUDA_SUCCESS"
+    }
+  },
+  {
+    "device": 2,
+    "name": "Tesla P100-PCIE-16GB",
+    "attributes": {
+      "cc_major": {
+        "value": 6,
+        "code": 0,
+        "name": "CUDA_SUCCESS"
+      },
+      "cc_minor": {
+        "value": 0,
+        "code": 0,
+        "name": "CUDA_SUCCESS"
+      },
+      "mapped_host_memory": {
+        "value": 1,
+        "code": 0,
+        "name": "CUDA_SUCCESS"
+      },
+      "stream_memops_v1": {
+        "value": 0,
+        "code": 0,
+        "name": "CUDA_SUCCESS"
+      },
+      "virtual_memory": {
+        "value": 0,
+        "code": 0,
+        "name": "CUDA_SUCCESS"
+      },
+      "tcc": {
+        "value": 1,
+        "code": 0,
+        "name": "CUDA_SUCCESS"
+      }
+    },
+    "context": {
+      "code": 0,
+      "name": "CUDA_SUCCESS"
+    },
+    "mapped_allocation": {
+      "code": 0,
+      "name": "CUDA_SUCCESS"
+    },
+    "device_pointer": {
+      "code": 0,
+      "name": "CUDA_SUCCESS"
+    },
+    "stream_write": {
+      "code": 0,
+      "name": "CUDA_SUCCESS"
+    },
+    "write_sync": {
+      "code": 0,
+      "name": "CUDA_SUCCESS"
+    },
+    "written_value": 123,
+    "stream_wait": {
+      "code": 0,
+      "name": "CUDA_SUCCESS"
+    },
+    "wait_sync": {
+      "code": 0,
+      "name": "CUDA_SUCCESS"
+    }
+  },
+  {
+    "device": 3,
+    "name": "Quadro P2200",
+    "attributes": {
+      "cc_major": {
+        "value": 6,
+        "code": 0,
+        "name": "CUDA_SUCCESS"
+      },
+      "cc_minor": {
+        "value": 1,
+        "code": 0,
+        "name": "CUDA_SUCCESS"
+      },
+      "mapped_host_memory": {
+        "value": 1,
+        "code": 0,
+        "name": "CUDA_SUCCESS"
+      },
+      "stream_memops_v1": {
+        "value": 0,
+        "code": 0,
+        "name": "CUDA_SUCCESS"
+      },
+      "virtual_memory": {
+        "value": 1,
+        "code": 0,
+        "name": "CUDA_SUCCESS"
+      },
+      "tcc": {
+        "value": 0,
+        "code": 0,
+        "name": "CUDA_SUCCESS"
+      }
+    },
+    "context": {
+      "code": 0,
+      "name": "CUDA_SUCCESS"
+    },
+    "mapped_allocation": {
+      "code": 0,
+      "name": "CUDA_SUCCESS"
+    },
+    "device_pointer": {
+      "code": 0,
+      "name": "CUDA_SUCCESS"
+    },
+    "stream_write": {
+      "code": 0,
+      "name": "CUDA_SUCCESS"
+    },
+    "write_sync": {
+      "code": 0,
+      "name": "CUDA_SUCCESS"
+    },
+    "written_value": 123,
+    "stream_wait": {
+      "code": 0,
+      "name": "CUDA_SUCCESS"
+    },
+    "wait_sync": {
+      "code": 0,
+      "name": "CUDA_SUCCESS"
+    }
+  }
+]

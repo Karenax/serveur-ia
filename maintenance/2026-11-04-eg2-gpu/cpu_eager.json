@@ -1,0 +1,76 @@
+{
+  "name": "cpu_eager",
+  "device": "cpu",
+  "gpu_uuid": "",
+  "dtype": "float32",
+  "attention": "eager",
+  "batch": 4,
+  "cpu_threads": 2,
+  "torch": "2.14.1+cpu",
+  "cuda_build": null,
+  "cases": [
+    {
+      "case": "query_short",
+      "texts": 1,
+      "characters": 43,
+      "tokens": 16,
+      "seconds": [
+        0.11,
+        0.109,
+        0.094
+      ],
+      "median_seconds": 0.109,
+      "memory": {
+        "rss_mib": 1694.2
+      }
+    },
+    {
+      "case": "documents_32",
+      "texts": 32,
+      "characters": 62,
+      "tokens": 566,
+      "seconds": [
+        1.656,
+        2.156,
+        2.578
+      ],
+      "median_seconds": 2.156,
+      "memory": {
+        "rss_mib": 1714.8
+      }
+    },
+    {
+      "case": "long_4",
+      "texts": 4,
+      "characters": 4200,
+      "tokens": 3212,
+      "seconds": [
+        10.516
+      ],
+      "median_seconds": 10.516,
+      "memory": {
+        "rss_mib": 1775.8
+      }
+    },
+    {
+      "case": "long_32",
+      "texts": 32,
+      "characters": 4200,
+      "tokens": 25718,
+      "seconds": [
+        84.39
+      ],
+      "median_seconds": 84.39,
+      "memory": {
+        "rss_mib": 2043.9
+      }
+    }
+  ],
+  "synthetic_only": true,
+  "load_seconds": 3.156,
+  "parameters": 271002624,
+  "after_load": {
+    "rss_mib": 1668.0
+  },
+  "passed": true
+}

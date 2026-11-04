@@ -1,0 +1,37 @@
+{
+  "id": "chatcmpl-1e2e8f83a11a497da71b1afb",
+  "object": "chat.completion",
+  "created": 1793734179,
+  "model": "qwen3.8-flash-next-iq4-xs",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "64"
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 35,
+    "completion_tokens": 3,
+    "total_tokens": 38,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 35,
+    "prompt_ms": 916.6,
+    "prompt_per_token_ms": 26.189,
+    "prompt_per_second": 38.2,
+    "predicted_n": 3,
+    "predicted_ms": 54.8,
+    "predicted_per_token_ms": 18.267,
+    "predicted_per_second": 54.7,
+    "draft_n": 4,
+    "draft_n_accepted": 2
+  }
+}

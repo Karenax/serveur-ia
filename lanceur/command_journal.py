@@ -9,7 +9,7 @@ import time
 MAX_RECEIPTS = 5000
 KEEP_RECEIPTS = 2500
 RETENTION_MS = 30 * 86400 * 1000
-RECOVERY = frozenset({'memory_forget', 'reminder_cancel', 'task_cancel', 'task_pause'})
+RECOVERY = frozenset({'memory_forget', 'reminder_cancel'})
 PATTERN = re.compile(r'v2_([a-f0-9]{12})[a-f0-9]{20}\Z')
 EXPIRED = 'Cette demande a expiré. Relancez l’action ; aucune nouvelle modification n’a été enregistrée.'
 

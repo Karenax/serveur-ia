@@ -1,0 +1,19 @@
+{
+  "phase": "reference_loading_after_trials",
+  "started": "2026-10-31T10:41:52.566687+01:00",
+  "runs": [
+    {
+      "tag": "opt4-int8-coexist1g",
+      "exit_code": 0
+    }
+  ],
+  "stop": {
+    "cleanup_wait": "{\"error\": \"Windows lib\u00e8re encore les processus du mod\u00e8le. Attendre avant de relancer.\"}"
+  },
+  "current": "opt4-int8-coexist1g",
+  "benchmark_pid": 16144,
+  "restore": {
+    "status": "chargement",
+    "worker_pid": 25864
+  }
+}
