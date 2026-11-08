@@ -80,8 +80,14 @@ def lock_token_embeddings(args):
 
 
 def verify_locked_ram(log_path, offset, args):
-    if '--resident-experts' not in args or '--no-prefill-borrow' not in args:
-        raise ValueError('Le calcul exige les experts verrouillés en RAM, sans emprunt du cache GPU.')
+    if '--resident-experts' not in args:
+        raise ValueError('Le calcul exige les experts verrouillés en RAM.')
+    if '--no-prefill-borrow' not in args:
+        if '--prefill' not in args or args[args.index('--prefill') + 1] != 'auto':
+            raise ValueError('L’emprunt du cache GPU exige le préfill automatique.')
+        for flag in ('--pack', '--native'):
+            if flag not in args or Path(args[args.index(flag) + 1]).resolve(strict=True).drive.upper() not in ('C:', 'F:'):
+                raise ValueError('Le préfill automatique exige le pack et le GGUF sur le SSD C: ou F:.')
     if '--ple-io' not in args:
         raise ValueError('Le mode de lecture de la table PLE doit être explicite.')
     ple_mode = args[args.index('--ple-io') + 1]

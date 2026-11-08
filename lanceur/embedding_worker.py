@@ -10,6 +10,7 @@ import time
 from http.server import BaseHTTPRequestHandler
 from http_boundary import BoundedHTTPServer, json_body
 from eg2_runtime import ModelRuntime
+from embedding_limits import MAX_INPUT_TOKENS, NO_TRUNCATION, EmbeddingInputTooLong, input_tokens
 
 
 class EmbeddingHTTPServer(BoundedHTTPServer):
@@ -39,7 +40,7 @@ def serve(model_path, token, port, threads, parent, parent_created,device='cpu',
     model = SentenceTransformer(str(model_path), device='cpu', local_files_only=True,
         trust_remote_code=False, config_kwargs={'vision_config': None, 'audio_config': None},
         model_kwargs={'torch_dtype': torch.float32, 'attn_implementation': 'sdpa' if device=='cuda' else 'eager'})
-    model.max_seq_length = 2048
+    model.max_seq_length = MAX_INPUT_TOKENS
     runtime=ModelRuntime(model,torch,device,gpu_uuid,memory_limit_mib,minimum_free_mib,cpu_fallback,fallback_reason)
     config_hash = hashlib.sha256((Path(model_path) / 'config.json').read_bytes()).hexdigest()
     guard = threading.Lock()
@@ -75,17 +76,20 @@ def serve(model_path, token, port, threads, parent, parent_created,device='cpu',
                 texts = data.get('texts'); mode = data.get('mode')
                 if mode not in ('query', 'document') or not isinstance(texts, list) or not 1 <= len(texts) <= 32:
                     raise ValueError('Lot invalide.')
-                if any(not isinstance(s, str) or not s.strip() or len(s) > 4500 for s in texts):
+                if any(not isinstance(s, str) or not s.strip() for s in texts):
                     raise ValueError('Texte invalide.')
                 start = time.monotonic()
                 # Titles are formatted by Kiara; suppress the model's default prefix.
                 prompt = 'task: search result | query: ' if mode == 'query' else ''
                 with torch.inference_mode():
-                    tokens = int(model.tokenize([prompt+text for text in texts])['attention_mask'].sum().item())
+                    tokens = input_tokens(model, texts, prompt)
                     vectors = runtime.encode(texts, prompt=prompt, batch_size=batch_size,
-                        normalize_embeddings=True, show_progress_bar=False).tolist()
+                        normalize_embeddings=True, show_progress_bar=False,
+                        processing_kwargs=NO_TRUNCATION).tolist()
                 if not all(len(v) == 768 for v in vectors): raise ValueError('Dimensions invalides.')
                 self.reply(200, {'vectors': vectors, 'seconds': time.monotonic() - start,'prompt_tokens':tokens})
+            except EmbeddingInputTooLong as error:
+                self.reply(400, {'error': 'input_too_long', 'index': error.index, 'tokens': error.tokens})
             except (ValueError, TypeError, KeyError): self.reply(400, {'error': 'Requête EG2 invalide.'})
             except Exception: self.reply(503, {'error': 'Échec du calcul EG2.'})
             finally: guard.release()

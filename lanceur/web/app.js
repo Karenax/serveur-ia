@@ -8,7 +8,7 @@ const definitions = {
   'compute-fields': [
     ['context','Contexte maximal','number','Tokens du prompt et de la réponse. Maximum du modèle : 262 144.',512,262144],
     ['workers','Travailleurs CPU','number','15 travailleurs + le thread principal = 16 cœurs. Au-delà de 15, le gain SMT reste à mesurer.',1,31],
-    ['prefill','Bloc de traitement du prompt','select','Des blocs plus grands demandent davantage de VRAM.',[[256,'256 tokens · profil actuel'],[512,'512 tokens'],[1024,'1 024 tokens'],[2048,'2 048 tokens'],[4096,'4 096 tokens'],[8192,'8 192 tokens']]],
+    ['prefill','Bloc de traitement du prompt','select','Des blocs plus grands demandent davantage de VRAM.',[['auto','Automatique'],[256,'256 tokens'],[512,'512 tokens'],[1024,'1 024 tokens'],[2048,'2 048 tokens'],[4096,'4 096 tokens'],[8192,'8 192 tokens']]],
     ['vram_reserve','Réserve VRAM par GPU','number','En Mo. Préserve de la place pour les buffers ; réduit le nombre d’experts en VRAM.',512,8192],
   ],
   'history-fields': [

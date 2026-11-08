@@ -75,6 +75,10 @@ patch de `maintenance/2026-10-21-correctifs-audit/`.
 
 Le point d’entrée complet, depuis la racine, est :
 
+Sur ce poste, le projet actif est `F:\Serveur IA`. La variable utilisateur
+`KIARA_EVIDENCE_DIR` dirige les nouvelles preuves vers `D:\Archives Kiara\preuves` ;
+`--output` reste prioritaire. Voir la [répartition après migration](maintenance/2026-11-04-migration-stockage/README.md).
+
 ```powershell
 & '.\Strata-src\.venv\Scripts\python.exe' maintenance/verify_project.py
 ```

@@ -13,8 +13,8 @@ def request(value):
     texts=value.get('input')
     if isinstance(texts,str):texts=[texts]
     if not isinstance(texts,list) or not 1<=len(texts)<=32 or any(
-            not isinstance(text,str) or not text.strip() or len(text)>4500 for text in texts):
-        raise ValueError('Fournir un texte ou un lot de 1 à 32 textes, de 1 à 4500 caractères chacun.')
+            not isinstance(text,str) or not text.strip() for text in texts):
+        raise ValueError('Fournir un texte ou un lot de 1 à 32 textes non vides.')
     encoding=value.get('encoding_format','float')
     if encoding not in ('float','base64') or type(value.get('dimensions',768)) is not int or value.get('dimensions',768)!=768:
         raise ValueError('Encodage float/base64 et dimensions 768 attendus.')

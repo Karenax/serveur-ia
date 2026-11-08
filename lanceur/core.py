@@ -48,6 +48,7 @@ def arg(config, flag, default=''):
     return args[args.index(flag) + 1] if flag in args else default
 
 def defaults_from_config(config):
+    prefill = arg(config, '--prefill', 256)
     return {
         'model_name': config.get('model_name', 'qwen3.8-flash-next'),
         'pack': arg(config, '--pack'), 'native': arg(config, '--native'),
@@ -55,7 +56,7 @@ def defaults_from_config(config):
         'mtp_path': arg(config, '--mtp'), 'expert_profile': arg(config, '--expert-profile'),
         'context': int(arg(config, '--max-context', 262144)),
         'workers': int(arg(config, '--pool-workers', 15)),
-        'prefill': int(arg(config, '--prefill', 256)),
+        'prefill': 'auto' if prefill == 'auto' else int(prefill),
         'vram_reserve': int(arg(config, '--vram-reserve-mib', 2048)),
         'expert_cache': str(arg(config, '--expert-cache', 'auto')),
         'layer_split': int(arg(config, '--layer-split', 24)),
@@ -104,6 +105,8 @@ def validate(settings, check_paths=False):
               'vram_reserve': (512, 8192), 'layer_split': (1, 47), 'spec': (2, 8),
               'history_slots': (1, 24), 'history_every': (0, 262144),
               'short_read': (0, 256), 'port': (1, 65535)}
+    if s.get('prefill') == 'auto':
+        del limits['prefill']
     for name, (lo, hi) in limits.items():
         try:
             number = float(s[name])
@@ -151,7 +154,7 @@ def validate(settings, check_paths=False):
                 raise ValueError()
         except ValueError:
             raise ValueError('Le cache GPU doit être auto ou un nombre de 0 à 24576.')
-    if s['prefill'] > s['context']:
+    if s['prefill'] != 'auto' and s['prefill'] > s['context']:
         raise ValueError('Le bloc de prompt ne peut pas dépasser le contexte.')
     cors = origins(s.get('cors_origins', ''), True)
     origins(s.get('trusted_origins', ''))
@@ -195,6 +198,8 @@ def build_config(base, settings, log_path=None):
         while flag in args:
             i = args.index(flag)
             del args[i:i + (2 if valued else 1)]
+    if s['prefill'] == 'auto':
+        remove_arg('--no-prefill-borrow', False)
     if len(s['gpus'].split(',')) == 3:
         remove_arg('--layer-split')
         remove_arg('--split-device')

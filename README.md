@@ -51,7 +51,7 @@ Le [plan global](PLAN-GLOBAL-SERVEUR-FRED.md) découpe en lots les sauvegardes, 
 
 ## Utilisation locale
 
-Le poste d'origine utilise Windows et le dossier `D:\Serveur IA`. Certains scripts et configurations contiennent les chemins de ce poste : les adapter avant une installation ailleurs.
+Le poste d'origine utilise Windows et le dossier `F:\Serveur IA`. Certains scripts et configurations contiennent les chemins de ce poste : les adapter avant une installation ailleurs.
 
 `Serveur Qwen.cmd` lance `Start-Interface-Qwen.ps1`. Consulter `lanceur/LISEZ-MOI.txt`, `client-qwen/LISEZ-MOI.txt` et les rapports `RESULTATS-*.txt` pour les commandes et configurations mesurées. Les prérequis Python du lanceur et du client sont dans leurs fichiers `requirements*.txt`.
 

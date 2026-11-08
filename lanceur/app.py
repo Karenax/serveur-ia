@@ -231,7 +231,7 @@ class Controller:
         current = psutil.disk_io_counters(perdisk=True)
         seconds = max(now - self.disk_before[0], .01)
         disks = []
-        for disk, label in [('PhysicalDrive0', 'C:'), ('PhysicalDrive1', 'D:')]:
+        for disk, label in [('PhysicalDrive0', 'C:'), ('PhysicalDrive1', 'D:'), ('PhysicalDrive2', 'F:')]:
             if disk in current and disk in self.disk_before[1]:
                 before = self.disk_before[1][disk]
                 disks.append({'name': label, 'read_mib_s': round((current[disk].read_bytes - before.read_bytes) / seconds / 2**20, 2),
@@ -317,7 +317,6 @@ def serve(port=8765, controller=None):
             if path == '/api/clients/activity':
                 if not hmac.compare_digest(self.headers.get('X-Launcher-Token', ''), token):
                     return self.respond(403, {'error':'Rechargez la page du lanceur.'})
-                from urllib.parse import parse_qs
                 period = parse_qs(urlsplit(self.path).query).get('period',['day'])[0]
                 try:
                     return self.respond(200, controller.remote.usage_summary(period))

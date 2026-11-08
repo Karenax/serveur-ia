@@ -48,13 +48,29 @@ class EmbeddingsAPITests(unittest.TestCase):
 
     def test_limits_and_unknown_fields_rejected_before_computation(self):
         self.prepare()
-        for patch_value in ({'input':[]},{'input':[1]},{'input':['a']*33},{'input':' '},{'input':'a'*4501},
+        for patch_value in ({'input':[]},{'input':[1]},{'input':['a']*33},{'input':' '},
                             {'dimensions':True},{'dimensions':512},{'model':'qwen'},{'encoding_format':'unknown'},
                             {'stream':True},{'input_type':'bad'},{'user':{}}):
             with self.subTest(value=patch_value),self.assertRaises(urllib.error.HTTPError) as error:
                 self.call({'model':MODEL_ID,'input':'ok',**patch_value})
             self.assertEqual(error.exception.code,400);error.exception.close()
         self.assertFalse(self.calls)
+
+    def test_long_texts_forwarded_intact_and_token_limit_is_not_retried_as_503(self):
+        from embedding_limits import EmbeddingInputTooLong
+        self.prepare()
+        for length in (4501, 4835, 12000):
+            text = 'é' * length
+            with self.call({'model':MODEL_ID,'input':text}) as response:
+                self.assertEqual(response.status, 200)
+            self.assertEqual(self.calls[-1][0], [text])
+        def fail(*args, **kwargs):raise EmbeddingInputTooLong(0, 8193)
+        self.engine.encode = fail
+        with self.assertRaises(urllib.error.HTTPError) as error:self.call()
+        self.assertEqual(error.exception.code, 400)
+        self.assertEqual(json.load(error.exception)['error']['code'], 'input_too_long')
+        error.exception.close()
+        self.assertFalse(self.store.embedding_queue.active)
 
     def test_auth_origin_pressure_and_revocation_during_calculation(self):
         self.prepare()

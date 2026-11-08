@@ -12,6 +12,7 @@ import subprocess
 import threading
 import time
 from core import ROOT, HIDDEN
+from embedding_limits import EmbeddingInputTooLong
 
 MODEL = ROOT / 'toolchain' / 'eg2-model'
 PYTHON = ROOT / 'toolchain' / 'eg2-python' / 'Scripts' / 'python.exe'
@@ -64,6 +65,10 @@ class EmbeddingService:
             connection.request('POST' if body is not None else 'GET', path,
                 json.dumps(body, ensure_ascii=False).encode() if body is not None else None, headers)
             response = connection.getresponse(); raw = response.read(2 * 1024 * 1024 + 1)
+            if response.status == 400 and len(raw) <= 2 * 1024 * 1024:
+                error = json.loads(raw)
+                if error.get('error') == 'input_too_long' and type(error.get('index')) is int and type(error.get('tokens')) is int:
+                    raise EmbeddingInputTooLong(error['index'], error['tokens'])
             if len(raw) > 2 * 1024 * 1024 or response.status != 200: raise ValueError('Moteur EG2 indisponible ou occupé.')
             return json.loads(raw)
         finally: connection.close()

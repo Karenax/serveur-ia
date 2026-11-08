@@ -1,16 +1,16 @@
 {
   "exe": "F:\\Kiara\\moteurs\\strata-0.1.56-cuda12\\strata.exe",
-  "cwd": "D:\\Serveur IA\\dependances\\strata-0.1.43.1\\source",
+  "cwd": "F:\\Serveur IA\\dependances\\strata-0.1.43.1\\source",
   "args": [
     "--pack",
-    "D:/Serveur IA/strata-data/iq4-xs-local",
+    "F:/Serveur IA/strata-data/iq4-xs-local",
     "--native",
     "F:/Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
     "--mmap-experts",
     "--resident-cpu-experts",
     "--resident-experts",
     "--expert-profile",
-    "D:\\Serveur IA\\dependances\\strata-0.1.43.1\\expert-profile.bin",
+    "F:\\Serveur IA\\dependances\\strata-0.1.43.1\\expert-profile.bin",
     "--no-prefill-borrow",
     "--adapt-every",
     "0",
@@ -59,7 +59,7 @@
     "--draft-fallback",
     "none",
     "--mtp-draft-vocab",
-    "D:\\Serveur IA\\strata-data\\mtp-local-rt\\draft_vocab.bin",
+    "F:\\Serveur IA\\strata-data\\mtp-local-rt\\draft_vocab.bin",
     "--draft-conf",
     "0.8",
     "--expert-cache-device1",
@@ -84,9 +84,9 @@
   "lib_dirs": [
     "F:\\Kiara\\moteurs\\strata-0.1.56-cuda12"
   ],
-  "tokenizer": "D:\\Serveur IA\\dependances\\strata-0.1.43.1\\tokenizer",
+  "tokenizer": "F:\\Serveur IA\\dependances\\strata-0.1.43.1\\tokenizer",
   "model_name": "qwen3.8-flash-next-iq4-xs",
-  "log": "D:/Serveur IA/strata-engine-iq4-rtx4080.log",
+  "log": "F:/Serveur IA/strata-engine-iq4-rtx4080.log",
   "host": "127.0.0.1",
   "port": 8080,
   "api_key": "",
@@ -101,8 +101,8 @@
     "STRATA_ENGINE_READY_S": "3600"
   },
   "vision": {
-    "exe": "D:\\Serveur IA\\dependances\\strata-0.1.43.1\\vision-p2200-cuda12.4\\strata-vision.exe",
-    "mmproj": "D:\\Serveur IA\\strata-data\\vision\\mmproj-Qwen3.8-Flash-Next-BF16.gguf",
+    "exe": "F:\\Serveur IA\\dependances\\strata-0.1.43.1\\vision-p2200-cuda12.4\\strata-vision.exe",
+    "mmproj": "F:\\Serveur IA\\strata-data\\vision\\mmproj-Qwen3.8-Flash-Next-BF16.gguf",
     "model": "F:/Qwen3.8-Flash-Next-Uncensored-IQ4_XS-00001-of-00003.gguf",
     "gpu": true,
     "threads": 4,

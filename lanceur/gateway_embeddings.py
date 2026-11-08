@@ -6,6 +6,7 @@ import threading
 import time
 from kiara_shared.http import json_body
 from workspace_types import Conflict, Denied
+from embedding_limits import EmbeddingInputTooLong
 
 
 class EmbeddingQueue:
@@ -53,7 +54,7 @@ def handle(handler,store):
     try:
         texts, encoding, mode = request(json_body(handler, 2 * 1024 * 1024))
     except (ValueError, TypeError):
-        return handler.respond(400, {'error': {'message': 'Requête embeddings invalide : modèle google/embeddinggemma-2, 1 à 32 textes de 4500 caractères, 768 dimensions, float/base64.'}})
+        return handler.respond(400, {'error': {'message': 'Requête embeddings invalide : modèle google/embeddinggemma-2, 1 à 32 textes non vides, 768 dimensions, float/base64.'}})
     if not store.embedding_queue.acquire(timeout=30):
         return handler.respond(429, {'error': {'message': 'File EG2 pleine ou délai d’attente dépassé. Réessayez dans un instant.'}})
     try:
@@ -68,6 +69,8 @@ def handle(handler,store):
         return handler.respond(200, result)
     except Denied:
         return handler.respond(403, {'error': {'message': 'Accès désactivé.'}})
+    except EmbeddingInputTooLong as error:
+        return handler.respond(400, {'error': {'message': str(error), 'code': 'input_too_long'}})
     except (OSError, ValueError, RuntimeError, http.client.HTTPException):
         return handler.respond(503, {'error': {'message': 'EmbeddingGemma 2 indisponible ou occupé. Réessayez plus tard.'}})
     finally:
