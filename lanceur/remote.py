@@ -27,7 +27,7 @@ from accounts import Accounts
 from operations import VERSION
 from workspace import Workspace, Conflict, Denied, IDENTITY_INSTRUCTIONS
 from urllib.parse import urlsplit
-from core import HOME, ROOT, PYTHON as PYTHON, HIDDEN as HIDDEN, read_json, write_json, health
+from core import HOME, ROOT, PYTHON as PYTHON, HIDDEN as HIDDEN, context_capacity, read_json, write_json, health
 
 GATEWAY_PORT = 8766
 
@@ -477,8 +477,8 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 if set(parse_qs(urlsplit(self.path).query))-{'client_version'}:
                     return self.respond(400,{'error':{'message':'Paramètre de catalogue inconnu.'}})
                 try:
-                    value=read_json(ROOT/'maintenance/codex/qwen-models.json')
-                    if not isinstance(value,dict) or not isinstance(value.get('models'),list):raise ValueError()
+                    from codex_assets import catalogue as codex_catalogue
+                    value=codex_catalogue(context_capacity(health('127.0.0.1', backend()[0])))
                     if store.authenticate(self.access_token)!=self.identity:return self.respond(403,{'error':{'message':'Accès désactivé.'}})
                     return self.respond(200,value)
                 except (OSError,ValueError):return self.respond(503,{'error':{'message':'Catalogue Qwen indisponible.'}})
@@ -486,7 +486,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 if not self.authorized():return
                 from codex_assets import payload as codex_payload
                 try:
-                    value=codex_payload(store.home)
+                    value=codex_payload(store.home, context_capacity(health('127.0.0.1', backend()[0])))
                     if store.authenticate(self.access_token)!=self.identity:return self.respond(403,{'error':{'message':'Accès désactivé.'}})
                     return self.respond(200,value)
                 except (OSError,ValueError):return self.respond(503,{'error':{'message':'Les fichiers Codex sont indisponibles. Réessayez plus tard.'}})
@@ -599,7 +599,10 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 return self.respond(503, {'error': {'code':'model_unloaded', 'message': 'Serveur connecté, mais le modèle n’est pas chargé. Le lancer dans la console serveur.'}})
             live_model=live.get('model')
             if isinstance(live_model,str) and live_model:model=live_model
-            self.respond(200, {'object': 'list', 'data': [{'id': model, 'object': 'model', 'owned_by': 'local', 'capabilities': capabilities(live)}]+extra})
+            model_caps=capabilities(live)
+            context=context_capacity(live)
+            if context is not None:model_caps['context_length']=context
+            self.respond(200, {'object': 'list', 'data': [{'id': model, 'object': 'model', 'owned_by': 'local', 'capabilities': model_caps}]+extra})
 
         def do_POST(self):
             if self.path == '/v1/responses':

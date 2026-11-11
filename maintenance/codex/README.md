@@ -92,8 +92,8 @@ sur ce PC. Le profil n'élargit pas les permissions de fichiers ou d'exécution.
   depuis le serveur. La vision réelle n'a pas été requalifiée pour cette livraison.
 - Les autres modèles partagés Hermes gardent leur API Chat Completions. La nouvelle
   route Responses est réservée à Qwen local.
-- Le contexte annoncé est celui du profil actuel, 262144 tokens. Adapter le
-  catalogue si l'administrateur réduit cette capacité.
+- Le bouton Kiara télécharge un catalogue signé avec la fenêtre du modèle chargé.
+  Le catalogue fourni pour une installation manuelle utilise le profil par défaut de 393 216 tokens.
 - Les transports source Windows/Linux et les deux filtres WireGuard autorisent
   `/v1/responses`. Un ancien EXE client conserve son filtre embarqué ; utiliser
   directement HTTPS avec le paquet Codex, ou reconstruire ce client pour passer

@@ -1,8 +1,8 @@
 # -*- mode: python ; coding: utf-8 -*-
 from PyInstaller.utils.hooks import collect_all
 
-datas = [('D:/Serveur IA/client-qwen/voice', 'voice'), ('D:/Serveur IA/client-qwen/voice.js', '.'), ('D:/Serveur IA/client-qwen/conversation.js', '.'), ('D:/Serveur IA/client-qwen/workspace.html', '.'), ('D:/Serveur IA/client-qwen/ui.css', '.'), ('D:/Serveur IA/client-qwen/ui.js', '.'), ('D:/Serveur IA/client-qwen/attachments.js', '.'), ('D:/Serveur IA/client-qwen/selection.js', '.'), ('D:/Serveur IA/client-qwen/thinking.js', '.'), ('D:/Serveur IA/client-qwen/markdown.js', '.'), ('D:/Serveur IA/client-qwen/corrector.js', '.'), ('D:/Serveur IA/client-qwen/vendor', 'vendor'), ('D:/Serveur IA/client-qwen/chat.html', '.'), ('D:/Serveur IA/client-qwen/LICENSE.txt', '.'), ('D:/Serveur IA/client-qwen/THIRD-PARTY.txt', '.')]
-binaries = [('D:/Serveur IA/client-qwen/wireguard-bridge.exe', '.')]
+datas = [('F:/Serveur IA/client-qwen/voice', 'voice'), ('F:/Serveur IA/client-qwen/voice.js', '.'), ('F:/Serveur IA/client-qwen/conversation.js', '.'), ('F:/Serveur IA/client-qwen/workspace.html', '.'), ('F:/Serveur IA/client-qwen/ui.css', '.'), ('F:/Serveur IA/client-qwen/ui.js', '.'), ('F:/Serveur IA/client-qwen/attachments.js', '.'), ('F:/Serveur IA/client-qwen/selection.js', '.'), ('F:/Serveur IA/client-qwen/thinking.js', '.'), ('F:/Serveur IA/client-qwen/markdown.js', '.'), ('F:/Serveur IA/client-qwen/corrector.js', '.'), ('F:/Serveur IA/client-qwen/vendor', 'vendor'), ('F:/Serveur IA/client-qwen/chat.html', '.'), ('F:/Serveur IA/client-qwen/LICENSE.txt', '.'), ('F:/Serveur IA/client-qwen/THIRD-PARTY.txt', '.')]
+binaries = [('F:/Serveur IA/client-qwen/wireguard-bridge.exe', '.')]
 hiddenimports = []
 tmp_ret = collect_all('kiara_shared')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
@@ -15,8 +15,8 @@ datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 
 
 a = Analysis(
-    ['D:/Serveur IA/client-qwen/client.py'],
-    pathex=['D:/Serveur IA/shared'],
+    ['F:/Serveur IA/client-qwen/client.py'],
+    pathex=['F:/Serveur IA/shared'],
     binaries=binaries,
     datas=datas,
     hiddenimports=hiddenimports,
@@ -48,6 +48,6 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    version='D:/Serveur IA/client-qwen/product-version.txt',
-    icon=['D:/Serveur IA/client-qwen/fred.ico'],
+    version='F:/Serveur IA/client-qwen/product-version.txt',
+    icon=['F:/Serveur IA/client-qwen/fred.ico'],
 )

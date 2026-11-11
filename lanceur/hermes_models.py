@@ -14,7 +14,7 @@ import threading
 import time
 from urllib.parse import urlsplit
 
-from core import HIDDEN, health, read_json, write_json
+from core import HIDDEN, NATIVE_CONTEXT, context_capacity, health, read_json, write_json
 from workspace import Denied
 from kiara_shared.attachments import capabilities as attachment_capabilities
 from hermes_reasoning import controls
@@ -351,7 +351,7 @@ class HermesModels:
             self.local_route=(port,{str(alias),str(state.get('model') or '')})
         except Exception:alias='';state={}
         vision=state.get('images') is True
-        context=state.get('context_length') or state.get('context_size') or 262144
+        context=context_capacity(state, NATIVE_CONTEXT)
         return {'id':LOCAL,'name':str(state.get('model') or alias or 'Qwen local'),'label':'Qwen local',
                 'provider':'Qwen local','local':True,'available':state.get('loaded') is True,
                 'capabilities':{**attachment_capabilities(state),'vision':vision,'context_length':context,'reasoning_mode':'effort'},'native_model':LOCAL}

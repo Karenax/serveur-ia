@@ -6,7 +6,7 @@ let remoteBusy = false;
 let remoteDirty = false;
 const definitions = {
   'compute-fields': [
-    ['context','Contexte maximal','number','Tokens du prompt et de la réponse. Maximum du modèle : 262 144.',512,262144],
+    ['context','Contexte maximal','number','Jusqu’à 393 216 tokens pour la demande et la réponse. YaRN s’active au-delà de 262 144.',512,393216],
     ['workers','Travailleurs CPU','number','15 travailleurs + le thread principal = 16 cœurs. Au-delà de 15, le gain SMT reste à mesurer.',1,31],
     ['prefill','Bloc de traitement du prompt','select','Des blocs plus grands demandent davantage de VRAM.',[['auto','Automatique'],[256,'256 tokens'],[512,'512 tokens'],[1024,'1 024 tokens'],[2048,'2 048 tokens'],[4096,'4 096 tokens'],[8192,'8 192 tokens']]],
     ['vram_reserve','Réserve VRAM par GPU','number','En Mo. Préserve de la place pour les buffers ; réduit le nombre d’experts en VRAM.',512,8192],
@@ -358,7 +358,7 @@ request('/api/defaults').then(showDefaults).catch(error=>toast(error.message,tru
 
 request('/api/operations').then(o=>{for(const k of ['startup','autoload','restart'])$('ops-'+k).checked=o[k];});
 $('ops-save').onclick=()=>action(async()=>{await request('/api/operations',{autoload:$('ops-autoload').checked,restart:$('ops-restart').checked});await request('/api/startup',{enabled:$('ops-startup').checked});toast('Options d’exploitation enregistrées.');});
-$('performance-profile').onchange=()=>{const profiles={fast:{context:8192,history_slots:2},long:{context:262144,history_slots:6},shared:{context:32768,history_slots:6}};const p=profiles[$('performance-profile').value];if(p){applySettings({...form(),...p,history_enabled:true});dirty=true;$('save-state').textContent='Profil à enregistrer pour le prochain lancement';}};
+$('performance-profile').onchange=()=>{const profiles={fast:{context:8192,history_slots:2},long:{context:393216,history_slots:6},shared:{context:32768,history_slots:6}};const p=profiles[$('performance-profile').value];if(p){applySettings({...form(),...p,history_enabled:true});dirty=true;$('save-state').textContent='Profil à enregistrer pour le prochain lancement';}};
 $('ops-backup').onclick=()=>action(async()=>{const r=await request('/api/backup',{password:$('backup-password').value});$('backup-password').value='';$('backup-result').textContent=r.file;toast(r.message);});
 $('ops-restore').onclick=()=>action(async()=>{const r=await request('/api/restore',{file:$('backup-file').value,password:$('backup-password').value});$('backup-password').value='';applySettings(await request('/api/settings'));$('backup-result').textContent=r.message;toast(r.message);});
 $('ops-diagnostic').onclick=()=>action(async()=>{const d=await request('/api/diagnostic');const url=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='diagnostic-qwen.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});

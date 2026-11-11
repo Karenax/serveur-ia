@@ -201,7 +201,8 @@ class AuthGatewayTests(unittest.TestCase):
         import threading,urllib.request,yaml
         remote=client.Remote(self.profile,opener=object());key=secrets.token_urlsafe(32)
         home=Path(self.temporary.name)
-        remote.models_catalogue={'object':'list','data':[{'id':'test-model','name':'test-model','available':True}]}
+        remote.models_catalogue={'object':'list','data':[{'id':'test-model','name':'test-model','available':True,
+                                                         'capabilities':{'context_length':393216}}]}
         apps={name:{'installed':True,'config_path':str(home/(name+suffix))} for name,suffix in [('opencode','.json'),('hermes','.yaml')]}
         state={'connected':True,'model':'test-model','models':['test-model']}
         with patch.object(client,'settings_path',return_value=home/'settings.dpapi'):
@@ -223,8 +224,10 @@ class AuthGatewayTests(unittest.TestCase):
                     with post({'app':app,'model':'test-model'}) as response:self.assertEqual(json.load(response)['model'],expected)
                 config=json.loads(Path(apps['opencode']['config_path']).read_text())['providers']['serveur-fred']
                 self.assertEqual(config['settings'],{'baseURL':base+'/v1','apiKey':key})
+                self.assertEqual(config['models']['test-model']['limit'],{'context':393216})
                 hermes=yaml.safe_load(Path(apps['hermes']['config_path']).read_text())['providers']['serveur-fred']
                 self.assertEqual(hermes['api'],base+'/hermes/v1');self.assertEqual(hermes['api_key'],key)
+                self.assertEqual(hermes['models'][hermes['default_model']]['context_length'],393216)
                 snapshots={app:Path(info['config_path']).read_bytes() for app,info in apps.items()}
                 for values in [{'app':'opencode','model':'invented'},{'app':'unknown'},{'app':'opencode','config_path':str(home/'injected.json')},{'app':'hermes','key':'injected'}]:
                     with self.assertRaises(urllib.error.HTTPError) as refused:post(values)

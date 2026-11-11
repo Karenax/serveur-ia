@@ -1,12 +1,12 @@
 # Kiara — architecture et versions actuelles
 
-Référence courante au 4 novembre 2026 : serveur/Windows 3.5.60, APK Android 1.0.25/code 26 publié le 26 octobre. Les rapports datés conservent leur valeur historique. Les modifications Android postérieures à cet APK restent dans les sources ; elles ne sont pas déclarées livrées.
+Référence courante au 8 novembre 2026 : serveur/Windows 3.5.61, APK Android 1.0.25/code 26 publié le 26 octobre. Les rapports datés conservent leur valeur historique. Les modifications Android postérieures à cet APK restent dans les sources ; elles ne sont pas déclarées livrées.
 
 ## Versions et responsabilités
 
 | Composant | Version ou contrat | Rôle |
 |---|---|---|
-| Serveur et Windows | 3.5.60, dans `shared/kiara_shared/version.py` | Application et distribution Windows |
+| Serveur et Windows | 3.5.61, dans `shared/kiara_shared/version.py` | Application et distribution Windows |
 | Android | 1.0.25, code 26 | Enveloppe Java/WebView et interface partagée |
 | Contrat agent | 4 | Conversation, outils et approbations existants |
 | Identifiants de commandes | Version 2 négociée par `/v1/status` | Rétention bornée et refus du rejeu après expiration |
@@ -25,7 +25,7 @@ L’état effectivement installé et les empreintes des livrables sont dans les 
 Le [profil GPU par défaut du 3 novembre](maintenance/2026-11-03-rtx4080/default-mode/README.md)
 utilise NVIDIA 581.80 sur les quatre cartes. Le modèle IQ4_XS et la table PLE/Ngram
 sont sur F:, ainsi que le moteur permanent sous `F:/Kiara/moteurs/strata-0.1.56-cuda12`.
-Le contexte maximal reste 262144 tokens, avec cache KV INT8 : le KV complet réside en RAM avec
+Le contexte par défaut est de 393 216 tokens avec YaRN ×1,5 et un cache KV INT8. Le KV complet réside en RAM avec
 20480 cellules par couche d'attention conservées en VRAM. Le cache d'experts du
 GPU principal et ceux des deux P100 sont automatiques. DFlash2 remplace la couche
 MTP, avec fenêtre 6 et seuil 0,8 ; son pack vérifié est sous `F:/Kiara/modeles/dflash2/`.

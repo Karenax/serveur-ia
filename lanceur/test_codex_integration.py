@@ -57,6 +57,8 @@ class CodexSetupTests(unittest.TestCase):
         self.assertEqual(data['model'],'old');self.assertEqual(data['approval_policy'],'on-request')
         self.assertNotIn('model_provider',data);self.assertNotIn('model_catalog_json',data)
         self.assertEqual(data['model_providers']['kiara']['base_url'],'https://ia.karenax.net/v1')
+        catalogue=json.loads((self.config.parent/'kiara-models.json').read_text(encoding='utf-8'))
+        self.assertEqual(catalogue['models'][0]['context_window'],393216)
         self.assertTrue(result['backups']);self.assertIn('réglages ChatGPT par défaut sont conservés',result['message'])
         for p in self.config.parent.iterdir():
             if p.is_file():self.assertNotIn(self.key.encode(),p.read_bytes())
@@ -88,10 +90,14 @@ class CodexDownloadTests(unittest.TestCase):
     request=test_remote.RemoteTests.request
     def test_authenticated_route_and_pinned_signature(self):
         pinned=public(self.store.home)
-        with self.request('/v1/client/codex') as response:value=json.load(response)
+        with patch('remote.health',return_value={'loaded':True,'max_context':327680}):
+            with self.request('/v1/client/codex') as response:value=json.load(response)
+            with self.request('/v1/client/codex/models') as response:catalogue=json.load(response)
         target=Path(self.temporary.name)/'verified';target.mkdir()
         codex_integration.unpack(value,pinned,target)
         self.assertTrue((target/'Installer-Codex-Kiara.ps1').is_file())
+        self.assertEqual(json.loads((target/'qwen-models.json').read_bytes()),catalogue)
+        self.assertEqual(catalogue['models'][0]['context_window'],327680)
         import urllib.error
         with self.assertRaises(urllib.error.HTTPError) as error:self.request('/v1/client/codex',token='x'*40)
         self.assertEqual(error.exception.code,401)

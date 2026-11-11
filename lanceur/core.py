@@ -18,6 +18,8 @@ HOME = Path(os.environ.get('KIARA_DATA_DIR', ROOT / 'lanceur')).expanduser().res
 BASE_PATH = ROOT / 'strata-iq4-p100-hybride.json'
 PYTHON = Path(os.environ.get('KIARA_RUNTIME_PYTHON',ROOT / 'Strata-src/.venv/Scripts/python.exe')).expanduser().resolve()
 HIDDEN = getattr(subprocess, 'CREATE_NO_WINDOW', 0)
+NATIVE_CONTEXT = 262144
+MAX_CONTEXT = 393216
 
 def read_json(path, fallback=None):
     try:
@@ -47,6 +49,10 @@ def arg(config, flag, default=''):
     args = config.get('args', [])
     return args[args.index(flag) + 1] if flag in args else default
 
+def context_capacity(state, default=None):
+    return next((size for field in ('max_context', 'context_length', 'context_size')
+                 if type(size := state.get(field)) is int and size > 0), default)
+
 def defaults_from_config(config):
     prefill = arg(config, '--prefill', 256)
     return {
@@ -54,7 +60,7 @@ def defaults_from_config(config):
         'pack': arg(config, '--pack'), 'native': arg(config, '--native'),
         'tokenizer': config.get('tokenizer', ''), 'exe': config.get('exe', ''),
         'mtp_path': arg(config, '--mtp'), 'expert_profile': arg(config, '--expert-profile'),
-        'context': int(arg(config, '--max-context', 262144)),
+        'context': int(arg(config, '--max-context', NATIVE_CONTEXT)),
         'workers': int(arg(config, '--pool-workers', 15)),
         'prefill': 'auto' if prefill == 'auto' else int(prefill),
         'vram_reserve': int(arg(config, '--vram-reserve-mib', 2048)),
@@ -101,7 +107,7 @@ def validate(settings, check_paths=False):
     if not isinstance(settings, dict):
         raise ValueError('Réglages invalides.')
     s = copy.deepcopy(settings)
-    limits = {'context': (512, 262144), 'workers': (1, 31), 'prefill': (256, 8192),
+    limits = {'context': (512, MAX_CONTEXT), 'workers': (1, 31), 'prefill': (256, 8192),
               'vram_reserve': (512, 8192), 'layer_split': (1, 47), 'spec': (2, 8),
               'history_slots': (1, 24), 'history_every': (0, 262144),
               'short_read': (0, 256), 'port': (1, 65535)}
@@ -198,6 +204,12 @@ def build_config(base, settings, log_path=None):
         while flag in args:
             i = args.index(flag)
             del args[i:i + (2 if valued else 1)]
+    if s['context'] > NATIVE_CONTEXT:
+        set_arg('--rope-scaling', 'yarn')
+        set_arg('--rope-scale', s['context'] / NATIVE_CONTEXT)
+    elif arg(cfg, '--rope-scaling') == 'yarn':
+        remove_arg('--rope-scaling')
+        remove_arg('--rope-scale')
     if s['prefill'] == 'auto':
         remove_arg('--no-prefill-borrow', False)
     if len(s['gpus'].split(',')) == 3:

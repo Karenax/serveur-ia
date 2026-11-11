@@ -71,12 +71,14 @@ class IntegrationTests(unittest.TestCase):
             with self.subTest(section=section):
                 selected='fred-model-'+'a'*24;previous='fred-model-'+'b'*24
                 source={section:{PROVIDER:{'models':{
-                    selected:{'name':selected,'limit':{'context':64000}},
+                    selected:{'name':selected,'limit':{'context':200000,'output':8192}},
                     previous:{'name':previous,'disabled':True},
                     'custom':{'name':'Mon modèle'}}},'other':{'name':'Conservé'}},'model':'other/original'}
                 path=self.write('opencode',json.dumps(source))
-                catalogue={'data':[{'id':selected,'name':'gpt-6-luna','label':'GPT-6 Luna'},
-                                   {'id':previous,'name':'gpt-6-astra','label':'GPT-6 Astra'},
+                catalogue={'data':[{'id':selected,'name':'gpt-6-luna','label':'GPT-6 Luna',
+                                    'capabilities':{'context_length':262144}},
+                                   {'id':previous,'name':'gpt-6-astra','label':'GPT-6 Astra',
+                                    'capabilities':{'context_length':True}},
                                    {'id':'not-added','name':'Autre modèle'},
                                    {'id':'google/embeddinggemma-2','capabilities':{'embedding':True}}]}
                 result=integrations.install('opencode',URL,KEY,selected,self.apps,catalogue=catalogue)
@@ -84,7 +86,8 @@ class IntegrationTests(unittest.TestCase):
                 self.assertEqual(set(models),{selected,previous,'custom'})
                 self.assertEqual(models[selected]['name'],'GPT-6 Luna')
                 self.assertEqual(models[previous]['name'],'GPT-6 Astra');self.assertTrue(models[previous]['disabled'])
-                self.assertEqual(models[selected]['limit'],{'context':64000})
+                self.assertEqual(models[selected]['limit'],{'context':262144,'output':8192})
+                self.assertNotIn('limit',models[previous])
                 self.assertEqual(models['custom']['name'],'Mon modèle')
                 self.assertEqual(value[section]['other'],source[section]['other']);self.assertEqual(value['model'],'other/original')
                 self.assertIn('GPT-6 Luna',result['message']);self.assertEqual(result['model'],selected)

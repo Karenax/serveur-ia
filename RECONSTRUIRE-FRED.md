@@ -1,6 +1,6 @@
 # Reconstruire et vérifier Kiara
 
-Les constructions Windows/serveur 3.5.60 et Android 1.0.25/code 26 utilisent les
+Les constructions Windows/serveur 3.5.61 et Android 1.0.25/code 26 utilisent les
 sources locales et les clés de signature existantes. Chaque construction produit
 `build-manifest.json` : empreintes des sources, empreinte du binaire, versions des
 paquets Python, Go, CMake, JDK, SDK/NDK Android et commit Hermes réellement utilisés.

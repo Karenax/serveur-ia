@@ -115,6 +115,11 @@ def _json_set(text,path,value):
     return text[:end]+'\n'+json.dumps(path[-1])+': '+encoded+'\n'+text[end:]
 
 
+def model_context(row):
+    context=(row.get('capabilities') or {}).get('context_length')
+    return context if type(context) is int and context>0 else None
+
+
 def opencode_text(text,base_url,key,model,catalogue=None):
     value,_=jsonc(text)
     v2='providers' in value or 'provider' not in value
@@ -133,12 +138,17 @@ def opencode_text(text,base_url,key,model,catalogue=None):
               and isinstance(row.get('id'),str) and not (row.get('capabilities') or {}).get('embedding')}
         if model not in rows or not rows[model].get('available',True):
             raise ValueError('Ce modèle de conversation n’est plus disponible. Actualisez la liste.')
-        # Refresh names of models already added; adding one model must not import
+        # Refresh metadata of models already added; adding one model must not import
         # every shared provider into OpenCode's configuration.
         for identity,settings in models.items():
             if identity in rows and isinstance(settings,dict):
                 row=rows[identity]
                 settings['name']=row.get('label') or row.get('name') or identity
+                context=model_context(row)
+                if context is not None:
+                    limit=settings.setdefault('limit',{})
+                    if not isinstance(limit,dict):raise ValueError('Limites du modèle OpenCode invalides.')
+                    limit['context']=context
     if v2:
         details['disabled']=False
         capabilities=details.setdefault('capabilities',{})
@@ -251,7 +261,15 @@ def hermes_text(text,base_url,key,model,catalogue=None):
         providers[PROVIDER]=entry
     if catalogue is not None:
         # This provider belongs to Kiara: replace obsolete opaque/embedding entries.
-        entry['models']={row['id']:{} for row in catalogue['data']}
+        existing=entry['models']
+        entry['models']={}
+        for row in catalogue['data']:
+            identity=row['id']
+            settings=existing.get(identity) if isinstance(existing,dict) else None
+            settings=settings if isinstance(settings,dict) else {}
+            context=model_context(row)
+            if context is not None:settings['context_length']=context
+            entry['models'][identity]=settings
     if value.get(section)==providers:return text
     updated=_yaml_provider(text,node,section,entry,legacy,providers)
     try:check=yaml.load(updated,Loader=UniqueLoader)

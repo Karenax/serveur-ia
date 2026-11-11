@@ -21,7 +21,7 @@
       "support_verbosity": false,
       "apply_patch_tool_type": "freeform",
       "truncation_policy": {"mode": "tokens", "limit": 10000},
-      "context_window": 262144,
+      "context_window": 393216,
       "effective_context_window_percent": 90,
       "input_modalities": ["text", "image"],
       "supports_search_tool": false,

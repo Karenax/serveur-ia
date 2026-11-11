@@ -13,7 +13,7 @@ from types import SimpleNamespace
 import urllib.error
 import urllib.request
 import psutil
-from core import ROOT, HOME, BASE_PATH, PYTHON, HIDDEN, read_json, write_json, defaults_from_config, build_config, validate, matching_servers, process_identity, stop_processes
+from core import ROOT, HOME, BASE_PATH, PYTHON, HIDDEN, arg, read_json, write_json, defaults_from_config, build_config, validate, matching_servers, process_identity, stop_processes
 from app import Controller, serve
 from runtime import supervise
 
@@ -29,12 +29,19 @@ class LaunchTests(unittest.TestCase):
 
     def test_default_profile_and_unchanged_native_options(self):
         s = validate(self.settings, True)
-        self.assertEqual((s['context'], s['workers'], s['history_slots']), (262144, 15, 8))
+        self.assertEqual((s['context'], s['workers'], s['history_slots']), (393216, 15, 8))
         self.assertEqual(s['model_name'], 'qwen3.8-flash-next-iq4-xs')
         self.assertFalse(s['mtp_enabled'])
         self.assertEqual(self.base['args'][self.base['args'].index('--draft') + 1], 'dflash2')
         self.assertTrue(s['history_enabled'])
         cfg = build_config(self.base, s)
+        self.assertEqual((arg(cfg, '--max-context'), arg(cfg, '--rope-scaling'), arg(cfg, '--rope-scale')),
+                         ('393216', 'yarn', '1.5'))
+        native = build_config(cfg, {**s, 'context': 262144})
+        self.assertNotIn('--rope-scaling', native['args'])
+        self.assertNotIn('--rope-scale', native['args'])
+        intermediate = build_config(native, {**s, 'context': 327680})
+        self.assertEqual(arg(intermediate, '--rope-scale'), '1.25')
         for flag in ['--resident-cpu-experts', '--mmap-experts', '--no-prefill-borrow']:
             self.assertIn(flag, cfg['args'])
         self.assertEqual(cfg['env'], self.base['env'])
@@ -51,7 +58,7 @@ class LaunchTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate({**s, 'trusted_origins': 'https://example.org/path'})
         with self.assertRaises(ValueError):
-            validate({**s, 'context': 262145})
+            validate({**s, 'context': 393217})
 
     def test_three_gpu_dense_and_experts_survive_settings_roundtrip(self):
         settings = {**self.settings, 'gpus': 'GPU-dense,GPU-experts-a,GPU-experts-b'}
@@ -138,7 +145,7 @@ class LaunchTests(unittest.TestCase):
                     post(base, 'wrong-token')
                 with post(base) as response:
                     self.assertEqual(json.load(response)['history_slots'], self.settings['history_slots'])
-                self.assertEqual(controller.settings()['context'], 262144)
+                self.assertEqual(controller.settings()['context'], 393216)
                 with self.assertRaises(urllib.error.HTTPError):
                     urllib.request.urlopen(urllib.request.Request(base, headers={'Host': 'foreign.example'}))
             finally:
@@ -202,7 +209,7 @@ class LaunchTests(unittest.TestCase):
             self.assertEqual(state['status'],'pret');self.assertTrue(state['running'])
             self.assertEqual(state['active']['context'],4096)
             self.assertEqual(controller.defaults()['model_name'],self.settings['model_name'])
-            self.assertEqual(controller.defaults()['context'],262144)
+            self.assertEqual(controller.defaults()['context'],393216)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

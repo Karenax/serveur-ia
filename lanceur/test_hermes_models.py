@@ -88,10 +88,12 @@ class ModelsTests(unittest.TestCase):
             with urllib.request.urlopen(request,timeout=5) as response:return response.status,json.loads(response.read())
         except urllib.error.HTTPError as response:return response.code,json.loads(response.read())
     def test_default_is_local_and_public_catalog_contains_no_server_route_or_secrets(self):
-        public=self.models.catalog(self.a)
+        with patch('hermes_models.health',return_value={'loaded':True,'model':'actual-local','images':True,'max_context':393216}):
+            public=self.models.catalog(self.a)
         self.assertEqual(public['default_model'],'fred-qwen');self.assertEqual(public['source'],'hermes')
         self.assertEqual(len(public['data']),1)
         caps=public['data'][0]['capabilities']
+        self.assertEqual(caps['context_length'],393216)
         self.assertEqual(caps['files'],['txt','md','pdf','docx']);self.assertTrue(caps['thinking'])
         self.assertGreater(caps['max_file_bytes'],0)
         rows=self.shared();self.assertEqual(len(rows),2)

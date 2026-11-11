@@ -6,7 +6,7 @@
   "exe": "F:\\Kiara\\moteurs\\strata-0.1.56-cuda12\\strata.exe",
   "mtp_path": "F:/Serveur IA/strata-data/mtp-local-rt",
   "expert_profile": "F:\\Serveur IA\\dependances\\strata-0.1.43.1\\expert-profile.bin",
-  "context": 262144,
+  "context": 393216,
   "workers": 15,
   "prefill": "auto",
   "vram_reserve": 1600,
