@@ -20,7 +20,10 @@ async function check(browser,platform){
   if(req.url==='/client/state')return json(res,{version:'fixture',preferences:state.preferences,profile_required:false,profile:{name:'Accès fictif'},update:{message:'À jour'},endpoint:'https://example.test',internet_endpoint:'example.test',local_api:'http://127.0.0.1/v1',key:config.key,connection:{connected:true,transport:'https',model:config.model,endpoint:'https://example.test'}});
   if(req.url==='/client/history'&&req.method==='GET')return json(res,{history:state.history,revision:state.revision});
   if(req.url==='/client/history/sync'){state.history=state.history||body.initial;return json(res,{history:state.history,revision:state.revision,message:'Synchronisé'});}
-  if(req.url==='/client/history'){state.history=body.history;state.revision=String(Number(state.revision)+1);return json(res,{saved:true,revision:state.revision});}
+  if(req.url==='/client/history'){
+   if(body.revision!==state.revision)return json(res,{error:{message:'Conflit fictif de révision'}},409);
+   state.history=body.history;state.revision=String(Number(state.revision)+1);return json(res,{saved:true,revision:state.revision});
+  }
   if(req.url==='/client/preferences'){
    if(state.failPreferences)return json(res,{error:{message:'Échec fictif de sauvegarde'}},503);
    const drafts={...state.preferences.conversation_drafts};for(const [id,text]of Object.entries(body.conversation_drafts||{})){if(text)drafts[id]=text;else delete drafts[id];}
@@ -59,6 +62,12 @@ async function check(browser,platform){
   await page.goto('http://127.0.0.1:'+server.address().port);await ready();
   assert.match(await page.evaluate(()=>clientRequestId()),/^v2_[a-f0-9]{32}$/);
   await page.evaluate(()=>commandNonceVersion=1);assert.match(await page.evaluate(()=>clientRequestId()),/^[a-f0-9]{32}$/);await page.evaluate(()=>commandNonceVersion=2);
+  assert.deepEqual(await page.evaluate(()=>[...document.querySelectorAll('#client-navigation .nav-button')].map(b=>b.dataset.viewButton)),['chat','voice','projects','corrector','assistant','notifications']);
+  assert.equal(await page.locator('#ui-document-controls').isVisible(),false);
+  await page.locator('#ws-chat-project').selectOption(project.id);await page.waitForFunction(()=>!conversationActionPending&&document.getElementById('ui-document-controls').hidden===false);await ready();
+  assert.equal(await page.locator('#ui-document-controls').isVisible(),true);assert.equal(await page.locator('#ws-publish').isVisible(),true);
+  await page.locator('#ws-chat-project').selectOption('');await page.waitForFunction(()=>!conversationActionPending&&document.getElementById('ui-document-controls').hidden===true);await ready();
+  assert.equal(await page.locator('#ui-document-controls').isVisible(),false);
   const first=await page.evaluate(()=>currentId);await page.locator('#prompt').fill('Brouillon de la conversation A');await draftSaved();
   await page.locator('#new').click();await ready();assert.equal(await page.locator('#prompt').inputValue(),'');
   const second=await page.evaluate(()=>currentId);assert.notEqual(first,second);await page.locator('#prompt').fill('Brouillon de la conversation B');await draftSaved();
@@ -71,6 +80,10 @@ async function check(browser,platform){
   state.failPreferences=false;await page.locator('#ui-draft-retry').click();await draftSaved();assert(!await page.locator('#ui-draft-retry').isVisible());await page.reload();await ready();assert.equal(await page.locator('#prompt').inputValue(),'Brouillon après une panne');
   await page.locator('#prompt').fill('');await draftSaved();await page.reload();await ready();assert.equal(await page.locator('#prompt').inputValue(),'');assert(!state.preferences.conversation_drafts[second]);
   await page.locator('#prompt').fill('Brouillon à restaurer après annulation');await draftSaved();await page.locator('#ui-conversation-menu summary').click();await page.locator('#delete-conversation').click();await ready();await draftSaved();assert(!state.preferences.conversation_drafts[second]);await page.locator('#undo-delete').click();await ready();assert.equal(await page.locator('#prompt').inputValue(),'Brouillon à restaurer après annulation');await page.locator('#prompt').fill('');await draftSaved();
+  await page.evaluate(async()=>{const old=historyRevision;historyRevision='stale';try{await flushHistory();}catch{}});
+  assert.equal(await page.evaluate(()=>historyBlocked),true);assert.equal(await page.locator('#history-conflict-merge').isVisible(),true);assert.equal(await page.locator('#send').isDisabled(),true);
+  await page.locator('#history-conflict-merge').click();await ready();
+  assert.equal(await page.evaluate(()=>historyBlocked),false);assert.equal(await page.locator('#history-conflict-merge').isVisible(),false);assert.equal(await page.locator('#send').isDisabled(),false);
   await page.locator('[data-view-button="projects"]').click();await page.locator('#ws-project-list button').click();await page.locator('[data-project-tab="instructions"]').click();await page.locator('#ws-project-instructions').fill('Consigne à enregistrer');
   warned=false;page.once('dialog',async d=>{warned=d.type()==='beforeunload';await d.dismiss();});await page.reload({timeout:1500}).catch(()=>{});assert(warned,'Unsaved instructions must warn');
   await page.locator('#ws-project-form button').first().click();await page.waitForFunction(()=>!ws.projectDirty);
@@ -83,14 +96,23 @@ async function check(browser,platform){
   await page.evaluate(()=>wsRefresh());
   await page.locator('#ws-memories button').filter({hasText:'Enregistrer'}).click();
   await page.waitForFunction(()=>document.getElementById('ws-memory-status').textContent.includes('a changé'));
+  assert.equal(await page.locator('#ws-memory-status').evaluate(e=>e.classList.contains('ws-warning')),true);
   assert.equal(await page.locator('#ws-memories textarea').inputValue(),'Brouillon concurrent à conserver');
   assert.equal(project.memories[0].text,'Modification récente sur un autre appareil');
   page.once('dialog',d=>d.accept());await page.getByRole('button',{name:'Recharger la version du serveur'}).click();
   await page.waitForFunction(()=>document.querySelector('#ws-memories textarea').dataset.revision===ws.data.projects[0].memories[0].revision);
+  assert.equal(await page.locator('#ws-memory-status').evaluate(e=>e.classList.contains('ws-warning')),false);
   page.once('dialog',d=>d.dismiss());await page.locator('#ws-memories button').filter({hasText:'Supprimer'}).click();assert.equal(project.memories.length,1);
-  state.failDelete=true;page.once('dialog',d=>d.accept());await page.locator('#ws-memories button').filter({hasText:'Supprimer'}).click();await page.waitForFunction(()=>document.getElementById('ws-memory-status').textContent.includes('non supprimée'));assert.equal(await page.locator('#ws-memories textarea').count(),1);
+  state.failDelete=true;page.once('dialog',d=>d.accept());await page.locator('#ws-memories button').filter({hasText:'Supprimer'}).click();await page.waitForFunction(()=>document.getElementById('ws-memory-status').textContent.includes('non supprimée'));assert.equal(await page.locator('#ws-memory-status').evaluate(e=>e.classList.contains('ws-warning')),true);assert.equal(await page.locator('#ws-memories textarea').count(),1);
   state.failDelete=false;page.once('dialog',d=>d.accept());await page.locator('#ws-memories button').filter({hasText:'Supprimer'}).click();await page.waitForFunction(()=>document.querySelectorAll('#ws-memories textarea').length===0);assert.equal(await page.evaluate(()=>document.activeElement.id),'ws-memory-text');
   await page.evaluate(()=>wsOpenSource('source-fixture'));assert(await page.getByRole('dialog',{name:'Passage fictif'}).isVisible());await page.keyboard.press('Escape');
+  await page.locator('#connection').click();assert.equal(await page.locator('#connection-panel').isVisible(),true);assert.equal(await page.evaluate(()=>document.activeElement.id),'connection-close');
+  await page.keyboard.press('Escape');assert.equal(await page.locator('#connection-panel').isVisible(),false);assert.equal(await page.evaluate(()=>document.activeElement.id),'connection');
+  if(platform==='android'){
+   await page.evaluate(()=>showView('voice'));await page.locator('#voice-settings-toggle').click();assert.equal(await page.evaluate(()=>document.getElementById('voice-settings-dialog').open),true);
+   assert.equal(await page.evaluate(()=>window.androidBack()),true);assert.equal(await page.evaluate(()=>document.getElementById('voice-settings-dialog').open),false);
+   await page.evaluate(()=>showView('chat'));
+  }
   for(const width of [390,768]){
    await page.setViewportSize({width,height:width===390?844:1024});
    // Let the resize/media-query handler settle before opening the mobile drawer.

@@ -37,6 +37,11 @@ module.exports=async({page,state,android,errors})=>{
   await page.locator('#assistant-memory-text').fill('Je préfère les réponses détaillées.');
   await page.locator('#assistant-memory-form button[type="submit"]').click();
   await page.waitForFunction(()=>document.getElementById('assistant-memories').textContent.includes('détaillées'));
+  page.once('dialog',d=>d.dismiss());await page.locator('#assistant-memories button').filter({hasText:'Oublier'}).click();
+  assert((await page.locator('#assistant-memories').innerText()).includes('détaillées'));
+  page.once('dialog',d=>d.accept());await page.locator('#assistant-memories button').filter({hasText:'Oublier'}).click();
+  await page.waitForFunction(()=>document.getElementById('assistant-status').textContent.includes('Souvenir oublié'));
+  assert.equal(await page.locator('#assistant-memories').innerText(),'Aucun souvenir dans cet espace.');
   await page.locator('#assistant-reminder-add summary').click();
   await page.locator('#assistant-reminder-text').fill('Reprendre le dossier Orion');
   await page.locator('#assistant-reminder-at').fill('2027-01-04T18:00');

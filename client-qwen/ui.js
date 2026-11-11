@@ -99,7 +99,8 @@ uiThemeSelect.addEventListener('change',()=>uiPersistPreferences().catch(e=>erro
 $('ui-sidebar-toggle').addEventListener('click',()=>uiPersistPreferences().catch(e=>error(e)));
 
 const uiSendRow=document.querySelector('.send-row');uiSendRow.prepend(pickers);
-const uiDocumentControls=wsElement('div');uiDocumentControls.hidden=true;uiDocumentControls.append($('ws-chat-document').parentElement,$('ws-publish'),$('ws-panel'));document.querySelector('.composer').append(uiDocumentControls);
+const uiDocumentControls=wsElement('div',undefined,'ws-pickers');uiDocumentControls.id='ui-document-controls';uiDocumentControls.hidden=true;uiDocumentControls.append($('ws-chat-document').parentElement,$('ws-publish'),$('ws-panel'));document.querySelector('.composer').insertBefore(uiDocumentControls,document.querySelector('.composer-bottom'));
+const uiChatSelections=wsChatSelections;wsChatSelections=function(){uiChatSelections();uiDocumentControls.hidden=!wsCurrent()?.project_id;};wsChatSelections();
 uiSendRow.insertBefore($('thinking'),uiSendRow.querySelector('.hint'));
 const uiSourceButton=wsElement('button','Sources','context-details');uiSourceButton.type='button';uiSourceButton.hidden=true;pickers.append(uiSourceButton);const uiOriginalSources=workspaceShowSources;workspaceShowSources=function(sources){ws.lastSources=sources;uiSourceButton.hidden=!sources.length;uiSourceButton.textContent='Sources · '+sources.length;};uiSourceButton.onclick=()=>uiOriginalSources(ws.lastSources||[]);
 let uiConversation=null;
@@ -109,7 +110,7 @@ const uiShowView=showView;showView=function(name){const moveFocus=uiSidebarModal
 $('prompt').addEventListener('input',()=>{const field=$('prompt');field.style.height='auto';field.style.height=Math.min(180,Math.max(74,field.scrollHeight))+'px';});
 $('conversation-title').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('rename-conversation').click();e.target.blur();}});$('conversation-title').addEventListener('change',()=>$('rename-conversation').click());
 document.addEventListener('click',e=>{for(const menu of document.querySelectorAll('.menu[open]')){if(!menu.contains(e.target)||e.target.closest('.menu-body button'))menu.open=false;}});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){for(const d of document.querySelectorAll('.menu[open],.composer-options[open]'))d.open=false;uiCloseSidebar();$('ws-side').hidden=true;}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='b'&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)){e.preventDefault();uiToggleSidebar();}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){for(const d of document.querySelectorAll('.menu[open],.composer-options[open]'))d.open=false;if(!$('connection-panel').hidden){$('connection-close').click();return;}uiCloseSidebar();$('ws-side').hidden=true;}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='b'&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)){e.preventDefault();uiToggleSidebar();}});
 
 function uiProjectTab(name){for(const pane of document.querySelectorAll('[data-project-pane]'))pane.hidden=pane.dataset.projectPane!==name;for(const b of document.querySelectorAll('[data-project-tab]')){const selected=b.dataset.projectTab===name;b.classList.toggle('active',selected);b.removeAttribute('aria-selected');if(selected)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');}}
 document.querySelector('.project-tabs').after($('ws-project-status'));
@@ -159,26 +160,30 @@ for(const name of ['opencode','hermes','codex'])$('integration-'+name).onclick=a
 };
 /* /kiara-slot:desktop-integration-logic-26 */const uiConnectionPhases={requesting:'Envoi de la demande',queued:'En attente du moteur',waiting_model:'Calcul en cours',thinking:'Réflexion en cours',answering:'Rédaction de la réponse',working:'Préparation de la réponse',tool:'Utilisation des outils',approval:'Accord nécessaire',stopping:'Arrêt en cours',complete:'Réponse terminée',interrupted:'Réponse interrompue'};
 const uiConnectionEvents={endpoint_selected:'Adresse sélectionnée',wireguard_started:'Nouveau tunnel WireGuard',connection_probe:'Vérification de connexion',connection_failed:'Échec de connexion',server_response:'Réponse du serveur',generation_complete:'Génération terminée',generation_interrupted:'Flux interrompu'};
+const uiQueueLive=wsElement('span',undefined,'sr-only');uiQueueLive.id='ui-queue-live';uiQueueLive.setAttribute('role','status');$('queue-state').removeAttribute('role');$('queue-state').setAttribute('aria-hidden','true');$('queue-state').after(uiQueueLive);
+let uiLastQueueAnnouncement='';
 function uiConnectionStatus(state=uiLastConnection){
   uiLastConnection=state;const phase=busy?(replyProgress.phase||state.stream?.phase||'requesting'):null;
   /* kiara-slot:platform-expression-31 */uiIntegrationButtons();/* /kiara-slot:platform-expression-31 */
   uiLoadedModel(connected?conversationModelLabel():'',state.code);
   const https=state.transport==='https',checking=state.checking&&!connected;
-  let label=phase?(uiConnectionPhases[phase]||'Préparation de la réponse'):state.reconnecting?'Connexion instable · nouvelle vérification':checking?(https?'Vérification HTTPS':'Vérification WireGuard'):connected?'Connecté au serveur IA':'Connexion indisponible';
+  const baseLabel=phase?(uiConnectionPhases[phase]||'Préparation de la réponse'):state.reconnecting?'Connexion instable · nouvelle vérification':checking?(https?'Vérification HTTPS':'Vérification WireGuard'):connected?'Connecté au serveur IA':'Connexion indisponible';
   const elapsed=busy?Math.max(0,Math.round((Date.now()-(replyProgress.started||Date.now()))/1000)):0;
   const silence=busy?Math.max(0,Math.round((Date.now()-(replyProgress.lastEvent||Date.now()))/1000)):0;
-  if(busy)label+=' · '+elapsed+' s';if(busy&&silence>=45)label='Flux silencieux · '+silence+' s';
+  const label=busy&&silence>=45?'Flux silencieux · '+silence+' s':busy?baseLabel+' · '+elapsed+' s':baseLabel;
+  const announced=busy?(silence>=45?'Flux silencieux':baseLabel):'';if(announced!==uiLastQueueAnnouncement){uiLastQueueAnnouncement=announced;uiQueueLive.textContent=announced;}
   const text='● '+label+' ⌄';if($('connection').textContent!==text)$('connection').textContent=text;$('connection').classList.toggle('online',connected&&silence<45);
+  $('connection').setAttribute('aria-label',label+' · Afficher le diagnostic de connexion');
   $('connection-summary').textContent=busy&&silence>=45?'Aucun nouveau texte reçu. Le moteur peut encore calculer ; les compteurs ci-dessous permettent de vérifier le tunnel.':state.checking?'Le client vérifie le serveur et essaie les adresses disponibles.':state.connection_warning||state.error||label;
   const lines=['Adresse active : '+(state.endpoint||'en cours'), 'Mode : '+(state.automatic?'automatique':'adresse manuelle'), 'Handshakes : '+(state.handshake?'un échange authentifié a été reçu':'aucun reçu'), 'Dernier handshake : '+(state.last_handshake_time_sec?new Date(state.last_handshake_time_sec*1000).toLocaleString():'aucun'), 'Reçu / envoyé : '+(state.rx_bytes||0)+' / '+(state.tx_bytes||0)+' octets', 'Dernière réponse HTTP : '+(state.last_contact?new Date(state.last_contact*1000).toLocaleTimeString():'aucune'), 'Tunnels démarrés : '+(state.bridge_starts||0)+' · vérifications : '+(state.attempts||0), 'État : '+(state.code||'connexion')];
   if(state.stream?.started)lines.push('Dernière génération : '+(uiConnectionPhases[state.stream.phase]||state.stream.phase),'Réflexion / réponse : '+(state.stream.reasoning_chars||0)+' / '+(state.stream.answer_chars||0)+' caractères reçus');
   lines.push('','Événements récents :');for(const e of (state.events||[]).slice(-6))lines.push(new Date(e.time*1000).toLocaleTimeString()+' · '+(uiConnectionEvents[e.event]||e.event)+(e.route?' · '+e.route:'')+(e.code?' · '+e.code:'')+(e.status?' · HTTP '+e.status:''));
   if(https){lines.splice(2,3);lines[1]='Mode : HTTPS Cloudflare';const i=lines.findIndex(line=>line.startsWith('Tunnels démarrés'));lines[i]='Vérifications HTTPS : '+(state.attempts||0);}
   $('connection-panel-text').textContent=lines.join('\n');$('connection-retry').disabled=busy||!!modelsPending;
-  if(busy)$('queue-state').textContent=label;
+  if(busy&&!agentApproval)$('queue-state').textContent=label;
 }
-$('connection').onclick=()=>{const panel=$('connection-panel');panel.hidden=!panel.hidden;$('connection').setAttribute('aria-expanded',String(!panel.hidden));uiConnectionStatus();};
-$('connection-close').onclick=()=>{$('connection-panel').hidden=true;$('connection').setAttribute('aria-expanded','false');};
+$('connection').onclick=()=>{const panel=$('connection-panel');panel.hidden=!panel.hidden;$('connection').setAttribute('aria-expanded',String(!panel.hidden));uiConnectionStatus();if(!panel.hidden)$('connection-close').focus();};
+$('connection-close').onclick=()=>{const restore=$('connection-panel').contains(document.activeElement);$('connection-panel').hidden=true;$('connection').setAttribute('aria-expanded','false');if(restore)$('connection').focus();};
 $('connection-retry').onclick=()=>{$('reconnect').click();};
 /* kiara-slot:desktop-connection-transfer-controls-32 */let uiWireGuardEndpoint='';
 function uiSetConnectionMode(https){
@@ -219,7 +224,7 @@ function uiUseConnectionParameters(text){
   if(busy)throw new Error('Attendez la fin de la réponse avant de changer la connexion.');
   $('endpoint').value=uiReadConnectionParameters(text);endpointDirty=true;
   uiSetConnectionMode($('endpoint').value==='https://ia.karenax.net');
-  $('connection-transfer-status').textContent='Adresse prête. Cliquez Appliquer l’adresse pour vous connecter.';
+  $('connection-transfer-status').textContent='Adresse prête. Cliquez Appliquer la connexion pour vous connecter.';
 }
 $('connection-copy').onclick=()=>wsTry(async()=>{
   const state=await api('/client/state');uiConnectionSettings(state);

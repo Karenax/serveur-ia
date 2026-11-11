@@ -23,7 +23,9 @@
   if(testMax)testMax.textContent='Tester le serveur';
   const theme=document.querySelector('#ui-theme option[value="system"]');
   if(theme)theme.textContent='Comme le système';
-  const access=document.querySelector('[data-view="access"] small');
+  const font=document.querySelector('#ui-font option[value="system"]');
+  if(font){font.textContent='Moderne · Système';if(typeof uiFonts!=='undefined'&&uiFonts.system)uiFonts.system.label='Moderne · Système';}
+  const access=[...document.querySelectorAll('[data-view="access"] .settings-card small')].find(node=>node.textContent.includes('EXE'));
   if(access)access.textContent='Votre accès est personnel. Le serveur peut le suspendre, limiter sa validité ou le révoquer. Ne partagez pas le fichier fourni par votre administrateur.';
   const connection=document.getElementById('connection-diagnostic')?.closest('.settings-card')?.querySelector('small');
   if(connection)connection.textContent='Utilisez un accès distinct pour chaque appareil connecté en même temps. Deux appareils partageant le même accès peuvent interrompre leurs connexions.';

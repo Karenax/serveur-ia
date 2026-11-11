@@ -192,6 +192,7 @@ androidViewportChanged();
 
 window.androidBack=()=>{
   if($('android-onboarding').open||$('connection-choice').open)return false;
+  if($('voice-settings-dialog')?.open){$('voice-settings-dialog').close();return true;}
   if($('fred-source-dialog')?.open){$('fred-source-dialog').close();return true;}
   if(!wsConversationMenu.hidden){wsCloseConversationMenu();return true;}
   if(!selectionMenu.hidden){selectionClose();return true;}

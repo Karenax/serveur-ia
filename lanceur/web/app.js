@@ -13,11 +13,11 @@ const definitions = {
   ],
   'history-fields': [
     ['history_enabled','Réutiliser l’historique','toggle','Évite de relire les parties identiques d’une conversation.'],
-    ['history_slots','Points de sauvegarde','number','Environ 118 Mo de RAM par point ; six correspondent au réglage par défaut de Strata.',1,24],
-    ['history_every','Sauvegarde tous les… tokens','number','16 384 par défaut. 0 désactive les points intermédiaires.',0,262144],
-    ['mtp_enabled','Accélération MTP','toggle','Le modèle propose des tokens, puis vérifie leur validité.'],
-    ['spec','Taille des fenêtres MTP','number','3 correspond à la configuration validée.',2,8],
-    ['spec_min_p','Seuil des propositions MTP','number','Valeur entre 0 et 1. Réglage actuel : 0,5.',0,1,.05],
+    ['history_slots','Points de sauvegarde','number','Nombre d’états intermédiaires conservés en mémoire.',1,24],
+    ['history_every','Sauvegarde tous les… tokens','number','160 000 dans le profil actuel. 0 désactive les points intermédiaires.',0,262144],
+    ['mtp_enabled','Forcer le pack MTP','toggle','Remplace DFlash2 du profil de base par un pack MTP personnalisé.'],
+    ['spec','Fenêtre de spéculation','number','6 dans le profil DFlash2 actuel (2 à 8 tokens).',2,8],
+    ['spec_min_p','Seuil des propositions','number','Valeur entre 0 et 1. Réglage actuel : 0,5.',0,1,.05],
   ],
   'advanced-fields': [
     ['layer_split','Première couche du GPU 2','number','Avec deux GPU : 24 répartit les couches en deux moitiés. Sans effet avec trois GPU.',1,47],
@@ -73,10 +73,11 @@ function drawFields(){
 function applySettings(value){settings=value;for(const [name,,type]of flat){if(type==='toggle')$(name).checked=!!value[name];else $(name).value=value[name]??'';}dirty=false;updatePreview();$('save-state').textContent='Réglages enregistrés pour le prochain lancement';}
 function form(){const data={...settings};for(const [name,,type]of flat)data[name]=type==='toggle'?$(name).checked:type==='number'?Number($(name).value):$(name).value;return data;}
 function number(value){return Number(value).toLocaleString('fr-FR');}
-function showDefaults(value){$('default-profile').textContent=`${value.workers+1} threads · ${number(value.context)} tokens\n${value.mtp_enabled?'MTP activé':'MTP désactivé'} · ${value.history_enabled?'historique réutilisé':'historique relu'}`;}
+function plural(n,s,p=s+'s'){return n+' '+(n>1?p:s);}
+function showDefaults(value){$('default-profile').textContent=`${value.workers+1} threads · ${number(value.context)} tokens\n${value.mtp_enabled?'MTP activé':'DFlash2 / base'} · ${value.history_enabled?'historique réutilisé':'historique relu'}`;}
 function updatePreview(){
-  const s=form();$('context-value').replaceChildren(document.createTextNode(number(s.context)+' '));const unit=document.createElement('em');unit.textContent='tokens';$('context-value').append(unit);
-  $('profile-detail').textContent=`${s.workers+1} threads de calcul · ${s.mtp_enabled?'MTP actif':'MTP désactivé'} · ${s.history_enabled?'historique réutilisé':'historique relu'}`;
+  const s=form(),draft=liveState.active?.draft||'DFlash2';$('context-value').replaceChildren(document.createTextNode(number(s.context)+' '));const unit=document.createElement('em');unit.textContent='tokens';$('context-value').append(unit);
+  $('profile-detail').textContent=`${s.workers+1} threads de calcul · ${s.mtp_enabled?'MTP actif':draft+' actif'} · ${s.history_enabled?'historique réutilisé':'historique relu'}`;
   $('history_slots').disabled=!s.history_enabled;$('history_every').disabled=!s.history_enabled;$('spec').disabled=!s.mtp_enabled;$('spec_min_p').disabled=!s.mtp_enabled;
   $('layer_split').disabled=s.gpus.split(',').filter(part=>part.trim()).length===3;
   const host=s.host==='0.0.0.0'?(liveState.lan_ips?.[0]||'ADRESSE_DU_PC'):s.host;
@@ -158,7 +159,7 @@ function renderState(s){
   $('ram-value').textContent=`${number(s.ram.available_gib)} Go`;$('ram-detail').textContent=`${number(s.ram.total_gib)} Go au total · ${s.ram.percent}% utilisés`;$('ram-meter').style.width=s.ram.percent+'%';$('ram-meter').style.background=s.ram.available_gib<6?'#f2a477':'var(--green)';
   const gpu=s.gpus;$('gpu-value').textContent=gpu.length?`${number(gpu.reduce((n,g)=>n+g.used_mib,0)/1024).split(',')[0]} / ${Math.round(gpu.reduce((n,g)=>n+g.total_mib,0)/1024)} Go`:'—';
   $('gpu-lines').replaceChildren(...gpu.map((g,i)=>{const span=document.createElement('span');span.textContent=`${g.name.replace('NVIDIA ', '').replace('Tesla ', '')} · ${g.utilization}% · ${g.temperature??'—'} °C · ${(g.used_mib/1024).toFixed(1)} Go`;return span;}));
-  $('active-details').replaceChildren();if(s.running){for(const [label,value]of [['Contexte',number(s.active.context)+' tokens'],['Calcul CPU',`${s.active.workers+1} threads`],['MTP',s.active.mtp?'Activé':'Désactivé'],['Historique',s.active.history?`${s.active.history} sauvegardes`:'Désactivé'],['Écoute',`${s.active.host}:${s.active.port}`]]){const row=document.createElement('div');const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;dd.textContent=value;row.append(dt,dd);$('active-details').append(row);}}
+  $('active-details').replaceChildren();if(s.running){for(const [label,value]of [['Contexte',number(s.active.context)+' tokens'],['Calcul CPU',`${s.active.workers+1} threads`],['Accélération',s.active.draft||(s.active.mtp?'Activée':'Désactivée')],['Historique',s.active.history?plural(s.active.history,'sauvegarde'):'Désactivé'],['Écoute',`${s.active.host}:${s.active.port}`]]){const row=document.createElement('div');const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;dd.textContent=value;row.append(dt,dd);$('active-details').append(row);}}
   $('disk-stats').replaceChildren(...s.disks.map(d=>{const row=document.createElement('div');const title=document.createElement('span'),data=document.createElement('span');title.textContent=d.name;data.textContent=`↓ ${d.read_mib_s} · ↑ ${d.write_mib_s} Mo/s`;row.append(title,data);return row;}));
   $('open-chat').disabled=s.status!=='pret';const log=$('engine-log'),nearEnd=log.scrollTop+log.clientHeight>=log.scrollHeight-50;log.textContent=s.logs||'Aucun journal disponible.';if(nearEnd)log.scrollTop=log.scrollHeight;
   if(!s.running){$('notice').textContent=s.error||'Le serveur est arrêté. Le lancement utilisera les réglages affichés.';$('notice').classList.toggle('warning',!!s.error);}updatePreview();updateButtons();
@@ -166,7 +167,7 @@ function renderState(s){
 async function refresh(){if(polling)return;polling=true;try{renderState(await request('/api/state'));}catch(error){$('status-badge').className='badge error';$('status-badge').querySelector('span').textContent='Lanceur indisponible';$('start').disabled=true;$('stop').disabled=true;}finally{polling=false;}}
 async function copy(value){try{await navigator.clipboard.writeText(value);toast('Copié dans le presse-papiers.');}catch{toast('Copie indisponible : sélectionnez le texte manuellement.',true);}}
 drawFields();
-const topics={notifications:['MAINTENANCE','Notifications','Alertes du serveur, lecture et préférences.'],overview:['PILOTAGE','Vue d’ensemble','État du modèle, ressources et demandes en cours.'],launch:['PILOTAGE','Calcul & lancement','Réglez les performances du prochain chargement.'],files:['PILOTAGE','Modèle & fichiers','Choisissez les packs et les fichiers utilisés par le moteur.'],clients:['CLIENTS','Clients & accès','Distribuez les EXE personnels et gérez les autorisations.'],internet:['CLIENTS','Accès distant','Adresse publique, tunnel WireGuard et pare-feu.'],network:['CLIENTS','API & réseau local','Connexion des applications sur ce PC et sur le réseau local.'],updates:['CLIENTS','Mises à jour','Préparez la version signée distribuée aux clients.'],backup:['MAINTENANCE','Sauvegardes','Protégez et restaurez les réglages, accès et clés du serveur.'],exploitation:['MAINTENANCE','Démarrage & surveillance','Démarrage Windows, chargement automatique et reprise après une panne.'],logs:['MAINTENANCE','Journaux & diagnostic','Consultez le moteur ou exportez un diagnostic.']};
+const topics={notifications:['MAINTENANCE','Notifications','Alertes du serveur, lecture et préférences.'],overview:['PILOTAGE','Vue d’ensemble','État du modèle, ressources et demandes en cours.'],launch:['PILOTAGE','Modèle et calcul','Réglez les performances du prochain chargement.'],files:['PILOTAGE','Fichiers du modèle','Choisissez les packs et les fichiers utilisés par le moteur.'],clients:['CLIENTS','Clients','Distribuez les EXE personnels et gérez les autorisations.'],internet:['CLIENTS','Connexion distante','Adresse publique, tunnel WireGuard et pare-feu.'],network:['CLIENTS','API et réseau','Connexion des applications sur ce PC et sur le réseau local.'],updates:['CLIENTS','Mises à jour','Préparez la version signée distribuée aux clients.'],backup:['MAINTENANCE','Sauvegardes','Protégez et restaurez les réglages, accès et clés du serveur.'],exploitation:['MAINTENANCE','Démarrage','Démarrage Windows, chargement automatique et reprise après une panne.'],logs:['MAINTENANCE','Journaux','Consultez le moteur ou exportez un diagnostic.']};
 function openTopic(id){
   if(!topics[id])id='overview';
   document.querySelectorAll('.tab').forEach(t=>{const selected=t.dataset.tab===id;t.classList.toggle('active',selected);t.setAttribute('aria-selected',String(selected));t.tabIndex=selected?0:-1;});
@@ -183,13 +184,13 @@ window.addEventListener('hashchange',()=>openTopic(location.hash.slice(1)));if(!
 let clientsFingerprint='';
 let hermesModelsState=null, hermesModelsBusy=false;
 function element(tag,text,className){const node=document.createElement(tag);if(text)node.textContent=text;if(className)node.className=className;return node;}
-function labelled(label,input,help){const field=element('div',null,'field'),lab=element('label',label);lab.htmlFor=input.id;field.append(lab,input);if(help)field.append(element('small',help));return field;}
-function clientStorageInfo(storage){const box=element('div',null,'client-storage');if(!storage)return box;box.append(element('strong','Dossier des données sur le serveur'),element('code',storage.path,'client-storage-path'));const copy=element('button','Copier le chemin','button secondary');copy.type='button';copy.onclick=()=>action(async()=>{await navigator.clipboard.writeText(storage.path);toast('Chemin copié.');});box.append(copy);box.append(element('p',storage.error||(storage.status==='ready'?storage.conversations+' conversation(s) · dossier mis à jour le '+new Date(storage.updated*1000).toLocaleString():'Création du dossier en attente…'),'muted'));return box;}
+function labelled(label,input,help){const field=element('div',null,'field'),lab=element('label',label);lab.htmlFor=input.id;field.append(lab,input);if(help){const hint=element('small',help);if(input.id){hint.id=input.id+'-help';input.setAttribute('aria-describedby',hint.id);}field.append(hint);}return field;}
+function clientStorageInfo(storage){const box=element('div',null,'client-storage');if(!storage)return box;box.append(element('strong','Dossier des données sur le serveur'),element('code',storage.path,'client-storage-path'));const copy=element('button','Copier le chemin','button secondary');copy.type='button';copy.onclick=()=>action(async()=>{await navigator.clipboard.writeText(storage.path);toast('Chemin copié.');});box.append(copy);box.append(element('p',storage.error||(storage.status==='ready'?plural(storage.conversations,'conversation')+' · dossier mis à jour le '+new Date(storage.updated*1000).toLocaleString():'Création du dossier en attente…'),'muted'));return box;}
 function renderClients(value,force=false){
-  const active=value.clients.filter(c=>!c.revoked);
-  $('accounts-summary').textContent=active.length+' accès personnels · '+active.filter(c=>!c.suspended).length+' autorisés';
+  const active=value.clients.filter(c=>!c.revoked),allowed=active.filter(c=>!c.suspended).length;
+  $('accounts-summary').textContent=plural(active.length,'accès personnel','accès personnels')+' · '+allowed+' '+(allowed>1?'autorisés':'autorisé');
   $('account-alert').textContent='('+active.length+')';
-  $('client-create-help').textContent=$('remote-create').disabled?'Enregistrer le réseau dans Accès distant avant de générer un nouvel EXE.':'Un EXE différent par personne ou PC utilisé simultanément. Téléchargez-le et transmettez-le uniquement à son destinataire. Aucun login requis.';
+  $('client-create-help').textContent=$('remote-create').disabled?'Enregistrer le réseau dans Connexion distante avant de générer un nouvel EXE.':'Un EXE différent par personne ou PC utilisé simultanément. Téléchargez-le et transmettez-le uniquement à son destinataire. Aucun identifiant requis.';
   const fingerprint=JSON.stringify(value.clients);if(!force&&fingerprint===clientsFingerprint)return;clientsFingerprint=fingerprint;
   $('remote-clients').replaceChildren(...value.clients.map(client=>{
     const card=element('article',null,'client-card'),header=element('div',null,'client-heading');
@@ -243,6 +244,7 @@ async function remoteRefresh(force=false){
   if(remoteBusy)return;
   try{
     const value=await request('/api/remote');
+    $('remote-status').classList.remove('maintenance-error');
     $('remote-status').textContent=(value.enabled?'Accès clients activé. ':'Accès clients désactivé. ')+value.connection.message+(value.hermes?' · Hermes '+(value.hermes.available?'disponible':'indisponible'):'');
     $('remote-save').disabled=false;
     if(!remoteDirty){$('remote-host').value=value.connection.public_host;$('remote-port').value=value.connection.listen_port;}
@@ -255,7 +257,7 @@ async function remoteRefresh(force=false){
     $('remote-disable').disabled=!value.enabled;
     $('remote-create').disabled=remoteDirty||!value.connection.public_host||!value.client_compiled;
     if(force||!document.activeElement?.closest('#remote-clients'))renderClients(value,force);
-  }catch(error){$('remote-status').textContent=error.message;}
+  }catch(error){$('remote-status').classList.add('maintenance-error');$('remote-status').textContent=error.message;}
 }
 async function remoteAction(path,data={}){
   if(remoteBusy)return;remoteBusy=true;
