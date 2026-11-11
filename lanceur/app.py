@@ -562,7 +562,7 @@ if __name__ == '__main__':
         threading.Thread(target=start_agents,daemon=True,name='fred-hermes-startup').start()
     controller.client_storage.start()
     controller.remote.workspace.knowledge.start()
-    if controller.voice.settings()['enabled']:controller.voice.start()
+    controller.voice.start_on_boot()
     server = serve(args.port, controller)
     write_json(HOME / 'interface.pid.json', process_identity(psutil.Process()))
     # HTTP remains on loopback; WireGuard has an isolated in-process network stack.

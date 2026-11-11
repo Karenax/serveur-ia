@@ -11,6 +11,10 @@ from core import read_json, write_json
 from wg_crypto import private_directory, protect
 
 
+class IncompatibleHermesAccess(ValueError):
+    pass
+
+
 def atomic(path, raw):
     import tempfile
     path = Path(path)
@@ -154,7 +158,7 @@ class RestoreManager:
 
     def preview(self, data):
         inspected=self.controller.operations.backups.inspect(data)
-        validate_package(self.controller,inspected['package'])
+        files=validate_package(self.controller,inspected['package'])
         password=self.controller.operations.backups.resolve_password(data.get('password'))
         path=Path(inspected['summary']['file'])
         token=secrets.token_urlsafe(32)
@@ -167,7 +171,9 @@ class RestoreManager:
                 'effects':['Interruption des accès et arrêt coordonné du modèle.',
                            'Point de retour automatique avant toute modification.',
                            'Accès distant désactivé après restauration.',
-                           'Reprise explicite des historiques dans les clients.']}
+                           'Reprise explicite des historiques dans les clients.',
+                           'Les données Hermes seront remplacées par celles de la sauvegarde.' if 'hermes' in files else
+                           'Les données Hermes actuelles seront conservées. La restauration s’arrêtera si leurs accès sont absents de la sauvegarde.']}
 
     def start(self, data):
         if data.get('confirm') is not True:raise ValueError('Confirmer la restauration et son interruption du service.')
@@ -183,10 +189,12 @@ class RestoreManager:
             self.job={'id':secrets.token_hex(12),'state':'preparing','phase':'validation','active':True,'started':time.time(),'message':'Restauration préparée.'}
             def worker():
                 try:self._restore(data, inspected, password, True)
-                except Exception:
+                except Exception as error:
                     if self.job.get('state')=='applying':
                         self.job.update(phase='recovery_failed',active=True,message='Retour incomplet : accès bloqués. Corrigez le stockage puis réessayez le retour.')
-                    else:self.job.update(state='failed',active=False,finished=time.time(),message='Restauration refusée ou interrompue ; état précédent conservé ou récupéré.')
+                    else:
+                        message = str(error) if isinstance(error, IncompatibleHermesAccess) else 'Restauration refusée ou interrompue ; état précédent conservé ou récupéré.'
+                        self.job.update(state='failed',active=False,finished=time.time(),message=message)
                     write_json(self.controller.home/'securite'/'restauration.json',self.job)
                 finally:self.lock.release()
             self.thread=threading.Thread(target=worker,daemon=True,name='fred-restore');self.thread.start()
@@ -258,8 +266,18 @@ class RestoreManager:
                     originals={name:base64.b64encode((c.home/name).read_bytes()).decode() if (c.home/name).is_file() else None for name in allowed_paths(c.home) if name != 'hermes-fred'}
                     originals['espaces-prives/espaces.sqlite3']=base64.b64encode(original_workspace).decode()
                     from operations import registered_profile_ids
-                    original_hermes = c.operations.hermes_export(registered_profile_ids({'acces-distants.json': current_access}))
-                    originals['hermes-fred'] = base64.b64encode(json.dumps(original_hermes).encode()).decode() if original_hermes is not None else None
+                    original_owners = registered_profile_ids({'acces-distants.json': read_json(c.remote.path)})
+                    original_hermes = c.operations.hermes_export(original_owners)
+                    if original_hermes is not None and 'hermes' not in files and 'acces-distants.json' in files:
+                        restored_owners = registered_profile_ids(files)
+                        if original_owners - restored_owners:
+                            from hermes_backup import HermesBackup
+                            try:
+                                HermesBackup(c.home / 'hermes-fred').validate(original_hermes, restored_owners)
+                            except ValueError as error:
+                                raise IncompatibleHermesAccess('Des accès liés aux données Hermes actuelles manquent dans cette sauvegarde. Choisissez une autre sauvegarde.') from error
+                    if 'hermes' in files:
+                        originals['hermes-fred'] = base64.b64encode(json.dumps(original_hermes).encode()).decode() if original_hermes is not None else None
                     atomic(staging,protect(json.dumps(originals).encode()))
                     del originals, original_workspace, original_hermes
                     self.job.update(state='applying',phase='restore',message='Restauration des données ; accès fermés.')

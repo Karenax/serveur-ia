@@ -24,23 +24,40 @@ class VoiceService:
             'busy':self.current is not None,'max_text_chars':600,'max_parallel':1}
     def configure(self,enabled):
         if type(enabled) is not bool:raise ValueError('Activation vocale invalide.')
-        write_json(self.path,{'enabled':enabled})
-        if enabled:self.start()
-        else:self.close()
-        return self.status()
-    def start(self):
         with self.lock:
-            if not self.settings()['enabled']:raise ValueError('La voix est désactivée dans la console.')
-            if self.process and self.process.poll() is None:return
-            executable=ROOT/'toolchain/phonon-server-python/Scripts/python.exe'
-            if not executable.exists():raise ValueError('Le moteur vocal serveur n’est pas installé.')
-            self.ready.clear();self.phase='loading';self.error=''
-            self.process=subprocess.Popen([str(executable),'-X','utf8',str(ROOT/'lanceur/phonon_worker.py')],
-                stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,
-                text=True,encoding='utf-8',creationflags=HIDDEN)
-            from runtime_diagnostics import watch_stderr
-            watch_stderr(self.process,self.diagnostics,'voice')
-            self.thread=threading.Thread(target=self._read,args=(self.process,),daemon=True);self.thread.start()
+            if enabled:
+                started = self._start_worker()
+                try:
+                    write_json(self.path,{'enabled':True})
+                except OSError:
+                    if started:self.close()
+                    raise
+            else:
+                write_json(self.path,{'enabled':False})
+                self.close()
+        return self.status()
+    def start_on_boot(self):
+        with self.lock:
+            try:
+                if self.settings()['enabled']:self._start_worker()
+            except (OSError, ValueError, RuntimeError, KeyError, TypeError) as error:
+                self.ready.clear()
+                self.phase='error'
+                self.error='La voix est indisponible. Vérifiez le moteur vocal dans la console.'
+                self.diagnostics.record('voice','startup',error)
+
+    def _start_worker(self):
+        if self.process and self.process.poll() is None:return False
+        executable=ROOT/'toolchain/phonon-server-python/Scripts/python.exe'
+        if not executable.exists():raise ValueError('Le moteur vocal serveur n’est pas installé.')
+        self.process=subprocess.Popen([str(executable),'-X','utf8',str(ROOT/'lanceur/phonon_worker.py')],
+            stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,
+            text=True,encoding='utf-8',creationflags=HIDDEN)
+        self.ready.clear();self.phase='loading';self.error=''
+        from runtime_diagnostics import watch_stderr
+        watch_stderr(self.process,self.diagnostics,'voice')
+        self.thread=threading.Thread(target=self._read,args=(self.process,),daemon=True);self.thread.start()
+        return True
     def _write(self,value):
         with self.write_lock:
             if not self.process or self.process.poll() is not None:raise OSError('Moteur vocal arrêté.')

@@ -17,6 +17,7 @@ from app import Controller
 from core import ROOT, PYTHON, read_json, write_json
 from hermes_accounts import HermesAccounts
 from hermes_backup import HermesBackup
+from operations import cipher
 from restoration import atomic, recover, validate_package
 from wg_crypto import protect
 
@@ -120,6 +121,42 @@ class HermesRestorationTests(unittest.TestCase):
         self.assertEqual(self.controller.hermes.accounts.credentials(self.owner)['api_key'], credentials['api_key'])
         self.assertIsNone(self.controller.operations.hermes_pause)
         self.assertFalse(self.controller.remote.metadata()['enabled'])
+
+    def legacy_archive(self, files):
+        path = self.home / 'ancienne.fredbackup'
+        salt = bytes(16)
+        payload = json.dumps({'version': 1, 'files': files}).encode()
+        path.write_bytes(b'QWENBACKUP1' + salt + cipher(PHRASE, salt).encrypt(payload))
+        return {'file': str(path)}
+
+    def test_archive_without_hermes_keeps_current_files(self):
+        access = read_json(self.controller.remote.path)
+        archive = self.legacy_archive({'acces-distants.json': access})
+        untracked = self.memory.parent / 'local-only.txt'
+        untracked.write_text('Fichier local', encoding='utf-8')
+        preview = self.controller.operations.restorations.preview({**archive, 'password': PHRASE})
+        self.assertTrue(any('Hermes actuelles seront conservées' in effect for effect in preview['effects']))
+        self.restore(archive)
+        self.assertIn('avant sauvegarde', self.memory.read_text(encoding='utf-8'))
+        self.assertTrue(untracked.is_file())
+
+    def test_archive_without_hermes_cannot_remove_its_access(self):
+        access = read_json(self.controller.remote.path)
+        archive = self.legacy_archive({'acces-distants.json': {**access, 'clients': []}})
+        with self.assertRaisesRegex(ValueError, 'accès liés aux données Hermes'):
+            self.restore(archive)
+        self.assertTrue(self.memory.is_file())
+        self.assertEqual(read_json(self.controller.remote.path), access)
+
+    def test_rollback_without_hermes_does_not_replace_its_directory(self):
+        archive = self.legacy_archive({})
+        marker = self.root / 'local-only.txt'
+        marker.write_text('Fichier local', encoding='utf-8')
+        with patch.object(self.controller.operations.backups, 'register_legacy', side_effect=OSError('fixture failure')):
+            with self.assertRaises(OSError):
+                self.restore(archive)
+        self.assertEqual(read_json(self.home/'securite/restauration.json')['state'], 'recovered')
+        self.assertTrue(marker.is_file())
 
     def test_failed_restore_returns_current_hermes_state(self):
         archive = self.backup()

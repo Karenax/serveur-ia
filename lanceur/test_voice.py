@@ -1,11 +1,33 @@
 """Voice gateway authorization and bounded streams, isolated synthetic users."""
 import json
+from pathlib import Path
+import tempfile
 import unittest
 import urllib.request
 import urllib.error
 from unittest.mock import patch
 import test_remote as fixtures
-from core import write_json
+from core import read_json, write_json
+from voice import VoiceService
+
+
+class VoiceStartupTests(unittest.TestCase):
+    def test_missing_runtime_does_not_persist_activation(self):
+        with tempfile.TemporaryDirectory() as directory, patch('voice.ROOT', Path(directory)):
+            service = VoiceService(directory)
+            with self.assertRaisesRegex(ValueError, 'moteur vocal serveur'):
+                service.configure(True)
+            self.assertFalse(service.settings()['enabled'])
+            self.assertIsNone(service.process)
+
+    def test_boot_with_missing_runtime_reports_error_and_keeps_preference(self):
+        with tempfile.TemporaryDirectory() as directory, patch('voice.ROOT', Path(directory)):
+            service = VoiceService(directory)
+            write_json(service.path, {'enabled': True})
+            service.start_on_boot()
+            self.assertEqual(service.status()['phase'], 'error')
+            self.assertFalse(service.status()['ready'])
+            self.assertEqual(read_json(service.path), {'enabled': True})
 
 class VoiceHTTPTests(unittest.TestCase):
     setUp=fixtures.RemoteTests.setUp

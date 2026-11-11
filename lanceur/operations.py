@@ -389,9 +389,12 @@ class Operations:
             targets=[c.home/name for name in FILES]+[c.wireguard.vault_path,c.wireguard.directory/'profils-restaures.dpapi',c.wireguard.directory/'signature.dpapi',c.home/'recherche-web.dpapi']
             originals={path:path.read_bytes() if path.exists() else None for path in targets}
             original_workspace=c.remote.workspace.backup()
-            original_owners=registered_profile_ids({name:read_json(c.home/name) for name in FILES if (c.home/name).exists()})
-            original_hermes=self.hermes_export(original_owners)
+            if 'hermes' in files:
+                access_path = c.home / 'acces-distants.json'
+                original_owners = registered_profile_ids({'acces-distants.json': read_json(access_path)})
+                original_hermes = self.hermes_export(original_owners)
             old_desired=self.desired;self.desired=False
+            hermes_replaced=False
             try:
                 for name in FILES:
                     if name in files:
@@ -402,15 +405,16 @@ class Operations:
                 (c.wireguard.directory/'profils-restaures.dpapi').write_bytes(protect(json.dumps(files.get('profiles',{})).encode()))
                 if seed is not None:(c.wireguard.directory/'signature.dpapi').write_bytes(protect(seed))
                 if workspace_raw is not None:c.remote.workspace.restore(workspace_raw)
-                if 'hermes' in files or original_hermes is not None:
-                    hermes_backup.restore(files.get('hermes', {'version': 1, 'files': {}}), set(records))
+                if 'hermes' in files:
+                    hermes_backup.restore(files['hermes'], set(records))
+                    hermes_replaced=True
                 if web_raw is not None:(c.home/'recherche-web.dpapi').write_bytes(protect(web_raw))
                 elif 'workspace' in files:(c.home/'recherche-web.dpapi').unlink(missing_ok=True)
                 c.base=read_json(c.base_path)
                 with c.remote.accounts.lock:c.remote.accounts.sessions.clear();c.remote.accounts.failures.clear()
             except Exception:
                 c.remote.workspace.restore(base64.b64decode(original_workspace))
-                if original_hermes is not None or 'hermes' in files:
+                if hermes_replaced:
                     hermes_backup.restore(original_hermes or {'version': 1, 'files': {}}, original_owners)
                 for path,raw in originals.items():
                     if raw is None:path.unlink(missing_ok=True)
