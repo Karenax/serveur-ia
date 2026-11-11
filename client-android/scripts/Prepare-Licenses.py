@@ -31,15 +31,6 @@ def go_components(root: Path) -> tuple[list[dict], Path]:
     go = root / 'client-qwen/wireguard-tools/versions' / spec['version'] / 'go/bin/go.exe'
     environment = {**os.environ, 'GOPATH': str(root / 'client-qwen' / 'wireguard-tools' / 'workspace'),
                    'GOTOOLCHAIN': 'local', 'GOPROXY': 'off'}
-    # Module metadata is read locally, never from a remote service.
-    listed = run_go(go, ['list', '-m', '-f', '{{.Path}}|{{.Version}}|{{.Dir}}', 'all'], source, environment)
-    modules = []
-    for line in listed.splitlines():
-        name, version, directory = line.split('|', 2)
-        if not version:  # The bridge itself is covered by the application license.
-            continue
-        if directory:
-            modules.append({'name': name, 'version': version, 'directory': Path(directory)})
     binaries = [root / 'client-android' / 'app/src/main/jniLibs' / abi / 'libfredwireguard.so'
                 for abi in ('arm64-v8a', 'x86_64')]
     if any(not binary.is_file() for binary in binaries):
@@ -48,6 +39,15 @@ def go_components(root: Path) -> tuple[list[dict], Path]:
     if re.findall(r': (go1\.\d+\.\d+)\s*$', metadata, re.M) != [spec['version']] * len(binaries):
         raise ValueError('Les deux bridges Android doivent utiliser la version Go épinglée.')
     required = binary_dependencies(metadata)
+    declared = json.loads(run_go(go, ['mod', 'edit', '-json'], source, environment))['Require']
+    selected = sorted(set(required) | {module['Path'] for module in declared})
+    # The full graph includes modules used only by upstream tools and tests.
+    listed = run_go(go, ['list', '-m', '-f', '{{.Path}}|{{.Version}}|{{.Dir}}', *selected], source, environment)
+    modules = []
+    for line in listed.splitlines():
+        name, version, directory = line.split('|', 2)
+        if directory:
+            modules.append({'name': name, 'version': version, 'directory': Path(directory)})
     available = {module['name']: module for module in modules}
     for name, version in required.items():
         if name not in available or available[name]['version'] != version:

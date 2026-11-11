@@ -8,7 +8,7 @@ peuvent concerner uniquement la variante Windows de ce même bridge.
 Accès serveur Kiara
   application/LICENSE.txt
 
-Go runtime go1.27.3
+Go runtime go1.27.4
   go/LICENSE
 
 markdown-it 15.0.2
@@ -38,13 +38,13 @@ Kotlin standard library 2.0.21
 github.com/google/btree v1.1.2
   modules/github.com/google/btree/LICENSE
 
-golang.org/x/crypto v0.37.0
+golang.org/x/crypto v0.58.1-0.20261009181718-2f1f834330b2
   modules/golang.org/x/crypto/LICENSE
 
-golang.org/x/net v0.39.0
+golang.org/x/net v0.62.0
   modules/golang.org/x/net/LICENSE
 
-golang.org/x/sys v0.32.0
+golang.org/x/sys v0.49.0
   modules/golang.org/x/sys/LICENSE
 
 golang.org/x/time v0.7.0
