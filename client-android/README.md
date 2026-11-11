@@ -7,7 +7,7 @@ Les appareils Android limités aux applications 32 bits ne sont pas pris en char
 ## Installer et ouvrir
 
 Le fichier à installer est `dist/Acces-serveur-Kiara-Android.apk`, version
-**1.0.25** (`versionCode=26`), publié le 26 octobre 2026. Installer le nouvel APK par-dessus l’application
+**1.0.26** (`versionCode=27`), publié le 11 novembre 2026. Installer le nouvel APK par-dessus l’application
 existante pour conserver le profil et les conversations.
 
 Les changements d’interface présents dans les sources depuis cette livraison

@@ -3,7 +3,6 @@ from __future__ import annotations
 import ctypes
 import copy
 from collections import deque
-from ctypes import wintypes
 import hashlib
 import hmac
 import io
@@ -30,8 +29,11 @@ from connection_settings import parse as parse_connection_settings, validate_con
 import app_integrations
 import hermes_catalogue
 
-class Blob(ctypes.Structure):
-    _fields_ = [('cbData', wintypes.DWORD), ('pbData', ctypes.POINTER(ctypes.c_ubyte))]
+if sys.platform == 'win32':
+    from ctypes import wintypes
+
+    class Blob(ctypes.Structure):
+        _fields_ = [('cbData', wintypes.DWORD), ('pbData', ctypes.POINTER(ctypes.c_ubyte))]
 
 def protect(value, decrypt=False):
     if sys.platform.startswith('linux'):
@@ -882,12 +884,13 @@ def install_close_guard(window):
 def window_geometry():
     """Keep the initial window inside the Windows work area, including scaled displays."""
     width,height=1200,780
-    try:
-        area=wintypes.RECT()
-        if ctypes.windll.user32.SystemParametersInfoW(0x0030,0,ctypes.byref(area),0):
-            width=max(400,min(1440,int((area.right-area.left)*0.9)))
-            height=max(320,min(960,int((area.bottom-area.top)*0.9)))
-    except (AttributeError,OSError):pass
+    if sys.platform == 'win32':
+        try:
+            area=wintypes.RECT()
+            if ctypes.windll.user32.SystemParametersInfoW(0x0030,0,ctypes.byref(area),0):
+                width=max(400,min(1440,int((area.right-area.left)*0.9)))
+                height=max(320,min(960,int((area.bottom-area.top)*0.9)))
+        except (AttributeError,OSError):pass
     return {'width':width,'height':height,'min_size':(min(640,width),min(480,height))}
 
 def main():

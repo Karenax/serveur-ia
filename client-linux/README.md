@@ -31,7 +31,7 @@ Installer les prérequis système (Ubuntu 24.04) :
 sudo apt install python3 python3-venv python3-tk gnome-keyring pulseaudio-utils libegl1 libopengl0 libxcb-cursor0 libnss3 libasound2t64
 ```
 
-Télécharger **l’archive complète** `Kiara-linux-amd64-3.5.55-vocal.tar.gz`.
+Télécharger **l’archive complète** `Kiara-linux-amd64-3.5.62-vocal.tar.gz`.
 Le dossier `client-linux` du dépôt contient les sources de l’installateur :
 le copier seul ne permet pas d’installer l’application.
 
@@ -39,7 +39,7 @@ Depuis le dossier contenant l’archive téléchargée, extraire le paquet dans 
 emplacement que vous conserverez, puis ouvrir son dossier :
 
 ```sh
-tar -xzf Kiara-linux-amd64-3.5.55-vocal.tar.gz
+tar -xzf Kiara-linux-amd64-3.5.62-vocal.tar.gz
 cd Kiara-linux-amd64
 python3 installer.py
 ./start.sh

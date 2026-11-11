@@ -1,4 +1,4 @@
-Accès serveur Kiara — version 3.5.61
+Accès serveur Kiara — version 3.5.62
 
 Nouveautés : souvenirs gérés en conversation, commandes vocales de notes et
 rappels récurrents, bilans de projet et image jointe à une question orale.

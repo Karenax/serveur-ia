@@ -1,7 +1,7 @@
 # Serveur IA
 
 Référence courante : [architecture, versions et compatibilités](ARCHITECTURE-ACTUELLE.md).
-Version du 8 novembre 2026 : **serveur/Windows 3.5.61 et Android 1.0.25/code 26**.
+Version du 11 novembre 2026 : **serveur/Windows/Linux 3.5.62 et Android 1.0.26/code 27**.
 La [publication Windows](maintenance/2026-11-04-connexion-client/README.md)
 efface le message temporaire de connexion dès que le catalogue est retrouvé.
 Les lots EG2 de 32 textes et la file de 16 demandes en attente sont conservés.
