@@ -34,6 +34,11 @@ sous `%LOCALAPPDATA%\Fred\runtime-security\hermes-20261021`. Le pointeur validé
 reste dans `toolchain/hermes-security-runtime/runtime.json`. Le code et les profils
 de l’installation personnelle Hermes restent distincts.
 
+Pour le runtime de sécurité du 11 novembre, appliquer `hermes-fred.patch` au
+commit Hermes `79651b71bd56efd76d06f3de1df64dde09b58ff3`, puis utiliser le verrou
+`hermes-fred.requirements.txt` avant l’installation éditable. Le pointeur peut
+sélectionner le runtime préparé dans `toolchain/hermes-security-runtime`.
+
 Un environnement de développement peut hériter du `site-packages` du runtime
 d’outillage. Le générateur retient la première distribution réellement résolue
 par Python ; les doublons des dossiers de repli ne remplacent pas ses versions.

@@ -31,7 +31,7 @@
         "pydantic": "2.13.5",
         "pydantic-core": "2.46.5",
         "pyhumps": "3.8.0",
-        "pypdf": "6.21.2",
+        "pypdf": "6.21.4",
         "pypdfium2": "5.14.0",
         "python-dateutil": "2.9.0.post0",
         "python-docx": "1.2.0",
@@ -52,7 +52,7 @@
         "wheel": "0.48.0",
         "xlsxwriter": "3.2.9"
       },
-      "sha256": "d5d9685e50ea54709709b55080603e755654502e913b652bb9551f5f715bb9bb"
+      "sha256": "d919882377706a8675073a89cf7df471e2264d8c4798e48232aa18c048802dc7"
     },
     "eg2": {
       "packages": {
@@ -229,12 +229,12 @@
         "mcp": "2.2.0",
         "mcp-types": "2.2.0",
         "mdurl": "0.1.2",
-        "msgpack": "1.2.1",
+        "msgpack": "1.2.3",
         "multidict": "6.9.1",
         "nemo-relay": "0.10.0",
         "nest-asyncio": "1.6.0",
         "numpy": "2.4.3",
-        "oauthlib": "4.0.0",
+        "oauthlib": "4.0.1",
         "onnxruntime": "1.29.0",
         "openai": "2.24.0",
         "opentelemetry-api": "1.45.1",
@@ -249,7 +249,7 @@
         "protobuf": "6.33.6",
         "psutil": "7.2.2",
         "pvporcupine": "4.0.3",
-        "pyasn1": "0.6.4",
+        "pyasn1": "0.6.5",
         "pyasn1-modules": "0.4.2",
         "pycparser": "3.0",
         "pydantic": "2.13.4",
@@ -308,7 +308,7 @@
         "youtube-transcript-api": "1.2.4",
         "zipp": "4.1.0"
       },
-      "sha256": "da3acb2bbddcb9f5483c145246fb6bc2584743ad41d8d19dd98df60bca9c76e9"
+      "sha256": "e5ecae56848f6819964acf87b57f3bf36d3427a551903454edf84c8b8927b015"
     },
     "construction-windows": {
       "packages": {
