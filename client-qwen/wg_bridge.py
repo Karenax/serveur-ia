@@ -16,6 +16,42 @@ import threading
 import tempfile
 from file_lock import locked
 
+
+def _windows_local_app_data():
+    import ctypes
+    from ctypes import wintypes
+    from uuid import UUID
+
+    folder_id = UUID('f1b32785-6fba-4fcf-9d55-7b8e7f157091')  # FOLDERID_LocalAppData
+    guid = (ctypes.c_uint32 * 4).from_buffer_copy(folder_id.bytes_le)
+    path = ctypes.c_wchar_p()
+    get_known_folder = ctypes.windll.shell32.SHGetKnownFolderPath
+    get_known_folder.argtypes = (ctypes.c_void_p, wintypes.DWORD, wintypes.HANDLE,
+                                 ctypes.POINTER(ctypes.c_wchar_p))
+    get_known_folder.restype = ctypes.c_long
+    free = ctypes.windll.ole32.CoTaskMemFree
+    free.argtypes = (ctypes.c_void_p,)
+    free.restype = None
+    initialize = ctypes.windll.ole32.CoInitializeEx
+    initialize.argtypes = (ctypes.c_void_p, wintypes.DWORD)
+    initialize.restype = ctypes.c_long
+    uninitialize = ctypes.windll.ole32.CoUninitialize
+    uninitialize.argtypes = ()
+    uninitialize.restype = None
+    com_result = initialize(None, 0)
+    if com_result < 0 and com_result & 0xffffffff != 0x80010106:  # RPC_E_CHANGED_MODE
+        raise OSError(f'Initialisation COM impossible (0x{com_result & 0xffffffff:08X}).')
+    try:
+        result = get_known_folder(ctypes.byref(guid), 0, None, ctypes.byref(path))
+        if result != 0:
+            raise OSError(f'Dossier Windows LocalAppData inaccessible (0x{result & 0xffffffff:08X}).')
+        return Path(path.value)
+    finally:
+        free(path)
+        if com_result >= 0:
+            uninitialize()
+
+
 def bridge_executable():
     """Keep Windows firewall identity stable across one-file client launches."""
     source=Path(getattr(sys,'_MEIPASS',Path(__file__).parent))/('wireguard-bridge' if sys.platform.startswith('linux') else 'wireguard-bridge.exe')
@@ -25,7 +61,7 @@ def bridge_executable():
         return source
     data=source.read_bytes()
     digest=hashlib.sha256(data).hexdigest()
-    directory=Path(os.environ['LOCALAPPDATA'])/'AccesServeurFred'/'WireGuard'/digest
+    directory=_windows_local_app_data()/'AccesServeurFred'/'WireGuard'/digest
     directory.mkdir(parents=True,exist_ok=True)
     target=directory/'wireguard-bridge.exe'
     with locked(target):

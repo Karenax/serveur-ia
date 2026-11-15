@@ -1,0 +1,25 @@
+.meeting-audio { margin-bottom: 24px; }
+.meeting-audio h3, .meeting-audio h4, .meeting-audio h5 { margin: 0 0 10px; }
+.meeting-audio header p, .meeting-audio .muted { color: var(--muted, #687380); font-size: 13px; }
+.meeting-upload, .meeting-speakers { display: flex; flex-wrap: wrap; gap: 12px; margin: 14px 0; align-items: end; }
+.meeting-audio label { display: grid; gap: 5px; font-size: 13px; }
+.meeting-upload label:first-child { flex: 1; min-width: 200px; }
+.meeting-audio audio { width: 100%; margin: 8px 0 14px; }
+.meeting-recording-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+.meeting-job { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; padding: 14px; margin-bottom: 12px; border: 1px solid var(--border, #d8dfe5); border-radius: 10px; }
+.meeting-job progress { flex: 1; min-width: 120px; accent-color: var(--accent, #b68634); }
+.meeting-error { color: var(--danger, #a73131); white-space: pre-wrap; padding: 8px 0; }
+.meeting-transcript { display: grid; gap: 12px; margin: 16px 0; }
+.meeting-turn { border-left: 3px solid var(--accent, #b68634); padding: 10px 14px; background: var(--panel-bg, rgba(128,128,128,.05)); border-radius: 5px; }
+.meeting-turn-heading { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; }
+.meeting-audio textarea { width: 100%; resize: vertical; line-height: 1.5; }
+.meeting-summary-section { margin-top: 20px; }
+.meeting-summary-section article { padding: 12px 0; border-bottom: 1px solid var(--border, #d8dfe5); }
+.meeting-summary-section blockquote { margin: 10px 0; font-size: 13px; color: var(--muted, #687380); border-left: 2px solid var(--border, #d8dfe5); padding-left: 12px; }
+.meeting-overview { margin-top: 5px; }
+.meeting-audio details > summary { cursor: pointer; font-weight: 600; }
+.meeting-audio .input:disabled { opacity: 1; color: inherit; -webkit-text-fill-color: currentColor; }
+.meeting-audio-tabs { display:flex; gap:4px; border-bottom:1px solid var(--border, #d8dfe5); margin:16px 0; }
+.meeting-audio-tabs button { border:0; border-bottom:2px solid transparent; background:transparent; color:var(--muted, #687380); padding:10px 14px; cursor:pointer; font:inherit; font-size:13px; }
+.meeting-audio-tabs button[aria-selected=true] { color:var(--accent, #b68634); border-bottom-color:var(--accent, #b68634); font-weight:600; }
+.meeting-audio [role=tabpanel][hidden] { display:none; }

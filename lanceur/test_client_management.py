@@ -1,5 +1,6 @@
 """Client edits must preserve credentials; removal must revoke both transports."""
 import json
+import hashlib
 from pathlib import Path
 import re
 import socket
@@ -10,9 +11,11 @@ import unittest
 from unittest.mock import Mock, patch
 import urllib.error
 import urllib.request
-from urllib.parse import unquote
 from app import serve
-from core import read_json
+from core import read_json, write_json
+from kiara_shared.profiles import decode_access_code
+from releases import DESKTOP_INSTALLER, DESKTOP_INSTALLER_VERSION
+from signing import sign
 import remote
 import test_remote
 
@@ -89,11 +92,17 @@ class ClientManagementTests(unittest.TestCase):
         self.assertTrue(read_json(self.store.path)['clients'][0]['revoked'])
         self.assertIsNone(self.store.authenticate(self.access['token']))
 
-    def test_http_edit_and_download_name_are_authenticated_and_consistent(self):
+    def test_http_download_is_current_and_access_code_requires_admin(self):
         home=Path(self.temporary.name);directory=home/'clients';directory.mkdir()
         target=directory/(self.access['id']+'.exe')
         profile={**self.profile,'version':'3.5.3'};encoded=json.dumps(profile).encode()
         target.write_bytes(b'MZfixture'+encoded+struct.pack('<I',len(encoded))+b'QWENPROFILE1')
+        installers=home/'installateurs';installers.mkdir()
+        binary=b'current setup fixture'
+        (installers/DESKTOP_INSTALLER).write_bytes(binary)
+        release=sign({'version':DESKTOP_INSTALLER_VERSION,'protocol':4,'bytes':len(binary),
+                      'sha256':hashlib.sha256(binary).hexdigest()},home)
+        write_json(installers/f'kiara-{DESKTOP_INSTALLER_VERSION}.json',release)
         with socket.socket() as sock:sock.bind(('127.0.0.1',0));port=sock.getsockname()[1]
         controller=SimpleNamespace(home=home,remote=self.store,wireguard=self.wireguard,lock=threading.RLock())
         server=serve(port,controller);threading.Thread(target=server.serve_forever,daemon=True).start()
@@ -104,18 +113,26 @@ class ClientManagementTests(unittest.TestCase):
             def post(route,data,key=token,origin=base):
                 return urllib.request.urlopen(urllib.request.Request(base+route,json.dumps(data).encode(),
                     {'Content-Type':'application/json','Origin':origin,'X-Launcher-Token':key}),timeout=5)
-            for route in ('rename','delete'):
+            for route in ('rename','delete','access-code'):
                 with self.assertRaises(urllib.error.HTTPError) as error:
                     post('/api/remote/'+route,{'id':self.access['id'],'name':'PC'},key='bad')
                 self.assertEqual(error.exception.code,403);error.exception.close()
             with post('/api/remote/rename',{'id':self.access['id'],'name':'PC Frédéric'}) as response:self.assertEqual(response.status,200)
             with urllib.request.urlopen(base+'/api/remote/client/'+self.access['id']) as response:
-                filename=unquote(response.headers['Content-Disposition'].split("filename*=UTF-8''")[1])
-                self.assertEqual(filename,'Accès serveur Fred 3.5.3 - PC Frédéric.exe')
-                self.assertEqual(response.read(),target.read_bytes())
+                self.assertEqual(response.url,base+'/api/releases/windows/download')
+                self.assertIn(DESKTOP_INSTALLER,response.headers['Content-Disposition'])
+                self.assertEqual(response.read(),binary)
+            with post('/api/remote/access-code',{'id':self.access['id']}) as response:
+                self.assertEqual(response.headers['Cache-Control'],'no-store')
+                personal=decode_access_code(json.load(response)['code'])
+            self.assertEqual(personal['client_name'],'PC Frédéric')
+            self.assertEqual(personal['wireguard'],self.profile['wireguard'])
+            self.assertEqual(personal['token'],self.profile['token'])
             with post('/api/remote/delete',{'id':self.access['id']}) as response:self.assertEqual(response.status,200)
             with self.assertRaises(urllib.error.HTTPError) as error:urllib.request.urlopen(base+'/api/remote/client/'+self.access['id'])
             self.assertEqual(error.exception.code,404);error.exception.close()
+            with self.assertRaises(urllib.error.HTTPError):
+                post('/api/remote/access-code',{'id':self.access['id']})
         finally:server.shutdown();server.server_close()
 
 

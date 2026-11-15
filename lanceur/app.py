@@ -5,17 +5,19 @@ import datetime as dt
 import hmac
 from http.server import BaseHTTPRequestHandler
 import json
+import os
 from pathlib import Path
 import secrets
+import shutil
 import socket
 import subprocess
 import threading
 import time
-from urllib.parse import urlsplit, quote, parse_qs
+from urllib.parse import urlsplit, parse_qs
 import psutil
 from core import ROOT, HOME, BASE_PATH, PYTHON, HIDDEN, read_json, write_json, defaults_from_config, validate, build_config, health, matching_servers, process_identity, same_process, stop_processes, available_port, tail, arg
 from operations import Operations, VERSION as VERSION
-from releases import status as release_status, repackage, rollback, download_name
+from releases import DESKTOP_INSTALLER, status as release_status, repackage, rollback, windows_installer
 from remote import AccessStore, GATEWAY_PORT, serve_gateway
 from wireguard_access import WireGuardAccess,firewall
 from http_boundary import json_body
@@ -56,6 +58,21 @@ class Controller:
         self.remote.storage = self.client_storage
         self.wireguard = WireGuardAccess(self.remote,self.home)
         self.gateway = None
+        self.agent_service = None
+        self.agent_configuration_error = ''
+        from agent_service import AgentService, service_configuration
+        try:
+            agent_settings = service_configuration(self.home)
+            if agent_settings:
+                self.agent_service = AgentService(self.remote, inference_port=GATEWAY_PORT, **agent_settings)
+        except (OSError, ValueError) as error:
+            self.agent_configuration_error = str(error)
+        if self.agent_service or self.agent_configuration_error:
+            from agent_gateway import project_catalogue, project_request
+            self.remote.workspace.agent_catalogue = lambda owner: project_catalogue(self.remote, owner)
+            self.remote.workspace.agent_project_request = lambda *args: project_request(self.remote, *args)
+            self.remote.notifications.agent_transcriptions = lambda owner: project_request(
+                self.remote, owner, 'GET', '/internal/kiara/transcriptions')
         self.local_network = LocalNetwork(self.remote_backend, self.home)
         self.operations = Operations(self)
         self.hermes = None
@@ -83,6 +100,7 @@ class Controller:
         values = self.remote.metadata()
         values.update(gateway_port=GATEWAY_PORT,
                       gateway_available=self.gateway is not None,
+                      agent_active=self.remote.agent_active,
                       client_compiled=(ROOT / 'client-qwen/dist/Accès serveur Fred.exe').is_file())
         values['connection'] = self.wireguard.status()
         values['online_clients'] = sum(time.time()-epoch < 45 for epoch in values['last_connections'].values())
@@ -149,7 +167,7 @@ class Controller:
                        'config_path': str(config_path), 'host': s['host'], 'port': s['port']})
             write_json(self.pointer, {'directory': str(directory)})
             with (directory / 'supervisor.log').open('wb') as stream:
-                worker = subprocess.Popen([str(PYTHON), '-u', str(HOME / 'runtime.py'),
+                worker = subprocess.Popen([str(PYTHON), '-u', str(Path(__file__).with_name('runtime.py')),
                          '--config', str(config_path), '--run-dir', str(directory),
                          '--floor', str(s['min_free_ram_gib'])], cwd=ROOT,
                          stdout=stream, stderr=stream,
@@ -315,6 +333,34 @@ def serve(port=8765, controller=None):
                 return self.respond(200, inventory(controller))
             if path == '/api/devices':
                 return self.respond(200, controller.remote.metadata())
+            if path == '/api/agent-service':
+                if not hmac.compare_digest(self.headers.get('X-Launcher-Token', ''), token):
+                    return self.respond(403, {'error': 'Accès administrateur requis.'})
+                service = controller.agent_service
+                owner = parse_qs(urlsplit(self.path).query).get('owner', [''])[0]
+                workers = service.worker_groups if service else None
+                if service and not service.start_workers:
+                    workers = ()
+                return self.respond(200, {'configured': service is not None,
+                                          'running': bool(service and service.running()),
+                                          'worker_groups': workers,
+                                          'document_project_root': service.document_project_root if service else '',
+                                          'thunderbird_device': getattr(service, 'thunderbird_device', None),
+                                          'web_origin': getattr(controller, 'agent_web_origin', ''),
+                                          'web_port': getattr(controller, 'agent_web_port', None),
+                                          'web_error': getattr(controller, 'agent_web_error', ''),
+                                          'configuration_error': getattr(controller, 'agent_configuration_error', ''),
+                                          'startup_error': getattr(service, 'startup_error', ''),
+                                          'operator': service.access.operator_for(owner) if service and owner else None})
+            if path == '/api/agent-service/catalogue':
+                if not hmac.compare_digest(self.headers.get('X-Launcher-Token', ''), token):
+                    return self.respond(403, {'error': 'Accès administrateur requis.'})
+                if not controller.agent_service:
+                    return self.respond(503, {'error': 'Le service Projets de Kiara n’est pas configuré.'})
+                try:
+                    return self.respond(200, controller.agent_service.management_data())
+                except ValueError as error:
+                    return self.respond(503, {'error': str(error)})
             if path == '/api/clients/activity':
                 if not hmac.compare_digest(self.headers.get('X-Launcher-Token', ''), token):
                     return self.respond(403, {'error':'Rechargez la page du lanceur.'})
@@ -365,7 +411,36 @@ def serve(port=8765, controller=None):
                     result = controller.remote.notifications.admin()
                 return self.respond(200, result)
             if path == '/api/releases':
-                return self.respond(200, release_status(controller.home))
+                status = release_status(controller.home)
+                try:
+                    desktop, _ = windows_installer(controller.home, desktop=True)
+                    status['desktop_version'] = desktop['version']
+                except ValueError:
+                    status['desktop_version'] = None
+                return self.respond(200, status)
+            if path == '/api/releases/windows/download':
+                target = controller.home / 'installateurs' / DESKTOP_INSTALLER
+                try:
+                    stream = target.open('rb')
+                except OSError:
+                    return self.respond(503, {'error': 'Installateur Kiara indisponible.'})
+                with stream:
+                    try:
+                        release, _ = windows_installer(controller.home, stream=stream, desktop=True)
+                    except ValueError as error:
+                        return self.respond(503, {'error': str(error)})
+                    self.send_response(200)
+                    self.send_header('Content-Type', 'application/octet-stream')
+                    self.send_header('Content-Disposition', f'attachment; filename="{DESKTOP_INSTALLER}"')
+                    self.send_header('Content-Length', str(release['bytes']))
+                    self.send_header('Cache-Control', 'no-store')
+                    self.send_header('X-Content-Type-Options', 'nosniff')
+                    self.end_headers()
+                    try:
+                        shutil.copyfileobj(stream, self.wfile, length=1024 * 1024)
+                    except (BrokenPipeError, ConnectionResetError):
+                        pass
+                    return
             if path == '/api/diagnostic':
                 return self.respond(200, controller.operations.diagnostic())
             if path == '/api/audit':
@@ -381,29 +456,20 @@ def serve(port=8765, controller=None):
                 if len(identity) != 16 or any(c not in '0123456789abcdef' for c in identity):
                     return self.respond(404, {'error': 'Client inconnu.'})
                 record = next((client for client in controller.remote.metadata()['clients'] if client['id'] == identity and not client['revoked']), None)
-                target = controller.home / 'clients' / (identity + '.exe')
-                if not record or not target.is_file():
+                if not record:
                     return self.respond(404, {'error': 'Client absent ou révoqué.'})
-                filename=download_name(target,record['name'])
-                import unicodedata
-                fallback=unicodedata.normalize('NFKD',filename).encode('ascii','ignore').decode()
-                self.send_response(200)
-                self.send_header('Content-Type', 'application/octet-stream')
-                self.send_header('Content-Disposition', f'attachment; filename="{fallback}"; filename*=UTF-8\'\'{quote(filename,safe="")}')
-                self.send_header('Content-Length', str(target.stat().st_size))
+                self.send_response(303)
+                self.send_header('Location', '/api/releases/windows/download')
+                self.send_header('Content-Length', '0')
                 self.send_header('Cache-Control', 'no-store')
-                self.send_header('X-Content-Type-Options', 'nosniff')
                 self.end_headers()
-                with target.open('rb') as stream:
-                    while block := stream.read(65536):
-                        self.wfile.write(block)
                 return
             if path == '/api/state':
                 try:
                     return self.respond(200, controller.state())
                 except Exception as error:
                     return self.respond(500, {'error': str(error)})
-            if path in ('/', '/app.css', '/app.js','/workspace.js','/interface.css','/interface.js','/maintenance.js','/maintenance.css','/notifications.js','/notifications.css','/voice.js','/local-network.js','/client-usage.js','/client-usage.css'):
+            if path in ('/', '/app.css', '/app.js','/workspace.js','/interface.css','/interface.js','/maintenance.js','/maintenance.css','/notifications.js','/notifications.css','/voice.js','/local-network.js','/client-usage.js','/client-usage.css','/agent-access.js'):
                 filename = 'index.html' if path == '/' else path[1:]
                 data = (HOME / 'web' / filename).read_bytes()
                 if filename == 'index.html':
@@ -431,12 +497,53 @@ def serve(port=8765, controller=None):
                 # available while that worker shuts down.
                 if path == '/api/restore':
                     return self.respond(200, controller.operations.restore(data))
+                if path == '/api/backups/agent-restore':
+                    service = controller.agent_service
+                    if service is None:
+                        raise ValueError('Le service Projets de Kiara n’est pas configuré.')
+                    if any(not isinstance(data.get(key), str) or not Path(data[key]).is_absolute()
+                           for key in ('file', 'directory')):
+                        raise ValueError('Choisissez l’archive des Projets et le dossier de restauration.')
+                    manager = controller.operations.backups
+                    password = manager.resolve_password(data)
+                    with manager.exclusive():
+                        restored = service.restore_archive(data['file'], data['directory'], password)
+                    return self.respond(200, {'directory': str(restored), 'message': 'Données des Projets restaurées dans un dossier isolé.'})
                 with controller.lock:
                     if getattr(controller.remote,'maintenance',False) and path not in ('/api/backups/verify','/api/backups/recover'):
                         raise ValueError('Serveur en maintenance ; action suspendue.')
                     path = urlsplit(self.path).path
                     if path == '/api/voice':
                         result=controller.voice.configure(data.get('enabled'))
+                    elif path == '/api/agent-service':
+                        service = controller.agent_service
+                        if service is None:
+                            raise ValueError('Le service Projets de Kiara n’est pas configuré.')
+                        action = data.get('action')
+                        if action == 'access':
+                            if 'project_ids' not in data or 'role' not in data:
+                                raise ValueError('Rôle et périmètre Agent requis.')
+                            service.access.set_operator(data.get('owner'), role=data['role'],
+                                                        project_ids=data['project_ids'], person_id=data.get('person_id'),
+                                                        agent_operator_id=data.get('agent_operator_id'),
+                                                        **({'expected': data['expected']} if 'expected' in data else {}))
+                        elif action == 'revoke':
+                            service.access.revoke(data.get('owner'), **({'expected': data['expected']} if 'expected' in data else {}))
+                        elif action == 'link-project-knowledge':
+                            service.link_project_knowledge(data.get('project_id'))
+                        elif action == 'enable-meetings':
+                            service.enable_meetings()
+                        elif action == 'thunderbird-device':
+                            if 'owner' not in data:
+                                raise ValueError('Choisissez le poste Thunderbird ou retirez la liaison.')
+                            service.set_thunderbird_device(data['owner'])
+                        elif action == 'start':
+                            service.start()
+                        elif action == 'stop':
+                            service.stop()
+                        else:
+                            raise ValueError('Commande Agent inconnue.')
+                        result = {'saved': True, 'running': service.running()}
                     elif path == '/api/local-network':
                         result = controller.local_network.configure(data.get('enabled'))
                     elif path == '/api/operations':
@@ -494,8 +601,7 @@ def serve(port=8765, controller=None):
                         if data.get('platform','android')=='android':
                             result=controller.wireguard.create_android(data.get('name'),controller.remote_backend()[1],data.get('owner',''),data.get('kind','phone'))
                         elif data.get('platform')=='windows':
-                            result=controller.wireguard.create_client(data.get('name'),controller.remote_backend()[1])
-                            controller.remote.device({'id':result['id'],'kind':'pc','owner':data.get('owner','')})
+                            result=controller.wireguard.create_desktop(data.get('name'),controller.remote_backend()[1],data.get('owner',''))
                         else:raise ValueError('Plateforme attendue : Android ou Windows.')
                     elif path == '/api/devices/replace':
                         result=controller.wireguard.replace(data.get('id'),controller.remote_backend()[1],data.get('platform','android'),data.get('name'),data.get('owner'),data.get('kind'))
@@ -512,7 +618,9 @@ def serve(port=8765, controller=None):
                     elif path == '/api/remote/configure':
                         result = controller.wireguard.configure(data)
                     elif path == '/api/remote/create-client':
-                        result = controller.wireguard.create_client(data.get('name'), controller.remote_backend()[1])
+                        result = controller.wireguard.create_desktop(data.get('name'), controller.remote_backend()[1])
+                    elif path == '/api/remote/access-code':
+                        result = {'code': controller.wireguard.desktop_access_code(data.get('id'))}
                     elif path == '/api/remote/hermes-retry':
                         if not controller.hermes:raise ValueError('Hermes n’est pas activé.')
                         client=next((c for c in controller.remote.metadata()['clients'] if c['id']==data.get('id')),None)
@@ -520,7 +628,7 @@ def serve(port=8765, controller=None):
                         if client.get('hermes_pending'):
                             if client.get('creation_platform')=='android':
                                 result=controller.wireguard.create_android(client['name'],controller.remote_backend()[1],client.get('device_owner',''),client.get('device_kind') if client.get('device_kind') in ('phone','tablet') else 'phone',resume=client['id'])
-                            else:result=controller.wireguard.create_client(client['name'],controller.remote_backend()[1],resume=client['id'])
+                            else:result=controller.wireguard.create_desktop(client['name'],controller.remote_backend()[1],resume=client['id'])
                         else:
                             controller.hermes.ensure(client['id'],client['name'])
                             result={'message':'Assistant Hermes prêt.'}
@@ -554,6 +662,13 @@ if __name__ == '__main__':
     parser.add_argument('--preserve-model-state',action='store_true')
     args = parser.parse_args()
     controller = Controller()
+    if controller.agent_service:
+        def start_agent_service():
+            try:
+                controller.agent_service.start()
+            except (OSError, ValueError, RuntimeError):
+                controller.last_error = 'Le service Projets de Kiara est indisponible. Vérifiez sa configuration et ses données.'
+        threading.Thread(target=start_agent_service, daemon=True, name='kiara-agent-startup').start()
     if controller.hermes:
         def start_agents():
             try:controller.hermes.start()
@@ -566,16 +681,42 @@ if __name__ == '__main__':
     controller.voice.start_on_boot()
     server = serve(args.port, controller)
     write_json(HOME / 'interface.pid.json', process_identity(psutil.Process()))
+    from agent_service import web_configuration
+    web_settings = None
+    try:
+        web_settings = web_configuration(controller.home)
+    except (OSError, ValueError) as error:
+        controller.agent_web_error = str(error)
+    shared_origin = web_settings[0] if web_settings and web_settings[1] == 0 else None
     # HTTP remains on loopback; WireGuard has an isolated in-process network stack.
     try:
-        controller.gateway = serve_gateway(controller.remote, controller.remote_backend)
+        controller.gateway = serve_gateway(controller.remote, controller.remote_backend, agent_web_origin=shared_origin)
         threading.Thread(target=controller.gateway.serve_forever, daemon=True).start()
+        if shared_origin:
+            controller.agent_web_origin, controller.agent_web_port = shared_origin, GATEWAY_PORT
     except OSError as error:
         controller.last_error = 'Passerelle Internet indisponible : ' + str(error)
+    agent_web = None
+    try:
+        if web_settings and not shared_origin:
+            agent_web = serve_gateway(controller.remote, controller.remote_backend, web_settings[1],
+                                      agent_web_origin=web_settings[0], browser_only=True)
+            threading.Thread(target=agent_web.serve_forever, daemon=True, name='kiara-agent-web').start()
+            controller.agent_web_origin, controller.agent_web_port = web_settings
+    except (OSError, ValueError):
+        controller.agent_web_error = 'Le portail Kiara est indisponible. Vérifiez son origine HTTPS et son port local.'
+        controller.last_error = controller.agent_web_error
     if controller.remote.metadata()['enabled']:
         try:
             controller.wireguard.activate(controller.gateway is not None)
         except (OSError,ValueError) as error:
             controller.last_error='WireGuard : '+str(error)
     threading.Thread(target=controller.operations.watch,kwargs={'preserve_state':args.preserve_model_state}, daemon=True).start()
-    server.serve_forever()
+    try:
+        server.serve_forever()
+    finally:
+        if agent_web:
+            agent_web.shutdown()
+            agent_web.server_close()
+        if controller.agent_service:
+            controller.agent_service.stop()

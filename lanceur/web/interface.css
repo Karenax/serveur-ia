@@ -20,3 +20,8 @@ body.sidebar-collapsed{--sidebar-width:70px}body.sidebar-collapsed .console-side
 
 .metric>span,.gpu-lines,.disk-stats,.badge,.eyebrow,.nav-group>span,.client-badge{font-size:11px}
 #console-main:focus,#page-title:focus,[tabindex="-1"]:focus{outline:none}
+.agent-all-projects,.agent-project-option{display:flex;align-items:center;gap:8px;margin:8px 0}
+.agent-all-projects input,.agent-project-option input{width:18px;height:18px;flex:none;accent-color:var(--accent)}
+.agent-all-projects label,.agent-project-option label{cursor:pointer}
+.agent-project-list{min-width:0;margin:12px 0;padding:8px 12px;border:1px solid var(--line);border-radius:8px}
+.agent-project-list legend{padding:0 4px;font-weight:600}

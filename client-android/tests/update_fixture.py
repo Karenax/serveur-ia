@@ -31,8 +31,7 @@ def main():
     store.configure({'enabled': True, 'url': 'wireguard://10.77.0.1:8766'})
     server = serve_gateway(store, lambda: (0, 'unused', ''), 0)
     engine = Engine({'role': 'server', 'wireguard': {'private_key': wireguard.vault()['private_key']},
-                    'listen_port': 0, 'upstream_port': server.server_port, 'peers': wireguard.peers()},
-                    executable=ROOT / 'toolchain/releases-staging/android-updates/wireguard-bridge.exe')
+                    'listen_port': 0, 'upstream_port': server.server_port, 'peers': wireguard.peers()})
     profile['wireguard']['endpoint'] = f'10.0.2.2:{engine.port}'
     (args.output / 'profile.b64').write_text(base64.b64encode(json.dumps(profile).encode()).decode(), encoding='ascii')
     print('Isolated Android update fixture ready', flush=True)

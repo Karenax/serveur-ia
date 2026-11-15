@@ -1,0 +1,5022 @@
+{
+  "audited_on": "2026-10-05",
+  "scope": "Local static project feature audit; shared route files are dependency inventories, not all project submenus. API router paths precede global /api/v1 mounting.",
+  "xpilot": {
+    "root": "C:\\Users\\Frederic.LEFRANCOIS\\Documents\\ChatGPT\\Xpilot",
+    "version": "0.1.54",
+    "commit": "82d47dff8475d32ea18a99e9f81d6409b1c19643",
+    "ui_files": [
+      {
+        "path": "web/src/components/AcvAnalysisPanel.tsx",
+        "sha256": "77681dbb24e156471274b2da91f160d12a7bb409d8b2169260cee02785bf39a2",
+        "lines": 509,
+        "api_calls": [
+          {
+            "name": "acvAnalyses",
+            "line": 96
+          },
+          {
+            "name": "acvAnalyses",
+            "line": 104
+          },
+          {
+            "name": "acvAnalysis",
+            "line": 132
+          },
+          {
+            "name": "acvAnalysisJob",
+            "line": 133
+          },
+          {
+            "name": "acvAnalysis",
+            "line": 159
+          },
+          {
+            "name": "acvAnalysisJob",
+            "line": 160
+          },
+          {
+            "name": "registerExistingAcv",
+            "line": 182
+          },
+          {
+            "name": "createAcvAnalysis",
+            "line": 216
+          }
+        ],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/AgencyAutocomplete.tsx",
+        "sha256": "20e04595b29bf97d206bf88e9406e06373639f856df74e2f486c80bc4b8e90ca",
+        "lines": 145,
+        "api_calls": [],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/BomClassificationMemoryPanel.tsx",
+        "sha256": "167d96dbedb834f962f43d141405ccf8ee4876c2d4fa43ebfdeadf8af7af6bc9",
+        "lines": 328,
+        "api_calls": [
+          {
+            "name": "bomClassificationMemories",
+            "line": 72
+          },
+          {
+            "name": "reviewBomClassificationMemory",
+            "line": 97
+          }
+        ],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/BomClassificationMetricsPanel.tsx",
+        "sha256": "2f26b76f8c2ac1a3e3ed37c23fc34497ddba690778b96120501a3ea1efb6588f",
+        "lines": 182,
+        "api_calls": [
+          {
+            "name": "bomClassificationMetrics",
+            "line": 26
+          }
+        ],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/BomClassificationReview.tsx",
+        "sha256": "9bd7858ea2b004d8d20126d0017984f7daa8da9fd46b20a0333588eb9e23e2a2",
+        "lines": 1336,
+        "api_calls": [
+          {
+            "name": "bomClassification",
+            "line": 134
+          },
+          {
+            "name": "runBomClassification",
+            "line": 293
+          },
+          {
+            "name": "saveBomClassificationDecisions",
+            "line": 313
+          }
+        ],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/BomSupplierProposalReview.tsx",
+        "sha256": "e72d6963f52356a861374c2f464f3a086e0274dd5d921f634a0a742ac0dbb974",
+        "lines": 1001,
+        "api_calls": [
+          {
+            "name": "bomSupplierProposals",
+            "line": 131
+          },
+          {
+            "name": "bomSupplierDirectory",
+            "line": 163
+          },
+          {
+            "name": "generateBomSupplierProposals",
+            "line": 199
+          },
+          {
+            "name": "saveBomSupplierDecisions",
+            "line": 254
+          }
+        ],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/DeliverableAssistancePanel.tsx",
+        "sha256": "5fb6ad4f3e00efb67501dcc1f58b70651a5d55b124c0d86d44bc6d8814d8481d",
+        "lines": 757,
+        "api_calls": [
+          {
+            "name": "deliverableAssistance",
+            "line": 287
+          },
+          {
+            "name": "cdcAnalyses",
+            "line": 320
+          },
+          {
+            "name": "previewFunctionalAnalysis",
+            "line": 342
+          },
+          {
+            "name": "generateFunctionalAnalysis",
+            "line": 387
+          },
+          {
+            "name": "generateFunctionalAnalysis",
+            "line": 399
+          },
+          {
+            "name": "generateCalculationNote",
+            "line": 431
+          },
+          {
+            "name": "copyDeliverableTemplate",
+            "line": 435
+          },
+          {
+            "name": "deliverableVerificationDraft",
+            "line": 461
+          }
+        ],
+        "runtime_calls": [
+          {
+            "name": "selectFolder",
+            "line": 360
+          },
+          {
+            "name": "openPath",
+            "line": 370
+          },
+          {
+            "name": "composeOutlookDraft",
+            "line": 465
+          }
+        ]
+      },
+      {
+        "path": "web/src/components/DesignAssistancePanel.tsx",
+        "sha256": "136639cc8b1bf244311335764371a9867f27170c3e6c2e06e0d7cbe892032f37",
+        "lines": 489,
+        "api_calls": [
+          {
+            "name": "weldingQuestionnaire",
+            "line": 89
+          },
+          {
+            "name": "excQuestionnaire",
+            "line": 103
+          },
+          {
+            "name": "evaluateWelding",
+            "line": 122
+          },
+          {
+            "name": "evaluateExc",
+            "line": 136
+          },
+          {
+            "name": "prepareWeldingChat",
+            "line": 160
+          }
+        ],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/FunctionalAnalysisVerificationPanel.tsx",
+        "sha256": "3466bc8104e9b0ba79bbf00bd2281a3b54d0f1d81b795942f21ae8caf7f16d50",
+        "lines": 595,
+        "api_calls": [
+          {
+            "name": "cdcAnalyses",
+            "line": 90
+          },
+          {
+            "name": "functionalVerifications",
+            "line": 95
+          },
+          {
+            "name": "functionalVerification",
+            "line": 129
+          },
+          {
+            "name": "functionalVerificationJob",
+            "line": 130
+          },
+          {
+            "name": "functionalVerification",
+            "line": 157
+          },
+          {
+            "name": "functionalVerificationJob",
+            "line": 158
+          },
+          {
+            "name": "createFunctionalVerificationFromPdf",
+            "line": 200
+          },
+          {
+            "name": "createFunctionalVerification",
+            "line": 206
+          },
+          {
+            "name": "reviewFunctionalVerificationFinding",
+            "line": 237
+          },
+          {
+            "name": "validateFunctionalVerification",
+            "line": 267
+          },
+          {
+            "name": "deliverables",
+            "line": 281
+          }
+        ],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/project-advanced/FinancialPanel.tsx",
+        "sha256": "8ec686821414402a14ff66074a47f86fa0ccd369f171f7698a0e6eb329c7372e",
+        "lines": 147,
+        "api_calls": [],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/project-advanced/formatters.ts",
+        "sha256": "c5d0465fd46c81e81ef2fac43f1ca4e1e84dc05ae57a6d7b648ba29592a52da3",
+        "lines": 30,
+        "api_calls": [],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/project-advanced/MacroOverview.tsx",
+        "sha256": "fe8d3434bbab871dd79eaeee96dce9055fadbf68373e49356a7f107276363f80",
+        "lines": 75,
+        "api_calls": [],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/project-advanced/PilotInspector.tsx",
+        "sha256": "f9d8f2a13c3d1593144bfac0976e26e5c06eb21b41374c2706b951f3183bff09",
+        "lines": 456,
+        "api_calls": [
+          {
+            "name": "updateMilestone",
+            "line": 222
+          }
+        ],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/project-advanced/ProjectAdvancedPanel.tsx",
+        "sha256": "5c6c784b62a449ef6c8e35e2be7cf84d615f1f75cae8eb45e793ff5f6fd055bb",
+        "lines": 245,
+        "api_calls": [
+          {
+            "name": "timeTracking",
+            "line": 58
+          },
+          {
+            "name": "purchases",
+            "line": 60
+          },
+          {
+            "name": "sales",
+            "line": 62
+          },
+          {
+            "name": "betaGraph",
+            "line": 63
+          },
+          {
+            "name": "people",
+            "line": 73
+          },
+          {
+            "name": "people",
+            "line": 83
+          },
+          {
+            "name": "createTask",
+            "line": 98
+          },
+          {
+            "name": "updateTask",
+            "line": 132
+          },
+          {
+            "name": "assignTask",
+            "line": 151
+          },
+          {
+            "name": "unassignTask",
+            "line": 153
+          }
+        ],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/project-advanced/ProjectFinancialOverview.tsx",
+        "sha256": "9c6017b23e231a031d59d066f4d6f31e286b6bef16526d055df001b5c4f70b6e",
+        "lines": 47,
+        "api_calls": [
+          {
+            "name": "financialSummary",
+            "line": 25
+          },
+          {
+            "name": "refreshFinancials",
+            "line": 43
+          }
+        ],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/project-advanced/ProjectMacroOverview.tsx",
+        "sha256": "c32a012672dac4db86637b50fa54c160ef21123e79d66797d64683645f28f310",
+        "lines": 53,
+        "api_calls": [
+          {
+            "name": "betaGraph",
+            "line": 23
+          }
+        ],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/project-advanced/ProjectPilotage.tsx",
+        "sha256": "87ef743dde22cd7aaee7b45d1300445c7ed553b63390b8a8ad230bf180194150",
+        "lines": 724,
+        "api_calls": [],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/project-advanced/PurchasesPanel.tsx",
+        "sha256": "9afdc5bd3610fcf4cd1e7d6628cd1e09c108c0c0777a3284f4c73854d081ac73",
+        "lines": 288,
+        "api_calls": [
+          {
+            "name": "savePurchaseRemaining",
+            "line": 34
+          }
+        ],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/project-advanced/SageDataTable.tsx",
+        "sha256": "5c89ee52fd719fee1e2bf6dce173ea2ef4736dc31cbcb4902b10fb75349a4f58",
+        "lines": 271,
+        "api_calls": [],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/project-advanced/SalesPanel.tsx",
+        "sha256": "3f5cac4970d25b1b0871c633b8040cb76e3942d7900f9af38e106cb7fbd924b4",
+        "lines": 159,
+        "api_calls": [],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/project-advanced/TimePanel.tsx",
+        "sha256": "3f84ddaa2cf826d8646fca36565771c5ce685e810465608a834e498bfeb2f330",
+        "lines": 297,
+        "api_calls": [
+          {
+            "name": "saveRemainingHours",
+            "line": 54
+          },
+          {
+            "name": "timeTrackingDetails",
+            "line": 79
+          }
+        ],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/project-advanced/types.ts",
+        "sha256": "254f234364dc71ed052de203716f452fe374334c007f4239502a8ecfd31ec3d6",
+        "lines": 11,
+        "api_calls": [],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/ProjectAdvancedPanels.tsx",
+        "sha256": "339885059d12beb541cc5ace28ea76f73ed5428554649bcaa06e7b2d7702b49a",
+        "lines": 7,
+        "api_calls": [],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/ProjectBaselinesPanel.tsx",
+        "sha256": "e6bd5146e5056580dfb41af05df85e8d1c8a0078d6c73e1e7493ee0169bb3cbf",
+        "lines": 235,
+        "api_calls": [
+          {
+            "name": "projectBaselines",
+            "line": 56
+          },
+          {
+            "name": "projectBaselineComparison",
+            "line": 61
+          },
+          {
+            "name": "projectBaselineComparison",
+            "line": 84
+          },
+          {
+            "name": "createProjectBaseline",
+            "line": 99
+          },
+          {
+            "name": "projectBaselines",
+            "line": 107
+          }
+        ],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/ProjectBomPanel.tsx",
+        "sha256": "d796d6a38e31dc75f988cb76e5911a945793002ac89c55f8e0ddc1c903544b4f",
+        "lines": 516,
+        "api_calls": [
+          {
+            "name": "bomWorkspace",
+            "line": 79
+          },
+          {
+            "name": "bomLines",
+            "line": 139
+          },
+          {
+            "name": "bomIssues",
+            "line": 140
+          },
+          {
+            "name": "createBomRevision",
+            "line": 199
+          },
+          {
+            "name": "uploadBomRevision",
+            "line": 207
+          }
+        ],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/ProjectCdcAnalysisPanel.tsx",
+        "sha256": "8786f156296b6e4ff02872619e39746ef416d8b00b1c24f724d77bc16f8aa93d",
+        "lines": 1448,
+        "api_calls": [
+          {
+            "name": "cdcWorkspace",
+            "line": 231
+          },
+          {
+            "name": "initializeCdcWorkspace",
+            "line": 236
+          },
+          {
+            "name": "cdcSources",
+            "line": 249
+          },
+          {
+            "name": "cdcAnalysis",
+            "line": 261
+          },
+          {
+            "name": "cdcAnalyses",
+            "line": 277
+          },
+          {
+            "name": "activeCdcAnalysisJob",
+            "line": 292
+          },
+          {
+            "name": "cdcJob",
+            "line": 345
+          },
+          {
+            "name": "createCdcSource",
+            "line": 433
+          },
+          {
+            "name": "uploadCdcSource",
+            "line": 438
+          },
+          {
+            "name": "generateCdcAnalysis",
+            "line": 453
+          },
+          {
+            "name": "createCdcAnalysisItem",
+            "line": 473
+          },
+          {
+            "name": "runCdcChecks",
+            "line": 494
+          },
+          {
+            "name": "transitionCdcAnalysis",
+            "line": 510
+          },
+          {
+            "name": "deleteCdcAnalysis",
+            "line": 534
+          },
+          {
+            "name": "cdcSourcePage",
+            "line": 555
+          },
+          {
+            "name": "extractCdcSource",
+            "line": 699
+          },
+          {
+            "name": "updateCdcAnalysisItem",
+            "line": 1166
+          }
+        ],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/ProjectCdcBeTransferPanel.tsx",
+        "sha256": "2c51394b623a12c60acc3cc57d56a40f892cc70cffc29d54092738315a9d165e",
+        "lines": 781,
+        "api_calls": [
+          {
+            "name": "cdcBeTransfer",
+            "line": 186
+          },
+          {
+            "name": "cdcBeTransfers",
+            "line": 195
+          },
+          {
+            "name": "cdcJob",
+            "line": 233
+          },
+          {
+            "name": "createCdcBeTransfer",
+            "line": 273
+          },
+          {
+            "name": "updateCdcBeTransfer",
+            "line": 282
+          },
+          {
+            "name": "updateCdcBeTransferItem",
+            "line": 306
+          },
+          {
+            "name": "transitionCdcBeTransfer",
+            "line": 321
+          },
+          {
+            "name": "runCdcBeTransferChecks",
+            "line": 338
+          },
+          {
+            "name": "generateCdcBeTransfer",
+            "line": 346
+          },
+          {
+            "name": "issueCdcBeTransfer",
+            "line": 355
+          },
+          {
+            "name": "downloadCdcBeTransferArtifact",
+            "line": 362
+          }
+        ],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/ProjectCollaborationPanels.tsx",
+        "sha256": "aeca924b646e9a36303084a4f49000f1b87d2732cc6feb06985b4afb93fde1f4",
+        "lines": 1562,
+        "api_calls": [
+          {
+            "name": "projectMembers",
+            "line": 239
+          },
+          {
+            "name": "people",
+            "line": 253
+          },
+          {
+            "name": "updateProjectMember",
+            "line": 300
+          },
+          {
+            "name": "addProjectMember",
+            "line": 304
+          },
+          {
+            "name": "projectMembers",
+            "line": 311
+          },
+          {
+            "name": "removeProjectMember",
+            "line": 332
+          },
+          {
+            "name": "signatureEligibility",
+            "line": 603
+          },
+          {
+            "name": "people",
+            "line": 617
+          },
+          {
+            "name": "createSignatureRequest",
+            "line": 636
+          },
+          {
+            "name": "networkLinks",
+            "line": 839
+          },
+          {
+            "name": "signatureEligibility",
+            "line": 852
+          },
+          {
+            "name": "saveNetworkLinks",
+            "line": 865
+          },
+          {
+            "name": "saveNetworkLinks",
+            "line": 885
+          },
+          {
+            "name": "people",
+            "line": 908
+          },
+          {
+            "name": "createSignatureRequest",
+            "line": 935
+          },
+          {
+            "name": "updateProjectSummary",
+            "line": 1315
+          },
+          {
+            "name": "tasks",
+            "line": 1349
+          },
+          {
+            "name": "closeProject",
+            "line": 1370
+          },
+          {
+            "name": "reopenProject",
+            "line": 1383
+          }
+        ],
+        "runtime_calls": [
+          {
+            "name": "openPath",
+            "line": 1030
+          }
+        ]
+      },
+      {
+        "path": "web/src/components/ProjectDeliverableCards.tsx",
+        "sha256": "8ef0c7c3d957db3be3d489949fb6365e3a446189c5c66f6ed5ea82508dc39aa3",
+        "lines": 889,
+        "api_calls": [
+          {
+            "name": "updateDeliverableSelection",
+            "line": 120
+          },
+          {
+            "name": "updateDeliverable",
+            "line": 367
+          },
+          {
+            "name": "transitionDeliverable",
+            "line": 398
+          },
+          {
+            "name": "addDeliverableVersion",
+            "line": 423
+          },
+          {
+            "name": "generateDeliverableManifest",
+            "line": 446
+          }
+        ],
+        "runtime_calls": [
+          {
+            "name": "openPath",
+            "line": 752
+          },
+          {
+            "name": "openPath",
+            "line": 764
+          },
+          {
+            "name": "openPath",
+            "line": 806
+          }
+        ]
+      },
+      {
+        "path": "web/src/components/ProjectDocumentFillingPanel.tsx",
+        "sha256": "60281251905f354b721a270cdde9d5a4b9fa1dcb9eef1676ecd7df77e6e4b888",
+        "lines": 880,
+        "api_calls": [
+          {
+            "name": "updateDocumentFillingLink",
+            "line": 197
+          },
+          {
+            "name": "documentFillingWorkspace",
+            "line": 246
+          },
+          {
+            "name": "reportProjectDocumentFilling",
+            "line": 378
+          },
+          {
+            "name": "documentFillingWorkspace",
+            "line": 385
+          },
+          {
+            "name": "updateDocumentFillingLink",
+            "line": 416
+          },
+          {
+            "name": "updateDocumentFillingLink",
+            "line": 464
+          }
+        ],
+        "runtime_calls": [
+          {
+            "name": "analyzeProjectDocuments",
+            "line": 171
+          },
+          {
+            "name": "pathIsDirectory",
+            "line": 224
+          },
+          {
+            "name": "onDocumentFillingProgress",
+            "line": 271
+          },
+          {
+            "name": "selectFolder",
+            "line": 284
+          },
+          {
+            "name": "fillProjectDocumentsLocally",
+            "line": 365
+          },
+          {
+            "name": "selectFile",
+            "line": 403
+          },
+          {
+            "name": "cancelDocumentFilling",
+            "line": 446
+          },
+          {
+            "name": "openPath",
+            "line": 452
+          },
+          {
+            "name": "openPath",
+            "line": 556
+          }
+        ]
+      },
+      {
+        "path": "web/src/components/ProjectDocumentsPanels.tsx",
+        "sha256": "bb69567e1d645b0d75664ca353a741ff4a4fedc88047dca47b6223dc9d3ab54b",
+        "lines": 1677,
+        "api_calls": [
+          {
+            "name": "personalNotes",
+            "line": 203
+          },
+          {
+            "name": "personalNotesLocation",
+            "line": 211
+          },
+          {
+            "name": "networkLinks",
+            "line": 212
+          },
+          {
+            "name": "projectLegacyNotes",
+            "line": 252
+          },
+          {
+            "name": "openProjectNoteDocument",
+            "line": 448
+          },
+          {
+            "name": "personalNote",
+            "line": 465
+          },
+          {
+            "name": "projectNote",
+            "line": 466
+          },
+          {
+            "name": "createPersonalNote",
+            "line": 527
+          },
+          {
+            "name": "createProjectNote",
+            "line": 528
+          },
+          {
+            "name": "deletePersonalNote",
+            "line": 668
+          },
+          {
+            "name": "deleteProjectNote",
+            "line": 669
+          },
+          {
+            "name": "addPersonalNoteAttachment",
+            "line": 832
+          },
+          {
+            "name": "addProjectNoteAttachment",
+            "line": 833
+          },
+          {
+            "name": "personalNoteVersion",
+            "line": 860
+          },
+          {
+            "name": "projectNoteVersion",
+            "line": 861
+          },
+          {
+            "name": "restorePersonalNoteVersion",
+            "line": 885
+          },
+          {
+            "name": "restoreProjectNoteVersion",
+            "line": 886
+          },
+          {
+            "name": "personalNoteAttachment",
+            "line": 913
+          },
+          {
+            "name": "projectNoteAttachment",
+            "line": 914
+          }
+        ],
+        "runtime_calls": [
+          {
+            "name": "listLocalProjectNotes",
+            "line": 223
+          },
+          {
+            "name": "openPath",
+            "line": 390
+          },
+          {
+            "name": "readLocalProjectNote",
+            "line": 394
+          },
+          {
+            "name": "createLocalProjectNote",
+            "line": 499
+          },
+          {
+            "name": "listLocalProjectNotes",
+            "line": 506
+          },
+          {
+            "name": "readLocalProjectNote",
+            "line": 518
+          },
+          {
+            "name": "saveLocalProjectNote",
+            "line": 566
+          },
+          {
+            "name": "renameLocalProjectNote",
+            "line": 626
+          },
+          {
+            "name": "deleteLocalProjectNote",
+            "line": 664
+          },
+          {
+            "name": "addLocalProjectNoteAttachment",
+            "line": 824
+          },
+          {
+            "name": "readLocalProjectNoteVersion",
+            "line": 853
+          },
+          {
+            "name": "restoreLocalProjectNoteVersion",
+            "line": 878
+          },
+          {
+            "name": "openLocalProjectNoteAttachment",
+            "line": 905
+          }
+        ]
+      },
+      {
+        "path": "web/src/components/ProjectMilestonesPanel.tsx",
+        "sha256": "c9c0b639df81db2baa39766ec701636d22d0d69f3f5f5e9f8f0fcaab720c2925",
+        "lines": 508,
+        "api_calls": [
+          {
+            "name": "replaceMilestones",
+            "line": 109
+          },
+          {
+            "name": "updateMilestone",
+            "line": 323
+          },
+          {
+            "name": "milestones",
+            "line": 336
+          }
+        ],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/ProjectReviewAudioRecorder.tsx",
+        "sha256": "cacfbdc9a5808ef238de48491d67427fd63f81bee1fc1b9ef52dfa6cda066fd0",
+        "lines": 377,
+        "api_calls": [
+          {
+            "name": "audioTranscriptions",
+            "line": 85
+          },
+          {
+            "name": "createAudioTranscription",
+            "line": 169
+          },
+          {
+            "name": "uploadAudioTranscription",
+            "line": 178
+          },
+          {
+            "name": "queueAudioTranscription",
+            "line": 179
+          }
+        ],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/ProjectReviewsPanel.tsx",
+        "sha256": "a5f6619430f1bd23dda4a5dd7314b4f5b121a462236ad3bf24111f9b6c59bde4",
+        "lines": 997,
+        "api_calls": [
+          {
+            "name": "updateDeliverable",
+            "line": 118
+          },
+          {
+            "name": "projectReviewTypes",
+            "line": 374
+          },
+          {
+            "name": "projectReview",
+            "line": 375
+          },
+          {
+            "name": "deliverables",
+            "line": 376
+          },
+          {
+            "name": "people",
+            "line": 377
+          },
+          {
+            "name": "signatureSigners",
+            "line": 378
+          },
+          {
+            "name": "projectReview",
+            "line": 423
+          },
+          {
+            "name": "saveProjectReview",
+            "line": 504
+          },
+          {
+            "name": "updateDeliverableSelection",
+            "line": 505
+          },
+          {
+            "name": "publishProjectReview",
+            "line": 568
+          },
+          {
+            "name": "projectReviewPdf",
+            "line": 593
+          },
+          {
+            "name": "requestProjectReviewSignatures",
+            "line": 614
+          },
+          {
+            "name": "createProjectReviewRevision",
+            "line": 637
+          }
+        ],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/ProjectSimilarityPanel.tsx",
+        "sha256": "00dce1f711acae7cefeb85fc68f56ac0cdfa85930d50d06db32839e4e62afb41",
+        "lines": 279,
+        "api_calls": [
+          {
+            "name": "projectSimilarities",
+            "line": 52
+          },
+          {
+            "name": "retryProjectSimilarities",
+            "line": 85
+          }
+        ],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/ProjectTabs.tsx",
+        "sha256": "c68fd351246bf114b1e01aad2f8b4cd4092e8328174836270fe483517eb5f30b",
+        "lines": 526,
+        "api_calls": [],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/ProjectTasksPanel.tsx",
+        "sha256": "de2b7cf0b82e696a7f9728c294b696b0521fc7d1240704f5653219a45882d213",
+        "lines": 627,
+        "api_calls": [],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/ProjectTdaoPanel.tsx",
+        "sha256": "fe43e757d6169589c50e2ac8a7f3a11aba1df2425c80b405b494d900e6a14a10",
+        "lines": 420,
+        "api_calls": [
+          {
+            "name": "networkLinks",
+            "line": 98
+          },
+          {
+            "name": "importTdao",
+            "line": 130
+          },
+          {
+            "name": "updateProject",
+            "line": 162
+          }
+        ],
+        "runtime_calls": [
+          {
+            "name": "selectFile",
+            "line": 180
+          },
+          {
+            "name": "openPath",
+            "line": 213
+          }
+        ]
+      },
+      {
+        "path": "web/src/components/ProjectTemplateEditor.tsx",
+        "sha256": "5bdb6c6efb04bda28e724529880e329c14c33f3d7695dcd12c52d4ba77826380",
+        "lines": 420,
+        "api_calls": [
+          {
+            "name": "projectTemplate",
+            "line": 31
+          },
+          {
+            "name": "updateProjectTemplate",
+            "line": 52
+          }
+        ],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/RecordingPrivacyNotice.tsx",
+        "sha256": "7218b9b43d0c120badb99c3ec11e1f3799941c13ba6180daceb63509cfddc919",
+        "lines": 47,
+        "api_calls": [],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/RiskAnalysisVerificationPanel.tsx",
+        "sha256": "5dd493a542a7b9604c0a2af21832c5954c77c72edfcd0396d48cbefaf9f9d763",
+        "lines": 813,
+        "api_calls": [
+          {
+            "name": "cdcAnalyses",
+            "line": 122
+          },
+          {
+            "name": "riskVerifications",
+            "line": 127
+          },
+          {
+            "name": "deliverables",
+            "line": 128
+          },
+          {
+            "name": "riskVerification",
+            "line": 168
+          },
+          {
+            "name": "riskVerificationJob",
+            "line": 169
+          },
+          {
+            "name": "riskVerification",
+            "line": 196
+          },
+          {
+            "name": "riskVerificationJob",
+            "line": 197
+          },
+          {
+            "name": "createRiskVerificationFromPdf",
+            "line": 235
+          },
+          {
+            "name": "createRiskVerification",
+            "line": 242
+          },
+          {
+            "name": "registerExistingRiskAnalysis",
+            "line": 276
+          },
+          {
+            "name": "reviewRiskVerificationFinding",
+            "line": 312
+          },
+          {
+            "name": "validateRiskVerification",
+            "line": 342
+          },
+          {
+            "name": "deliverables",
+            "line": 356
+          }
+        ],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/TaskEditorModal.tsx",
+        "sha256": "7092acd9f1f6964ca0f1f79598cb887932047b3f83105a7c332cca482d24d47d",
+        "lines": 246,
+        "api_calls": [],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/TubeCostingPanel.tsx",
+        "sha256": "895060a1d1a0cde14e893d5d95ba97ff6624a772edb130640abfc3a43f81df9a",
+        "lines": 1589,
+        "api_calls": [
+          {
+            "name": "tubeCosting",
+            "line": 359
+          },
+          {
+            "name": "calculateTubeCuttingBox",
+            "line": 390
+          },
+          {
+            "name": "calculateTubeTracingBox",
+            "line": 395
+          },
+          {
+            "name": "calculateTubeFullScaleTrace",
+            "line": 400
+          },
+          {
+            "name": "calculateTubeCom",
+            "line": 405
+          },
+          {
+            "name": "calculateTubeWeldTack",
+            "line": 407
+          },
+          {
+            "name": "updateTubeCosting",
+            "line": 436
+          },
+          {
+            "name": "exportTubeTechnicalOffer",
+            "line": 488
+          },
+          {
+            "name": "exportTubeTdao",
+            "line": 489
+          },
+          {
+            "name": "tubeCostingParameters",
+            "line": 519
+          },
+          {
+            "name": "updateTubeCostingParameters",
+            "line": 542
+          }
+        ],
+        "runtime_calls": [
+          {
+            "name": "runTubeOfferMacros",
+            "line": 491
+          },
+          {
+            "name": "openPath",
+            "line": 492
+          },
+          {
+            "name": "openPath",
+            "line": 497
+          }
+        ]
+      },
+      {
+        "path": "web/src/components/Ui.tsx",
+        "sha256": "99903dd2d6d0b437cd881315d116b26a385627ea18757111d5da832d6680b708",
+        "lines": 629,
+        "api_calls": [],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/notes/clientProjectNotes.ts",
+        "sha256": "f205829be2fd5496e9d4a690634a5397b254abb0ddd940d226cb7aeb59c2090f",
+        "lines": 224,
+        "api_calls": [],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/notes/noteSaveQueue.ts",
+        "sha256": "76d7a38b698136ac7d3b4c2076b829e465c650eda20d0bc67cd9d6827a410740",
+        "lines": 249,
+        "api_calls": [
+          {
+            "name": "savePersonalNote",
+            "line": 135
+          },
+          {
+            "name": "saveProjectNote",
+            "line": 136
+          }
+        ],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/notes/noteStorage.ts",
+        "sha256": "8d509668bebb640b9115789bf5963b34a9191e3e848377563676151b48b17792",
+        "lines": 73,
+        "api_calls": [],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/notes/projectNoteListCache.ts",
+        "sha256": "526bd5ff44bbf4e16c961f0b27076f53e1b1cb07a12d7ee2cabe18d85ad8cab1",
+        "lines": 79,
+        "api_calls": [
+          {
+            "name": "projectNotes",
+            "line": 30
+          }
+        ],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/pages/ProjectDetailPage.tsx",
+        "sha256": "1bcd9c6ffb9395eef2195f8a236beb17138074ea28a3aef0dd0a57e22e852943",
+        "lines": 1255,
+        "api_calls": [
+          {
+            "name": "projectFamilies",
+            "line": 258
+          },
+          {
+            "name": "agencies",
+            "line": 265
+          },
+          {
+            "name": "project",
+            "line": 303
+          },
+          {
+            "name": "milestones",
+            "line": 344
+          },
+          {
+            "name": "tasks",
+            "line": 352
+          },
+          {
+            "name": "people",
+            "line": 359
+          },
+          {
+            "name": "milestones",
+            "line": 365
+          },
+          {
+            "name": "tasks",
+            "line": 375
+          },
+          {
+            "name": "projectMessages",
+            "line": 406
+          },
+          {
+            "name": "deliverables",
+            "line": 409
+          },
+          {
+            "name": "updateChecklist",
+            "line": 451
+          },
+          {
+            "name": "updateTask",
+            "line": 484
+          },
+          {
+            "name": "assignTask",
+            "line": 503
+          },
+          {
+            "name": "unassignTask",
+            "line": 505
+          },
+          {
+            "name": "createTask",
+            "line": 519
+          },
+          {
+            "name": "deleteTask",
+            "line": 548
+          },
+          {
+            "name": "sendProjectMessage",
+            "line": 557
+          },
+          {
+            "name": "updateProject",
+            "line": 571
+          }
+        ],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/pages/ProjectsPage.tsx",
+        "sha256": "8fdfcfafb3beadc158077510db21a06455c484bde3d2ba7ec94214d6c8b1da56",
+        "lines": 654,
+        "api_calls": [
+          {
+            "name": "portfolioProjects",
+            "line": 157
+          },
+          {
+            "name": "inconsistencies",
+            "line": 179
+          },
+          {
+            "name": "agencies",
+            "line": 193
+          },
+          {
+            "name": "clients",
+            "line": 193
+          },
+          {
+            "name": "projectTypologies",
+            "line": 193
+          },
+          {
+            "name": "createProject",
+            "line": 210
+          }
+        ],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/runtime/browserRuntime.ts",
+        "sha256": "10c7c20f7ef9898ba4914dc328e9ef8e9e7b283d69734c24d3e44e76c0962442",
+        "lines": 148,
+        "api_calls": [],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/runtime/tauriRuntime.ts",
+        "sha256": "2a9bf8ccfd10d047aba2de1ef66578951acd50d54698fe89cf2cd6c7e330f9e0",
+        "lines": 475,
+        "api_calls": [],
+        "runtime_calls": []
+      }
+    ],
+    "route_files": [
+      {
+        "path": "backend/app/api/v1/routes/projects.py",
+        "sha256": "1f5f770c15e54038c899ab3d2c044dba22051399cdaae457c19a3c2461141c0a",
+        "lines": 1000,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "",
+            "function": "list_projects",
+            "line": 202
+          },
+          {
+            "method": "POST",
+            "path": "",
+            "function": "create_project",
+            "line": 225
+          },
+          {
+            "method": "GET",
+            "path": "/overview",
+            "function": "list_project_overview",
+            "line": 256
+          },
+          {
+            "method": "GET",
+            "path": "/my-overview",
+            "function": "list_my_project_overview",
+            "line": 268
+          },
+          {
+            "method": "GET",
+            "path": "/my-team-overview",
+            "function": "list_my_team_project_overview",
+            "line": 284
+          },
+          {
+            "method": "GET",
+            "path": "/portfolio",
+            "function": "list_project_portfolio",
+            "line": 313
+          },
+          {
+            "method": "GET",
+            "path": "/references",
+            "function": "list_project_references",
+            "line": 348
+          },
+          {
+            "method": "GET",
+            "path": "/families",
+            "function": "list_project_families",
+            "line": 357
+          },
+          {
+            "method": "GET",
+            "path": "/family-options",
+            "function": "list_project_family_options",
+            "line": 362
+          },
+          {
+            "method": "PUT",
+            "path": "/family-options",
+            "function": "replace_project_family_options",
+            "line": 367
+          },
+          {
+            "method": "GET",
+            "path": "/control-note-updates",
+            "function": "list_control_note_updates",
+            "line": 380
+          },
+          {
+            "method": "GET",
+            "path": "/chat/notifications",
+            "function": "get_project_chat_notifications",
+            "line": 403
+          },
+          {
+            "method": "POST",
+            "path": "/chat/notifications/read",
+            "function": "mark_project_chat_notifications_read",
+            "line": 414
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}",
+            "function": "get_project",
+            "line": 425
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/beta-graph",
+            "function": "get_project_beta_graph",
+            "line": 433
+          },
+          {
+            "method": "PATCH",
+            "path": "/{project_id}",
+            "function": "update_project",
+            "line": 480
+          },
+          {
+            "method": "PUT",
+            "path": "/{project_id}/information",
+            "function": "update_project_information",
+            "line": 503
+          },
+          {
+            "method": "PUT",
+            "path": "/{project_id}/summary",
+            "function": "update_project_summary",
+            "line": 525
+          },
+          {
+            "method": "DELETE",
+            "path": "/{project_id}",
+            "function": "delete_project",
+            "line": 539
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/members",
+            "function": "list_project_members",
+            "line": 556
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/members",
+            "function": "add_project_member",
+            "line": 566
+          },
+          {
+            "method": "PATCH",
+            "path": "/{project_id}/members/{member_id}",
+            "function": "update_project_member",
+            "line": 580
+          },
+          {
+            "method": "DELETE",
+            "path": "/{project_id}/members/{member_id}",
+            "function": "remove_project_member",
+            "line": 595
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/close",
+            "function": "close_project",
+            "line": 603
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/reopen",
+            "function": "reopen_project",
+            "line": 617
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/network-links",
+            "function": "list_project_network_links",
+            "line": 639
+          },
+          {
+            "method": "PUT",
+            "path": "/{project_id}/network-links",
+            "function": "replace_project_network_links",
+            "line": 650
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/milestones",
+            "function": "list_project_milestones",
+            "line": 664
+          },
+          {
+            "method": "PUT",
+            "path": "/{project_id}/milestones",
+            "function": "replace_project_milestones",
+            "line": 675
+          },
+          {
+            "method": "PUT",
+            "path": "/{project_id}/migration-history",
+            "function": "import_project_historical_state",
+            "line": 689
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/tdao/import",
+            "function": "import_project_tdao",
+            "line": 709
+          },
+          {
+            "method": "PATCH",
+            "path": "/{project_id}/milestones/{milestone_code}",
+            "function": "update_project_milestone",
+            "line": 723
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/chat/messages",
+            "function": "list_project_chat_messages",
+            "line": 742
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/chat/messages",
+            "function": "create_project_chat_message",
+            "line": 757
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/notes",
+            "function": "list_project_notes",
+            "line": 779
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/notes-legacy",
+            "function": "list_legacy_project_notes",
+            "line": 792
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/notes/{note_id}",
+            "function": "read_project_note",
+            "line": 820
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/notes",
+            "function": "create_project_note",
+            "line": 838
+          },
+          {
+            "method": "PUT",
+            "path": "/{project_id}/notes/{note_id}",
+            "function": "update_project_note",
+            "line": 849
+          },
+          {
+            "method": "DELETE",
+            "path": "/{project_id}/notes/{note_id}",
+            "function": "delete_project_note",
+            "line": 868
+          },
+          {
+            "method": "PUT",
+            "path": "/{project_id}/notes/{note_id}/save",
+            "function": "save_project_note_in_background",
+            "line": 881
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/notes/{note_id}/versions/{version_key}",
+            "function": "read_project_note_version",
+            "line": 901
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/notes/{note_id}/versions/{version_key}/restore",
+            "function": "restore_project_note_version",
+            "line": 915
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/notes/{note_id}/attachments",
+            "function": "add_project_note_attachment",
+            "line": 928
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/notes/{note_id}/attachments/{attachment_name}",
+            "function": "download_project_note_attachment",
+            "line": 946
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/notes/{note_id}/download",
+            "function": "download_project_note_document",
+            "line": 975
+          }
+        ],
+        "service_imports": [
+          "backend.app.services.audit_log",
+          "backend.app.services.deliverables",
+          "backend.app.services.errors",
+          "backend.app.services.kaizen",
+          "backend.app.services.project_notes",
+          "backend.app.services.project_notes_web",
+          "backend.app.services.project_overview"
+        ]
+      },
+      {
+        "path": "backend/app/api/v1/routes/project_governance.py",
+        "sha256": "78105ae74e620a011be676e578a155f976632075153961c5eb39e7b065798ee5",
+        "lines": 212,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/project-configuration/typologies/{typology_id}/template",
+            "function": "read_project_template",
+            "line": 52
+          },
+          {
+            "method": "PUT",
+            "path": "/project-configuration/typologies/{typology_id}/template",
+            "function": "replace_project_template",
+            "line": 67
+          },
+          {
+            "method": "GET",
+            "path": "/projects/{project_id}/baselines",
+            "function": "list_project_baselines",
+            "line": 85
+          },
+          {
+            "method": "POST",
+            "path": "/projects/{project_id}/baselines",
+            "function": "create_project_baseline",
+            "line": 101
+          },
+          {
+            "method": "PATCH",
+            "path": "/projects/{project_id}/baselines/{baseline_id}",
+            "function": "update_project_baseline",
+            "line": 120
+          },
+          {
+            "method": "GET",
+            "path": "/projects/{project_id}/baselines/{baseline_id}/comparison",
+            "function": "compare_project_baseline",
+            "line": 138
+          },
+          {
+            "method": "GET",
+            "path": "/calendar-subscriptions",
+            "function": "list_calendar_subscriptions",
+            "line": 154
+          },
+          {
+            "method": "POST",
+            "path": "/calendar-subscriptions",
+            "function": "create_calendar_subscription",
+            "line": 166
+          },
+          {
+            "method": "DELETE",
+            "path": "/calendar-subscriptions/{subscription_id}",
+            "function": "revoke_calendar_subscription",
+            "line": 183
+          },
+          {
+            "method": "GET",
+            "path": "/calendar/feeds/{secret}.ics",
+            "function": "calendar_feed",
+            "line": 199
+          }
+        ],
+        "service_imports": [
+          "backend.app.services.errors",
+          "backend.app.services.project_governance"
+        ]
+      },
+      {
+        "path": "backend/app/api/v1/routes/deliverables.py",
+        "sha256": "f250f55f9150615bebd8655a2205dfbf886a96250d74a6c4858d6e8f307fc3b1",
+        "lines": 556,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/deliverable-types",
+            "function": "list_deliverable_types",
+            "line": 76
+          },
+          {
+            "method": "GET",
+            "path": "/project-typologies",
+            "function": "list_project_typologies",
+            "line": 84
+          },
+          {
+            "method": "GET",
+            "path": "/project-configuration",
+            "function": "read_project_configuration",
+            "line": 95
+          },
+          {
+            "method": "POST",
+            "path": "/project-configuration/deliverable-types",
+            "function": "create_deliverable_type",
+            "line": 107
+          },
+          {
+            "method": "PUT",
+            "path": "/project-configuration/deliverable-types/{deliverable_type_id}",
+            "function": "update_deliverable_type",
+            "line": 124
+          },
+          {
+            "method": "POST",
+            "path": "/project-configuration/typologies",
+            "function": "create_project_typology",
+            "line": 146
+          },
+          {
+            "method": "PUT",
+            "path": "/project-configuration/typologies/{typology_id}",
+            "function": "update_project_typology",
+            "line": 163
+          },
+          {
+            "method": "GET",
+            "path": "/projects/{project_id}/deliverables/readiness",
+            "function": "read_deliverable_readiness",
+            "line": 184
+          },
+          {
+            "method": "GET",
+            "path": "/projects/{project_id}/deliverables/workspace",
+            "function": "read_deliverable_workspace",
+            "line": 199
+          },
+          {
+            "method": "PUT",
+            "path": "/projects/{project_id}/deliverables/selection",
+            "function": "update_deliverable_selection",
+            "line": 214
+          },
+          {
+            "method": "POST",
+            "path": "/projects/{project_id}/deliverables/custom",
+            "function": "create_custom_deliverable",
+            "line": 233
+          },
+          {
+            "method": "PATCH",
+            "path": "/projects/{project_id}/deliverables/{deliverable_id}",
+            "function": "edit_project_deliverable",
+            "line": 251
+          },
+          {
+            "method": "GET",
+            "path": "/projects/{project_id}/deliverables/{deliverable_id}/assistance",
+            "function": "read_deliverable_assistance",
+            "line": 277
+          },
+          {
+            "method": "POST",
+            "path": "/projects/{project_id}/deliverables/{deliverable_id}/assistance/functional-analysis/preview",
+            "function": "preview_functional_analysis",
+            "line": 297
+          },
+          {
+            "method": "POST",
+            "path": "/projects/{project_id}/deliverables/{deliverable_id}/assistance/functional-analysis",
+            "function": "generate_functional_analysis",
+            "line": 321
+          },
+          {
+            "method": "POST",
+            "path": "/projects/{project_id}/deliverables/{deliverable_id}/assistance/template-copy",
+            "function": "copy_deliverable_template",
+            "line": 345
+          },
+          {
+            "method": "POST",
+            "path": "/projects/{project_id}/deliverables/{deliverable_id}/assistance/calculation-note",
+            "function": "generate_calculation_note",
+            "line": 369
+          },
+          {
+            "method": "GET",
+            "path": "/projects/{project_id}/deliverables/{deliverable_id}/assistance/verification-draft",
+            "function": "prepare_deliverable_verification",
+            "line": 392
+          },
+          {
+            "method": "GET",
+            "path": "/projects/{project_id}/deliverables/{deliverable_id}/assistance/acv-measurements",
+            "function": "list_deliverable_acv_measurements",
+            "line": 414
+          },
+          {
+            "method": "POST",
+            "path": "/projects/{project_id}/deliverables/{deliverable_id}/assistance/acv-measurements",
+            "function": "add_deliverable_acv_measurement",
+            "line": 435
+          },
+          {
+            "method": "POST",
+            "path": "/projects/{project_id}/deliverables/{deliverable_id}/versions",
+            "function": "add_deliverable_version",
+            "line": 457
+          },
+          {
+            "method": "POST",
+            "path": "/projects/{project_id}/deliverables/{deliverable_id}/transitions",
+            "function": "transition_deliverable",
+            "line": 483
+          },
+          {
+            "method": "POST",
+            "path": "/projects/{project_id}/deliverables/{deliverable_id}/manifest",
+            "function": "generate_deliverable_manifest",
+            "line": 511
+          },
+          {
+            "method": "PATCH",
+            "path": "/projects/{project_id}/deliverable-checklist-items/{item_id}",
+            "function": "update_deliverable_checklist_item",
+            "line": 537
+          }
+        ],
+        "service_imports": [
+          "backend.app.services.deliverable_assistance",
+          "backend.app.services.deliverables",
+          "backend.app.services.errors",
+          "backend.app.services.project_configuration"
+        ]
+      },
+      {
+        "path": "backend/app/api/v1/routes/cdc_analysis.py",
+        "sha256": "97e527f68df79922ed76cd37e14741586205b1dc9f6af0189b16239199b72805",
+        "lines": 549,
+        "routes": [
+          {
+            "method": "POST",
+            "path": "/{project_id}/cdc/initialize",
+            "function": "initialize_workspace",
+            "line": 78
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/cdc",
+            "function": "get_workspace",
+            "line": 99
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/cdc/sources",
+            "function": "list_sources",
+            "line": 113
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/cdc/sources",
+            "function": "create_source",
+            "line": 134
+          },
+          {
+            "method": "PUT",
+            "path": "/{project_id}/cdc/sources/{source_id}/content",
+            "function": "upload_source_content",
+            "line": 162
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/cdc/sources/{source_id}/extract",
+            "function": "extract_source",
+            "line": 208
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/cdc/source-revisions/{revision_id}/pages",
+            "function": "list_source_pages",
+            "line": 231
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/cdc/source-pages/{page_id}",
+            "function": "get_source_page",
+            "line": 256
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/cdc/analysis-revisions",
+            "function": "list_analysis_revisions",
+            "line": 281
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/cdc/analysis-revisions/generate",
+            "function": "generate_analysis",
+            "line": 303
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/cdc/analysis-revisions/{analysis_id}",
+            "function": "get_analysis_revision",
+            "line": 341
+          },
+          {
+            "method": "DELETE",
+            "path": "/{project_id}/cdc/analysis-revisions/{analysis_id}",
+            "function": "delete_analysis_revision",
+            "line": 362
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/cdc/analysis-revisions/{analysis_id}/items",
+            "function": "create_analysis_item",
+            "line": 391
+          },
+          {
+            "method": "PATCH",
+            "path": "/{project_id}/cdc/analysis-items/{item_id}",
+            "function": "update_analysis_item",
+            "line": 413
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/cdc/analysis-items/{item_id}/evidence",
+            "function": "add_item_evidence",
+            "line": 442
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/cdc/analysis-revisions/{analysis_id}/checks",
+            "function": "run_analysis_checks",
+            "line": 464
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/cdc/analysis-revisions/{analysis_id}/transition",
+            "function": "transition_analysis",
+            "line": 485
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/cdc/jobs/active-analysis",
+            "function": "get_active_analysis_job",
+            "line": 518
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/cdc/jobs/{job_id}",
+            "function": "get_job",
+            "line": 537
+          }
+        ],
+        "service_imports": [
+          "backend.app.services.audit_log",
+          "backend.app.services.cdc_analysis",
+          "backend.app.services.errors"
+        ]
+      },
+      {
+        "path": "backend/app/api/v1/routes/cdc_be_transfer.py",
+        "sha256": "b402840e8cea51676f19072293decbf01ae9ee050933183ca12e752cfb82b6ee",
+        "lines": 296,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/{project_id}/cdc/be-transfers",
+            "function": "list_be_transfers",
+            "line": 61
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/cdc/analysis-revisions/{analysis_id}/be-transfers",
+            "function": "create_be_transfer",
+            "line": 81
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/cdc/be-transfers/{transfer_id}",
+            "function": "get_be_transfer",
+            "line": 109
+          },
+          {
+            "method": "PATCH",
+            "path": "/{project_id}/cdc/be-transfers/{transfer_id}",
+            "function": "update_be_transfer",
+            "line": 127
+          },
+          {
+            "method": "PATCH",
+            "path": "/{project_id}/cdc/be-transfer-items/{item_id}",
+            "function": "update_be_transfer_item",
+            "line": 148
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/cdc/be-transfers/{transfer_id}/checks",
+            "function": "run_be_transfer_checks",
+            "line": 167
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/cdc/be-transfers/{transfer_id}/transition",
+            "function": "transition_be_transfer",
+            "line": 185
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/cdc/be-transfers/{transfer_id}/generate",
+            "function": "generate_be_transfer",
+            "line": 219
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/cdc/be-transfers/{transfer_id}/issue",
+            "function": "issue_be_transfer",
+            "line": 252
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/cdc/be-transfer-artifacts/{artifact_id}/{format_name}",
+            "function": "download_be_transfer_artifact",
+            "line": 275
+          }
+        ],
+        "service_imports": [
+          "backend.app.services.audit_log",
+          "backend.app.services.cdc_analysis",
+          "backend.app.services.cdc_be_transfer",
+          "backend.app.services.errors"
+        ]
+      },
+      {
+        "path": "backend/app/api/v1/routes/project_reviews.py",
+        "sha256": "db8f160f6cb38f280b769cfe1c26c05ac8e09c9790e30f3aebb470b4afaeba6d",
+        "lines": 183,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/project-review-types",
+            "function": "list_project_review_types",
+            "line": 49
+          },
+          {
+            "method": "GET",
+            "path": "/projects/{project_id}/reviews/{type_code}",
+            "function": "get_project_review",
+            "line": 65
+          },
+          {
+            "method": "PUT",
+            "path": "/projects/{project_id}/reviews/{type_code}",
+            "function": "save_project_review",
+            "line": 84
+          },
+          {
+            "method": "POST",
+            "path": "/projects/{project_id}/reviews/{type_code}/revisions",
+            "function": "create_project_review_revision",
+            "line": 105
+          },
+          {
+            "method": "POST",
+            "path": "/projects/{project_id}/reviews/{type_code}/publish",
+            "function": "publish_project_review",
+            "line": 124
+          },
+          {
+            "method": "GET",
+            "path": "/projects/{project_id}/reviews/{type_code}/pdf",
+            "function": "download_project_review_pdf",
+            "line": 141
+          },
+          {
+            "method": "POST",
+            "path": "/projects/{project_id}/reviews/{type_code}/signature-requests",
+            "function": "request_project_review_signatures",
+            "line": 166
+          }
+        ],
+        "service_imports": [
+          "backend.app.services.errors",
+          "backend.app.services.project_reviews"
+        ]
+      },
+      {
+        "path": "backend/app/api/v1/routes/audio_transcriptions.py",
+        "sha256": "6fe4323650b3be3499c6db2160b271dffa8020f033ac0c661837b327e3c78717",
+        "lines": 410,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/capabilities",
+            "function": "audio_transcription_capabilities",
+            "line": 42
+          },
+          {
+            "method": "POST",
+            "path": "",
+            "function": "create_audio_transcription",
+            "line": 87
+          },
+          {
+            "method": "GET",
+            "path": "",
+            "function": "list_audio_transcriptions",
+            "line": 118
+          },
+          {
+            "method": "GET",
+            "path": "/{transcription_id}",
+            "function": "get_audio_transcription",
+            "line": 153
+          },
+          {
+            "method": "GET",
+            "path": "/{transcription_id}/audio",
+            "function": "download_audio_transcription",
+            "line": 170
+          },
+          {
+            "method": "PATCH",
+            "path": "/{transcription_id}/transcript",
+            "function": "update_audio_transcript",
+            "line": 192
+          },
+          {
+            "method": "POST",
+            "path": "/{transcription_id}/summary",
+            "function": "generate_audio_summary",
+            "line": 220
+          },
+          {
+            "method": "POST",
+            "path": "/{transcription_id}/publish",
+            "function": "publish_audio_summary",
+            "line": 248
+          },
+          {
+            "method": "PUT",
+            "path": "/{transcription_id}/audio",
+            "function": "upload_audio_transcription",
+            "line": 286
+          },
+          {
+            "method": "POST",
+            "path": "/{transcription_id}/queue",
+            "function": "queue_audio_transcription",
+            "line": 352
+          },
+          {
+            "method": "POST",
+            "path": "/{transcription_id}/retry",
+            "function": "retry_audio_transcription",
+            "line": 363
+          },
+          {
+            "method": "POST",
+            "path": "/{transcription_id}/cancel",
+            "function": "cancel_audio_transcription",
+            "line": 374
+          }
+        ],
+        "service_imports": [
+          "backend.app.services.audio_transcriptions",
+          "backend.app.services.audit_log",
+          "backend.app.services.errors",
+          "backend.app.services.operational_readiness"
+        ]
+      },
+      {
+        "path": "backend/app/api/v1/routes/project_similarity.py",
+        "sha256": "81269093d5193018baee6a1829cc1fc65a0c9ff8aee53a1024981b66fde560b7",
+        "lines": 55,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/{project_id}/similar-projects",
+            "function": "read_similar_projects",
+            "line": 26
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/similar-projects/retry",
+            "function": "retry_similar_projects",
+            "line": 44
+          }
+        ],
+        "service_imports": [
+          "backend.app.services.errors",
+          "backend.app.services.project_similarity"
+        ]
+      },
+      {
+        "path": "backend/app/api/v1/routes/project_time_tracking.py",
+        "sha256": "8007925ee55fa8635bd341b76763bb117930a7ec18421313db6a31bd9d9e9b5e",
+        "lines": 65,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/{project_id}/time-tracking",
+            "function": "project_time_tracking_summary",
+            "line": 18
+          },
+          {
+            "method": "PUT",
+            "path": "/{project_id}/time-tracking/remaining-work",
+            "function": "update_project_remaining_work",
+            "line": 32
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/time-tracking/details",
+            "function": "project_time_tracking_details",
+            "line": 46
+          }
+        ],
+        "service_imports": [
+          "backend.app.services.errors",
+          "backend.app.services.time_tracking"
+        ]
+      },
+      {
+        "path": "backend/app/api/v1/routes/project_purchases.py",
+        "sha256": "92ecba44a86f6123fc531476daed53fb7bf4a4e5847acee945429eb0c3fab638",
+        "lines": 40,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/{project_id}/purchases",
+            "function": "project_purchases",
+            "line": 15
+          },
+          {
+            "method": "PUT",
+            "path": "/{project_id}/purchases/remaining-work",
+            "function": "update_project_purchase_remaining_work",
+            "line": 27
+          }
+        ],
+        "service_imports": [
+          "backend.app.services.errors",
+          "backend.app.services.project_purchases"
+        ]
+      },
+      {
+        "path": "backend/app/api/v1/routes/project_sales.py",
+        "sha256": "98dd6b9b00c2710314bf2faa8f20e85ed2e8e4c0bea15ce4ff29fe4b1414f3c7",
+        "lines": 16,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/{project_id}/sales",
+            "function": "project_sales",
+            "line": 12
+          }
+        ],
+        "service_imports": [
+          "backend.app.services.errors",
+          "backend.app.services.project_sales"
+        ]
+      },
+      {
+        "path": "backend/app/api/v1/routes/project_financials.py",
+        "sha256": "41cc8d19de1c2bf5e684a416caba9f3dfa6d0ef0a97628cab4819062287a7841",
+        "lines": 36,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/{project_id}/financial-summary",
+            "function": "read_project_financial_summary",
+            "line": 15
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/financial-summary/refresh",
+            "function": "refresh_project_financial_summary",
+            "line": 29
+          }
+        ],
+        "service_imports": [
+          "backend.app.services.errors",
+          "backend.app.services.project_financials"
+        ]
+      },
+      {
+        "path": "backend/app/api/v1/routes/bom.py",
+        "sha256": "c45510773b26eeb6757affd3c6d3435d0f51968f22e380b77a4010ed4e68be88",
+        "lines": 598,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/{project_id}/bom",
+            "function": "get_bom_workspace",
+            "line": 65
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/bom/revisions",
+            "function": "create_bom_revision",
+            "line": 82
+          },
+          {
+            "method": "PUT",
+            "path": "/{project_id}/bom/revisions/{revision_id}/content",
+            "function": "upload_bom_revision",
+            "line": 115
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/bom/revisions/{revision_id}/lines",
+            "function": "list_bom_lines",
+            "line": 159
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/bom/revisions/{revision_id}/issues",
+            "function": "list_bom_issues",
+            "line": 183
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/bom/classification/rules",
+            "function": "list_bom_classification_rules",
+            "line": 207
+          },
+          {
+            "method": "PATCH",
+            "path": "/{project_id}/bom/classification/rules/{rule_id}",
+            "function": "update_bom_classification_rule",
+            "line": 220
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/bom/classification/memories",
+            "function": "list_bom_classification_memories",
+            "line": 248
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/bom/classification/metrics",
+            "function": "get_bom_classification_metrics",
+            "line": 263
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/bom/classification/memories/{memory_id}/promote",
+            "function": "promote_bom_classification_memory",
+            "line": 310
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/bom/classification/memories/{memory_id}/reject",
+            "function": "reject_bom_classification_memory",
+            "line": 332
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/bom/classification/memories/{memory_id}/restore",
+            "function": "restore_bom_classification_memory",
+            "line": 354
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/bom/classification/memories/{memory_id}/rollback",
+            "function": "rollback_bom_classification_memory",
+            "line": 376
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/bom/revisions/{revision_id}/classification",
+            "function": "get_bom_classification",
+            "line": 398
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/bom/revisions/{revision_id}/classification/runs",
+            "function": "run_bom_classification",
+            "line": 423
+          },
+          {
+            "method": "PUT",
+            "path": "/{project_id}/bom/revisions/{revision_id}/classification/decisions",
+            "function": "save_bom_classification_decisions",
+            "line": 463
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/bom/revisions/{revision_id}/supplier-proposals",
+            "function": "get_bom_supplier_proposals",
+            "line": 496
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/bom/revisions/{revision_id}/supplier-directory",
+            "function": "search_bom_supplier_directory",
+            "line": 516
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/bom/revisions/{revision_id}/supplier-proposals/runs",
+            "function": "generate_bom_supplier_proposals",
+            "line": 541
+          },
+          {
+            "method": "PUT",
+            "path": "/{project_id}/bom/revisions/{revision_id}/supplier-decisions",
+            "function": "save_bom_supplier_decisions",
+            "line": 573
+          }
+        ],
+        "service_imports": [
+          "backend.app.services.audit_log",
+          "backend.app.services.bom_classification",
+          "backend.app.services.bom_import",
+          "backend.app.services.bom_suppliers",
+          "backend.app.services.errors"
+        ]
+      },
+      {
+        "path": "backend/app/api/v1/routes/signatures.py",
+        "sha256": "e772666022804dbd4510a5504db4189e2de59dddc4965060276fcd4ad98f661e",
+        "lines": 282,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/signature-capabilities",
+            "function": "signature_capabilities",
+            "line": 37
+          },
+          {
+            "method": "GET",
+            "path": "/projects/{project_id}/network-links/{link_id}/signature-eligibility",
+            "function": "eligibility",
+            "line": 63
+          },
+          {
+            "method": "POST",
+            "path": "/projects/{project_id}/network-links/{link_id}/signature-requests",
+            "function": "create_request",
+            "line": 86
+          },
+          {
+            "method": "GET",
+            "path": "/projects/{project_id}/network-links/{link_id}/signature-requests",
+            "function": "list_requests",
+            "line": 106
+          },
+          {
+            "method": "GET",
+            "path": "/signature-network",
+            "function": "browse_signature_network",
+            "line": 122
+          },
+          {
+            "method": "GET",
+            "path": "/signature-signers",
+            "function": "list_signature_signers",
+            "line": 136
+          },
+          {
+            "method": "GET",
+            "path": "/signature-requests",
+            "function": "list_visible_signature_requests",
+            "line": 149
+          },
+          {
+            "method": "POST",
+            "path": "/signature-requests",
+            "function": "create_standalone_signature_request",
+            "line": 166
+          },
+          {
+            "method": "GET",
+            "path": "/signature-requests/{request_id}",
+            "function": "read_request",
+            "line": 180
+          },
+          {
+            "method": "GET",
+            "path": "/signature-requests/{request_id}/document",
+            "function": "read_document",
+            "line": 194
+          },
+          {
+            "method": "GET",
+            "path": "/signature-requests/{request_id}/final-document",
+            "function": "read_final_document",
+            "line": 208
+          },
+          {
+            "method": "POST",
+            "path": "/signature-requests/{request_id}/sign",
+            "function": "sign_request",
+            "line": 222
+          },
+          {
+            "method": "POST",
+            "path": "/signature-requests/{request_id}/decline",
+            "function": "decline_request",
+            "line": 240
+          },
+          {
+            "method": "POST",
+            "path": "/signature-requests/{request_id}/remind",
+            "function": "remind_request",
+            "line": 258
+          },
+          {
+            "method": "POST",
+            "path": "/signature-requests/{request_id}/cancel",
+            "function": "cancel_request",
+            "line": 272
+          }
+        ],
+        "service_imports": [
+          "backend.app.services.errors",
+          "backend.app.services.operational_readiness",
+          "backend.app.services.signatures"
+        ]
+      },
+      {
+        "path": "backend/app/api/v1/routes/document_filling.py",
+        "sha256": "c42c9f55a25d0f6bc71819cdc1d3441663872244ca2497facd52db389c1371e0",
+        "lines": 168,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/document-filling-rules",
+            "function": "read_document_search_rules",
+            "line": 43
+          },
+          {
+            "method": "PUT",
+            "path": "/document-filling-rules",
+            "function": "replace_document_search_rules",
+            "line": 51
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/document-filling",
+            "function": "read_document_filling_workspace",
+            "line": 73
+          },
+          {
+            "method": "PUT",
+            "path": "/{project_id}/document-filling/{document_id}/link",
+            "function": "update_document_filling_link",
+            "line": 88
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/document-filling/report",
+            "function": "report_filled_project_documents",
+            "line": 120
+          }
+        ],
+        "service_imports": [
+          "backend.app.services.audit_log",
+          "backend.app.services.document_filling",
+          "backend.app.services.errors"
+        ]
+      },
+      {
+        "path": "backend/app/api/v1/routes/functional_verification.py",
+        "sha256": "95576c31117a79e5bec955c2b337ecf9ac8a0ff7c324cbf9096766d576368d2d",
+        "lines": 315,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/{project_id}/deliverables/{deliverable_id}/functional-verifications",
+            "function": "list_functional_verifications",
+            "line": 85
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/deliverables/{deliverable_id}/functional-verifications",
+            "function": "create_functional_verification",
+            "line": 108
+          },
+          {
+            "method": "PUT",
+            "path": "/{project_id}/deliverables/{deliverable_id}/functional-verifications/from-pdf",
+            "function": "create_functional_verification_from_pdf",
+            "line": 153
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/deliverables/{deliverable_id}/functional-verifications/{run_id}",
+            "function": "get_functional_verification",
+            "line": 211
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/deliverables/{deliverable_id}/functional-verifications/{run_id}/job",
+            "function": "get_functional_verification_job",
+            "line": 233
+          },
+          {
+            "method": "PATCH",
+            "path": "/{project_id}/deliverables/{deliverable_id}/functional-verifications/{run_id}/findings/{finding_id}",
+            "function": "review_functional_verification_finding",
+            "line": 254
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/deliverables/{deliverable_id}/functional-verifications/{run_id}/validate",
+            "function": "validate_functional_verification",
+            "line": 282
+          }
+        ],
+        "service_imports": [
+          "backend.app.services.audit_log",
+          "backend.app.services.errors",
+          "backend.app.services.functional_verification"
+        ]
+      },
+      {
+        "path": "backend/app/api/v1/routes/risk_verification.py",
+        "sha256": "cd45ae7ba4ecf3dfdb84d14addb7baaff4d47b8979845002b482c13e121da3c8",
+        "lines": 356,
+        "routes": [
+          {
+            "method": "POST",
+            "path": "/{project_id}/deliverables/{deliverable_id}/risk-verifications/ar-versions",
+            "function": "register_existing_risk_analysis",
+            "line": 87
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/deliverables/{deliverable_id}/risk-verifications",
+            "function": "list_risk_verifications",
+            "line": 123
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/deliverables/{deliverable_id}/risk-verifications",
+            "function": "create_risk_verification",
+            "line": 146
+          },
+          {
+            "method": "PUT",
+            "path": "/{project_id}/deliverables/{deliverable_id}/risk-verifications/from-pdf",
+            "function": "create_risk_verification_from_pdf",
+            "line": 192
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/deliverables/{deliverable_id}/risk-verifications/{run_id}",
+            "function": "get_risk_verification",
+            "line": 252
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/deliverables/{deliverable_id}/risk-verifications/{run_id}/job",
+            "function": "get_risk_verification_job",
+            "line": 274
+          },
+          {
+            "method": "PATCH",
+            "path": "/{project_id}/deliverables/{deliverable_id}/risk-verifications/{run_id}/findings/{finding_id}",
+            "function": "review_risk_verification_finding",
+            "line": 295
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/deliverables/{deliverable_id}/risk-verifications/{run_id}/validate",
+            "function": "validate_risk_verification",
+            "line": 323
+          }
+        ],
+        "service_imports": [
+          "backend.app.services.audit_log",
+          "backend.app.services.errors",
+          "backend.app.services.risk_verification"
+        ]
+      },
+      {
+        "path": "backend/app/api/v1/routes/acv_analysis.py",
+        "sha256": "4032e88baf8972ac91208c708a5d6913376943e699a49c1ff1df071fe23d2ac3",
+        "lines": 200,
+        "routes": [
+          {
+            "method": "POST",
+            "path": "/{project_id}/deliverables/{deliverable_id}/acv-analyses/acv-versions",
+            "function": "register_existing_acv",
+            "line": 74
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/deliverables/{deliverable_id}/acv-analyses",
+            "function": "list_acv_analyses",
+            "line": 102
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/deliverables/{deliverable_id}/acv-analyses",
+            "function": "create_acv_analysis",
+            "line": 123
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/deliverables/{deliverable_id}/acv-analyses/{run_id}",
+            "function": "get_acv_analysis",
+            "line": 168
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/deliverables/{deliverable_id}/acv-analyses/{run_id}/job",
+            "function": "get_acv_analysis_job",
+            "line": 188
+          }
+        ],
+        "service_imports": [
+          "backend.app.services.acv_analysis",
+          "backend.app.services.audit_log",
+          "backend.app.services.errors"
+        ]
+      },
+      {
+        "path": "backend/app/api/v1/routes/design_assistance.py",
+        "sha256": "5ef9fb0c4a2c03ce7c9153f3705c8608947a6db5e5c5e0568f93b8ca59fd6b1a",
+        "lines": 66,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/welding/questionnaire",
+            "function": "welding_questionnaire",
+            "line": 21
+          },
+          {
+            "method": "GET",
+            "path": "/welding/chat-guidance",
+            "function": "prepare_welding_chat",
+            "line": 26
+          },
+          {
+            "method": "POST",
+            "path": "/welding/evaluate",
+            "function": "evaluate_welding",
+            "line": 33
+          },
+          {
+            "method": "GET",
+            "path": "/welding/evaluate",
+            "function": "evaluate_welding_readonly",
+            "line": 38
+          },
+          {
+            "method": "GET",
+            "path": "/exc/questionnaire",
+            "function": "exc_questionnaire",
+            "line": 45
+          },
+          {
+            "method": "POST",
+            "path": "/exc/evaluate",
+            "function": "evaluate_exc",
+            "line": 50
+          },
+          {
+            "method": "GET",
+            "path": "/exc/evaluate",
+            "function": "evaluate_exc_readonly",
+            "line": 59
+          }
+        ],
+        "service_imports": []
+      },
+      {
+        "path": "backend/app/api/v1/routes/tube_costing.py",
+        "sha256": "322183a54bdbd1ade6bfcd7252e5cdc136ea0dfe58ea68003ab5c202cc566cd6",
+        "lines": 181,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/{project_id}/tube-costing",
+            "function": "get_tube_costing",
+            "line": 43
+          },
+          {
+            "method": "PATCH",
+            "path": "/{project_id}/tube-costing",
+            "function": "update_tube_costing",
+            "line": 48
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/tube-costing/cutting-box",
+            "function": "calculate_cutting_box",
+            "line": 62
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/tube-costing/tracing-box",
+            "function": "calculate_tracing_box",
+            "line": 76
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/tube-costing/full-scale-trace",
+            "function": "calculate_full_scale_trace",
+            "line": 90
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/tube-costing/com",
+            "function": "calculate_com",
+            "line": 106
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/tube-costing/weld-tack",
+            "function": "calculate_weld_tack",
+            "line": 120
+          },
+          {
+            "method": "GET",
+            "path": "/{project_id}/tube-costing/parameters",
+            "function": "get_tube_costing_parameters",
+            "line": 134
+          },
+          {
+            "method": "PUT",
+            "path": "/{project_id}/tube-costing/parameters",
+            "function": "update_tube_costing_parameters",
+            "line": 146
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/tube-costing/export/tdao",
+            "function": "export_tdao",
+            "line": 161
+          },
+          {
+            "method": "POST",
+            "path": "/{project_id}/tube-costing/export/technical-offer",
+            "function": "export_technical_offer",
+            "line": 175
+          }
+        ],
+        "service_imports": [
+          "backend.app.services.errors",
+          "backend.app.services.tube_costing"
+        ]
+      },
+      {
+        "path": "backend/app/api/v1/routes/tasks.py",
+        "sha256": "0447f78c538d17af89c0d49eec69b3c7cd800bfe72474a6298f5018e8e13f5ea",
+        "lines": 215,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "",
+            "function": "list_tasks",
+            "line": 33
+          },
+          {
+            "method": "GET",
+            "path": "/mine",
+            "function": "list_my_tasks",
+            "line": 60
+          },
+          {
+            "method": "GET",
+            "path": "/planning-assignments",
+            "function": "list_planning_assignment_tasks",
+            "line": 97
+          },
+          {
+            "method": "PUT",
+            "path": "/{task_id}/planning-assignment",
+            "function": "apply_planning_assignment",
+            "line": 118
+          },
+          {
+            "method": "POST",
+            "path": "",
+            "function": "create_task",
+            "line": 138
+          },
+          {
+            "method": "GET",
+            "path": "/{task_id}",
+            "function": "get_task",
+            "line": 158
+          },
+          {
+            "method": "PATCH",
+            "path": "/{task_id}",
+            "function": "update_task",
+            "line": 170
+          },
+          {
+            "method": "DELETE",
+            "path": "/{task_id}",
+            "function": "delete_task",
+            "line": 184
+          },
+          {
+            "method": "POST",
+            "path": "/{task_id}/assignments",
+            "function": "assign_task",
+            "line": 197
+          },
+          {
+            "method": "DELETE",
+            "path": "/{task_id}/assignments/{person_id}",
+            "function": "unassign_task",
+            "line": 211
+          }
+        ],
+        "service_imports": [
+          "backend.app.services.errors"
+        ]
+      },
+      {
+        "path": "backend/app/api/v1/routes/planning.py",
+        "sha256": "3675b1265b43dee6ead701b9503fe5d7a37e3c35e2ffef2cbac9b97a6fbdb172",
+        "lines": 222,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "",
+            "function": "list_planning",
+            "line": 34
+          },
+          {
+            "method": "GET",
+            "path": "/workload",
+            "function": "workload_capacity",
+            "line": 59
+          },
+          {
+            "method": "GET",
+            "path": "/workload/daily",
+            "function": "daily_workload_capacity",
+            "line": 80
+          },
+          {
+            "method": "GET",
+            "path": "/source",
+            "function": "planning_source_configuration",
+            "line": 105
+          },
+          {
+            "method": "PUT",
+            "path": "/source",
+            "function": "update_planning_source_configuration",
+            "line": 120
+          },
+          {
+            "method": "GET",
+            "path": "/agenda",
+            "function": "planning_agenda",
+            "line": 134
+          },
+          {
+            "method": "PUT",
+            "path": "/agenda",
+            "function": "save_planning_agenda",
+            "line": 157
+          },
+          {
+            "method": "POST",
+            "path": "",
+            "function": "create_planning_entry",
+            "line": 175
+          },
+          {
+            "method": "GET",
+            "path": "/{planning_id}",
+            "function": "get_planning_entry",
+            "line": 188
+          },
+          {
+            "method": "PATCH",
+            "path": "/{planning_id}",
+            "function": "update_planning_entry",
+            "line": 200
+          },
+          {
+            "method": "DELETE",
+            "path": "/{planning_id}",
+            "function": "delete_planning_entry",
+            "line": 218
+          }
+        ],
+        "service_imports": [
+          "backend.app.services.errors"
+        ]
+      },
+      {
+        "path": "backend/app/api/v1/routes/quality.py",
+        "sha256": "c700273476a66e3cc28127376871510f63f43d3c0f33ffe6788adc4ba07b742b",
+        "lines": 226,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/issues",
+            "function": "list_quality_issues",
+            "line": 50
+          },
+          {
+            "method": "GET",
+            "path": "/issues/summary",
+            "function": "quality_summary",
+            "line": 77
+          },
+          {
+            "method": "GET",
+            "path": "/issues/{issue_id}",
+            "function": "get_quality_issue",
+            "line": 82
+          },
+          {
+            "method": "POST",
+            "path": "/issues",
+            "function": "create_quality_issue",
+            "line": 94
+          },
+          {
+            "method": "PATCH",
+            "path": "/issues/{issue_id}",
+            "function": "update_quality_issue",
+            "line": 107
+          },
+          {
+            "method": "POST",
+            "path": "/issues/{issue_id}/transitions",
+            "function": "transition_quality_issue",
+            "line": 125
+          },
+          {
+            "method": "POST",
+            "path": "/issues/{issue_id}/actions",
+            "function": "add_quality_action",
+            "line": 147
+          },
+          {
+            "method": "PATCH",
+            "path": "/issues/{issue_id}/actions/{action_id}",
+            "function": "update_quality_action",
+            "line": 163
+          },
+          {
+            "method": "DELETE",
+            "path": "/issues/{issue_id}/actions/{action_id}",
+            "function": "delete_quality_action",
+            "line": 182
+          },
+          {
+            "method": "POST",
+            "path": "/issues/{issue_id}/evidences",
+            "function": "add_quality_evidence",
+            "line": 200
+          },
+          {
+            "method": "DELETE",
+            "path": "/issues/{issue_id}/evidences/{evidence_id}",
+            "function": "delete_quality_evidence",
+            "line": 216
+          }
+        ],
+        "service_imports": [
+          "backend.app.services.errors",
+          "backend.app.services.quality"
+        ]
+      },
+      {
+        "path": "backend/app/api/v1/routes/kaizen.py",
+        "sha256": "065ead0df3cb94a3e1e180160601b4d8b80f31a78d23b6d5f88d3e6228caf7c3",
+        "lines": 388,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/tickets",
+            "function": "list_kaizen_tickets",
+            "line": 52
+          },
+          {
+            "method": "GET",
+            "path": "/tickets/summary",
+            "function": "kaizen_summary",
+            "line": 84
+          },
+          {
+            "method": "GET",
+            "path": "/tickets/notifications",
+            "function": "get_kaizen_notifications",
+            "line": 89
+          },
+          {
+            "method": "POST",
+            "path": "/tickets/notifications/read",
+            "function": "mark_kaizen_notifications_read",
+            "line": 99
+          },
+          {
+            "method": "GET",
+            "path": "/tickets/{ticket_id}",
+            "function": "get_kaizen_ticket",
+            "line": 109
+          },
+          {
+            "method": "POST",
+            "path": "/tickets",
+            "function": "create_kaizen_ticket",
+            "line": 121
+          },
+          {
+            "method": "PATCH",
+            "path": "/tickets/{ticket_id}",
+            "function": "update_kaizen_ticket",
+            "line": 140
+          },
+          {
+            "method": "POST",
+            "path": "/tickets/{ticket_id}/transitions",
+            "function": "transition_kaizen_ticket",
+            "line": 160
+          },
+          {
+            "method": "POST",
+            "path": "/tickets/{ticket_id}/actions",
+            "function": "create_kaizen_action",
+            "line": 182
+          },
+          {
+            "method": "PATCH",
+            "path": "/tickets/{ticket_id}/actions/{action_id}",
+            "function": "update_kaizen_action",
+            "line": 210
+          },
+          {
+            "method": "DELETE",
+            "path": "/tickets/{ticket_id}/actions/{action_id}",
+            "function": "delete_kaizen_action",
+            "line": 235
+          },
+          {
+            "method": "POST",
+            "path": "/tickets/{ticket_id}/measures",
+            "function": "create_kaizen_measure",
+            "line": 253
+          },
+          {
+            "method": "PATCH",
+            "path": "/tickets/{ticket_id}/measures/{measure_id}",
+            "function": "update_kaizen_measure",
+            "line": 274
+          },
+          {
+            "method": "DELETE",
+            "path": "/tickets/{ticket_id}/measures/{measure_id}",
+            "function": "delete_kaizen_measure",
+            "line": 298
+          },
+          {
+            "method": "POST",
+            "path": "/tickets/{ticket_id}/evidences",
+            "function": "create_kaizen_evidence",
+            "line": 316
+          },
+          {
+            "method": "DELETE",
+            "path": "/tickets/{ticket_id}/evidences/{evidence_id}",
+            "function": "delete_kaizen_evidence",
+            "line": 333
+          },
+          {
+            "method": "GET",
+            "path": "/tickets/{ticket_id}/chat/messages",
+            "function": "list_kaizen_ticket_chat_messages",
+            "line": 350
+          },
+          {
+            "method": "POST",
+            "path": "/tickets/{ticket_id}/chat/messages",
+            "function": "create_kaizen_ticket_chat_message",
+            "line": 369
+          }
+        ],
+        "service_imports": [
+          "backend.app.services.errors",
+          "backend.app.services.kaizen"
+        ]
+      },
+      {
+        "path": "backend/app/api/v1/routes/sage_imports.py",
+        "sha256": "ffa9b41be39077afa8cc276904c222834b3092bde3ced8a2dc6385913268d970",
+        "lines": 90,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/latest",
+            "function": "latest_sage_import",
+            "line": 31
+          },
+          {
+            "method": "GET",
+            "path": "/status",
+            "function": "sage_import_status",
+            "line": 36
+          },
+          {
+            "method": "GET",
+            "path": "/configuration",
+            "function": "sage_import_configuration",
+            "line": 41
+          },
+          {
+            "method": "PUT",
+            "path": "/configuration",
+            "function": "update_sage_import_configuration",
+            "line": 46
+          },
+          {
+            "method": "GET",
+            "path": "/sources/{source_key}/download",
+            "function": "download_sage_import",
+            "line": 60
+          },
+          {
+            "method": "POST",
+            "path": "/run",
+            "function": "run_sage_import",
+            "line": 78
+          }
+        ],
+        "service_imports": [
+          "backend.app.services.sage_import",
+          "backend.app.services.sage_ods",
+          "backend.app.services.sage_scheduler"
+        ]
+      },
+      {
+        "path": "backend/app/api/v1/routes/persons.py",
+        "sha256": "0e4f9a31c4e331d01dfc75b9272c75c7d236ddc4ab275a17c056e299ef3536b0",
+        "lines": 122,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "",
+            "function": "list_persons",
+            "line": 26
+          },
+          {
+            "method": "GET",
+            "path": "/public",
+            "function": "list_persons_public",
+            "line": 41
+          },
+          {
+            "method": "POST",
+            "path": "",
+            "function": "create_person",
+            "line": 71
+          },
+          {
+            "method": "GET",
+            "path": "/{person_id}",
+            "function": "get_person",
+            "line": 83
+          },
+          {
+            "method": "PATCH",
+            "path": "/{person_id}",
+            "function": "update_person",
+            "line": 95
+          },
+          {
+            "method": "DELETE",
+            "path": "/{person_id}",
+            "function": "delete_person",
+            "line": 116
+          }
+        ],
+        "service_imports": [
+          "backend.app.services.audit_log",
+          "backend.app.services.errors"
+        ]
+      },
+      {
+        "path": "backend/app/api/v1/routes/clients.py",
+        "sha256": "3f6711daf4d6b8f3dd7a92935a26fe1f9cbc1c82ae38df551a928504100ed356",
+        "lines": 90,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "",
+            "function": "list_clients",
+            "line": 22
+          },
+          {
+            "method": "POST",
+            "path": "",
+            "function": "create_client",
+            "line": 41
+          },
+          {
+            "method": "GET",
+            "path": "/{client_id}",
+            "function": "get_client",
+            "line": 51
+          },
+          {
+            "method": "PATCH",
+            "path": "/{client_id}",
+            "function": "update_client",
+            "line": 63
+          },
+          {
+            "method": "DELETE",
+            "path": "/{client_id}",
+            "function": "delete_client",
+            "line": 84
+          }
+        ],
+        "service_imports": [
+          "backend.app.services.audit_log",
+          "backend.app.services.errors"
+        ]
+      },
+      {
+        "path": "backend/app/api/v1/routes/agencies.py",
+        "sha256": "36444d450fa312cfde582057d5ba0db670c8df0f3e572c21a363f07f65846cd6",
+        "lines": 90,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "",
+            "function": "list_agencies",
+            "line": 22
+          },
+          {
+            "method": "POST",
+            "path": "",
+            "function": "create_agency",
+            "line": 41
+          },
+          {
+            "method": "GET",
+            "path": "/{agency_id}",
+            "function": "get_agency",
+            "line": 51
+          },
+          {
+            "method": "PATCH",
+            "path": "/{agency_id}",
+            "function": "update_agency",
+            "line": 63
+          },
+          {
+            "method": "DELETE",
+            "path": "/{agency_id}",
+            "function": "delete_agency",
+            "line": 84
+          }
+        ],
+        "service_imports": [
+          "backend.app.services.audit_log",
+          "backend.app.services.errors"
+        ]
+      },
+      {
+        "path": "backend/app/api/v1/routes/notifications.py",
+        "sha256": "c16b5162a91a0e3939d1427b2ed6fa3afd1121c93f2904621ed49a5a8e5c371f",
+        "lines": 53,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "",
+            "function": "list_notifications",
+            "line": 15
+          },
+          {
+            "method": "GET",
+            "path": "/count",
+            "function": "count_notifications",
+            "line": 20
+          },
+          {
+            "method": "DELETE",
+            "path": "/{notification_key}",
+            "function": "dismiss_notification",
+            "line": 25
+          },
+          {
+            "method": "DELETE",
+            "path": "",
+            "function": "dismiss_all_notifications",
+            "line": 37
+          },
+          {
+            "method": "PUT",
+            "path": "/preferences",
+            "function": "update_notification_preference",
+            "line": 45
+          }
+        ],
+        "service_imports": [
+          "backend.app.services.notifications"
+        ]
+      }
+    ],
+    "direct_service_files": [
+      {
+        "path": "backend/app/services/acv_analysis.py",
+        "sha256": "864553bb1e12e04044b2b0a5ca22c0a7352db792ffb577b0e588fa46c8179a85",
+        "lines": 180,
+        "service_imports": [
+          "backend.app.services.acv_livrable_parser",
+          "backend.app.services.analysis_integrity",
+          "backend.app.services.deliverables",
+          "backend.app.services.errors"
+        ]
+      },
+      {
+        "path": "backend/app/services/audio_transcriptions.py",
+        "sha256": "29846346c89bf5c574bdfc39970facdbab6584fa3828462b73f213d561d62ddc",
+        "lines": 837,
+        "service_imports": [
+          "backend.app.services.audit_log",
+          "backend.app.services.errors",
+          "backend.app.services.meeting_summary",
+          "backend.app.services.project_notes",
+          "backend.app.services.project_notes_web",
+          "backend.app.services.projects"
+        ]
+      },
+      {
+        "path": "backend/app/services/audit_log.py",
+        "sha256": "8ad4ba9fd7ba0dbc156dd76fbf96571706362a5ae886b1a400b15e1a260897e2",
+        "lines": 51,
+        "service_imports": []
+      },
+      {
+        "path": "backend/app/services/bom_classification.py",
+        "sha256": "66874bdc6e57fb8c53a1defb6ba01fd1922122bc1d264e53878d447799dac473",
+        "lines": 1914,
+        "service_imports": [
+          "backend.app.services.errors",
+          "backend.app.services.local_llm"
+        ]
+      },
+      {
+        "path": "backend/app/services/bom_import.py",
+        "sha256": "641b346df7db07776e99f4760c2d17f0522ca16f4b92a44c11421911a785c9da",
+        "lines": 392,
+        "service_imports": [
+          "backend.app.services.bom_parser",
+          "backend.app.services.errors"
+        ]
+      },
+      {
+        "path": "backend/app/services/bom_suppliers.py",
+        "sha256": "de43a099abe522f2f5fa0f62955dcba74693bf35f0b1269a360f71d30f5f9adf",
+        "lines": 385,
+        "service_imports": [
+          "backend.app.services.errors"
+        ]
+      },
+      {
+        "path": "backend/app/services/cdc_analysis.py",
+        "sha256": "ae75a4ec82a42c3749584e0d1d56ee650ac7a8412b5654e7f1c0782ef387f885",
+        "lines": 483,
+        "service_imports": [
+          "backend.app.services.cdc_checks",
+          "backend.app.services.cdc_document_extraction",
+          "backend.app.services.errors"
+        ]
+      },
+      {
+        "path": "backend/app/services/cdc_be_transfer.py",
+        "sha256": "56f96d6197c0a0cbb4bcf8a724c6324cf2258692fbc1d1716c82fd5ac40a782c",
+        "lines": 328,
+        "service_imports": [
+          "backend.app.services.cdc_be_transfer_checks",
+          "backend.app.services.errors"
+        ]
+      },
+      {
+        "path": "backend/app/services/deliverable_assistance.py",
+        "sha256": "bd842f03f53406bf02471f2738464ce47c95496e0ebea8da909efdaf0b9d65d8",
+        "lines": 1167,
+        "service_imports": [
+          "backend.app.services.deliverables",
+          "backend.app.services.errors"
+        ]
+      },
+      {
+        "path": "backend/app/services/deliverables.py",
+        "sha256": "0513ba614762f999a449150054a560f397b65dba5e39875865e614c97d07f26c",
+        "lines": 1071,
+        "service_imports": [
+          "backend.app.services.analysis_integrity",
+          "backend.app.services.deliverable_reference",
+          "backend.app.services.errors"
+        ]
+      },
+      {
+        "path": "backend/app/services/document_filling.py",
+        "sha256": "fd18d50cfedaf4bda1d6b5fb16b75f586a0504a72f60a21fbafeee94dbc932fb",
+        "lines": 679,
+        "service_imports": [
+          "backend.app.services.errors"
+        ]
+      },
+      {
+        "path": "backend/app/services/errors.py",
+        "sha256": "f7878676a85f3e5aa011e31d325949ab4b8ac6d1cf958aa44c177e7911319e08",
+        "lines": 15,
+        "service_imports": []
+      },
+      {
+        "path": "backend/app/services/functional_verification.py",
+        "sha256": "c85a7eb693b1ad426ea1222c33fa32185982714b659fec0c0a111f11a2d07ec8",
+        "lines": 404,
+        "service_imports": [
+          "backend.app.services.analysis_integrity",
+          "backend.app.services.cdc_document_extraction",
+          "backend.app.services.errors"
+        ]
+      },
+      {
+        "path": "backend/app/services/kaizen.py",
+        "sha256": "9884ae1aa6c413fcb135863fadc25fac1416301dba64a07e527054e9a98bd172",
+        "lines": 742,
+        "service_imports": [
+          "backend.app.services.errors"
+        ]
+      },
+      {
+        "path": "backend/app/services/notifications.py",
+        "sha256": "fa0305c11d887bf5c220d0d23a8a38bfbc71b5471f18e70ebdbc3287043bc141",
+        "lines": 627,
+        "service_imports": [
+          "backend.app.services.performance_cache"
+        ]
+      },
+      {
+        "path": "backend/app/services/operational_readiness.py",
+        "sha256": "a03ba2229a4b9b11c5e09d926803e465e6bfa906d70a76b5f3e91e7c36ec0dc3",
+        "lines": 75,
+        "service_imports": []
+      },
+      {
+        "path": "backend/app/services/project_configuration.py",
+        "sha256": "a16d31711f964b658da8056699f294278df003e0a4f9f27c95afcf2d4775fd87",
+        "lines": 370,
+        "service_imports": [
+          "backend.app.services.deliverable_reference",
+          "backend.app.services.errors",
+          "backend.app.services.project_template_defaults"
+        ]
+      },
+      {
+        "path": "backend/app/services/project_financials.py",
+        "sha256": "9bbad1bcb66f728ab4e077366f9b110416b64bbbc99bf299589535e558e1c8f2",
+        "lines": 539,
+        "service_imports": [
+          "backend.app.services.errors",
+          "backend.app.services.time_tracking"
+        ]
+      },
+      {
+        "path": "backend/app/services/project_governance.py",
+        "sha256": "c1a1db693f3e15eb14e27bf5b76d6063c0ff629270a8343b654e18a941d79069",
+        "lines": 836,
+        "service_imports": [
+          "backend.app.services.errors"
+        ]
+      },
+      {
+        "path": "backend/app/services/project_notes.py",
+        "sha256": "32ecbf356b2628849cb99da53fde6175cec83b4f182a716733f1c815e9ecdf21",
+        "lines": 311,
+        "service_imports": [
+          "backend.app.services.project_notes_web"
+        ]
+      },
+      {
+        "path": "backend/app/services/project_notes_web.py",
+        "sha256": "163839a00ad9aa3e4ad496bc049886a961c52dc902978f74a1a3818f1ad6e668",
+        "lines": 679,
+        "service_imports": []
+      },
+      {
+        "path": "backend/app/services/project_overview.py",
+        "sha256": "4a45263f449c2b541a810ad6a9724a190cd250691b2375c0dbb2925d6d57f704",
+        "lines": 287,
+        "service_imports": []
+      },
+      {
+        "path": "backend/app/services/project_purchases.py",
+        "sha256": "c2898094364cdc79829cee2d5f3416cf26fbe27c2fdbbfb042293d3b303ff548",
+        "lines": 214,
+        "service_imports": [
+          "backend.app.services.errors",
+          "backend.app.services.project_financials"
+        ]
+      },
+      {
+        "path": "backend/app/services/project_reviews.py",
+        "sha256": "0287ed4978fe5e8e6b12e85086faa6d5d2158f92090ef7b0e34cc48a0ff5884b",
+        "lines": 590,
+        "service_imports": [
+          "backend.app.services.deliverables",
+          "backend.app.services.errors",
+          "backend.app.services.project_review_pdf",
+          "backend.app.services.signatures"
+        ]
+      },
+      {
+        "path": "backend/app/services/project_sales.py",
+        "sha256": "fa4f5be8581b6a7e4a506aff1199a3040980c78118a85a1ae7afe8556a5caaee",
+        "lines": 261,
+        "service_imports": [
+          "backend.app.services.errors"
+        ]
+      },
+      {
+        "path": "backend/app/services/project_similarity.py",
+        "sha256": "c73894ba78dd11c9f5412a01ddb90d987716a1815025d559bc873e7a0a0aa16e",
+        "lines": 595,
+        "service_imports": [
+          "backend.app.services.errors",
+          "backend.app.services.project_financials"
+        ]
+      },
+      {
+        "path": "backend/app/services/quality.py",
+        "sha256": "641d2b9f73ab4ca9cffb99fad19433eb669d2e2f3702c278475f350e8abc8a15",
+        "lines": 458,
+        "service_imports": [
+          "backend.app.services.errors"
+        ]
+      },
+      {
+        "path": "backend/app/services/risk_verification.py",
+        "sha256": "1ae6a70c05d32e30ee3edcd748f14df827e2b2fa6173ce5357dc2e601f20c363",
+        "lines": 482,
+        "service_imports": [
+          "backend.app.services.analysis_integrity",
+          "backend.app.services.cdc_document_extraction",
+          "backend.app.services.deliverables",
+          "backend.app.services.errors",
+          "backend.app.services.risk_analysis_parser"
+        ]
+      },
+      {
+        "path": "backend/app/services/sage_import.py",
+        "sha256": "c53e261e994c08943dfa62b573815ad1e7dbf54cb67bd4c5cc6f6e0c604f8189",
+        "lines": 408,
+        "service_imports": [
+          "backend.app.services.sage_ods",
+          "backend.app.services.supply_projection"
+        ]
+      },
+      {
+        "path": "backend/app/services/sage_ods.py",
+        "sha256": "10b393e230a3a54e2672d2269c18a76254a9beff189e6f94716083eceb38e850",
+        "lines": 282,
+        "service_imports": []
+      },
+      {
+        "path": "backend/app/services/sage_scheduler.py",
+        "sha256": "67b2cb84e651502b9d9eb00006a48fbe18e11a07fd701ffe3819a93d8d5e4f64",
+        "lines": 251,
+        "service_imports": [
+          "backend.app.services.audit_log",
+          "backend.app.services.sage_import"
+        ]
+      },
+      {
+        "path": "backend/app/services/signatures.py",
+        "sha256": "537dd66b54477b42922f62e35f286598a36c7b5de8db905d69a60b5213818d95",
+        "lines": 774,
+        "service_imports": [
+          "backend.app.services.audit_log",
+          "backend.app.services.errors"
+        ]
+      },
+      {
+        "path": "backend/app/services/time_tracking.py",
+        "sha256": "a2511731d39b83a49b7c2873404089f5ab3f7145874a79df12f8d61246bc5d13",
+        "lines": 324,
+        "service_imports": [
+          "backend.app.services.errors"
+        ]
+      },
+      {
+        "path": "backend/app/services/tube_costing.py",
+        "sha256": "60adc35333b52412914e01e920d57f494ee33efb79f8ab3d9f4d3888f484afce",
+        "lines": 681,
+        "service_imports": [
+          "backend.app.services.document_filling",
+          "backend.app.services.errors"
+        ]
+      }
+    ],
+    "reference_files": [
+      {
+        "path": "backend/app/domain/deliverables.py",
+        "sha256": "f9b43bee67946ad7691bff8d6683f08d1bdc31e70a15c21f6cb30b7b1de44bc5",
+        "lines": 411,
+        "service_imports": []
+      },
+      {
+        "path": "backend/app/domain/project_reviews.py",
+        "sha256": "6fee965dc4ce8f233d3fbde3a5ecc4423cd2cdf4d4ee5c1116e48ed6cd148144",
+        "lines": 84,
+        "service_imports": []
+      },
+      {
+        "path": "docs/business/projects.md",
+        "sha256": "ce62a30c0405a3c8a68e3d14948dd8baa95be91ac314e462938b9e3bc8605887",
+        "lines": 221
+      },
+      {
+        "path": "docs/business/project_governance.md",
+        "sha256": "8eea309d61d7b498929846bc881adb7fca20ce0111386a10fa0574d2b9bd6af8",
+        "lines": 125
+      },
+      {
+        "path": "docs/business/bom.md",
+        "sha256": "b2229ad53ce05513e70c71e6d96abdde2d11c57696b90bcf893d9caaa41ea587",
+        "lines": 113
+      },
+      {
+        "path": "docs/business/cdc_analysis_transfer_be.md",
+        "sha256": "825982a694e1a39262e23bb32b89a8b7136b9a2ba7730fe5f3699246cd9d8cf7",
+        "lines": 157
+      },
+      {
+        "path": "docs/ai/project_similarity.md",
+        "sha256": "2e7997c1837154def11cc21863766a37c371cb5ffd4873133fa88b37836ae989",
+        "lines": 75
+      }
+    ]
+  },
+  "agent": {
+    "root": "C:\\Users\\Frederic.LEFRANCOIS\\.codex\\worktrees\\264b\\Agent",
+    "commit": "42eabda68ab277bdc8bbdfa2816fe36f20b0105f",
+    "working_tree": "modified; file hashes define the audited baseline",
+    "files": [
+      {
+        "path": "backend/app/models.py",
+        "sha256": "4b4b937ddb424286a825317ef3156d8f8af6f7567eb8a9b2ef3294e875cdb099",
+        "lines": 402,
+        "service_imports": []
+      },
+      {
+        "path": "backend/app/routers/__init__.py",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "lines": 0,
+        "service_imports": []
+      },
+      {
+        "path": "backend/app/routers/ai.py",
+        "sha256": "681fac946428800d08bd5d929c817185d2c17d9fdfc492965f7d3fe701df3731",
+        "lines": 123,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/api/v1/ai/status",
+            "function": "ai_status",
+            "line": 55
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/projects/{project_id}/cdc/ai-generate",
+            "function": "ai_generate",
+            "line": 90
+          }
+        ],
+        "service_imports": []
+      },
+      {
+        "path": "backend/app/routers/brain.py",
+        "sha256": "fee1c966f957830da463369ad897234727985001754e0bd616b0747d80699a9b",
+        "lines": 433,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/api/v1/brain/status",
+            "function": "brain_status",
+            "line": 56
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/brain/projects",
+            "function": "brain_projects",
+            "line": 65
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/brain/overview",
+            "function": "brain_overview",
+            "line": 71
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/brain/proposals",
+            "function": "brain_proposals",
+            "line": 93
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/brain/scan",
+            "function": "brain_scan_global",
+            "line": 99
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/brain/triage/stats",
+            "function": "brain_triage_stats",
+            "line": 106
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/brain/triage/queue",
+            "function": "brain_triage_queue",
+            "line": 111
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/brain/sources",
+            "function": "brain_sources",
+            "line": 116
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/brain/sources/{source_id}/reassign",
+            "function": "reassign_source",
+            "line": 129
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/brain/sources/{source_id}/discard",
+            "function": "discard_source",
+            "line": 134
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/brain/triage/run",
+            "function": "brain_triage_run",
+            "line": 139
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/brain/triage/{proposal_id}/accept",
+            "function": "brain_triage_accept",
+            "line": 152
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/brain/triage/{proposal_id}/assign",
+            "function": "brain_triage_assign",
+            "line": 164
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/brain/ingest/auto-status",
+            "function": "brain_auto_status",
+            "line": 190
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/brain/ai-settings",
+            "function": "brain_ai_settings",
+            "line": 207
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/brain/mail-settings",
+            "function": "brain_mail_settings",
+            "line": 217
+          },
+          {
+            "method": "PUT",
+            "path": "/api/v1/brain/mail-settings",
+            "function": "save_brain_mail_settings",
+            "line": 230
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/brain/memory-settings",
+            "function": "brain_memory_settings",
+            "line": 235
+          },
+          {
+            "method": "PUT",
+            "path": "/api/v1/brain/memory-settings",
+            "function": "save_brain_memory_settings",
+            "line": 244
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/brain/memory-test",
+            "function": "brain_memory_test",
+            "line": 253
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/brain/chat",
+            "function": "brain_chat",
+            "line": 263
+          },
+          {
+            "method": "PUT",
+            "path": "/api/v1/brain/ai-settings",
+            "function": "save_brain_ai_settings",
+            "line": 269
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/brain/ai-test",
+            "function": "brain_ai_test",
+            "line": 279
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/projects/{project_id}/brain",
+            "function": "brain_link",
+            "line": 299
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/projects/{project_id}/brain/ensure",
+            "function": "ensure_brain_link",
+            "line": 334
+          },
+          {
+            "method": "PUT",
+            "path": "/api/v1/projects/{project_id}/brain",
+            "function": "save_brain_link",
+            "line": 368
+          },
+          {
+            "method": "DELETE",
+            "path": "/api/v1/projects/{project_id}/brain",
+            "function": "delete_brain_link",
+            "line": 387
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/projects/{project_id}/brain/knowledge",
+            "function": "brain_knowledge",
+            "line": 397
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/projects/{project_id}/brain/actions",
+            "function": "brain_actions",
+            "line": 406
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/projects/{project_id}/brain/risks",
+            "function": "brain_risks",
+            "line": 412
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/projects/{project_id}/brain/timeline",
+            "function": "brain_timeline",
+            "line": 418
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/projects/{project_id}/brain/scan",
+            "function": "brain_scan",
+            "line": 424
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/projects/{project_id}/brain/memory/retry",
+            "function": "brain_retry_memory",
+            "line": 431
+          }
+        ],
+        "service_imports": []
+      },
+      {
+        "path": "backend/app/routers/cdc.py",
+        "sha256": "0c863a172242b8f277ac12d3bbe3c62470b200446a0e198c81e763f40783289c",
+        "lines": 488,
+        "routes": [
+          {
+            "method": "POST",
+            "path": "/api/v1/projects/{project_id}/cdc/sources/upload",
+            "function": "upload_source",
+            "line": 67
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/projects/{project_id}/cdc/sources",
+            "function": "list_sources",
+            "line": 133
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/projects/{project_id}/cdc/sources/{source_id}/pages",
+            "function": "list_source_pages",
+            "line": 162
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/projects/{project_id}/cdc/items",
+            "function": "list_items",
+            "line": 182
+          },
+          {
+            "method": "PATCH",
+            "path": "/api/v1/projects/{project_id}/cdc/items/{item_id}",
+            "function": "update_item",
+            "line": 228
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/projects/{project_id}/cdc/items/bulk-status",
+            "function": "bulk_status",
+            "line": 258
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/projects/{project_id}/cdc/review",
+            "function": "review_stats",
+            "line": 281
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/projects/{project_id}/cdc/analyze",
+            "function": "analyze",
+            "line": 315
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/projects/{project_id}/cdc/checks",
+            "function": "list_checks",
+            "line": 344
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/projects/{project_id}/cdc/runs",
+            "function": "list_runs",
+            "line": 353
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/projects/{project_id}/cdc/items",
+            "function": "add_item",
+            "line": 364
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/projects/{project_id}/cdc/transfer",
+            "function": "generate_transfer",
+            "line": 384
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/projects/{project_id}/cdc/deliveries",
+            "function": "list_deliveries",
+            "line": 426
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/projects/{project_id}/cdc/deliveries/{version_id}",
+            "function": "read_delivery",
+            "line": 436
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/projects/{project_id}/cdc/jobs",
+            "function": "queue_analysis",
+            "line": 452
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/projects/{project_id}/cdc/jobs",
+            "function": "analysis_jobs",
+            "line": 458
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/projects/{project_id}/cdc/jobs/{job_id}/cancel",
+            "function": "cancel_analysis",
+            "line": 468
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/projects/{project_id}/cdc/jobs/{job_id}/retry",
+            "function": "retry_analysis",
+            "line": 474
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/projects/{project_id}/cdc/decisions",
+            "function": "list_decisions",
+            "line": 481
+          }
+        ],
+        "service_imports": []
+      },
+      {
+        "path": "backend/app/routers/meeting_audio.py",
+        "sha256": "187ac16011abae6e4952b1d90c8b35b380386c78a223003495162cfcf8566519",
+        "lines": 193,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/api/v1/meeting-audio/status",
+            "function": "audio_status",
+            "line": 46
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/projects/{project_id}/recordings",
+            "function": "list_recordings",
+            "line": 52
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/projects/{project_id}/recordings",
+            "function": "upload_recording",
+            "line": 94
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/projects/{project_id}/recordings/{recording_id}",
+            "function": "get_recording",
+            "line": 108
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/projects/{project_id}/recordings/{recording_id}/audio",
+            "function": "get_audio",
+            "line": 113
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/projects/{project_id}/recordings/{recording_id}/transcribe",
+            "function": "transcribe",
+            "line": 124
+          },
+          {
+            "method": "PUT",
+            "path": "/api/v1/projects/{project_id}/recordings/{recording_id}/transcript",
+            "function": "review_transcript",
+            "line": 142
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/projects/{project_id}/recordings/{recording_id}/synthesize",
+            "function": "synthesize",
+            "line": 156
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/projects/{project_id}/recordings/{recording_id}/cancel",
+            "function": "cancel",
+            "line": 167
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/projects/{project_id}/recordings/{recording_id}/publish",
+            "function": "publish_summary",
+            "line": 184
+          }
+        ],
+        "service_imports": []
+      },
+      {
+        "path": "backend/app/routers/meetings.py",
+        "sha256": "747c0cde9cdd6fbb0b4be1e6b4023c58fd5401e0f90018c8f823eb4907402a3c",
+        "lines": 135,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/api/v1/projects/{project_id}/meetings",
+            "function": "list_meetings",
+            "line": 47
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/projects/{project_id}/meetings",
+            "function": "create_meeting",
+            "line": 61
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/projects/{project_id}/meetings/{meeting_id}/actions",
+            "function": "add_action",
+            "line": 72
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/projects/{project_id}/meetings/{meeting_id}/actions/{action_id}/to-task",
+            "function": "action_to_task",
+            "line": 85
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/projects/{project_id}/meetings/{meeting_id}/export",
+            "function": "export_meeting",
+            "line": 105
+          }
+        ],
+        "service_imports": []
+      },
+      {
+        "path": "backend/app/routers/milestones.py",
+        "sha256": "1d37a2185ffc12d831f8c6d3cba1c18577d578fb813ff3b85980fd6ca3e110be",
+        "lines": 76,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/api/v1/projects/{project_id}/milestones/review",
+            "function": "review",
+            "line": 20
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/projects/{project_id}/milestones/scan",
+            "function": "scan",
+            "line": 38
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/projects/{project_id}/milestones/candidates/{candidate_id}/decision",
+            "function": "decide",
+            "line": 50
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/projects/{project_id}/milestones/{milestone_id}/history",
+            "function": "history",
+            "line": 69
+          }
+        ],
+        "service_imports": []
+      },
+      {
+        "path": "backend/app/routers/network_links.py",
+        "sha256": "5d8d151e02484064edec2cf2761a88558301b149881b4bd53a50e79131a70bb7",
+        "lines": 116,
+        "routes": [
+          {
+            "method": "POST",
+            "path": "/api/v1/open-path",
+            "function": "open_path",
+            "line": 31
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/projects/{project_id}/network-links",
+            "function": "list_links",
+            "line": 91
+          },
+          {
+            "method": "PUT",
+            "path": "/api/v1/projects/{project_id}/network-links",
+            "function": "replace_links",
+            "line": 100
+          }
+        ],
+        "service_imports": []
+      },
+      {
+        "path": "backend/app/routers/operations.py",
+        "sha256": "12a82324d6b7de160d51bc6a62e7238d85e202659ec7d67f47c7bb4789362dd5",
+        "lines": 122,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/api/v1/actions",
+            "function": "actions",
+            "line": 24
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/operations/status",
+            "function": "operation_status",
+            "line": 85
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/operations/backup/verify",
+            "function": "verify_last_backup",
+            "line": 98
+          }
+        ],
+        "service_imports": []
+      },
+      {
+        "path": "backend/app/routers/portfolio_tools.py",
+        "sha256": "596c0037b339702919bab7f9cb0f073d322d99c2329882761101728cb5b0d293",
+        "lines": 256,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/api/v1/search",
+            "function": "search",
+            "line": 16
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/projects/{project_id}/export",
+            "function": "export_project",
+            "line": 82
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/projects/import-json",
+            "function": "import_json",
+            "line": 140
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/projects/{project_id}/planning",
+            "function": "planning",
+            "line": 218
+          }
+        ],
+        "service_imports": []
+      },
+      {
+        "path": "backend/app/routers/projects.py",
+        "sha256": "7c0e833e7a4f9de00d4331648e2f92cbb03e78a2d49343cdaaebf539b9eb8c09",
+        "lines": 249,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/api/v1/portfolio",
+            "function": "portfolio",
+            "line": 54
+          },
+          {
+            "method": "PATCH",
+            "path": "/api/v1/projects/{project_id}",
+            "function": "patch_project",
+            "line": 111
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/projects",
+            "function": "create_project",
+            "line": 126
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/projects/{project_id}",
+            "function": "get_project",
+            "line": 137
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/projects/{project_id}/tasks",
+            "function": "add_task",
+            "line": 154
+          },
+          {
+            "method": "PATCH",
+            "path": "/api/v1/projects/{project_id}/tasks/{task_id}",
+            "function": "patch_task",
+            "line": 183
+          },
+          {
+            "method": "PATCH",
+            "path": "/api/v1/projects/{project_id}/milestones/{milestone_id}",
+            "function": "patch_milestone",
+            "line": 197
+          },
+          {
+            "method": "PATCH",
+            "path": "/api/v1/projects/{project_id}/deliverables/{deliverable_id}",
+            "function": "patch_deliverable",
+            "line": 214
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/projects/{project_id}/deliverables",
+            "function": "add_deliverable",
+            "line": 228
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/projects/{project_id}/milestones",
+            "function": "add_milestone",
+            "line": 238
+          }
+        ],
+        "service_imports": []
+      },
+      {
+        "path": "backend/app/routers/sage.py",
+        "sha256": "5ed17844733772bbb2fa0b38204635f0572cfb3dca070e33998e79ef14adca62",
+        "lines": 177,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/api/v1/sage/config",
+            "function": "get_config",
+            "line": 54
+          },
+          {
+            "method": "PUT",
+            "path": "/api/v1/sage/config",
+            "function": "put_config",
+            "line": 64
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/sage/status",
+            "function": "sage_status",
+            "line": 79
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/sage/run",
+            "function": "run_import",
+            "line": 99
+          }
+        ],
+        "service_imports": []
+      },
+      {
+        "path": "backend/app/routers/scan.py",
+        "sha256": "6df421110e45a233a4ba3aa453943251b414d46bce16e408813c042fc0abc759",
+        "lines": 317,
+        "routes": [
+          {
+            "method": "POST",
+            "path": "/api/v1/projects/scan",
+            "function": "scan",
+            "line": 265
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/projects/import",
+            "function": "import_project",
+            "line": 270
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/projects/{project_id}/budgets-from-tdao",
+            "function": "budgets_from_tdao",
+            "line": 305
+          }
+        ],
+        "service_imports": []
+      },
+      {
+        "path": "backend/app/routers/workshop.py",
+        "sha256": "346d4e91f99b44c4a166dfa730c18e7d823addf5da9142f1e9c2b3281cbe9dd4",
+        "lines": 221,
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/api/v1/projects/{project_id}/purchases",
+            "function": "purchases",
+            "line": 51
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/projects/{project_id}/time-tracking",
+            "function": "time_tracking",
+            "line": 69
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/projects/{project_id}/time-entries",
+            "function": "add_time_entry",
+            "line": 104
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/projects/{project_id}/bom",
+            "function": "get_bom",
+            "line": 140
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/projects/{project_id}/bom",
+            "function": "add_bom_line",
+            "line": 146
+          },
+          {
+            "method": "PATCH",
+            "path": "/api/v1/projects/{project_id}/bom/{line_id}",
+            "function": "patch_bom_line",
+            "line": 158
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/projects/{project_id}/bom/import",
+            "function": "import_bom_csv",
+            "line": 172
+          }
+        ],
+        "service_imports": []
+      },
+      {
+        "path": "backend/app/schemas.py",
+        "sha256": "60679b7b1b2455fcb5edd28cec8f336123f5c7b7ff68b1a8b0fece5d42335568",
+        "lines": 21,
+        "service_imports": []
+      },
+      {
+        "path": "web/src/App.tsx",
+        "sha256": "19038dc77d05297dc455bb225c68266506bb7e98a3880166f64c46e22566bec0",
+        "lines": 3692,
+        "api_calls": [
+          {
+            "name": "portfolio",
+            "line": 81
+          },
+          {
+            "name": "cdcReview",
+            "line": 157
+          },
+          {
+            "name": "exportProject",
+            "line": 184
+          },
+          {
+            "name": "uploadCdc",
+            "line": 336
+          },
+          {
+            "name": "addCdcItem",
+            "line": 424
+          },
+          {
+            "name": "patchProject",
+            "line": 534
+          },
+          {
+            "name": "brainStatus",
+            "line": 556
+          },
+          {
+            "name": "brainTriageStats",
+            "line": 784
+          },
+          {
+            "name": "pendingMailPage",
+            "line": 784
+          },
+          {
+            "name": "brainProjects",
+            "line": 784
+          },
+          {
+            "name": "portfolio",
+            "line": 785
+          },
+          {
+            "name": "brainAutoStatus",
+            "line": 785
+          },
+          {
+            "name": "ensureBrainLink",
+            "line": 835
+          },
+          {
+            "name": "createProject",
+            "line": 842
+          },
+          {
+            "name": "brainTriageAssign",
+            "line": 874
+          },
+          {
+            "name": "brainTriageAccept",
+            "line": 876
+          },
+          {
+            "name": "brainTriageAssign",
+            "line": 958
+          },
+          {
+            "name": "brainStatus",
+            "line": 1010
+          },
+          {
+            "name": "brainOverview",
+            "line": 1013
+          },
+          {
+            "name": "brainProposals",
+            "line": 1013
+          },
+          {
+            "name": "brainLink",
+            "line": 1017
+          },
+          {
+            "name": "brainScanGlobal",
+            "line": 1033
+          },
+          {
+            "name": "brainStatus",
+            "line": 1123
+          },
+          {
+            "name": "brainLink",
+            "line": 1123
+          },
+          {
+            "name": "brainOverview",
+            "line": 1123
+          },
+          {
+            "name": "brainKnowledge",
+            "line": 1130
+          },
+          {
+            "name": "brainActions",
+            "line": 1131
+          },
+          {
+            "name": "brainRisks",
+            "line": 1132
+          },
+          {
+            "name": "saveBrainLink",
+            "line": 1155
+          },
+          {
+            "name": "unlinkBrain",
+            "line": 1165
+          },
+          {
+            "name": "brainScan",
+            "line": 1175
+          },
+          {
+            "name": "brainScanGlobal",
+            "line": 1175
+          },
+          {
+            "name": "brainRetryMemory",
+            "line": 1238
+          },
+          {
+            "name": "openPath",
+            "line": 1286
+          },
+          {
+            "name": "networkLinks",
+            "line": 1308
+          },
+          {
+            "name": "saveNetworkLinks",
+            "line": 1324
+          },
+          {
+            "name": "scanFolder",
+            "line": 1461
+          },
+          {
+            "name": "createProject",
+            "line": 1476
+          },
+          {
+            "name": "importFolder",
+            "line": 1488
+          },
+          {
+            "name": "createMeeting",
+            "line": 1570
+          },
+          {
+            "name": "exportMeeting",
+            "line": 1618
+          },
+          {
+            "name": "actionToTask",
+            "line": 1645
+          },
+          {
+            "name": "addAction",
+            "line": 1664
+          },
+          {
+            "name": "addTask",
+            "line": 1703
+          },
+          {
+            "name": "patchTask",
+            "line": 1730
+          },
+          {
+            "name": "patchTask",
+            "line": 1742
+          },
+          {
+            "name": "addDeliverable",
+            "line": 1767
+          },
+          {
+            "name": "patchDeliverable",
+            "line": 1787
+          },
+          {
+            "name": "planning",
+            "line": 1806
+          },
+          {
+            "name": "planning",
+            "line": 1809
+          },
+          {
+            "name": "sageStatus",
+            "line": 1843
+          },
+          {
+            "name": "sageConfig",
+            "line": 1844
+          },
+          {
+            "name": "saveSageConfig",
+            "line": 1865
+          },
+          {
+            "name": "sageRun",
+            "line": 1877
+          },
+          {
+            "name": "detail",
+            "line": 2000
+          },
+          {
+            "name": "cdcItems",
+            "line": 2000
+          },
+          {
+            "name": "cdcSources",
+            "line": 2000
+          },
+          {
+            "name": "meetings",
+            "line": 2000
+          },
+          {
+            "name": "aiStatus",
+            "line": 2906
+          },
+          {
+            "name": "exportProject",
+            "line": 2917
+          },
+          {
+            "name": "importJson",
+            "line": 2932
+          },
+          {
+            "name": "importJson",
+            "line": 3339
+          },
+          {
+            "name": "exportProject",
+            "line": 3347
+          },
+          {
+            "name": "aiStatus",
+            "line": 3555
+          },
+          {
+            "name": "search",
+            "line": 3608
+          }
+        ],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/MeetingAudioPanel.tsx",
+        "sha256": "89e2b2e50be2dda8580861eb37cdb2d49468212932ab967e552d79f07741a9f4",
+        "lines": 207,
+        "api_calls": [],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/MilestonesPanel.tsx",
+        "sha256": "d5133cf2b45b1a669da4011d6cdb203596eebe0c06b4da1da0e49ec61439cb94",
+        "lines": 149,
+        "api_calls": [
+          {
+            "name": "openPath",
+            "line": 65
+          },
+          {
+            "name": "patchMilestone",
+            "line": 71
+          },
+          {
+            "name": "patchMilestone",
+            "line": 107
+          },
+          {
+            "name": "addMilestone",
+            "line": 116
+          }
+        ],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/TransferPanel.tsx",
+        "sha256": "02a0ea0b514ffc1de0cf638fe1b7abcdfeac297b7420fd864a888e586c4553e0",
+        "lines": 30,
+        "api_calls": [
+          {
+            "name": "deliveries",
+            "line": 10
+          },
+          {
+            "name": "deliveries",
+            "line": 11
+          },
+          {
+            "name": "transfer",
+            "line": 17
+          },
+          {
+            "name": "delivery",
+            "line": 25
+          }
+        ],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/WorkshopPanels.tsx",
+        "sha256": "686c5570346ac979ee853edc9e2175a7ca67f29fa71138c04fd8781aa89076f9",
+        "lines": 184,
+        "api_calls": [
+          {
+            "name": "purchases",
+            "line": 8
+          },
+          {
+            "name": "purchases",
+            "line": 11
+          },
+          {
+            "name": "tracking",
+            "line": 42
+          },
+          {
+            "name": "addTimeEntry",
+            "line": 67
+          },
+          {
+            "name": "bom",
+            "line": 98
+          },
+          {
+            "name": "addBomLine",
+            "line": 119
+          },
+          {
+            "name": "importBomCsv",
+            "line": 135
+          },
+          {
+            "name": "patchBomLine",
+            "line": 159
+          },
+          {
+            "name": "patchBomLine",
+            "line": 170
+          }
+        ],
+        "runtime_calls": []
+      },
+      {
+        "path": "web/src/components/WorkspaceViews.tsx",
+        "sha256": "3224b644f4549e2df6794d534492715263639b0eb52a1db2ead3cbbd6a1b0278",
+        "lines": 314,
+        "api_calls": [],
+        "runtime_calls": []
+      }
+    ]
+  }
+}

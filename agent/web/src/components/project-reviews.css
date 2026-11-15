@@ -1,0 +1,26 @@
+.project-reviews { min-width: 0; }
+.review-list { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,230px),1fr)); gap: 10px; margin: 16px 0; }
+.review-card { display: grid; gap: 6px; text-align: left; padding: 16px; border: 1px solid var(--line,#d7dde7); border-radius: 12px; background: var(--surface,#fff); color: inherit; cursor: pointer; }
+.review-card.selected { border-color: var(--accent,#355be7); box-shadow: 0 0 0 2px color-mix(in srgb,var(--accent,#355be7) 18%,transparent); }
+.review-card:focus-visible { outline: 3px solid var(--accent,#355be7); outline-offset: 3px; }
+.review-sheet { margin-top: 18px; min-width: 0; }
+.review-sheet fieldset { min-width: 0; border: 1px solid var(--line,#d7dde7); border-radius: 10px; padding: 14px; }
+.review-sheet legend { font-weight: 600; padding: 0 5px; }
+.review-sheet label { display: block; margin: 8px 0; }
+.review-sheet .input { width: 100%; min-width: 0; box-sizing: border-box; }
+.review-form-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; }
+.review-section,.review-recording,.review-publication,.review-history { margin: 18px 0; padding: 16px; border: 1px solid var(--line,#d7dde7); border-radius: 12px; min-width: 0; }
+.review-point { margin: 12px 0; }
+.review-evidence { margin: 10px 0; padding: 12px; border-left: 3px solid var(--accent,#355be7); background: var(--surface-soft,#f3f6fb); overflow-wrap: anywhere; }
+.review-evidence blockquote { margin: 12px 0; white-space: pre-wrap; }
+.review-evidence audio { display: block; width: 100%; max-width: 100%; margin-top: 12px; }
+.review-publication li button { margin: 4px 10px; }
+.review-evidence code,.review-publication code { overflow-wrap: anywhere; word-break: break-all; }
+.review-save { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 20px 0; }
+.review-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+.review-conflicts { border: 2px solid var(--warning,#c08a28); padding: 16px; border-radius: 12px; }
+.review-conflicts fieldset { margin: 12px 0; }
+.review-history li,.review-section li { margin: 10px 0; overflow-wrap: anywhere; }
+.review-history li button,.review-section li button { margin: 4px 10px; }
+.review-sheet summary { cursor: pointer; padding: 8px 0; }
+@media (max-width:700px) { .review-form-grid { grid-template-columns: minmax(0,1fr); } .review-section,.review-sheet fieldset { padding: 10px; } .review-sheet .planning-heading { flex-wrap: wrap; } }

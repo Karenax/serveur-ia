@@ -11,7 +11,7 @@ def max_voice(handler,store):
     sent = False
     try:
         value = json_body(handler, 1300000 if handler.path.endswith('/transcribe') else 8192)
-        valid = lambda: store.authenticate(handler.access_token) == handler.identity
+        valid = lambda: handler.access_valid()
         if not valid():
             raise PermissionError('Accès vocal désactivé.')
         if handler.path.endswith('/test'):
@@ -67,7 +67,7 @@ def low_voice(handler,store):
             if not isinstance(value, dict) or set(value) != {'request_id'} or (not isinstance(value['request_id'], str)):
                 raise ValueError('Annulation vocale invalide.')
             return handler.respond(200, store.voice.cancel(handler.identity, value['request_id']))
-        frames = store.voice.stream(handler.identity, value, lambda: store.authenticate(handler.access_token) == handler.identity)
+        frames = store.voice.stream(handler.identity, value, lambda: handler.access_valid())
         handler.send_response(200)
         handler.send_header('Content-Type', 'text/event-stream')
         handler.send_header('Cache-Control', 'no-store')

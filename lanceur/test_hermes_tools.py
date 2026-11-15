@@ -98,6 +98,20 @@ class ToolsTests(unittest.TestCase):
         self.assertFalse(document['truncated'])
         self.assertTrue(self.call('fred_document_get', document_id=self.private)['isError'])
 
+    def test_agent_project_search_tools_publish_openable_agent_citations(self):
+        project = '70e4b89b-2c57-4aff-b8f3-d76ead185d89'
+        source = '80e4b89b-2c57-4aff-b8f3-d76ead185d89'
+        self.context['project_id'] = project
+        self.workspace.agent_catalogue = lambda owner: {'projects': [{'id': project, 'archived': False}]}
+        item = {'title': 'Source Agent', 'text': 'Preuve', 'agent_project_id': project, 'agent_source_id': source}
+        with patch.object(self.workspace, 'context', side_effect=lambda *args, **kwargs: ([], [item.copy()], '')) as context:
+            for name in ('fred_document_search', 'fred_knowledge_search'):
+                hit = self.data(self.call(name, query='preuve'))['sources'][0]
+                self.assertEqual(self.data(self.call('fred_source_get', source_id=hit['source_id']))['sources'], [hit])
+            self.assertEqual(context.call_count, 2)
+        self.assertEqual([row['agent_source_id'] for row in self.context['sources']], [source])
+        self.assertNotIn('source_id', self.context['sources'][0])
+
     def test_timestamped_command_identity_survives_recreated_tool_context(self):
         from command_journal import request_key
         self.context['request_id']=request_key()

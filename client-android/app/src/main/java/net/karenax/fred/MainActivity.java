@@ -33,6 +33,57 @@ public final class MainActivity extends Activity {
         }catch(Exception e){if(pendingPhoto!=null)try{PhotoProvider.file(this,pendingPhoto).delete();}catch(IOException ignored){}pendingPhoto=null;if(fileCallback!=null){fileCallback.onReceiveValue(null);fileCallback=null;}toast("Appareil photo indisponible. Choisissez une image enregistrée.");}
     }
     private byte[] exportBytes;
+    private static final int ORIGINAL_EXPORT=47;
+    private boolean preparingOriginal;
+    private OriginalDownload pendingOriginal;
+
+    private void downloadOriginal(String path,String filename){
+        if(preparingOriginal||pendingOriginal!=null){toast("Un téléchargement est déjà ouvert.");return;}
+        LoopbackServer current=server;
+        if(current==null||!current.backend.remote.hasProfile()){toast("Connexion requise pour télécharger l’original.");return;}
+        preparingOriginal=true;
+        toast("Téléchargement de l’original…");
+        io.execute(()->{
+            try {
+                OriginalDownload original=OriginalDownload.prepare(current.backend.remote,getCacheDir(),path,filename);
+                runOnUiThread(()->{
+                    preparingOriginal=false;
+                    if(isFinishing()||isDestroyed()||server!=current){original.close();return;}
+                    pendingOriginal=original;
+                    Intent picker=new Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE)
+                        .setType(original.mime).putExtra(Intent.EXTRA_TITLE,original.filename);
+                    try{startActivityForResult(picker,ORIGINAL_EXPORT);}
+                    catch(ActivityNotFoundException e){discardOriginal();toast("Aucun sélecteur de fichiers disponible.");}
+                });
+            }catch(Exception failure){
+                runOnUiThread(()->{
+                    preparingOriginal=false;
+                    if(!isFinishing()&&!isDestroyed())showError("Téléchargement impossible",Remote.safeMessage(failure));
+                });
+            }
+        });
+    }
+
+    private void discardOriginal(){
+        if(pendingOriginal!=null){pendingOriginal.close();pendingOriginal=null;}
+    }
+
+    private void saveOriginal(Uri destination){
+        OriginalDownload original=pendingOriginal;
+        pendingOriginal=null;
+        if(original==null)return;
+        io.execute(()->{
+            try(OriginalDownload staged=original;
+                InputStream source=new FileInputStream(staged.file);
+                OutputStream target=getContentResolver().openOutputStream(destination,"wt")){
+                if(target==null)throw new IOException();
+                byte[] buffer=new byte[65536];
+                int count;
+                while((count=source.read(buffer))!=-1)target.write(buffer,0,count);
+            }catch(IOException failure){showError("Export impossible","Le fichier n’a pas pu être enregistré.");return;}
+            toast("Fichier enregistré.");
+        });
+    }
     private boolean demo;
     private volatile boolean exitRequested;
     private String permissionIdentity="",pendingNotification="",pendingIdentity="";
@@ -91,7 +142,7 @@ public final class MainActivity extends Activity {
     }
     private void openExternal(String url){Uri uri=Uri.parse(url);if(!"https".equals(uri.getScheme())&&!"http".equals(uri.getScheme()))return;runOnUiThread(()->{try{startActivity(new Intent(Intent.ACTION_VIEW,uri));}catch(ActivityNotFoundException e){toast("Aucun navigateur disponible.");}});}
     private void nativeSettings(){runOnUiThread(()->{LoopbackServer current=server;if(current==null)return;String name=current.backend.remote.hasProfile()?Profile.name(current.backend.remote.profile):"Aucun accès importé";new AlertDialog.Builder(this).setTitle("Connexion · "+name).setItems(new String[]{"Connexion HTTPS (Internet)","Connexion WireGuard", "Importer un autre accès personnel"},(dialog,index)->{if(index==2){chooseProfile();return;}io.execute(()->{try{current.backend.selectMode(index==0?"https":"wireguard");runOnUiThread(()->web.evaluateJavascript("window.androidConnectionChanged?.()",null));}catch(Exception e){showError("Connexion impossible",Remote.safeMessage(e));}});}).setNegativeButton("Fermer",null).show();});}
-    @Override protected void onActivityResult(int requestCode,int resultCode,Intent data){super.onActivityResult(requestCode,resultCode,data);if(requestCode==UPDATE_PERMISSION){if(getPackageManager().canRequestPackageInstalls())installUpdate();else toast("Installation non autorisée. La mise à jour reste disponible dans Kiara.");return;}if(requestCode==PHOTO){final Uri uri=pendingPhoto;pendingPhoto=null;if(uri!=null)revokeUriPermission(uri,Intent.FLAG_GRANT_READ_URI_PERMISSION|Intent.FLAG_GRANT_WRITE_URI_PERMISSION);if(fileCallback!=null){fileCallback.onReceiveValue(resultCode==RESULT_OK&&uri!=null?new Uri[]{uri}:null);fileCallback=null;}if(uri!=null)new Handler(Looper.getMainLooper()).postDelayed(()->{try{PhotoProvider.file(this,uri).delete();}catch(IOException ignored){}},resultCode==RESULT_OK?600000:0);return;}if(requestCode==FILES){if(fileCallback!=null){fileCallback.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode,data));fileCallback=null;}return;}if(resultCode!=RESULT_OK||data==null||data.getData()==null){if(requestCode==EXPORT)exportBytes=null;return;}Uri uri=data.getData();if(requestCode==IMPORT){io.execute(()->{try{JSONObject profile;try(InputStream input=getContentResolver().openInputStream(uri)){if(input==null)throw new IOException();profile=Profile.importFile(input);}LoopbackServer current=server;if(current!=null&&current.backend.remote.active.get()>0)throw new IllegalArgumentException("Attendez la fin de la requête avant de changer d’accès.");String identity=Profile.identity(profile);JSONObject prefs=store.read(identity+".settings");if(prefs==null)prefs=new JSONObject();prefs.put("connection_selected",false);prefs.remove("endpoint");store.write(identity+".settings",prefs);store.write("profile",profile);demo=false;startClient(profile);toast("Accès personnel importé. Choisissez votre mode de connexion.");}catch(Exception e){showError("Import impossible",e instanceof IllegalArgumentException||e instanceof JSONException?"Profil personnel invalide ou incompatible.":Remote.safeMessage(e));}});}else if(requestCode==EXPORT){byte[] bytes=exportBytes;exportBytes=null;if(bytes==null)return;io.execute(()->{try(OutputStream output=getContentResolver().openOutputStream(uri,"wt")){if(output==null)throw new IOException();output.write(bytes);toast("Fichier enregistré.");}catch(Exception e){showError("Export impossible","Le fichier n’a pas pu être enregistré.");}});}}
+    @Override protected void onActivityResult(int requestCode,int resultCode,Intent data){super.onActivityResult(requestCode,resultCode,data);if(requestCode==ORIGINAL_EXPORT){if(resultCode==RESULT_OK&&data!=null&&data.getData()!=null)saveOriginal(data.getData());else discardOriginal();return;}if(requestCode==UPDATE_PERMISSION){if(getPackageManager().canRequestPackageInstalls())installUpdate();else toast("Installation non autorisée. La mise à jour reste disponible dans Kiara.");return;}if(requestCode==PHOTO){final Uri uri=pendingPhoto;pendingPhoto=null;if(uri!=null)revokeUriPermission(uri,Intent.FLAG_GRANT_READ_URI_PERMISSION|Intent.FLAG_GRANT_WRITE_URI_PERMISSION);if(fileCallback!=null){fileCallback.onReceiveValue(resultCode==RESULT_OK&&uri!=null?new Uri[]{uri}:null);fileCallback=null;}if(uri!=null)new Handler(Looper.getMainLooper()).postDelayed(()->{try{PhotoProvider.file(this,uri).delete();}catch(IOException ignored){}},resultCode==RESULT_OK?600000:0);return;}if(requestCode==FILES){if(fileCallback!=null){fileCallback.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode,data));fileCallback=null;}return;}if(resultCode!=RESULT_OK||data==null||data.getData()==null){if(requestCode==EXPORT)exportBytes=null;return;}Uri uri=data.getData();if(requestCode==IMPORT){io.execute(()->{try{JSONObject profile;try(InputStream input=getContentResolver().openInputStream(uri)){if(input==null)throw new IOException();profile=Profile.importFile(input);}LoopbackServer current=server;if(current!=null&&current.backend.remote.active.get()>0)throw new IllegalArgumentException("Attendez la fin de la requête avant de changer d’accès.");String identity=Profile.identity(profile);JSONObject prefs=store.read(identity+".settings");if(prefs==null)prefs=new JSONObject();prefs.put("connection_selected",false);prefs.remove("endpoint");store.write(identity+".settings",prefs);store.write("profile",profile);demo=false;startClient(profile);toast("Accès personnel importé. Choisissez votre mode de connexion.");}catch(Exception e){showError("Import impossible",e instanceof IllegalArgumentException||e instanceof JSONException?"Profil personnel invalide ou incompatible.":Remote.safeMessage(e));}});}else if(requestCode==EXPORT){byte[] bytes=exportBytes;exportBytes=null;if(bytes==null)return;io.execute(()->{try(OutputStream output=getContentResolver().openOutputStream(uri,"wt")){if(output==null)throw new IOException();output.write(bytes);toast("Fichier enregistré.");}catch(Exception e){showError("Export impossible","Le fichier n’a pas pu être enregistré.");}});}}
     @Override protected void onResume(){super.onResume();LocalConversation current=conversation;if(current!=null)current.resume();}
     @Override protected void onPause(){if(wakeword!=null)wakeword.stopAndWait();if(voice!=null)voice.pause();LocalConversation current=conversation;if(current!=null)current.pause();if(web!=null)web.evaluateJavascript("window.conversationSuspend?.();window.androidFlush?.()",null);super.onPause();}
     private void requestExit(){if(exitRequested||web==null)return;exitRequested=true;web.evaluateJavascript("(async()=>{try{await window.voiceFinishForClose?.();if(typeof busy!=='undefined'&&busy){controller?.abort();try{await api('/v1/cancel',{}, {'X-Qwen-Request':requestId});}catch(e){}while(busy)await new Promise(r=>setTimeout(r,25));}const ok=typeof window.androidFlush==='function'?await window.androidFlush():false;AndroidClient.finishSaved(ok);}catch(e){AndroidClient.finishSaved(false);}})()",null);}
@@ -99,7 +150,7 @@ public final class MainActivity extends Activity {
     // Android 8–12 still dispatch this legacy method; API 33+ uses the registered platform callback.
     @android.annotation.SuppressLint("GestureBackNavigation")
     @Override public void onBackPressed(){handleBack();}
-    @Override protected void onDestroy(){if(wakeword!=null)wakeword.close();LocalConversation talking=conversation;if(talking!=null)talking.close();if(voice!=null)voice.close();if(Build.VERSION.SDK_INT>=33&&backCallback!=null)getOnBackInvokedDispatcher().unregisterOnBackInvokedCallback(backCallback);LoopbackServer current=server;server=null;io.execute(()->{if(current!=null)current.close();});io.shutdown();if(fileCallback!=null){fileCallback.onReceiveValue(null);fileCallback=null;}if(web!=null){web.removeJavascriptInterface("AndroidClient");web.destroy();web=null;}super.onDestroy();}
+    @Override protected void onDestroy(){discardOriginal();if(wakeword!=null)wakeword.close();LocalConversation talking=conversation;if(talking!=null)talking.close();if(voice!=null)voice.close();if(Build.VERSION.SDK_INT>=33&&backCallback!=null)getOnBackInvokedDispatcher().unregisterOnBackInvokedCallback(backCallback);LoopbackServer current=server;server=null;io.execute(()->{if(current!=null)current.close();});io.shutdown();if(fileCallback!=null){fileCallback.onReceiveValue(null);fileCallback=null;}if(web!=null){web.removeJavascriptInterface("AndroidClient");web.destroy();web=null;}super.onDestroy();}
     public final class AndroidBridge {
         @JavascriptInterface public String voiceStatus(){return voice.status();}
         @JavascriptInterface public String voiceAction(String command){synchronized(voiceControl){if(!wakeword.stopAndWait())return Json.object("error","Le microphone se ferme encore. Réessayez.").toString();LocalConversation current=conversation;if(current!=null&&current.busy())return Json.object("error","Raccrochez le vocal avant d’utiliser la dictée.").toString();return voice.action(command);}}
@@ -122,6 +173,10 @@ public final class MainActivity extends Activity {
         @JavascriptInterface public void copyText(String text){if(text==null||text.length()>2*1024*1024)return;runOnUiThread(()->{((android.content.ClipboardManager)getSystemService(CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("Kiara",text));toast("Texte copié.");});}
         @JavascriptInterface public void openUrl(String url){if(url!=null&&url.length()<4096)openExternal(url);}
         @JavascriptInterface public void finishSaved(boolean saved){if(!exitRequested)return;runOnUiThread(()->{if(!exitRequested||isFinishing()||isDestroyed())return;exitRequested=false;if(saved)finish();else new AlertDialog.Builder(MainActivity.this).setTitle("Enregistrement non confirmé").setMessage("Le client reste ouvert. Réessayez l’enregistrement ou exportez vos conversations pour conserver votre travail.").setPositiveButton("Réessayer",(dialog,which)->requestExit()).setNegativeButton("Rester",null).show();});}
+        @JavascriptInterface public void downloadProjectOriginal(String path,String filename){
+            if(!OriginalDownload.route(path))return;
+            runOnUiThread(()->downloadOriginal(path,filename));
+        }
         @JavascriptInterface public synchronized String exportFile(String name,String mime,String base64){if(exportBytes!=null)return Json.object("error","Un export est déjà ouvert.").toString();if(name==null||name.isEmpty()||mime==null||base64==null||base64.length()>23*1024*1024)return Json.object("error","Export trop volumineux ou invalide.").toString();try{byte[] bytes=android.util.Base64.decode(base64,android.util.Base64.DEFAULT);if(bytes.length>16*1024*1024)throw new IllegalArgumentException();String safeName=name.replaceAll("[\\\\/:*?\"<>|\\p{Cntrl}]","_");if(safeName.length()>180)safeName=safeName.substring(0,180);String rawType=mime.split(";",2)[0].trim();String type=rawType.matches("[A-Za-z0-9.+-]+/[A-Za-z0-9.+-]+")?rawType:"application/octet-stream";String suggested=safeName;exportBytes=bytes;runOnUiThread(()->{Intent intent=new Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType(type).putExtra(Intent.EXTRA_TITLE,suggested);try{startActivityForResult(intent,EXPORT);}catch(ActivityNotFoundException e){exportBytes=null;toast("Aucun sélecteur de fichiers disponible.");}});return Json.object("ok",true,"pending",true).toString();}catch(IllegalArgumentException e){return Json.object("error","Export trop volumineux ou invalide.").toString();}}
     }
 }

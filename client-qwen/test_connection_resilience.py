@@ -23,6 +23,25 @@ class ConnectionResilienceTests(unittest.TestCase):
         remote.device_reported_at=time.time()
         return remote
 
+    def test_agent_business_transport_preserves_method_and_content_type(self):
+        requests=[]
+        class Opener:
+            def open(self,request,timeout):
+                requests.append((request,timeout))
+                return io.BytesIO(b'{}')
+        remote=self.remote(Opener())
+        with remote.open('/v1/business/api/v1/projects?filter=x',b'example',
+                         method='PATCH',content_type='text/plain'):
+            pass
+        request,timeout=requests[0]
+        self.assertEqual(request.get_method(),'PATCH')
+        self.assertEqual(request.get_header('Content-type'),'text/plain')
+        self.assertTrue(request.full_url.endswith('/v1/business/api/v1/projects?filter=x'))
+        self.assertEqual(timeout,900)
+        with self.assertRaises(ValueError):remote.open('/v1/workspace',method='DELETE')
+        with self.assertRaises(ValueError):remote.open('/v1/business/api/v1/projects',method='TRACE')
+        with self.assertRaises(ValueError):remote.open('/v1/business/api/v1/projects',content_type='text/plain\r\nX: x')
+
     def test_secondary_timeout_keeps_working_connection_and_auth_denial_does_not(self):
         remote=self.remote(object())
         remote.failure('connection_error','Timeout')

@@ -169,6 +169,19 @@ class DeviceTests(unittest.TestCase):
         new_record=next(c for c in self.store.metadata()['clients'] if c['id']==new['id'])
         self.assertEqual(new_record['device_owner'],'Kiara');self.assertEqual(new_record['device_kind'],'tablet')
 
+    def test_windows_access_uses_an_encrypted_profile_without_a_personal_executable(self):
+        from kiara_shared.profiles import decode_access_code
+
+        device = self.wireguard.create_desktop('PC Kiara', 'test-model')
+        code = self.wireguard.desktop_access_code(device['id'])
+        profile = decode_access_code(code)
+        self.assertEqual(self.store.authenticate(profile['token']), device['id'])
+        self.assertFalse((self.store.home/'clients'/f"{device['id']}.exe").exists())
+        encrypted = (self.wireguard.directory/'profils-restaures.dpapi').read_bytes()
+        self.assertNotIn(profile['token'].encode(), encrypted)
+        with self.assertRaises(ValueError):
+            decode_access_code(code[:-8])
+
     def test_suspension_removes_peer_and_reactivation_preserves_keys(self):
         before=read_json(self.store.path)['clients'][0]
         engine=Mock();engine.running.return_value=True;self.wireguard.engine=engine

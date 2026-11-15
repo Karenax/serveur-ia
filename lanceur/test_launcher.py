@@ -29,14 +29,14 @@ class LaunchTests(unittest.TestCase):
 
     def test_default_profile_and_unchanged_native_options(self):
         s = validate(self.settings, True)
-        self.assertEqual((s['context'], s['workers'], s['history_slots']), (393216, 15, 8))
+        self.assertEqual((s['context'], s['workers'], s['history_slots']), (524288, 15, 8))
         self.assertEqual(s['model_name'], 'qwen3.8-flash-next-iq4-xs')
         self.assertFalse(s['mtp_enabled'])
         self.assertEqual(self.base['args'][self.base['args'].index('--draft') + 1], 'dflash2')
         self.assertTrue(s['history_enabled'])
         cfg = build_config(self.base, s)
         self.assertEqual((arg(cfg, '--max-context'), arg(cfg, '--rope-scaling'), arg(cfg, '--rope-scale')),
-                         ('393216', 'yarn', '1.5'))
+                         ('524288', 'yarn', '2.0'))
         native = build_config(cfg, {**s, 'context': 262144})
         self.assertNotIn('--rope-scaling', native['args'])
         self.assertNotIn('--rope-scale', native['args'])
@@ -58,7 +58,7 @@ class LaunchTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate({**s, 'trusted_origins': 'https://example.org/path'})
         with self.assertRaises(ValueError):
-            validate({**s, 'context': 393217})
+            validate({**s, 'context': 524289})
 
     def test_three_gpu_dense_and_experts_survive_settings_roundtrip(self):
         settings = {**self.settings, 'gpus': 'GPU-dense,GPU-experts-a,GPU-experts-b'}
@@ -75,10 +75,16 @@ class LaunchTests(unittest.TestCase):
         self.assertNotIn('--remote-expert-opt', fallback['args'])
         self.assertNotIn('--expert-cache-device2', fallback['args'])
         self.assertEqual(fallback['args'][fallback['args'].index('--layer-split') + 1], '24')
-        for invalid in ('GPU-a,GPU-a,GPU-b', '0,1,2,3', '0'):
+        for invalid in ('GPU-a,GPU-a,GPU-b', '0,1,2,3', ''):
             with self.subTest(gpus=invalid), self.assertRaises(ValueError):
                 validate({**settings, 'gpus': invalid})
 
+    def test_single_gpu_removes_split_and_remote_expert_options(self):
+        multi = build_config(self.base, {**self.settings, 'gpus': 'GPU-a,GPU-b,GPU-c'})
+        single = build_config(multi, {**self.settings, 'gpus': 'GPU-a'})
+        self.assertEqual(single['env']['CUDA_VISIBLE_DEVICES'], 'GPU-a')
+        for flag in ('--layer-split', '--split-device', '--remote-expert-opt', '--expert-cache-device1', '--expert-cache-device2'):
+            self.assertNotIn(flag, single['args'])
     def test_mtp_and_history_can_be_disabled_without_changing_sources(self):
         mtp = build_config(self.base, {**self.settings, 'mtp_enabled': True, 'mtp_path': 'mtp-fixture'})
         cfg = build_config(mtp, {**self.settings, 'mtp_enabled': False, 'history_enabled': False})
@@ -145,7 +151,7 @@ class LaunchTests(unittest.TestCase):
                     post(base, 'wrong-token')
                 with post(base) as response:
                     self.assertEqual(json.load(response)['history_slots'], self.settings['history_slots'])
-                self.assertEqual(controller.settings()['context'], 393216)
+                self.assertEqual(controller.settings()['context'], 524288)
                 with self.assertRaises(urllib.error.HTTPError):
                     urllib.request.urlopen(urllib.request.Request(base, headers={'Host': 'foreign.example'}))
             finally:
@@ -163,7 +169,7 @@ class LaunchTests(unittest.TestCase):
             config_path = folder / 'strata.json'
             write_json(config_path, cfg)
             write_json(controller.pointer, {'directory': str(folder)})
-            process = subprocess.Popen([str(PYTHON), '-u', str(HOME / 'runtime.py'), '--config', str(config_path),
+            process = subprocess.Popen([str(PYTHON), '-u', str(Path(__file__).with_name('runtime.py')), '--config', str(config_path),
                         '--run-dir', str(folder), '--mock'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
                         creationflags=HIDDEN)
             try:
@@ -209,7 +215,7 @@ class LaunchTests(unittest.TestCase):
             self.assertEqual(state['status'],'pret');self.assertTrue(state['running'])
             self.assertEqual(state['active']['context'],4096)
             self.assertEqual(controller.defaults()['model_name'],self.settings['model_name'])
-            self.assertEqual(controller.defaults()['context'],393216)
+            self.assertEqual(controller.defaults()['context'],524288)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

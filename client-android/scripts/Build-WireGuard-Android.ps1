@@ -11,11 +11,12 @@ if ($LASTEXITCODE -ne 0 -or $versionGoReelle -notmatch [regex]::Escape($versionG
 $sourcesBridge = Join-Path $projetRacine 'client-qwen\wireguard-bridge'
 $travailBridge = Join-Path $projetRacine 'toolchain\android-wireguard-build'
 New-Item -ItemType Directory -Force -Path $travailBridge | Out-Null
-foreach ($sourceBridge in @('main.go','go.mod','go.sum')) {
+$fichiersBridge = @('main.go','bind_loopback.go','go.mod','go.sum')
+foreach ($sourceBridge in $fichiersBridge) {
     Copy-Item -LiteralPath (Join-Path $sourcesBridge $sourceBridge) -Destination (Join-Path $travailBridge $sourceBridge) -Force
 }
 $clangAndroid = Join-Path $env:ANDROID_HOME 'ndk\27.3.13750724\toolchains\llvm\prebuilt\windows-x86_64\bin\clang.exe'
-$empreinteSources = ((@('main.go','go.mod','go.sum') | ForEach-Object { (Get-FileHash -LiteralPath (Join-Path $travailBridge $_)).Hash }) -join '-') + '-go' + $versionGo.version + '-ndk27-api26-pie-16k-v1'
+$empreinteSources = (($fichiersBridge | ForEach-Object { (Get-FileHash -LiteralPath (Join-Path $travailBridge $_)).Hash }) -join '-') + '-go' + $versionGo.version + '-ndk27-api26-pie-16k-v1'
 $variablesGoAvant = @{}
 foreach ($nomGo in @('GOOS','GOARCH','CGO_ENABLED','CC','GOPATH','GOCACHE','GOMAXPROCS','CGO_LDFLAGS','GOTOOLCHAIN')) { $variablesGoAvant[$nomGo] = [Environment]::GetEnvironmentVariable($nomGo,'Process') }
 Push-Location $travailBridge

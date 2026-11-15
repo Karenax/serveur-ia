@@ -7,11 +7,15 @@ Delivery is polling/reconnection, not an external push service.
 from __future__ import annotations
 
 import json
+import hashlib
 import math
 import re
 import secrets
 import sqlite3
 import time
+
+from kiara_shared.history_store import is_agent_project_id
+from workspace_types import Conflict, Denied
 
 MAX_OWNER = 1000
 MAX_GLOBAL = 20000
@@ -87,6 +91,9 @@ def _target(value, owner, *, legacy=False):
     if kind == 'notifications':
         if set(value) != {'kind'}:
             raise ValueError('Destination de notification invalide.')
+    elif kind == 'agent_project' and owner != 'admin':
+        if set(value) != {'kind', 'project'} or not is_agent_project_id(value['project']):
+            raise ValueError('Destination de notification invalide.')
     elif (kind in ('document', 'assistant') or legacy and kind == 'job') and owner != 'admin':
         _id(value.get('id'))
         if 'project' in value:
@@ -118,7 +125,7 @@ def _prune(db, owner, now):
     db.execute('DELETE FROM notifications WHERE seq NOT IN (SELECT seq FROM notifications ORDER BY seq DESC LIMIT ?)', (MAX_GLOBAL,))
 
 
-def publish(db, owner, kind, source_key, target=None, now=None):
+def publish(db, owner, kind, source_key, target=None, now=None, *, prune=True):
     """Publish once, inside an existing workspace transaction (server callers)."""
     _owner(owner)
     if kind not in _types(owner):
@@ -138,7 +145,8 @@ def publish(db, owner, kind, source_key, target=None, now=None):
     identity = secrets.token_hex(16)
     db.execute('INSERT INTO notifications(id,owner,type,source_key,target,created) VALUES(?,?,?,?,?,?)',
                (identity, owner, kind, source_key, json.dumps(destination, separators=(',', ':')), now))
-    _prune(db, owner, now)
+    if prune:
+        _prune(db, owner, now)
     return {'id': identity, 'created': True}
 
 
@@ -227,6 +235,7 @@ def _validate(db, owners):
 class Notifications:
     def __init__(self, workspace):
         self.workspace = workspace
+        self.agent_transcriptions = None
         with workspace.db() as db:
             migrate(db)
 
@@ -234,10 +243,8 @@ class Notifications:
         _owner(owner)
         device = owner if device is None else _owner(device)
         if device != owner:
-            from workspace import Denied
             raise Denied('Abonnement hors de cet accès personnel.')
         if owner != 'admin' and not self.workspace.valid(owner):
-            from workspace import Denied
             raise Denied('Accès aux notifications désactivé.')
         return device
 
@@ -247,33 +254,57 @@ class Notifications:
                 'title': title, 'body': body, 'created': row['created'], 'read_at': row['read_at'],
                 'target': json.loads(row['target']), 'enabled': preferences['types'].get(row['type'], True)}
 
+    def _agent_events(self, owner):
+        if owner == 'admin' or self.agent_transcriptions is None:
+            return {'projects': [], 'events': []}
+        try:
+            return self.agent_transcriptions(owner)
+        except (ValueError, OSError):
+            return {'projects': [], 'events': []}
+
     def snapshot(self, owner, cursor=None, device=None, limit=MAX_PAGE):
         device = self._identity(owner, device)
         if cursor is not None and (type(cursor) is not int or cursor < 0):
             raise ValueError('Curseur de notification invalide.')
         if type(limit) is not int or not 1 <= limit <= MAX_PAGE:
             raise ValueError('Maximum 100 notifications par page.')
+        agent = self._agent_events(owner)
+        visible = "owner=? AND type NOT IN ('job_completed','job_failed') AND (json_extract(target,'$.kind') != 'agent_project' OR json_extract(target,'$.project') IN (SELECT value FROM json_each(?)))"
+        args = (owner, json.dumps(agent['projects']))
         from server_state import generation
         with self.workspace.db() as db:
             self._identity(owner, device)
             if not self.workspace.maintenance:
+                cutoff = time.time() - RETENTION_DAYS * 86400
+                existing = db.execute('SELECT source_key,created FROM notifications WHERE owner=? AND created>=?',
+                                      (owner, cutoff)).fetchall()
+                keys = {row['source_key'] for row in existing}
+                if len(existing) >= MAX_OWNER:
+                    cutoff = max(cutoff, min(row['created'] for row in existing))
+                for event in reversed(agent['events']):
+                    key = 'agent:transcription:' + event['id']
+                    if key not in keys and event['created'] > cutoff and event['project'] in agent['projects']:
+                        publish(db, owner, 'transcription_ready', key,
+                                {'kind': 'agent_project', 'project': event['project']}, now=event['created'], prune=False)
+                        keys.add(key)
                 _prune(db, owner, time.time())
             preferences = _preferences(db, owner)
             if cursor is None:
-                rows = db.execute("SELECT * FROM notifications WHERE owner=? AND type NOT IN ('job_completed','job_failed') ORDER BY seq DESC LIMIT ?", (owner, limit + 1)).fetchall()
+                rows = db.execute(f'SELECT * FROM notifications WHERE {visible} ORDER BY seq DESC LIMIT ?', (*args, limit + 1)).fetchall()
                 has_more = len(rows) > limit
                 rows = list(reversed(rows[:limit]))
             else:
-                rows = db.execute("SELECT * FROM notifications WHERE owner=? AND type NOT IN ('job_completed','job_failed') AND seq>? ORDER BY seq LIMIT ?", (owner, cursor, limit + 1)).fetchall()
+                rows = db.execute(f'SELECT * FROM notifications WHERE {visible} AND seq>? ORDER BY seq LIMIT ?', (*args, cursor, limit + 1)).fetchall()
                 has_more = len(rows) > limit
                 rows = rows[:limit]
             latest = db.execute('SELECT MAX(seq) FROM notifications WHERE owner=?', (owner,)).fetchone()[0] or 0
             marker = generation(self.workspace.home)
             return {'items': [self._public(row, preferences) for row in rows],
+                    'agent_scope': hashlib.sha256(json.dumps(sorted(agent['projects'])).encode()).hexdigest(),
                     'cursor': rows[-1]['seq'] if rows else max(cursor or 0, latest), 'has_more': has_more,
-                    'unread_count': db.execute("SELECT COUNT(*) FROM notifications WHERE owner=? AND type NOT IN ('job_completed','job_failed') AND read_at IS NULL", (owner,)).fetchone()[0],
-                    'read_ids': [row[0] for row in db.execute("SELECT id FROM notifications WHERE owner=? AND type NOT IN ('job_completed','job_failed') AND read_at IS NOT NULL ORDER BY seq", (owner,))],
-                    'retained_ids': [row[0] for row in db.execute("SELECT id FROM notifications WHERE owner=? AND type NOT IN ('job_completed','job_failed') ORDER BY seq", (owner,))],
+                    'unread_count': db.execute(f'SELECT COUNT(*) FROM notifications WHERE {visible} AND read_at IS NULL', args).fetchone()[0],
+                    'read_ids': [row[0] for row in db.execute(f'SELECT id FROM notifications WHERE {visible} AND read_at IS NOT NULL ORDER BY seq', args)],
+                    'retained_ids': [row[0] for row in db.execute(f'SELECT id FROM notifications WHERE {visible} ORDER BY seq', args)],
                     'preferences': preferences, 'subscription': _subscription(db, owner, device),
                     'generation': marker['id'], 'restored': marker['restored'],
                     'delivery': {'mode': 'connected', 'push': False},
@@ -292,17 +323,23 @@ class Notifications:
             raise ValueError('Action de notification invalide.')
         if action == 'list':
             return self.snapshot(owner, body.get('after'), device, body.get('limit', MAX_PAGE))
+        projects = set(self._agent_events(owner)['projects']) if action in ('get', 'read', 'delivered') else set()
+
+        def visible(row):
+            if row is None:
+                return False
+            target = json.loads(row['target'])
+            return target['kind'] != 'agent_project' or target['project'] in projects
+
         with self.workspace.db() as db:
             self._identity(owner, device)
             if self.workspace.maintenance:
-                from workspace import Denied
                 raise Denied('Serveur en maintenance.')
             now = time.time()
             if action == 'get':
                 identity = _id(body.get('id'))
                 row = db.execute('SELECT * FROM notifications WHERE id=? AND owner=?', (identity, owner)).fetchone()
-                if row is None or row['type'] not in _types(owner):
-                    from workspace import Denied
+                if not visible(row) or row['type'] not in _types(owner):
                     raise Denied('Notification absente ou accès interdit.')
                 from server_state import generation
                 return {'notification': self._public(row, _preferences(db, owner)), 'generation': generation(self.workspace.home)['id']}
@@ -314,8 +351,7 @@ class Notifications:
                 rows = []
                 for identity in identities:
                     row = db.execute('SELECT * FROM notifications WHERE id=? AND owner=?', (identity, owner)).fetchone()
-                    if row is None:
-                        from workspace import Denied
+                    if not visible(row):
                         raise Denied('Notification absente ou accès interdit.')
                     rows.append(row)
                 # Validate the whole selection before changing any row.
@@ -328,7 +364,6 @@ class Notifications:
             elif action == 'preferences':
                 previous = _preferences(db, owner)
                 if type(body.get('revision')) is not int or body['revision'] != previous['revision']:
-                    from workspace import Conflict
                     raise Conflict('Réglages de notification modifiés ailleurs : rechargez-les.')
                 updates = body.get('types', {})
                 discreet = body.get('discreet', previous['discreet'])

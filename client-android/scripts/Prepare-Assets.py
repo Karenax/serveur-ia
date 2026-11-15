@@ -17,7 +17,7 @@ PROJECT = Path(__file__).resolve().parent.parent
 MOBILE = PROJECT / "mobile-ui"
 SHARED = ("chat.html", "workspace.html", "ui.css", "ui.js", "markdown.js",
           "corrector.js", "attachments.js", "thinking.js", "selection.js", "voice.js", "conversation.js",
-          "vendor/markdown-it.min.js")
+          "project-conversation.js", "vendor/markdown-it.min.js")
 
 
 def read(path: Path) -> str:
@@ -69,7 +69,7 @@ def prepare(source: Path) -> str:
     if adapters.get('format') != 1: raise ValueError('Unsupported UI platform contract')
     files = {name: platform_source(source, name, adapters) for name in SHARED}
     presentation = ''.join(script(files[name]) for name in ('ui.js', 'attachments.js', 'corrector.js',
-        'selection.js', 'thinking.js', 'voice.js', 'conversation.js')) + script(read(MOBILE / 'android.js'))
+        'selection.js', 'thinking.js', 'voice.js', 'conversation.js', 'project-conversation.js')) + script(read(MOBILE / 'android.js'))
     platform = script('window.kiaraPlatform=Object.freeze(' + json.dumps(adapters['capabilities'],ensure_ascii=False) + ');')
     markdown = platform + script(files['vendor/markdown-it.min.js']) + script(files['markdown.js'])
     chat = replace_once(files['chat.html'], '</head>', markdown + '</head>', 'markdown bootstrap')

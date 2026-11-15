@@ -1,4 +1,7 @@
 """Stable updater directories, bounded files and safe legacy handoff cleanup."""
+import base64
+import hashlib
+import io
 import json
 from pathlib import Path
 from types import SimpleNamespace
@@ -6,6 +9,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 import updater
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 
 class UpdateLayoutTests(unittest.TestCase):
@@ -14,6 +18,32 @@ class UpdateLayoutTests(unittest.TestCase):
         self.home=Path(self.temp.name)
         self.target=self.home/'Mon client Kiara.exe';self.target.write_bytes(b'personal-client')
         self.profile={'url':'wireguard://10.77.0.1:8766','token':'fixture-owned-token'}
+
+    def test_desktop_channel_selects_newer_signed_installer_and_rejects_tampering(self):
+        signer = Ed25519PrivateKey.generate()
+        binary = b'fixture installer'
+        release = {'version': '4.0.1', 'protocol': 4, 'bytes': len(binary),
+                   'sha256': hashlib.sha256(binary).hexdigest()}
+        signature = signer.sign(json.dumps(release, sort_keys=True, separators=(',', ':')).encode())
+        release['signature'] = base64.b64encode(signature).decode()
+        remote = SimpleNamespace(version='3.5.63', profile={
+            'update_public_key': base64.b64encode(signer.public_key().public_bytes_raw()).decode()})
+        responses = {updater.DESKTOP_RELEASE: json.dumps(release).encode(), updater.DESKTOP_DOWNLOAD: binary}
+        remote.open = lambda path: io.BytesIO(responses[path])
+
+        metadata, installer = updater.prepare_kiara4(remote, self.home)
+        self.assertEqual(metadata['version'], '4.0.1')
+        self.assertEqual(installer.name, 'Kiara_4.0.1_x64-setup.exe')
+        self.assertEqual(installer.read_bytes(), binary)
+
+        remote.version = '4.0.1'
+        with self.assertRaisesRegex(ValueError, 'à jour'):
+            updater.prepare_kiara4(remote, self.home)
+        remote.version = '4.0.0'
+        responses[updater.DESKTOP_DOWNLOAD] = binary.lower() + b'!'
+        with self.assertRaises(ValueError):
+            updater.prepare_kiara4(remote, self.home)
+        self.assertFalse(installer.exists())
 
     def test_preparation_reuses_exact_exe_name_directory_twice(self):
         remote=SimpleNamespace(profile=self.profile)

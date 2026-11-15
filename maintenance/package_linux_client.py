@@ -17,7 +17,7 @@ MODULES = ('client','linux_support','fred_http','product','updater','history_sto
            'opencode_visibility','advanced_voice','max_installation','local_voice',
            'conversation_service','screen_capture')
 ASSETS = ('chat.html','workspace.html','ui.css','ui.js','markdown.js','attachments.js','corrector.js',
-          'selection.js','thinking.js','voice.js','conversation.js','linux_features.js','fred-icon.png','LICENSE.txt','THIRD-PARTY.txt')
+          'selection.js','thinking.js','voice.js','conversation.js','project-conversation.js','linux_features.js','fred-icon.png','LICENSE.txt','THIRD-PARTY.txt')
 
 
 def build(output, architecture):

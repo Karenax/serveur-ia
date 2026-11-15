@@ -113,8 +113,10 @@ class EmbeddingService:
             if self.process: self.stop()
             return
         with self.lock:
-            if self.process and self.process.poll() is not None:
+            exit_code = self.process.poll() if self.process else None
+            if exit_code is not None:
                 self.process = None; self.state = 'erreur'; self.error = 'Le moteur EG2 s’est arrêté.'
+                self.workspace.diagnostics.record('eg2', 'worker_exit', exit_code=exit_code)
                 self.failures += 1; self.retry_at = time.monotonic() + 30
                 if self.launch_device=='cuda' and self.runtime_options.get('cpu_fallback'):
                     self.gpu_failed=True;self.retry_at=0
@@ -127,8 +129,11 @@ class EmbeddingService:
                 if health.get('service') != 'fred-eg2' or health.get('dimensions') != DIMENSIONS:
                     raise ValueError('Moteur incompatible.')
                 self.ready = health; self.state = 'pret'; self.error = ''
+                self.failures = 0
             except (OSError, ValueError, http.client.HTTPException):
-                if time.monotonic() - self.started > 180:
+                # Once ready, a failed heartbeat can be caused by an ongoing
+                # inference. Process exit and startup timeout are distinct.
+                if self.state == 'chargement' and time.monotonic() - self.started > 180:
                     self.stop(); self.state = 'erreur'; self.error = 'Chargement EG2 trop long.'
                     self.failures += 1; self.retry_at = time.monotonic() + 30
                     if self.launch_device=='cuda' and self.runtime_options.get('cpu_fallback'):

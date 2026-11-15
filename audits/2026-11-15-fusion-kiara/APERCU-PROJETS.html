@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="fr" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kiara · Aperçu Projets</title>
+<style>
+:root{color-scheme:light;--bg:#fff;--sidebar:#f7f7f5;--panel:#fafaf9;--raised:#f0f0ed;--line:#e7e7e3;--text:#242423;--muted:#686862;--accent:#242423;--on-accent:#fff;--green:#327854;--gold:#8a5a10;--input:#888881}
+:root[data-theme=dark]{color-scheme:dark;--bg:#202021;--sidebar:#19191a;--panel:#262627;--raised:#303032;--line:#383839;--text:#ececeb;--muted:#aaa9a5;--accent:#ececeb;--on-accent:#202021;--green:#8fba9e;--gold:#d7ba89;--input:#858581}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 "Segoe UI",system-ui,sans-serif}
+[hidden]{display:none!important}
+a{color:inherit;text-underline-offset:3px}
+button,select,input{font:inherit;color:inherit}
+button,select,input[type=search]{min-height:38px;border:1px solid var(--input);border-radius:8px;background:var(--bg);padding:6px 12px}
+button,select{cursor:pointer}
+button:hover,a.action:hover{background:var(--raised)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.skip{position:fixed;left:12px;top:-80px;z-index:4;background:var(--bg);padding:8px}
+.skip:focus{top:12px}
+.layout{min-height:100vh;display:grid;grid-template-columns:238px minmax(0,1fr)}
+aside{background:var(--sidebar);border-right:1px solid var(--line);padding:20px 12px 16px;display:flex;flex-direction:column;gap:32px}
+.brand{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:650;margin:4px 10px}
+.logo{display:grid;place-items:center;background:var(--accent);color:var(--on-accent);width:30px;height:30px;border-radius:8px;font-size:15px}
+nav{display:flex;flex-direction:column;gap:4px}
+nav>*{display:flex;align-items:center;min-height:40px;gap:12px;padding:8px 12px;border-radius:8px;text-decoration:none}
+nav [aria-current=page]{background:var(--raised);font-weight:650}
+nav span.inactive{color:var(--muted)}
+nav svg{width:17px;height:17px;flex:none;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.aside-note{margin:auto 10px 0;color:var(--muted);font-size:12px;border-top:1px solid var(--line);padding-top:12px}
+header{min-height:58px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 24px}
+header label{display:flex;align-items:center;gap:8px;color:var(--muted)}
+main{max-width:1220px;margin:auto;padding:38px 42px 56px}
+h1,h2,p{margin:0}
+h1{font-size:24px;line-height:1.25;letter-spacing:-.025em}
+h2{font-size:18px;line-height:1.35}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+.headline,.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.headline{margin-bottom:22px}
+.toolbar{margin-bottom:14px;justify-content:flex-start}
+.toolbar input{width:min(100%,320px)}
+.table{border:1px solid var(--line);border-radius:12px;overflow:auto}
+table{width:100%;border-collapse:collapse;text-align:left}
+th,td{padding:14px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--panel);color:var(--muted);white-space:nowrap;font-size:12px}
+tr:last-child td{border:0}
+td:first-child{width:42%;font-weight:600}
+td small{display:block;font-weight:400;margin-top:2px}
+.status{color:var(--green);white-space:nowrap}
+.status::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;margin-right:7px;vertical-align:2px}
+.status.closed{color:var(--muted)}
+.status.waiting{color:var(--gold)}
+.back{display:inline-block;margin-bottom:16px}
+.project-meta{margin-top:8px;display:flex;gap:8px 14px;flex-wrap:wrap}
+.tabs{display:flex;flex-direction:row;overflow:auto;border-bottom:1px solid var(--line);margin-bottom:24px}
+.tabs a{white-space:nowrap;border-radius:0;border-bottom:2px solid transparent}
+.tabs a[aria-current=page]{border-color:var(--accent);background:var(--panel)}
+.project-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px}
+.panel{padding:20px;border:1px solid var(--line);border-radius:12px}
+.panel h2{margin-bottom:10px}
+.panel p+p,.panel ul{margin-top:10px}
+.panel ul{padding-left:20px;margin-bottom:0}
+.summary{margin:0;display:grid;grid-template-columns:auto 1fr;gap:10px 16px}
+.summary dt{color:var(--muted)}
+.summary dd{margin:0;font-weight:600}
+.action{display:inline-flex;align-items:center;min-height:38px;text-decoration:none;border:1px solid var(--input);border-radius:8px;padding:6px 12px;white-space:nowrap}
+.empty{padding:24px}
+@media(max-width:850px){
+.layout{grid-template-columns:minmax(0,1fr)}aside{display:none}main{padding:24px 20px 38px}
+header{padding-inline:20px}.project-grid{grid-template-columns:1fr}
+button,select,input[type=search],.action,.tabs a,.back{min-height:44px}.back{align-content:center}
+}
+@media(max-width:520px){
+.optional{display:none}.toolbar input{flex:1 1 100%;width:100%}th,td{padding:12px}
+td:first-child{width:auto}.tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.tabs a{padding-inline:9px}.summary{grid-template-columns:auto 1fr}
+}
+</style>
+</head>
+<body>
+<svg aria-hidden="true" width="0" height="0" style="position:absolute">
+<symbol id="chat" viewBox="0 0 24 24"><path d="M3 4h18v12H8l-5 4z"/></symbol>
+<symbol id="folder" viewBox="0 0 24 24"><path d="M3 7V5h6l2 2h10v13H3z"/></symbol>
+<symbol id="mail" viewBox="0 0 24 24"><path d="M3 5h18v14H3zM3 5l9 7 9-7"/></symbol>
+<symbol id="audio" viewBox="0 0 24 24"><path d="M4 9v6M8 5v14M12 3v18M16 6v12M20 9v6"/></symbol>
+<symbol id="activity" viewBox="0 0 24 24"><path d="M3 12h4l3-6 4 12 3-6h4"/></symbol>
+</svg>
+<a href="#main" class="skip">Aller au contenu</a>
+<div class="layout">
+<aside>
+<div class="brand"><span class="logo" aria-hidden="true">K</span> Kiara</div>
+<nav aria-label="Navigation principale">
+<span class="inactive"><svg aria-hidden="true"><use href="#chat"/></svg> Conversations</span>
+<a href="#projets" aria-current="page"><svg aria-hidden="true"><use href="#folder"/></svg> Projets</a>
+<span class="inactive"><svg aria-hidden="true"><use href="#mail"/></svg> Mails</span>
+<span class="inactive"><svg aria-hidden="true"><use href="#audio"/></svg> Réunions</span>
+<span class="inactive"><svg aria-hidden="true"><use href="#activity"/></svg> Activité</span>
+</nav>
+<div class="aside-note">Aperçu · données fictives</div>
+</aside>
+<div>
+<header><span id="location">Projets</span><label>Thème <select id="theme"><option value="light">Clair</option><option value="dark">Sombre</option></select></label></header>
+<main id="main" tabindex="-1">
+<section id="portfolio">
+<div class="headline"><h1 tabindex="-1">Projets</h1><p class="muted small">Aperçu sur données fictives</p></div>
+<div class="toolbar">
+<input type="search" id="search" placeholder="Rechercher un projet…" aria-label="Rechercher un projet">
+<select id="state" aria-label="Filtrer par état"><option value="active">Actifs</option><option value="archived">Archivés</option><option value="all">Tous</option></select>
+</div>
+<div class="table"><table>
+<thead><tr><th scope="col">Projet / client</th><th scope="col">État</th><th class="optional" scope="col">Avancement</th><th class="optional" scope="col">Prochaine étape</th></tr></thead>
+<tbody>
+<tr data-state="active"><td><a href="#projet/vue">Rénovation de la médiathèque</a><small class="muted">MED-026 · Ville de Saint-Lys</small></td><td><span class="status">En cours</span></td><td class="optional">65 %</td><td class="optional">Valider le plan d’éclairage<small class="muted">24 novembre</small></td></tr>
+<tr data-state="active"><td>Réaménagement de l’atelier Nord<small class="muted">ATN-014 · Les Ateliers du Parc</small></td><td><span class="status waiting">À démarrer</span></td><td class="optional">—</td><td class="optional">Réunion de lancement<small class="muted">26 novembre</small></td></tr>
+<tr data-state="active"><td>Extension de l’accueil municipal<small class="muted">ACM-052 · Ville de Saint-Lys</small></td><td><span class="status">En cours</span></td><td class="optional">30 %</td><td class="optional">Remettre le relevé de site<small class="muted">2 décembre</small></td></tr>
+<tr data-state="archived"><td>Mise aux normes de la salle des fêtes<small class="muted">SDF-008 · Ville de Saint-Lys</small></td><td><span class="status closed">Archivé</span></td><td class="optional">100 %</td><td class="optional">—</td></tr>
+</tbody>
+</table><p id="empty" class="empty" hidden>Aucun projet trouvé. Modifie la recherche ou le filtre.</p></div>
+<p id="count" class="muted small" style="margin-top:10px" role="status"></p>
+</section>
+<section id="project" hidden>
+<a class="back muted" href="#projets">← Tous les projets</a>
+<div class="headline">
+<div><h1 tabindex="-1">Rénovation de la médiathèque</h1><p class="project-meta"><span class="muted">MED-026 · Ville de Saint-Lys</span><span class="status">En cours</span></p></div>
+<a class="action" href="#projet/pilotage">Voir le planning</a>
+</div>
+<nav class="tabs" aria-label="Rubriques du projet">
+<a href="#projet/vue" data-section="vue">Vue d’ensemble</a>
+<a href="#projet/pilotage" data-section="pilotage">Pilotage</a>
+<a href="#projet/documents" data-section="documents">Documents</a>
+<a href="#projet/reunions" data-section="reunions">Réunions</a>
+</nav>
+<div data-panel="vue" class="project-grid">
+<section class="panel"><h2>À traiter</h2><ul><li>Valider le plan d’éclairage avant le 24 novembre.</li><li>Confirmer la largeur de passage à l’entrée.</li></ul></section>
+<section class="panel"><h2>Situation</h2><dl class="summary"><dt>Avancement</dt><dd>65 %</dd><dt>Échéance</dt><dd>15 décembre 2026</dd><dt>Responsable</dt><dd>Camille Martin</dd></dl></section>
+<section class="panel"><h2>Dernier document</h2><p>Plan d’éclairage · version 2</p><p><a href="#projet/documents">Voir les documents</a></p></section>
+<section class="panel"><h2>Prochaine réunion</h2><p>Revue de chantier · 27 novembre</p><p><a href="#projet/reunions">Voir les réunions</a></p></section>
+</div>
+<section data-panel="pilotage" class="panel" hidden><h2>Planning</h2><ul><li>24 novembre · Valider le plan d’éclairage</li><li>27 novembre · Revue de chantier</li><li>15 décembre · Remise du dossier final</li></ul></section>
+<section data-panel="documents" class="panel" hidden><h2>Documents</h2><ul><li>Plan d’éclairage · version 2 · 12 novembre</li><li>Cahier des charges · version 1 · 2 novembre</li></ul></section>
+<section data-panel="reunions" class="panel" hidden><h2>Réunions</h2><ul><li>27 novembre · Revue de chantier · À venir</li><li>10 novembre · Réunion de coordination · Compte rendu publié</li></ul></section>
+</section>
+</main>
+</div>
+</div>
+<script>
+const search = document.getElementById('search');
+const filter = document.getElementById('state');
+const rows = [...document.querySelectorAll('tbody tr')];
+const normalize = value => value.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
+function applyFilter() {
+  const query = normalize(search.value.trim());
+  for (const row of rows) {
+    row.hidden = (filter.value !== 'all' && filter.value !== row.dataset.state) ||
+      !normalize(row.textContent).includes(query);
+  }
+  const total = rows.filter(row => !row.hidden).length;
+  document.getElementById('empty').hidden = total !== 0;
+  document.getElementById('count').textContent = total ? total + (total === 1 ? ' projet' : ' projets') : '';
+}
+search.addEventListener('input', applyFilter);
+filter.addEventListener('change', applyFilter);
+document.getElementById('theme').addEventListener('change', event => {
+  document.documentElement.dataset.theme = event.target.value;
+});
+function route(moveFocus = false) {
+  const requested = location.hash.split('/')[1];
+  const panels = [...document.querySelectorAll('[data-panel]')];
+  const detail = location.hash.startsWith('#projet/');
+  const section = panels.some(panel => panel.dataset.panel === requested) ? requested : 'vue';
+  const current = document.getElementById(detail ? 'project' : 'portfolio');
+  const changedView = current.hidden;
+  document.getElementById('portfolio').hidden = detail;
+  document.getElementById('project').hidden = !detail;
+  for (const panel of panels) panel.hidden = panel.dataset.panel !== section;
+  for (const link of document.querySelectorAll('[data-section]')) {
+    if (link.dataset.section === section) link.setAttribute('aria-current', 'page');
+    else link.removeAttribute('aria-current');
+  }
+  document.getElementById('location').textContent = detail ? 'Projets / MED-026' : 'Projets';
+  document.title = detail ? 'Kiara · Rénovation de la médiathèque' : 'Kiara · Aperçu Projets';
+  if (moveFocus && changedView) current.querySelector('h1').focus();
+}
+window.addEventListener('hashchange', () => route(true));
+applyFilter();
+route();
+</script>
+</body>
+</html>

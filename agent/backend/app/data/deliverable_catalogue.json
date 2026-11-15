@@ -1,0 +1,864 @@
+{
+  "format": "agent-deliverable-catalogue",
+  "version": 1,
+  "source": {
+    "repository": "XPilot local audit",
+    "commit": "82d47dff8475d32ea18a99e9f81d6409b1c19643",
+    "file": "backend/app/domain/deliverables.py",
+    "sha256": "f9b43bee67946ad7691bff8d6683f08d1bdc31e70a15c21f6cb30b7b1de44bc5"
+  },
+  "types": [
+    {
+      "code": "analyse_fonctionnelle",
+      "label": "Analyse Fonctionnelle",
+      "order": 10,
+      "definition": {
+        "category": "studies",
+        "design": true,
+        "position": 10,
+        "checklist": [
+          {
+            "code": "xpilot_1",
+            "label": "Générer le fichier AF",
+            "milestone_code": "pdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_2",
+            "label": "Définir les FP/FC et les critères",
+            "milestone_code": "pdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_46",
+            "label": "Vérification par l'IA",
+            "milestone_code": "pdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_3",
+            "label": "Validation par le vérificateur",
+            "milestone_code": "pdr",
+            "is_gate": true,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_4",
+            "label": "Mettre à jour l'AF si nécessaire",
+            "milestone_code": "cdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_5",
+            "label": "(Si Modification) Validation par le vérificateur",
+            "milestone_code": "cdr",
+            "is_gate": true,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": [
+              "modification"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "code": "analyse_risque",
+      "label": "Analyse de risque",
+      "order": 20,
+      "definition": {
+        "category": "studies",
+        "design": true,
+        "position": 20,
+        "checklist": [
+          {
+            "code": "xpilot_6",
+            "label": "Copier le template dans le dossier",
+            "milestone_code": "pdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_7",
+            "label": "Remplir la Page de Présentations et Limites",
+            "milestone_code": "pdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_8",
+            "label": "Définir les phases de Fonctionnement",
+            "milestone_code": "pdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_47",
+            "label": "EESS",
+            "milestone_code": "pdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_9",
+            "label": "Identifier les risques, mesurer le PrX",
+            "milestone_code": "pdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_90",
+            "label": "Vérification de l’AR par l’IA",
+            "milestone_code": "pdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_10",
+            "label": "Validation par le vérificateur",
+            "milestone_code": "pdr",
+            "is_gate": true,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_11",
+            "label": "Mettre à jour l'AR si nécessaire",
+            "milestone_code": "cdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_12",
+            "label": "(Si Modification) Validation par le vérificateur",
+            "milestone_code": "cdr",
+            "is_gate": true,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": [
+              "modification"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "code": "conception_3d",
+      "label": "Conception 3D",
+      "order": 30,
+      "definition": {
+        "category": "studies",
+        "design": true,
+        "position": 30,
+        "checklist": [
+          {
+            "code": "xpilot_15",
+            "label": "Pas de clash avec la visserie (diamètres concordants)",
+            "milestone_code": "pdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_48",
+            "label": "3D respectant les contraintes du CDC / AF",
+            "milestone_code": "pdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_66",
+            "label": "Propriétés 3D / 2D / Nomenclature similaires",
+            "milestone_code": "pdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_67",
+            "label": "Matière rentrée au 3D -> Masses concordantes",
+            "milestone_code": "pdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_61",
+            "label": "Nommage des pièces",
+            "milestone_code": "pdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_62",
+            "label": "Vérifications des contraintes (non cassées)",
+            "milestone_code": "pdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_63",
+            "label": "Vérifier la cinématique (avec et sans pièce client)",
+            "milestone_code": "pdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_64",
+            "label": "Vérifier l'identification des éléments volants / imperdables",
+            "milestone_code": "pdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_65",
+            "label": "Vérifier la faisabilité des pièces (fabrication)",
+            "milestone_code": "pdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_14",
+            "label": "Insérer la plaquette eXcent",
+            "milestone_code": "cdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_17",
+            "label": "Modifications demandées",
+            "milestone_code": "cdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_19",
+            "label": "Création de la liasse dans le dossier",
+            "milestone_code": "fdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_20",
+            "label": "Ajout de l'arborescence sous format excel",
+            "milestone_code": "fdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_21",
+            "label": "Création de la BOM",
+            "milestone_code": "fdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_49",
+            "label": "Vérification des demandes clients liées au livrable",
+            "milestone_code": "fdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          }
+        ]
+      }
+    },
+    {
+      "code": "conception_2d",
+      "label": "Conception 2D",
+      "order": 40,
+      "definition": {
+        "category": "studies",
+        "design": true,
+        "position": 40,
+        "checklist": [
+          {
+            "code": "xpilot_23",
+            "label": "Plans à jour",
+            "milestone_code": "fdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_24",
+            "label": "Vérification cartouche, Tableau de révision/désignation",
+            "milestone_code": "fdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_25",
+            "label": "Ajout dans la liasse",
+            "milestone_code": "fdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_26",
+            "label": "Planche d'ensemble : Plan lisible (vue de coupe, ISO)",
+            "milestone_code": "fdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_68",
+            "label": "Planche d'ensemble : Nomenclature, Bullage",
+            "milestone_code": "fdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_69",
+            "label": "Planche d'ensemble : Tableau couple de visserie (NDC)",
+            "milestone_code": "fdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_70",
+            "label": "Planche de détail : Matière / Cotation / Tolérances",
+            "milestone_code": "fdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_71",
+            "label": "Planche de détail (Soudage) : Plans de débits, NOTA Soudure",
+            "milestone_code": "fdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_72",
+            "label": "Planche de contrôle : Tolérance / Tableau de contrôle",
+            "milestone_code": "fdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_73",
+            "label": "Classification de soudure",
+            "milestone_code": "fdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_82",
+            "label": "Vérifier soudures EXC3+",
+            "milestone_code": "fdr",
+            "is_gate": false,
+            "transverse": true,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_83",
+            "label": "Présence des informations de soudure (tableau...)",
+            "milestone_code": "fdr",
+            "is_gate": false,
+            "transverse": true,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          }
+        ]
+      }
+    },
+    {
+      "code": "calcul",
+      "label": "Calcul",
+      "order": 50,
+      "definition": {
+        "category": "studies",
+        "design": true,
+        "position": 50,
+        "checklist": [
+          {
+            "code": "xpilot_28",
+            "label": "Définition des hypothèses de calcul (cas de charge)",
+            "milestone_code": "pdr",
+            "is_gate": false,
+            "transverse": true,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_29",
+            "label": "Predimensionnement (Simsolid...)",
+            "milestone_code": "pdr",
+            "is_gate": false,
+            "transverse": true,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_30",
+            "label": "Choix des matériaux / coefficients de sécurité",
+            "milestone_code": "pdr",
+            "is_gate": false,
+            "transverse": true,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_31",
+            "label": "Validation par le vérificateur",
+            "milestone_code": "pdr",
+            "is_gate": true,
+            "transverse": true,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_32",
+            "label": "Définir si fait en interne ou externe",
+            "milestone_code": "cdr",
+            "is_gate": false,
+            "transverse": true,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_33",
+            "label": "Rédaction note d'hypothèse pour le service calcul",
+            "milestone_code": "cdr",
+            "is_gate": false,
+            "transverse": true,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_34",
+            "label": "Envoie au service calcul",
+            "milestone_code": "cdr",
+            "is_gate": false,
+            "transverse": true,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_35",
+            "label": "(Si demandé) Modification de la conception",
+            "milestone_code": "cdr",
+            "is_gate": false,
+            "transverse": true,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_36",
+            "label": "(Si demandé) Itération / relance du calcul",
+            "milestone_code": "cdr",
+            "is_gate": false,
+            "transverse": true,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_38",
+            "label": "Vérification cohérence note de calcul / plans",
+            "milestone_code": "fdr",
+            "is_gate": false,
+            "transverse": true,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          }
+        ]
+      }
+    },
+    {
+      "code": "amdec",
+      "label": "AMDEC",
+      "order": 60,
+      "definition": {
+        "category": "studies",
+        "design": true,
+        "position": 60,
+        "checklist": [
+          {
+            "code": "xpilot_42",
+            "label": "Réalisation de l'AMDEC (analyse + cotation + action)",
+            "milestone_code": "fdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          }
+        ]
+      }
+    },
+    {
+      "code": "notice",
+      "label": "Notice",
+      "order": 70,
+      "definition": {
+        "category": "studies",
+        "design": true,
+        "position": 70,
+        "checklist": [
+          {
+            "code": "xpilot_40",
+            "label": "Rédaction de la notice d'utilisation",
+            "milestone_code": "fdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_41",
+            "label": "Rédaction de la notice de montage",
+            "milestone_code": "fdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          }
+        ]
+      }
+    },
+    {
+      "code": "v_and_v",
+      "label": "V and V",
+      "order": 80,
+      "definition": {
+        "category": "fabrication",
+        "design": false,
+        "position": 80,
+        "checklist": [
+          {
+            "code": "xpilot_89",
+            "label": "Effectuer le V & V",
+            "milestone_code": "ciss",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          }
+        ]
+      }
+    },
+    {
+      "code": "formation",
+      "label": "Formation",
+      "order": 90,
+      "definition": {
+        "category": "project_end",
+        "design": false,
+        "position": 90,
+        "checklist": [
+          {
+            "code": "xpilot_43",
+            "label": "Préparation du support de formation",
+            "milestone_code": "tr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_44",
+            "label": "Validation du support par le vérificateur",
+            "milestone_code": "tr",
+            "is_gate": true,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_45",
+            "label": "Animation de la formation (théorique + pratique)",
+            "milestone_code": "tr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          }
+        ]
+      }
+    },
+    {
+      "code": "dossier_fdr",
+      "label": "Dossier FDR",
+      "order": 100,
+      "definition": {
+        "category": "studies",
+        "design": true,
+        "position": 100,
+        "checklist": [
+          {
+            "code": "xpilot_50",
+            "label": "Signature AR",
+            "milestone_code": "fdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_51",
+            "label": "Signature AMDEC",
+            "milestone_code": "fdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_52",
+            "label": "Signature Notice",
+            "milestone_code": "fdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_53",
+            "label": "Signature NDC",
+            "milestone_code": "fdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_54",
+            "label": "Package 3D (STEP : général / pièces unitaires)",
+            "milestone_code": "fdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_55",
+            "label": "Package 2D (IGS - plan de contrôle / PDF / DXF)",
+            "milestone_code": "fdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_56",
+            "label": "Validation 3D client",
+            "milestone_code": "fdr",
+            "is_gate": false,
+            "transverse": false,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          },
+          {
+            "code": "xpilot_84",
+            "label": "Cahier de soudage (Rapport CND / matière / Type de soudure)",
+            "milestone_code": "fdr",
+            "is_gate": false,
+            "transverse": true,
+            "contributes": true,
+            "active": true,
+            "typology_codes": []
+          }
+        ]
+      }
+    },
+    {
+      "code": "acv",
+      "label": "ACV / Écoconception",
+      "order": 110,
+      "definition": {
+        "category": "studies",
+        "design": true,
+        "position": 110,
+        "checklist": []
+      }
+    }
+  ],
+  "typologies": [
+    {
+      "code": "conception",
+      "label": "Conception",
+      "description": "Projet complet avec études, conception, vérification et dossier final.",
+      "order": 10,
+      "type_codes": [
+        "analyse_fonctionnelle",
+        "analyse_risque",
+        "conception_3d",
+        "conception_2d",
+        "calcul",
+        "amdec",
+        "notice",
+        "v_and_v",
+        "formation",
+        "dossier_fdr"
+      ]
+    },
+    {
+      "code": "modification",
+      "label": "Modification",
+      "description": "Évolution d’un équipement existant avec analyse de risque et mise à jour documentaire.",
+      "order": 20,
+      "type_codes": [
+        "analyse_risque",
+        "conception_3d",
+        "conception_2d",
+        "calcul",
+        "notice",
+        "v_and_v",
+        "dossier_fdr"
+      ]
+    },
+    {
+      "code": "duplication",
+      "label": "Duplication",
+      "description": "Reproduction maîtrisée d’un équipement avec contrôles, plans et dossier final.",
+      "order": 30,
+      "type_codes": [
+        "analyse_risque",
+        "conception_2d",
+        "v_and_v",
+        "dossier_fdr"
+      ]
+    }
+  ]
+}

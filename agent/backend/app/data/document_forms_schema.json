@@ -1,0 +1,298 @@
+{
+  "format": "agent-document-sqlite-schema",
+  "tables": {
+    "project_document_draft_versions": {
+      "checks": [
+        "document_id in ('ce_request','customer_satisfaction_fixed_price','customer_satisfaction_product','manufacturing_specification','offer_lt_simple','tdao','tdsp','user_manual')",
+        "length(sha256) = 64 and sha256 not glob '*[^0-9a-f]*'",
+        "revision >= 1"
+      ],
+      "columns": {
+        "actor_id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(120)"
+        },
+        "bindings": {
+          "default": "'{}'",
+          "nullable": false,
+          "type": "JSON"
+        },
+        "created_at": {
+          "default": "",
+          "nullable": false,
+          "type": "DATETIME"
+        },
+        "document_id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(64)"
+        },
+        "draft_id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(36)"
+        },
+        "id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(36)"
+        },
+        "project_id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(36)"
+        },
+        "revision": {
+          "default": "",
+          "nullable": false,
+          "type": "INTEGER"
+        },
+        "sha256": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(64)"
+        },
+        "snapshot": {
+          "default": "",
+          "nullable": false,
+          "type": "TEXT"
+        }
+      },
+      "foreign_keys": [
+        {
+          "columns": [
+            "project_id",
+            "draft_id",
+            "document_id"
+          ],
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION",
+          "table": "project_document_drafts",
+          "targets": [
+            "project_id",
+            "id",
+            "document_id"
+          ]
+        },
+        {
+          "columns": [
+            "project_id"
+          ],
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION",
+          "table": "projects",
+          "targets": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": {
+        "ix_project_document_draft_versions_draft_id": {
+          "columns": [
+            "draft_id"
+          ],
+          "unique": false
+        },
+        "ix_project_document_draft_versions_project_id": {
+          "columns": [
+            "project_id"
+          ],
+          "unique": false
+        }
+      },
+      "primary_key": [
+        "id"
+      ],
+      "unique": [
+        [
+          "draft_id",
+          "revision"
+        ]
+      ]
+    },
+    "project_document_drafts": {
+      "checks": [
+        "document_id in ('ce_request','customer_satisfaction_fixed_price','customer_satisfaction_product','manufacturing_specification','offer_lt_simple','tdao','tdsp','user_manual')",
+        "revision >= 1"
+      ],
+      "columns": {
+        "document_id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(64)"
+        },
+        "id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(36)"
+        },
+        "link_id": {
+          "default": "",
+          "nullable": true,
+          "type": "VARCHAR(36)"
+        },
+        "overrides": {
+          "default": "'{}'",
+          "nullable": false,
+          "type": "JSON"
+        },
+        "project_id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(36)"
+        },
+        "relative_path": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(2048)"
+        },
+        "revision": {
+          "default": "",
+          "nullable": false,
+          "type": "INTEGER"
+        },
+        "updated_at": {
+          "default": "",
+          "nullable": false,
+          "type": "DATETIME"
+        }
+      },
+      "foreign_keys": [
+        {
+          "columns": [
+            "project_id"
+          ],
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION",
+          "table": "projects",
+          "targets": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": {
+        "ix_project_document_drafts_project_id": {
+          "columns": [
+            "project_id"
+          ],
+          "unique": false
+        }
+      },
+      "primary_key": [
+        "id"
+      ],
+      "unique": [
+        [
+          "project_id",
+          "document_id"
+        ],
+        [
+          "project_id",
+          "id",
+          "document_id"
+        ]
+      ]
+    },
+    "project_document_search_states": {
+      "checks": [
+        "id = 'common' and revision >= 1"
+      ],
+      "columns": {
+        "current_version_id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(36)"
+        },
+        "id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(16)"
+        },
+        "revision": {
+          "default": "",
+          "nullable": false,
+          "type": "INTEGER"
+        },
+        "updated_at": {
+          "default": "",
+          "nullable": false,
+          "type": "DATETIME"
+        }
+      },
+      "foreign_keys": [
+        {
+          "columns": [
+            "current_version_id",
+            "revision"
+          ],
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION",
+          "table": "project_document_search_versions",
+          "targets": [
+            "id",
+            "revision"
+          ]
+        }
+      ],
+      "indexes": {},
+      "primary_key": [
+        "id"
+      ],
+      "unique": []
+    },
+    "project_document_search_versions": {
+      "checks": [
+        "length(sha256) = 64 and sha256 not glob '*[^0-9a-f]*'",
+        "revision >= 1"
+      ],
+      "columns": {
+        "actor_id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(120)"
+        },
+        "created_at": {
+          "default": "",
+          "nullable": false,
+          "type": "DATETIME"
+        },
+        "id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(36)"
+        },
+        "revision": {
+          "default": "",
+          "nullable": false,
+          "type": "INTEGER"
+        },
+        "sha256": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(64)"
+        },
+        "snapshot": {
+          "default": "",
+          "nullable": false,
+          "type": "TEXT"
+        }
+      },
+      "foreign_keys": [],
+      "indexes": {},
+      "primary_key": [
+        "id"
+      ],
+      "unique": [
+        [
+          "id",
+          "revision"
+        ],
+        [
+          "revision"
+        ]
+      ]
+    }
+  },
+  "version": 1
+}

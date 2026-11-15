@@ -1,0 +1,55 @@
+import { useEffect, useState } from 'react';
+import { planningApi, type PlanningInfo, type PlanningTemplate, type TemplateInputs, type TemplatePreview, type TemplateVersionDetail } from '../lib/projectPlanning';
+import { Pagination } from './IdentityPickers';
+import { DiffDetails, PlanningValue } from './PlanningChanges';
+import { message, useAlive, useEditorFocus, PlanningRelationPicker } from './PlanningTasksPanel';
+
+type Suggestions=Awaited<ReturnType<typeof planningApi.mappingProposals>>;
+export function PlanningTemplateApplication({projectId,template,version,initial,onCancel,onSaved}:{projectId:string;template:PlanningTemplate;version:TemplateVersionDetail;initial:PlanningInfo;onCancel:()=>void;onSaved:()=>void}) {
+  const [base,setBase]=useState(initial);const [latest,setLatest]=useState<PlanningInfo|null>(null);
+  const [inputs,setInputs]=useState<TemplateInputs>({expected_revision:initial.revision,start_date:'',excluded_dates:[...initial.excluded_dates],milestone_mapping:{},forecast_policy:'fill_empty',update_tasks:false});
+  const [date,setDate]=useState('');const [offset,setOffset]=useState(0);const [current,setCurrent]=useState<Record<string,{id:string;title:string}>>({});
+  const [openMappings,setOpenMappings]=useState<Record<string,boolean>>({});
+  const [suggestions,setSuggestions]=useState<Suggestions|null>(null);const [error,setError]=useState('');const [suggestionError,setSuggestionError]=useState('');const [busy,setBusy]=useState(false);
+  const [preview,setPreview]=useState<TemplatePreview|null>(null);const alive=useAlive();const focus=useEditorFocus();
+  useEffect(()=>{const controller=new AbortController();planningApi.mappingProposals(projectId,controller.signal).then(value=>{if(!controller.signal.aborted)setSuggestions(value);})
+    .catch(e=>{if(!controller.signal.aborted)setSuggestionError(message(e));});return()=>controller.abort();},[projectId]);
+  function change(patch:Partial<TemplateInputs>){setInputs(value=>({...value,...patch}));setPreview(null);setLatest(null);setError('');}
+  function map(code:string,id:string|null,row?:{id:string;title:string}|null){const mapping={...inputs.milestone_mapping};if(id)mapping[code]=id;else delete mapping[code];change({milestone_mapping:mapping});if(row!==undefined||!id)setCurrent(value=>{const next={...value};if(row)next[code]=row;else delete next[code];return next;});}
+  async function calculate(){if(busy||latest)return;setBusy(true);setPreview(null);setError('');try{const result=await planningApi.preview(projectId,version.id,inputs);if(alive.current)setPreview(result);}catch(e){if(alive.current)setError(message(e));}finally{if(alive.current)setBusy(false);}}
+  async function apply(){if(busy||!preview||!base.can_edit)return;setBusy(true);setError('');try{await planningApi.apply(projectId,preview);if(alive.current)onSaved();}catch(e){if(alive.current){setError(message(e));setPreview(null);}}finally{if(alive.current)setBusy(false);}}
+  async function reload(){if(busy)return;setBusy(true);setPreview(null);try{const state=await planningApi.info(projectId);if(alive.current)setLatest(state);}catch(e){if(alive.current)setError(message(e));}finally{if(alive.current)setBusy(false);}}
+  const disabled=busy||!!latest;const page=version.definition.milestones.slice(offset,offset+10);
+  const mappedIds=new Set(Object.values(inputs.milestone_mapping));
+  return <form ref={focus} tabIndex={-1} className="card planning-editor" aria-label="Application du modèle au projet" data-workspace-dirty={base.can_edit?'true':undefined} onSubmit={e=>{e.preventDefault();void calculate();}}>
+    <div className="planning-heading"><div><h3>{template.name} · version {version.number}</h3><p>Préparer les changements du projet · révision {base.revision}</p></div><button type="button" className="button secondary sm" disabled={busy} onClick={onCancel}>Fermer la préparation</button></div>
+    <p className="planning-note">Vérifier les correspondances et les écarts avant application. Les engagements contractuels, réalisations, preuves et tâches manuelles sont conservés. Le modèle ne fixe ni le début/fin du projet ni son budget d’heures.</p>
+    {error&&<p role="alert" className="planning-error">{error} Les paramètres saisis sont conservés ; aucun aperçu précédent ne peut être appliqué.</p>}
+    {latest&&<section className="planning-conflict" aria-label="Révision actuelle du projet"><h4>Planning actuel · révision {latest.revision}</h4><p>Vos dates, correspondances et choix restent conservés. Les exclusions d’un collègue sont reprises si vous n’avez pas modifié le calendrier.</p>
+      <div><strong>Calendrier au début : </strong><PlanningValue value={base.excluded_dates}/><strong>Calendrier actuel : </strong><PlanningValue value={latest.excluded_dates}/></div>
+      <button type="button" className="button secondary" disabled={busy} onClick={()=>{setInputs(value=>({...value,expected_revision:latest.revision,excluded_dates:JSON.stringify(value.excluded_dates)===JSON.stringify(base.excluded_dates)?[...latest.excluded_dates]:value.excluded_dates}));setBase(latest);setLatest(null);setError('');}}>Préparer un nouvel aperçu sur cette révision</button></section>}
+    <div className="planning-form-grid"><label>Début de calcul des prévisions<input className="input" type="date" value={inputs.start_date} disabled={disabled} onChange={e=>change({start_date:e.target.value})}/></label>
+      <label>Politique des dates prévisionnelles<select className="input" value={inputs.forecast_policy} disabled={disabled} onChange={e=>change({forecast_policy:e.target.value as TemplateInputs['forecast_policy']})}><option value="preserve">Conserver les prévisions existantes</option><option value="fill_empty">Compléter seulement les prévisions vides</option><option value="replace">Remplacer les prévisions proposées par cette version</option></select></label></div>
+    <label className="identity-checkbox"><input type="checkbox" checked={inputs.update_tasks} disabled={disabled} onChange={e=>change({update_tasks:e.target.checked})}/>Mettre à jour les tâches actives déjà issues de ce modèle (intitulés, parents, jalons, charges et métiers)</label>
+    <fieldset className="planning-spec"><legend>Calendrier · dates exclues ({inputs.excluded_dates.length})</legend><p>Lundi à vendredi, hors exclusions explicites. Aucun jour férié n’est ajouté automatiquement.</p>
+      <div className="planning-toolbar"><label>Date à exclure<input className="input" type="date" value={date} disabled={disabled} onChange={e=>setDate(e.target.value)}/></label><button type="button" className="button secondary sm" disabled={disabled||!date||inputs.excluded_dates.includes(date)||inputs.excluded_dates.length>=3660} onClick={()=>{change({excluded_dates:[...inputs.excluded_dates,date].sort()});setDate('');}}>Ajouter l’exclusion</button></div>
+      <div className="planning-calendar-list">{inputs.excluded_dates.map(value=><span key={value}><PlanningValue value={value}/><button type="button" className="button secondary sm" disabled={disabled} aria-label={`Retirer l’exclusion ${value} du brouillon`} onClick={()=>change({excluded_dates:inputs.excluded_dates.filter(item=>item!==value)})}>Retirer</button></span>)}</div>
+      {!inputs.excluded_dates.length&&<p>Aucune exclusion.</p>}</fieldset>
+    <section aria-label="Correspondances des jalons"><h4>Correspondances des jalons · {version.definition.milestones.length}</h4><p>Sans correspondance manuelle, le même code est réutilisé ; sinon un jalon est ajouté. Les suggestions historiques attendent votre choix.</p>
+      {suggestionError&&<p role="alert">Suggestions indisponibles : {suggestionError}. Les correspondances manuelles restent accessibles.</p>}
+      <Pagination offset={offset} total={version.definition.milestones.length} limit={10} onChange={setOffset} disabled={busy}/>
+      {page.map(spec=>{const suggestion=suggestions?.items.find(row=>row.suggested_code===spec.code);return <fieldset className="planning-spec" key={spec.code}><legend>{spec.title} · {spec.code}</legend>
+        <details onToggle={e=>{const open=e.currentTarget.open;setOpenMappings(value=>({...value,[spec.code]:open}));}}><summary>Choisir un jalon existant · {current[spec.code]?.title||(inputs.milestone_mapping[spec.code]?'Correspondance conservée':'Correspondance automatique par code')}</summary>
+          {openMappings[spec.code]&&<PlanningRelationPicker projectId={projectId} kind="milestones" label={`Jalon existant pour ${spec.title}`} value={inputs.milestone_mapping[spec.code]||null} current={current[spec.code]} onChange={id=>map(spec.code,id)} onPick={row=>{if(row)setCurrent(value=>({...value,[spec.code]:{id:row.id,title:row.title}}));}} disabled={disabled}/>}</details>
+        {suggestion&&<p>Suggestion à vérifier : {suggestion.title} <button type="button" className="button secondary sm" disabled={disabled||mappedIds.has(suggestion.milestone_id)} onClick={()=>map(spec.code,suggestion.milestone_id,{id:suggestion.milestone_id,title:suggestion.title})}>Choisir la suggestion pour {spec.title}</button></p>}
+        {inputs.milestone_mapping[spec.code]&&!current[spec.code]&&<small>Correspondance conservée.</small>}</fieldset>;})}</section>
+    <div className="planning-actions"><button className="button primary" type="submit" disabled={disabled}>{busy?'Traitement…':'Calculer l’aperçu des changements'}</button><button type="button" className="button secondary" disabled={busy} onClick={()=>void reload()}>Relire la révision du projet</button></div>
+    {preview&&<section className="planning-comparison" aria-label="Aperçu du modèle"><h4>Aperçu · version {version.number} · révision {preview.revision}</h4>
+      <p className="planning-note">Modifier un paramètre retire cet aperçu. L’application vérifiera de nouveau l’état du projet ; un conflit demandera un nouvel aperçu.</p>
+      <p>{preview.milestones.length} jalon(s) et {preview.tasks.length} tâche(s) après application.</p>
+      <p>Version du planning : {preview.changes.template_version_id?.before===preview.changes.template_version_id?.after?'version déjà appliquée':preview.changes.template_version_id?.before?'changement de version':'première application'} · {template.name} v{version.number}. Calendrier : {JSON.stringify(preview.changes.calendar?.before||[])===JSON.stringify(preview.changes.calendar?.after||[])?'inchangé':'exclusions modifiées'}.</p>
+      <details><summary>Calendrier et version appliquée</summary><dl><dt>Exclusions avant</dt><dd><PlanningValue value={preview.changes.calendar?.before||[]}/></dd><dt>Exclusions après</dt><dd><PlanningValue value={preview.changes.calendar?.after||[]}/></dd><dt>Version choisie</dt><dd>{template.name} · v{version.number}</dd></dl></details>
+      <DiffDetails key={preview.preview_sha256} diff={preview.changes}/>
+      {base.can_edit?<button type="button" className="button primary" disabled={busy} onClick={()=>void apply()}>Appliquer cet aperçu au projet</button>:<p>Vous pouvez consulter l’aperçu ; votre rôle ne permet pas de l’appliquer.</p>}</section>}
+  </form>;
+}

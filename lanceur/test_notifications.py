@@ -35,6 +35,32 @@ class NotificationTests(unittest.TestCase):
         self.assertEqual([identity], [row['id'] for row in restarted.snapshot(self.owner)['items']])
         restarted.workspace.shutdown()
 
+    def test_agent_transcription_is_deduplicated_and_follows_project_access(self):
+        project = '11111111-2222-3333-4444-555555555555'
+        event = {'id': 'transcription-a', 'project': project, 'created': time.time()}
+        allowed = {self.owner}
+        self.inbox.agent_transcriptions = lambda owner: (
+            {'projects': [project], 'events': [event]} if owner in allowed else {'projects': [], 'events': []})
+        local = self.publish()
+        first = self.inbox.snapshot(self.owner)
+        notice = first['items'][-1]
+        self.assertEqual(notice['target'], {'kind': 'agent_project', 'project': project})
+        self.assertEqual(notice['type'], 'transcription_ready')
+        self.assertEqual(self.inbox.snapshot(self.owner)['retained_ids'], [local, notice['id']])
+        self.assertEqual(self.inbox.snapshot(self.other)['items'], [])
+        allowed.clear()
+        restricted = self.inbox.snapshot(self.owner)
+        self.assertEqual(restricted['retained_ids'], [local])
+        self.assertEqual(restricted['unread_count'], 1)
+        self.assertNotEqual(first['agent_scope'], restricted['agent_scope'])
+        with self.assertRaises(Denied):
+            self.inbox.action(self.owner, {'action': 'get', 'id': notice['id']})
+        with self.assertRaises(Denied):
+            self.inbox.action(self.owner, {'action': 'read', 'ids': [local, notice['id']]})
+        self.assertEqual(self.inbox.snapshot(self.owner)['read_ids'], [])
+        allowed.add(self.owner)
+        self.assertEqual(self.inbox.snapshot(self.owner)['retained_ids'], [local, notice['id']])
+
     def test_order_uses_durable_sequence_even_if_clock_moves_back(self):
         with self.workspace.db() as db:
             first = publish(db, self.owner, 'document_indexed', 'first', now=time.time())['id']

@@ -1,0 +1,32 @@
+.milestones-panel { display: grid; gap: 18px; }
+.milestones-heading, .milestone-history header, .milestone-candidate header { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.milestones-heading h3, .milestones-heading p, .milestone-candidate p { margin: 0; }
+.milestones-heading p, .milestones-note, .milestone-candidate p, .milestone-proof, .milestone-history small { color: var(--muted, #787b86); font-size: 12px; }
+.milestones-heading p { margin-top: 5px; max-width: 650px; line-height: 1.6; }
+.milestones-note { margin: 0; line-height: 1.6; }
+.milestones-error { border-left: 3px solid #d46262; padding: 12px; background: #d4626215; }
+.milestones-scan { display: grid; gap: 8px; background: var(--surface-muted, #81869b12); border: 1px solid var(--border, #80869b30); border-radius: 12px; padding: 14px; font-size: 12px; }
+.milestones-scan p { margin: 0; }
+.milestones-scan progress { width: 100%; height: 6px; accent-color: var(--accent, #c39436); }
+.milestone-table-scroll { overflow-x: auto; }
+.milestone-dates { min-width: 950px; }
+.milestone-dates caption { caption-side: bottom; text-align: left; font-size: 11px; padding: 10px 0; color: var(--muted, #787b86); }
+.milestone-dates input[type=date] { width: 145px; }
+.milestone-title { min-width: 155px; width: 100%; }
+.milestone-proof { max-width: 175px; margin-top: 5px; }
+.milestone-proof summary, .milestones-scan summary { cursor: pointer; }
+.milestone-proof span { display: block; margin: 6px 0; overflow-wrap: anywhere; }
+.milestone-delay { color: var(--danger, #b03038); font-weight: 600; }
+.milestone-ahead { color: var(--text, inherit); }
+.milestone-history-button { background: none; border: 0; color: var(--muted, #787b86); padding: 6px 0; font-size: 11px; cursor: pointer; display: block; }
+.milestone-history, .milestone-candidate { padding: 16px; border: 1px solid var(--border, #80869b30); border-radius: 12px; background: var(--surface, #81869b08); }
+.milestone-history > div { border-top: 1px solid var(--border, #80869b30); padding: 12px 0; font-size: 12px; }
+.milestone-history small { display: block; margin: 6px 0; }
+.milestone-candidates { display: grid; gap: 12px; }
+.milestone-candidates h4 { margin: 0; }
+.milestone-candidate { display: grid; gap: 10px; }
+.milestone-candidate.conflict { border-left: 3px solid #d26050; }
+.milestones-panel blockquote { margin: 4px 0; padding: 9px 12px; border-left: 2px solid var(--accent, #c39436); background: #80869b0a; font-size: 12px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+.milestone-candidate-actions { display: flex; gap: 8px; align-items: end; flex-wrap: wrap; }
+.milestone-candidate-actions label { display: grid; gap: 5px; font-size: 11px; }
+@media(max-width: 800px) { .milestones-heading { align-items: flex-start; flex-direction: column; } }

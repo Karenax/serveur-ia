@@ -1,0 +1,16 @@
+.tb-panel { padding: 18px; background: var(--md-surface, var(--panel-bg, #fff)); color: var(--md-ink, inherit); border-bottom: 1px solid var(--md-line, #ddd); font-size: 12px; }
+.tb-panel > header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.tb-panel > header > span { font-size: 10px; opacity: .75; }
+.tb-panel .connected { color: var(--state-information); }
+.tb-panel summary { cursor: pointer; padding: 6px 0; }
+.tb-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.tb-folders { max-height: 180px; overflow: auto; margin: 8px 0; }
+.tb-folders label { display: flex; align-items: center; gap: 7px; padding: 5px 0; overflow-wrap: anywhere; }
+.tb-compose { display: grid; gap: 8px; padding-top: 10px; }
+.tb-compose > label { display: grid; gap: 4px; }
+.tb-compose .input { width: 100%; min-width: 0; }
+.tb-compose > div { display: flex; flex-wrap: wrap; gap: 7px; }
+.tb-panel [role="alert"] { color: var(--danger-strong); }
+.tb-panel [role="status"] { color: var(--state-information); }
+.maildesk > .tb-panel { flex: none; max-height: 45%; overflow: auto; }
+@media (max-width: 850px) { .tb-columns { grid-template-columns: 1fr; } }

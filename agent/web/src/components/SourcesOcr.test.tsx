@@ -1,0 +1,32 @@
+import {afterEach,expect,it,vi} from 'vitest';
+import {cleanup,fireEvent,render,screen,waitFor} from '@testing-library/react';
+import {SourcesLibrary} from './SourcesLibrary';
+import {fusionSources,type LibrarySource} from '../lib/fusionSources';
+afterEach(()=>{cleanup();vi.restoreAllMocks();});
+const scan:LibrarySource={id:'scan',source_id:'scan',version_id:'v1',kind:'document',title:'Plan scanné.pdf',project_id:'p1',file_format:'pdf',labels:[],status:'resolved',current:true,date:'2026-10-16',extraction_status:'ocr_required',index_status:'not_indexed'};
+it('montre le travail OCR puis recharge les sources sans masquer la relecture',async()=>{
+  const list=vi.spyOn(fusionSources,'list').mockResolvedValue({items:[scan],total:1,offset:0,limit:25,has_next:false,labels:[]});
+  let finish!:(value:Awaited<ReturnType<typeof fusionSources.ocr>>)=>void;
+  const recognize=vi.spyOn(fusionSources,'ocr').mockReturnValue(new Promise(resolve=>{finish=resolve;}));
+  render(<SourcesLibrary rows={[]} onOpenSource={vi.fn()}/>);
+  await screen.findByRole('button',{name:scan.title});
+  fireEvent.click(screen.getByLabelText('Détails de '+scan.title));
+  fireEvent.click(screen.getByRole('button',{name:'Reconnaître le texte du scan'}));
+  expect(recognize).toHaveBeenCalledWith('scan');
+  expect(screen.getByText('Reconnaissance de Plan scanné.pdf en cours…')).toBeTruthy();
+  expect(screen.getByRole('button',{name:'Reconnaître le texte du scan'})).toHaveProperty('disabled',true);
+  list.mockResolvedValue({items:[{...scan,id:'ocr1',source_id:'ocr1',extraction_status:'ocr_extracted'}],total:1,offset:0,limit:25,has_next:false,labels:[]});
+  finish({source_id:'ocr1',recognized_pages:2,empty_pages:0,extraction_status:'ocr_extracted',current:true});
+  await screen.findByText(/2 page\(s\) reconnue\(s\)/);
+  await waitFor(()=>expect(screen.queryByText('Reconnaissance de Plan scanné.pdf en cours…')).toBeNull());
+  await screen.findByText('Texte OCR · relecture nécessaire · Non indexée');
+});
+it('garde l’original et affiche un échec OCR sans succès inventé',async()=>{
+  vi.spyOn(fusionSources,'list').mockResolvedValue({items:[scan],total:1,offset:0,limit:25,has_next:false,labels:[]});
+  vi.spyOn(fusionSources,'ocr').mockRejectedValue(new Error('OCR indisponible'));
+  render(<SourcesLibrary rows={[]} onOpenSource={vi.fn()}/>);
+  await screen.findByRole('button',{name:scan.title});fireEvent.click(screen.getByLabelText('Détails de '+scan.title));
+  fireEvent.click(screen.getByRole('button',{name:'Reconnaître le texte du scan'}));
+  expect(await screen.findByRole('alert')).toHaveProperty('textContent','OCR indisponible');
+  expect(screen.getByRole('link',{name:'Ouvrir l’original : '+scan.title})).toBeTruthy();
+});

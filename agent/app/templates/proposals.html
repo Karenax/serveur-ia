@@ -1,0 +1,34 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Validation</title><script>
+const nativeFetch = window.fetch.bind(window);
+let agentSession;
+window.fetch = async (url, init = {}) => {
+  const method = (init.method || 'GET').toUpperCase();
+  if (!['GET', 'HEAD'].includes(method)) {
+    agentSession ||= nativeFetch('/api/v1/session').then(r => r.json());
+    const {token} = await agentSession;
+    init.headers = {...init.headers, 'X-Agent-Token': token};
+  }
+  const response = await nativeFetch(url, init);
+  if (!response.ok) {
+    if (response.status === 403) agentSession = undefined;
+    const data = await response.clone().json().catch(() => ({}));
+    const message = typeof data.detail === 'string' ? data.detail : data.detail?.message || 'Échec de la requête';
+    alert(message);
+    const error = new Error(message); error.detail = data.detail; throw error;
+  }
+  return response;
+};
+</script></head><body>
+<nav><a href="/ui">Accueil</a><a href="/ui/pending">Résolution projet</a><a href="/ui/proposals">À examiner</a><a href="/ui/settings">Paramètres</a></nav><h1>Informations à examiner</h1>
+<p>Les informations des sources rattachées à un projet sont retenues comme vraies par défaut. Consultez la rubrique Connaissance d’Agent pour les déclasser ou les rétablir. Cette liste conserve les exceptions à examiner.</p>
+{% for r in rows %}<div style="border:1px solid #ccc;margin:1rem 0;padding:1rem">
+<b>[{{r.kind}}]</b> {{r.subject}} <i>(conf {{r.confidence}})</i><br>{{r.value}}<br>
+<small>projet={{r.project_id}} source={{r.source_id}}</small><br>
+{% if r.source_id %}<a href="/v1/sources/{{r.source_id}}" target="_blank">Texte source complet et provenance</a> · <a href="/v1/sources/{{r.source_id}}/raw">Original</a><br>{% endif %}
+<button onclick="dec('{{r.id}}','accept')">Accepter</button>
+<button onclick="dec('{{r.id}}','reject')">Rejeter</button>
+</div>{% else %}<p>Rien à valider.</p>{% endfor %}
+<nav>{% if offset > 0 %}<a href="?offset={{ [0, offset - 200]|max }}">Précédentes</a>{% endif %}
+{% if rows|length == 200 %}<a href="?offset={{ offset + 200 }}">Suivantes</a>{% endif %}</nav>
+<script>async function dec(id,a){try {await fetch(`/v1/proposals/${id}/${a}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({actor:'ui'})});location.reload()} catch(error) { if(a === 'accept' && error.detail?.knowledge_ids?.length === 1 && confirm('Remplacer explicitement la connaissance validée précédente par cette proposition ?')) { await fetch(`/v1/proposals/${id}/accept`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({actor:'ui',supersedes_id:error.detail.knowledge_ids[0]})});location.reload(); } }}</script>
+</body></html>

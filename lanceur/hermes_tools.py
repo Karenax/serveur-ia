@@ -6,6 +6,7 @@ server-created mapping; a profile may have only one active run at a time.
 from __future__ import annotations
 
 import ast
+import hashlib
 import http.client
 import json
 import math
@@ -16,6 +17,7 @@ import threading
 import time
 
 from workspace import Denied, identifier, text
+from kiara_shared.history_store import is_agent_project_id
 from hermes_web import arguments_for as native_web_arguments, public_url as native_public_url
 
 
@@ -109,6 +111,16 @@ class FredTools:
         if self.workspace.maintenance or not self.authorized(owner, context):
             raise Denied('Accès suspendu, révoqué ou conversation inactive.')
         project, document = context.get('project_id'), context.get('document_id')
+        if is_agent_project_id(project):
+            if document:
+                raise Denied('Choisissez les documents de ce projet dans Agent.')
+            if self.workspace.agent_catalogue is None:
+                raise Denied('Catalogue Agent indisponible.')
+            catalogue = self.workspace.agent_catalogue(owner)
+            p = next((row for row in catalogue['projects'] if row['id'] == project), None)
+            if not p or p.get('archived'):
+                raise Denied('Projet Agent indisponible pour cet outil.')
+            return
         with self.workspace.db() as db:
             if project:
                 p = self.workspace.own(db, 'projects', project, owner)
@@ -129,15 +141,19 @@ class FredTools:
         # A bounded catalogue is copied by the caller when publishing final results.
         with self.sources_lock:
             retained = context.setdefault('sources', [])
-            seen = {s.get('source_id') or s.get('url') for s in retained}
+            seen = {s.get('agent_source_id') or s.get('source_id') or s.get('url') for s in retained}
             for source in sources:
-                key = source.get('source_id') or source.get('url')
+                key = source.get('agent_source_id') or source.get('source_id') or source.get('url')
                 if source.get('origin') == 'hermes-web' and source.get('text') and key in seen:
                     previous = next((s for s in retained if not s.get('source_id') and s.get('url') == key), None)
                     if previous is not None and (source.get('retrieved') or not previous.get('retrieved')):
                         previous.update({**source, 'title': source.get('title') or previous.get('title', '')})
                 if key and key not in seen and len(retained) < 40:
-                    retained.append(source.copy()); seen.add(key)
+                    published = source.copy()
+                    if published.get('agent_source_id') and published.get('source_id'):
+                        published.pop('source_id')
+                    retained.append(published)
+                    seen.add(key)
 
     def _check_web(self, owner, context):
         self._check(owner, context)
@@ -213,6 +229,31 @@ class FredTools:
     def _call(self, owner, context, name, arguments):
         project, document = context.get('project_id'), context.get('document_id')
         w = self.workspace
+        if is_agent_project_id(project) and name == 'fred_workspace_info':
+            catalogue = w.agent_catalogue(owner)
+            p = next((row for row in catalogue['projects'] if row['id'] == project), None)
+            if not p or p.get('archived'):
+                raise Denied('Projet Agent indisponible pour cet outil.')
+            return {'project': {key: p[key] for key in ('id', 'title')}, 'documents': []}
+        if is_agent_project_id(project) and name in ('fred_document_search', 'fred_knowledge_search', 'fred_source_get'):
+            if name == 'fred_source_get':
+                source = next((row for row in context.get('agent_tool_sources', {}).values()
+                               if row.get('source_id') == arguments.get('source_id')
+                               and row.get('agent_project_id') == project), None)
+                if source is None:
+                    raise Denied('Source absente des résultats de cette conversation.')
+                return {'sources': [source]}
+            action = 'search' if name == 'fred_document_search' else 'knowledge_search'
+            result = w.action(owner, {'action': action, 'project': project, 'query': arguments.get('query')})
+            sources = result['sources']
+            for source in sources:
+                source['source_id'] = hashlib.sha256(json.dumps(source, sort_keys=True).encode()).hexdigest()
+            with self.sources_lock:
+                retained = context.setdefault('agent_tool_sources', {})
+                for source in sources:
+                    if len(retained) < 40:
+                        retained[source['source_id']] = source
+            return {'sources': sources, 'empty': not sources}
         if name == 'fred_assistant':
             from assistant_commands import execute, digest
             # The model cannot select a different owner/project or invent a request identity.

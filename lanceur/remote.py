@@ -25,11 +25,13 @@ from voice_web_plan import plan as plan_voice_web
 from voice_response import configure as configure_oral_response, respond as stream_oral_response, INSTRUCTION as ORAL_PROTOCOL
 from accounts import Accounts
 from operations import VERSION
+from kiara_shared.releases import DESKTOP_DOWNLOAD, DESKTOP_RELEASE
 from workspace import Workspace, Conflict, Denied, IDENTITY_INSTRUCTIONS
 from urllib.parse import urlsplit
 from core import HOME, ROOT, PYTHON as PYTHON, HIDDEN as HIDDEN, context_capacity, read_json, write_json, health
 
 GATEWAY_PORT = 8766
+AGENT_INFERENCE_IDENTITY = 'kiara-internal-agent-inference'
 
 class GatewayHTTPServer(BoundedHTTPServer):
     def server_close(self):
@@ -57,17 +59,22 @@ class AccessStore:
         self.path = home / 'acces-distants.json'
         self.lock = threading.RLock()
         self.active = 0
+        self.agent_active = 0
         from gateway_embeddings import EmbeddingQueue
         self.embedding_queue = EmbeddingQueue()
         self.maintenance = False
         self.on_access_changed = None
         self.storage = None
         self.hermes = None
+        self.agent_bridge = None
+        self.agent_inference_token = None
         self.scheduler = Scheduler()
         self.text_transforms = TextTransforms()
         self.voice_web = VoiceWeb(self)
         self.accounts = Accounts(home)
         self.workspace = Workspace(home)
+        from agent_gateway import project_context
+        self.workspace.agent_context = lambda owner, project, query: project_context(self, owner, project, query)
         self.workspace.access_lock=self.lock
         from voice import VoiceService
         self.voice = VoiceService(home)
@@ -210,7 +217,7 @@ class AccessStore:
             records = data.get('clients',[]) + [{**row,'deleted':True} for row in data.get('deleted_clients',[])]
         return self.usage.summary(records,period)
 
-    def valid_owner(self, identity):
+    def valid_owner(self, identity, *, credential_hash=None):
         with self.lock:
             if self.maintenance: return False
             data = read_json(self.path, {})
@@ -218,7 +225,11 @@ class AccessStore:
             try:
                 if self.revocations.contains(identity): return False
             except (ValueError, OSError): return False
-            return any(c['id'] == identity and not c['revoked'] and not c.get('suspended') and (not c.get('expires_epoch') or c['expires_epoch'] > time.time()) for c in data.get('clients', []))
+            return any(c['id'] == identity and not c['revoked'] and not c.get('suspended')
+                       and not c.get('hermes_pending')
+                       and (not c.get('expires_epoch') or c['expires_epoch'] > time.time())
+                       and (credential_hash is None or hmac.compare_digest(c['hash'], credential_hash))
+                       for c in data.get('clients', []))
 
     def set_peer(self, identity, public_key, address):
         with self.lock:
@@ -260,12 +271,10 @@ class AccessStore:
             raise ValueError('Configurer WireGuard avant de générer un client.')
         if profile_factory is None:
             raise ValueError('Le client nécessite son profil WireGuard personnel.')
-        source = ROOT / 'client-qwen/dist/Accès serveur Fred.exe'
-        if not source.exists():
-            raise ValueError('Le client Windows doit d’abord être compilé.')
-        from releases import status
+        from releases import release_binary, status
         release=status(self.home)
         if not release['verified']:raise ValueError('La version cliente doit être signée et vérifiée avant distribution.')
+        source = release_binary(release['release'])
         access = self.issue(name,resume=resume)
         directory = self.home / 'clients'
         directory.mkdir(parents=True, exist_ok=True)
@@ -275,7 +284,7 @@ class AccessStore:
         try:
             from signing import public
             from profiles import match
-            values={**profile_factory(access), 'version':VERSION, 'protocol':3, 'update_public_key':public(self.home),'client_name':access['name']}
+            values={**profile_factory(access), 'version':release['release']['version'], 'protocol':3, 'update_public_key':public(self.home),'client_name':access['name']}
             record=next(c for c in read_json(self.path)['clients'] if c['id']==access['id'])
             match(record,values)
             profile=json.dumps(values,ensure_ascii=False).encode()
@@ -368,6 +377,10 @@ class AccessStore:
     def authenticate(self, token):
         if not isinstance(token, str) or not 20 <= len(token) <= 256:
             return None
+        with self.lock:
+            service_token = self.agent_inference_token
+            if not self.maintenance and service_token and hmac.compare_digest(token, service_token):
+                return AGENT_INFERENCE_IDENTITY
         digest = hashlib.sha256(token.encode()).hexdigest()
         with self.lock:
             data = read_json(self.path)
@@ -426,13 +439,45 @@ def chat_request(value, model):
     if 'reasoning_effort' in template:template['reasoning_effort']=normalize_reasoning(template['reasoning_effort'])
     return value
 
-def serve_gateway(store, backend, port=GATEWAY_PORT):
+def serve_gateway(store, backend, port=GATEWAY_PORT, *, agent_web_origin=None, browser_only=False):
     """backend returns (loopback port, model alias, private upstream API key)."""
     scheduler = store.scheduler
     from hermes_models import ModelUnavailable
     def valid_owner(owner):
         return store.valid_owner(owner)
-    class Handler(BaseHTTPRequestHandler):
+    web_handler = BaseHTTPRequestHandler
+    if agent_web_origin:
+        from agent_web import agent_web_handler
+        web_handler = agent_web_handler(store, agent_web_origin, '' if browser_only else '/agent')
+
+    class Handler(web_handler):
+        def agent_web_request(self):
+            if getattr(self, '_browser_access', None):
+                return False
+            path = urlsplit(self.path).path
+            return agent_web_origin and (browser_only or path == '/agent' or path.startswith('/agent/'))
+
+        def browser_conversation(self, path, identity, active):
+            bridge = store.agent_bridge
+            operator = bridge.operator_for(identity) if bridge else None
+            if operator is None:
+                return self.respond(403, {'error': {'message': 'Accès Kiara refusé.'}})
+            self._browser_access = lambda: (active() and store.agent_bridge is bridge
+                                            and bridge.operator_for(identity) == operator)
+            self.identity = identity
+            self.session = ''
+            self.internal_agent = False
+            self.path = path
+            return self.do_GET() if self.command == 'GET' else self.do_POST()
+
+        def access_valid(self):
+            browser = getattr(self, '_browser_access', None)
+            return browser() if browser else store.authenticate(self.access_token) == self.identity
+
+        def do_HEAD(self):
+            if self.agent_web_request():
+                return super().dispatch()
+            self.send_error(501)
         def setup(self):
             super().setup()
             self.connection.settimeout(30)
@@ -455,6 +500,11 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
             if store.maintenance:
                 self.respond(503, {'error': {'code':'maintenance','message':'Serveur en maintenance : réessayer après la restauration.'}})
                 return False
+            if getattr(self, '_browser_access', None):
+                if self.access_valid():
+                    return True
+                self.respond(403, {'error': {'message': 'Accès Kiara refusé.'}})
+                return False
             # Native client; arbitrary browser pages cannot submit authenticated commands.
             if self.headers.get('Origin'):
                 self.respond(403, {'error': {'message': 'Utiliser le client Windows ou un client API.'}})
@@ -465,12 +515,34 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 code,message=store.denial(key[7:] if key.startswith('Bearer ') else '')
                 self.respond(401, {'error': {'code':code,'message':message}})
                 return False
+            if identity == AGENT_INFERENCE_IDENTITY and self.path not in (
+                    '/v1/models', '/v1/chat/completions', '/v1/embeddings'):
+                self.respond(403, {'error': {'message': 'Route interdite à ce service.'}})
+                return False
             self.session = self.headers.get('X-Qwen-Session','')
             self.identity = identity
+            self.internal_agent = identity == AGENT_INFERENCE_IDENTITY
             self.access_token = key[7:]
             return True
 
+        def business_write(self):
+            if self.agent_web_request():
+                return super().dispatch()
+            if urlsplit(self.path).path.startswith('/v1/business/'):
+                from agent_gateway import handle
+                return handle(self, store)
+            return self.respond(404, {'error': {'message': 'Route non disponible.'}})
+
+        do_PUT = business_write
+        do_PATCH = business_write
+        do_DELETE = business_write
+
         def do_GET(self):
+            if self.agent_web_request():
+                return super().dispatch()
+            if urlsplit(self.path).path.startswith('/v1/business/') and self.path not in (DESKTOP_RELEASE, DESKTOP_DOWNLOAD):
+                from agent_gateway import handle
+                return handle(self, store)
             if urlsplit(self.path).path == '/v1/client/codex/models':
                 if not self.authorized():return
                 from urllib.parse import parse_qs
@@ -479,7 +551,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 try:
                     from codex_assets import catalogue as codex_catalogue
                     value=codex_catalogue(context_capacity(health('127.0.0.1', backend()[0])))
-                    if store.authenticate(self.access_token)!=self.identity:return self.respond(403,{'error':{'message':'Accès désactivé.'}})
+                    if not self.access_valid():return self.respond(403,{'error':{'message':'Accès désactivé.'}})
                     return self.respond(200,value)
                 except (OSError,ValueError):return self.respond(503,{'error':{'message':'Catalogue Qwen indisponible.'}})
             if self.path == '/v1/client/codex':
@@ -487,7 +559,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 from codex_assets import payload as codex_payload
                 try:
                     value=codex_payload(store.home, context_capacity(health('127.0.0.1', backend()[0])))
-                    if store.authenticate(self.access_token)!=self.identity:return self.respond(403,{'error':{'message':'Accès désactivé.'}})
+                    if not self.access_valid():return self.respond(403,{'error':{'message':'Accès désactivé.'}})
                     return self.respond(200,value)
                 except (OSError,ValueError):return self.respond(503,{'error':{'message':'Les fichiers Codex sont indisponibles. Réessayez plus tard.'}})
             if self.path == '/v1/agent/state':
@@ -511,7 +583,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                     self.send_header('Connection', 'close')
                     self.end_headers()
                     while chunk := stream.read(65536):
-                        if store.authenticate(self.access_token) != self.identity: return
+                        if not self.access_valid(): return
                         self.wfile.write(chunk)
                 return
             if self.path == '/v1/voice/status':
@@ -538,14 +610,14 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                     self.send_header('Connection', 'close')
                     self.end_headers()
                     while block := stream.read(256*1024):
-                        if store.authenticate(self.access_token) != self.identity:return
+                        if not self.access_valid():return
                         self.wfile.write(block)
                 return
             if self.path == '/v1/notifications':
                 if not self.authorized(): return
                 try:
                     with store.lock:
-                        if store.authenticate(self.access_token) != self.identity: raise Denied('Accès désactivé.')
+                        if not self.access_valid(): raise Denied('Accès désactivé.')
                         result = store.notifications.snapshot(self.identity)
                     return self.respond(200, result)
                 except Denied as error: return self.respond(403, {'error': {'message': str(error)}})
@@ -556,15 +628,48 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
             if self.path=='/v1/workspace':
                 if not self.authorized():return
                 return self.respond(200,store.workspace.snapshot(self.identity))
+            if self.path in ('/v1/client/kiara4/release', '/v1/client/kiara4/download', DESKTOP_RELEASE, DESKTOP_DOWNLOAD):
+                if not self.authorized(): return
+                from releases import DESKTOP_INSTALLER, WINDOWS_INSTALLER, windows_installer
+                desktop = self.path in (DESKTOP_RELEASE, DESKTOP_DOWNLOAD)
+                if self.path.endswith('/release'):
+                    try:
+                        release, _ = windows_installer(store.home, desktop=desktop)
+                        return self.respond(200, release)
+                    except ValueError as error:
+                        return self.respond(503, {'error': {'message': str(error)}})
+                try:
+                    filename = DESKTOP_INSTALLER if desktop else WINDOWS_INSTALLER
+                    stream = (store.home / 'installateurs' / filename).open('rb')
+                except OSError:
+                    return self.respond(503, {'error': {'message': 'Installateur Kiara 4 indisponible.'}})
+                with stream:
+                    try:
+                        release, _ = windows_installer(store.home, stream=stream, desktop=desktop)
+                    except ValueError as error:
+                        return self.respond(503, {'error': {'message': str(error)}})
+                    self.send_response(200)
+                    self.send_header('Content-Type', 'application/octet-stream')
+                    self.send_header('Content-Length', str(release['bytes']))
+                    self.send_header('Cache-Control', 'no-store')
+                    self.send_header('X-Content-Type-Options', 'nosniff')
+                    self.end_headers()
+                    try:
+                        while chunk := stream.read(256 * 1024):
+                            if not self.access_valid(): return
+                            self.wfile.write(chunk)
+                    except (ConnectionError, TimeoutError):
+                        return
+                return
             if self.path in ('/v1/client/release','/v1/client/download'):
                 if not self.authorized():return
-                from releases import status
+                from releases import release_binary, status
                 release=status(store.home)
                 if not release['verified']:return self.respond(503, {'error':{'message':'Version serveur absente ou invalide.'}})
                 if self.path.endswith('/release'):
                     record=next((c for c in store.metadata()['clients'] if c['id']==self.identity),{})
                     return self.respond(200,{**release['release'],'client_name':record.get('name','Client')})
-                source=ROOT/'client-qwen/dist/Accès serveur Fred.exe'
+                source=release_binary(release['release'])
                 self.send_response(200);self.send_header('Content-Type','application/octet-stream');self.send_header('Content-Length',str(source.stat().st_size));self.send_header('Cache-Control','no-store');self.end_headers()
                 with source.open('rb') as stream:shutil.copyfileobj(stream,self.wfile)
                 return
@@ -578,10 +683,10 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 return self.respond(404, {'error': {'message': 'Route non disponible.'}})
             if not self.authorized():
                 return
-            if store.hermes and hasattr(store.hermes, 'model_catalog'):
+            if not self.internal_agent and store.hermes and hasattr(store.hermes, 'model_catalog'):
                 try:
                     catalog = store.hermes.model_catalog(self.identity)
-                    if store.authenticate(self.access_token) != self.identity:
+                    if not self.access_valid():
                         raise Denied('Accès désactivé.')
                     from public_embeddings import catalogue
                     engine=getattr(getattr(store.workspace,'knowledge',None),'engine',None)
@@ -593,18 +698,25 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
             upstream_port, model, _ = backend()
             live = health('127.0.0.1', upstream_port)
             from public_embeddings import catalogue
-            extra=catalogue(getattr(getattr(store.workspace,'knowledge',None),'engine',None))
+            extra=[] if self.internal_agent else catalogue(getattr(getattr(store.workspace,'knowledge',None),'engine',None))
             if not live.get('loaded'):
                 if extra:return self.respond(200,{'object':'list','data':extra})
                 return self.respond(503, {'error': {'code':'model_unloaded', 'message': 'Serveur connecté, mais le modèle n’est pas chargé. Le lancer dans la console serveur.'}})
             live_model=live.get('model')
             if isinstance(live_model,str) and live_model:model=live_model
+            if self.internal_agent:
+                model = 'fred-qwen'
             model_caps=capabilities(live)
             context=context_capacity(live)
             if context is not None:model_caps['context_length']=context
             self.respond(200, {'object': 'list', 'data': [{'id': model, 'object': 'model', 'owned_by': 'local', 'capabilities': model_caps}]+extra})
 
         def do_POST(self):
+            if self.agent_web_request():
+                return super().dispatch()
+            if urlsplit(self.path).path.startswith('/v1/business/'):
+                from agent_gateway import handle
+                return handle(self, store)
             if self.path == '/v1/responses':
                 from gateway_responses import handle as responses
                 return responses(self, store, backend)
@@ -646,10 +758,14 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 return self.respond(415, {'error': {'message': 'Corps JSON attendu.'}})
             try:
                 raw = json_body(self, 10 * 1024 * 1024)
+                if self.internal_agent and any(field in raw for field in (
+                        'project_id', 'document_id', 'assistant_id', 'conversation_id', 'turn_id',
+                        'text_transform', 'voice_conversation', 'voice_realtime')):
+                    raise ValueError('Paramètre de conversation Kiara interdit au service Agent.')
                 upstream_port, model, key = backend()
                 conversation=raw.pop('conversation_id',None)
                 turn=raw.pop('turn_id',None)
-                external_api = bool(store.hermes) and self.path=='/v1/chat/completions' and conversation is None and turn is None
+                external_api = (bool(store.hermes) or self.internal_agent) and self.path=='/v1/chat/completions' and conversation is None and turn is None
                 raw.pop('history_revision',None)
                 if isinstance(raw.get('messages'),list):
                     for message in raw['messages']:
@@ -667,7 +783,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                     raise ValueError('Identité de conversation vocale invalide.')
                 if text_transform and self.path!='/v1/chat/completions':raise ValueError('Transformation réservée à la route de génération.')
                 selection = None
-                if not text_transform and not voice_conversation and store.hermes and hasattr(store.hermes, 'select_model'):
+                if not self.internal_agent and not text_transform and not voice_conversation and store.hermes and hasattr(store.hermes, 'select_model'):
                     selection = store.hermes.select_model(self.identity, raw.get('model'))
                 data = chat_request(transform_request(raw) if text_transform else raw, selection['id'] if selection else model);sources=[]
                 if external_api:
@@ -696,7 +812,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 if direct_request and store.text_transforms.cancelled(self.identity,direct_request):raise ValueError('Demande annulée.')
                 if not external_api and not text_transform and (voice_conversation or not (store.hermes and self.path=='/v1/chat/completions')) and (project or document or getattr(store.workspace,'knowledge',None)):
                     data['messages'],sources=store.workspace.context(self.identity,data['messages'],project,document,**({'voice_conversation':conversation} if voice_conversation else {}))
-                if not store.hermes and not text_transform and not voice_conversation:
+                if not store.hermes and not self.internal_agent and not text_transform and not voice_conversation:
                     if not any(m['role']=='system' and IDENTITY_INSTRUCTIONS in m['content'] for m in data['messages']):
                         data['messages'].insert(0,{'role':'system','content':IDENTITY_INSTRUCTIONS})
             except Denied as error:
@@ -737,7 +853,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                                  for m in data['messages'])
                 capacity = selection.get('capabilities', {}).get('context_length')
                 if type(capacity) is not int or capacity <= 0: capacity = None
-                if store.authenticate(self.access_token) != self.identity:
+                if not self.access_valid():
                     return self.respond(403, {'error': {'message': 'Accès désactivé.'}})
                 return self.respond(200, {'tokens': (characters + 2) // 3 + 6 * len(data['messages']),
                                          'capacity': capacity, 'estimated': True, 'model': data['model'],
@@ -751,7 +867,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                     stream=store.hermes.stream(self.identity,data,request,conversation,project,document)
                     answer=[];reasoning=[];final_sources=[]
                     for block in stream:
-                        if store.authenticate(self.access_token)!=self.identity:raise Denied('Accès désactivé.')
+                        if not self.access_valid():raise Denied('Accès désactivé.')
                         if data.get('stream'):
                             if not sent:
                                 self.send_response(200);self.send_header('Content-Type','text/event-stream');self.send_header('Cache-Control','no-store');self.send_header('Connection','close');self.end_headers();sent=True
@@ -814,6 +930,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
             except ValueError as error:
                 return self.respond(429, {'error': {'message': str(error)}})
             connection = None
+            response = None
             headers_sent = False
             active_registered = False
             try:
@@ -821,7 +938,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 # suspension/revocation. Commit the first private response only
                 # while that access is still valid, serialized with revocation.
                 with store.lock:
-                    if item['cancelled'] or store.authenticate(self.access_token) != self.identity:
+                    if item['cancelled'] or not self.access_valid():
                         raise Denied('Demande annulée ou accès désactivé.')
                     store.active += 1
                     active_registered = True
@@ -843,7 +960,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                         frame=': qwen-keepalive\n\n' if position is None else ': qwen-queue '+json.dumps({'position': position})+'\n\n'
                         self.wfile.write(frame.encode())
                         self.wfile.flush()
-                request_valid = lambda: not item['cancelled'] and store.authenticate(self.access_token)==self.identity and (not web_query or store.voice_web.permitted(self.identity))
+                request_valid = lambda: not item['cancelled'] and self.access_valid() and (not web_query or store.voice_web.permitted(self.identity))
                 scheduler.wait(item, request_valid, heartbeat)
                 heartbeat(0)
                 if voice_realtime:
@@ -891,7 +1008,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                     def web_valid():
                         nonlocal last_web_heartbeat
                         if (item['cancelled'] or store.text_transforms.cancelled(self.identity,item['id'])
-                                or store.authenticate(self.access_token)!=self.identity):
+                                or not self.access_valid()):
                             return False
                         if not store.voice_web.permitted(self.identity):return False
                         if time.monotonic()-last_web_heartbeat>=5:
@@ -916,7 +1033,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                 store.audit('inference_started', self.identity)
                 if not local:
                     from external_api import complete, response_body
-                    valid=lambda: not item['cancelled'] and store.authenticate(self.access_token)==self.identity and store.hermes.models.valid(self.identity,selection)
+                    valid=lambda: not item['cancelled'] and self.access_valid() and store.hermes.models.valid(self.identity,selection)
                     result=complete(store.hermes.models,self.identity,selection,data,valid,
                                     heartbeat=lambda:heartbeat(0))
                     payload=response_body(result,data.get('stream',False))
@@ -941,7 +1058,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                         if not request_valid():
                             raise Denied('Demande annulée ou accès désactivé.')
                     connection = http.client.HTTPConnection('127.0.0.1', upstream_port, timeout=120)
-                    if text_transform or voice_conversation:
+                    if text_transform or voice_conversation or (self.internal_agent and data.get('stream')):
                         connection.response_class=lambda *args,**kwargs:CancellableResponse(*args,valid=request_valid,heartbeat=heartbeat if headers_sent else None,**kwargs)
                     connection.request('POST', '/v1/chat/completions', json.dumps(data).encode(), headers)
                     upstream_socket = connection.sock
@@ -1025,22 +1142,28 @@ def serve_gateway(store, backend, port=GATEWAY_PORT):
                         self.wfile.flush()
                     except OSError: pass
                 if not headers_sent:
-                    if store.authenticate(self.access_token) != self.identity:
-                        code, message = store.denial(self.access_token)
+                    if not self.access_valid():
+                        code, message = store.denial(getattr(self, 'access_token', ''))
                         self.respond(503 if code == 'maintenance' else 401, {'error': {'code': code, 'message': message}})
                     else:
                         self.respond(503, {'error': {'message': 'Le modèle local est indisponible ou ne répond pas.'}})
             finally:
-                if connection:
-                    connection.close()
-                if active_registered:
-                    with store.lock:
-                        store.active -= 1
-                scheduler.finish(item)
-    server = GatewayHTTPServer(('127.0.0.1', port), Handler)
-    server.workspace=store.workspace
-    server.voice=store.voice
-    server.voice_max=store.voice_max
-    store.workspace.start(valid_owner)
+                try:
+                    if response is not None:
+                        response.close()
+                finally:
+                    if connection:
+                        connection.close()
+                    if active_registered:
+                        with store.lock:
+                            store.active -= 1
+                    scheduler.finish(item)
+    server_class = BoundedHTTPServer if browser_only else GatewayHTTPServer
+    server = server_class(('127.0.0.1', port), Handler)
+    if not browser_only:
+        server.workspace=store.workspace
+        server.voice=store.voice
+        server.voice_max=store.voice_max
+        store.workspace.start(valid_owner)
     server.daemon_threads = True
     return server

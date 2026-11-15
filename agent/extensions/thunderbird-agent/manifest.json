@@ -1,0 +1,11 @@
+{
+  "manifest_version": 2,
+  "name": "Agent — liaison Thunderbird",
+  "version": "0.3.1",
+  "description": "Synchronise les mails choisis avec Agent local et prépare les brouillons demandés dans Agent.",
+  "browser_specific_settings": { "gecko": { "id": "agent-bridge@agent.local", "strict_min_version": "153.0" } },
+  "permissions": ["accountsRead", "messagesRead", "compose", "compose.save", "messages.save", "storage", "alarms", "http://127.0.0.1:8001/*", "http://127.0.0.1:17841/*"],
+  "background": { "scripts": ["core.js", "background.js"] },
+  "browser_action": { "default_title": "Agent — synchroniser les dossiers choisis" },
+  "options_ui": { "page": "options.html", "open_in_tab": true }
+}

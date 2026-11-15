@@ -6,6 +6,7 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import Mock,patch
 from eg2_runtime import configuration,ModelRuntime
+from embeddings import EmbeddingService
 
 
 class CudaOOM(RuntimeError):pass
@@ -52,6 +53,15 @@ class RuntimeTests(unittest.TestCase):
         self.assertEqual(self.model.encode.call_count,2);self.assertEqual(runtime.device,'cpu')
         self.assertEqual(len(result[0]),768);self.assertIn('repris',runtime.fallback_reason)
 
+    def test_oom_retries_a_smaller_batch_on_gpu_before_cpu(self):
+        vectors = [[1.0] + [0.0] * 767] * 2
+        self.model.encode.side_effect = [CudaOOM('full'), vectors]
+        with patch('eg2_runtime.gpu_free_mib', return_value=3853):
+            runtime = self.gpu()
+            self.assertEqual(runtime.encode(['a', 'b'], batch_size=4), vectors)
+        self.assertEqual(runtime.device, 'cuda:0')
+        self.assertEqual(self.model.encode.call_args.kwargs['batch_size'], 1)
+
     def test_configuration_requires_uuid_and_scoped_python(self):
         with tempfile.TemporaryDirectory() as folder:
             path=Path(folder)/'runtime.json'
@@ -62,6 +72,20 @@ class RuntimeTests(unittest.TestCase):
             base['python']='toolchain/eg2-cuda-python/Scripts/python.exe';base['gpu_uuid']='cuda:0'
             path.write_text(json.dumps(base),encoding='utf-8')
             with self.assertRaises(ValueError):configuration(path)
+
+    def test_ready_worker_survives_a_failed_heartbeat_after_startup(self):
+        service = EmbeddingService(SimpleNamespace(maintenance=False))
+        service.process = Mock()
+        service.process.poll.return_value = None
+        service.state = 'pret'
+        with patch.object(service, 'enabled', return_value=True), \
+                patch.object(service, 'call', side_effect=TimeoutError), \
+                patch('embeddings.time.monotonic', return_value=181), \
+                patch.object(service, 'stop') as stop:
+            service.tick()
+        stop.assert_not_called()
+        self.assertEqual(service.state, 'pret')
+        service.process = None
 
 
 if __name__=='__main__':unittest.main()

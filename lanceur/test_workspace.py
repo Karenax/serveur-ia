@@ -169,6 +169,43 @@ class WorkspaceTests(unittest.TestCase):
         raw=base64.b64decode(self.w.backup());db=sqlite3.connect(':memory:');db.deserialize(raw);db.execute('CREATE TABLE evil(x)');bad=base64.b64encode(db.serialize()).decode();db.close()
         with self.assertRaisesRegex(ValueError,'Schéma'):self.w.validate_backup(bad,{'a'})
 
+    def test_backup_restores_agent_project_grant_and_rejects_invalid_bindings(self):
+        from agent_access import AgentAccess
+        from types import SimpleNamespace
+
+        store = SimpleNamespace(workspace=self.w, lock=threading.RLock(), valid_owner=lambda owner: owner == 'a')
+        access = AgentAccess(store)
+        project_id = '5aa712eb-e182-4da9-8c00-a4da4f34a1bd'
+        access.set_operator('a', role='owner', project_ids=[project_id])
+        restored = self.w.validate_backup(self.w.backup(), {'a'})
+        access.revoke('a')
+        self.w.restore(restored)
+        self.assertEqual(access.operator_for('a')['project_ids'], [project_id])
+        self.assertEqual(access.operator_for('a')['role'], 'owner')
+
+        for owner, role in [('missing', 'owner'), ('a', 'admin')]:
+            with self.subTest(owner=owner, role=role), self.w.db() as db:
+                db.execute('INSERT OR REPLACE INTO settings VALUES(?,?)', (
+                    'agent-access:' + owner, json.dumps({'role': role, 'project_ids': [project_id], 'person_id': None})))
+                db.commit()
+                with self.assertRaisesRegex(ValueError, 'Habilitation Agent'):
+                    self.w.validate_backup(self.w.backup(), {'a'})
+                db.execute('DELETE FROM settings WHERE key=?', ('agent-access:' + owner,))
+
+    def test_agent_catalogue_rejects_restoring_legacy_projects_but_allows_inspection(self):
+        legacy = self.w.backup()
+        self.w.agent_catalogue = lambda owner: None
+        self.assertIsInstance(self.w.validate_backup(legacy, {'a'}), bytes)
+        with self.assertRaisesRegex(ValueError, 'projets historiques'):
+            self.w.validate_backup(legacy, {'a'}, for_restore=True)
+        with tempfile.TemporaryDirectory() as folder:
+            clean = Workspace(folder)
+            clean.history_write('a', {'history': {'currentId': 'a', 'conversations': [
+                {'id': 'a', 'title': 'Discussion', 'messages': []}]}, 'revision': 0,
+                'reset_id': HISTORY_RESET_ID})
+            clean.agent_catalogue = self.w.agent_catalogue
+            self.assertIsInstance(clean.validate_backup(clean.backup(), {'a'}, for_restore=True), bytes)
+
     def test_drafts_are_encrypted_and_windows_cannot_clear_each_other(self):
         from draft_store import DraftStore
         from client import protect

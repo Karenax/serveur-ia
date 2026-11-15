@@ -1,0 +1,4 @@
+.async-download-link{display:inline-flex;flex-wrap:wrap;align-items:center;gap:4px 8px;max-width:100%;vertical-align:baseline;overflow-wrap:anywhere}
+.async-download-status,.async-download-ready{color:var(--text-muted,#64748b);font-size:11px}
+.async-download-error{color:var(--danger,#b91c1c);font-size:11px}
+.async-download-link>a[aria-disabled="true"]{cursor:wait;opacity:.7}

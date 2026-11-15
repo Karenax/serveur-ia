@@ -16,7 +16,7 @@ import sqlite3
 import threading
 import time
 from workspace import Conflict, Denied
-from kiara_shared.history_store import validate as validate_history, HistoryError
+from kiara_shared.history_store import validate as validate_history, HistoryError, is_agent_project_id
 from hermes_storage import HermesStorage, JOURNAL_DAYS, RECOVERY_DAYS
 
 TERMINAL = {'completed', 'failed', 'cancelled', 'interrupted'}
@@ -334,7 +334,7 @@ class HermesConversations:
         # again. Documents are explicit untrusted turn data, never a new global
         # persona or permissions supplied by a source.
         try:
-            if project and self.projects:
+            if project and self.projects and not is_agent_project_id(project):
                 self.projects.bind_session(owner, project, session, create=True)
             _, sources, instructions = self.store.workspace.context(owner, messages, project, document, separate=True)
             body['instructions'] = instructions + '\n' + NATIVE_WEB_INSTRUCTIONS + '\n' + body['instructions']

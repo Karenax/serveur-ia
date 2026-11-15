@@ -1,0 +1,6 @@
+# Isolated speech/WASAPI runtime. Compile to requirements-audio.txt with hashes.
+faster-whisper==1.2.1
+sherpa-onnx==1.12.35
+av==16.1.0
+PyAudioWPatch==0.2.12.9; platform_system == "Windows"
+pip>=26.2,<27

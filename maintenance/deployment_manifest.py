@@ -4,6 +4,9 @@ from datetime import datetime,timezone
 import hashlib
 import json
 from pathlib import Path
+import zipfile
+
+from build_manifest import WEB_DIST
 
 ROOT=Path(__file__).resolve().parents[1]
 REQUIRED_CHECKS={'sources','runtimes','server','windows','voice','android','ui','go','go-security','dependencies','maintenance','android-lint'}
@@ -30,10 +33,23 @@ def generate(manifests,validation):
         binary=path.parent/artifact['name']
         if not binary.is_file() or binary.stat().st_size!=artifact['bytes'] or digest(binary)!=artifact['sha256']:
             raise ValueError('Artifact no longer matches its manifest: '+component)
+        packaged_frontend = {}
         for name,expected in data['source_files'].items():
             source=(ROOT/name).resolve()
+            if component == 'server' and Path(name).is_relative_to(WEB_DIST) and source.is_relative_to(ROOT/WEB_DIST):
+                packaged_frontend[name] = expected
+                continue
             if not source.is_relative_to(ROOT) or not source.is_file() or digest(source)!=expected:
                 raise ValueError('Source changed since build: '+name)
+        if packaged_frontend:
+            try:
+                with zipfile.ZipFile(binary) as archive:
+                    for name, expected in packaged_frontend.items():
+                        with archive.open(name) as stream:
+                            if hashlib.file_digest(stream,'sha256').hexdigest() != expected:
+                                raise ValueError('Packaged frontend changed since build: '+name)
+            except (zipfile.BadZipFile, KeyError) as error:
+                raise ValueError('Packaged server frontend is incomplete') from error
         components[component]={'manifest':path.name,'sha256':digest(path),'artifact':data['artifact'],
                                'source_commit':data['source_commit'],'source_files':data['source_files']}
     return {'format':1,'created_at':datetime.now(timezone.utc).isoformat(),'components':components,

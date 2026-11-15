@@ -4,6 +4,9 @@ import json
 import re
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 
+DESKTOP_RELEASE = '/v1/business/client/windows/release'
+DESKTOP_DOWNLOAD = '/v1/business/client/windows/download'
+
 def client_filename(number,name):
     version(number)
     label=re.sub(r'[\x00-\x1f\x7f<>:"/\\|?*]','-',str(name)).strip(' .')[:80] or 'Client'

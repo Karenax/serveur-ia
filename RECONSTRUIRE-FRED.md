@@ -56,6 +56,63 @@ seul ne contient pas les SDK, moteurs, modèles et clés privées. Le manifeste 
 la construction réalisée ; il ne promet pas un binaire bit à bit identique sur un
 autre poste ou avec une autre clé.
 
+Pour activer Agent au démarrage du lanceur, créer `agent-service.json` dans
+`KIARA_DATA_DIR` (par défaut, le dossier `lanceur`). Renseigner `data` avec le
+chemin absolu du dossier Agent restauré qui contient `brain`, `erp` et `storage`,
+et `python` avec celui de l’exécutable Python du service. Le champ facultatif
+`speech_python` désigne le runtime audio.
+Le champ `speech_models` désigne le dossier des modèles audio et de leur rapport
+`audio-qualification.json`. `KIARA_AGENT_SPEECH_MODELS_DIR` prime sur le fichier.
+Installer `agent/requirements-pdf.txt` dans le Python du service pour le rendu PDF.
+La recherche multimodale locale est obsolète. La recherche sémantique utilise
+EmbeddingGemma 2 via EG2, y compris pour le texte extrait des images et de l’audio.
+Les variables `KIARA_AGENT_DATA_DIR`, `KIARA_AGENT_PYTHON` et
+`KIARA_AGENT_SPEECH_PYTHON` priment sur les champs correspondants.
+Après modification du fichier, relancer le lanceur.
+Sous Windows, pour relancer uniquement le lanceur depuis une session de même
+niveau de droits, exécuter `& '.\Start-Interface-Qwen.ps1' -Redemarrer -SansNavigateur`.
+L’option `-VerifierBascule` exécute les vérifications préalables sur le lanceur
+en service. Lors de la première activation, elle vérifie aussi en lecture seule
+que le catalogue Kiara historique ne contient aucun projet ni document, puis
+relève les projets de la base ERP restaurée. À chaque redémarrage, le script
+compare les identifiants, codes, intitulés et états relevés avant l’arrêt
+au catalogue servi par Agent.
+La rubrique **Accès Agent** affiche les erreurs de configuration et de démarrage.
+Les journaux du processus sont dans `logs/service.log` sous le dossier de données Agent.
+Pour la recette d’une restauration, `start_workers: false` suspend le démarrage
+automatique des traitements. La variable `KIARA_AGENT_START_WORKERS` accepte `0`
+ou `1` et prime sur le fichier. Les traitements démarrent par défaut.
+Pour une reprise progressive, régler `start_workers` à `true` et renseigner
+`worker_groups` avec les groupes à démarrer parmi `mail`, `cdc`, `audio`,
+`documents`, `planning` et `knowledge`. Une liste vide les
+suspend tous. Sans ce champ, Agent applique le démarrage habituel.
+Pour les documents de projet, `document_roots` et `document_write_roots`
+sont deux listes distinctes de chemins absolus vus par le service Agent.
+`document_drive_mappings` associe si nécessaire une lettre de lecteur
+au chemin absolu du partage sur le serveur. Les variables JSON
+`AGENT_DOCUMENT_ROOTS`, `AGENT_DOCUMENT_WRITE_ROOTS` et
+`AGENT_DOCUMENT_DRIVE_MAPPINGS` priment sur le fichier. Sans racines
+configurées, Agent désactive l’accès correspondant.
+Le champ `document_project_root` désigne le répertoire privé des dossiers
+clients. Kiara crée un sous-dossier par projet lors de la création ou de
+l’import. La configuration autorise le projet à lire et publier dans son
+sous-dossier. Les racines partagées doivent être distinctes de ce répertoire.
+`AGENT_DOCUMENT_PROJECT_ROOT` accepte un chemin absolu encodé en JSON.
+La sauvegarde chiffrée inclut les dossiers clients. Une restauration isolée
+place les fichiers sous `data/dossiers-clients` et reloge les liens correspondants.
+Pour remettre une restauration en service, définir `data` sur son répertoire de
+données et `document_project_root` sur le dossier client restauré.
+Dans Kiara, le scan des jalons utilise les mêmes racines de lecture et les
+mêmes correspondances de lecteurs pour ses sources réseau.
+Pour activer le web privé, renseigner `web_origin` avec son origine HTTPS
+dédiée et, si nécessaire, `web_port` avec le port local (8767 par défaut).
+Le proxy HTTPS conserve l’en-tête `Host` et transmet au port d’écoute sur
+`127.0.0.1`. Les variables `KIARA_AGENT_WEB_ORIGIN` et `KIARA_AGENT_WEB_PORT`
+priment sur le fichier.
+Pour les imports Thunderbird, renseigner `thunderbird_device` avec l’identifiant
+de l’accès Kiara du poste prévu. Cet accès doit avoir le rôle Propriétaire sans
+restriction de projets. `KIARA_AGENT_THUNDERBIRD_DEVICE` prime sur le fichier.
+
 L’intégration de l’assistant ajoute des ressources de détection locale épinglées
 (sherpa-onnx 1.13.8, modèle int8, AAR Android) : exécuter
 `maintenance/2026-10-25-assistant-integration/prepare_wakeword.py --download` avec
@@ -148,6 +205,15 @@ debug et son APK de tests. `SelfTestInstrumentation` et `-e fred_updates true`
 vérifient notamment la politique des signatures et la conservation du cache.
 
 ## Construire avant publication
+
+Avant les tests locaux de transport WireGuard, lancer
+`& '.\client-qwen\Build-WireGuard.ps1'` depuis la racine. Les fixtures Windows
+et Android utilisent le pont reconstruit et son écoute UDP sur `127.0.0.1`.
+Avant de créer l’archive serveur, installer les dépendances verrouillées du
+frontend Agent avec `pnpm --dir agent/web install --frozen-lockfile`, puis
+compiler avec `pnpm --dir agent/web run build`. L’archive serveur contient
+l’interface compilée et les sources Agent. Les données et le fichier
+`lanceur/agent-service.json` se préparent sur le serveur cible.
 
 ```powershell
 & '.\Strata-src\.venv\Scripts\python.exe' maintenance/prepare_go.py

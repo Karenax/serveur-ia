@@ -14,6 +14,13 @@ public final class SelfTestInstrumentation extends Instrumentation {
     private Bundle arguments;
     @Override public void onCreate(Bundle arguments){super.onCreate(arguments);this.arguments=arguments;start();}
     @Override public void onStart(){Bundle result=new Bundle();StringBuilder log=new StringBuilder();try{
+        if (arguments != null && arguments.containsKey("fred_agent_history")) {
+            checkAgentProjectHistory();
+            result.putString("stream", "PASS Agent UUID through Android history validation, encryption and merge\n");
+            result.putBoolean("passed", true);
+            finish(Activity.RESULT_OK, result);
+            return;
+        }
         if(arguments!=null&&arguments.containsKey("fred_assistant")){result.putString("stream",AssistantChecks.run(this));finish(-1,result);return;}
         if(arguments!=null&&arguments.containsKey("fred_conversation_permission")){result.putString("stream",ConversationChecks.permission(this));finish(-1,result);return;}
         if(arguments!=null&&arguments.containsKey("fred_conversation")){result.putString("stream",ConversationChecks.run(this));finish(-1,result);return;}
@@ -78,6 +85,38 @@ public final class SelfTestInstrumentation extends Instrumentation {
         if(arguments!=null&&"true".equals(arguments.getString("fred_https_probe"))){javax.net.ssl.HttpsURLConnection probe=(javax.net.ssl.HttpsURLConnection)new URL(Profile.HTTPS+"/v1/models").openConnection();probe.setInstanceFollowRedirects(false);probe.setConnectTimeout(15000);probe.setReadTimeout(15000);try{int status=probe.getResponseCode();check(status==401||status==403,"HTTPS denies unauthenticated probe");check(probe.getServerCertificates().length>0,"HTTPS certificate chain verified");log.append("PASS HTTPS DNS/TLS/certificate verification without credentials (HTTP "+status+")\n");}finally{probe.disconnect();}}
         result.putString("stream",log+"ALL CHECKS PASSED\n");result.putBoolean("passed",true);finish(Activity.RESULT_OK,result);
     }catch(Throwable error){result.putString("stream",log+"FAIL "+error.getClass().getSimpleName()+": "+error.getMessage()+"\n");result.putBoolean("passed",false);finish(Activity.RESULT_CANCELED,result);}}
+    private void checkAgentProjectHistory() throws Exception {
+        String projectId = "5aa712eb-e182-4da9-8c00-a4da4f34a1bd";
+        JSONObject original = HistorySync.empty();
+        JSONObject row = original.getJSONArray("conversations").getJSONObject(0);
+        row.put("project_id", projectId);
+        row.put("document_id", JSONObject.NULL);
+        row.getJSONArray("messages").put(Json.object("role", "user", "content", "Projet de recette"));
+        SecureStore store = new SecureStore(getTargetContext(), "agent-history-test");
+        JSONObject validated = HistorySync.validate(original);
+        JSONObject reopened;
+        try (Remote offline = new Remote(getTargetContext(), null, new JSONObject(), false, store)) {
+            HistorySync history = new HistorySync(store, offline, Json.id());
+            JSONObject saved = history.write(validated, history.read().getString("revision"));
+            JSONObject persisted = history.read();
+            reopened = persisted.getJSONObject("history");
+            check(persisted.getString("revision").equals(saved.getString("revision")), "Local history revision round trip");
+            check(Json.canonical(reopened).equals(Json.canonical(validated)), "Agent project survives encrypted history");
+        }
+
+        JSONObject remote = Json.copy(reopened);
+        remote.getJSONArray("conversations").getJSONObject(0).put("title", "Projet depuis Kiara");
+        HistorySync.Merge merged = HistorySync.merge(reopened, remote, HistorySync.fingerprints(validated));
+        JSONObject mergedRow = merged.history.getJSONArray("conversations").getJSONObject(0);
+        check(merged.conflicts == 0 && projectId.equals(mergedRow.getString("project_id")), "Merge preserves Agent scope");
+        check("Projet depuis Kiara".equals(mergedRow.getString("title")), "Merge adopts server edit");
+
+        mergedRow.put("document_id", projectId);
+        boolean rejected = false;
+        try { HistorySync.validate(merged.history); }
+        catch (IllegalArgumentException expected) { rejected = true; }
+        check(rejected, "Agent project UUID cannot substitute for a legacy document ID");
+    }
     private static void check(boolean condition,String message){if(!condition)throw new AssertionError(message);}
     private static JSONObject request(LoopbackServer local,ClientBackend client,String route,JSONObject body)throws Exception {HttpURLConnection connection=(HttpURLConnection)new URL(local.origin()+route).openConnection();connection.setRequestProperty("Authorization","Bearer "+client.key);connection.setConnectTimeout(15000);connection.setReadTimeout(45000);if(body!=null){connection.setRequestMethod("POST");connection.setDoOutput(true);connection.setRequestProperty("Content-Type","application/json");byte[] bytes=Json.bytes(body);connection.setFixedLengthStreamingMode(bytes.length);try(OutputStream out=connection.getOutputStream()){out.write(bytes);}}try{check(connection.getResponseCode()==200,"Authenticated local route "+route);try(InputStream input=connection.getInputStream()){return new JSONObject(new String(SecureStore.readBounded(input,2*1024*1024),StandardCharsets.UTF_8));}}finally{connection.disconnect();}}
 }

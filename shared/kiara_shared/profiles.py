@@ -1,6 +1,7 @@
 """Shared validation of signed client transport profiles."""
 import base64
 import ipaddress
+import json
 import re
 
 def validate_endpoint(value):
@@ -61,3 +62,25 @@ def validate_profile(profile):
     except (ValueError,TypeError,KeyError):
         raise ValueError('Adresses locales du serveur invalides.')
     return profile
+
+
+_ACCESS_PREFIX = 'kiara1:'
+
+
+def encode_access_code(profile):
+    data = json.dumps(validate_profile(profile), ensure_ascii=True, separators=(',', ':')).encode()
+    if len(data) > 65536:
+        raise ValueError('Le profil Kiara est trop volumineux.')
+    return _ACCESS_PREFIX + base64.urlsafe_b64encode(data).decode('ascii').rstrip('=')
+
+
+def decode_access_code(code):
+    encoded = code.strip().removeprefix(_ACCESS_PREFIX)
+    if (not code.strip().startswith(_ACCESS_PREFIX) or not 1 <= len(encoded) <= 87382
+            or not re.fullmatch(r'[A-Za-z0-9_-]+', encoded)):
+        raise ValueError('Code d’accès Kiara invalide.')
+    try:
+        data = base64.b64decode(encoded + '=' * (-len(encoded) % 4), altchars=b'-_', validate=True)
+        return validate_profile(json.loads(data.decode('utf-8')))
+    except (ValueError, RecursionError):
+        raise ValueError('Code d’accès Kiara invalide.') from None

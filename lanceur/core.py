@@ -19,7 +19,7 @@ BASE_PATH = ROOT / 'strata-iq4-p100-hybride.json'
 PYTHON = Path(os.environ.get('KIARA_RUNTIME_PYTHON',ROOT / 'Strata-src/.venv/Scripts/python.exe')).expanduser().resolve()
 HIDDEN = getattr(subprocess, 'CREATE_NO_WINDOW', 0)
 NATIVE_CONTEXT = 262144
-MAX_CONTEXT = 393216
+MAX_CONTEXT = 524288
 
 def read_json(path, fallback=None):
     try:
@@ -151,8 +151,8 @@ def validate(settings, check_paths=False):
     if not host.is_loopback and len(s['api_key']) < 24:
         raise ValueError('Pour le réseau, générer une clé API d’au moins 24 caractères.')
     gpus = [part.strip() for part in s['gpus'].split(',')]
-    if len(gpus) not in (2, 3) or len(set(gpus)) != len(gpus) or not all(part and (part.isdecimal() or part.startswith('GPU-')) for part in gpus):
-        raise ValueError('Indiquer deux ou trois GPU distincts, dans leur ordre de calcul ; avec trois GPU, le premier calcule les couches denses.')
+    if len(gpus) not in (1, 2, 3) or len(set(gpus)) != len(gpus) or not all(part and (part.isdecimal() or part.startswith('GPU-')) for part in gpus):
+        raise ValueError('Indiquer un, deux ou trois GPU distincts, dans leur ordre de calcul ; avec trois GPU, le premier calcule les couches denses.')
     s['gpus'] = ','.join(gpus)
     if s['expert_cache'] != 'auto':
         try:
@@ -219,12 +219,16 @@ def build_config(base, settings, log_path=None):
         set_arg('--expert-cache-device2', 'auto')
         if '--remote-expert-opt' not in args:
             args.append('--remote-expert-opt')
-    else:
+    elif len(s['gpus'].split(',')) == 2:
         remove_arg('--expert-cache-device1')
         remove_arg('--expert-cache-device2')
         remove_arg('--remote-expert-opt', False)
         set_arg('--layer-split', s['layer_split'])
         set_arg('--split-device', 1)
+    else:
+        for flag in ('--expert-cache-device1', '--expert-cache-device2', '--layer-split', '--split-device'):
+            remove_arg(flag)
+        remove_arg('--remote-expert-opt', False)
     set_arg('--prompt-cache', s['history_slots'] if s['history_enabled'] else 0)
     dflash_enabled = arg(cfg, '--draft') == 'dflash2' and not s['mtp_enabled']
     if s['mtp_enabled']:

@@ -155,9 +155,21 @@ class WireGuardAccess:
         """Issue a portable JSON profile without requiring a Windows release."""
         from devices import fields
         fields({'name':name, 'owner':owner, 'kind':kind})
+        access = self._create_profile(name, model, 'android', owner, kind, resume)
+        return {'id':access['id'],'name':access['name'],'download':'/api/remote/profile/'+access['id'],
+                'message':'Profil Android personnel prêt. Importez ce fichier dans le téléphone ou la tablette.'}
+
+    def create_desktop(self, name, model, owner='', kind='pc', resume=None):
+        from devices import fields
+        fields({'name': name, 'owner': owner, 'kind': kind})
+        access = self._create_profile(name, model, 'windows', owner, kind, resume)
+        return {'id': access['id'], 'name': access['name'], 'message': 'Accès Kiara créé.'}
+
+    def _create_profile(self, name, model, platform, owner, kind, resume):
+        android = platform == 'android'
         with self.lock:
             self.vault()
-            access=self.store.issue(name,resume=resume,platform='android')
+            access=self.store.issue(name,resume=resume,platform=platform)
             target=self.directory/'profils-restaures.dpapi'
             temporary=None
             try:
@@ -169,29 +181,60 @@ class WireGuardAccess:
                 record=next(c for c in read_json(self.store.path)['clients'] if c['id']==access['id'])
                 match(record, profile, self.settings()['public_key'], self.vault()['peers'][access['id']])
                 raw=json.dumps(profile,ensure_ascii=False,indent=2).encode('utf-8')
-                if len(raw)>65536:raise ValueError('Le profil Android dépasse 64 Ko.')
+                if len(raw)>65536:raise ValueError('Le profil Kiara dépasse 64 Ko.')
                 profiles=json.loads(protect(target.read_bytes(),decrypt=True)) if target.exists() else {}
                 if not isinstance(profiles,dict):raise ValueError('Registre des profils personnels illisible.')
                 profiles[access['id']]=profile
-                descriptor,name=tempfile.mkstemp(prefix='android-',suffix='.tmp',dir=self.directory)
+                descriptor,name=tempfile.mkstemp(prefix='profil-',suffix='.tmp',dir=self.directory)
                 temporary=Path(name)
                 with os.fdopen(descriptor,'wb') as stream:
                     stream.write(protect(json.dumps(profiles,ensure_ascii=False).encode('utf-8')));stream.flush();os.fsync(stream.fileno())
                 os.replace(temporary,target)
                 with self.store.lock:
                     data=read_json(self.store.path)
-                    next(c for c in data['clients'] if c['id']==access['id'])['android_profile']=True
+                    next(c for c in data['clients'] if c['id']==access['id'])['android_profile' if android else 'desktop_profile']=True
                     write_json(self.store.path,data)
                 self.store.device({'id':access['id'],'owner':owner,'kind':kind})
                 self.refresh_peers()
-                self.store.audit('android_profile_created', access['id'])
+                self.store.audit('android_profile_created' if android else 'desktop_profile_created', access['id'])
             except Exception:
                 self.store.revoke(access['id'])
                 raise
             finally:
                 if temporary:temporary.unlink(missing_ok=True)
-            return {'id':access['id'],'name':access['name'],'download':'/api/remote/profile/'+access['id'],
-                    'message':'Profil Android personnel prêt. Importez ce fichier dans le téléphone ou la tablette.'}
+            return access
+
+    def desktop_access_code(self, identity):
+        from kiara_shared.profiles import encode_access_code
+        from profiles import match
+        from releases import profile as legacy_profile
+
+        if not isinstance(identity, str) or not re.fullmatch(r'[0-9a-f]{16}', identity):
+            raise ValueError('Accès Kiara inconnu.')
+        with self.lock, self.store.lock:
+            active = next((c for c in self.store.metadata()['clients']
+                           if c['id'] == identity and not c['revoked'] and not c.get('hermes_pending')), None)
+            if active is None:
+                raise ValueError('Accès Kiara inconnu ou révoqué.')
+            raw_record = next(c for c in read_json(self.store.path)['clients'] if c['id'] == identity)
+            saved = self.directory / 'profils-restaures.dpapi'
+            profiles = json.loads(protect(saved.read_bytes(), decrypt=True)) if saved.exists() else {}
+            if not isinstance(profiles, dict):
+                raise ValueError('Registre des profils personnels illisible.')
+            personal = profiles.get(identity)
+            if personal is None:
+                try:
+                    personal = legacy_profile(self.home / 'clients' / f'{identity}.exe')
+                except OSError as error:
+                    raise ValueError('Aucun code d’accès disponible pour ce client.') from error
+            settings = self.settings()
+            psk = self.vault()['peers'].get(identity)
+            if not psk:
+                raise ValueError('Le tunnel de cet accès n’est pas configuré.')
+            match(raw_record, personal, settings['public_key'], psk)
+            self.store.audit('desktop_access_code_copied', identity)
+            return encode_access_code({**personal, 'client_name': active['name'],
+                                       'local_routes': network_routes(settings['listen_port'])})
 
     def android_profile(self, identity):
         """Admin-only download; never reveal an archived/revoked identity."""
@@ -224,9 +267,8 @@ class WireGuardAccess:
             kind=('phone' if platform=='android' else 'pc') if kind is None else kind
             from devices import fields
             fields({'name':name,'owner':owner,'kind':kind})
-            result=self.create_android(name,model,owner,kind) if platform=='android' else self.create_client(name,model)
+            result=self.create_android(name,model,owner,kind) if platform=='android' else self.create_desktop(name,model,owner,kind)
             try:
-                if platform=='windows':self.store.device({'id':result['id'],'owner':owner,'kind':kind})
                 self.store.delete(identity)
                 self.store.audit('device_replaced', identity)
             except Exception:

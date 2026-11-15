@@ -79,11 +79,9 @@ class AndroidUpdatesTests(unittest.TestCase):
             server.shutdown(); server.server_close()
 
     def test_real_wireguard_download_allowlists(self):
-        from core import ROOT
         import wireguard_access
         import wg_bridge
-        binary = ROOT / 'toolchain/releases-staging/android-updates/wireguard-bridge.exe'
-        if not binary.exists(): self.skipTest('Build the staged WireGuard bridge first.')
+        if not wireguard_access.ENGINE.is_file(): self.skipTest('Build WireGuard first.')
         store = AccessStore(self.directory / 'private-wg')
         access = store.issue('WireGuard Android fixture')
         wireguard = wireguard_access.WireGuardAccess(store, store.home)
@@ -94,9 +92,9 @@ class AndroidUpdatesTests(unittest.TestCase):
         threading.Thread(target=server.serve_forever, daemon=True).start()
         engine = bridge = None
         try:
-            with patch.object(wireguard_access, 'ENGINE', binary), patch.object(wg_bridge, 'bridge_executable', return_value=binary), patch.object(android_releases, 'DIRECTORY', self.directory):
+            with patch.object(android_releases, 'DIRECTORY', self.directory):
                 engine = wireguard_access.Engine({'role': 'server', 'wireguard': {'private_key': wireguard.vault()['private_key']},
-                        'listen_port': 0, 'upstream_port': server.server_port, 'peers': wireguard.peers()}, executable=binary)
+                        'listen_port': 0, 'upstream_port': server.server_port, 'peers': wireguard.peers()})
                 profile['wireguard']['endpoint'] = f'127.0.0.1:{engine.port}'
                 bridge = wg_bridge.Bridge(profile)
                 for path in ('release', 'download'):

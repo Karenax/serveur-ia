@@ -44,6 +44,25 @@ class RestorationTests(unittest.TestCase):
 
     def backup(self):return self.c.operations.backups.create(PASSWORD)
 
+    def test_inspection_can_stop_a_paired_rehearsal_before_restore(self):
+        archive = self.backup()
+        before = generation(self.home)
+        path = self.c.settings_path
+        settings = path.read_bytes()
+        manager = self.c.operations.backups
+
+        def require_pair(summary):
+            self.assertNotIn('agent', summary)
+            raise ValueError('Archive des Projets requise.')
+
+        with patch.object(manager, 'inspect', wraps=manager.inspect) as inspect:
+            with self.assertRaisesRegex(ValueError, 'Archive des Projets requise'):
+                self.c.operations.restorations.restore_sync(
+                    {'file': archive['file'], 'password': PASSWORD}, on_inspected=require_pair)
+            self.assertEqual(inspect.call_count, 1)
+        self.assertEqual(generation(self.home), before)
+        self.assertEqual(path.read_bytes(), settings)
+
     def test_voice_configuration_is_backed_up_and_restored_with_worker_stopped(self):
         from core import write_json,read_json
         write_json(self.home/'voix.json',{'enabled':True})
@@ -96,6 +115,17 @@ class RestorationTests(unittest.TestCase):
         path=Path(archive['file']);raw=path.read_bytes();path.write_bytes(raw[:-4]+b'bad!')
         with self.assertRaises(ValueError):self.c.operations.restorations.start({'file':str(path),'password':PASSWORD,'restore_token':preview['restore_token'],'confirm':True})
         self.assertEqual(self.c.settings(),before);self.assertEqual(self.w.history_read(self.owner),state)
+
+    def test_agent_catalogue_blocks_legacy_project_archive_before_maintenance(self):
+        archive = self.backup()
+        request = {'file': archive['file'], 'password': PASSWORD}
+        self.w.agent_catalogue = lambda owner: None
+        before = self.w.path.read_bytes()
+        for restore in (self.c.operations.restorations.preview, self.c.operations.restorations.restore_sync):
+            with self.assertRaisesRegex(ValueError, 'projets historiques'):
+                restore(request)
+        self.assertEqual(self.w.path.read_bytes(), before)
+        self.assertFalse(self.c.remote.maintenance)
 
     def test_failure_during_restore_rolls_back_and_preserves_point_of_return(self):
         archive=self.backup();before=self.c.settings();self.c.save({**before,'context':8192});changed=self.c.settings()

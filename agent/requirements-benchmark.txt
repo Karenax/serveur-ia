@@ -1,0 +1,2 @@
+# Optional local process telemetry for scripts/embedding_resource_probe.py.
+psutil==7.2.2

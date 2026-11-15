@@ -66,8 +66,15 @@ class ModelRuntime:
         try:return self.model.encode(texts,**kwargs)
         except self.torch.cuda.OutOfMemoryError:
             if self.device=='cpu' or not self.cpu_fallback:raise
-            self.to_cpu('Mémoire GPU saturée ; calcul repris sur CPU.')
-            return self.model.encode(texts,**kwargs)
+        # Let the failed inference release its temporary tensors before retrying.
+        self.torch.cuda.empty_cache()
+        if kwargs.get('batch_size', 1) > 1 and len(texts) > 1:
+            try:
+                return self.model.encode(texts, **{**kwargs, 'batch_size': 1})
+            except self.torch.cuda.OutOfMemoryError:
+                pass
+        self.to_cpu('Mémoire GPU saturée ; calcul repris sur CPU.')
+        return self.model.encode(texts,**kwargs)
 
     def status(self):
         return {'device':self.device,'requested_device':self.requested_device,

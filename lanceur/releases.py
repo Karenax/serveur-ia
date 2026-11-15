@@ -1,6 +1,8 @@
 """Locally built releases with SHA-256 integrity and personal-client rollback."""
 import hashlib
 import json
+import os
+import re
 from pathlib import Path
 import shutil
 import struct
@@ -15,7 +17,7 @@ from core import ROOT, read_json, write_json
 from operations import VERSION
 from profiles import match,validate_access
 from kiara_shared.file_lock import locked
-from kiara_shared.releases import verify as verify_release
+from kiara_shared.releases import version, verify as verify_release
 
 def digest(path):
     with Path(path).open('rb') as stream:
@@ -36,10 +38,85 @@ def download_name(path, name):
 
 def manifest(home=HOME):
     source=ROOT/'client-qwen/dist/Accès serveur Fred.exe'
+    versioned=release_binary({'version': VERSION})
+    if versioned != source:
+        raise ValueError('Augmentez la version avant de signer un nouveau client classique.')
     result={'version':VERSION,'protocol':3,'sha256':digest(source),'bytes':source.stat().st_size}
     result.update(sign(result,home))
     write_json(source.parent/'release.json',result)
     return result
+
+WINDOWS_INSTALLER_VERSION = '4.0.0'
+WINDOWS_INSTALLER = f'Kiara_{WINDOWS_INSTALLER_VERSION}_x64-setup.exe'
+DESKTOP_INSTALLER_VERSION = '4.0.5'
+DESKTOP_INSTALLER = f'Kiara_{DESKTOP_INSTALLER_VERSION}_x64-setup.exe'
+
+
+def windows_installer(home, *, stream=None, desktop=False):
+    folder = home / 'installateurs'
+    number = DESKTOP_INSTALLER_VERSION if desktop else WINDOWS_INSTALLER_VERSION
+    release = read_json(folder / (f'kiara-{number}.json' if desktop else 'kiara-4.json'), {})
+    try:
+        verify_release(release, public(home, create=False))
+        if release['version'] != number:
+            raise ValueError
+        source = folder / (DESKTOP_INSTALLER if desktop else WINDOWS_INSTALLER)
+        if stream is None:
+            with source.open('rb') as opened:
+                _verify_installer(opened, source, release)
+        else:
+            _verify_installer(stream, source, release)
+        return release, source
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        raise ValueError('Installateur Kiara 4 absent ou invalide.') from error
+
+
+_INSTALLER_CACHE = {}
+
+
+def _verify_installer(stream, source, release):
+    stat = os.fstat(stream.fileno())
+    if stat.st_size != release['bytes']:
+        raise ValueError
+    key = (source, stat.st_dev, stat.st_ino, stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns, release['sha256'])
+    with _LOCK:
+        if key not in _INSTALLER_CACHE:
+            _INSTALLER_CACHE.clear()
+            _INSTALLER_CACHE[key] = hashlib.file_digest(stream, 'sha256').hexdigest() == release['sha256']
+            stream.seek(0)
+        if not _INSTALLER_CACHE[key]:
+            raise ValueError
+
+
+def release_binary(release):
+    directory = ROOT / 'client-qwen/dist'
+    number = release['version']
+    version(number)
+    sha256 = release.get('sha256', '')
+    if isinstance(sha256, str) and re.fullmatch('[0-9a-f]{64}', sha256):
+        revision = directory / f'Kiara-classique-{number}-{sha256}.exe'
+        if revision.is_file():
+            return revision
+    staged = directory / f'Kiara-classique-{number}.exe'
+    return staged if staged.is_file() else directory / 'Accès serveur Fred.exe'
+
+
+def publish_pending(home=HOME):
+    directory = ROOT / 'client-qwen/dist'
+    pending = directory / 'release-pending.json'
+    with _LOCK, locked(home / 'versions-clients.json'):
+        if not pending.is_file():
+            return None
+        release = verify_release(read_json(pending, {}), public(home, create=False))
+        if release['version'] != VERSION:
+            raise ValueError('La version en attente diffère du lanceur démarré.')
+        source = release_binary(release)
+        if source.stat().st_size != release['bytes'] or digest(source) != release['sha256']:
+            raise ValueError('Le client classique en attente est incomplet ou altéré.')
+        windows_installer(home)
+        _repackage(home, release=release, pending=pending)
+        return VERSION
+
 
 def status(home):
     source=ROOT/'client-qwen/dist/Accès serveur Fred.exe'
@@ -47,10 +124,11 @@ def status(home):
     verified=False
     try:
         verify_release(release,public(home,create=False))
+        source=release_binary(release)
         stat=source.stat();key=(str(source),stat.st_size,stat.st_mtime_ns,stat.st_ctime_ns,release['sha256'])
         if key not in _CACHE:
             _CACHE.clear();_CACHE[key]=digest(source)==release['sha256'] and stat.st_size==release['bytes']
-        verified=_CACHE[key] and release['version']==VERSION
+        verified=_CACHE[key] and version(release['version']) <= version(VERSION)
     except (OSError,ValueError,KeyError,TypeError):pass
     except Exception:pass
     return {'server_version':VERSION, 'release':release,
@@ -61,12 +139,14 @@ def status(home):
 def repackage(home):
     with _LOCK,locked(home/'versions-clients.json'):return _repackage(home)
 
-def _repackage(home):
-    info=status(home)
-    if not info['verified']:raise ValueError('Binaire absent, signature invalide ou empreinte différente du manifeste.')
-    source=ROOT/'client-qwen/dist/Accès serveur Fred.exe'
+def _repackage(home, *, release=None, pending=None):
+    if release is None:
+        info=status(home)
+        if not info['verified']:raise ValueError('Binaire absent, signature invalide ou empreinte différente du manifeste.')
+        release=info['release']
+    source=release_binary(release)
     directory=home/'clients';directory.mkdir(exist_ok=True)
-    release=info['release'];folder_name='clients-retour-'+release['version']+'-'+release['sha256'][:12]
+    number=release['version'];folder_name='clients-retour-'+release['version']+'-'+release['sha256'][:12]
     archive=home/folder_name
     from wg_crypto import private_directory
     private_directory(archive)
@@ -86,13 +166,16 @@ def _repackage(home):
     for record in records:
         if record['revoked']:continue
         target=directory/(record['id']+'.exe')
+        if record.get('desktop_profile') and not target.exists():continue
         values=profile(target) if target.exists() else restored.get(record['id'])
         if values is None:continue
         match(record,values,settings.get('public_key') or None,vault.get('peers',{}).get(record['id']))
-        values.update(version=VERSION,protocol=3,update_public_key=public(home),client_name=record.get('name',values.get('client_name','Client')),local_routes=routes)
+        values.update(version=number,protocol=3,update_public_key=public(home),client_name=record.get('name',values.get('client_name','Client')),local_routes=routes)
         selected.append((target,values))
     stage=Path(tempfile.mkdtemp(prefix='preparation-',dir=directory));prepared=[];committed=[]
     original_versions=read_json(home/'versions-clients.json',{})
+    rollback_path=home/'retour-client.json'
+    original_rollback=read_json(rollback_path,{})
     versions=dict(original_versions);hashes=read_json(archive/'hashes.json',{})
     try:
         for target,values in selected:
@@ -111,14 +194,18 @@ def _repackage(home):
         write_json(archive/'hashes.json',hashes)
         for target,temporary,previous in prepared:
             temporary.replace(target);committed.append((target,previous))
-            versions[target.stem]={'version':VERSION,'sha256':digest(target),'epoch':time.time()}
+            versions[target.stem]={'version':number,'sha256':digest(target),'epoch':time.time()}
         write_json(home/'versions-clients.json',versions)
-        if prepared:write_json(home/'retour-client.json',{'folder':folder_name})
+        if prepared:write_json(rollback_path,{'folder':folder_name})
+        if pending is not None:pending.replace(pending.with_name('release.json'))
     except Exception:
         for target,previous in reversed(committed):
             if previous.exists():shutil.copyfile(previous,target)
             else:target.unlink(missing_ok=True)
         write_json(home/'versions-clients.json',original_versions)
+        if prepared:
+            if original_rollback:write_json(rollback_path,original_rollback)
+            else:rollback_path.unlink(missing_ok=True)
         raise
     finally:
         for temporary in stage.iterdir():temporary.unlink()

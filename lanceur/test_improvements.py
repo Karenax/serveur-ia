@@ -105,7 +105,15 @@ class ImprovementsTests(unittest.TestCase):
             write_json(home/'acces-distants.json',{'enabled':False,'url':'wireguard://10.77.0.1:8766','clients':[record]})
             routes=[{'endpoint':'192.168.1.41:51820','network':'192.168.1.0/24'}]
             with patch('releases.ROOT',root),patch('wireguard_access.network_routes',return_value=routes) as route_scan:
-                releases.manifest(home);self.assertEqual(releases.repackage(home)['count'],1)
+                release = releases.manifest(home)
+                pending = dist/'release-pending.json'
+                (dist/'release.json').replace(pending)
+                with patch('releases.windows_installer') as installer:
+                    self.assertEqual(releases.publish_pending(home), release['version'])
+                installer.assert_called_once_with(home)
+                self.assertFalse(pending.exists())
+                self.assertEqual(releases.status(home)['release'], release)
+                self.assertEqual(releases.profile(target)['version'], release['version'])
                 self.assertEqual(releases.profile(target)['wireguard'],personal['wireguard'])
                 self.assertEqual(releases.profile(target)['token'],personal['token'])
                 self.assertEqual(releases.profile(target)['local_routes'],routes)

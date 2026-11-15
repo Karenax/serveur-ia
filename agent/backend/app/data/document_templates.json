@@ -1,0 +1,582 @@
+{
+  "format": "agent-project-document-templates",
+  "version": 1,
+  "source": {
+    "repository": "XPilot",
+    "commit": "82d47dff8475d32ea18a99e9f81d6409b1c19643",
+    "path": "backend/app/services/document_filling.py",
+    "sha256": "fd18d50cfedaf4bda1d6b5fb16b75f586a0504a72f60a21fbafeee94dbc932fb",
+    "extraction": "AST literals only; identification mappings, no file assets or runtime import"
+  },
+  "financial_calculations": false,
+  "fields": {
+    "project_code": {
+      "label": "Numéro d'affaire",
+      "edit_scope": null
+    },
+    "offer_number": {
+      "label": "Numéro d'offre",
+      "edit_scope": "project"
+    },
+    "client_name": {
+      "label": "Nom du client",
+      "edit_scope": "client"
+    },
+    "client_reference": {
+      "label": "Numéro d'avis / référence client",
+      "edit_scope": "project"
+    },
+    "description": {
+      "label": "Description / désignation",
+      "edit_scope": "project"
+    },
+    "equipment_number": {
+      "label": "Numéro d'outillage",
+      "edit_scope": "project"
+    },
+    "client_responsible": {
+      "label": "Responsable client",
+      "edit_scope": "project"
+    },
+    "client_requester": {
+      "label": "Demandeur client",
+      "edit_scope": "project"
+    },
+    "project_manager_trigram": {
+      "label": "Trigramme du CAF",
+      "edit_scope": "person"
+    },
+    "project_manager_first_name": {
+      "label": "Prénom du CAF",
+      "edit_scope": "person"
+    },
+    "project_manager_last_name": {
+      "label": "Nom du CAF",
+      "edit_scope": "person"
+    },
+    "project_manager_email": {
+      "label": "E-mail du CAF",
+      "edit_scope": "person"
+    },
+    "project_manager_phone": {
+      "label": "Téléphone du CAF",
+      "edit_scope": "person"
+    },
+    "project_manager_full_name": {
+      "label": "Prénom et nom du CAF",
+      "edit_scope": "person"
+    },
+    "agency_address": {
+      "label": "Adresse de l'agence",
+      "edit_scope": "agency"
+    },
+    "agency_postal_code": {
+      "label": "Code postal de l'agence",
+      "edit_scope": "agency"
+    },
+    "agency_city": {
+      "label": "Ville de l'agence",
+      "edit_scope": "agency"
+    },
+    "agency_phone": {
+      "label": "Téléphone de l'agence",
+      "edit_scope": "agency"
+    },
+    "today": {
+      "label": "Date du jour",
+      "edit_scope": null
+    }
+  },
+  "documents": [
+    {
+      "id": "offer_lt_simple",
+      "label": "Offre LT simplifiée",
+      "format": "DOCX",
+      "folder_tokens": [
+        "02 avant vente",
+        "01 offres"
+      ],
+      "filename_tokens": [
+        "proposition technique commerciale",
+        "lt simplifiee"
+      ],
+      "preferred_version": 2,
+      "output_name": "{offer_number}-001-A.docx",
+      "fields": [
+        "project_code",
+        "offer_number",
+        "client_reference",
+        "description",
+        "client_requester",
+        "project_manager_first_name",
+        "project_manager_last_name",
+        "project_manager_email",
+        "project_manager_phone",
+        "agency_address",
+        "agency_postal_code",
+        "agency_city",
+        "agency_phone",
+        "today"
+      ],
+      "sheet_name": null,
+      "cells": [],
+      "bookmarks": [
+        [
+          "Description_Avis",
+          "description"
+        ],
+        [
+          "Numero_Avis",
+          "client_reference"
+        ],
+        [
+          "Nom_CAF",
+          "project_manager_last_name"
+        ],
+        [
+          "Nom_CAF2",
+          "project_manager_last_name"
+        ],
+        [
+          "Tel_CAF",
+          "project_manager_phone"
+        ],
+        [
+          "Mail_CAF",
+          "project_manager_email"
+        ],
+        [
+          "Mail_CAF2",
+          "project_manager_email"
+        ],
+        [
+          "Prenom_CAF",
+          "project_manager_first_name"
+        ],
+        [
+          "Prenom_CAF2",
+          "project_manager_first_name"
+        ],
+        [
+          "Prenom_Nom_CAF",
+          "project_manager_full_name"
+        ],
+        [
+          "Numero_Telephone",
+          "project_manager_phone"
+        ],
+        [
+          "Numero_Affaire",
+          "project_code"
+        ],
+        [
+          "Numero_Offre",
+          "offer_number"
+        ],
+        [
+          "Demandeur",
+          "client_requester"
+        ],
+        [
+          "Date",
+          "today"
+        ],
+        [
+          "Date2",
+          "today"
+        ],
+        [
+          "Adresse_Ville",
+          "agency_city"
+        ],
+        [
+          "Adresse_Ville2",
+          "agency_city"
+        ],
+        [
+          "Adresse_Code",
+          "agency_postal_code"
+        ],
+        [
+          "Adresse_Agence",
+          "agency_address"
+        ],
+        [
+          "Adresse_TEL",
+          "agency_phone"
+        ]
+      ],
+      "excluded_tokens": [],
+      "link_code": "offre",
+      "link_order": 100,
+      "link_aliases": [
+        "derniere_offre",
+        "offer_lt_simple"
+      ]
+    },
+    {
+      "id": "tdao",
+      "label": "TDAO",
+      "format": "XLSM",
+      "folder_tokens": [
+        "02 avant vente",
+        "01 offres"
+      ],
+      "filename_tokens": [
+        "fml",
+        "tdao",
+        "lt"
+      ],
+      "preferred_version": 7,
+      "output_name": "{project_code}-TDAO-001-A.xlsm",
+      "fields": [
+        "project_code",
+        "offer_number",
+        "description",
+        "client_name",
+        "client_responsible",
+        "client_requester",
+        "project_manager_trigram"
+      ],
+      "sheet_name": "Accueil",
+      "cells": [
+        [
+          "E6",
+          "offer_number"
+        ],
+        [
+          "E8",
+          "project_code"
+        ],
+        [
+          "E10",
+          "description"
+        ],
+        [
+          "K6",
+          "client_name"
+        ],
+        [
+          "K8",
+          "client_requester"
+        ],
+        [
+          "K10",
+          "client_responsible"
+        ],
+        [
+          "E15",
+          "project_manager_trigram"
+        ]
+      ],
+      "bookmarks": [],
+      "excluded_tokens": [
+        "old"
+      ],
+      "link_code": "dernier_tdao",
+      "link_order": 110,
+      "link_aliases": [
+        "tdao"
+      ]
+    },
+    {
+      "id": "tdsp",
+      "label": "TDSP",
+      "format": "XLSM",
+      "folder_tokens": [
+        "03 suivi affaire"
+      ],
+      "filename_tokens": [
+        "fml",
+        "tdsp",
+        "lt",
+        "xpl"
+      ],
+      "preferred_version": 2,
+      "output_name": "{project_code}-TDSP-001-A.xlsm",
+      "fields": [
+        "project_code",
+        "offer_number",
+        "description",
+        "client_name",
+        "client_responsible",
+        "client_requester",
+        "project_manager_trigram"
+      ],
+      "sheet_name": "Page d'Accueil",
+      "cells": [
+        [
+          "L22",
+          "offer_number"
+        ],
+        [
+          "E6",
+          "project_code"
+        ],
+        [
+          "E8",
+          "description"
+        ],
+        [
+          "K6",
+          "client_name"
+        ],
+        [
+          "K8",
+          "client_requester"
+        ],
+        [
+          "K10",
+          "client_responsible"
+        ],
+        [
+          "E15",
+          "project_manager_trigram"
+        ]
+      ],
+      "bookmarks": [],
+      "excluded_tokens": [],
+      "link_code": "dernier_tdsp",
+      "link_order": 120,
+      "link_aliases": [
+        "tdsp"
+      ]
+    },
+    {
+      "id": "manufacturing_specification",
+      "label": "Cahier des charges de fabrication simple",
+      "format": "XLSM",
+      "folder_tokens": [
+        "06 supply chain"
+      ],
+      "filename_tokens": [
+        "cahier charges fabrication simple"
+      ],
+      "preferred_version": 9,
+      "output_name": "{project_code}-Cahier des charges de fabrication.xlsm",
+      "fields": [
+        "equipment_number",
+        "project_manager_first_name",
+        "project_manager_last_name",
+        "project_manager_email",
+        "project_manager_phone"
+      ],
+      "sheet_name": null,
+      "cells": [
+        [
+          "E11",
+          "project_manager_phone"
+        ],
+        [
+          "M11",
+          "project_manager_phone"
+        ],
+        [
+          "E10",
+          "project_manager_full_name"
+        ],
+        [
+          "M10",
+          "project_manager_full_name"
+        ],
+        [
+          "E12",
+          "project_manager_email"
+        ],
+        [
+          "M12",
+          "project_manager_email"
+        ],
+        [
+          "M7",
+          "equipment_number"
+        ]
+      ],
+      "bookmarks": [],
+      "excluded_tokens": [],
+      "link_code": "cahier_fabrication",
+      "link_order": 130,
+      "link_aliases": []
+    },
+    {
+      "id": "user_manual",
+      "label": "Notice d'utilisation",
+      "format": "DOCM",
+      "folder_tokens": [
+        "05 etudes",
+        "02 etudes",
+        "04 notice"
+      ],
+      "filename_tokens": [
+        "fml",
+        "notice utilisation"
+      ],
+      "preferred_version": 2,
+      "output_name": "{project_code}-Notice d'utilisation.docm",
+      "fields": [
+        "description"
+      ],
+      "sheet_name": null,
+      "cells": [],
+      "bookmarks": [
+        [
+          "Désignation",
+          "description"
+        ]
+      ],
+      "excluded_tokens": [],
+      "link_code": "notice_utilisation",
+      "link_order": 140,
+      "link_aliases": []
+    },
+    {
+      "id": "ce_request",
+      "label": "Demande de déclaration CE",
+      "format": "DOCX",
+      "folder_tokens": [
+        "04 qualite",
+        "06 ce"
+      ],
+      "filename_tokens": [
+        "fiche demande declaration ce"
+      ],
+      "preferred_version": 10,
+      "output_name": "{project_code}-Demande de CE.docx",
+      "fields": [
+        "project_code"
+      ],
+      "sheet_name": null,
+      "cells": [],
+      "bookmarks": [
+        [
+          "Affaire",
+          "project_code"
+        ],
+        [
+          "Affaire2",
+          "project_code"
+        ]
+      ],
+      "excluded_tokens": [],
+      "link_code": "demande_ce",
+      "link_order": 150,
+      "link_aliases": []
+    },
+    {
+      "id": "customer_satisfaction_product",
+      "label": "Enquête de satisfaction client produit",
+      "format": "XLSX",
+      "folder_tokens": [
+        "03 suivi affaire",
+        "05 correspondance client"
+      ],
+      "filename_tokens": [
+        "enquete satisfaction client industrial support"
+      ],
+      "preferred_version": 10,
+      "output_name": "{project_code}-Enquête de satisfaction client produit.xlsx",
+      "fields": [
+        "project_code",
+        "description",
+        "client_name",
+        "agency_city",
+        "today",
+        "project_manager_first_name",
+        "project_manager_last_name"
+      ],
+      "sheet_name": null,
+      "cells": [
+        [
+          "P2",
+          "project_code"
+        ],
+        [
+          "P3",
+          "description"
+        ],
+        [
+          "C2",
+          "client_name"
+        ],
+        [
+          "I2",
+          "agency_city"
+        ],
+        [
+          "C3",
+          "today"
+        ],
+        [
+          "I3",
+          "project_manager_full_name"
+        ]
+      ],
+      "bookmarks": [],
+      "excluded_tokens": [],
+      "link_code": "satisfaction_client_produit",
+      "link_order": 160,
+      "link_aliases": [
+        "customer_satisfaction_product",
+        "satisfaction_client_pi"
+      ]
+    },
+    {
+      "id": "customer_satisfaction_fixed_price",
+      "label": "Enquête de satisfaction client forfait",
+      "format": "XLSX",
+      "folder_tokens": [
+        "03 suivi affaire",
+        "05 correspondance client"
+      ],
+      "filename_tokens": [
+        "enquete satisfaction client forfait"
+      ],
+      "preferred_version": 10,
+      "output_name": "{project_code}-Enquête de satisfaction client forfait.xlsx",
+      "fields": [
+        "project_code",
+        "description",
+        "client_name",
+        "agency_city",
+        "today",
+        "project_manager_first_name",
+        "project_manager_last_name"
+      ],
+      "sheet_name": null,
+      "cells": [
+        [
+          "P2",
+          "project_code"
+        ],
+        [
+          "P3",
+          "description"
+        ],
+        [
+          "C2",
+          "client_name"
+        ],
+        [
+          "I2",
+          "agency_city"
+        ],
+        [
+          "C3",
+          "today"
+        ],
+        [
+          "I3",
+          "project_manager_full_name"
+        ]
+      ],
+      "bookmarks": [],
+      "excluded_tokens": [],
+      "link_code": "satisfaction_client_forfait",
+      "link_order": 170,
+      "link_aliases": [
+        "customer_satisfaction_fixed_price",
+        "satisfaction_client_pf"
+      ]
+    }
+  ]
+}

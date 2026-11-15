@@ -166,6 +166,24 @@ main#messages{overflow-y:scroll;scrollbar-gutter:stable;overflow-anchor:none;scr
 .conversation-item[data-archived="true"]{display:flex;align-items:center;justify-content:space-between;gap:8px}.conversation-item[data-archived="true"] span{flex:1;min-width:0}.conversation-item[data-archived="true"] small{display:inline-block;flex-shrink:0;font-size:10px;padding:2px 6px;border-radius:5px;background:var(--raised);color:var(--muted)}
 .ws-doc-library #ws-documents{gap:5px}.ws-doc-library #ws-documents button{border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--text);font-weight:500;padding:8px 10px}.ws-doc-library #ws-documents button.selected{border-color:var(--green);background:var(--hover)}.ws-doc-library #ws-documents button:hover{border-color:var(--muted);background:var(--hover)}
 #ui-document-controls{margin-top:6px;padding:2px 4px}
+.ws-agent-project [data-project-tab="documents"],.ws-agent-project [data-project-tab="instructions"],
+.ws-agent-project [data-project-pane="documents"],.ws-agent-project [data-project-pane="instructions"]{display:none}
 #search-conversations{min-height:36px}
 @media(hover:none),(pointer:coarse){#search-conversations{min-height:42px;font-size:14px}.message-copy{position:static;float:right;opacity:1!important;min-height:36px;margin:0 0 5px 8px}.message.user .message-copy{float:none;display:block;margin:0 0 6px auto}}
 #agent-approval{margin:12px max(24px,calc((100% - clamp(760px,65vw,1200px))/2));padding:16px 18px;border:1px solid var(--gold);border-left:4px solid var(--gold);border-radius:10px;background:var(--panel)}#agent-approval strong{display:block;font-size:14px;margin-bottom:6px}#agent-approval p{margin:6px 0 12px}#agent-approval button{margin-right:8px}
+
+.project-conversation-switch,.project-conversation-controls {
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 24px;
+}
+.project-conversation-switch:has(> [hidden]) { display:none; }
+.project-conversation-controls label { display:flex;align-items:center;gap:6px; }
+.project-conversation-controls select { max-width:min(70vw,280px); }
+.project-conversation-controls [role=status] { flex:1 1 100%;color:var(--muted);font-size:12px; }
+.project-conversation-messages { flex:1;min-height:0;overflow:auto;padding:12px 24px; }
+.project-conversation-messages details a { color:var(--text);text-underline-offset:3px; }
+body[data-project-conversation] .chat-view :is(#messages,.conversation-top,.ws-pickers,.composer-bottom) { display:none!important; }
+@media(max-width:850px) {
+  .project-conversation-switch,.project-conversation-controls,.project-conversation-messages { padding-inline:14px; }
+}
+body[data-project-conversation] .composer :is(.attachment-tools,#chat-attachments,#voice-start,#voice-cancel,#voice-status,#thinking) { display:none!important; }
+body[data-project-ephemeral="true"] :is(#ui-draft-status,#ui-draft-retry), body[data-project-conversation] #loaded-model { display:none!important; }

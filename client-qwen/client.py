@@ -6,10 +6,12 @@ from collections import deque
 import hashlib
 import hmac
 import io
+from http.cookies import SimpleCookie, CookieError
 from http.server import BaseHTTPRequestHandler
 from fred_http import BoundedHTTPServer, json_body
 import json
 import os
+import re
 from pathlib import Path
 import secrets
 import subprocess
@@ -17,17 +19,22 @@ import struct
 import sys
 import threading
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import filedialog, messagebox, simpledialog
 import urllib.error
 import urllib.request
+from uuid import UUID
+from urllib.parse import urlsplit
 import time
 from updater import VERSION, AGENT_PROTOCOL
+from kiara_shared.releases import version as validate_version
 from product import APP_NAME, LOCAL_API_PORT, LOCAL_API_LAST_PORT
 import history_store
 from wg_bridge import Bridge,validate_profile,connection_candidates
 from connection_settings import parse as parse_connection_settings, validate_connection_endpoint, HTTPS_ENDPOINT
 import app_integrations
 import hermes_catalogue
+from kiara_shared.agent_http import AGENT_RESPONSE_HEADERS
+from kiara_shared.thunderbird import PREFIX as THUNDERBIRD_PREFIX, bridge_route
 
 if sys.platform == 'win32':
     from ctypes import wintypes
@@ -64,6 +71,7 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
 class Remote:
     def __init__(self, profile, opener=None, endpoint=None, connection_required=False):
         validate_profile(profile)
+        self.version = VERSION
         self.profile=copy.deepcopy(profile)
         self.url=profile['url']
         self.token = profile['token']
@@ -91,8 +99,12 @@ class Remote:
         self.activity_lock = threading.RLock()
         self.cancelled_requests = deque(maxlen=128)
         self.active_requests = 0
+        self.active_inference_requests = 0
         self.applying_update = False
+        self.kiara4 = None
         self.window = None
+        self.close_guard = None
+        self.desktop_update = None
         self.connected = False
         self.reachable = False
         self.error = 'Connexion au serveur IA…'
@@ -169,9 +181,21 @@ class Remote:
             if model not in self.models:raise ValueError('Ce modèle ne figure pas dans le dernier scan du serveur.')
             self.model=model
 
-    def open(self, path, data=None, request_id=None):
+    def open(self, path, data=None, request_id=None, *, method=None, content_type='application/json', content_length=None, timeout=None, range_headers=None):
         if not isinstance(path,str) or not path.startswith('/v1/') or any(c in path for c in ('\\','\r','\n')):
             raise ValueError('Route API invalide.')
+        business = path.startswith('/v1/business/')
+        if method is not None and (not business or method not in ('GET', 'POST', 'PUT', 'PATCH', 'DELETE')):
+            raise ValueError('Méthode API invalide.')
+        if not isinstance(content_type, str) or not content_type or len(content_type) > 512 or any(c in content_type for c in '\r\n'):
+            raise ValueError('Type de contenu invalide.')
+        if content_length is not None and (not business or type(content_length) is not int or not 0 <= content_length <= 272 * 1024 * 1024):
+            raise ValueError('Taille de contenu invalide.')
+        range_headers = range_headers or {}
+        if range_headers and (not business or method != 'GET' or any(
+                name not in ('Range', 'If-Range') or not isinstance(value, str) or len(value) > 512
+                or not value.isascii() or any(c in value for c in '\r\n') for name, value in range_headers.items())):
+            raise ValueError('Plage de téléchargement invalide.')
         with self.bridge_lock:
             if self.connection_required:raise ValueError('Choisissez le mode de connexion avant de contacter le serveur.')
             https=self.endpoint==HTTPS_ENDPOINT
@@ -188,9 +212,13 @@ class Remote:
             opener=self.https_opener if https else self.opener
         # Capture the URL and its matching secret together; a reconnect may replace the bridge.
         request = urllib.request.Request(url + path, data=data,
-            headers={**headers, 'User-Agent':'AccesServeurKiara/'+VERSION+' ('+('Linux' if sys.platform.startswith('linux') else 'Windows')+'; '+('HTTPS' if https else 'WireGuard')+')', 'Content-Type': 'application/json','X-Qwen-Session':self.session,'X-Fred-Agent-Protocol':str(AGENT_PROTOCOL),**({'X-Qwen-Request':request_id} if request_id else {})})
+        headers={**headers, 'User-Agent':'AccesServeurKiara/'+self.version+' ('+('Linux' if sys.platform.startswith('linux') else 'Windows')+'; '+('HTTPS' if https else 'WireGuard')+')', 'Content-Type': content_type,'X-Qwen-Session':self.session,'X-Fred-Agent-Protocol':str(AGENT_PROTOCOL),**({'X-Qwen-Request':request_id} if request_id else {}),**({'Content-Length':str(content_length)} if content_length is not None else {})}, method=method)
+        for name, value in range_headers.items():
+            request.add_header(name, value)
         try:
-            response=opener.open(request, timeout=900 if path in ("/v1/chat/completions","/v1/responses") else 120 if path=="/v1/client/download" else 90 if path in ('/v1/voice/max/transcribe','/v1/voice/max/speech') else 60 if path in ("/v1/workspace/action","/v1/history") else 3 if path=="/v1/device" else 90 if path=="/v1/embeddings" else 30)
+            if timeout is None:
+                timeout=900 if business or path in ("/v1/chat/completions","/v1/responses") else 120 if path=="/v1/client/download" else 90 if path in ('/v1/voice/max/transcribe','/v1/voice/max/speech') else 60 if path in ("/v1/workspace/action","/v1/history") else 3 if path=="/v1/device" else 90 if path=="/v1/embeddings" else 30
+            response=opener.open(request, timeout=timeout)
             with self.activity_lock:self.last_contact=time.time();self.response_count+=1
             self.event('server_response',route=path,status=getattr(response,'status',200))
             return response
@@ -199,7 +227,8 @@ class Remote:
             raw=error.read(65536)
             try:
                 detail=json.loads(raw).get('error',{})
-                if isinstance(detail,dict):self.failure(detail.get('code'),detail.get('message','Serveur indisponible.'))
+                if isinstance(detail,dict) and (not business or detail.get('code') in ('access_denied','access_revoked','access_suspended','access_expired','remote_disabled')):
+                    self.failure(detail.get('code'),detail.get('message','Serveur indisponible.'))
             except (ValueError,AttributeError):pass
             response=urllib.error.HTTPError(error.url,error.code,error.reason,error.headers,io.BytesIO(raw))
             error.close()
@@ -208,12 +237,19 @@ class Remote:
             self.failure('connection_error','Connexion au serveur IA interrompue. Vérifier le réseau puis réessayer.')
             raise
 
-    def update(self,apply=False):
+    def update(self,apply=False, *, migrate=False):
+        managed = getattr(self, 'managed_relay', False)
+        if managed and (self.desktop_update is None or migrate):
+            raise ValueError('Utilisez l’installateur Kiara pour mettre à jour cette application.')
         if sys.platform.startswith('linux'):
             self.update_state={'busy':False,'available':False,'current':VERSION,
                                'message':'Pour mettre Kiara à jour, installez le nouveau paquet Linux fourni par votre administrateur.'}
             return self.update_state
+        if migrate and (sys.platform != 'win32' or not getattr(sys, 'frozen', False) or self.mock or not self.window):
+            raise ValueError('Le passage à Kiara 4 est disponible depuis l’EXE personnel Windows.')
         with self.activity_lock:
+            if (migrate or managed and apply) and self.active_inference_requests:
+                raise ValueError('Attendez la fin de la requête en cours.')
             if self.applying_update:raise ValueError('Installation en cours. Attendre le redémarrage du client.')
             if not self.update_lock.acquire(blocking=False):raise ValueError('Une mise à jour est déjà en cours.')
             if apply:self.applying_update=True
@@ -223,13 +259,22 @@ class Remote:
             try:
                 import updater
                 if apply:
-                    updater.prepare(self,protect)
+                    if managed:
+                        self.desktop_update.stage(self)
+                        prepared = True
+                        return
+                    if migrate:
+                        self.kiara4 = updater.install_kiara4(self)
+                        if self.close_guard is not None:
+                            self.close_guard['ready'] = True  # The migration route already flushed local data.
+                    else:
+                        updater.prepare(self,protect)
                     prepared=True
                     self.update_state={'busy':False,'message':'Mise à jour vérifiée. Redémarrage du client…'}
                     if self.window:self.window.destroy()
                 else:
-                    release=updater.check(self)
-                    self.update_state={**release,'busy':False,'message':('Version '+release['version']+' disponible.' if release['available'] else 'Client à jour · '+VERSION)}
+                    release=updater.desktop_release(self) if managed else updater.check(self)
+                    self.update_state={**release,'busy':False,'message':('Version '+release['version']+' disponible.' if release['available'] else 'Client à jour · '+release['current'])}
             except Exception as error:self.update_state={'busy':False,'message':str(error),'error':True}
             finally:
                 with self.activity_lock:
@@ -274,7 +319,7 @@ class Remote:
                 if time.time()-getattr(self,'device_reported_at',0)>=60:
                     self.device_reported_at=time.time()
                     try:
-                        declaration={'kind':'pc','version':VERSION,'transport':'https' if self.endpoint==HTTPS_ENDPOINT else 'wireguard','agent_protocol':AGENT_PROTOCOL}
+                        declaration={'kind':'pc','version':self.version,'transport':'https' if self.endpoint==HTTPS_ENDPOINT else 'wireguard','agent_protocol':AGENT_PROTOCOL}
                         with self.open('/v1/device',json.dumps(declaration).encode()) as response:response.read(2048)
                     except urllib.error.HTTPError as error:
                         if error.code in (401,403):raise
@@ -348,7 +393,33 @@ class Remote:
         if not self.connected:self.models=[];self.model=''
         self.code=code;self.diagnostic=diagnostic;self.checked_at=time.time()
 
-def serve_local(remote, key, port=LOCAL_API_PORT):
+AGENT_OPEN_EXTENSIONS = frozenset({'.pdf', '.docx', '.xlsx', '.csv', '.txt', '.md', '.png', '.jpg',
+                                  '.jpeg', '.pptx', '.dwg', '.dxf', '.step', '.stp', '.iges', '.igs', '.sldprt'})
+
+
+def agent_windows_path(value, roots):
+    if not isinstance(value, str) or not 1 <= len(value) <= 2048 or any(ord(char) < 32 for char in value):
+        raise ValueError('Chemin de projet invalide.')
+    from pathlib import PureWindowsPath
+    windows = PureWindowsPath(value)
+    if (not windows.is_absolute() or '..' in windows.parts or ':' in value[2:]
+            or value.replace('/', '\\').startswith(('\\\\?\\', '\\\\.\\'))):
+        raise ValueError('Choisissez un dossier ou un fichier du projet.')
+    requested = Path(value)
+    # Check the configured prefix before touching a remote filesystem.
+    candidates = [Path(root) for root in roots if PureWindowsPath(root).is_absolute()
+                  and windows.is_relative_to(PureWindowsPath(root))]
+    for root in candidates:
+        resolved_root = root.resolve(strict=True)
+        resolved = requested.resolve(strict=True)
+        if resolved.is_relative_to(resolved_root):
+            if resolved.is_dir() or (resolved.is_file() and resolved.suffix.lower() in AGENT_OPEN_EXTENSIONS):
+                return resolved
+            raise PermissionError('Ce type de fichier ne peut pas être ouvert par Agent.')
+    raise PermissionError('Ce chemin est en dehors des dossiers autorisés sur ce poste.')
+
+
+def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
     from conversation_service import ConversationService, DictationService
     from advanced_voice import AdvancedVoice, choose_execution
     from max_installation import MaxInstallation, max_home
@@ -374,6 +445,12 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
     from history_sync import HistorySync
     drafts=DraftStore(settings_path(remote.profile),protect)
     histories=HistorySync(remote,settings_path(remote.profile).with_suffix('.history.dpapi'),protect)
+    agent_cookie = secrets.token_urlsafe(32)
+    helper = Path(sys.executable).with_name('kiara-agent-capture.exe')
+    desktop_capture = None
+    if managed and sys.platform == 'win32' and getattr(sys, 'frozen', False) and helper.is_file():
+        from agent_capture import DesktopCapture
+        desktop_capture = DesktopCapture(remote, helper, settings_path(remote.profile).with_suffix('.capture'))
     class Handler(BaseHTTPRequestHandler):
         def setup(self):
             super().setup()
@@ -407,13 +484,224 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
             hosts = (f'127.0.0.1:{port}', f'localhost:{port}')
             return self.headers.get('Host') in hosts and self.headers.get('Origin') in (None, *(f'http://{host}' for host in hosts))
 
+        def agent_request(self):
+            path = urlsplit(self.path).path
+            prefixes = ('/api/v1/', '/assets/', '/app/', '/v1/projects/', '/v1/sources/',
+                        '/v1/settings/', '/v1/mail/', '/v1/triage/', '/v1/thunderbird/',
+                        '/v1/proposals/', '/v1/search/')
+            return path in ('/app', '/v1/settings') or path.startswith(prefixes)
+
+        def agent_authorized(self):
+            if not self.local_request():
+                return False
+            try:
+                cookie = SimpleCookie()
+                cookie.load(self.headers.get('Cookie', ''))
+                value = cookie.get('kiara_agent')
+                return bool(value and hmac.compare_digest(value.value, agent_cookie))
+            except CookieError:
+                return False
+
+        def agent_proxy(self):
+            bridge = self.path.startswith(THUNDERBIRD_PREFIX)
+            if bridge:
+                origin = self.headers.get('Origin', '')
+                provided = self.headers.get('X-Agent-Thunderbird-Token', '')
+                expected = client_settings(remote.profile).get('thunderbird_token', '')
+                if (self.headers.get('Host') != f'127.0.0.1:{self.server.server_port}'
+                        or (origin and not self.thunderbird_origin())
+                        or self.command != 'POST' or not bridge_route(self.path)
+                        or not isinstance(expected, str) or not expected or not provided.isascii()
+                        or not hmac.compare_digest(provided, expected)):
+                    return self.reply(403, {'detail': 'Liaison Thunderbird non appairée.'})
+            elif not self.agent_authorized():
+                return self.reply(403, {'error': {'message': 'Ouvrez Agent depuis Kiara.'}})
+            if not bridge and self.command not in ('GET', 'HEAD'):
+                port = self.server.server_address[1]
+                if self.headers.get('Origin') not in (f'http://127.0.0.1:{port}', f'http://localhost:{port}'):
+                    return self.reply(403, {'error': {'message': 'Commande locale refusée.'}})
+            if managed and sys.platform == 'win32' and self.path == '/api/v1/kiara/thunderbird-extension':
+                return self.thunderbird_extension()
+            native_path = re.fullmatch(r'/api/v1/meeting-sessions/([0-9a-f-]{36})/native-capture/(status|start|pause|resume|stop)', self.path)
+            if desktop_capture and (native_path or self.path == '/api/v1/workspace/native-capture'):
+                return self.agent_desktop_capture(native_path)
+            lengths = self.headers.get_all('Content-Length', [])
+            if self.headers.get('Transfer-Encoding') or len(lengths) > 1:
+                return self.reply(400, {'error': {'message': 'Transfert invalide.'}})
+            try:
+                length = int(lengths[0]) if lengths else 0
+                if not 0 <= length <= 272 * 1024 * 1024:
+                    raise ValueError('Taille invalide')
+            except ValueError:
+                return self.reply(413, {'error': {'message': 'Fichier trop volumineux.'}})
+
+            def body():
+                remaining = length
+                while remaining:
+                    chunk = self.rfile.read(min(65536, remaining))
+                    if not chunk:
+                        raise OSError('Transfert interrompu')
+                    remaining -= len(chunk)
+                    yield chunk
+
+            started = False
+            try:
+                try:
+                    response = remote.open('/v1/business' + self.path, body() if length else None,
+                                           method=self.command, content_type=self.headers.get('Content-Type', 'application/json'),
+                                           content_length=length, range_headers={name: self.headers[name]
+                                               for name in ('Range', 'If-Range') if self.command == 'GET' and name in self.headers})
+                except urllib.error.HTTPError as error:
+                    response = error
+                with response:
+                    html = None
+                    path = urlsplit(self.path).path
+                    if self.command == 'GET' and (path == '/app' or path.startswith('/app/')) and response.status == 200:
+                        html = response.read(1024 * 1024 + 1)
+                        if len(html) > 1024 * 1024 or b'<body>' not in html:
+                            raise ValueError('Page Agent invalide')
+                        capture = b' data-kiara-capture="true"' if desktop_capture else b''
+                        html = html.replace(b'<body>', b'<body data-kiara-desktop="true" data-kiara-project-conversation="true"' + capture + b'>', 1)
+                    self.send_response(response.status if hasattr(response, 'status') else response.code)
+                    for name in AGENT_RESPONSE_HEADERS:
+                        value = response.headers.get(name)
+                        if name == 'Content-Length' and html is not None:
+                            value = str(len(html))
+                        if value:
+                            self.send_header(name, value)
+                    self.send_header('Connection', 'close')
+                    if bridge and origin:
+                        self.send_header('Access-Control-Allow-Origin', origin)
+                        self.send_header('Vary', 'Origin')
+                    self.end_headers()
+                    started = True
+                    if html is not None:
+                        self.wfile.write(html)
+                        return
+                    while chunk := response.read1(65536):
+                        self.wfile.write(chunk)
+                        self.wfile.flush()
+            except (OSError, ValueError, urllib.error.URLError):
+                if not started:
+                    self.reply(503, {'error': {'message': 'Service Agent indisponible.'}})
+
+        def thunderbird_extension(self):
+            if self.command not in ('GET', 'POST'):
+                return self.reply(405, {'detail': 'Commande Thunderbird inconnue.'})
+            if self.command == 'POST' and self.server.server_port != LOCAL_API_PORT:
+                return self.reply(409, {'detail': 'Le port de Thunderbird est occupé. Libérez le port 17841 puis relancez Kiara.'})
+            try:
+                from thunderbird_integration import manage
+                result = manage(remote.profile, thunderbird_extension_source(), enable=self.command == 'POST', inspect=self.command == 'GET')
+            except (OSError, ValueError, KeyError, TypeError) as error:
+                return self.reply(400, {'detail': str(error) or 'Installation Thunderbird impossible.'})
+            return self.reply(200, result)
+
+        def agent_desktop_capture(self, match):
+            sid, operation = match.groups() if match else (None, 'status')
+            try:
+                if sid and str(UUID(sid)) != sid:
+                    raise ValueError('Séance invalide.')
+                if operation == 'status' and self.command == 'GET':
+                    return self.reply(200, desktop_capture.status(sid))
+                if operation != 'status' and self.command == 'POST':
+                    values = json_body(self, 8192)
+                    with desktop_capture.lock:
+                        if operation == 'start' and remote.applying_update:
+                            raise ValueError('Attendez le redémarrage de Kiara avant de lancer une capture.')
+                        result = desktop_capture.control(sid, operation, values)
+                    return self.reply(200, result)
+                return self.reply(405, {'detail': 'Commande de capture non disponible.'})
+            except urllib.error.HTTPError as error:
+                status = error.code
+                error.close()
+                return self.reply(status, {'detail': 'La séance a changé ou le serveur ne répond pas. Actualisez la séance. Les fragments restent sur ce poste.'})
+            except ValueError as error:
+                return self.reply(409, {'detail': str(error)})
+            except (OSError, KeyError, subprocess.SubprocessError):
+                return self.reply(503, {'detail': 'Capture Windows indisponible. Les fragments restent sur ce poste.'})
+
+        def thunderbird_origin(self):
+            from re import fullmatch
+            return bool(fullmatch(r'moz-extension://[0-9a-fA-F-]{36}', self.headers.get('Origin', '')))
+
+        def do_OPTIONS(self):
+            if (not bridge_route(self.path) or not self.thunderbird_origin()
+                    or self.headers.get('Host') != f'127.0.0.1:{self.server.server_port}'
+                    or self.headers.get('Access-Control-Request-Method') != 'POST'):
+                return self.reply(403, {'detail': 'Origine de liaison non autorisée.'})
+            self.send_response(204)
+            self.send_header('Access-Control-Allow-Origin', self.headers['Origin'])
+            self.send_header('Access-Control-Allow-Methods', 'POST')
+            self.send_header('Access-Control-Allow-Headers', 'Content-Type, X-Agent-Thunderbird-Token')
+            self.send_header('Vary', 'Origin')
+            self.end_headers()
+
+        def agent_session(self):
+            if not self.authorized():
+                return
+            try:
+                json_body(self, 4096)
+            except (ValueError, TypeError):
+                return self.reply(400, {'error': {'message': 'Demande invalide.'}})
+            try:
+                with remote.open('/v1/business/api/v1/session') as response:
+                    response.read(65536)
+            except urllib.error.HTTPError as error:
+                status = 403 if error.code in (401, 403) else 503
+                error.close()
+                return self.reply(status, {'error': {'message': 'Accès aux projets indisponible. Vérifiez la connexion ou contactez votre administrateur.'}})
+            except (OSError, ValueError, urllib.error.URLError):
+                return self.reply(503, {'error': {'message': 'Projets indisponibles. Vérifiez la connexion puis réessayez.'}})
+            data = b'{"url":"/app"}'
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json; charset=utf-8')
+            self.send_header('Content-Length', str(len(data)))
+            self.send_header('Set-Cookie', f'kiara_agent={agent_cookie}; Path=/; HttpOnly; SameSite=Strict')
+            self.send_header('Cache-Control', 'no-store')
+            self.end_headers()
+            self.wfile.write(data)
+
+        def agent_open_path(self):
+            origin = f'http://{self.headers.get("Host", "")}'
+            if not self.agent_authorized() or self.headers.get('Origin') != origin:
+                return self.reply(403, {'detail': 'Ouvrez Agent depuis Kiara.'})
+            if sys.platform != 'win32':
+                return self.reply(403, {'detail': 'Ouvrez ce chemin depuis le poste Windows.'})
+            try:
+                data = json_body(self, 8192)
+                project = data.get('project') if isinstance(data, dict) else None
+                if not isinstance(project, str) or str(UUID(project)) != project:
+                    raise ValueError('Projet invalide.')
+                value = data.get('path')
+            except (ValueError, TypeError):
+                return self.reply(400, {'detail': 'Projet ou chemin invalide.'})
+            try:
+                with remote.open(f'/v1/business/api/v1/projects/{project}/network-links') as response:
+                    response.read(1024 * 1024)
+            except urllib.error.HTTPError as error:
+                status = 403 if error.code in (401, 403, 404) else 503
+                error.close()
+                return self.reply(status, {'detail': 'Vérifiez votre accès au projet avant d’ouvrir ce chemin.'})
+            except (OSError, ValueError):
+                return self.reply(503, {'detail': 'Connexion au projet indisponible.'})
+            try:
+                roots = [root for root in os.environ.get('AGENT_OPEN_ROOTS', '').split(';') if root]
+                path = agent_windows_path(value, roots)
+                os.startfile(str(path))
+            except PermissionError as error:
+                return self.reply(403, {'detail': str(error) if error.errno is None else 'Accès refusé sur ce poste.'})
+            except (OSError, ValueError, RuntimeError):
+                return self.reply(422, {'detail': 'Ce fichier ou dossier est inaccessible sur ce poste.'})
+            return self.reply(200, {'opened': True})
+
         def chat(self):
             if not self.local_request():
                 return self.reply(403, {'error': {'message': 'Le chat est accessible sur localhost uniquement.'}})
             nonce = secrets.token_urlsafe(24)
-            config = json.dumps({'key':key, 'model':remote.model, 'version':VERSION, 'storage':hashlib.sha256(key.encode()).hexdigest()[:20], 'platform':'linux' if sys.platform.startswith('linux') else 'windows'}, ensure_ascii=False).replace('<', '\\u003c')
+            config = json.dumps({'key':key, 'model':remote.model, 'version':remote.version, 'storage':hashlib.sha256(key.encode()).hexdigest()[:20], 'platform':'linux' if sys.platform.startswith('linux') else 'windows'}, ensure_ascii=False).replace('<', '\\u003c')
             template = Path(getattr(sys, '_MEIPASS', Path(__file__).parent)) / 'chat.html'
-            scripts=('ui.js','attachments.js','corrector.js','selection.js','thinking.js','voice.js','conversation.js')+ (('linux_features.js',) if sys.platform.startswith('linux') else ())
+            scripts=('ui.js','attachments.js','corrector.js','selection.js','thinking.js','voice.js','conversation.js','project-conversation.js')+ (('linux_features.js',) if sys.platform.startswith('linux') else ())
             presentation = ''.join('<script nonce="__NONCE__">'+(template.parent/name).read_text(encoding='utf-8')+'</script>' for name in scripts)
             markdown=''.join('<script nonce="__NONCE__">'+path.read_text(encoding='utf-8').replace('</script','<\\/script')+'</script>' for path in (template.parent/'vendor/markdown-it.min.js',template.parent/'markdown.js'))
             content = template.read_text(encoding='utf-8').replace('</head>',markdown+'</head>').replace('</body>',(template.parent/'workspace.html').read_text(encoding='utf-8')+presentation+'</body>').replace('__UI_CSS__',(template.parent/'ui.css').read_text(encoding='utf-8')).replace('__CONFIG__', config).replace('__NONCE__', nonce).encode()
@@ -427,6 +715,8 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
             self.wfile.write(content)
 
         def do_GET(self):
+            if self.agent_request():
+                return self.agent_proxy()
             if self.path=='/client/voice/max':
                 if not self.authorized():return
                 return self.reply(200,{'pc':advanced.status(),'server':max_server_status(),'installation':max_installation.status()})
@@ -456,7 +746,7 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
                 if not self.authorized():return
                 histories.schedule()
                 remote.refresh_diagnostic()
-                return self.reply(200,{'version':VERSION,'logged_in':True,'username':'Accès personnel','endpoint':remote.endpoint,'internet_endpoint':remote.profile['wireguard']['endpoint'],'connection':remote.state(),'history':histories.status(),'preferences':client_settings(remote.profile).get('preferences',{}),'update':remote.update_state,'local_api':f'http://127.0.0.1:{self.server.server_port}/v1','key':key})
+                return self.reply(200,{'version':remote.version,'logged_in':True,'username':'Accès personnel','endpoint':remote.endpoint,'internet_endpoint':remote.profile['wireguard']['endpoint'],'connection':remote.state(),'history':histories.status(),'preferences':client_settings(remote.profile).get('preferences',{}),'update':remote.update_state,'desktop_managed':managed,'kiara4_migration':sys.platform=='win32' and not managed and bool(getattr(sys,'frozen',False)),'local_api':f'http://127.0.0.1:{self.server.server_port}/v1','key':key})
             if self.path == '/client/history':
                 if not self.authorized():return
                 try:return self.reply(200,histories.read())
@@ -480,9 +770,15 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
             self.forward()
 
         def do_POST(self):
+            if self.path == '/client/agent/session':
+                return self.agent_session()
+            if self.path == '/api/v1/open-path':
+                return self.agent_open_path()
+            if self.agent_request():
+                return self.agent_proxy()
             hermes_request=self.path=='/hermes/v1/chat/completions'
             if hermes_request:self.path='/v1/chat/completions'
-            if self.path not in ('/client/wakeword','/client/capture') and self.path not in ('/v1/embeddings','/v1/chat/completions','/v1/responses','/v1/context', '/v1/cancel','/v1/workspace/action','/v1/notifications/action','/v1/agent/action','/v1/voice/speech','/v1/voice/cancel','/client/conversation','/client/draft','/client/endpoint','/client/preferences','/client/update/check','/client/update/apply','/client/history','/client/history/sync','/client/history/restore-ack','/client/history/flush','/client/history/recover','/client/integrations/apply','/client/voice','/client/voice/max/test','/client/voice/max/transcribe','/client/voice/max/speech','/client/voice/max/cancel','/client/voice/max/plan','/client/voice/max/install','/client/voice/max/install-cancel','/client/voice/max/detect','/client/voice/max/remove','/client/voice/max/open-folder','/client/voice/max/choose-folder','/client/voice/max/devices','/client/voice/max/gpu'):
+            if self.path not in ('/client/wakeword','/client/capture') and self.path not in ('/v1/embeddings','/v1/chat/completions','/v1/responses','/v1/context', '/v1/cancel','/v1/workspace/action','/v1/notifications/action','/v1/agent/action','/v1/voice/speech','/v1/voice/cancel','/client/conversation','/client/draft','/client/endpoint','/client/preferences','/client/update/check','/client/update/apply','/client/update/kiara4','/client/history','/client/history/sync','/client/history/restore-ack','/client/history/flush','/client/history/recover','/client/integrations/apply','/client/voice','/client/voice/max/test','/client/voice/max/transcribe','/client/voice/max/speech','/client/voice/max/cancel','/client/voice/max/plan','/client/voice/max/install','/client/voice/max/install-cancel','/client/voice/max/detect','/client/voice/max/remove','/client/voice/max/open-folder','/client/voice/max/choose-folder','/client/voice/max/devices','/client/voice/max/gpu'):
                 return self.reply(404, {'error': {'message': 'Route non disponible.'}})
             if not self.authorized():
                 return
@@ -560,7 +856,7 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
                 try:
                     values=json.loads(body)
                     if not isinstance(values,dict):raise ValueError('Paramètres invalides.')
-                    if self.path in ('/client/update/apply','/client/endpoint') and (wakeword.status()['phase'] in ('loading','listening','stopping') or voice.status()['phase'] in ('loading','listening','finishing','cancelling') or conversation.status()['phase'] in ('loading','listening','stopping')):
+                    if self.path in ('/client/update/apply','/client/update/kiara4','/client/endpoint') and (wakeword.status()['phase'] in ('loading','listening','stopping') or voice.status()['phase'] in ('loading','listening','finishing','cancelling') or conversation.status()['phase'] in ('loading','listening','stopping')):
                         raise ValueError('Terminez la dictée avant de mettre le client à jour.')
                     if self.path=='/client/capture':
                         if values:raise ValueError('La capture ne reçoit pas de coordonnées ni de chemin.')
@@ -622,7 +918,19 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
                         result=history_store.recover(settings_path(remote.profile).with_suffix('.history.dpapi'),protect,values.get('history'))
                     elif self.path=='/client/draft':
                         result=drafts.write(values.get('draft'))
-                    else:result=remote.update(self.path.endswith('/apply'))
+                    elif self.path=='/client/update/kiara4':
+                        if values:raise ValueError('Paramètres de migration invalides.')
+                        histories.flush()
+                        result=remote.update(True,migrate=True)
+                    else:
+                        apply = self.path.endswith('/apply')
+                        if managed and apply and desktop_capture:
+                            with desktop_capture.lock:
+                                if desktop_capture.current:
+                                    raise ValueError('Terminez l’enregistrement de la réunion avant la mise à jour.')
+                                result = remote.update(apply)
+                        else:
+                            result = remote.update(apply)
                     return self.reply(200,result)
                 except urllib.error.HTTPError as error:
                     try:return self.reply(error.code,json.loads(error.read(65536)))
@@ -630,6 +938,15 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
                 except history_store.HistoryConflict as error:return self.reply(409,{'error':{'message':str(error)}})
                 except (ValueError,OSError,TypeError) as error:return self.reply(400,{'error':{'message':str(error)}})
             self.forward(body, streaming)
+
+        def agent_write(self):
+            if self.agent_request():
+                return self.agent_proxy()
+            return self.reply(404, {'error': {'message': 'Route non disponible.'}})
+
+        do_PUT = agent_write
+        do_PATCH = agent_write
+        do_DELETE = agent_write
 
         def forward(self, body=None, streaming=False):
             sent = False
@@ -642,6 +959,7 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
                     remote.cancelled_requests.append(self.headers.get('X-Qwen-Request'))
                 if inference and remote.applying_update:return self.reply(409,{'error':{'message':'Mise à jour en cours. Réessayer après le redémarrage.'}})
                 if tracked:remote.active_requests+=1
+                if inference:remote.active_inference_requests+=1
             try:
                 try:
                     response = remote.open(self.path, body,self.headers.get("X-Qwen-Request"))
@@ -714,7 +1032,9 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
             finally:
                 if chat_stream and remote.stream.get('phase') not in ('complete','failed'):remote.stream['phase']='interrupted';remote.event('generation_interrupted')
                 if tracked:
-                    with remote.activity_lock:remote.active_requests-=1
+                    with remote.activity_lock:
+                        remote.active_requests-=1
+                        if inference:remote.active_inference_requests-=1
     server = LocalHTTPServer(('127.0.0.1', port), Handler)
     server.voice = voice
     server.conversation = conversation
@@ -742,8 +1062,11 @@ def serve_local(remote, key, port=LOCAL_API_PORT):
         return conversation.cache
     conversation.max_models=max_capture_models
     server.advanced_voice=advanced
+    server.desktop_capture=desktop_capture
     server.max_installation=max_installation
     server.daemon_threads = True
+    if desktop_capture:
+        desktop_capture.start_transfer_worker()
     return server
 
 class LocalHTTPServer(BoundedHTTPServer):
@@ -752,6 +1075,7 @@ class LocalHTTPServer(BoundedHTTPServer):
         super().__init__(*args,capacity=24,**kwargs)
 
     def server_close(self):
+        if getattr(self, 'desktop_capture', None):self.desktop_capture.close()
         if hasattr(self, "max_installation"):self.max_installation.close()
         if hasattr(self, "conversation"):self.conversation.close()
         if hasattr(self, "wakeword"):self.wakeword.close()
@@ -759,22 +1083,26 @@ class LocalHTTPServer(BoundedHTTPServer):
         if hasattr(self, "advanced_voice"):self.advanced_voice.close()
         super().server_close()
 
-def read_profile():
+def read_profile(executable=None):
     if sys.platform.startswith('linux'):
         from linux_support import read_profile as linux_profile
         return linux_profile()
-    if getattr(sys, 'frozen', False):
-        with open(sys.executable, 'rb') as stream:
+    if executable is not None or getattr(sys, 'frozen', False):
+        with open(executable or sys.executable, 'rb') as stream:
+            if stream.seek(0, 2) < 16:
+                raise ValueError('Accès intégré invalide.')
             stream.seek(-16, 2)
             footer = stream.read(16)
             if footer[4:] == b'QWENPROFILE1':
                 size = struct.unpack('<I', footer[:4])[0]
-                if not 1 <= size <= 65536:
+                if not 1 <= size <= min(65536, stream.tell() - 16):
                     raise ValueError('Accès intégré invalide.')
                 stream.seek(-16 - size, 2)
                 profile = json.loads(stream.read(size))
                 validate_profile(profile)
                 return profile
+        if executable is not None:
+            raise ValueError('Le fichier choisi ne contient pas de profil Kiara.')
     bundled = Path(getattr(sys, '_MEIPASS', Path(__file__).parent)) / 'profil.json'
     # Per-client profile is bundled by the server; no settings or file import on the client.
     if not bundled.exists():
@@ -874,7 +1202,7 @@ def install_close_guard(window):
                 if result.get('saved') or window.create_confirmation_dialog(APP_NAME,'Historique non enregistré : '+result.get('message','')+'\nExportez vos conversations pour les conserver. Fermer quand même ?'):
                     state['ready']=True;window.destroy()
                 else:state['pending']=False
-            try:window.evaluate_js("(async()=>{try{await window.voiceFinishForClose?.();window.uiCheckPendingEdits?.();const cancelBody=window.generationCancelBody?.()||{};controller?.abort();if(busy)await api('/v1/cancel',cancelBody, {'X-Qwen-Request':requestId});await uiPersistPreferences();await flushHistory();await api('/client/history/flush',{});return {saved:true};}catch(e){return {saved:false,message:e.message};}})()",callback=complete)
+            try:window.evaluate_js("(async()=>{try{if(window.kiaraPrepareClose)await window.kiaraPrepareClose();else if(!window.dispatchEvent(new Event('beforeunload',{cancelable:true})))throw new Error('Des modifications sont en cours dans Agent.');return {saved:true};}catch(e){return {saved:false,message:e.message};}})()",callback=complete)
             except Exception as error:complete({'saved':False,'message':str(error)})
         threading.Thread(target=work,daemon=True).start()
         return False
@@ -893,9 +1221,146 @@ def window_geometry():
         except (AttributeError,OSError):pass
     return {'width':width,'height':height,'min_size':(min(640,width),min(480,height))}
 
+def thunderbird_extension_source():
+    if getattr(sys, 'frozen', False):
+        return Path(sys._MEIPASS) / 'thunderbird-agent'
+    return Path(__file__).resolve().parent.parent / 'agent' / 'extensions' / 'thunderbird-agent'
+
+
+def open_local_relay(profile, *, managed=False):
+    if managed and sys.platform == 'win32' and (thunderbird_extension_source() / 'manifest.json').is_file():
+        from thunderbird_integration import manage
+        try:
+            manage(profile, thunderbird_extension_source())
+        except (OSError, ValueError, KeyError, TypeError):
+            pass  # The Thunderbird panel can report the error without blocking Kiara startup.
+    settings = client_settings(profile)
+    remote = Remote(profile, endpoint=settings.get('endpoint'),
+                    connection_required=not (settings.get('connection_selected') or settings.get('endpoint')))
+    try:
+        key = local_key(profile)
+        last_port = LOCAL_API_PORT if settings.get('thunderbird_token') else LOCAL_API_LAST_PORT
+        for port in range(LOCAL_API_PORT, last_port + 1):
+            try:
+                return remote, serve_local(remote, key, port, managed=managed)
+            except OSError:
+                pass
+        if last_port == LOCAL_API_PORT:
+            raise ValueError(f'Le port local {LOCAL_API_PORT} de Thunderbird est occupé.')
+        raise ValueError(f'Les ports locaux {LOCAL_API_PORT} à {last_port} sont occupés.')
+    except BaseException:
+        remote.close()
+        raise
+
+
+def relay_profile_path():
+    return Path(os.environ.get('LOCALAPPDATA', str(Path.home()))) / 'QwenClient' / 'tauri-profile.dpapi'
+
+
+def read_relay_profile():
+    with relay_profile_path().open('rb') as stream:
+        protected = stream.read(131073)
+    if len(protected) > 131072:
+        raise ValueError('Profil Kiara trop volumineux.')
+    profile = json.loads(protect(protected, decrypt=True))
+    validate_profile(profile)
+    return profile
+
+
+def select_relay_profile():
+    from kiara_shared.profiles import decode_access_code
+
+    print('KIARA_RELAY_SELECT_PROFILE', flush=True)
+    root = tk.Tk()
+    root.withdraw()
+    try:
+        while True:
+            code = simpledialog.askstring('Connexion à Kiara',
+                'Collez le code d’accès fourni par votre administrateur.',
+                show='*', parent=root)
+            if code is None:
+                return None
+            try:
+                return decode_access_code(code)
+            except ValueError:
+                messagebox.showerror(APP_NAME, 'Code d’accès invalide. Copiez le code complet puis réessayez.', parent=root)
+    finally:
+        root.destroy()
+
+
+def relay_stdio(executable=None, version=VERSION):
+    validate_version(version)
+    profile_path = relay_profile_path()
+    if executable is not None:
+        profile = read_profile(executable)
+        imported = True
+    else:
+        try:
+            profile = read_relay_profile()
+            imported = False
+        except (OSError, ValueError):
+            profile = select_relay_profile()
+            imported = True
+            if profile is None:
+                print('KIARA_RELAY_CANCELLED', flush=True)
+                return
+    remote, server = open_local_relay(profile, managed=True)
+    remote.managed_relay = True
+    remote.version = version
+    if os.environ.get('KIARA_DESKTOP_UPDATES') == '1':
+        from updater import DesktopUpdate
+        remote.desktop_update = DesktopUpdate(profile_path.parent / 'desktop-updates', sys.stdin.buffer, sys.stdout.buffer)
+    worker = threading.Thread(target=server.serve_forever, daemon=True)
+    try:
+        if imported:
+            history_store.atomic(profile_path, protect(json.dumps(profile, ensure_ascii=False)))
+        worker.start()
+        print(f'KIARA_RELAY_READY http://127.0.0.1:{server.server_port}/chat {settings_path(profile).stem}', flush=True)
+        # Tauri owns the write end. EOF also shuts down the relay if Tauri crashes.
+        if remote.desktop_update:
+            remote.desktop_update.wait(remote)
+        else:
+            sys.stdin.buffer.read(1)
+    finally:
+        if worker.is_alive():
+            server.shutdown()
+            worker.join()
+        server.server_close()
+        remote.close()
+
+
 def main():
+    if len(sys.argv) == 4 and sys.argv[1] == '--sync-agent-capture':
+        from agent_capture import upload_journal
+        try:
+            session_id = str(UUID(sys.argv[2]))
+            directory = Path(sys.argv[3]).resolve(strict=True)
+            if not directory.is_dir():
+                raise ValueError('Dossier de capture invalide.')
+            profile = read_relay_profile()
+            settings = client_settings(profile)
+            remote = Remote(profile, endpoint=settings.get('endpoint'),
+                            connection_required=not (settings.get('connection_selected') or settings.get('endpoint')))
+            try:
+                count = sum(1 for _ in upload_journal(remote, directory, session_id))
+            finally:
+                remote.close()
+            print(json.dumps({'acknowledged': count}))
+        except (OSError, ValueError) as error:
+            print(f'Synchronisation audio interrompue ({type(error).__name__}). Fragments conservés.', file=sys.stderr)
+            sys.exit(1)
+        return
+    if len(sys.argv) in (2, 3) and sys.argv[1] == '--relay-stdio':
+        try:
+            relay_stdio(Path(sys.argv[2]) if len(sys.argv) == 3 else None,
+                       version=os.environ.get('KIARA_DESKTOP_VERSION', VERSION))
+        except Exception as error:
+            print(f'Impossible de démarrer le relais Kiara ({type(error).__name__}).', file=sys.stderr)
+            sys.exit(1)
+        return
     if '--self-test' in sys.argv:
         # Packaging smoke check, without a window or a model request.
+        urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())
         raw = b'Qwen client self test'
         assert protect(protect(raw), decrypt=True) == raw
         if '--with-profile' in sys.argv:
@@ -956,17 +1421,11 @@ def main():
     try:
         import webview
         profile=read_profile()
-        settings=client_settings(profile)
-        remote=Remote(profile,endpoint=settings.get('endpoint'),connection_required=not (settings.get('connection_selected') or settings.get('endpoint')))
-        key=local_key(profile)
-        for port in range(LOCAL_API_PORT,LOCAL_API_LAST_PORT+1):
-            try:server=serve_local(remote,key,port);break
-            except OSError:pass
-        if server is None:raise ValueError(f'Les ports locaux {LOCAL_API_PORT} à {LOCAL_API_LAST_PORT} sont occupés.')
+        remote,server=open_local_relay(profile)
         threading.Thread(target=server.serve_forever,daemon=True).start()
         window=webview.create_window(APP_NAME+' · '+VERSION,f'http://127.0.0.1:{server.server_port}/chat',background_color='#ffffff',text_select=True,**window_geometry())
         remote.window=window
-        install_close_guard(window)
+        remote.close_guard = install_close_guard(window)
         if '--update-ack' in sys.argv:
             def acknowledge():
                 path=Path(sys.argv[sys.argv.index('--update-ack')+1])
@@ -997,6 +1456,14 @@ def main():
     finally:
         if remote:remote.close()
         if server:server.shutdown();server.server_close()
+        if remote and remote.kiara4 is not None:
+            try:
+                subprocess.Popen([str(remote.kiara4), '--profile-exe', str(Path(sys.executable).resolve())],
+                                 close_fds=True)
+            except OSError as error:
+                root=tk.Tk();root.withdraw()
+                messagebox.showerror(APP_NAME, 'Kiara 4 est installé. Ouvrez-le depuis le menu Démarrer.\n'+str(error),parent=root)
+                root.destroy()
 
 if __name__ == '__main__':
     try:main()

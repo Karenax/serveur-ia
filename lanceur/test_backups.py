@@ -66,6 +66,39 @@ class BackupsTests(unittest.TestCase):
     def backup(self, **kwargs):
         return self.b.create(PHRASE, **kwargs)
 
+    def test_agent_archive_is_paired_with_the_verified_secondary_copy(self):
+        from types import SimpleNamespace
+        from agent_archive import extract_archive, write_archive
+
+        snapshot = self.home / 'agent-fixture'
+        snapshot.mkdir()
+        (snapshot / 'backup.json').write_text('{}', encoding='utf-8')
+        client_document = Path('dossiers-clients') / '038ff214-abf8-414e-b904-1ee4b0c49a41' / 'contrat.txt'
+        (snapshot / client_document).parent.mkdir(parents=True)
+        (snapshot / client_document).write_text('Document client fictif', encoding='utf-8')
+        self.c.agent_service = SimpleNamespace(backup_archive=lambda path, phrase: write_archive(snapshot, path, phrase))
+        secondary = self.home / 'secondary'
+        self.b.configure({'secondary_destination': str(secondary)})
+        result = self.backup()
+        archive = Path(result['agent']['file'])
+        self.assertEqual(archive, Path(result['file']).with_suffix('.kiara-agent'))
+        self.assertEqual(result['secondary']['status'], 'copied')
+        self.assertEqual(hashlib.sha256((secondary / archive.name).read_bytes()).hexdigest(), result['agent']['sha256'])
+        restored = self.home / 'agent-extracted'
+        restored.mkdir()
+        extract_archive(secondary / archive.name, restored, PHRASE)
+        self.assertEqual((restored / client_document).read_text(encoding='utf-8'), 'Document client fictif')
+        with self.b.lock:
+            self.b.data['catalog'].clear()
+            self.b._reconcile()
+        inspected = self.b.inspect({'id': result['id'], 'password': PHRASE})
+        self.assertEqual(inspected['summary']['agent'], result['agent'])
+        self.assertEqual(self.b.data['catalog'][0]['agent'], result['agent'])
+        with archive.open('r+b') as stream:
+            stream.write(b'altered')
+        with self.assertRaisesRegex(ValueError, 'Archive Agent associée'):
+            self.b.inspect({'id': result['id'], 'password': PHRASE})
+
     def join(self):
         self.assertIsNotNone(self.b.thread)
         self.b.thread.join(15)

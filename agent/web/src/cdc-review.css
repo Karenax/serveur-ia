@@ -1,0 +1,202 @@
+/* ── Améliorations de la revue CDC : progression inline, raccourcis ── */
+
+.button.sm {
+  min-height: 26px;
+  padding: 3px 9px;
+  font-size: 12px;
+}
+.mp-breadcrumb.compact {
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.cdc-progress-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 200px;
+}
+.cdc-progress-inline > b {
+  font-size: 13px;
+  white-space: nowrap;
+}
+.cdc-progress-inline > span {
+  color: var(--muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+.cdc-progress-inline .cdc-progress-bar {
+  flex: 1;
+}
+.cdc-chips-divider {
+  width: 1px;
+  align-self: stretch;
+  margin: 3px 2px;
+  background: var(--border);
+}
+.cdc-progress-bar {
+  display: flex;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--surface-muted);
+}
+.cdc-progress-bar > i {
+  display: block;
+  min-width: 2px;
+  background: var(--accent);
+}
+.cdc-progress-bar > i.st-confirmed {
+  background: color-mix(in srgb, #15803d 78%, var(--surface));
+}
+.cdc-progress-bar > i.st-to_confirm {
+  background: color-mix(in srgb, #b45309 70%, var(--surface));
+}
+.cdc-progress-bar > i.st-contradictory,
+.cdc-progress-bar > i.st-rejected {
+  background: color-mix(in srgb, #b91c1c 72%, var(--surface));
+}
+.cdc-progress-bar > i.st-not_provided {
+  background: color-mix(in srgb, #6b7280 70%, var(--surface));
+}
+.cdc-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.cdc-chip {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  min-height: 25px;
+  padding: 2px 9px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+.cdc-chip b {
+  color: var(--text);
+}
+.cdc-chip.active {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 9%, var(--surface));
+  color: var(--text);
+}
+.cdc-chip.alert b {
+  color: var(--danger);
+}
+
+.cdc-review-grid.compact {
+  grid-template-columns: minmax(300px, 1fr) minmax(280px, 0.9fr);
+  min-height: 0;
+  max-height: 620px;
+}
+.cdc-review-grid.compact .cdc-item-editor {
+  grid-column: 1 / -1;
+  border-top: 1px solid var(--border);
+  border-right: 0;
+  max-height: 320px;
+}
+.cdc-review-grid.compact .cdc-item-editor.empty {
+  display: none;
+}
+.cdc-review-grid .cdc-item-row .row-status {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.cdc-review-grid .cdc-item-row .row-status.confirmed {
+  color: #15803d;
+}
+.cdc-review-grid .cdc-item-row .row-status.candidate {
+  color: var(--muted);
+}
+.cdc-review-grid .cdc-item-row .row-status.to_confirm {
+  color: #b45309;
+}
+.cdc-review-grid .cdc-item-row .row-status.contradictory,
+.cdc-review-grid .cdc-item-row .row-status.rejected {
+  color: #b91c1c;
+}
+.cdc-review-grid .cdc-item-row mark {
+  background: color-mix(in srgb, #fde047 55%, transparent);
+  color: inherit;
+  border-radius: 3px;
+  padding: 0 2px;
+}
+.cdc-bulk {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-muted);
+}
+.cdc-bulk b {
+  font-size: 12px;
+}
+.cdc-decisions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 9px 10px;
+  border-top: 1px solid var(--border);
+  background: var(--surface-muted);
+  position: sticky;
+  bottom: 0;
+}
+.cdc-decisions button {
+  min-height: 30px;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+}
+.cdc-decisions button:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+.cdc-decisions button kbd {
+  margin-left: 5px;
+  color: var(--muted);
+  font: 10px var(--font-mono, monospace);
+}
+.cdc-decisions button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.cdc-decisions button.danger {
+  border-color: color-mix(in srgb, var(--danger) 45%, var(--border));
+  color: var(--danger);
+}
+.cdc-kbd-hint {
+  padding: 0 10px 8px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.cdc-inline-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
+  padding: 8px 10px;
+  border: 1px solid color-mix(in srgb, var(--danger) 40%, var(--border));
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--danger) 8%, var(--surface));
+  color: var(--danger);
+  font-size: 12px;
+}
+.cdc-list-virtual {
+  overflow: auto;
+  max-height: 620px;
+}
+
+.cdc-filter-disclosure>summary{display:none}.cdc-panel progress.cdc-progress-bar{display:block;appearance:none;border:0;background:var(--border);border-radius:6px}.cdc-panel progress.cdc-progress-bar::-webkit-progress-bar{background:var(--border);border-radius:6px}.cdc-panel progress.cdc-progress-bar::-webkit-progress-value{background:var(--accent);border-radius:6px}.cdc-panel progress.cdc-progress-bar::-moz-progress-bar{background:var(--accent)}
+@media(max-width:670px){.cdc-filter-disclosure{margin:8px 0}.cdc-filter-disclosure>summary{display:list-item;cursor:pointer;padding:10px;border:1px solid var(--border);border-radius:7px;font-size:13px}.cdc-toolbar{padding:8px;gap:8px}.cdc-filters{flex-wrap:wrap}.cdc-item-list{max-height:300px}}

@@ -12,12 +12,24 @@ import sys
 ROOT=Path(__file__).resolve().parents[1]
 SOURCE_DIRS=('lanceur','client-qwen','client-android','client-voice','maintenance')
 COMPONENT_DIRS={
-    'windows':('client-qwen','client-voice','shared','maintenance/2026-10-25-assistant-integration'),
+    'windows':('client-qwen','client-tauri','client-voice','shared','maintenance/2026-10-25-assistant-integration'),
     'android':('client-android','client-qwen','maintenance/2026-10-25-assistant-integration'),
-    'server':('lanceur','shared','maintenance/codex'),
+    'server':('lanceur','shared','maintenance/codex','agent/app','agent/backend','agent/scripts',
+              'agent/extensions','agent/web/src','agent/web/public','agent/web/package.json',
+              'agent/web/pnpm-lock.yaml','agent/web/pnpm-workspace.yaml','agent/web/index.html',
+              'agent/web/tsconfig.json','agent/web/vite.config.ts','agent/README.md',
+              'agent/README_BACKEND.md','agent/THIRD_PARTY_NOTICES.md','agent/requirements*.txt',
+              'agent/requirements*.in','Start-Interface-Qwen.ps1','strata-iq4-p100-hybride.json',
+              'maintenance/package_server.py'),
     'voice':('client-voice','shared'),
 }
-SUFFIXES={'.py','.js','.cjs','.html','.css','.ps1','.cmd','.go','.mod','.sum','.java','.gradle','.xml','.toml','.properties','.cpp','.h','.cmake','.json'}
+WEB_CONVERSATION_SOURCES = tuple('client-qwen/' + name for name in (
+    'chat.html', 'workspace.html', 'ui.css', 'ui.js', 'attachments.js', 'corrector.js', 'selection.js',
+    'thinking.js', 'voice.js', 'conversation.js', 'project-conversation.js', 'web_conversations.js',
+    'markdown.js', 'vendor/markdown-it.min.js',
+))
+SUFFIXES={'.py','.js','.cjs','.html','.css','.ps1','.cmd','.go','.mod','.sum','.java','.gradle','.xml','.toml','.properties','.cpp','.h','.cmake','.json','.rs','.nsh'}
+AGENT_SUFFIXES={'.ts','.tsx','.mjs','.svg','.md','.yml','.yaml','.in','.ico','.png','.po'}
 
 def command(arguments,cwd=ROOT):
     result=subprocess.run(arguments,cwd=cwd,capture_output=True,text=True,encoding='utf-8',errors='replace',timeout=30)
@@ -27,7 +39,17 @@ def command(arguments,cwd=ROOT):
 def digest(path):
     with path.open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
 
-def source_names(component):
+WEB_DIST = Path('agent/web/dist')
+
+
+def source_path(name, web_dist=None):
+    path = Path(name)
+    if web_dist is not None and path.is_relative_to(WEB_DIST):
+        return Path(web_dist) / path.relative_to(WEB_DIST)
+    return ROOT / path
+
+
+def source_names(component, web_dist=None):
     if component not in COMPONENT_DIRS:raise ValueError('Composant inconnu : '+component)
     listed=command(['git','ls-files','--cached','--others','--exclude-standard','-z',*COMPONENT_DIRS[component],
                     'maintenance/build_manifest.py','maintenance/prepare_build_environment.py',
@@ -35,17 +57,35 @@ def source_names(component):
     for name in sorted(set(listed)):
         path=ROOT/name
         if not name or not path.is_file():continue
-        if path.suffix.lower() not in SUFFIXES and not (path.suffix=='.txt' and (path.name.startswith('requirements') or path.name=='product-version.txt')):continue
+        is_cargo_lock = component == 'windows' and name == 'client-tauri/Cargo.lock'
+        if not is_cargo_lock and path.suffix.lower() not in SUFFIXES and not (path.suffix=='.txt' and (path.name.startswith('requirements') or path.name=='product-version.txt')):
+            if not (component=='server' and name.startswith('agent/') and path.suffix.lower() in AGENT_SUFFIXES):continue
         if path.name.startswith(('test_','preview_','verify_','validate_')) or any(part in {'tests','__pycache__','node_modules'} for part in path.parts):continue
         if '/src/androidTest/' in name or '/src/debug/' in name:continue
         if component=='android' and name.startswith('client-qwen/') and path.suffix not in {'.js','.html','.css'}:continue
-        if component=='windows' and '/android-outils/' in name:continue
+        if component=='windows' and ('/android-outils/' in name or
+                                     name.startswith(('client-tauri/gen/', 'client-tauri/installer-input/'))):continue
         yield name
+    if component == 'server':
+        for name in WEB_CONVERSATION_SOURCES:
+            if not (ROOT / name).is_file():
+                raise ValueError('Source Conversations absente : ' + name)
+            yield name
+        dist = Path(web_dist) if web_dist is not None else ROOT / WEB_DIST
+        assets = dist / 'assets'
+        if (not (dist / 'index.html').is_file()
+                or not any(assets.glob('*.js')) or not any(assets.glob('*.css'))):
+            raise ValueError('Frontend Agent absent. Construire agent/web avant de préparer le paquet serveur.')
+        for path in (dist, assets, dist / 'index.html', *sorted(assets.iterdir())):
+            if path.is_symlink() or path.is_junction():
+                raise ValueError('Lien inattendu dans le frontend Agent compilé.')
+            if path.is_file() and path.suffix.lower() in {'.html', '.js', '.css', '.svg', '.png', '.ico', '.woff2'}:
+                yield (WEB_DIST / path.relative_to(dist)).as_posix()
 
 
-def generate(artifact,component=None):
+def generate(artifact,component=None, *, web_dist=None):
     component=component or ('android' if artifact.suffix.lower()=='.apk' else 'windows')
-    sources={name:digest(ROOT/name) for name in source_names(component)}
+    sources={name:digest(source_path(name, web_dist)) for name in source_names(component, web_dist)}
     engines=json.loads((ROOT/'dependances/moteurs.json').read_text(encoding='utf-8'))
     for row in engines:
         if row.get('patch'):row['patch_sha256']=digest(ROOT/'dependances'/row['patch'])

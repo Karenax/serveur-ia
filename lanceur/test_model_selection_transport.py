@@ -77,6 +77,16 @@ class ModelSelectionTransportTests(unittest.TestCase):
         self.health.assert_not_called()
         self.assertEqual(401, self.call(token='invalid-access')[0])
 
+    def test_agent_catalog_reflects_the_local_engine(self):
+        token = 'kiara-agent-' + secrets.token_urlsafe(32)
+        self.store.agent_inference_token = token
+        self.assertEqual(self.call(token=token)[0], 503)
+
+        self.health.return_value = {'loaded': True, 'model': 'qwen-local-runtime'}
+        status, raw = self.call(token=token)
+        self.assertEqual(status, 200)
+        self.assertEqual([model['id'] for model in json.loads(raw)['data']], ['fred-qwen'])
+
     def test_cloud_turn_uses_selected_model_without_local_health(self):
         code, raw = self.call('/v1/chat/completions', self.body('cloud-test'))
         self.assertEqual(200, code); self.assertIn(b'[DONE]', raw)

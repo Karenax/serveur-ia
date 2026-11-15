@@ -4,18 +4,51 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
 const {chromium,options}=require('./browser_test_support.cjs');
 const read=name=>fs.readFileSync(path.join(__dirname,name),'utf8');
 const script=name=>'<script nonce="ux">'+read(name).replaceAll('</script','<\\/script')+'</script>';
-const windows=read('chat.html').replace('__UI_CSS__',read('ui.css')).replace('</head>',()=>script('vendor/markdown-it.min.js')+script('markdown.js')+'</head>').replace('</body>',()=>read('workspace.html')+['ui.js','attachments.js','corrector.js','selection.js','thinking.js','voice.js','conversation.js'].map(script).join('')+'</body>');
+const windows=read('chat.html').replace('__UI_CSS__',read('ui.css')).replace('</head>',()=>script('vendor/markdown-it.min.js')+script('markdown.js')+'</head>').replace('</body>',()=>read('workspace.html')+['ui.js','attachments.js','corrector.js','selection.js','thinking.js','voice.js','conversation.js','project-conversation.js'].map(script).join('')+'</body>');
 const python=process.env.PYTHON_EXE||path.join(__dirname,'../toolchain/eg2-python/Scripts/python.exe');
 const android=execFileSync(python,['-c',"import importlib.util,sys; from pathlib import Path; s=importlib.util.spec_from_file_location('assets',sys.argv[1]); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); print(m.prepare(Path(sys.argv[2])),end='')",path.join(__dirname,'../client-android/scripts/Prepare-Assets.py'),__dirname],{encoding:'utf8',maxBuffer:6e6,env:{...process.env,PYTHONIOENCODING:'utf-8'}});
 async function check(browser,platform){
  const config={key:'synthetic-ux',storage:'ux-'+platform,model:'model-ux',version:'fixture',...(platform==='android'?{platform}:{})};
  const html=(platform==='android'?android:windows).replace('__CONFIG__',JSON.stringify(config)).replaceAll('__NONCE__','ux');
  const project={id:'a'.repeat(32),title:'Projet fictif UX',instructions:'',revision:1,documents:[],memories:[],conversations:[]};
+ const managed={id:'11111111-2222-3333-4444-555555555555',title:'Projet Agent fictif',code:'ERP-42',instructions:'',can_edit:true,documents:[],memories:[],conversations:[]};
  const state={history:null,revision:'1',preferences:{},failPreferences:false,failDelete:false};
  const json=(res,value,status=200)=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8'});res.end(JSON.stringify(value));};
  const server=http.createServer(async(req,res)=>{
   let raw='';for await(const chunk of req)raw+=chunk;const body=JSON.parse(raw||'{}');
   if(req.url==='/'){res.writeHead(200,{'Content-Type':'text/html; charset=utf-8'});return res.end(html);}
+  if(state.projectConversation){
+   if(platform==='android'&&req.headers.authorization!=='Bearer '+config.key)return json(res,{error:{message:'Fixture auth required'}},401);
+   const threadPath='/api/v1/workspace/assistant-threads';
+   if(req.url==='/api/v1/project-catalogue')return json(res,[{...managed,brain_project_id:'brain-recette'},
+     {id:'projet-a-relier',title:'Projet sans sources',brain_project_id:null}]);
+   if(req.url==='/api/v1/brain/projects')return json(res,[{id:'brain-autonome',name:'Projet de connaissance'}]);
+   if(req.url==='/api/v1/projects/projet-a-relier/brain/ensure'){
+    assert.equal(req.method,'POST');
+    state.projectLinks++;
+    return json(res,{linked:true,brain_project_id:'brain-relie'});
+   }
+   if(req.url.startsWith(threadPath)){
+    if(req.method==='GET')return json(res,req.url.includes('/historical')?state.projectThread:{items:[state.projectThread]});
+    if(state.projectConflict)return json(res,{detail:'Révision modifiée par un autre poste.'},409);
+    state.projectWrites++;
+    assert.equal(body.expected_revision,state.projectThread.revision);
+    state.projectThread={...state.projectThread,messages:body.messages,revision:state.projectThread.revision+1};
+    return json(res,state.projectThread);
+   }
+   if(req.url==='/v1/sources/source-recette')return json(res,{metadata:{filename:'Notice de recette'},
+     artifacts:[{text:'Texte indexé de la notice.'}]});
+   if(req.url==='/v1/projects/chat/stream'){
+    assert.equal(body.project_id,'brain-recette');
+    assert.equal(body.include_evidence,false);
+    res.writeHead(200,{'Content-Type':'text/event-stream'});
+    if(body.query==='Question à interrompre'){
+     res.write('event: delta\ndata: {"text":"Fragment de réponse"}\n\n');
+     return;
+    }
+    return res.end('event: done\ndata: {"answer":"Réponse de recette","citations":[{"source_id":"source-recette","excerpt":"Extrait de recette."}],"warnings":["Certaines sources sont indisponibles."]}\n\n');
+   }
+  }
   if(req.headers.authorization!=='Bearer '+config.key)return json(res,{error:{message:'Fixture auth required'}},401);
   if(req.url==='/client/state')return json(res,{version:'fixture',preferences:state.preferences,profile_required:false,profile:{name:'Accès fictif'},update:{message:'À jour'},endpoint:'https://example.test',internet_endpoint:'example.test',local_api:'http://127.0.0.1/v1',key:config.key,connection:{connected:true,transport:'https',model:config.model,endpoint:'https://example.test'}});
   if(req.url==='/client/history'&&req.method==='GET')return json(res,{history:state.history,revision:state.revision});
@@ -30,14 +63,23 @@ async function check(browser,platform){
    state.preferences={...state.preferences,...body,conversation_drafts:drafts};return json(res,{saved:true});
   }
   if(req.url==='/client/draft')return json(res,{draft:null});
+  if(req.url==='/client/agent/session')return state.projectConversation?json(res,{url:'/app'}):json(res,{error:{message:'Service Agent indisponible.'}},503);
   if(req.url==='/client/integrations')return json(res,{apps:[]});
   if(req.url==='/client/voice'||req.url==='/client/conversation')return json(res,{installed:false,phase:'idle'});
   if(req.url==='/v1/models')return json(res,{data:[{id:config.model,name:'Modèle fictif',available:true,capabilities:{thinking:false,context_length:4096}}]});
   if(req.url==='/v1/status')return json(res,{protocol:4,agent_protocol:4,command_nonce_version:2,server_time_ms:Date.now()});
   if(req.url==='/v1/context')return json(res,{tokens:5,capacity:4096,estimated:true});
-  if(req.url==='/v1/workspace')return json(res,{projects:[project],jobs:[]});
-  if(req.url==='/v1/notifications'||req.url==='/v1/notifications/action')return json(res,{items:[],unread:0,preferences:{types:{}}});
+  if(req.url==='/v1/workspace')return json(res,state.managed?{projects:state.managed==='ready'?[managed]:[],jobs:[],project_catalogue:{provider:'agent',state:state.managed,can_create:state.managed==='ready'}}:{projects:[project],jobs:[]});
+  if(req.url==='/v1/notifications'||req.url==='/v1/notifications/action'){
+   const visible=state.transcription===true;
+   const item={id:'e'.repeat(32),sequence:1,type:'transcription_ready',title:'Transcription disponible',created:1700000000,target:{kind:'agent_project',project:managed.id}};
+   return json(res,{items:visible&&!body.after?[item]:[],cursor:1,generation:'fixture',agent_scope:visible?'allowed':'empty',
+    retained_ids:visible?[item.id]:[],preferences:{types:{}},subscription:{enabled:true}});
+  }
   if(req.url==='/v1/workspace/action'){
+   if(body.action==='memory_create'&&body.project===managed.id){managed.memories.push({id:'c'.repeat(32),text:body.text,revision:'1'});return json(res,{revision:'1'});}
+   if(body.action==='conversation_save'&&body.project===managed.id){managed.conversations=[{id:body.id,title:body.title,revision:1,archived:false}];return json(res,{revision:1});}
+   if(body.action==='project_archive'&&body.id===managed.id){managed.archived=body.archived;return json(res,{id:managed.id});}
    if(body.action==='project_save'){project.instructions=body.instructions;project.title=body.title;project.revision++;return json(res,{saved:true,revision:project.revision});}
    if(body.action==='memory_create'){project.memories.push({id:'b'.repeat(32),text:body.text,revision:'1'});return json(res,{id:'b'.repeat(32)});}
    if(body.action==='memory_save'||body.action==='memory_delete'){
@@ -54,7 +96,10 @@ async function check(browser,platform){
  await new Promise(r=>server.listen(0,'127.0.0.1',r));
  const context=await browser.newContext({viewport:{width:1440,height:900}}),page=await context.newPage(),errors=[];
  page.on('pageerror',e=>errors.push(e.message));
- if(platform==='android')await page.addInitScript(()=>{window.AndroidClient={notificationReady(){},notificationStatus(){return '{"enabled":false}';}};});
+ if(platform==='android')await page.addInitScript(()=>{
+  window.AndroidClient={notificationReady(){},notificationStatus(){return '{"enabled":false}';},
+   downloadProjectOriginal(path,filename){window.lastOriginalDownload={path,filename};}};
+ });
  const ready=()=>page.waitForFunction(()=>connected&&historyReady&&serverHistoryReady&&!historySyncPending&&!historySaving&&!uiPreferencesPending);
  const draftSaved=()=>page.waitForFunction(()=>!uiDraftDirty&&!uiPreferencesPending);
  const sidebar=async()=>{if(await page.locator('#ui-sidebar-toggle').getAttribute('aria-expanded')==='false')await page.locator('#ui-sidebar-toggle').click();};
@@ -62,7 +107,13 @@ async function check(browser,platform){
   await page.goto('http://127.0.0.1:'+server.address().port);await ready();
   assert.match(await page.evaluate(()=>clientRequestId()),/^v2_[a-f0-9]{32}$/);
   await page.evaluate(()=>commandNonceVersion=1);assert.match(await page.evaluate(()=>clientRequestId()),/^[a-f0-9]{32}$/);await page.evaluate(()=>commandNonceVersion=2);
-  assert.deepEqual(await page.evaluate(()=>[...document.querySelectorAll('#client-navigation .nav-button')].map(b=>b.dataset.viewButton)),['chat','voice','projects','corrector','assistant','notifications']);
+  assert.deepEqual(await page.evaluate(()=>[...document.querySelectorAll('#client-navigation .nav-button')].map(b=>b.dataset.viewButton)),platform==='android'?['chat','voice','projects','corrector','assistant','notifications']:['chat','voice','projects','agent','corrector','assistant','notifications']);
+  if(platform!=='android'){
+   await page.locator('#prompt').fill('Brouillon avant ouverture Agent');await draftSaved();
+   await page.locator('#open-agent').click();await page.waitForFunction(()=>document.getElementById('error').textContent.includes('Service Agent indisponible.'));
+   assert.equal(await page.locator('#prompt').inputValue(),'Brouillon avant ouverture Agent');
+   await page.locator('#prompt').fill('');await draftSaved();
+  }
   assert.equal(await page.locator('#ui-document-controls').isVisible(),false);
   await page.locator('#ws-chat-project').selectOption(project.id);await page.waitForFunction(()=>!conversationActionPending&&document.getElementById('ui-document-controls').hidden===false);await ready();
   assert.equal(await page.locator('#ui-document-controls').isVisible(),true);assert.equal(await page.locator('#ws-publish').isVisible(),true);
@@ -124,7 +175,106 @@ async function check(browser,platform){
   }
   await page.setViewportSize({width:390,height:844});await sidebar();await page.locator('[data-view-button="chat"]').click();await page.waitForTimeout(250);
   const send=await page.locator('#send').boundingBox();assert(send.x>300&&send.x+send.width<=390,'Send remains at the right edge');
-  assert.deepEqual(errors,[]);console.log(JSON.stringify({platform,passed:true,scenarios:['per-conversation drafts and reload','failed persistence blocks silent reload','cleared draft stays cleared','instructions unload warning','memory edit survives refresh','delete cancel/error/success','named source dialog','drawer focus at 390 and 768','one main landmark','right-aligned send']}));
+  state.managed='ready';await page.evaluate(()=>wsRefresh());
+  await page.locator('#ws-chat-project').selectOption(managed.id);
+  await page.waitForFunction(id=>wsCurrent().project_id===id&&!conversationActionPending,managed.id);
+  assert(await page.locator('#ws-publish').isEnabled());
+  await page.locator('#ws-publish').click();
+  await page.waitForFunction(()=>wsCurrent().server_revision===1&&!conversationActionPending);
+  assert.equal(managed.conversations.length,1);
+  await page.evaluate(()=>showView('projects'));
+  await page.locator('#ws-project-search').fill('ERP-42');
+  await page.locator('#ws-project-list button').click();
+  await page.locator('[data-project-pane="conversations"]').waitFor();
+  assert.equal(await page.locator('#ws-agent-project-open').isVisible(),platform!=='android');
+  await page.locator('[data-project-tab="memory"]').click();
+  await page.locator('#ws-memory-text').fill('Mémoire privée Agent');
+  await page.locator('#ws-memory-form button').click();
+  await page.locator('#ws-memories textarea').waitFor();
+  assert.equal(await page.locator('#ws-memories textarea').inputValue(),'Mémoire privée Agent');
+  for(const allowed of [true,false,true]){
+   state.transcription=allowed;
+   await page.waitForFunction(()=>!fredInbox.busy);
+   await page.evaluate(()=>fredInboxLoad());
+   assert.equal(await page.locator('#fred-inbox-list [data-notification-id]').count(),allowed?1:0);
+  }
+  await page.locator('#ws-agent-project-archive').click();
+  await page.waitForFunction(()=>ws.data.projects[0].archived);
+  assert(await page.locator('#ws-project-chat').isDisabled());
+  state.managed='unavailable';await page.evaluate(()=>wsRefresh());
+  assert(await page.locator('#ui-project-create').isDisabled());
+  assert.match(await page.locator('#ws-project-list').textContent(),/Projets indisponibles/);
+  {
+   state.managed='ready';state.projectConversation=true;state.projectWrites=0;state.projectLinks=0;
+   state.projectThread={id:'historical',title:'Échange historique',project_id:'brain-recette',revision:2,
+    messages:[{role:'user',text:'Première question'},{role:'assistant',text:'Première réponse'}]};
+   await page.evaluate(async()=>{showView('chat');await wsRefresh();});
+   await page.locator('#prompt').fill('Brouillon personnel à préserver');await draftSaved();
+   await page.getByRole('button',{name:'Assistant de projet',exact:true}).click();
+   const projects=page.getByRole('combobox',{name:'Projet',exact:true});
+   await projects.selectOption('erp:projet-a-relier');
+   assert.equal(state.projectLinks,0);
+   assert(await page.getByRole('button',{name:'Envoyer le message'}).isDisabled());
+   await page.locator('#prompt').fill('Brouillon du projet à relier');
+   await page.getByRole('button',{name:'Relier les sources du projet'}).click();
+   await page.waitForFunction(()=>document.querySelector('.project-conversation-controls select').value==='brain-relie');
+   assert.equal(state.projectLinks,1);
+   assert.equal(await page.locator('#prompt').inputValue(),'Brouillon du projet à relier');
+   await projects.selectOption('brain-autonome');
+   await page.getByRole('combobox',{name:'Projet',exact:true}).selectOption('brain-recette');
+   assert(await page.getByRole('checkbox',{name:'Éphémère'}).isChecked());
+   await page.getByRole('checkbox',{name:'Inclure les sources à confirmer'}).uncheck();
+   await page.locator('#prompt').fill('Ne pas conserver cet échange');
+   await page.locator('#composer').evaluate(form=>form.requestSubmit());
+   await page.getByText('Réponse de recette',{exact:true}).waitFor();
+   await page.getByText('Recherche de sources partielle',{exact:true}).click();
+   await page.getByText('Certaines sources sont indisponibles.',{exact:true}).waitFor();
+   await page.getByRole('region',{name:'Conversation de projet'}).getByText('Sources',{exact:true}).click();
+   if(platform==='android'){
+    await page.getByRole('button',{name:'Voir la source',exact:true}).click();
+    const source=page.getByRole('dialog',{name:'Notice de recette'});
+    await source.getByText('Texte indexé de la notice.').waitFor();
+    await source.getByRole('button',{name:'Télécharger l’original',exact:true}).click();
+    assert.deepEqual(await page.evaluate(()=>window.lastOriginalDownload),
+      {path:'/v1/sources/source-recette/raw',filename:'Notice de recette'});
+    await source.getByRole('button',{name:'Fermer',exact:true}).click();
+   }else assert.equal(await page.getByRole('link',{name:'Voir la source',exact:true}).getAttribute('href'),'/app/sources?source=source-recette');
+   await page.getByRole('button',{name:'Conversations personnelles'}).click();
+   assert.equal(await page.locator('#prompt').inputValue(),'Brouillon personnel à préserver');
+   assert.equal(state.projectWrites,0);
+   assert(!JSON.stringify(state.preferences).includes('Ne pas conserver'));
+   assert(!JSON.stringify(state.history).includes('Ne pas conserver'));
+   await page.getByRole('button',{name:'Assistant de projet',exact:true}).click();
+   await page.getByRole('combobox',{name:'Historique de projet'}).selectOption('historical');
+   await page.getByText('Première réponse',{exact:true}).waitFor();
+   assert.equal(await page.getByRole('checkbox',{name:'Éphémère'}).isChecked(),false);
+   await page.locator('#prompt').fill('Suite du fil enregistré');
+   await page.locator('#composer').evaluate(form=>form.requestSubmit());
+   await page.waitForFunction(()=>!document.querySelector('.project-conversation-switch button').disabled);
+   assert.equal(state.projectWrites,1);
+   assert(state.projectThread.messages.some(message=>message.text==='Suite du fil enregistré'));
+   assert(!state.projectThread.messages.some(message=>message.text==='Ne pas conserver cet échange'));
+   state.projectConflict=true;
+   await page.locator('#prompt').fill('Suite en conflit');
+   await page.locator('#composer').evaluate(form=>form.requestSubmit());
+   await page.getByText('Révision modifiée par un autre poste.',{exact:true}).waitFor();
+   assert.equal(state.projectWrites,1);
+   page.once('dialog',dialog=>dialog.accept());
+   await page.getByRole('button',{name:'Relire la version enregistrée'}).click();
+   await page.waitForFunction(()=>!document.querySelector('.project-conversation-switch button').disabled);
+   assert.equal(await page.getByText('Suite en conflit',{exact:true}).count(),0);
+   await page.getByText('Suite du fil enregistré',{exact:true}).waitFor();
+   await page.locator('#prompt').fill('Question à interrompre');
+   await page.locator('#composer').evaluate(form=>form.requestSubmit());
+   await page.getByText('Fragment de réponse',{exact:true}).waitFor();
+   await page.getByRole('button',{name:'Arrêter la réponse',exact:true}).click();
+   await page.waitForFunction(()=>!document.querySelector('.project-conversation-switch button').disabled);
+   assert.equal(await page.locator('#prompt').inputValue(),'Question à interrompre');
+   assert.equal(state.projectWrites,1);
+   await page.getByRole('button',{name:'Conversations personnelles'}).click();
+   assert.equal(await page.locator('#prompt').inputValue(),'Brouillon personnel à préserver');
+  }
+  assert.deepEqual(errors,[]);console.log(JSON.stringify({platform,passed:true,scenarios:['per-conversation drafts and reload','failed persistence blocks silent reload','cleared draft stays cleared','instructions unload warning','memory edit survives refresh','delete cancel/error/success','named source dialog','drawer focus at 390 and 768','one main landmark','right-aligned send','project history and ephemeral privacy']}));
  }finally{await context.close();await new Promise(r=>server.close(r));}
 }
 (async()=>{const browser=await chromium.launch(options);try{await check(browser,'windows');await check(browser,'android');}finally{await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1;});

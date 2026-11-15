@@ -9,10 +9,11 @@ import shutil
 import struct
 import subprocess
 import sys
+import tempfile
 import time
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 
-from kiara_shared.releases import verify, version, client_filename
+from kiara_shared.releases import DESKTOP_DOWNLOAD, DESKTOP_RELEASE, verify, version, client_filename
 
 from kiara_shared.version import VERSION, AGENT_PROTOCOL
 
@@ -33,11 +34,21 @@ def check(remote):
     verify(release,pinned)
     return {**release,'available':version(release['version'])>version(VERSION),'current':VERSION}
 
-def download(remote, release, directory):
+def desktop_release(remote):
+    with remote.open(DESKTOP_RELEASE) as response:
+        release = verify(json.loads(response.read(16384)), remote.profile['update_public_key'])
+    if version(release['version'])[0] != 4 or release['protocol'] != AGENT_PROTOCOL:
+        raise ValueError('Version de Kiara 4 incompatible.')
+    return {**release, 'available': version(release['version']) > version(remote.version), 'current': remote.version}
+
+
+def download(remote, release, directory, *, installer=False):
     verify(release,remote.profile['update_public_key'])
-    target=Path(directory)/'QwenClient.base.exe';total=0;digest=hashlib.sha256()
+    filename = f"Kiara_{release['version']}_x64-setup.exe" if installer else 'QwenClient.base.exe'
+    route = DESKTOP_DOWNLOAD if installer else '/v1/client/download'
+    target=Path(directory)/filename;total=0;digest=hashlib.sha256()
     try:
-        with remote.open('/v1/client/download') as response,target.open('wb') as stream:
+        with remote.open(route) as response,target.open('wb') as stream:
             while block:=response.read(1024*1024):
                 total+=len(block)
                 if total>release['bytes']:raise ValueError('Téléchargement trop volumineux.')
@@ -46,6 +57,107 @@ def download(remote, release, directory):
         return target
     except Exception:
         target.unlink(missing_ok=True);raise
+
+def prepare_kiara4(remote, folder):
+    release = desktop_release(remote)
+    if not release['available']:
+        raise ValueError('Kiara est à jour.')
+    return release, download(remote, release, folder, installer=True)
+
+
+def installed_kiara4():
+    import winreg
+
+    registry = r'Software\Microsoft\Windows\CurrentVersion\Uninstall\Kiara'
+    with winreg.OpenKey(winreg.HKEY_CURRENT_USER, registry) as key:
+        installed, _ = winreg.QueryValueEx(key, 'DisplayVersion')
+        folder, _ = winreg.QueryValueEx(key, 'InstallLocation')
+    executable = Path(folder.strip('"')) / 'Kiara.exe'
+    if not executable.is_absolute() or not executable.is_file():
+        raise ValueError('Installation de Kiara introuvable.')
+    return installed, executable
+
+
+def install_kiara4(remote):
+    with tempfile.TemporaryDirectory(prefix='kiara-install-') as folder:
+        release, installer = prepare_kiara4(remote, folder)
+        try:
+            completed = subprocess.run([str(installer), '/S'], timeout=600)
+        except subprocess.TimeoutExpired as error:
+            raise ValueError('Kiara 4 n’a pas confirmé son installation. Réessayez.') from error
+        if completed.returncode:
+            raise ValueError(f'Installation de Kiara 4 en échec (code {completed.returncode}).')
+
+    installed, executable = installed_kiara4()
+    if installed != release['version']:
+        raise ValueError('L’installation de Kiara 4 n’a pas été confirmée.')
+    return executable
+
+
+def stage_desktop(remote, root):
+    installed, executable = installed_kiara4()
+    if installed != remote.version or executable.resolve().parent != Path(sys.executable).resolve().parent:
+        raise ValueError('Ouvrez Kiara depuis le menu Démarrer pour installer la mise à jour.')
+    root.mkdir(parents=True, exist_ok=True)
+    for previous in root.glob('kiara-update-*'):
+        if previous.is_dir() and not previous.is_symlink() and not previous.is_junction():
+            try:
+                if time.time() - previous.stat().st_mtime > 86400:
+                    for old in previous.glob('Kiara_4.*_x64-setup.exe'):
+                        old.unlink()
+                    previous.rmdir()
+            except OSError:
+                pass
+    folder = Path(tempfile.mkdtemp(prefix='kiara-update-', dir=root))
+    try:
+        return prepare_kiara4(remote, folder)
+    except Exception:
+        folder.rmdir()
+        raise
+
+
+class DesktopUpdate:
+    """Stage a signed installer and hand it to the desktop over its private pipes."""
+
+    def __init__(self, root, commands, events):
+        self.root = root
+        self.commands = commands
+        self.events = events
+        self.installer = None
+
+    def stage(self, remote):
+        _, installer = stage_desktop(remote, self.root)
+        self.installer = installer
+        try:
+            remote.update_state = {'busy': True, 'message': 'Mise à jour vérifiée. Enregistrement avant redémarrage…'}
+            self.events.write(f'KIARA_RELAY_UPDATE {installer}\n'.encode('utf-8'))
+            self.events.flush()
+        except OSError:
+            self.discard()
+            raise ValueError('Impossible de fermer Kiara pour la mise à jour. Réessayez.') from None
+
+    def discard(self):
+        installer, self.installer = self.installer, None
+        if installer is not None:
+            try:
+                installer.unlink(missing_ok=True)
+                installer.parent.rmdir()
+            except OSError:
+                pass
+
+    def wait(self, remote):
+        while command := self.commands.read(1):
+            if command == b'u':
+                self.installer = None  # Windows installer owns the file until it exits.
+                break
+            if command == b'c':
+                with remote.update_lock, remote.activity_lock:
+                    self.discard()
+                    remote.applying_update = False
+                    remote.update_state = {'busy': False, 'available': True, 'error': True,
+                        'message': 'Installation interrompue. Vérifiez vos modifications en cours puis réessayez.'}
+        self.discard()
+
 
 def update_directory(target):
     target=Path(target).resolve()

@@ -367,7 +367,8 @@ class Operations:
             from hermes_backup import HermesBackup
             hermes_backup = HermesBackup(c.home / 'hermes-fred')
             if 'hermes' in files: hermes_backup.validate(files['hermes'], set(records))
-            workspace_raw=c.remote.workspace.validate_backup(files['workspace'],set(records)) if 'workspace' in files else None
+            workspace_raw=c.remote.workspace.validate_backup(
+                files['workspace'], set(records), for_restore=True) if 'workspace' in files else None
             web_raw=base64.b64decode(files['web_key'],validate=True) if 'web_key' in files else None
             if web_raw is not None and not 1<=len(web_raw)<=500:raise ValueError('Clé de recherche sauvegardée invalide.')
             server_key=files.get('wireguard.json',{}).get('public_key') or None

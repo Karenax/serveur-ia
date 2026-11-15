@@ -1,0 +1,32 @@
+CAHIER DES CHARGES — STB-A3 ( Poste de travail Ajustage T et X )
+
+1. OBJET
+Le poste Ajustage T&X SAP 694184 doit permettre le réglage et le contrôle
+des attaches de postes sur la ligne 0806.
+
+2. FONCTIONS
+Le poste doit supporter une charge de 250 kg sans déformation de la structure.
+La machine doit démarrer automatiquement à 7h00.
+Le système doit enregistrer les événements de cycle en journal local.
+L'opérateur doit pouvoir relancer un cycle depuis le pupitre.
+La machine doit s'arrêter en sécurité sur ouverture de la porte.
+
+3. CONTRAINTES
+Une tolérance de 0,2 mm est acceptable sur le perçage de fixation.
+La masse totale du poste ne doit pas dépasser 300 kg.
+Le bruit de l'aspiration ne doit pas dépasser 75 dB(A) à 1 m.
+La tension d'alimentation est 400 V triphasé 50 Hz.
+Le festival ne doit pas être utilisé comme élément de sécurité.
+
+4. EXIGENCES CLIENT
+Le poste doit être painted RAL 7035.
+Les poignées de préhension sont de couleur noire.
+L'interface automate doit exposer un mode maintenance (préférence).
+
+5. DONNÉES
+Le plan de maintenance est fourni en annexe (information).
+L'historique des cycles est conservé 30 jours.
+
+6. POINTS OUVERTS
+La fréquence d'étalonnage du capteur de couple n'est pas précisée dans le CDC.
+Le plan de maintenance est fourni en annexe.

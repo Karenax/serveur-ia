@@ -1,10 +1,12 @@
 """Isolated WireGuard/API fixture for emulator checks. No live accounts are read."""
 import argparse
 import base64
+import hashlib
 import json
 import os
 from pathlib import Path
 import secrets
+import ssl
 import subprocess
 import sys
 import threading
@@ -30,6 +32,11 @@ def main():
     parser.add_argument("--corrector", action="store_true", help="Verify direct-corrector bodies in the real Android tunnel")
     parser.add_argument("--model-selection", action="store_true", help="Verify public catalogue and selected-model chat/context native transport")
     parser.add_argument("--reasoning", action="store_true", help="Verify model-specific effort/toggle/automatic native reasoning transport")
+    parser.add_argument("--project-chat", action="store_true", help="Exercise project chat over the native tunnel")
+    parser.add_argument("--large-original", action="store_true", help="Serve a project original larger than 16 MiB")
+    parser.add_argument("--reset-wireguard", action="store_true", help="Allow the native pilot to restart its test tunnel on request")
+    parser.add_argument("--tls", type=Path, nargs=2, metavar=("CERTIFICATE", "KEY"),
+                        help="Run a local HTTPS fixture instead of WireGuard")
     parser.add_argument("--engine", type=Path, help="Isolated staged bridge, leaving a live production executable untouched")
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[2]
@@ -39,6 +46,14 @@ def main():
     stop_file.unlink(missing_ok=True)
     token = "qwen_" + secrets.token_hex(8) + "_" + secrets.token_urlsafe(32)
     state = {"history": None, "revision": 0, "requests": {}, "rejected": 0}
+    managed = {"id": "11111111-2222-3333-4444-555555555555", "title": "Projet de recette",
+               "brain_project_id": "brain-fixture", "project_kind": "managed", "has_knowledge": True,
+               "conversations": [], "documents": [], "memories": []}
+    threads = "/v1/business/api/v1/workspace/assistant-threads"
+    thread = {"id": "fil-recette", "title": "Discussion enregistrée", "revision": 2,
+              "project_id": managed["brain_project_id"], "messages": [
+                  {"role": "user", "text": "Ancienne question"},
+                  {"role": "assistant", "text": "Ancienne réponse"}]}
     corrector_modes = {}
     model_checks = {"context": 0, "chat": 0, "retired": 0, "local_unloaded": 0, "rejected": 0}
     reasoning_checks = {"context": 0, "chat": 0, "unsupported": 0, "rejected": 0, "combinations": {}}
@@ -109,6 +124,8 @@ def main():
         def do_POST(self):
             self.route()
 
+        do_PUT = do_POST
+
         def route(self):
             nonlocal model_available
             if self.headers.get("Authorization") != "Bearer " + token:
@@ -124,7 +141,51 @@ def main():
             with guard:
                 label = self.command + " " + self.path
                 state["requests"][label] = state["requests"].get(label, 0) + 1
-            if self.path == "/v1/models":
+            if args.project_chat and self.path == "/v1/business/api/v1/session":
+                self.json_reply({"operator":{"id":"recette","role":"owner"}})
+            elif args.project_chat and self.path == "/v1/business/api/v1/project-catalogue":
+                self.json_reply([managed])
+            elif args.project_chat and self.path.startswith(threads + "?") and self.command == "GET":
+                self.json_reply({"items": [thread]})
+            elif args.project_chat and self.path == threads + "/fil-recette":
+                if self.command == "PUT":
+                    with guard:
+                        if body.get("expected_revision") != thread["revision"]:
+                            self.json_reply({"detail": "Révision de recette obsolète."}, 409)
+                            return
+                        thread.update(messages=body["messages"], revision=thread["revision"] + 1)
+                self.json_reply(thread)
+            elif args.project_chat and self.path == "/v1/business/v1/sources/source-recette":
+                self.json_reply({"metadata": {"filename": "Notice de recette"},
+                                 "artifacts": [{"text": "Texte indexé de la notice."}]})
+            elif args.project_chat and self.path == "/v1/business/v1/sources/source-recette/raw":
+                copies = 17*1024*1024//256 if args.large_original else 1
+                original = bytes(range(256))*copies + b"Kiara original\r\n"
+                self.send_response(200)
+                self.send_header("Content-Type", "application/octet-stream")
+                self.send_header("Content-Disposition", 'attachment; filename="kiara-original.bin"')
+                self.send_header("Content-Length", str(len(original)))
+                self.send_header("X-Agent-Source-Sha256", hashlib.sha256(original).hexdigest())
+                self.end_headers()
+                self.wfile.write(original)
+            elif args.project_chat and self.path == "/v1/business/v1/projects/chat/stream":
+                if body.get("project_id") != managed["brain_project_id"]:
+                    self.json_reply({"detail": "Périmètre de recette invalide."}, 403)
+                    return
+                reply = "Réponse de projet reçue par " + ("HTTPS" if args.tls else "WireGuard")
+                evidence = [{"source_id": "source-recette", "excerpt": "Extrait de recette."}]
+                events = [f"event: {kind}\ndata: {json.dumps(data)}\n\n".encode()
+                          for kind, data in (("delta", {"text": reply}),
+                                             ("done", {"answer": reply, "citations": evidence}))]
+                self.send_response(200)
+                self.send_header("Content-Type", "text/event-stream")
+                self.send_header("Content-Length", str(sum(map(len, events))))
+                self.end_headers()
+                for event in events:
+                    self.wfile.write(event)
+                    self.wfile.flush()
+                    time.sleep(.15)
+            elif self.path == "/v1/models":
                 if args.reasoning:
                     self.json_reply({"object": "list", "source": "hermes", "default_model": "fred-model-toggle", "data": [
                         {"id": row["id"], "name": "Fixture " + row["reasoning_mode"], "provider": row["provider"], "available": True,
@@ -169,6 +230,9 @@ def main():
             elif self.path == "/v1/history":
                 with guard:
                     if self.command == "POST":
+                        if args.project_chat and "Échange éphémère de recette" in json.dumps(body, ensure_ascii=False):
+                            self.json_reply({"detail": "Une question éphémère a atteint l’historique."}, 422)
+                            return
                         if str(body.get("revision")) != str(state["revision"]):
                             self.json_reply({"error": {"message": "Fixture revision changed"}}, 409)
                             return
@@ -237,7 +301,10 @@ def main():
             elif self.path == "/v1/cancel":
                 self.json_reply({"cancelled": True})
             elif self.path == "/v1/workspace":
-                self.json_reply(workspace.snapshot(owner) if workspace else {"projects": [], "documents": []})
+                self.json_reply({"projects": [managed], "jobs": [],
+                                 "project_catalogue": {"state": "ready", "can_create": False}}
+                                if args.project_chat else workspace.snapshot(owner)
+                                if workspace else {"projects": [], "documents": []})
             elif self.path in ("/v1/workspace/action", "/v1/notifications", "/v1/notifications/action") and workspace:
                 try:
                     if self.path == "/v1/workspace/action": result = workspace.action(owner, body)
@@ -251,12 +318,17 @@ def main():
                 self.json_reply({"error": {"message": "Unknown fixture route"}}, 404)
             with guard:
                 counts = {k: state[k] for k in ("requests", "rejected")}
+                if args.tls: counts["tls"] = self.connection.version()
                 if args.corrector: counts["corrector_modes"] = corrector_modes
                 if args.model_selection: counts["model_selection"] = model_checks
                 if args.reasoning: counts["reasoning"] = reasoning_checks
                 (output / "request-counts.json").write_text(json.dumps(counts), encoding="utf-8")
 
     api = ThreadingHTTPServer(("127.0.0.1", 0), API)
+    if args.tls:
+        tls = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        tls.load_cert_chain(*args.tls)
+        api.socket = tls.wrap_socket(api.socket, server_side=True)
     threading.Thread(target=api.serve_forever, daemon=True).start()
     server_private, server_public = keypair()
     peers, profiles = [], []
@@ -269,33 +341,63 @@ def main():
                          "client_name": "Fixture Android " + ("téléphone" if index == 0 else "tablette"), "token": token,
                          "wireguard": {"private_key": private, "server_public_key": server_public,
                                        "preshared_key": psk, "address": address}})
-    process = subprocess.Popen([str(args.engine.resolve() if args.engine else root / "client-qwen" / "wireguard-bridge.exe")], stdin=subprocess.PIPE,
+    executable = args.engine.resolve() if args.engine else root / "client-qwen" / "wireguard-bridge.exe"
+
+    def start_bridge(config):
+        child = subprocess.Popen([str(executable)], stdin=subprocess.PIPE,
                                stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True, encoding="utf-8",
                                creationflags=subprocess.CREATE_NO_WINDOW)
+        try:
+            child.stdin.write(json.dumps(config) + "\n")
+            child.stdin.flush()
+            ready = json.loads(child.stdout.readline())
+            if not ready.get("ready") or not ready.get("udp_port"):
+                raise RuntimeError("Fixture bridge failed to start")
+            return child, ready
+        except BaseException:
+            stop_bridge(child)
+            raise
+
+    def stop_bridge(child):
+        child.stdin.close()
+        try:
+            child.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            child.kill()
+            child.wait()
+
+    process = None
     try:
         config = {"role": "server", "wireguard": {"private_key": server_private}, "listen_port": 0,
                   "upstream_port": api.server_port, "peers": peers}
-        process.stdin.write(json.dumps(config) + "\n")
-        process.stdin.flush()
-        ready = json.loads(process.stdout.readline())
-        if not ready.get("ready") or not ready.get("udp_port"):
-            raise RuntimeError("Fixture bridge failed to start")
+        ready = {"ready": True, "https_port": api.server_port}
+        if not args.tls:
+            process, ready = start_bridge(config)
         for index, profile in enumerate(profiles):
-            profile["wireguard"]["endpoint"] = "10.0.2.2:" + str(ready["udp_port"])
+            profile["wireguard"]["endpoint"] = "10.0.2.2:" + str(ready.get("udp_port", 51820))
             payload = json.dumps(profile, ensure_ascii=False).encode()
             (output / f"profile-{index}.b64").write_text(base64.b64encode(payload).decode(), encoding="ascii")
             (output / f"profile-{index}.fred-android").write_bytes(payload)
-        print(json.dumps({"ready": True, "udp_port": ready["udp_port"], "profiles": 2}), flush=True)
+        print(json.dumps({**ready, "profiles": 2}), flush=True)
+        (output / "ready.json").write_text(json.dumps(ready), encoding="utf-8")
         deadline = time.monotonic() + args.duration
-        while time.monotonic() < deadline and process.poll() is None and not stop_file.exists():
+        reset_file = output / "restart-wireguard"
+        restarted_file = output / "wireguard-restarted"
+        reset_file.unlink(missing_ok=True)
+        restarted_file.unlink(missing_ok=True)
+        restarts = 0
+        while time.monotonic() < deadline and (process is None or process.poll() is None) and not stop_file.exists():
+            if args.reset_wireguard and process and reset_file.exists():
+                reset_file.unlink()
+                stop_bridge(process)
+                process = None
+                process, _ = start_bridge({**config, "listen_port": ready["udp_port"]})
+                restarts += 1
+                restarted_file.write_text(str(restarts), encoding="ascii")
             time.sleep(.5)
     finally:
-        process.stdin.close()
-        try:
-            process.wait(timeout=5)
-        except subprocess.TimeoutExpired:
-            process.kill()
-            process.wait()
+        if process:
+            stop_bridge(process)
         api.shutdown()
 
 

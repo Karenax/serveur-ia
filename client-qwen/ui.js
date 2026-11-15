@@ -10,6 +10,65 @@ function uiIcon(name){const svg=document.createElementNS('http://www.w3.org/2000
 const uiNavTitles={notifications:'Notifications',chat:'Conversations',projects:'Projets',settings:'Réglages'};
 const uiNavigationLabels=new WeakMap();
 uiNavTitles.assistant='Mémoire et rappels';uiPaths.assistant='M4 4h7v16H4V4m9 0h7v16h-7V4M7 8h1m8 0h1M7 12h1m8 0h1';
+uiNavTitles.agent='Espace de travail';uiPaths.agent=uiPaths.projects;
+async function uiOpenAgent(path){
+  if(busy)throw new Error('Attendez la fin de la réponse.');
+  if(ws.projectDirty)throw new Error('Enregistrez les consignes du projet avant de continuer.');
+  window.uiCheckPendingEdits?.();
+  await wsFlush();save();await flushHistory();
+  if(platformCapabilities.platform==='web'){
+    await uiPersistPreferences();
+    await window.voiceFinishForClose?.();
+    window.location.assign(config.web_prefix+(path||'/app'));
+    return;
+  }
+  const result=await api('/client/agent/session',{});
+  await window.voiceFinishForClose?.();
+  window.location.assign(path||result.url);
+}
+if(platformCapabilities.platform!=='android'){
+  const openAgent=wsElement('button',null,'nav-button');
+  openAgent.type='button';openAgent.id='open-agent';openAgent.dataset.viewButton='agent';
+  openAgent.append(uiIcon('projects'),wsElement('span','Espace de travail','nav-text'));
+  openAgent.onclick=()=>wsTry(()=>uiOpenAgent());
+  const projectButton=document.querySelector('[data-view-button="projects"]');
+  projectButton.parentNode.insertBefore(openAgent,projectButton.nextSibling);
+  const openLocalProjects = projectButton.onclick;
+  projectButton.onclick = () => {
+    if(ws.data?.project_catalogue?.interface==='projects-v1' && ws.data.project_catalogue.state==='ready') {
+      return wsTry(()=>uiOpenAgent('/app/projets'));
+    }
+    return openLocalProjects();
+  };
+  const entries = [
+    ['Mails', '/app/mails', 'M3 5h18v14H3zM3 5l9 7 9-7'],
+    ['Réunions', '/app/reunions', 'M4 9v6M8 5v14M12 3v18M16 6v12M20 9v6'],
+    ['Activité', '/app/activite', 'M3 12h4l3-6 4 12 3-6h4']
+  ];
+  let links = [];
+  const drawProjects = wsDrawProjects;
+  wsDrawProjects = function(){
+    drawProjects();
+    const catalogue = ws.data?.project_catalogue;
+    const enabled = catalogue?.state === 'ready' && catalogue.navigation === 'kiara-v1';
+    openAgent.hidden = catalogue?.interface === 'projects-v1' && catalogue.state === 'ready';
+    if (enabled && !links.length) {
+      links = entries.map(([label,path,icon]) => {
+        uiPaths[label] = icon;
+        const button = wsElement('button',null,'nav-button');
+        button.type = 'button';
+        button.append(uiIcon(label),wsElement('span',label,'nav-text'));
+        button.onclick = () => wsTry(() => uiOpenAgent(path));
+        return button;
+      });
+      projectButton.after(...links);
+    }
+    for (const button of links) button.hidden = !enabled;
+  };
+}
+if (location.hash === '#notifications') {
+  void clientReady.then(() => showView('notifications'));
+}
 function uiDecorateNavigation(){for(const button of document.querySelectorAll('[data-view-button]')){button.removeAttribute('aria-selected');if(button.classList.contains('active'))button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');}for(const b of document.querySelectorAll('.nav-button')){const name=b.dataset.viewButton;if(!uiNavTitles[name])continue;const unchangedSignature=JSON.stringify([name,uiNavTitles[name],b.dataset.unreadCount||0,b.dataset.unread==='true'||b.textContent.includes('résultats disponibles')]);if(uiNavigationLabels.get(b)===unchangedSignature&&b.querySelector('.nav-text'))continue;uiNavigationLabels.set(b,unchangedSignature);if(name==='notifications'){const count=Number(b.dataset.unreadCount||0);b.replaceChildren(uiIcon(name),wsElement('span',uiNavTitles[name],'nav-text'));if(count)b.append(wsElement('span',String(count),'fred-nav-count'));b.title='Notifications'+(count?' · '+count+' non lues':'');continue;}b.replaceChildren(uiIcon(name),wsElement('span',uiNavTitles[name],'nav-text'));b.title=uiNavTitles[name];}}
 $('new').prepend(uiIcon('new'));$('ui-sidebar-toggle').append(uiIcon('sidebar'));
 document.querySelector('.sidebar-settings').append(document.querySelector('[data-view-button="settings"]'));
@@ -27,6 +86,7 @@ function uiToggleSidebar(){if(uiSidebarModal()){uiCloseSidebar();return;}documen
 uiSidebar.addEventListener('keydown',e=>{if(e.key!=='Tab'||!uiSidebarModal())return;const items=[...uiSidebar.querySelectorAll('button,input,select,summary,a[href],[tabindex="0"]')].filter(n=>!n.disabled&&n.getClientRects().length),first=items[0],last=items.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}});
 uiSidebarClose.onclick=()=>uiCloseSidebar();$('ui-sidebar-toggle').onclick=uiToggleSidebar;document.querySelector('.sidebar-backdrop').onclick=()=>uiCloseSidebar();matchMedia('(max-width:850px)').addEventListener('change',()=>{const hiddenFocus=uiSidebar.contains(document.activeElement);document.body.classList.remove('sidebar-open');uiSyncSidebar();if(hiddenFocus&&uiSidebar.inert)$('ui-sidebar-toggle').focus();});uiSyncSidebar();
 const uiThemeCard=wsElement('div',undefined,'settings-card');uiThemeCard.append(wsElement('h3','Apparence'));const uiThemeRow=wsElement('div',undefined,'theme-row');const uiThemeLabel=wsElement('label','Thème de l’interface');uiThemeLabel.htmlFor='ui-theme';const uiThemeSelect=wsElement('select');uiThemeSelect.id='ui-theme';uiThemeSelect.append(new Option('Clair','light'),new Option('Sombre','dark'),new Option('Comme Windows','system'));uiThemeRow.append(uiThemeLabel,uiThemeSelect);uiThemeCard.append(uiThemeRow);document.querySelector('[data-view="access"]').prepend(uiThemeCard);
+if(platformCapabilities.platform==='web') uiThemeSelect.options[2].textContent='Comme le système';
 let uiTheme='light';try{uiTheme=localStorage.getItem('fred-theme')||'light';}catch{}if(!['light','dark','system'].includes(uiTheme))uiTheme='light';
 function uiSetTheme(value){uiTheme=value;uiThemeSelect.value=value;document.documentElement.dataset.theme=value==='system'?(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'):value;try{localStorage.setItem('fred-theme',value);}catch{}}
 uiSetTheme(uiTheme);uiThemeSelect.onchange=()=>uiSetTheme(uiThemeSelect.value);matchMedia('(prefers-color-scheme:dark)').addEventListener('change',()=>{if(uiTheme==='system')uiSetTheme('system');});
@@ -56,6 +116,25 @@ const uiDraftChanges=new Map();
 function uiRemoveComposerDraft(id){uiComposerSync();const text=uiComposerDrafts[id]||'';if(uiComposerId===id)$('prompt').value='';uiComposerRemember(id,'');return text;}
 function uiRestoreComposerDraft(id,text){if(text)uiComposerRemember(id,text);}
 window.uiCheckPendingEdits=()=>{if(uiMemoryEditsPending())throw new Error('Enregistrez les mémoires modifiées avant de fermer.');};
+window.kiaraPrepareClose=async()=>{
+  window.uiCheckPendingEdits();
+  if(ws.projectDirty)throw new Error('Enregistrez les consignes du projet avant de fermer.');
+  await window.voiceFinishForClose?.();
+  if(busy&&controller){
+    const active=controller,turn=requestId,cancelBody=window.generationCancelBody?.()||{};
+    await api('/v1/cancel',cancelBody,{'X-Qwen-Request':turn});
+    active.abort();
+  }
+  const deadline=Date.now()+75000;
+  while(busy||historySyncPending){
+    if(Date.now()>=deadline)throw new Error('La conversation se termine encore. Réessayez dans un instant.');
+    await new Promise(resolve=>setTimeout(resolve,50));
+  }
+  await wsFlush();
+  await uiPersistPreferences();
+  await flushHistory();
+  await api('/client/history/flush',{});
+};
 const uiDraftStatus=wsElement('span',undefined,'draft-status');uiDraftStatus.id='ui-draft-status';uiDraftStatus.setAttribute('role','status');uiDraftStatus.hidden=true;document.querySelector('.composer').append(uiDraftStatus);
 const uiDraftRetry=wsElement('button','Réessayer l’enregistrement','secondary draft-retry');uiDraftRetry.id='ui-draft-retry';uiDraftRetry.type='button';uiDraftRetry.hidden=true;uiDraftStatus.after(uiDraftRetry);
 uiDraftRetry.onclick=async()=>{uiDraftRetry.disabled=true;try{await uiPersistPreferences();}catch(e){error(e);}finally{uiDraftRetry.disabled=false;}};
@@ -66,6 +145,7 @@ function uiComposerRemember(id,text){
   clearTimeout(uiDraftTimer);if(uiDraftsLoaded)uiDraftTimer=setTimeout(()=>uiPersistPreferences().catch(e=>{uiDraftStatus.hidden=false;uiDraftStatus.textContent='Brouillon non enregistré · réessayez avant de fermer';error(e);}),350);
 }
 function uiComposerSync(){
+  if(window.kiaraProjectConversation?.active)return;
   uiComposerRemember(uiComposerId,$('prompt').value);
   if(uiComposerId!==currentId){uiComposerId=currentId;$('prompt').value=uiComposerDrafts[currentId]||'';$('prompt').dispatchEvent(new Event('input',{bubbles:true}));uiDraftStatus.hidden=!$('prompt').value;uiDraftStatus.textContent=uiDraftDirty?'Brouillon à enregistrer sur cet appareil':'Brouillon conservé sur cet appareil';}
 }
@@ -74,7 +154,7 @@ function uiLoadComposerDrafts(values){
   uiComposerDrafts=Object.assign(Object.create(null),values?.conversation_drafts||{});for(const [id,text] of uiDraftChanges){if(text)uiComposerDrafts[id]=text;else delete uiComposerDrafts[id];}
   if(!$('prompt').value&&uiComposerDrafts[currentId]){$('prompt').value=uiComposerDrafts[currentId];uiDraftStatus.hidden=false;uiDraftStatus.textContent='Brouillon récupéré sur cet appareil';}
 }
-$('prompt').addEventListener('input',()=>uiComposerRemember(uiComposerId,$('prompt').value));
+$('prompt').addEventListener('input',()=>{if(!window.kiaraProjectConversation?.active)uiComposerRemember(uiComposerId,$('prompt').value);});
 async function uiPersistPreferences(){
   if(!uiDraftsLoaded){const state=await api('/client/state');uiLoadComposerDrafts(state.preferences||{});}
   uiComposerSync();clearTimeout(uiDraftTimer);const draftVersion=uiDraftVersion;
@@ -117,7 +197,7 @@ document.querySelector('.project-tabs').after($('ws-project-status'));
 for(const b of document.querySelectorAll('[data-project-tab]'))b.onclick=()=>uiProjectTab(b.dataset.projectTab);
 $('ui-project-create').onclick=()=>{$('ws-create-project').hidden=!$('ws-create-project').hidden;if(!$('ws-create-project').hidden)$('ws-project-name').focus();};
 const uiFillProject=wsFillProject;wsFillProject=function(){uiFillProject();const p=ws.data?.projects.find(p=>p.id===ws.project);$('ui-project-title').textContent=p?.title||'Votre projet';$('ui-document-empty').hidden=!!ws.document;for(const b of $('ws-documents').querySelectorAll('button'))b.classList.toggle('selected',b.textContent===ws.document?.title);};
-const uiSelectProject=wsSelectProject;wsSelectProject=async function(id){await uiSelectProject(id);$('ws-create-project').hidden=true;uiProjectTab('documents');$('ui-document-empty').hidden=false;};
+const uiSelectProject=wsSelectProject;wsSelectProject=async function(id){await uiSelectProject(id);$('ws-create-project').hidden=true;uiProjectTab(wsIsAgentProject(id)?'conversations':'documents');$('ui-document-empty').hidden=false;};
 const uiOpenDocument=wsOpenDocument;wsOpenDocument=async function(id){await uiOpenDocument(id);$('ui-document-empty').hidden=true;uiProjectTab('documents');for(const b of $('ws-documents').querySelectorAll('button'))b.classList.toggle('selected',b.textContent===$('ws-document-title').value);};
 $('ui-upload-label').onkeydown=e=>{if(['Enter',' '].includes(e.key)){e.preventDefault();$('ws-upload').click();}};
 

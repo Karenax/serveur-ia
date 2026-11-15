@@ -1,5 +1,6 @@
 """HTTP adapters for transactional commands; identity always comes from ingress."""
 from kiara_shared.http import json_body
+from kiara_shared.history_store import is_agent_project_id
 from workspace_types import Conflict,Denied
 
 ROUTES={
@@ -19,14 +20,23 @@ def handle(handler,store):
             raise ValueError('Les agents ne sont pas activés sur ce serveur.')
         value=json_body(handler,ROUTES[path])
         prepared=store.workspace.prepare_upload(handler.identity,value) if path=='/v1/workspace/action' else None
-        if path=='/v1/agent/action':
-            if store.authenticate(handler.access_token)!=handler.identity:raise Denied('Accès désactivé.')
+        agent_search = (path == '/v1/workspace/action' and isinstance(value, dict)
+                        and value.get('action') in ('search', 'knowledge_search')
+                        and is_agent_project_id(value.get('project')))
+        if agent_search:
+            if not handler.access_valid():
+                raise Denied('Accès désactivé.')
+            result = store.workspace.action(handler.identity, value, prepared)
+            if not handler.access_valid():
+                raise Denied('Accès désactivé.')
+        elif path=='/v1/agent/action':
+            if not handler.access_valid():raise Denied('Accès désactivé.')
             result=store.hermes.action(handler.identity,value)
         else:
             # Parsing/extraction happens outside this lock. Revalidate under
             # the same lock as suspension/revocation before any mutation.
             with store.lock:
-                if store.authenticate(handler.access_token)!=handler.identity:raise Denied('Accès désactivé.')
+                if not handler.access_valid():raise Denied('Accès désactivé.')
                 if path=='/v1/workspace/action':result=store.workspace.action(handler.identity,value,prepared)
                 elif path=='/v1/history':result=store.workspace.history_write(handler.identity,value)
                 elif path=='/v1/device':result=store.heartbeat(handler.identity,value)

@@ -1,0 +1,125 @@
+import { useEffect, useRef, useState } from 'react';
+import { deliverableApi, categoryLabels, documentLabels, workLabels, deliverableVersionLabel, type Category, type DeliverableDetail, type DeliverableFields, type DeliverableFocus, type DeliverablePage, type DocumentStatus, type Progress } from '../lib/projectDeliverables';
+import { useDebouncedValue } from '../hooks/useDebouncedValue';
+import { Pagination, PersonPicker } from './IdentityPickers';
+import { PlanningRelationPicker, useAlive, focusPlanning } from './PlanningTasksPanel';
+import { ErrorState, LoadingState } from './Ui';
+import { DeliverableChecklist } from './DeliverableChecklist';
+import { DeliverableValidation } from './DeliverableValidation';
+import { DeliverableVersions } from './DeliverableVersions';
+import { DeliverableHistory } from './DeliverableHistory';
+import { DeliverableSelection } from './DeliverableSelection';
+import './project-deliverables.css';
+
+const message=(error:unknown)=>error instanceof Error?error.message:String(error);
+const fields=(row:DeliverableDetail):DeliverableFields=>({title:row.title,responsible_id:row.responsible_id,verifier_id:row.verifier_id,comment:row.comment,active:row.active});
+function changed(base:DeliverableFields,draft:DeliverableFields) {return Object.fromEntries(Object.entries(draft).filter(([key,value])=>value!==base[key as keyof DeliverableFields])) as Partial<DeliverableFields>;}
+function abandon(element:HTMLElement|null) {return !element?.querySelector('[data-workspace-dirty="true"]')||window.confirm('Fermer sans enregistrer la saisie en cours ?');}
+export function DeliverableProgress({value,label}:{value:Progress;label:string}) {return <div className="deliverable-progress"><span>{label} : {value.total?`${value.completed}/${value.total} · ${value.percentage} %`:'Sans point applicable'}</span>{value.total>0&&<progress aria-label={label} value={value.completed} max={value.total}/>}</div>;}
+
+type DeliverablesProps={projectId:string;active?:boolean;onSaved:()=>void;focus?:DeliverableFocus|null;onFocusHandled?:()=>void};
+export function ProjectDeliverablesPanel(props:DeliverablesProps) {return <DeliverableList key={props.projectId} {...props}/>;}
+function DeliverableList({projectId,active=true,onSaved,focus,onFocusHandled}:DeliverablesProps) {
+  const [search,setSearch]=useState('');const term=useDebouncedValue(search);const [offset,setOffset]=useState(0);
+  const [status,setStatus]=useState<DocumentStatus|''>('');const [category,setCategory]=useState<Category|''>('');const [inactive,setInactive]=useState(false);
+  const [responsible,setResponsible]=useState<string|null>(null);const [verifier,setVerifier]=useState<string|null>(null);const [milestone,setMilestone]=useState<string|null>(null);
+  const [page,setPage]=useState<DeliverablePage|null>(null);const [loading,setLoading]=useState(false);const [error,setError]=useState('');const [notice,setNotice]=useState('');const [tick,setTick]=useState(0);
+  const [selected,setSelected]=useState<DeliverableDetail|null>(null);const [creating,setCreating]=useState(false);const [opening,setOpening]=useState(false);
+  const [selecting,setSelecting]=useState(false);const [selectionBusy,setSelectionBusy]=useState(false);
+  const [sheetBusy,setSheetBusy]=useState(false);const [openedFocus,setOpenedFocus]=useState<DeliverableFocus|null>(null);const handledFocus=useRef<number|null>(null);
+  const generation=useRef(0);const alive=useAlive();const container=useRef<HTMLElement>(null);
+  useEffect(()=>{if(!active||!focus||handledFocus.current===focus.requestId)return;
+    if(sheetBusy||selectionBusy)return;
+    handledFocus.current=focus.requestId;
+    if(!abandon(container.current)){setNotice('Ouverture du contrôle annulée ; votre saisie est conservée.');onFocusHandled?.();return;}
+    const controller=new AbortController();const request=++generation.current;let completed=false;setOpening(true);setError('');
+    deliverableApi.detail(projectId,focus.deliverableId,controller.signal).then(detail=>{if(controller.signal.aborted||request!==generation.current)return;if(detail.project_id!==projectId||detail.id!==focus.deliverableId)throw new Error('Fiche reçue pour un autre projet ou livrable.');completed=true;setSelected(detail);setCreating(false);setSelecting(false);setOpenedFocus(focus);setNotice('');onFocusHandled?.();}).catch(e=>{if(!controller.signal.aborted){completed=true;setError(message(e));onFocusHandled?.();}}).finally(()=>{if(alive.current&&request===generation.current)setOpening(false);});
+    return()=>{controller.abort();if(!completed&&handledFocus.current===focus.requestId&&request===generation.current)handledFocus.current=null;};
+  },[projectId,active,focus,onFocusHandled,sheetBusy,selectionBusy]);
+  useEffect(()=>{if(!active)return;const controller=new AbortController();setLoading(true);setError('');if(!creating&&!selecting)setPage(null);
+    const timer=window.setTimeout(()=>{deliverableApi.list(projectId,{search:term,offset,limit:25,status,category,include_inactive:inactive,responsible_id:responsible,verifier_id:verifier,milestone_id:milestone,signal:controller.signal})
+      .then(result=>{if(!controller.signal.aborted)setPage(result);}).catch(e=>{if(!controller.signal.aborted)setError(message(e));}).finally(()=>{if(!controller.signal.aborted)setLoading(false);});},60);
+    return()=>{controller.abort();window.clearTimeout(timer);};},[projectId,active,term,offset,status,category,inactive,responsible,verifier,milestone,tick]);
+  async function open(id:string) {if(opening)return;const request=++generation.current;setOpening(true);setError('');try {const detail=await deliverableApi.detail(projectId,id);if(alive.current&&request===generation.current){setSelected(detail);setOpenedFocus(null);}}catch(e){if(alive.current&&request===generation.current)setError(message(e));}finally{if(alive.current&&request===generation.current)setOpening(false);}}
+  function saved() {setTick(value=>value+1);setNotice('Livrable enregistré.');onSaved();}
+  const editing=!!selected||creating||selecting;const filtersDisabled=!active||editing||opening||selectionBusy;
+  return <section ref={container} className="planning-panel deliverables-panel" aria-label="Livrables du projet">
+    <header className="planning-heading"><div><h2>Documents à remettre</h2></div>{page&&<button type="button" className="button secondary" disabled={loading||filtersDisabled} onClick={()=>{setSelecting(true);setNotice('');}}>Ajouter depuis les modèles</button>}{page?.can_edit&&<button type="button" className="button primary" disabled={loading||filtersDisabled} onClick={()=>{setCreating(true);setNotice('');}}>Nouveau livrable</button>}</header>
+    <div className="planning-toolbar"><label>Rechercher un livrable<input className="input" type="search" value={search} maxLength={200} disabled={filtersDisabled} onChange={e=>{setSearch(e.target.value);setOffset(0);}}/></label>
+      <label>Statut documentaire<select className="input" value={status} disabled={filtersDisabled} onChange={e=>{setStatus(e.target.value as DocumentStatus|'');setOffset(0);}}><option value="">Tous</option>{Object.entries(documentLabels).map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label>
+    </div>
+    <details className="deliverable-filters"><summary>Filtres et options</summary><div className="planning-form-grid">
+      <label>Catégorie<select className="input" value={category} disabled={filtersDisabled} onChange={e=>{setCategory(e.target.value as Category|'');setOffset(0);}}><option value="">Toutes</option>{Object.entries(categoryLabels).map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label>
+      <label className="identity-checkbox"><input type="checkbox" checked={inactive} disabled={filtersDisabled} onChange={e=>{setInactive(e.target.checked);setOffset(0);}}/>Inclure les livrables désélectionnés</label>
+      <button type="button" className="button secondary sm" disabled={loading||filtersDisabled} onClick={()=>setTick(value=>value+1)}>Actualiser la liste</button>
+      <PersonPicker label="Filtrer par responsable" value={responsible} onChange={value=>{setResponsible(value);setOffset(0);}} disabled={filtersDisabled}/>
+      <PersonPicker label="Filtrer par vérificateur" value={verifier} onChange={value=>{setVerifier(value);setOffset(0);}} disabled={filtersDisabled}/>
+      <PlanningRelationPicker projectId={projectId} kind="milestones" label="Filtrer par jalon" value={milestone} onChange={value=>{setMilestone(value);setOffset(0);}} disabled={filtersDisabled}/></div></details>
+    {notice&&<p role="status" className="planning-notice">{notice}</p>}{error&&<ErrorState message={error} retry={()=>setTick(value=>value+1)}/>}{loading&&<LoadingState label="Chargement des livrables"/>}{opening&&<p role="status">Ouverture du livrable…</p>}
+    {creating&&page&&<DeliverableEditor projectId={projectId} revision={page.revision} onCancel={()=>{if(abandon(container.current))setCreating(false);}} onSaved={()=>{setCreating(false);saved();}}/>}
+    {selected&&<DeliverableSheet key={`${selected.id}-${openedFocus?.requestId||0}`} projectId={projectId} active={active} initial={selected} focus={openedFocus} onBusy={setSheetBusy} onClose={()=>{if(abandon(container.current))setSelected(null);}} onSaved={saved}/>}
+    {selecting&&page&&<DeliverableSelection projectId={projectId} active={active} revision={page.revision} canEdit={page.can_edit} onBusy={setSelectionBusy} onCancel={()=>{if(!selectionBusy&&abandon(container.current))setSelecting(false);}} onSaved={()=>{setSelecting(false);saved();}}/>}
+    {page&&<><div role="group" aria-label="Pages des livrables"><Pagination offset={page.offset} total={page.total} limit={page.limit} disabled={loading||filtersDisabled} onChange={setOffset}/></div>
+      {!page.items.length&&!loading&&<p>Aucun livrable ne correspond à ces filtres.</p>}
+      <div className="planning-table-scroll" hidden={!page.items.length}><table className="data-table deliverable-table"><thead><tr><th>Livrable</th><th>Document / travail</th><th>Progression</th><th>Dernière version</th><th>Action</th></tr></thead><tbody>{page.items.map(row=><tr key={row.id} className={!row.active?'planning-archived':undefined}>
+        <td><strong>{row.title}</strong><small>{row.type?.label||categoryLabels[row.category]}</small>{!row.active&&<span className="badge neutral">Désélectionné</span>}</td>
+        <td><span className={`badge ${row.document_status==='validated'?'ok':row.document_status==='to_revise'?'danger':'neutral'}`}>{documentLabels[row.document_status]}</span><small>Travail : {workLabels[row.legacy_status]||row.legacy_status}</small></td>
+        <td><DeliverableProgress value={row.progress} label="Points vérifiés"/><DeliverableProgress value={row.transverse_progress} label="Contrôles communs"/></td>
+        <td>{row.latest_version?<>V{row.latest_version.number} · {row.latest_version.reference}<small>{row.latest_version.filename}</small></>:'Aucune version'}</td>
+        <td><button type="button" className="button secondary sm" aria-label={`Consulter · ${row.title}`} disabled={loading||filtersDisabled} onClick={()=>void open(row.id)}>Consulter</button></td></tr>)}</tbody></table></div></>}
+  </section>;
+}
+
+function DeliverableSheet({projectId,initial,active,onClose,onSaved,focus,onBusy}:{projectId:string;initial:DeliverableDetail;active:boolean;onClose:()=>void;onSaved:()=>void;focus?:DeliverableFocus|null;onBusy?:(busy:boolean)=>void}) {
+  const [detail,setDetail]=useState(initial);const [tab,setTab]=useState<'fiche'|'controls'|'versions'>(focus&&focus.origin!=='cockpit'&&focus.origin!=='review'?'controls':'fiche');const [controlTab,setControlTab]=useState<'checklist'|'validation'>('checklist');const [historyOpen,setHistoryOpen]=useState(false);const [historyVisited,setHistoryVisited]=useState(false);const [loading,setLoading]=useState(false);const [error,setError]=useState('');const alive=useAlive();const container=useRef<HTMLElement>(null);
+  const [metadataPending,setMetadataPending]=useState(false);const [workPending,setWorkPending]=useState(false);
+  const [metadataBusy,setMetadataBusy]=useState(false);const [workBusy,setWorkBusy]=useState(false);const [commandBusy,setCommandBusy]=useState(false);const locked=loading||metadataBusy||workBusy||commandBusy;
+  useEffect(()=>focusPlanning(container.current),[]);
+  useEffect(()=>{onBusy?.(locked);return()=>onBusy?.(false);},[locked,onBusy]);
+  async function reload() {setLoading(true);try {const value=await deliverableApi.detail(projectId,detail.id);if(alive.current){setDetail(value);setError('');onSaved();}}catch(e){if(alive.current)setError(message(e));}finally{if(alive.current)setLoading(false);}}
+  return <section ref={container} tabIndex={-1} className="card deliverable-sheet" aria-label={`Fiche · ${detail.title}`}><header className="planning-heading"><div><h3>{detail.title}</h3><span>{documentLabels[detail.document_status]} · Révision {detail.revision}</span></div><button type="button" className="button secondary" disabled={locked} onClick={onClose}>Fermer le livrable</button></header>
+    {error&&<ErrorState message={error} retry={()=>{if(abandon(container.current))void reload();}}/>}
+    {focus&&<section className="planning-note" aria-label={focus.origin==='cockpit'?'Livrable ouvert depuis le cockpit':focus.origin==='review'?'Livrable ouvert depuis la revue':'Contrôle ouvert depuis le jalon'}><strong>Depuis {focus.milestoneTitle}</strong>
+      {focus.origin==='cockpit'?<p>Consulter les versions, contrôles et preuves de ce livrable.</p>:focus.origin==='review'?<p>Cette fiche présente le livrable actuel. La publication conserve les noms et états capturés dans la revue.</p>:<><p>{detail.checklist.find(row=>row.id===focus.checkId)?.label||'Contrôle absent ou retiré depuis cette lecture.'}</p><p>Version observée : {focus.version?`V${focus.version.number} · ${focus.version.reference||focus.version.filename}`:'aucune publication'}. Version actuelle : {deliverableVersionLabel(detail)}.</p>{(focus.version?.id||null)!==detail.latest_version_id&&<p role="alert">La publication a changé depuis la lecture du jalon. Relire les contrôles et confirmer un éventuel visa pour la version actuelle.</p>}</>}
+    </section>}
+    <nav className="planning-toolbar" aria-label="Rubriques du livrable">{(['fiche','versions','controls'] as const).map(value=><button key={value} type="button" className={`button ${tab===value?'primary':'secondary'}`} aria-pressed={tab===value} disabled={locked} onClick={()=>{if(value!==tab&&abandon(container.current))setTab(value);}}>{{fiche:'Fiche',versions:'Fichiers',controls:'Contrôles et validation'}[value]}</button>)}</nav>
+    {tab==='fiche'&&<><DeliverableEditor key={`fiche-${detail.revision}`} projectId={projectId} revision={detail.revision} initial={detail} blocked={loading||workPending} onPending={setMetadataPending} onBusy={setMetadataBusy} onCancel={onClose} onSaved={()=>void reload()}/><WorkStatus key={`travail-${detail.revision}`} projectId={projectId} detail={detail} blocked={loading||metadataPending} onPending={setWorkPending} onBusy={setWorkBusy} onSaved={()=>void reload()}/></>}
+    {tab==='controls'&&<><div className="deliverable-control-switch" aria-label="Choix du contrôle"><button type="button" className="button secondary sm" aria-pressed={controlTab==='checklist'} disabled={locked} onClick={()=>{if(controlTab!=='checklist'&&abandon(container.current))setControlTab('checklist');}}>Points à vérifier</button><button type="button" className="button secondary sm" aria-pressed={controlTab==='validation'} disabled={locked} onClick={()=>{if(controlTab!=='validation'&&abandon(container.current))setControlTab('validation');}}>Valider le document</button></div>
+    {controlTab==='checklist'?<fieldset className="deliverable-command" disabled={loading}><DeliverableProgress value={detail.progress} label="Points vérifiés"/><DeliverableProgress value={detail.transverse_progress} label="Contrôles communs"/><DeliverableChecklist projectId={projectId} active={active} detail={detail} focusedCheckId={focus?.checkId} onBusy={setCommandBusy} onSaved={()=>void reload()}/></fieldset>:<fieldset className="deliverable-command" disabled={loading}><DeliverableValidation key={detail.revision} projectId={projectId} detail={detail} onBusy={setCommandBusy} onSaved={()=>void reload()}/></fieldset>}</>}
+    {tab==='versions'&&<fieldset className="deliverable-command" disabled={loading}><DeliverableVersions projectId={projectId} active={active} detail={detail} onBusy={setCommandBusy} onSaved={()=>void reload()}/></fieldset>}
+    <div className="deliverable-history-disclosure"><button type="button" className="button secondary sm" disabled={locked} aria-expanded={historyOpen} onClick={()=>{setHistoryOpen(value=>!value);setHistoryVisited(true);}}>Historique</button>
+    {historyVisited&&<div hidden={!historyOpen}><DeliverableHistory projectId={projectId} deliverableId={detail.id} active={active&&historyOpen}/></div>}</div>
+  </section>;
+}
+
+function DeliverableEditor({projectId,revision,initial,onCancel,onSaved,blocked=false,onPending,onBusy}:{projectId:string;revision:number;initial?:DeliverableDetail;onCancel:()=>void;onSaved:()=>void;blocked?:boolean;onPending?:(pending:boolean)=>void;onBusy?:(busy:boolean)=>void}) {
+  const empty:DeliverableFields={title:'',responsible_id:null,verifier_id:null,comment:'',active:true};const [base,setBase]=useState(initial);const [baseRevision,setBaseRevision]=useState(revision);const [draft,setDraft]=useState(initial?fields(initial):empty);
+  const [latest,setLatest]=useState<DeliverableDetail|{revision:number}|null>(null);const [busy,setBusy]=useState(false);const [error,setError]=useState('');const alive=useAlive();const focus=useRef<HTMLFormElement>(null);
+  useEffect(()=>{if(initial)focus.current?.focus({preventScroll:true});else focusPlanning(focus.current);},[]);
+  const edits=changed(base?fields(base):empty,draft);const readOnly=!!base&&!base.can_edit;const disabled=readOnly||busy||blocked;
+  const pending=Object.keys(edits).length>0&&!readOnly;
+  useEffect(()=>{onPending?.(pending||busy);return()=>onPending?.(false);},[pending,busy,onPending]);
+  useEffect(()=>{onBusy?.(busy);return()=>onBusy?.(false);},[busy,onBusy]);
+  function change<K extends keyof DeliverableFields>(key:K,value:DeliverableFields[K]) {setDraft(old=>({...old,[key]:value}));}
+  async function save() {if(disabled||latest)return;setBusy(true);setError('');try {if(base)await deliverableApi.patch(projectId,base.id,baseRevision,edits);else await deliverableApi.create(projectId,baseRevision,{title:draft.title,responsible_id:draft.responsible_id,verifier_id:draft.verifier_id});if(alive.current)onSaved();}catch(e){if(alive.current)setError(message(e));}finally{if(alive.current)setBusy(false);}}
+  async function compare() {setBusy(true);try {const value=base?await deliverableApi.detail(projectId,base.id):await deliverableApi.list(projectId,{limit:1});if(alive.current)setLatest(value);}catch(e){if(alive.current)setError(message(e));}finally{if(alive.current)setBusy(false);}}
+  function prepare() {if(!latest)return;if('title' in latest){setDraft({...fields(latest),...edits});setBase(latest);}setBaseRevision(latest.revision);setLatest(null);setError('');}
+  return <form ref={focus} tabIndex={-1} className="planning-editor" aria-label={base?'Édition du livrable':'Nouveau livrable'} data-workspace-dirty={!readOnly&&Object.keys(edits).length?'true':undefined} onSubmit={e=>{e.preventDefault();void save();}}>
+    {error&&<p role="alert" className="planning-error">{error} Votre saisie est conservée.</p>}
+    {latest&&<section className="planning-conflict" aria-label="Comparaison avec la dernière révision"><h4>Révision actuelle : {latest.revision}</h4><p>Comparer les champs modifiés avant de préparer une nouvelle sauvegarde.</p><table className="data-table"><thead><tr><th>Champ</th><th>Au début</th><th>Actuellement</th><th>Votre saisie</th></tr></thead><tbody>{Object.entries(edits).map(([key,value])=><tr key={key}><td>{({title:'Intitulé',comment:'Commentaire',responsible_id:'Responsable',verifier_id:'Vérificateur',active:'Sélectionné'} as Record<string,string>)[key]}</td><td>{String((base?fields(base):empty)[key as keyof DeliverableFields]??'—')}</td><td>{'title' in latest?String(fields(latest)[key as keyof DeliverableFields]??'—'):'Nouveau livrable'}</td><td>{String(value??'—')}</td></tr>)}</tbody></table><button type="button" className="button secondary" disabled={busy} onClick={prepare}>Préparer mon brouillon sur cette révision</button></section>}
+    <div className="planning-form-grid"><label>Intitulé du livrable<input className="input" required maxLength={255} value={draft.title} disabled={disabled} onChange={e=>change('title',e.target.value)}/></label>
+      <PersonPicker label="Responsable du livrable" value={draft.responsible_id} disabled={disabled} onChange={value=>change('responsible_id',value)}/><PersonPicker label="Vérificateur du livrable" value={draft.verifier_id} disabled={disabled} onChange={value=>change('verifier_id',value)}/>
+      {base&&<><label>Commentaire du livrable<textarea className="input" maxLength={20000} value={draft.comment} disabled={disabled} onChange={e=>change('comment',e.target.value)}/></label><label className="identity-checkbox"><input type="checkbox" checked={draft.active} disabled={disabled} onChange={e=>change('active',e.target.checked)}/>Livrable sélectionné</label></>}</div>
+    <div className="planning-toolbar">{!readOnly&&<button type="submit" className="button primary" disabled={disabled||!!latest||!draft.title.trim()||!Object.keys(edits).length}>Enregistrer le livrable</button>}{error&&!readOnly&&<button type="button" className="button secondary" disabled={busy||blocked} onClick={()=>void compare()}>Recharger et comparer sans perdre ma saisie</button>}<button type="button" className="button secondary" disabled={busy} onClick={onCancel}>{readOnly?'Fermer':'Annuler'}</button></div>
+  </form>;
+}
+function WorkStatus({projectId,detail,onSaved,blocked,onPending,onBusy}:{projectId:string;detail:DeliverableDetail;onSaved:()=>void;blocked:boolean;onPending:(pending:boolean)=>void;onBusy:(busy:boolean)=>void}) {
+  const [base,setBase]=useState(detail);const [status,setStatus]=useState(detail.legacy_status);const [latest,setLatest]=useState<DeliverableDetail|null>(null);const [error,setError]=useState('');const [busy,setBusy]=useState(false);const alive=useAlive();const dirty=status!==base.legacy_status;
+  useEffect(()=>{onPending(dirty||busy);return()=>onPending(false);},[dirty,busy,onPending]);
+  useEffect(()=>{onBusy(busy);return()=>onBusy(false);},[busy,onBusy]);
+  async function save() {if(busy||blocked||!base.can_edit||latest)return;setBusy(true);setError('');try {await deliverableApi.workStatus(projectId,base.id,base.revision,status);if(alive.current)onSaved();}catch(e){if(alive.current)setError(message(e));}finally{if(alive.current)setBusy(false);}}
+  async function compare() {setBusy(true);try {const value=await deliverableApi.detail(projectId,base.id);if(alive.current)setLatest(value);}catch(e){if(alive.current)setError(message(e));}finally{if(alive.current)setBusy(false);}}
+  return <form className="deliverable-work" aria-label="Suivi du travail" data-workspace-dirty={base.can_edit&&dirty?'true':undefined} onSubmit={e=>{e.preventDefault();void save();}}><label>Statut du travail<select className="input" disabled={busy||blocked||!base.can_edit} value={status} onChange={e=>setStatus(e.target.value)}>{!workLabels[status]&&<option value={status}>{status}</option>}{Object.entries(workLabels).map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label><p>Le statut « Terminé » conserve le suivi du travail. Le visa documentaire porte sur une version de fichier.</p>{error&&<p role="alert" className="planning-error">{error} Votre choix est conservé.</p>}
+    {latest&&<section className="planning-conflict" aria-label="Comparaison du statut de travail"><p>Révision {latest.revision} · Actuellement : {workLabels[latest.legacy_status]||latest.legacy_status} · Votre choix : {workLabels[status]||status}</p><button type="button" className="button secondary" disabled={busy} onClick={()=>{setBase(latest);setLatest(null);setError('');}}>Préparer ce choix sur la révision actuelle</button></section>}
+    {base.can_edit&&<><button type="submit" className="button secondary" disabled={busy||blocked||!dirty||!!latest}>Enregistrer le statut du travail</button>{error&&<button type="button" className="button secondary" disabled={busy||blocked} onClick={()=>void compare()}>Comparer le statut actuel</button>}</>}</form>;
+}

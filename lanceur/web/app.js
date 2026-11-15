@@ -6,7 +6,7 @@ let remoteBusy = false;
 let remoteDirty = false;
 const definitions = {
   'compute-fields': [
-    ['context','Contexte maximal','number','Jusqu’à 393 216 tokens pour la demande et la réponse. YaRN s’active au-delà de 262 144.',512,393216],
+    ['context','Contexte maximal','number','Jusqu’à 524 288 tokens pour la demande et la réponse. YaRN s’active au-delà de 262 144.',512,524288],
     ['workers','Travailleurs CPU','number','15 travailleurs + le thread principal = 16 cœurs. Au-delà de 15, le gain SMT reste à mesurer.',1,31],
     ['prefill','Bloc de traitement du prompt','select','Des blocs plus grands demandent davantage de VRAM.',[['auto','Automatique'],[256,'256 tokens'],[512,'512 tokens'],[1024,'1 024 tokens'],[2048,'2 048 tokens'],[4096,'4 096 tokens'],[8192,'8 192 tokens']]],
     ['vram_reserve','Réserve VRAM par GPU','number','En Mo. Préserve de la place pour les buffers ; réduit le nombre d’experts en VRAM.',512,8192],
@@ -167,7 +167,7 @@ function renderState(s){
 async function refresh(){if(polling)return;polling=true;try{renderState(await request('/api/state'));}catch(error){$('status-badge').className='badge error';$('status-badge').querySelector('span').textContent='Lanceur indisponible';$('start').disabled=true;$('stop').disabled=true;}finally{polling=false;}}
 async function copy(value){try{await navigator.clipboard.writeText(value);toast('Copié dans le presse-papiers.');}catch{toast('Copie indisponible : sélectionnez le texte manuellement.',true);}}
 drawFields();
-const topics={notifications:['MAINTENANCE','Notifications','Alertes du serveur, lecture et préférences.'],overview:['PILOTAGE','Vue d’ensemble','État du modèle, ressources et demandes en cours.'],launch:['PILOTAGE','Modèle et calcul','Réglez les performances du prochain chargement.'],files:['PILOTAGE','Fichiers du modèle','Choisissez les packs et les fichiers utilisés par le moteur.'],clients:['CLIENTS','Clients','Distribuez les EXE personnels et gérez les autorisations.'],internet:['CLIENTS','Connexion distante','Adresse publique, tunnel WireGuard et pare-feu.'],network:['CLIENTS','API et réseau','Connexion des applications sur ce PC et sur le réseau local.'],updates:['CLIENTS','Mises à jour','Préparez la version signée distribuée aux clients.'],backup:['MAINTENANCE','Sauvegardes','Protégez et restaurez les réglages, accès et clés du serveur.'],exploitation:['MAINTENANCE','Démarrage','Démarrage Windows, chargement automatique et reprise après une panne.'],logs:['MAINTENANCE','Journaux','Consultez le moteur ou exportez un diagnostic.']};
+const topics={notifications:['MAINTENANCE','Notifications','Alertes du serveur, lecture et préférences.'],overview:['PILOTAGE','Vue d’ensemble','État du modèle, ressources et demandes en cours.'],launch:['PILOTAGE','Modèle et calcul','Réglez les performances du prochain chargement.'],files:['PILOTAGE','Fichiers du modèle','Choisissez les packs et les fichiers utilisés par le moteur.'],clients:['CLIENTS','Clients','Téléchargez Kiara et gérez les accès.'],internet:['CLIENTS','Connexion distante','Adresse publique, tunnel WireGuard et pare-feu.'],network:['CLIENTS','API et réseau','Connexion des applications sur ce PC et sur le réseau local.'],updates:['CLIENTS','Mises à jour','Téléchargez la version Windows disponible.'],backup:['MAINTENANCE','Sauvegardes','Protégez et restaurez les réglages, accès et clés du serveur.'],exploitation:['MAINTENANCE','Démarrage','Démarrage Windows, chargement automatique et reprise après une panne.'],logs:['MAINTENANCE','Journaux','Consultez le moteur ou exportez un diagnostic.']};
 function openTopic(id){
   if(!topics[id])id='overview';
   document.querySelectorAll('.tab').forEach(t=>{const selected=t.dataset.tab===id;t.classList.toggle('active',selected);t.setAttribute('aria-selected',String(selected));t.tabIndex=selected?0:-1;});
@@ -185,12 +185,60 @@ let clientsFingerprint='';
 let hermesModelsState=null, hermesModelsBusy=false;
 function element(tag,text,className){const node=document.createElement(tag);if(text)node.textContent=text;if(className)node.className=className;return node;}
 function labelled(label,input,help){const field=element('div',null,'field'),lab=element('label',label);lab.htmlFor=input.id;field.append(lab,input);if(help){const hint=element('small',help);if(input.id){hint.id=input.id+'-help';input.setAttribute('aria-describedby',hint.id);}field.append(hint);}return field;}
+function desktopAccessControls(identity, section){
+  const controls=element('div');
+  const actions=element('div',null,'key-row');
+  const reveal=element('button','Afficher le code d’accès','button secondary');
+  const copy=element('button','Copier le code d’accès','button secondary');
+  reveal.type=copy.type='button';
+  const code=element('textarea');
+  code.id=section+'-access-code-'+identity;
+  code.readOnly=true;
+  code.rows=3;
+  code.spellcheck=false;
+  const field=element('div');
+  field.hidden=true;
+  field.id=code.id+'-field';
+  field.append(labelled('Code d’accès Kiara',code));
+  reveal.setAttribute('aria-controls',field.id);
+  reveal.setAttribute('aria-expanded','false');
+  reveal.onclick=async()=>{
+    if(!field.hidden){
+      field.hidden=true;
+      code.value='';
+      reveal.textContent='Afficher le code d’accès';
+      reveal.setAttribute('aria-expanded','false');
+      return;
+    }
+    reveal.disabled=true;
+    try{
+      const result=await request('/api/remote/access-code',{id:identity});
+      code.value=result.code;
+      field.hidden=false;
+      reveal.textContent='Masquer le code d’accès';
+      reveal.setAttribute('aria-expanded','true');
+    }catch(error){toast(error.message,true);}
+    finally{reveal.disabled=false;}
+  };
+  copy.onclick=async()=>{
+    copy.disabled=true;
+    try{
+      const result=await request('/api/remote/access-code',{id:identity});
+      await navigator.clipboard.writeText(result.code);
+      toast('Code copié. Collez-le dans Kiara au premier lancement.');
+    }catch(error){toast(error.message,true);}
+    finally{copy.disabled=false;}
+  };
+  actions.append(reveal,copy);
+  controls.append(actions,field);
+  return controls;
+}
 function clientStorageInfo(storage){const box=element('div',null,'client-storage');if(!storage)return box;box.append(element('strong','Dossier des données sur le serveur'),element('code',storage.path,'client-storage-path'));const copy=element('button','Copier le chemin','button secondary');copy.type='button';copy.onclick=()=>action(async()=>{await navigator.clipboard.writeText(storage.path);toast('Chemin copié.');});box.append(copy);box.append(element('p',storage.error||(storage.status==='ready'?plural(storage.conversations,'conversation')+' · dossier mis à jour le '+new Date(storage.updated*1000).toLocaleString():'Création du dossier en attente…'),'muted'));return box;}
 function renderClients(value,force=false){
   const active=value.clients.filter(c=>!c.revoked),allowed=active.filter(c=>!c.suspended).length;
   $('accounts-summary').textContent=plural(active.length,'accès personnel','accès personnels')+' · '+allowed+' '+(allowed>1?'autorisés':'autorisé');
   $('account-alert').textContent='('+active.length+')';
-  $('client-create-help').textContent=$('remote-create').disabled?'Enregistrer le réseau dans Connexion distante avant de générer un nouvel EXE.':'Un EXE différent par personne ou PC utilisé simultanément. Téléchargez-le et transmettez-le uniquement à son destinataire. Aucun identifiant requis.';
+  $('client-create-help').textContent=$('remote-create').disabled?'Enregistrez le réseau dans Connexion distante avant d’ajouter un accès.':'Créez un accès différent pour chaque appareil utilisé simultanément.';
   const fingerprint=JSON.stringify(value.clients);if(!force&&fingerprint===clientsFingerprint)return;clientsFingerprint=fingerprint;
   $('remote-clients').replaceChildren(...value.clients.map(client=>{
     const card=element('article',null,'client-card'),header=element('div',null,'client-heading');
@@ -216,18 +264,18 @@ function renderClients(value,force=false){
     }
     const management=element('div',null,'key-row'),rename=element('button','Renommer','button secondary'),remove=element('button','Supprimer','button stop');
     const editor=element('form',null,'client-name-editor'),name=element('input');editor.hidden=true;name.id='name-'+client.id;name.value=client.name;name.maxLength=80;name.required=true;
-    editor.append(labelled('Nom du client',name,'Ce nom sera repris dans le nom de l’EXE téléchargé.'));
+    editor.append(labelled('Nom du client',name,'Ce nom identifie l’accès dans la liste.'));
     const editActions=element('div',null,'key-row'),saveName=element('button','Enregistrer le nom','button primary'),cancelName=element('button','Annuler','button secondary');saveName.type='submit';cancelName.type='button';cancelName.onclick=()=>{editor.hidden=true;};editActions.append(saveName,cancelName);editor.append(editActions);
     rename.onclick=()=>{editor.hidden=!editor.hidden;if(!editor.hidden){name.value=client.name;name.focus();name.select();}};
     editor.onsubmit=async event=>{event.preventDefault();if(editor.reportValidity())await remoteAction('/api/remote/rename',{id:client.id,name:name.value});};
     const deletion=element('div',null,'client-delete');deletion.hidden=true;
-    deletion.append(element('p','Supprimer « '+client.name+' » désactivera son EXE et retirera ce client de la liste. Ses conversations et fichiers resteront sur le serveur.','muted'));
+    deletion.append(element('p','Supprimer « '+client.name+' » désactivera son accès et retirera ce client de la liste. Ses conversations et fichiers resteront sur le serveur.','muted'));
     const deleteActions=element('div',null,'key-row'),confirmDelete=element('button','Confirmer la suppression','button stop'),cancelDelete=element('button','Annuler','button secondary');confirmDelete.onclick=()=>remoteAction('/api/remote/delete',{id:client.id});cancelDelete.onclick=()=>{deletion.hidden=true;};deleteActions.append(confirmDelete,cancelDelete);deletion.append(deleteActions);
     remove.onclick=()=>{deletion.hidden=!deletion.hidden;editor.hidden=true;};management.append(rename,remove);card.append(management,editor,deletion);
     card.append(element('p',(client.address?'Adresse privée : '+client.address.replace('/32','')+' · ':'')+(client.expires_epoch?'Expire le '+new Date(client.expires_epoch*1000).toLocaleString():'Accès sans expiration'),'muted'));
     if(client.revoked){card.append(element('p','Cet accès ne peut plus se connecter. Ajoutez un nouveau client pour créer un nouvel accès.','muted'));return card;}
     if(client.hermes_pending)return card;
-    const downloadRow=element('div',null,'client-download');const link=element('a','Télécharger l’EXE personnel','button primary');link.href='/api/remote/client/'+client.id;downloadRow.append(link,element('small','Connexion automatique avec cet EXE. Conservez-le comme une clé d’accès personnelle.'));card.append(downloadRow);
+    card.append(desktopAccessControls(client.id,'clients'));
     const policy=element('details',null,'client-policy');policy.append(element('summary','Limites et suspension de l’accès'));
     const policyFields=element('div',null,'fields'),duration=element('input');duration.id='duration-'+client.id;duration.type='number';duration.min=0;duration.max=3650;duration.placeholder='Ne pas changer';
     policyFields.append(labelled('Nouvelle durée de validité (jours)',duration,'Laissez vide pour conserver la date actuelle. 0 = illimité.'));policy.append(policyFields);
@@ -235,7 +283,7 @@ function renderClients(value,force=false){
     const suspend=element('button',client.suspended?'Réactiver l’accès':'Suspendre l’accès','button secondary');suspend.onclick=()=>remoteAction('/api/remote/policy',{id:client.id,suspended:!client.suspended});
     buttons.append(save,suspend);policy.append(buttons);card.append(policy);
     const revokeDetails=element('details',null,'client-revoke');revokeDetails.append(element('summary','Révocation définitive'));
-    revokeDetails.append(element('p','Révoquer cet accès invalide son EXE et son tunnel. Pour revenir, il faudra créer un nouvel accès.','muted'));
+    revokeDetails.append(element('p','Révoquer cet accès coupe la connexion. Pour la rétablir, créez un nouvel accès.','muted'));
     const revoke=element('button','Révoquer cet accès','button stop');revoke.onclick=()=>remoteAction('/api/remote/revoke',{id:client.id});revokeDetails.append(revoke);card.append(revokeDetails);return card;
   }));
   if(!value.clients.length)$('remote-clients').append(element('div','Aucun client enregistré. Ajoutez votre premier client ci-dessus.','network-help'));
@@ -255,14 +303,14 @@ async function remoteRefresh(force=false){
     $('remote-activate').disabled=remoteDirty||!value.connection.public_host||!value.connection.compiled||!value.gateway_available;
     $('remote-firewall').disabled=remoteDirty||!value.connection.public_host||!value.connection.compiled||(value.connection.firewall?.state==='ready'&&value.connection.firewall?.port===value.connection.listen_port);
     $('remote-disable').disabled=!value.enabled;
-    $('remote-create').disabled=remoteDirty||!value.connection.public_host||!value.client_compiled;
+    $('remote-create').disabled=remoteDirty||!value.connection.public_host;
     if(force||!document.activeElement?.closest('#remote-clients'))renderClients(value,force);
   }catch(error){$('remote-status').classList.add('maintenance-error');$('remote-status').textContent=error.message;}
 }
 async function remoteAction(path,data={}){
   if(remoteBusy)return;remoteBusy=true;
   const buttons=[...document.querySelectorAll('#internet button,#clients button')].map(button=>[button,button.disabled]);buttons.forEach(([button])=>button.disabled=true);
-  try{const result=await request(path,data);toast(result.message||'Commande terminée.');if(result.download){$('remote-client-name').value='';clientsFingerprint='';openTopic('clients');}return true;}
+  try{const result=await request(path,data);toast(result.message||'Commande terminée.');if(path==='/api/remote/create-client'||result.download){$('remote-client-name').value='';clientsFingerprint='';openTopic('clients');}return true;}
   catch(error){toast(error.message,true);return false;}
   finally{remoteBusy=false;buttons.forEach(([button,disabled])=>button.disabled=disabled);await remoteRefresh(true);}
 }
@@ -360,14 +408,12 @@ request('/api/defaults').then(showDefaults).catch(error=>toast(error.message,tru
 
 request('/api/operations').then(o=>{for(const k of ['startup','autoload','restart'])$('ops-'+k).checked=o[k];});
 $('ops-save').onclick=()=>action(async()=>{await request('/api/operations',{autoload:$('ops-autoload').checked,restart:$('ops-restart').checked});await request('/api/startup',{enabled:$('ops-startup').checked});toast('Options d’exploitation enregistrées.');});
-$('performance-profile').onchange=()=>{const profiles={fast:{context:8192,history_slots:2},long:{context:393216,history_slots:6},shared:{context:32768,history_slots:6}};const p=profiles[$('performance-profile').value];if(p){applySettings({...form(),...p,history_enabled:true});dirty=true;$('save-state').textContent='Profil à enregistrer pour le prochain lancement';}};
+$('performance-profile').onchange=()=>{const profiles={fast:{context:8192,history_slots:2},long:{context:524288,history_slots:6},shared:{context:32768,history_slots:6}};const p=profiles[$('performance-profile').value];if(p){applySettings({...form(),...p,history_enabled:true});dirty=true;$('save-state').textContent='Profil à enregistrer pour le prochain lancement';}};
 $('ops-backup').onclick=()=>action(async()=>{const r=await request('/api/backup',{password:$('backup-password').value});$('backup-password').value='';$('backup-result').textContent=r.file;toast(r.message);});
 $('ops-restore').onclick=()=>action(async()=>{const r=await request('/api/restore',{file:$('backup-file').value,password:$('backup-password').value});$('backup-password').value='';applySettings(await request('/api/settings'));$('backup-result').textContent=r.message;toast(r.message);});
 $('ops-diagnostic').onclick=()=>action(async()=>{const d=await request('/api/diagnostic');const url=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='diagnostic-qwen.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
 
-request('/api/releases').then(r=>{document.getElementById('release-status').textContent='Serveur '+r.server_version+' · client '+(r.release.version||'à compiler')+' · '+(r.verified?'empreinte vérifiée':'binaire non vérifié');});
-$('release-prepare').onclick=()=>action(async()=>{toast((await request('/api/releases/prepare',{})).message);});
-$('release-rollback').onclick=()=>action(async()=>{toast((await request('/api/releases/rollback',{})).message);});
+request('/api/releases').then(r=>{$('release-status').textContent=r.desktop_version?'Version Windows disponible · Kiara '+r.desktop_version:'Installateur Windows indisponible.';});
 $('remote-copy-connection').onclick=()=>action(async()=>{
   if(remoteDirty)throw new Error('Enregistrez les paramètres d’accès distant avant de les copier.');
   const endpoint=$('remote-url').value.replace(/\s*\/\s*UDP\s*$/i,'').trim();

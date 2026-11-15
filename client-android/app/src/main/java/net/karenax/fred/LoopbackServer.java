@@ -11,6 +11,42 @@ import java.util.concurrent.*;
 
 /** Bounded HTTP/1.1 server. Exactly one request per socket, always bound to IPv4 loopback. */
 final class LoopbackServer implements AutoCloseable {
+    private static final String PROJECT_THREADS="/api/v1/workspace/assistant-threads";
+    private static final String PROJECT_STREAM="/v1/projects/chat/stream";
+
+    static boolean projectRoute(String method,String path) {
+        if(method.equals("GET")) {
+            return path.equals("/api/v1/project-catalogue")
+                || path.equals("/api/v1/brain/projects")
+                || path.matches("/v1/sources/[A-Za-z0-9_-]{1,128}")
+                || path.matches(PROJECT_THREADS+"\\?limit=100(?:&project_id=[A-Za-z0-9_-]{1,128})?")
+                || path.matches(PROJECT_THREADS+"/[A-Za-z0-9_-]{1,128}");
+        }
+        if(method.equals("POST"))return path.equals(PROJECT_THREADS)||path.equals(PROJECT_STREAM)
+            ||path.matches("/api/v1/projects/[A-Za-z0-9_-]{1,128}/brain/ensure");
+        return method.equals("PUT")&&path.matches(PROJECT_THREADS+"/[A-Za-z0-9_-]{1,128}");
+    }
+
+    private void forwardProject(OutputStream output,String method,String path,byte[] body)throws Exception {
+        backend.remote.active.incrementAndGet();
+        try {
+            Remote.Response response=backend.remote.open(method,"/v1/business"+path,body,null);
+            try {
+                String type=path.equals(PROJECT_STREAM)&&response.status==200&&response.type!=null
+                    &&response.type.startsWith("text/event-stream")?"text/event-stream":"application/json; charset=utf-8";
+                headers(output,response.status,type,-1,"");
+                output.flush();
+                byte[] buffer=new byte[8192];
+                int count;
+                while((count=response.input.read(buffer))!=-1) {
+                    output.write(buffer,0,count);
+                    output.flush();
+                }
+            } catch(IOException disconnected) {
+                // Closing the socket terminates an interrupted stream.
+            } finally { backend.remote.finished(response); }
+        } finally { backend.remote.active.decrementAndGet(); }
+    }
     private final Context context;
     final ClientBackend backend;
     private final ServerSocket server;
@@ -27,6 +63,21 @@ final class LoopbackServer implements AutoCloseable {
             String host="127.0.0.1:"+port(),origin=headers.get("origin");if(!host.equals(headers.get("host"))||origin!=null&&!origin.equals(origin())){reply(output,403,error("Accès local uniquement."));return;}
             if(method.equals("GET")&&path.equals("/chat/"+backend.bootstrap)){html(output);return;}
             String authorization=headers.get("authorization");if(authorization==null||!MessageDigest.isEqual(authorization.getBytes(StandardCharsets.UTF_8),("Bearer "+backend.key).getBytes(StandardCharsets.UTF_8))){reply(output,401,error("Clé API locale requise."));return;}
+            if(projectRoute(method,path)){
+                byte[] body=null;
+                if(!method.equals("GET")){
+                    String length=headers.getOrDefault("content-length","");
+                    if(headers.containsKey("transfer-encoding")||!length.matches("[0-9]{1,7}")
+                        ||!headers.getOrDefault("content-type","").startsWith("application/json")){
+                        reply(output,400,error("Corps JSON attendu."));return;
+                    }
+                    int count=Integer.parseInt(length);
+                    if(count<1||count>2*1024*1024){reply(output,413,error("Requête trop volumineuse."));return;}
+                    body=new byte[count];
+                    new DataInputStream(input).readFully(body);
+                }
+                forwardProject(output,method,path,body);return;
+            }
             if(method.equals("GET")){if(Arrays.asList("/client/state","/client/history","/client/draft","/client/integrations","/v1/models").contains(path)){reply(output,200,backend.get(path,port()));return;}if(Arrays.asList("/v1/status","/v1/voice/status","/v1/workspace","/v1/notifications","/v1/agent/state").contains(path)){forward(output,path,null,false,headers.get("x-qwen-request"));return;}}
             else if(method.equals("POST")){
                 Set<String> local=new HashSet<>(Arrays.asList("/client/endpoint","/client/preferences","/client/history","/client/history/sync","/client/history/restore-ack","/client/history/flush","/client/history/recover","/client/draft","/client/update/check","/client/update/apply"));Set<String> remote=new HashSet<>(Arrays.asList("/v1/voice/speech","/v1/voice/cancel","/v1/embeddings","/v1/chat/completions","/v1/context","/v1/cancel","/v1/workspace/action","/v1/notifications/action","/v1/agent/action"));if(!local.contains(path)&&!remote.contains(path)){reply(output,404,error("Route non disponible."));return;}

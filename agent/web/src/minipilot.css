@@ -1,0 +1,427 @@
+/* MiniPilot — styles repris du look XPilot (portefeuille + détail projet) */
+
+.mp-app {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 16px 40px;
+}
+
+/* Bandeau applicatif supérieur */
+.mp-topnav {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  padding: 10px 4px;
+  border-bottom: 1px solid var(--border, #e5e5e5);
+  margin-bottom: 12px;
+}
+.mp-topnav button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  padding: 7px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--muted-foreground, #555);
+}
+.mp-topnav button.active {
+  background: #eef4ff;
+  color: #1d4ed8;
+  font-weight: 600;
+  box-shadow: inset 0 -2px 0 #3478f6;
+  border-radius: 8px 8px 0 0;
+}
+.mp-topnav button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+/* Titre de page */
+.mp-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 4px 0;
+  margin-bottom: 4px;
+}
+.mp-title h1 {
+  font-size: 22px;
+  margin: 0;
+}
+.mp-hit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.mp-hit:hover {
+  background: #eef4ff;
+}
+tr.mp-late td {
+  background: #fdf3e3;
+}
+
+/* Barre d'onglets collante : reste visible au scroll du détail projet */
+.sticky-tabs {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--background, #fff);
+  padding: 6px 0;
+}
+
+/* États vides avec action : bouton d'action directe */
+.mp-empty-action {
+  margin-top: 10px;
+}
+
+/* Légende de tableau : aide contextuelle discrète */
+.mp-caption {
+  caption-side: top;
+  text-align: left;
+  font-size: 12px;
+  color: var(--muted-foreground, #666);
+  padding: 2px 0 6px;
+}
+
+/* Portefeuille */
+.mp-section-head .eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: #3478f6;
+  font-weight: 700;
+}
+.mp-kpis {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 10px 0;
+}
+.mp-kpi {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f4f6f8;
+  border-radius: 10px;
+  padding: 7px 12px;
+  font-size: 13px;
+}
+.mp-kpi.alert {
+  background: #fdecec;
+  color: #b42318;
+}
+.mp-toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 10px 0 14px;
+}
+.mp-toolbar .input {
+  height: 34px;
+}
+.mp-count {
+  margin-left: auto;
+  font-size: 12px;
+  color: #777;
+}
+/* Alias historique : un bouton d'action comme les autres, il suit la
+   couleur primaire réglable (fini le rouge imposé). */
+.button.mp-red {
+  background: var(--button-primary-bg);
+  border-color: var(--button-primary-bg);
+  color: var(--button-primary-text);
+  font-weight: 600;
+}
+.button.mp-red:hover {
+  background: var(--button-primary-hover-bg);
+}
+.mp-create {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+/* Cartes projet */
+.mp-card {
+  border: 1px solid #e8e8e8;
+  border-left: 4px solid #f59e0b;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+.mp-card.ok {
+  border-left-color: #22c55e;
+}
+.mp-card.warn {
+  border-left-color: var(--state-warning);
+}
+.mp-card-main {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.mp-card-id {
+  min-width: 260px;
+  flex: 1;
+}
+.mp-code {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: #777;
+}
+.mp-jalon {
+  flex: 1;
+  min-width: 220px;
+}
+.mp-label {
+  font-size: 10px;
+  letter-spacing: 0.07em;
+  color: #888;
+  font-weight: 700;
+}
+.mp-progress {
+  height: 6px;
+  background: #eee;
+  border-radius: 4px;
+  margin: 6px 0 2px;
+  overflow: hidden;
+}
+.mp-progress > div {
+  height: 100%;
+  background: #0f766e;
+  border-radius: 4px;
+}
+.mp-pct {
+  font-size: 12px;
+  font-weight: 700;
+}
+.mp-card-stats {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  align-items: stretch;
+}
+.mp-stat {
+  background: #f4f6f8;
+  border-radius: 10px;
+  padding: 8px 12px;
+  min-width: 120px;
+}
+.mp-stat b {
+  display: block;
+  margin-top: 2px;
+  font-size: 14px;
+}
+.mp-stat.alert {
+  background: #fdecec;
+  color: #b42318;
+}
+.mp-corr {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.mp-corr.alert {
+  background: #fdf3e3;
+  color: #92400e;
+}
+.mp-corr.quiet {
+  background: #f4f6f8;
+  color: #666;
+}
+
+/* Détail */
+.mp-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.mp-spacer {
+  flex: 1;
+}
+.project-tabs button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.tab-badge {
+  display: inline-block;
+  min-width: 20px;
+  text-align: center;
+  background: var(--button-primary-bg);
+  color: var(--button-primary-text);
+  border-radius: 10px;
+  font-size: 11px;
+  margin-left: 6px;
+  padding: 1px 6px;
+}
+.mp-subtabs {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 10px 0;
+}
+.mp-subtabs > button {
+  border: 1px solid #e0e0e0;
+  background: #fff;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.mp-subtabs > button.active {
+  background: #eef4ff;
+  border-color: #3478f6;
+  color: #1d4ed8;
+  font-weight: 600;
+}
+.mp-doc-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
+}
+/* Vignettes projets pour le glisser-déposer des mails (app Mails) */
+.mail-projects {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 2px 8px;
+  margin-bottom: 4px;
+}
+.mail-project {
+  min-width: 132px;
+  max-width: 180px;
+  flex: 0 0 auto;
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: #fff;
+}
+.mail-project.drop-target {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
+  background: #eff6ff;
+}
+.mail-project .code {
+  font-weight: 700;
+}
+.mail-project small {
+  display: block;
+  color: #666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mail-project .linked {
+  color: #16a34a;
+}
+.mail-project .unlinked {
+  color: #d97706;
+}
+tr.dragging-mail {
+  opacity: 0.5;
+}
+.inline-form {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 8px 0;
+}
+.card {
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  padding: 12px;
+  margin: 10px 0;
+  background: #fff;
+}
+
+/* Panneau liens réseau (repris de XPilot) */
+.links-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.links-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 4px 0 6px;
+}
+.links-toolbar-label span {
+  display: flex;
+  flex-direction: column;
+}
+.links-toolbar-label small {
+  color: #777;
+  font-size: 12px;
+}
+.links-toolbar .button {
+  margin-left: auto;
+}
+.link-edit {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: #fff;
+}
+.link-edit input {
+  height: 32px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 0 8px;
+  font-size: 13px;
+}
+.link-edit input:read-only {
+  background: #f4f6f8;
+  color: #555;
+}
+.link-edit.required-link {
+  border-left: 4px solid #3478f6;
+}
+
+.data-table.project-summary {
+  min-width: 0;
+  width: 100%;
+  table-layout: fixed;
+}
+.data-table.project-summary td {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.data-table.project-summary td:first-child {
+  width: 48%;
+}
+.action-dashboard li {
+  margin-bottom: 8px;
+}

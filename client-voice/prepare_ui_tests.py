@@ -4,7 +4,6 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parent.parent
 TESTS=ROOT/'lanceur/web/tests'
 fixture=(TESTS/'lots6_8_fixture.py').read_text(encoding='utf-8')
-fixture=fixture.replace("ROOT/'toolchain/releases-staging/windows-3.5.18/wireguard-bridge.exe'","ROOT/'client-qwen/wireguard-bridge.exe'")
 fixture=fixture.replace("controller = Controller(home, include_legacy=False)","controller = Controller(home, include_legacy=False)\n        controller.voice.configure(True)\n        import time\n        deadline=time.monotonic()+60\n        while not controller.voice.ready.is_set() and time.monotonic()<deadline:time.sleep(.1)\n        assert controller.voice.ready.is_set(),controller.voice.status()")
 fixture=fixture.replace('controller.wireguard.close()','controller.wireguard.close();controller.voice.close()')
 fixture=fixture.replace('admin = serve(0,controller)',"from core import available_port\n        available_port('127.0.0.1',24800)\n        admin = serve(24800,controller)")

@@ -1,0 +1,28 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Projet</title><script>
+const nativeFetch = window.fetch.bind(window);
+let agentSession;
+window.fetch = async (url, init = {}) => {
+  const method = (init.method || 'GET').toUpperCase();
+  if (!['GET', 'HEAD'].includes(method)) {
+    agentSession ||= nativeFetch('/api/v1/session').then(r => r.json());
+    const {token} = await agentSession;
+    init.headers = {...init.headers, 'X-Agent-Token': token};
+  }
+  const response = await nativeFetch(url, init);
+  if (!response.ok) {
+    if (response.status === 403) agentSession = undefined;
+    const data = await response.clone().json().catch(() => ({}));
+    const message = typeof data.detail === 'string' ? data.detail : data.detail?.message || 'Échec de la requête';
+    alert(message);
+    const error = new Error(message); error.detail = data.detail; throw error;
+  }
+  return response;
+};
+</script></head><body>
+<nav><a href="/ui">Accueil</a><a href="/ui/pending">Résolution projet</a><a href="/ui/proposals">Validation</a><a href="/ui/settings">Paramètres</a></nav>
+<h1>{{project.code}} — {{project.name}}</h1>
+<h2>Connaissance validée ({{know|length}})</h2>
+{% for k in know %}<div style="border:1px solid #ccc;margin:.5rem 0;padding:.5rem"><b>[{{k.kind}}]</b> {{k.subject}}<br>{{k.value[:400]}}</div>{% endfor %}
+<h2>Sources ({{srcs|length}})</h2>
+<ul>{% for s in srcs %}<li>{{s.source_type}} — {{s.id}}</li>{% endfor %}</ul>
+</body></html>

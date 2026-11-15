@@ -1,0 +1,59 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Project Brain</title>
+<style>body{font-family:sans-serif;max-width:900px;margin:2rem auto;padding:0 1rem}nav a{margin-right:1rem}.card{border:1px solid #ddd;padding:1rem;margin:1rem 0;border-radius:8px}input[type=text]{width:100%}</style>
+<script>
+const nativeFetch = window.fetch.bind(window);
+let agentSession;
+window.fetch = async (url, init = {}) => {
+  const method = (init.method || 'GET').toUpperCase();
+  if (!['GET', 'HEAD'].includes(method)) {
+    agentSession ||= nativeFetch('/api/v1/session').then(r => r.json());
+    const {token} = await agentSession;
+    init.headers = {...init.headers, 'X-Agent-Token': token};
+  }
+  const response = await nativeFetch(url, init);
+  if (!response.ok) {
+    if (response.status === 403) agentSession = undefined;
+    const data = await response.clone().json().catch(() => ({}));
+    const message = typeof data.detail === 'string' ? data.detail : data.detail?.message || 'Échec de la requête';
+    alert(message);
+    const error = new Error(message); error.detail = data.detail; throw error;
+  }
+  return response;
+};
+</script></head><body>
+<nav><a href="/ui">Accueil</a><a href="/ui/pending">Résolution projet</a><a href="/ui/proposals">Validation</a><a href="/ui/settings">Paramètres</a><a href="/docs">API</a></nav>
+<h1>Project Brain — cœur de connaissance</h1>
+<p>Projets: {{n_proj}} | En attente résolution: {{n_pending}} | Propositions: {{n_prop}} | Validés: {{n_know}}</p>
+<div class="card"><h3>Créer un projet</h3>
+<form id="f">Code: <input name="code" required> Nom: <input name="name" required> <button>Créer</button></form></div>
+<div class="card"><h3>Scanner dossier mails (serveur)</h3>
+<p style="color:#555">Le backend scanne automatiquement au démarrage : <code>C:\Users\Frederic.LEFRANCOIS\Downloads\Infomaniak-IA</code></p>
+<label>Dossier à scanner :</label><br>
+<input type="text" id="scanFolder" value="C:\Users\Frederic.LEFRANCOIS\Downloads\Infomaniak-IA">
+<div style="margin-top:.5rem">
+<button onclick="useDefault()">Dossier par défaut</button>
+<button onclick="doScan()">Scanner</button>
+</div>
+<pre id="scanRes"></pre>
+<p style="color:#555">Astuce : le navigateur ne peut pas envoyer un chemin serveur pour raisons de sécurité — ce champ désigne un dossier <b>côté backend</b>. Pour importer depuis ton PC via le navigateur, utilise « Choisir des .eml » ci-dessous.</p>
+</div>
+<div class="card"><h3>Choisir des .eml / dossier (navigateur)</h3>
+<input type="file" id="bulkFiles" multiple accept=".eml">
+<button onclick="doBulk()">Importer la sélection</button>
+<pre id="bulkRes"></pre>
+</div>
+<div class="card"><h3>Ingérer un mail (.eml)</h3>
+<form action="/v1/sources/upload-eml" method="post" enctype="multipart/form-data"><input type="file" name="file" accept=".eml" required><button>Uploader</button></form></div>
+<div class="card"><h3>Ingérer un audio (téléphone / réunion)</h3>
+<form action="/v1/sources/upload-audio" method="post" enctype="multipart/form-data"><input type="file" name="file" required>
+<select name="source_type"><option value="meeting">réunion</option><option value="phone">téléphone</option></select>
+<input name="transcript" placeholder="transcription manuelle (optionnel)"><button>Uploader</button></form></div>
+<h3>Projets</h3><ul>{% for p in projects %}<li><a href="/ui/projects/{{p.id}}">{{p.code}} — {{p.name}}</a></li>{% endfor %}</ul>
+<script>
+document.getElementById('f').onsubmit=async e=>{e.preventDefault();const d=new FormData(e.target);await fetch('/v1/projects',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:d.get('code'),name:d.get('name')})});location.reload()};
+async function useDefault(){const r=await (await fetch('/v1/ingest/default-folder')).json();document.getElementById('scanFolder').value=r.folder;document.getElementById('scanRes').textContent=JSON.stringify(r,null,2)}
+async function doScan(){const folder=document.getElementById('scanFolder').value;document.getElementById('scanRes').textContent='scan en cours...';const r=await (await fetch('/v1/ingest/scan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({folder})})).json();document.getElementById('scanRes').textContent=JSON.stringify(r,null,2);setTimeout(()=>location.reload(),1500)}
+async function doBulk(){const inp=document.getElementById('bulkFiles');if(!inp.files.length){alert('Sélectionne des .eml');return}const fd=new FormData();for(const f of inp.files)fd.append('files',f);document.getElementById('bulkRes').textContent='import en cours...';const r=await (await fetch('/v1/sources/upload-eml-bulk',{method:'POST',body:fd})).json();document.getElementById('bulkRes').textContent=JSON.stringify(r,null,2);setTimeout(()=>location.reload(),1500)}
+useDefault();
+</script>
+</body></html>

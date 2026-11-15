@@ -4,6 +4,7 @@
 <form id="ws-create-project" class="ui-create-project" hidden><input class="ws-field" id="ws-project-name" maxlength="120" placeholder="Nom du projet" aria-label="Nom du nouveau projet" required><button class="secondary primary">Créer</button></form>
 <div class="ws-grid"><div id="ws-project-list" class="ws-list"></div><div><p id="ws-project-empty" class="ws-project-empty">Sélectionnez un projet pour retrouver votre travail.<br>Ou créez votre premier espace.</p><div id="ws-project-detail" hidden>
 <div class="project-detail-header"><h3 id="ui-project-title">Votre projet</h3><button id="ws-project-chat" type="button" class="secondary">Discuter du projet ↗</button></div>
+<div id="ws-agent-project-actions" class="ws-toolbar" hidden><button id="ws-agent-project-open" type="button" class="secondary">Voir le projet</button><button id="ws-agent-project-archive" type="button" class="secondary">Archiver</button></div>
 <nav class="project-tabs" aria-label="Rubriques du projet"><button type="button" data-project-tab="documents" class="active">Documents</button><button type="button" data-project-tab="conversations">Discussions</button><button type="button" data-project-tab="memory">Mémoire</button><button type="button" data-project-tab="instructions">Consignes</button></nav>
 <div class="project-pane" data-project-pane="documents"><div class="ws-doc-workspace"><div class="ws-doc-library"><div class="ws-toolbar"><button id="ws-new-document" class="secondary">＋ Note</button><label class="secondary" tabindex="0" role="button" id="ui-upload-label">Importer<input id="ws-upload" type="file" accept=".txt,.md,.docx,.pdf" hidden></label></div><small class="muted">TXT, MD, Word, PDF texte<br>2 Mo par fichier · Envoi au serveur</small><div id="ws-documents" class="ws-list"></div></div>
 <div><div id="ui-document-empty" class="ws-empty">Choisissez un document,<br>ou commencez avec une nouvelle note.</div><div id="ws-document-editor" class="ws-card" hidden><div class="editor-heading"><input id="ws-document-title" class="ws-field ws-document-title" maxlength="180" aria-label="Titre du document"><details class="menu"><summary aria-label="Actions du document">···</summary><div class="menu-body"><button id="ws-document-save" class="secondary">Enregistrer maintenant</button><button id="ws-document-reload" class="secondary">Comparer au serveur</button><button id="ws-document-export" class="secondary">Exporter le texte</button><button id="ws-document-original" class="secondary">Fichier d’origine</button><button id="ws-document-delete" class="secondary danger">Supprimer le document</button></div></details></div><textarea id="ws-document-text" class="ws-editor" maxlength="500000" aria-label="Texte du document" placeholder="Commencez à écrire…"></textarea><div class="editor-footer"><span id="ws-document-status" class="ws-status" role="status"></span><button id="ws-document-chat" class="secondary">Discuter du document ↗</button></div>
@@ -42,19 +43,54 @@ const wsShowViewOnce=showView;showView=function(name){const selected=name==='set
 wsSettingsButton.onclick=()=>showView('settings');
 const originalDrawLibrary=drawLibrary;drawLibrary=function(){originalDrawLibrary();wsChatSelections();};
 const wsFillProjectOnce=wsFillProject;wsFillProject=function(){wsFillProjectOnce();ws.projectRevision=ws.data?.projects.find(p=>p.id===ws.project)?.revision;};
-function wsChatSelections(){if(!ws.data)return;const c=wsCurrent();wsOptions($('ws-chat-project'),ws.data.projects.filter(p=>!p.archived||p.id===c?.project_id),'Sans projet');$('ws-chat-project').value=c?.project_id||'';const p=ws.data.projects.find(p=>p.id===c?.project_id);wsOptions($('ws-chat-document'),p?.documents||[],'Tous les documents');$('ws-chat-document').value=c?.document_id||'';for(const id of ['ws-chat-project','ws-chat-document','ws-publish'])$(id).disabled=conversationLocked();$('ws-panel').hidden=!c?.document_id;}
+function wsChatSelections(){if(!ws.data)return;const c=wsCurrent();wsOptions($('ws-chat-project'),ws.data.projects.filter(p=>!p.archived||p.id===c?.project_id),'Sans projet');$('ws-chat-project').value=c?.project_id||'';const p=ws.data.projects.find(p=>p.id===c?.project_id);wsOptions($('ws-chat-document'),p?.documents||[],'Tous les documents');$('ws-chat-document').value=c?.document_id||'';const managed=wsIsAgentProject(c?.project_id);$('ws-chat-project').disabled=conversationLocked();$('ws-chat-document').disabled=conversationLocked()||managed;$('ws-publish').disabled=conversationLocked()||(managed&&(!p?.can_edit||p.archived));$('ws-panel').hidden=!c?.document_id;}
 for(const id of ['ws-chat-project','ws-chat-document'])$(id).onchange=()=>wsTry(async()=>{if(conversationLocked())return;const c=wsCurrent();if(id==='ws-chat-project'){const target=$('ws-chat-project').value||null;wsChatSelections();await wsMoveConversation(c.id,target);return;}c.document_id=$('ws-chat-document').value||null;save();wsChatSelections();});
 $('ws-publish').onclick=()=>wsTry(()=>wsConversationAction(async()=>{const c=wsCurrent();if(!c.project_id)throw new Error('Choisissez un projet pour enregistrer la discussion sur le serveur.');const r=await wsAction('conversation_save',{id:c.id.replaceAll('-',''),project:c.project_id,title:c.title,messages:c.messages,archived:Boolean(c.archived),revision:c.server_revision||0});c.server_revision=r.revision;}));
 $('ws-panel').onclick=()=>wsTry(async()=>{const c=wsCurrent();if(!c.document_id)return;const d=await wsAction('document_get',{id:c.document_id});$('ws-side-title').textContent=d.title;$('ws-side-text').textContent=d.text;$('ws-side').hidden=false;});$('ws-side-close').onclick=()=>$('ws-side').hidden=true;
 async function wsRefresh(){if(ws.polling)return;ws.polling=true;try{const data=await api('/v1/workspace'),unchanged=JSON.stringify(data)===JSON.stringify(ws.data);ws.data=data;if(unchanged)return;wsChatSelections();wsDrawProjects();if(ws.project&&!ws.projectDirty)wsFillProject();}finally{ws.polling=false;}}
 const wsRefreshOnce=wsRefresh;wsRefresh=function(){if(ws.refreshPending)return ws.refreshPending;ws.refreshPending=wsRefreshOnce().finally(()=>ws.refreshPending=null);return ws.refreshPending;};
-function wsDrawProjects(){const query=$('ws-project-search').value.toLocaleLowerCase(),all=ws.data?.projects||[];const list=all.filter(p=>(!p.archived||$('ws-archived').checked)&&(p.title+' '+p.instructions).toLocaleLowerCase().includes(query));$('ws-project-list').replaceChildren(...list.map(p=>{const b=wsButton(p.title+(p.archived?' · archivé':''),()=>wsSelectProject(p.id));b.classList.toggle('selected',p.id===ws.project);return b;}));if(!list.length)$('ws-project-list').append(wsElement('p','Aucun projet correspondant.','muted'));}
+function wsIsAgentProject(id){
+  if(typeof id!=='string')return false;
+  const kind=ws.data?.projects.find(project=>project.id===id)?.project_kind;
+  if(kind==='managed'||kind==='private')return kind==='managed';
+  return /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/.test(id);
+}
+function wsVisibleProjects(){const query=$('ws-project-search').value.toLocaleLowerCase();return (ws.data?.projects||[]).filter(p=>(!p.archived||$('ws-archived').checked)&&[p.title,p.code,p.instructions].join(' ').toLocaleLowerCase().includes(query));}
+function wsDrawProjects(){
+  const list=wsVisibleProjects(),catalogue=ws.data?.project_catalogue;
+  $('ui-project-create').disabled=!!catalogue&&!catalogue.can_create;
+  if($('ui-project-create').disabled)$('ws-create-project').hidden=true;
+  $('ws-project-list').replaceChildren(...list.map(p=>{const b=wsButton(p.title+(p.archived?' · archivé':''),()=>wsSelectProject(p.id));b.classList.toggle('selected',p.id===ws.project);return b;}));
+  if(!list.length){
+    const message=catalogue?.state==='unavailable'?'Projets indisponibles. Réessayez avec Actualiser.':catalogue?.state==='forbidden'?'Aucun accès aux projets. Contactez votre administrateur.':'Aucun projet correspondant.';
+    $('ws-project-list').append(wsElement('p',message,'muted'));
+  }
+}
 async function wsSelectProject(id){if(id!==ws.project&&uiMemoryEditsPending())throw new Error('Enregistrez les mémoires modifiées avant de changer de projet.');await wsFlush();if(ws.projectDirty)throw new Error('Enregistrez les consignes du projet avant de changer de projet.');ws.project=id;ws.document=null;ws.dirty=false;ws.conflict=false;$('ws-document-editor').hidden=true;wsFillProject();wsDrawProjects();}
-function wsFillProject(){const p=ws.data?.projects.find(p=>p.id===ws.project);$('ws-project-empty').hidden=!!p;$('ws-project-detail').hidden=!p;if(!p)return;$('ws-project-title').value=p.title;$('ws-project-instructions').value=p.instructions;$('ws-project-archive').textContent=p.archived?'Restaurer le projet':'Archiver';$('ws-project-status').textContent=p.archived?'Projet archivé':'';$('ws-documents').replaceChildren(...p.documents.map(d=>wsButton(d.title,()=>wsOpenDocument(d.id))));wsDrawMemories(p);}
+function wsFillProject(){
+  const p=ws.data?.projects.find(p=>p.id===ws.project),managed=wsIsAgentProject(p?.id);
+  $('ws-project-empty').hidden=!!p;$('ws-project-detail').hidden=!p;
+  $('ws-agent-project-actions').hidden=!managed;
+  $('ws-project-detail').classList.toggle('ws-agent-project',managed);
+  $('ws-project-chat').disabled=!!p?.archived;
+  if(!p)return;
+  if(managed){
+    $('ws-agent-project-open').hidden=platformCapabilities.platform==='android';
+    $('ws-agent-project-archive').hidden=!p.can_edit;
+    $('ws-agent-project-archive').textContent=p.archived?'Restaurer le projet':'Archiver';
+    if(!ws.previousProjectWasManaged)document.querySelector('[data-project-tab="conversations"]').click();
+  }else if(!$('ws-project-detail').hidden&&ws.previousProjectWasManaged){
+    document.querySelector('[data-project-tab="documents"]').click();
+  }
+  ws.previousProjectWasManaged=managed;
+  $('ws-project-title').value=p.title;$('ws-project-instructions').value=p.instructions;$('ws-project-archive').textContent=p.archived?'Restaurer le projet':'Archiver';$('ws-project-status').textContent=p.archived?'Projet archivé':'';$('ws-documents').replaceChildren(...p.documents.map(d=>wsButton(d.title,()=>wsOpenDocument(d.id))));wsDrawMemories(p);
+}
 const wsMemoryStatus=wsElement('p',undefined,'ws-status');wsMemoryStatus.id='ws-memory-status';wsMemoryStatus.setAttribute('role','status');$('ws-memory-form').after(wsMemoryStatus);
 function uiMemoryEditsPending(){return !!document.querySelector('#ws-memories textarea[data-dirty="true"]');}
 function wsDrawMemories(project){
   const list=$('ws-memories'),existing=new Map([...list.children].map(row=>[row.dataset.memoryId,row]));
+  const editable=!wsIsAgentProject(project.id)||(project.can_edit&&!project.archived);
+  $('ws-memory-form').hidden=!editable;
   for(const memory of project.memories){
     let row=existing.get(memory.id);existing.delete(memory.id);
     if(!row){
@@ -64,12 +100,12 @@ function wsDrawMemories(project){
       input.oninput=()=>{input.dataset.dirty=String(input.value!==input.dataset.savedText);};
       const modify=wsButton('Enregistrer',async()=>{
         const text=input.value;modify.disabled=remove.disabled=true;wsMemoryStatus.classList.remove('ws-warning');wsMemoryStatus.textContent='Enregistrement de la mémoire…';
-        try{const saved=await wsAction('memory_save',{id:memory.id,text,revision:input.dataset.revision});input.dataset.revision=saved.revision;input.dataset.savedText=text;input.dataset.dirty=String(input.value!==text);reload.hidden=true;await wsRefresh();wsMemoryStatus.classList.remove('ws-warning');wsMemoryStatus.textContent='Mémoire enregistrée.';}catch(e){reload.hidden=e.status!==409;wsMemoryStatus.classList.add('ws-warning');wsMemoryStatus.textContent='Mémoire non enregistrée : '+e.message;throw e;}finally{modify.disabled=remove.disabled=false;}
+        try{const saved=await wsAction('memory_save',{project:project.id,id:memory.id,text,revision:input.dataset.revision});input.dataset.revision=saved.revision;input.dataset.savedText=text;input.dataset.dirty=String(input.value!==text);reload.hidden=true;await wsRefresh();wsMemoryStatus.classList.remove('ws-warning');wsMemoryStatus.textContent='Mémoire enregistrée.';}catch(e){reload.hidden=e.status!==409;wsMemoryStatus.classList.add('ws-warning');wsMemoryStatus.textContent='Mémoire non enregistrée : '+e.message;throw e;}finally{modify.disabled=remove.disabled=false;}
       });
       const remove=wsButton('Supprimer',async()=>{
         if(!confirm('Supprimer cette mémoire du projet ?\n\n'+input.value.slice(0,160)))return;
         modify.disabled=remove.disabled=true;wsMemoryStatus.classList.remove('ws-warning');wsMemoryStatus.textContent='Suppression de la mémoire…';
-        try{await wsAction('memory_delete',{id:memory.id,revision:input.dataset.revision});row.remove();$('ws-memory-text').focus();await wsRefresh();wsMemoryStatus.classList.remove('ws-warning');wsMemoryStatus.textContent='Mémoire supprimée.';}catch(e){reload.hidden=e.status!==409;wsMemoryStatus.classList.add('ws-warning');wsMemoryStatus.textContent='Mémoire non supprimée : '+e.message;throw e;}finally{modify.disabled=remove.disabled=false;}
+        try{await wsAction('memory_delete',{project:project.id,id:memory.id,revision:input.dataset.revision});row.remove();$('ws-memory-text').focus();await wsRefresh();wsMemoryStatus.classList.remove('ws-warning');wsMemoryStatus.textContent='Mémoire supprimée.';}catch(e){reload.hidden=e.status!==409;wsMemoryStatus.classList.add('ws-warning');wsMemoryStatus.textContent='Mémoire non supprimée : '+e.message;throw e;}finally{modify.disabled=remove.disabled=false;}
       });
       const reload=wsButton('Recharger la version du serveur',async()=>{
         if(input.dataset.dirty==='true'&&!confirm('Remplacer votre brouillon par la version du serveur ? Copiez votre texte avant de continuer si vous souhaitez le conserver.'))return;
@@ -79,7 +115,9 @@ function wsDrawMemories(project){
       });reload.hidden=true;
       row.append(label,input,modify,remove,reload);list.append(row);
     }
-    const input=row.querySelector('textarea');if(input.dataset.dirty!=='true'){input.value=memory.text;input.dataset.savedText=memory.text;input.dataset.revision=memory.revision||'';}
+    const input=row.querySelector('textarea');input.readOnly=!editable;
+    for(const button of [...row.querySelectorAll('button')].slice(0,2))button.hidden=!editable;
+    if(input.dataset.dirty!=='true'){input.value=memory.text;input.dataset.savedText=memory.text;input.dataset.revision=memory.revision||'';}
   }
   for(const row of existing.values()){
     if(row.querySelector('textarea')?.dataset.dirty==='true'){wsMemoryStatus.classList.add('ws-warning');wsMemoryStatus.textContent='Une mémoire a changé sur le serveur. Votre texte reste affiché ; copiez-le avant de recharger.';continue;}
@@ -87,13 +125,30 @@ function wsDrawMemories(project){
   }
 }
 $('ws-project-search').oninput=wsDrawProjects;$('ws-archived').onchange=wsDrawProjects;
-$('ws-create-project').onsubmit=e=>{e.preventDefault();wsTry(async()=>{const r=await wsAction('project_create',{title:$('ws-project-name').value});$('ws-project-name').value='';await wsRefresh();await wsSelectProject(r.id);});};
+$('ws-create-project').onsubmit=e=>{
+  e.preventDefault();
+  const submit=e.currentTarget.querySelector('button');
+  if(submit.disabled)return;
+  submit.disabled=true;
+  wsTry(async()=>{
+    const r=await wsAction('project_create',{title:$('ws-project-name').value});
+    $('ws-project-name').value='';await wsRefresh();await wsSelectProject(r.id);
+  }).finally(()=>submit.disabled=false);
+};
 for(const id of ['ws-project-title','ws-project-instructions'])$(id).oninput=()=>{ws.projectDirty=true;$('ws-project-status').textContent='Consignes à enregistrer';};
 async function wsSaveProject(archived){const p=ws.data.projects.find(p=>p.id===ws.project);await wsAction('project_save',{id:p.id,title:$('ws-project-title').value,instructions:$('ws-project-instructions').value,archived:archived??!!p.archived,revision:ws.projectRevision});ws.projectDirty=false;await wsRefresh();$('ws-project-status').textContent='Projet enregistré';}
 $('ws-project-form').onsubmit=e=>{e.preventDefault();wsTry(()=>wsSaveProject());};$('ws-project-archive').onclick=()=>wsTry(async()=>{await wsFlush();const p=ws.data.projects.find(p=>p.id===ws.project);await wsSaveProject(!p.archived);});
+$('ws-agent-project-open').onclick=()=>wsTry(()=>uiOpenAgent('/app/projects/'+encodeURIComponent(ws.project)+'/pilotage'));
+$('ws-agent-project-archive').onclick=()=>wsTry(async()=>{
+  const project=ws.data.projects.find(p=>p.id===ws.project);
+  if(!project?.can_edit)return;
+  await wsAction('project_archive',{id:project.id,archived:!project.archived});
+  await wsRefresh();
+});
 $('ws-project-chat').onclick=()=>wsTry(async()=>{if(busy)throw new Error('Attendez la fin de la réponse.');$('new').click();const c=wsCurrent();c.project_id=ws.project;save();wsChatSelections();showView('chat');});
 async function wsLoadConversation(id){return wsConversationAction(async()=>{
-  const remote=await wsAction('conversation_get',{id});if(!validMessages(remote.messages))throw new Error('Discussion serveur invalide.');
+  const record=wsConversationRecord(id);
+  const remote=await wsAction('conversation_get',{id,project:record.project});if(!validMessages(remote.messages))throw new Error('Discussion serveur invalide.');
   let c=library.find(c=>c.id.replaceAll('-','')===id);
   if(c&&JSON.stringify(c.messages)!==JSON.stringify(remote.messages)&&!confirm('Votre copie locale est différente. La remplacer par la version du serveur ? Exportez-la d’abord si nécessaire.'))return;
   if(!c){if(library.length>=200)throw new Error('Limite de 200 discussions locales.');c={id:remote.id,title:remote.title,messages:remote.messages};library.unshift(c);}
@@ -117,13 +172,13 @@ $('ws-new-document').onclick=()=>wsTry(async()=>{await wsFlush();const r=await w
 $('ws-upload').onchange=()=>wsTry(async()=>{try{const file=$('ws-upload').files[0];if(!file)return;if(file.size>2*1024*1024)throw new Error('Maximum 2 Mo par fichier.');const data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result.split(',')[1]);reader.onerror=()=>reject(new Error('Lecture du fichier impossible.'));reader.readAsDataURL(file);});$('ws-project-status').textContent='Import et extraction du fichier…';const r=await wsAction('document_upload',{project:ws.project,title:file.name,data});await wsRefresh();await wsOpenDocument(r.id);}finally{$('ws-upload').value='';}});
 $('ws-document-delete').onclick=()=>wsTry(async()=>{if(!confirm('Supprimer ce document et son index du serveur ?'))return;await wsFlush();await wsAction('document_delete',{id:ws.document.id,revision:ws.document.revision});ws.document=null;ws.dirty=false;$('ws-document-editor').hidden=true;await api('/client/draft',{draft:null});await wsRefresh();});
 $('ws-document-chat').onclick=()=>wsTry(async()=>{if(busy)throw new Error('Attendez la fin de la réponse.');await wsFlush();$('new').click();const c=wsCurrent();c.project_id=ws.project;c.document_id=ws.document.id;save();wsChatSelections();showView('chat');$('ws-panel').click();});
-function wsDrawSources(container,sources){container.replaceChildren();for(const s of sources){const row=wsElement('div',undefined,'ws-source');row.append(wsElement('strong',s.title||s.url||'Source'));if(Number.isInteger(s.page)&&s.page>0)row.append(wsElement('span',' · page '+s.page));if(s.revision)row.append(wsElement('span',' · révision '+s.revision));row.append(wsElement('p',s.text||''));if(s.source_id)row.append(wsButton('Ouvrir le passage cité',()=>wsOpenSource(s.source_id)));else if(s.document)row.append(wsElement('small','Référence ancienne : version non vérifiable.','muted'));if(s.url){try{const parsed=new URL(s.url);if(parsed.protocol==='https:'){const a=wsElement('a','Ouvrir la source');a.href=parsed.href;a.target='_blank';a.rel='noopener noreferrer';row.append(a);}}catch{}}container.append(row);}}
+function wsDrawSources(container,sources){container.replaceChildren();for(const s of sources){const row=wsElement('div',undefined,'ws-source');row.append(wsElement('strong',s.title||s.url||'Source'));if(Number.isInteger(s.page)&&s.page>0)row.append(wsElement('span',' · page '+s.page));if(s.revision)row.append(wsElement('span',' · révision '+s.revision));if(s.level)row.append(wsElement('span',' · '+s.level));row.append(wsElement('p',s.text||''));if(s.source_id)row.append(wsButton('Ouvrir le passage cité',()=>wsOpenSource(s.source_id)));else if(s.agent_source_id&&platformCapabilities.platform!=='android')row.append(wsButton('Voir la source',()=>uiOpenAgent('/app/sources?source='+encodeURIComponent(s.agent_source_id))));else if(s.document)row.append(wsElement('small','Référence ancienne : version non vérifiable.','muted'));if(s.url){try{const parsed=new URL(s.url);if(parsed.protocol==='https:'){const a=wsElement('a','Ouvrir la source');a.href=parsed.href;a.target='_blank';a.rel='noopener noreferrer';row.append(a);}}catch{}}container.append(row);}}
 const wsSourceDialog=wsElement('dialog',undefined,'fred-source-dialog');wsSourceDialog.id='fred-source-dialog';wsSourceDialog.setAttribute('aria-labelledby','fred-source-title');document.body.append(wsSourceDialog);
 async function wsOpenSource(id){const s=await wsAction('source_get',{source_id:id});wsSourceDialog.replaceChildren();const title=wsElement('h2',s.title||'Passage cité'),meta=wsElement('p',(s.page?'Page '+s.page+' · ':'')+'Révision '+s.revision,'muted'),notice=wsElement('p',s.message||({current:'Ce passage correspond à la version actuelle.',modified:'Le document a été modifié depuis cette citation.',unavailable:'La source est devenue indisponible.'})[s.status]),passage=wsElement('pre',s.passage||s.text||'','fred-source-passage');title.id='fred-source-title';wsSourceDialog.append(title,meta,notice,passage);if(s.status==='modified')wsSourceDialog.append(wsElement('p','Révision actuelle : '+s.current_revision));if(s.status!=='unavailable'&&s.document&&s.project)wsSourceDialog.append(wsButton('Ouvrir le document actuel',async()=>{await wsSelectProject(s.project);await wsOpenDocument(s.document);showView('projects');wsSourceDialog.close();}));wsSourceDialog.append(wsButton('Fermer',()=>wsSourceDialog.close()));if(!wsSourceDialog.open)wsSourceDialog.showModal();}
 
 $('ws-search-form').onsubmit=e=>{e.preventDefault();wsTry(async()=>{const r=await wsAction('search',{project:ws.project,query:$('ws-search-query').value});wsDrawSources($('ws-sources'),r.sources);if(!r.sources.length)$('ws-sources').textContent='Aucun passage correspondant. Essayez d’autres mots.';});};
 $('ws-memory-form').onsubmit=e=>{e.preventDefault();wsTry(async()=>{await wsAction('memory_create',{project:ws.project,text:$('ws-memory-text').value});$('ws-memory-text').value='';await wsRefresh();});};
-const originalDraw=draw;draw=function(message){const view=originalDraw(message);if(message.role==='assistant'&&message.content)view.article.append(wsButton('Enregistrer comme document',async()=>{const p=wsCurrent()?.project_id;if(!p)throw new Error('Choisissez un projet dans la discussion.');const r=await wsAction('document_create',{project:p,title:wsCurrent().title,text:message.content});await wsRefresh();await wsSelectProject(p);await wsOpenDocument(r.id);showView('projects');}));return view;};
+const originalDraw=draw;draw=function(message,container){const view=originalDraw(message,container);if(!container&&message.role==='assistant'&&message.content&&!wsIsAgentProject(wsCurrent()?.project_id))view.article.append(wsButton('Enregistrer comme document',async()=>{const p=wsCurrent()?.project_id;if(!p)throw new Error('Choisissez un projet dans la discussion.');const r=await wsAction('document_create',{project:p,title:wsCurrent().title,text:message.content});await wsRefresh();await wsSelectProject(p);await wsOpenDocument(r.id);showView('projects');}));return view;};
 const originalButtons=buttons;buttons=function(){originalButtons();wsChatSelections();};
 $('ws-refresh').onclick=()=>wsTry(()=>wsRefresh());
 async function wsPoll(){/* kiara-slot:platform-expression-24 */if(!connected||busy||historySyncPending||conversationActionPending||wsDraggedConversation)/* /kiara-slot:platform-expression-24 */return;if(!ws.bootstrapDone){await wsBootstrap();return;}try{await wsRefresh();}catch(e){error('Actualisation indisponible : '+e.message);}}
@@ -136,7 +191,7 @@ function wsConversationRecord(id){
   let published=null;
   for(const p of ws.data?.projects||[]){const row=p.conversations.find(c=>c.id===canonical);if(row){published={...row,project:p.id};break;}}
   if(!local&&!published)throw new Error('Conversation introuvable. Actualisez les projets.');
-  return {id:canonical,local,published,revision:local?.server_revision||published?.revision||0};
+  return {id:canonical,local,published,project:published?.project||local?.project_id,revision:local?.server_revision||published?.revision||0};
 }
 async function wsConversationAction(run){
   if(conversationLocked())throw new Error('Attendez la fin de l’action en cours.');
@@ -150,13 +205,15 @@ async function wsMoveConversation(id,project){
     if(previous===project)return;
     const target=ws.data?.projects.find(p=>p.id===project);
     if(project&&(!target||target.archived))throw new Error('Choisissez un projet actif.');
+    if(row.revision&&project&&wsIsAgentProject(previous)!==wsIsAgentProject(project))throw new Error('Retirez d’abord la publication de cette discussion avant de la déplacer.');
     let revision=row.revision;
     if(revision){
       if(!project){
         if(!row.local)throw new Error('Ouvrez cette discussion avant de la retirer du projet.');
         // Removing the publication leaves the complete personal history intact.
-        await wsAction('conversation_delete',{id:row.id,revision});revision=0;
-      }else revision=(await wsAction('conversation_move',{id:row.id,project,revision})).revision;
+        await wsAction('conversation_delete',{id:row.id,project:row.project,revision});revision=0;
+      }else if(wsIsAgentProject(previous))revision=(await wsAction('conversation_move',{id:row.id,project:row.project,destination:project,revision})).revision;
+      else revision=(await wsAction('conversation_move',{id:row.id,project,revision})).revision;
     }
     if(row.local){row.local.project_id=project;row.local.document_id=null;row.local.server_revision=revision;}
   });
@@ -164,7 +221,7 @@ async function wsMoveConversation(id,project){
 async function wsArchiveConversation(id){
   return wsConversationAction(async()=>{
     const row=wsConversationRecord(id),archived=!Boolean(row.local?.archived??row.published?.archived);
-    const result=row.revision?await wsAction('conversation_archive',{id:row.id,revision:row.revision,archived}):null;
+    const result=row.revision?await wsAction('conversation_archive',{id:row.id,project:row.project,revision:row.revision,archived}):null;
     if(row.local){row.local.archived=archived;if(result)row.local.server_revision=result.revision;}
   });
 }
@@ -172,7 +229,7 @@ async function wsDeleteConversation(id){
   return wsConversationAction(async()=>{
     const row=wsConversationRecord(id),local=row.local?JSON.parse(JSON.stringify(row.local)):null;
     let remote=null;
-    if(row.revision){remote=await wsAction('conversation_get',{id:row.id});await wsAction('conversation_delete',{id:row.id,revision:row.revision});}
+    if(row.revision){remote=await wsAction('conversation_get',{id:row.id,project:row.project});await wsAction('conversation_delete',{id:row.id,project:row.project,revision:row.revision});}
     const index=local?library.indexOf(row.local):-1;
     const composerDraft=local&&typeof uiRemoveComposerDraft==='function'?uiRemoveComposerDraft(local.id):'';
     if(local)library.splice(index,1);
@@ -245,8 +302,7 @@ function wsDrawSidebarProjects(){
 }
 const wsConversationLibrary=drawLibrary;drawLibrary=function(){wsConversationLibrary();for(const b of $('conversation-list').querySelectorAll('[data-conversation-id]'))wsPrepareConversationDrag(b);wsDrawSidebarProjects();wsDrawProjectConversations();};
 const wsConversationProjects=wsDrawProjects;wsDrawProjects=function(){
-  wsConversationProjects();const query=$('ws-project-search').value.toLocaleLowerCase();
-  const visible=(ws.data?.projects||[]).filter(p=>(!p.archived||$('ws-archived').checked)&&(p.title+' '+p.instructions).toLocaleLowerCase().includes(query));
+  wsConversationProjects();const visible=wsVisibleProjects();
   [...$('ws-project-list').querySelectorAll('button')].forEach((b,i)=>{if(!visible[i].archived)b.dataset.projectDrop=visible[i].id;});wsDrawSidebarProjects();
 };
 let wsDraggedConversation=null;
@@ -292,7 +348,7 @@ document.addEventListener('scroll',e=>{if(!wsConversationMenu.contains(e.target)
 drawLibrary();
 
 // Persistent server inbox; local state is disposable and authenticated again on every open.
-const fredInbox={items:new Map(),cursor:0,generation:null,preferences:null,busy:false,dirty:false,loaded:false};
+const fredInbox={items:new Map(),cursor:0,generation:null,agentScope:null,preferences:null,busy:false,dirty:false,loaded:false};
 const fredNotificationTypes={document_indexed:'Document prêt pour la recherche',transcription_ready:'Transcription disponible'};
 const fredInboxPane=wsElement('section',undefined,'settings-view');fredInboxPane.dataset.view='notifications';fredInboxPane.hidden=true;
 fredInboxPane.innerHTML='<h2>Notifications</h2><p>Vos résultats et alertes sont conservés sur le serveur. Ils sont retrouvés à la reconnexion.</p><div class="ws-toolbar"><button type="button" class="secondary" id="fred-inbox-refresh">Actualiser</button><button type="button" class="secondary" id="fred-inbox-read-all">Tout marquer lu</button></div><p id="fred-inbox-status" role="status"></p><div id="fred-inbox-list"></div><details class="revision-details"><summary>Préférences de notification</summary><form id="fred-inbox-preferences" class="ws-card"><div id="fred-inbox-types"></div><label><input type="checkbox" id="fred-inbox-discreet" checked> Alertes discrètes</label><small class="muted">Le contenu privé des documents et conversations est masqué dans les alertes.</small><button class="secondary" type="submit">Enregistrer les préférences</button><p>Les alertes Android nécessitent votre autorisation. Une application complètement arrêtée récupère les événements à sa prochaine ouverture.</p></form></details>';
@@ -303,8 +359,14 @@ function fredAndroidInbox(payload){if(typeof window.androidInboxChanged==='funct
 let fredInboxDrawSignature='';
 function fredInboxDraw(){const signature=JSON.stringify([[...fredInbox.items.values()],fredInbox.preferences,fredInbox.dirty]);if(signature===fredInboxDrawSignature)return;fredInboxDrawSignature=signature;const rows=[...fredInbox.items.values()].sort((a,b)=>b.sequence-a.sequence);$('fred-inbox-list').replaceChildren();for(const item of rows){const card=wsElement('article',undefined,'ws-card fred-notification'+(item.read_at?'':' unread'));card.dataset.notificationId=item.id;card.append(wsElement('h3',item.title||'Notification'),wsElement('p',item.body||''),wsElement('small',new Date(item.created*1000).toLocaleString()+(item.read_at?' · Lu':' · Non lu'),'muted'));card.append(wsButton('Ouvrir',()=>window.fredOpenNotificationById(item.id)));if(!item.read_at)card.append(wsButton('Marquer lu',()=>fredInboxRead([item.id])));$('fred-inbox-list').append(card);}if(!rows.length)$('fred-inbox-list').append(wsElement('p','Aucune notification pour le moment.'));const unread=rows.filter(x=>!x.read_at).length;fredInboxNav.dataset.unreadCount=String(unread);if(typeof uiDecorateNavigation==='function')uiDecorateNavigation();else fredInboxNav.textContent='Notifications'+(unread?' · '+unread:'');if(fredInbox.preferences&&!fredInbox.dirty){for(const box of $('fred-inbox-types').querySelectorAll('input'))box.checked=fredInbox.preferences.types[box.dataset.notificationType]!==false;$('fred-inbox-discreet').checked=fredInbox.preferences.discreet!==false;}}
 async function fredInboxRead(ids){for(let i=0;i<ids.length;i+=100)await api('/v1/notifications/action',{action:'read',ids:ids.slice(i,i+100)});await fredInboxLoad();}
-async function fredInboxLoad(){if(fredInbox.busy)return;fredInbox.busy=true;try{let payload=await api('/v1/notifications/action',{action:'list',after:fredInbox.cursor,limit:100});if(fredInbox.generation&&fredInbox.generation!==payload.generation){fredInbox.items.clear();fredInbox.cursor=0;fredInbox.loaded=false;fredAndroidInbox({reset:true,generation:payload.generation,items:[]});payload=await api('/v1/notifications/action',{action:'list',after:0,limit:100});}const newlyDelivered=[];for(let page=0;page<11;page++){if(fredInbox.generation&&fredInbox.generation!==payload.generation){fredInbox.items.clear();fredInbox.cursor=0;fredInbox.loaded=false;newlyDelivered.length=0;fredAndroidInbox({reset:true,generation:payload.generation,items:[]});payload=await api('/v1/notifications/action',{action:'list',after:0,limit:100});}fredInbox.generation=payload.generation;fredInbox.preferences=payload.preferences;for(const item of payload.items||[]){if(!fredInbox.items.has(item.id))newlyDelivered.push(item.id);fredInbox.items.set(item.id,item);}if(Array.isArray(payload.retained_ids)){const retained=new Set(payload.retained_ids);for(const id of fredInbox.items.keys())if(!retained.has(id))fredInbox.items.delete(id);}const read=new Set(payload.read_ids||[]);for(const item of fredInbox.items.values()){if(read.has(item.id))item.read_at=item.read_at||Date.now()/1000;item.enabled=payload.preferences.types[item.type]!==false&&payload.subscription.enabled!==false;}fredInbox.cursor=payload.cursor;fredAndroidInbox({...payload,items:[...fredInbox.items.values()]});if(!payload.has_more)break;payload=await api('/v1/notifications/action',{action:'list',after:fredInbox.cursor,limit:100});}if(fredInbox.items.size>1000){const oldest=[...fredInbox.items.values()].sort((a,b)=>a.sequence-b.sequence);for(const item of oldest.slice(0,oldest.length-1000))fredInbox.items.delete(item.id);}fredInboxDraw();fredInbox.loaded=true;$('fred-inbox-status').textContent='Notifications synchronisées avec le serveur.';const retainedDelivered=newlyDelivered.filter(id=>fredInbox.items.has(id));for(let i=0;i<retainedDelivered.length;i+=100){try{await api('/v1/notifications/action',{action:'delivered',ids:retainedDelivered.slice(i,i+100)});}catch(e){if(e.status===401)throw e;/* A receipt may expire between list and acknowledgement. The authenticated inbox stays usable. */}}}catch(e){if(e.status===401||e.status===403){fredInbox.items.clear();fredInbox.cursor=0;fredInbox.loaded=false;fredInboxDraw();fredAndroidInbox({access_revoked:true,items:[]});}$('fred-inbox-status').textContent=e.status===404?'Le serveur ne propose pas encore les notifications.':('Actualisation indisponible : '+e.message);}finally{fredInbox.busy=false;}}
-window.fredOpenNotification=async target=>{if(target?.kind==='document'){await wsFlush();await wsSelectProject(target.project);await wsOpenDocument(target.id);showView('projects');}else{showView('notifications');await fredInboxLoad();}};
+async function fredInboxLoad(){if(fredInbox.busy)return;fredInbox.busy=true;try{let payload=await api('/v1/notifications/action',{action:'list',after:fredInbox.cursor,limit:100});if((fredInbox.generation&&fredInbox.generation!==payload.generation)||(fredInbox.agentScope!==null&&fredInbox.agentScope!==payload.agent_scope)){fredInbox.items.clear();fredInbox.cursor=0;fredInbox.loaded=false;fredAndroidInbox({reset:true,generation:payload.generation,items:[]});payload=await api('/v1/notifications/action',{action:'list',after:0,limit:100});}const newlyDelivered=[];for(let page=0;page<11;page++){if((fredInbox.generation&&fredInbox.generation!==payload.generation)||(fredInbox.agentScope!==null&&fredInbox.agentScope!==payload.agent_scope)){fredInbox.items.clear();fredInbox.cursor=0;fredInbox.loaded=false;newlyDelivered.length=0;fredAndroidInbox({reset:true,generation:payload.generation,items:[]});payload=await api('/v1/notifications/action',{action:'list',after:0,limit:100});}fredInbox.generation=payload.generation;fredInbox.agentScope=payload.agent_scope??null;fredInbox.preferences=payload.preferences;for(const item of payload.items||[]){if(!fredInbox.items.has(item.id))newlyDelivered.push(item.id);fredInbox.items.set(item.id,item);}if(Array.isArray(payload.retained_ids)){const retained=new Set(payload.retained_ids);for(const id of fredInbox.items.keys())if(!retained.has(id))fredInbox.items.delete(id);}const read=new Set(payload.read_ids||[]);for(const item of fredInbox.items.values()){if(read.has(item.id))item.read_at=item.read_at||Date.now()/1000;item.enabled=payload.preferences.types[item.type]!==false&&payload.subscription.enabled!==false;}fredInbox.cursor=payload.cursor;fredAndroidInbox({...payload,items:[...fredInbox.items.values()]});if(!payload.has_more)break;payload=await api('/v1/notifications/action',{action:'list',after:fredInbox.cursor,limit:100});}if(fredInbox.items.size>1000){const oldest=[...fredInbox.items.values()].sort((a,b)=>a.sequence-b.sequence);for(const item of oldest.slice(0,oldest.length-1000))fredInbox.items.delete(item.id);}fredInboxDraw();fredInbox.loaded=true;$('fred-inbox-status').textContent='Notifications synchronisées avec le serveur.';const retainedDelivered=newlyDelivered.filter(id=>fredInbox.items.has(id));for(let i=0;i<retainedDelivered.length;i+=100){try{await api('/v1/notifications/action',{action:'delivered',ids:retainedDelivered.slice(i,i+100)});}catch(e){if(e.status===401)throw e;/* A receipt may expire between list and acknowledgement. The authenticated inbox stays usable. */}}}catch(e){if(e.status===401||e.status===403){fredInbox.items.clear();fredInbox.cursor=0;fredInbox.loaded=false;fredInboxDraw();fredAndroidInbox({access_revoked:true,items:[]});}$('fred-inbox-status').textContent=e.status===404?'Le serveur ne propose pas encore les notifications.':('Actualisation indisponible : '+e.message);}finally{fredInbox.busy=false;}}
+window.fredOpenNotification=async target=>{
+  if(target?.kind==='document'){await wsFlush();await wsSelectProject(target.project);await wsOpenDocument(target.id);showView('projects');}
+  else if(target?.kind==='agent_project'&&wsIsAgentProject(target.project)){
+    if(platformCapabilities.platform!=='android')await uiOpenAgent('/app/projects/'+encodeURIComponent(target.project)+'/reviews');
+    else{await wsRefresh();await wsSelectProject(target.project);showView('projects');}
+  }else{showView('notifications');await fredInboxLoad();}
+};
 window.fredOpenNotificationById=async id=>{try{const value=await api('/v1/notifications/action',{action:'get',id});await api('/v1/notifications/action',{action:'read',ids:[id]});const cached=fredInbox.items.get(id);if(cached)cached.read_at=Date.now()/1000;await window.fredOpenNotification(value.notification.target);await fredInboxLoad();}catch(e){showView('notifications');error(e);return false;}};
 const fredShowView=showView;showView=function(name){fredShowView(name);if(name==='notifications'){$('workspace-heading').textContent='Notifications';fredInboxLoad();}};
 $('fred-inbox-refresh').onclick=()=>fredInboxLoad();$('fred-inbox-read-all').onclick=()=>wsTry(()=>fredInboxRead([...fredInbox.items.values()].filter(x=>!x.read_at).map(x=>x.id)));

@@ -1,0 +1,104 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Paramètres — Project Brain</title>
+<style>body{font-family:sans-serif;max-width:900px;margin:2rem auto;padding:0 1rem}nav a{margin-right:1rem}.card{border:1px solid #ddd;padding:1rem;margin:1rem 0;border-radius:8px}label{display:block;margin:.5rem 0 .2rem}input,select{width:100%;padding:.4rem}button{margin-top:.6rem;padding:.5rem 1rem}pre{background:#f6f6f6;padding:.6rem;overflow:auto}</style>
+<script>
+const nativeFetch = window.fetch.bind(window);
+let agentSession;
+window.fetch = async (url, init = {}) => {
+  const method = (init.method || 'GET').toUpperCase();
+  if (!['GET', 'HEAD'].includes(method)) {
+    agentSession ||= nativeFetch('/api/v1/session').then(r => r.json());
+    const {token} = await agentSession;
+    init.headers = {...init.headers, 'X-Agent-Token': token};
+  }
+  const response = await nativeFetch(url, init);
+  if (!response.ok) {
+    if (response.status === 403) agentSession = undefined;
+    const data = await response.clone().json().catch(() => ({}));
+    const message = typeof data.detail === 'string' ? data.detail : data.detail?.message || 'Échec de la requête';
+    alert(message);
+    const error = new Error(message); error.detail = data.detail; throw error;
+  }
+  return response;
+};
+</script></head><body>
+<nav><a href="/ui">Accueil</a><a href="/ui/pending">Résolution projet</a><a href="/ui/proposals">Validation</a><a href="/ui/settings"><b>Paramètres</b></a><a href="/docs">API</a></nav>
+<h1>Paramètres</h1>
+
+<div class="card"><h3>IA — classement des mails</h3>
+<p style="color:#555">Local (Ollama) recommandé : <code>http://localhost:11434</code> + modèle <code>llama3.1</code> / <code>mistral</code>. Alternative : API compatible OpenAI.</p>
+<label>Fournisseur</label>
+<select id="provider"><option value="none">none (désactivée)</option><option value="ollama">ollama (local)</option><option value="openai_compatible">openai_compatible (API)</option></select>
+<label>Base URL</label><input id="base_url" placeholder="http://localhost:11434">
+<label>Modèle</label><input id="model" placeholder="llama3.1">
+<label>Clé API (API distante uniquement)</label><input id="api_key" type="password" placeholder="sk-...">
+<label><input type="checkbox" id="enabled" style="width:auto"> IA activée</label><br>
+<button onclick="saveAI()">Enregistrer IA</button>
+<button onclick="testAI()">Tester connexion</button>
+<pre id="aiRes"></pre>
+</div>
+
+<div class="card"><h3>Dossier e-mails</h3>
+<label>Dossier serveur scanné automatiquement</label>
+<input id="folder" value="">
+<label><input type="checkbox" id="auto_scan" style="width:auto"> Scan auto au démarrage</label><br>
+<button onclick="saveMail()">Enregistrer dossier</button>
+<button onclick="doScan()">Scanner maintenant</button>
+<button onclick="reanalyze()">Relancer IA sur pending</button>
+<pre id="mailRes"></pre>
+</div>
+
+<div class="card"><h3>Mémoire EG2</h3>
+<p>Index SQLite de passages EG2. La vérité validée reste dans la base canonique.</p>
+<select id="mem_engine"><option value="eg2">EmbeddingGemma 2</option></select>
+<button onclick="memHealth()">État EG2</button><pre id="memRes"></pre></div>
+
+<script>
+let S = {{ data|tojson }};
+function fill(){
+  const ai = S.ai||{}, mail=S.mail||{}, mem=S.memory||{};
+  document.getElementById('provider').value = ai.provider||'ollama';
+  document.getElementById('base_url').value = ai.base_url||'http://localhost:11434';
+  document.getElementById('model').value = ai.model||'llama3.1';
+  document.getElementById('enabled').checked = !!ai.enabled;
+  document.getElementById('folder').value = mail.folder||'';
+  document.getElementById('auto_scan').checked = mail.auto_scan!==false;
+  document.getElementById('mem_engine').value = mem.engine||'eg2';
+  document.getElementById('aiRes').textContent = 'Modèles Ollama : installe via `ollama pull llama3.1` puis `ollama serve`.';
+}
+async function saveAI(){
+  const body={provider:provider.value,base_url:base_url.value,model:model.value,api_key:api_key.value||undefined,enabled:enabled.checked,timeout_s:60};
+  const r=await (await fetch('/v1/settings/ai',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})).json();
+  S.ai=r; aiRes.textContent='Enregistré: '+JSON.stringify(r,null,2);
+}
+async function testAI(){
+  aiRes.textContent='test en cours...';
+  const r=await (await fetch('/v1/settings/ai/test',{method:'POST'})).json();
+  aiRes.textContent=JSON.stringify(r,null,2);
+}
+async function saveMail(){
+  const body={folder:folder.value,auto_scan:auto_scan.checked};
+  const r=await (await fetch('/v1/settings/mail',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})).json();
+  S.mail=r; mailRes.textContent='Enregistré: '+JSON.stringify(r,null,2);
+}
+async function doScan(){
+  mailRes.textContent='scan en cours...';
+  const r=await (await fetch('/v1/ingest/scan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({folder:folder.value})})).json();
+  mailRes.textContent=JSON.stringify(r,null,2);
+}
+async function reanalyze(){
+  mailRes.textContent='réanalyse IA en cours...';
+  const r=await (await fetch('/v1/ingest/reanalyze-pending?limit=20',{method:'POST'})).json();
+  mailRes.textContent=JSON.stringify(r,null,2);
+}
+async function saveMem(){
+  const r=await (await fetch('/v1/settings/memory',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({engine:mem_engine.value})})).json();
+  S.memory=r; memRes.textContent='Enregistré (actif pour les prochains appels) : '+JSON.stringify(r,null,2);
+}
+async function memHealth(){
+  memRes.textContent='état en cours...';
+  const r=await (await fetch('/v1/settings/memory/engines')).json();
+  memRes.textContent=JSON.stringify(r,null,2);
+}
+fill();
+</script>
+</body></html>

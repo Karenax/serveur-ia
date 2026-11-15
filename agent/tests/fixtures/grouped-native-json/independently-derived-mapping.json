@@ -1,0 +1,375 @@
+{
+  "source": "Independent stdlib Decimal calculation of actual fictitious JSON",
+  "request": {
+    "path": "C:\\Agent\\logs\\foresight-runtime\\l03-grouped-real-4dd6cc4542634043995928f92c222333\\resident-requests.jsonl",
+    "bytes": 1705,
+    "sha256": "7c15682bddeec59f12437f117f7cf2d2b238c52ffff05cfcf2f108c83325cceb"
+  },
+  "response": {
+    "path": "C:\\Agent\\logs\\foresight-runtime\\l03-grouped-real-4dd6cc4542634043995928f92c222333\\resident-responses.jsonl",
+    "bytes": 13337,
+    "sha256": "3085af2aa982788f2938e9b75e1e4139b39359663484fe1828a39f49560eac4b"
+  },
+  "JSON_timestamp_count": 174,
+  "JSON_timestamp_types": [
+    "float"
+  ],
+  "JSON_timestamps_all_finite": true,
+  "runtime_original_numeric_types_observed": false,
+  "worker_status": "refused",
+  "worker_refusal": "nonfinite_native_timestamp",
+  "independent_status": "mapped",
+  "independent_errors": [],
+  "texts_numbers_and_native_ordinals_rewritten": false,
+  "segments": [
+    {
+      "id": "live-f53c940893b2c314dbaaf0c2adfe2a0ea6f62a9c6ea84d09daf8a32d20228286",
+      "chunk_id": "clean-02",
+      "track": "mic",
+      "speaker": "mic",
+      "start_ms": 0,
+      "end_ms": 4400,
+      "text": "L'alimentation est de 230 volts et le courant maximal de 16",
+      "native_words": [
+        {
+          "segment_ordinal": 0,
+          "word_ordinal": 0,
+          "start": 0.0,
+          "end": 0.3,
+          "word": " L"
+        },
+        {
+          "segment_ordinal": 0,
+          "word_ordinal": 1,
+          "start": 0.3,
+          "end": 1.1,
+          "word": "'alimentation"
+        },
+        {
+          "segment_ordinal": 0,
+          "word_ordinal": 2,
+          "start": 1.1,
+          "end": 1.3,
+          "word": " est"
+        },
+        {
+          "segment_ordinal": 0,
+          "word_ordinal": 3,
+          "start": 1.3,
+          "end": 1.54,
+          "word": " de"
+        },
+        {
+          "segment_ordinal": 0,
+          "word_ordinal": 4,
+          "start": 1.54,
+          "end": 2.2,
+          "word": " 230"
+        },
+        {
+          "segment_ordinal": 0,
+          "word_ordinal": 5,
+          "start": 2.2,
+          "end": 2.6,
+          "word": " volts"
+        },
+        {
+          "segment_ordinal": 0,
+          "word_ordinal": 6,
+          "start": 2.6,
+          "end": 2.8,
+          "word": " et"
+        },
+        {
+          "segment_ordinal": 0,
+          "word_ordinal": 7,
+          "start": 2.8,
+          "end": 3.0,
+          "word": " le"
+        },
+        {
+          "segment_ordinal": 0,
+          "word_ordinal": 8,
+          "start": 3.0,
+          "end": 3.3,
+          "word": " courant"
+        },
+        {
+          "segment_ordinal": 0,
+          "word_ordinal": 9,
+          "start": 3.3,
+          "end": 3.88,
+          "word": " maximal"
+        },
+        {
+          "segment_ordinal": 0,
+          "word_ordinal": 10,
+          "start": 3.88,
+          "end": 4.14,
+          "word": " de"
+        },
+        {
+          "segment_ordinal": 0,
+          "word_ordinal": 11,
+          "start": 4.14,
+          "end": 4.4,
+          "word": " 16"
+        }
+      ]
+    },
+    {
+      "id": "live-e9ed64c5476b9a1c761a9f288e490e6010e23f8868048ad20ac7e7e3fd56ea8f",
+      "chunk_id": "clean-02",
+      "track": "mic",
+      "speaker": "mic",
+      "start_ms": 4400,
+      "end_ms": 5600,
+      "text": "ampères.",
+      "native_words": [
+        {
+          "segment_ordinal": 1,
+          "word_ordinal": 0,
+          "start": 4.4,
+          "end": 5.6,
+          "word": " ampères."
+        }
+      ]
+    },
+    {
+      "id": "live-47fe4848531f23db5eaa26951810f08b4b99a3ff9242ff97ce5d95271260fe09",
+      "chunk_id": "clean-03",
+      "track": "mic",
+      "speaker": "mic",
+      "start_ms": 6020,
+      "end_ms": 11200,
+      "text": "La puissance est de 1250 watts pour un éclairement de 350 lux.",
+      "native_words": [
+        {
+          "segment_ordinal": 1,
+          "word_ordinal": 1,
+          "start": 6.02,
+          "end": 6.26,
+          "word": " La"
+        },
+        {
+          "segment_ordinal": 1,
+          "word_ordinal": 2,
+          "start": 6.26,
+          "end": 6.76,
+          "word": " puissance"
+        },
+        {
+          "segment_ordinal": 1,
+          "word_ordinal": 3,
+          "start": 6.76,
+          "end": 6.98,
+          "word": " est"
+        },
+        {
+          "segment_ordinal": 1,
+          "word_ordinal": 4,
+          "start": 6.98,
+          "end": 7.1,
+          "word": " de"
+        },
+        {
+          "segment_ordinal": 1,
+          "word_ordinal": 5,
+          "start": 7.1,
+          "end": 8.26,
+          "word": " 1250"
+        },
+        {
+          "segment_ordinal": 1,
+          "word_ordinal": 6,
+          "start": 8.26,
+          "end": 8.56,
+          "word": " watts"
+        },
+        {
+          "segment_ordinal": 1,
+          "word_ordinal": 7,
+          "start": 8.56,
+          "end": 8.8,
+          "word": " pour"
+        },
+        {
+          "segment_ordinal": 1,
+          "word_ordinal": 8,
+          "start": 8.8,
+          "end": 9.0,
+          "word": " un"
+        },
+        {
+          "segment_ordinal": 1,
+          "word_ordinal": 9,
+          "start": 9.0,
+          "end": 9.44,
+          "word": " éclairement"
+        },
+        {
+          "segment_ordinal": 1,
+          "word_ordinal": 10,
+          "start": 9.44,
+          "end": 9.86,
+          "word": " de"
+        },
+        {
+          "segment_ordinal": 1,
+          "word_ordinal": 11,
+          "start": 9.86,
+          "end": 10.64,
+          "word": " 350"
+        },
+        {
+          "segment_ordinal": 1,
+          "word_ordinal": 12,
+          "start": 10.64,
+          "end": 11.2,
+          "word": " lux."
+        }
+      ]
+    },
+    {
+      "id": "live-d55c27c7acdd56ff303aedb48995bb87906c8be957a9fd567a9a227a76aabcfd",
+      "chunk_id": "clean-09",
+      "track": "mic",
+      "speaker": "mic",
+      "start_ms": 12130,
+      "end_ms": 12950,
+      "text": "La tolérance",
+      "native_words": [
+        {
+          "segment_ordinal": 1,
+          "word_ordinal": 13,
+          "start": 12.13,
+          "end": 12.45,
+          "word": " La"
+        },
+        {
+          "segment_ordinal": 1,
+          "word_ordinal": 14,
+          "start": 12.45,
+          "end": 12.95,
+          "word": " tolérance"
+        }
+      ]
+    },
+    {
+      "id": "live-c109992212ad872fdb1a565e96321d6814207a46cf49a84a1184e3a82ef57de8",
+      "chunk_id": "clean-09",
+      "track": "mic",
+      "speaker": "mic",
+      "start_ms": 12950,
+      "end_ms": 17850,
+      "text": "est de plus ou moins 0,2 mm pour une longueur de 1,5 m.",
+      "native_words": [
+        {
+          "segment_ordinal": 2,
+          "word_ordinal": 0,
+          "start": 12.95,
+          "end": 13.11,
+          "word": " est"
+        },
+        {
+          "segment_ordinal": 2,
+          "word_ordinal": 1,
+          "start": 13.11,
+          "end": 13.31,
+          "word": " de"
+        },
+        {
+          "segment_ordinal": 2,
+          "word_ordinal": 2,
+          "start": 13.31,
+          "end": 13.49,
+          "word": " plus"
+        },
+        {
+          "segment_ordinal": 2,
+          "word_ordinal": 3,
+          "start": 13.49,
+          "end": 13.59,
+          "word": " ou"
+        },
+        {
+          "segment_ordinal": 2,
+          "word_ordinal": 4,
+          "start": 13.59,
+          "end": 13.79,
+          "word": " moins"
+        },
+        {
+          "segment_ordinal": 2,
+          "word_ordinal": 5,
+          "start": 13.79,
+          "end": 14.15,
+          "word": " 0"
+        },
+        {
+          "segment_ordinal": 2,
+          "word_ordinal": 6,
+          "start": 14.15,
+          "end": 14.91,
+          "word": ",2"
+        },
+        {
+          "segment_ordinal": 2,
+          "word_ordinal": 7,
+          "start": 14.91,
+          "end": 15.31,
+          "word": " mm"
+        },
+        {
+          "segment_ordinal": 2,
+          "word_ordinal": 8,
+          "start": 15.31,
+          "end": 15.65,
+          "word": " pour"
+        },
+        {
+          "segment_ordinal": 2,
+          "word_ordinal": 9,
+          "start": 15.65,
+          "end": 15.81,
+          "word": " une"
+        },
+        {
+          "segment_ordinal": 2,
+          "word_ordinal": 10,
+          "start": 15.81,
+          "end": 16.31,
+          "word": " longueur"
+        },
+        {
+          "segment_ordinal": 2,
+          "word_ordinal": 11,
+          "start": 16.31,
+          "end": 16.57,
+          "word": " de"
+        },
+        {
+          "segment_ordinal": 2,
+          "word_ordinal": 12,
+          "start": 16.57,
+          "end": 16.71,
+          "word": " 1"
+        },
+        {
+          "segment_ordinal": 2,
+          "word_ordinal": 13,
+          "start": 16.71,
+          "end": 17.51,
+          "word": ",5"
+        },
+        {
+          "segment_ordinal": 2,
+          "word_ordinal": 14,
+          "start": 17.51,
+          "end": 17.85,
+          "word": " m."
+        }
+      ]
+    }
+  ]
+}

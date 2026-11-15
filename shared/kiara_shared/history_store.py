@@ -2,6 +2,7 @@
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import tempfile
 import threading
@@ -11,6 +12,11 @@ from .attachments import validate_message
 
 LOCK = threading.RLock()
 HISTORY_RESET_ID = '20261006-remove-assistants'
+
+
+def is_agent_project_id(value):
+    return isinstance(value, str) and re.fullmatch(
+        r'[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}', value) is not None
 
 class HistoryError(ValueError):
     pass
@@ -37,7 +43,11 @@ def validate(value):
             raise HistoryError('Identifiant de conversation invalide ou dupliqué.')
         ids.add(identity)
         for field in ('project_id','document_id'):
-            if row.get(field) is not None and (not isinstance(row[field],str) or len(row[field])!=32 or any(c not in '0123456789abcdef' for c in row[field])):raise HistoryError('Projet ou document invalide.')
+            reference = row.get(field)
+            if reference is None or (field == 'project_id' and is_agent_project_id(reference)):
+                continue
+            if not isinstance(reference, str) or not re.fullmatch(r'[0-9a-f]{32}', reference):
+                raise HistoryError('Projet ou document invalide.')
         if 'server_revision' in row and (type(row['server_revision']) is not int or row['server_revision']<0):raise HistoryError('Révision invalide.')
         if not isinstance(title, str) or not 1 <= len(title) <= 120 or not isinstance(messages, list) or len(messages) > 1000:
             raise HistoryError('Titre ou messages invalides.')

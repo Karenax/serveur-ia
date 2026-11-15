@@ -37,7 +37,7 @@ def main():
         fake = ThreadingHTTPServer(('127.0.0.1',0),FakeModel)
         controller.remote_backend = lambda: (fake.server_port,'test-model','')
         gateway = serve_gateway(store,controller.remote_backend,0)
-        stage = ROOT/'toolchain/releases-staging/windows-3.5.18/wireguard-bridge.exe'
+        stage = ROOT/'client-qwen/wireguard-bridge.exe'
         engine = Engine({'role':'server','wireguard':{'private_key':controller.wireguard.vault()['private_key']},
             'listen_port':0,'upstream_port':gateway.server_port,'peers':controller.wireguard.peers()}, executable=stage)
         profile['wireguard']['endpoint'] = f'127.0.0.1:{engine.port}'

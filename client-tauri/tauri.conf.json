@@ -1,0 +1,9 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Kiara Prototype",
+  "version": "0.1.0",
+  "identifier": "fr.kiara.integration.prototype",
+  "build": { "frontendDist": "assets" },
+  "app": { "windows": [], "security": { "csp": "default-src 'self'" } },
+  "bundle": { "active": false, "icon": ["../client-qwen/fred.ico"] }
+}

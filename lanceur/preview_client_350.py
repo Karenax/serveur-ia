@@ -52,7 +52,7 @@ try:
     os.environ['LOCALAPPDATA']=str(Path(fixture.temporary.name)/'local-data')
     owner=fixture.access['id'];identity=secrets.token_hex(16)
     fixture.store.workspace.history_write(owner,{'history':{'currentId':identity,'conversations':[{'id':identity,'title':'Créer une image avec ComfyUI','messages':[{'role':'user','content':'Comment créer une image avec ComfyUI ?'},{'role':'assistant','content':SAMPLE}]}]},'revision':0,'reset_id':'20261006-remove-assistants'})
-    configuration={'role':'server','wireguard':{'private_key':fixture.wireguard.vault()['private_key']},'listen_port':0,'upstream_port':fixture.gateway.server_port,'peers':fixture.wireguard.peers()}
+    configuration={'role':'server','wireguard':{'private_key':fixture.wireguard.vault()['private_key']},'listen_port':0,'loopback_only':True,'upstream_port':fixture.gateway.server_port,'peers':fixture.wireguard.peers()}
     engine=Engine(configuration);configuration['listen_port']=engine.port
     remote=client.Remote(fixture.profile,endpoint=f'127.0.0.1:{engine.port}')
     server=client.serve_local(remote,secrets.token_urlsafe(32),8099)

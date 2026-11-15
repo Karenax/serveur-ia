@@ -1,0 +1,110 @@
+# Client Windows Kiara 4
+
+Dans le client classique 3.5.62, ouvrir **Mises à jour** et installer la
+3.5.63. Dans cette dernière, cliquer sur **Passer à Kiara 4**. Le client
+vérifie l’installateur, l’exécute pour le compte Windows courant et ouvre
+Kiara 4 avec l’accès existant. Le relais conserve le profil chiffré par
+DPAPI et retrouve les réglages, l’historique et les brouillons de l’appareil.
+
+Une fois sur Kiara 4.0.2 ou ultérieure, ouvrir **Mises à jour**, puis
+**Vérifier les mises à jour** et **Mettre à jour le client**. Kiara vérifie le
+paquet du serveur, enregistre les changements en cours et redémarre après
+l’installation pour le compte Windows courant. Une 4.0.0 ou 4.0.1 déjà installée
+doit recevoir ce premier paquet via le téléchargement ci-dessous.
+
+Pour une installation manuelle, se connecter à la page Agent de Kiara et
+choisir **Télécharger Kiara 4 pour Windows**. Au premier lancement,
+coller le code fourni depuis **Clients & accès** dans la console serveur.
+Le même installateur convient à tous les utilisateurs.
+
+Le processus ne dispose d'aucune commande native exposée au contenu web. La
+navigation de la fenêtre est limitée à l'origine locale fournie au démarrage.
+Les caches Cargo et npm, les fichiers temporaires et les résultats de compilation
+vont dans `toolchain/tauri-work` sur le disque de travail. `-WorkRoot` permet de
+choisir un autre dossier de travail. Par défaut, `-ToolsRoot` pointe vers
+`toolchain` dans le dépôt. Pour fournir une autre installation de MSVC et Rust,
+indiquez le dossier d’outils du disque de travail.
+
+Depuis la racine du dépôt actif :
+
+```powershell
+. .\maintenance\tauri-dev-env.ps1
+cargo test -j 2 --locked --manifest-path .\client-tauri\Cargo.toml
+cargo build -j 2 --locked --manifest-path .\client-tauri\Cargo.toml
+```
+
+Le binaire de recette se trouve sous `toolchain/tauri-work/Build/tauri-prototype`.
+Compiler le pont WireGuard et le relais avec les ressources vocales Windows déjà
+préparées. Placer le prototype compilé à côté de `kiara-relay.exe`.
+
+```powershell
+$dist = 'D:\Kiara\integration-agent\relais-tauri'
+New-Item -ItemType Directory -Path $dist -Force | Out-Null
+$bridge = Join-Path $dist 'wireguard-bridge.exe'
+.\client-qwen\Build-WireGuard.ps1 -OutputBinary $bridge
+.\client-qwen\Build-Client.ps1 -Relay -SkipManifest -DistributionDirectory $dist -WireGuardBinary $bridge
+Copy-Item -LiteralPath (Join-Path $env:CARGO_TARGET_DIR 'debug\kiara-tauri-prototype.exe') -Destination $dist
+& (Join-Path $dist 'kiara-tauri-prototype.exe') --profile-exe 'D:\Kiara\integration-agent\profil-de-recette.exe'
+```
+
+Le mode `--local-url http://127.0.0.1:PORT/chat` utilise un serveur de recette
+démarré séparément. L’option `--hidden` masque la fenêtre pour l’automatisation.
+L’option `--profile-exe` permet de choisir le fichier sans ouvrir la boîte de
+sélection. En mode avec relais, la fenêtre attend la sauvegarde des conversations
+et des brouillons avant de l’arrêter. Si l’enregistrement échoue ou si Agent
+signale des modifications en attente, Kiara demande de confirmer la fermeture.
+Les fonctions natives et la distribution signée restent à qualifier.
+
+Pour ouvrir les liens réseau et les preuves de jalon dans l’Explorateur,
+définir `AGENT_OPEN_ROOTS` dans l’environnement de l’utilisateur Windows, avec
+les chemins absolus des dossiers autorisés, séparés par `;`. Le relais vérifie
+l’accès au projet et limite l’ouverture à ces dossiers et aux types de
+documents pris en charge.
+
+## Installateur de recette
+
+Le script assemble un installateur NSIS en français pour le compte Windows
+courant. Il prend le relais compilé par `Build-Client.ps1` et utilise Tauri CLI
+2.12.2. L’installateur se trouve sous
+`E:\Kiara-Integration\Build\tauri-prototype\x86_64-pc-windows-msvc\debug\bundle\nsis`.
+
+```powershell
+.\client-tauri\Build-Installer.ps1 `
+  -Relay (Join-Path $dist 'kiara-relay.exe') `
+  -TauriCli '.\toolchain\TauriCLI-2.12.2\cargo-tauri.exe'
+```
+
+Pour construire le paquet de distribution en mode release, fournir `-Version`
+avec la version Windows et `-AgentCapture`. Le paquet utilise le nom **Kiara**
+et l’identifiant `fr.kiara.desktop`. Pour le signer, fournir `-SigningTool`
+avec le chemin de l’outil de signature, `-SigningArguments` avec ses arguments
+et `-SignerThumbprint` avec l’empreinte du certificat de l’éditeur.
+Le script ajoute le chemin de chaque binaire en dernier argument. Configurer les
+identifiants du service de signature hors des arguments, car Tauri écrit la
+configuration de construction sur disque. Le script vérifie la signature
+Authenticode du relais, du helper, de l’application et du paquet NSIS, puis
+affiche le SHA-256 du paquet. L’installateur `Kiara_<version>_x64-setup.exe` se trouve sous
+`E:\Kiara-Integration\Build\tauri-prototype\x86_64-pc-windows-msvc\release\bundle\nsis`.
+
+## Helper WASAPI
+
+Compiler le helper Agent avec un environnement Windows Python 3.13 qui contient
+PyInstaller 6.22.3 et les versions de PyAV, NumPy et PyAudioWPatch verrouillées
+dans `agent/requirements-audio.txt`. Le script vérifie que le binaire peut
+inventorier les périphériques WASAPI. Passer le binaire à `Build-Installer.ps1`
+avec `-AgentCapture` pour le livrer aux côtés du relais.
+
+```powershell
+.\client-tauri\Build-AgentCapture.ps1 `
+  -Python 'E:\Kiara-Integration\Toolchain\Agent-Audio-Build\Scripts\python.exe' `
+  -OutputDirectory 'D:\Kiara\integration-agent\wasapi'
+```
+
+Pour la recette de transfert, après avoir fermé Tauri, le relais peut renvoyer
+les fragments journalisés d’une séance existante avec
+`kiara-relay.exe --sync-agent-capture <UUID-séance> <dossier-des-fragments>`.
+Cette commande utilise le profil Kiara importé sous le compte Windows courant.
+Elle conserve les fichiers locaux et vérifie chaque reçu du serveur. Dans Kiara,
+les commandes de la séance pilotent la capture Windows. Si la connexion se coupe
+pendant l’arrêt, le relais reprend le transfert des fragments dès qu’il peut joindre
+Agent, y compris après un redémarrage de Kiara.

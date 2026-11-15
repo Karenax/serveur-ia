@@ -121,7 +121,8 @@ def validate_package(controller, package):
     if 'hermes' in files:
         from hermes_backup import HermesBackup
         HermesBackup(controller.home / 'hermes-fred').validate(files['hermes'], set(records))
-    if 'workspace' in files:controller.remote.workspace.validate_backup(files['workspace'],set(records))
+    if 'workspace' in files:
+        controller.remote.workspace.validate_backup(files['workspace'], set(records), for_restore=True)
     profiles=files.get('profiles',{})
     if not isinstance(profiles,dict):raise ValueError('Profils invalides.')
     server_key=settings.get('public_key')
@@ -201,7 +202,7 @@ class RestoreManager:
             return self.status()
         except Exception:self.lock.release();raise
 
-    def restore_sync(self, data, guided=False):
+    def restore_sync(self, data, guided=False, *, on_inspected=None):
         if not self.lock.acquire(False):raise ValueError('Une restauration est déjà en cours.')
         try:
             c=self.controller
@@ -210,6 +211,8 @@ class RestoreManager:
             inspected=c.operations.backups.inspect(data)
             password=c.operations.backups.resolve_password(data.get('password'))
             validate_package(c,inspected['package'])
+            if on_inspected is not None:
+                on_inspected(inspected['summary'])
             self.job={'id':secrets.token_hex(12),'state':'preparing','active':True,'started':time.time(),'message':'Préparation de la restauration.'}
             return self._restore(data,inspected,password,guided)
         except Exception:

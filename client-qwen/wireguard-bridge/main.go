@@ -21,7 +21,6 @@ import (
 	"strings"
 	"time"
 
-	"golang.zx2c4.com/wireguard/conn"
 	"golang.zx2c4.com/wireguard/device"
 	"golang.zx2c4.com/wireguard/tun/netstack"
 )
@@ -39,6 +38,7 @@ type Config struct {
 	APIToken     string    `json:"api_token"`
 	BridgeToken  string    `json:"bridge_token"`
 	ListenPort   int       `json:"listen_port"`
+	LoopbackOnly bool      `json:"loopback_only"`
 	UpstreamPort int       `json:"upstream_port"`
 	Peers        []Peer    `json:"peers"`
 }
@@ -54,9 +54,47 @@ type bridgeTransport struct {
 	data, control *http.Transport
 }
 
+func businessRoute(r *http.Request) bool {
+	if !strings.HasPrefix(r.URL.Path, "/v1/business/") {
+		return false
+	}
+	switch r.Method {
+	case "GET", "POST", "PUT", "PATCH", "DELETE":
+		return true
+	default:
+		return false
+	}
+}
+
+func maxVoiceRoute(r *http.Request) bool {
+	switch r.Method {
+	case http.MethodGet:
+		switch r.URL.Path {
+		case "/v1/voice/max/status", "/v1/voice/max/package", "/v1/voice/max/package/download":
+			return true
+		}
+	case http.MethodPost:
+		switch r.URL.Path {
+		case "/v1/voice/max/test", "/v1/voice/max/warm", "/v1/voice/max/end",
+			"/v1/voice/max/transcribe", "/v1/voice/max/speech", "/v1/voice/max/cancel":
+			return true
+		}
+	}
+	return false
+}
+
+func copyBusinessHeaders(out, in http.Header) {
+	for _, name := range []string{"Content-Type", "Accept", "Range", "If-Range", "If-Match", "If-None-Match"} {
+		if value := in.Get(name); value != "" {
+			out.Set(name, value)
+		}
+	}
+}
+
 func (t bridgeTransport) RoundTrip(r *http.Request) (*http.Response, error) {
 	switch r.URL.Path {
-	case "/v1/models", "/v1/status", "/v1/device", "/v1/cancel", "/v1/voice/cancel":
+	case "/v1/models", "/v1/status", "/v1/device", "/v1/cancel", "/v1/voice/cancel",
+		"/v1/voice/max/status", "/v1/voice/max/cancel", "/v1/voice/max/end":
 		return t.control.RoundTrip(r)
 	default:
 		return t.data.RoundTrip(r)
@@ -114,7 +152,9 @@ func runServer(cfg Config, decoder *json.Decoder) error {
 	if e != nil {
 		return fmt.Errorf("création du serveur WireGuard impossible")
 	}
-	dev := device.NewDevice(tun, conn.NewDefaultBind(), device.NewLogger(device.LogLevelSilent, ""))
+	// The production launcher requires a fixed port. Ephemeral servers are
+	// local recipes, and a recipe can opt in explicitly when reusing its port.
+	dev := device.NewDevice(tun, udpBind(cfg.LoopbackOnly || cfg.ListenPort == 0), device.NewLogger(device.LogLevelSilent, ""))
 	defer dev.Close()
 	if dev.IpcSet(fmt.Sprintf("private_key=%s\nlisten_port=%d\n%s", private, cfg.ListenPort, commands)) != nil || dev.Up() != nil {
 		return fmt.Errorf("port UDP indisponible ou serveur WireGuard impossible")
@@ -129,6 +169,9 @@ func runServer(cfg Config, decoder *json.Decoder) error {
 		Rewrite: func(r *httputil.ProxyRequest) {
 			r.SetURL(target)
 			r.Out.Header = http.Header{"Authorization": {r.In.Header.Get("Authorization")}, "Content-Type": {"application/json"}, "X-Qwen-Session": {r.In.Header.Get("X-Qwen-Session")}, "X-Qwen-Request": {r.In.Header.Get("X-Qwen-Request")}, "X-Fred-Agent-Protocol": {r.In.Header.Get("X-Fred-Agent-Protocol")}}
+			if businessRoute(r.In) {
+				copyBusinessHeaders(r.Out.Header, r.In.Header)
+			}
 		},
 		ErrorHandler: func(w http.ResponseWriter, r *http.Request, e error) {
 			w.Header().Set("Content-Type", "application/json")
@@ -138,15 +181,20 @@ func runServer(cfg Config, decoder *json.Decoder) error {
 	}
 	slots := make(chan struct{}, 32)
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Host != "10.77.0.1:8766" || r.Header.Get("Origin") != "" || r.URL.RawQuery != "" {
+		business := businessRoute(r)
+		if r.Host != "10.77.0.1:8766" || r.Header.Get("Origin") != "" || (r.URL.RawQuery != "" && !business) {
 			http.Error(w, "Accès refusé", 403)
 			return
 		}
-		if !((r.Method == "GET" && (r.URL.Path == "/v1/history" || r.URL.Path == "/v1/workspace" || r.URL.Path == "/v1/notifications" || r.URL.Path == "/v1/models" || r.URL.Path == "/v1/status" || r.URL.Path == "/v1/agent/state" || r.URL.Path == "/v1/voice/status" || r.URL.Path == "/v1/client/release" || r.URL.Path == "/v1/client/codex" || r.URL.Path == "/v1/client/download" || r.URL.Path == "/v1/client/android/release" || r.URL.Path == "/v1/client/android/download")) || (r.Method == "POST" && (r.URL.Path == "/v1/embeddings" || r.URL.Path == "/v1/device" || r.URL.Path == "/v1/history" || r.URL.Path == "/v1/workspace/action" || r.URL.Path == "/v1/notifications/action" || r.URL.Path == "/v1/chat/completions" || r.URL.Path == "/v1/responses" || r.URL.Path == "/v1/context" || r.URL.Path == "/v1/cancel" || r.URL.Path == "/v1/agent/action" || r.URL.Path == "/v1/voice/speech" || r.URL.Path == "/v1/voice/cancel"))) {
+		if !business && !maxVoiceRoute(r) && !((r.Method == "GET" && (r.URL.Path == "/v1/history" || r.URL.Path == "/v1/workspace" || r.URL.Path == "/v1/notifications" || r.URL.Path == "/v1/models" || r.URL.Path == "/v1/status" || r.URL.Path == "/v1/agent/state" || r.URL.Path == "/v1/voice/status" || r.URL.Path == "/v1/client/release" || r.URL.Path == "/v1/client/codex" || r.URL.Path == "/v1/client/download" || r.URL.Path == "/v1/client/android/release" || r.URL.Path == "/v1/client/android/download" || r.URL.Path == "/v1/client/kiara4/release" || r.URL.Path == "/v1/client/kiara4/download")) || (r.Method == "POST" && (r.URL.Path == "/v1/embeddings" || r.URL.Path == "/v1/device" || r.URL.Path == "/v1/history" || r.URL.Path == "/v1/workspace/action" || r.URL.Path == "/v1/notifications/action" || r.URL.Path == "/v1/chat/completions" || r.URL.Path == "/v1/responses" || r.URL.Path == "/v1/context" || r.URL.Path == "/v1/cancel" || r.URL.Path == "/v1/agent/action" || r.URL.Path == "/v1/voice/speech" || r.URL.Path == "/v1/voice/cancel"))) {
 			http.NotFound(w, r)
 			return
 		}
 		bodyLimit := int64(2 * 1024 * 1024)
+		if business {
+			bodyLimit = 272 * 1024 * 1024
+			_ = http.NewResponseController(w).SetReadDeadline(time.Now().Add(15 * time.Minute))
+		}
 		if r.URL.Path == "/v1/notifications/action" {
 			bodyLimit = 65536
 		}
@@ -159,7 +207,7 @@ func runServer(cfg Config, decoder *json.Decoder) error {
 		if r.URL.Path == "/v1/history" || r.URL.Path == "/v1/responses" {
 			bodyLimit = 10 * 1024 * 1024
 		}
-		if r.Method == "POST" && (r.ContentLength < 1 || r.ContentLength > bodyLimit) {
+		if (!business && r.Method == "POST" && (r.ContentLength < 1 || r.ContentLength > bodyLimit)) || (business && (r.ContentLength < 0 || r.ContentLength > bodyLimit)) {
 			http.Error(w, "Requête trop volumineuse", 413)
 			return
 		}
@@ -263,7 +311,8 @@ func run() error {
 	if err != nil {
 		return fmt.Errorf("création du tunnel impossible")
 	}
-	dev := device.NewDevice(tun, conn.NewDefaultBind(), device.NewLogger(device.LogLevelSilent, ""))
+	endpoint, _ := netip.ParseAddrPort(cfg.WireGuard.Endpoint)
+	dev := device.NewDevice(tun, udpBind(endpoint.Addr() == netip.MustParseAddr("127.0.0.1")), device.NewLogger(device.LogLevelSilent, ""))
 	defer dev.Close()
 	if dev.IpcSet(ipc) != nil || dev.Up() != nil {
 		return fmt.Errorf("activation du tunnel impossible")
@@ -292,6 +341,9 @@ func run() error {
 		Rewrite: func(r *httputil.ProxyRequest) {
 			r.SetURL(target)
 			r.Out.Header = http.Header{"Authorization": {"Bearer " + cfg.APIToken}, "Content-Type": {"application/json"}, "X-Qwen-Session": {r.In.Header.Get("X-Qwen-Session")}, "X-Qwen-Request": {r.In.Header.Get("X-Qwen-Request")}, "X-Fred-Agent-Protocol": {r.In.Header.Get("X-Fred-Agent-Protocol")}}
+			if businessRoute(r.In) {
+				copyBusinessHeaders(r.Out.Header, r.In.Header)
+			}
 		},
 		ErrorHandler: func(w http.ResponseWriter, r *http.Request, e error) {
 			w.Header().Set("Content-Type", "application/json")
@@ -340,11 +392,15 @@ func run() error {
 			json.NewEncoder(w).Encode(status)
 			return
 		}
-		if r.URL.RawQuery != "" || !((r.Method == "GET" && (r.URL.Path == "/v1/history" || r.URL.Path == "/v1/workspace" || r.URL.Path == "/v1/notifications" || r.URL.Path == "/v1/models" || r.URL.Path == "/v1/status" || r.URL.Path == "/v1/agent/state" || r.URL.Path == "/v1/voice/status" || r.URL.Path == "/v1/client/release" || r.URL.Path == "/v1/client/codex" || r.URL.Path == "/v1/client/download" || r.URL.Path == "/v1/client/android/release" || r.URL.Path == "/v1/client/android/download")) || (r.Method == "POST" && (r.URL.Path == "/v1/embeddings" || r.URL.Path == "/v1/device" || r.URL.Path == "/v1/history" || r.URL.Path == "/v1/workspace/action" || r.URL.Path == "/v1/notifications/action" || r.URL.Path == "/v1/chat/completions" || r.URL.Path == "/v1/responses" || r.URL.Path == "/v1/context" || r.URL.Path == "/v1/cancel" || r.URL.Path == "/v1/agent/action" || r.URL.Path == "/v1/voice/speech" || r.URL.Path == "/v1/voice/cancel"))) {
+		business := businessRoute(r)
+		if (r.URL.RawQuery != "" && !business) || (!business && !maxVoiceRoute(r) && !((r.Method == "GET" && (r.URL.Path == "/v1/history" || r.URL.Path == "/v1/workspace" || r.URL.Path == "/v1/notifications" || r.URL.Path == "/v1/models" || r.URL.Path == "/v1/status" || r.URL.Path == "/v1/agent/state" || r.URL.Path == "/v1/voice/status" || r.URL.Path == "/v1/client/release" || r.URL.Path == "/v1/client/codex" || r.URL.Path == "/v1/client/download" || r.URL.Path == "/v1/client/android/release" || r.URL.Path == "/v1/client/android/download" || r.URL.Path == "/v1/client/kiara4/release" || r.URL.Path == "/v1/client/kiara4/download")) || (r.Method == "POST" && (r.URL.Path == "/v1/embeddings" || r.URL.Path == "/v1/device" || r.URL.Path == "/v1/history" || r.URL.Path == "/v1/workspace/action" || r.URL.Path == "/v1/notifications/action" || r.URL.Path == "/v1/chat/completions" || r.URL.Path == "/v1/responses" || r.URL.Path == "/v1/context" || r.URL.Path == "/v1/cancel" || r.URL.Path == "/v1/agent/action" || r.URL.Path == "/v1/voice/speech" || r.URL.Path == "/v1/voice/cancel")))) {
 			http.NotFound(w, r)
 			return
 		}
 		bodyLimit := int64(2 * 1024 * 1024)
+		if business {
+			bodyLimit = 272 * 1024 * 1024
+		}
 		if r.URL.Path == "/v1/notifications/action" {
 			bodyLimit = 65536
 		}
@@ -357,11 +413,11 @@ func run() error {
 		if r.URL.Path == "/v1/history" || r.URL.Path == "/v1/responses" {
 			bodyLimit = 10 * 1024 * 1024
 		}
-		if r.Method == "POST" && (r.ContentLength < 1 || r.ContentLength > bodyLimit) {
+		if (!business && r.Method == "POST" && (r.ContentLength < 1 || r.ContentLength > bodyLimit)) || (business && (r.ContentLength < 0 || r.ContentLength > bodyLimit)) {
 			http.Error(w, "Corps JSON trop volumineux", 413)
 			return
 		}
-		if r.Method == "GET" && r.URL.Path != "/v1/client/download" && r.URL.Path != "/v1/client/android/download" {
+		if r.Method == "GET" && !business && r.URL.Path != "/v1/voice/max/package/download" && r.URL.Path != "/v1/client/download" && r.URL.Path != "/v1/client/android/download" && r.URL.Path != "/v1/client/kiara4/download" {
 			// Allow handshake retries on remote networks before declaring the tunnel unavailable.
 			ctx, cancel := context.WithTimeout(r.Context(), 25*time.Second)
 			defer cancel()

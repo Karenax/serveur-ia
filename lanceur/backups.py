@@ -345,6 +345,14 @@ class BackupManager:
         if version == 2 and document.get('manifest') != _manifest(package, extras, security):
             raise ValueError('Manifeste de sauvegarde endommagé.')
         summary = self._summary(package, extras, security, version, document.get('created_at', ''))
+        if 'agent' in document and version == 2:
+            agent = document['agent']
+            if (not isinstance(agent, dict) or set(agent) != {'size', 'sha256'}
+                    or type(agent['size']) is not int or agent['size'] <= 0
+                    or not isinstance(agent['sha256'], str) or len(agent['sha256']) != 64
+                    or any(char not in '0123456789abcdef' for char in agent['sha256'])):
+                raise ValueError('Empreinte de l’archive Agent invalide.')
+            summary['agent'] = agent
         return {'summary': summary, 'package': package, 'extras': extras, 'security': security}
 
     def resolve(self, data):
@@ -371,12 +379,21 @@ class BackupManager:
             if len(blob) != size: raise ValueError('Sauvegarde modifiée pendant sa lecture ; réessayez.')
         if len(blob) > MAX_ARCHIVE: raise ValueError('Sauvegarde trop volumineuse.')
         result = self._decode(blob, self.resolve_password(data))
+        agent = result['summary'].get('agent')
+        if agent is not None:
+            companion = path.with_suffix('.kiara-agent')
+            if (not companion.is_file() or companion.stat().st_size != agent['size']
+                    or _hash_file(companion) != agent['sha256']):
+                raise ValueError('Archive Agent associée absente ou endommagée.')
+            agent['file'] = str(companion.resolve())
         result['summary'].update(file=str(path.resolve()), size=len(blob), sha256=hashlib.sha256(blob).hexdigest())
         # Adoption is explicit: recovered archives are never retention candidates before verification.
         with self.lock:
             record = next((r for r in self.data['catalog'] if r.get('file') == str(path.resolve())), None)
             if record:
                 record.update(verified=True, summary=result['summary'], sha256=result['summary']['sha256'])
+                if agent is not None:
+                    record['agent'] = dict(agent)
                 self._save()
         return result
 
@@ -453,15 +470,24 @@ class BackupManager:
         private_directory(destination)
         if shutil.disk_usage(destination).free < len(raw) * 2 + 1024 * 1024:
             raise OSError(errno.ENOSPC, 'Sauvegarde')
-        self._phase('encrypt', 'Chiffrement de l’archive portable.')
-        blob = HEADER + salt + key.encrypt(raw)
-        if len(blob) > MAX_ARCHIVE: raise ValueError('Sauvegarde trop volumineuse.')
-        blob_size = len(blob)
-        digest = hashlib.sha256(blob).hexdigest()
         identity = secrets.token_hex(12)
         target = destination / ('fred-' + dt.datetime.fromtimestamp(timestamp).strftime('%Y%m%d-%H%M%S') + '-' + identity + '.qwenbackup')
+        agent = getattr(self.controller, 'agent_service', None)
+        companion = target.with_suffix('.kiara-agent') if agent is not None else None
         temporary = target.with_suffix('.verification.tmp')
+        agent_metadata = None
         try:
+            if companion is not None:
+                self._phase('agent', 'Sauvegarde et vérification des données Agent.')
+                agent.backup_archive(companion, password)
+                agent_metadata = {'size': companion.stat().st_size, 'sha256': _hash_file(companion)}
+                document['agent'] = agent_metadata
+                raw = _canonical(document)
+            self._phase('encrypt', 'Chiffrement de l’archive portable.')
+            blob = HEADER + salt + key.encrypt(raw)
+            if len(blob) > MAX_ARCHIVE: raise ValueError('Sauvegarde trop volumineuse.')
+            blob_size = len(blob)
+            digest = hashlib.sha256(blob).hexdigest()
             _atomic_bytes(temporary, blob)
             # Verification decrypts a fresh immutable archive. Release the
             # original plaintext and ciphertext before that second traversal.
@@ -470,11 +496,16 @@ class BackupManager:
             self._decode(temporary.read_bytes(), password, key=key)
             if _hash_file(temporary) != digest: raise ValueError('Archive modifiée pendant sa vérification.')
             os.replace(temporary, target)
-        finally: temporary.unlink(missing_ok=True)
+        finally:
+            temporary.unlink(missing_ok=True)
+            if companion is not None and not target.exists() and companion.is_file():
+                companion.unlink(missing_ok=True)
         record = {'id': identity, 'file': str(target.resolve()), 'timestamp': timestamp, 'created_at': created,
                   'kind': kind, 'protected': bool(protected or kind in ('rollback', 'pre_restore')), 'version': 2,
                   'size': blob_size, 'sha256': digest, 'verified': True, 'summary': summary,
                   'secondary': {'status': 'disabled', 'file': '', 'attempts': 0, 'error': ''}}
+        if agent_metadata is not None:
+            record['agent'] = {'file': str(companion), **agent_metadata}
         with self.lock:
             secondary = self.data['config']['secondary_destination']
             if secondary: record['secondary'].update(status='pending', next_retry=0, destination=secondary)
@@ -487,6 +518,7 @@ class BackupManager:
         self._phase('retention', 'Conservation des points vérifiés et des points de retour.')
         self.prune()
         return {'id': identity, 'file': str(target.resolve()), 'message': 'Sauvegarde chiffrée créée et vérifiée.',
+                **({'agent': copy.deepcopy(record['agent'])} if companion is not None else {}),
                 'secondary': copy.deepcopy(record['secondary'])}
 
     def create(self, password, kind='manual', protected=False):
@@ -545,6 +577,24 @@ class BackupManager:
             # No plaintext is written on the NAS. Failure cannot invalidate the local archive.
             destination.mkdir(parents=True, exist_ok=True)
             if _hash_file(source) != record['sha256']: raise ValueError('Archive source endommagée.')
+            agent = record.get('agent')
+            if agent:
+                agent_source = Path(agent['file'])
+                if agent_source != source.with_suffix('.kiara-agent') or _hash_file(agent_source) != agent['sha256']:
+                    raise ValueError('Archive Agent source endommagée.')
+                if shutil.disk_usage(destination).free < record['size'] + agent['size'] + 1024 * 1024:
+                    raise OSError(errno.ENOSPC, 'Seconde copie')
+                agent_target = target.with_suffix('.kiara-agent')
+                agent_temp = agent_target.with_suffix('.agent-copy.tmp')
+                try:
+                    with agent_source.open('rb') as reader, agent_temp.open('wb') as writer:
+                        shutil.copyfileobj(reader, writer, 1024 * 1024)
+                        writer.flush(); os.fsync(writer.fileno())
+                    if _hash_file(agent_temp) != agent['sha256'] or agent_temp.stat().st_size != agent['size']:
+                        raise ValueError('Seconde copie Agent endommagée.')
+                    os.replace(agent_temp, agent_target)
+                finally:
+                    agent_temp.unlink(missing_ok=True)
             if shutil.disk_usage(destination).free < record['size'] + 1024 * 1024: raise OSError(errno.ENOSPC, 'Seconde copie')
             with source.open('rb') as reader, temporary.open('wb') as writer:
                 shutil.copyfileobj(reader, writer, 1024 * 1024); writer.flush(); os.fsync(writer.fileno())
@@ -586,6 +636,15 @@ class BackupManager:
                     secondary = record.get('secondary', {})
                     second_path = Path(secondary['file']) if secondary.get('file') else None
                     if second_path and (second_path.name != path.name or not MANAGED_NAME.fullmatch(second_path.name)): continue
+                    agent = record.get('agent')
+                    companions = []
+                    if agent:
+                        primary = path.with_suffix('.kiara-agent')
+                        if Path(agent['file']) != primary: continue
+                        companions = [primary] + ([second_path.with_suffix('.kiara-agent')] if second_path else [])
+                        if any(p.exists() and _hash_file(p) != agent['sha256'] for p in companions): continue
+                    for companion in companions:
+                        companion.unlink(missing_ok=True)
                     path.unlink(missing_ok=True)
                     if second_path and second_path.exists() and _hash_file(second_path) == record['sha256']:
                         second_path.unlink()

@@ -1,5 +1,6 @@
 """The extracted public agent adapter preserves authenticated identity and masking."""
 import json
+import threading
 import types
 import unittest
 import urllib.error
@@ -32,6 +33,26 @@ class AgentCommandAdapterTests(unittest.TestCase):
             self.request('/v1/agent/action',{'action':'state'},headers={'Authorization':'Bearer invalid'})
         self.assertEqual(denied.exception.code,401);denied.exception.close()
         self.assertEqual(len(calls),2)
+
+    def test_agent_project_search_can_authenticate_an_internal_request(self):
+        def action(owner, value, prepared):
+            identities = []
+            worker = threading.Thread(target=lambda: identities.append(
+                self.store.authenticate(self.first['token'])))
+            worker.start()
+            worker.join(1)
+            self.assertEqual(identities, [owner])
+            return {'sources': []}
+
+        self.store.workspace.action = action
+        for name in ('search', 'knowledge_search'):
+            with self.subTest(action=name):
+                result = self.request('/v1/workspace/action', {
+                    'action': name,
+                    'project': 'f84a8a99-b5b8-493e-95a5-533a095d20a7',
+                    'query': 'essai',
+                })
+                self.assertEqual(result, {'sources': []})
 
 
 if __name__=='__main__':unittest.main()

@@ -1,0 +1,43 @@
+.progressive-options { grid-column:1/-1; border:1px solid var(--border, #d8dfe5); border-radius:9px; padding:12px 14px; min-width:0; }
+.progressive-options>summary { cursor:pointer; font-weight:600; font-size:13px; }
+.progressive-options[open]>summary { margin-bottom:14px; }
+.progressive-options-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr)); gap:14px; }
+.progressive-options-grid label { display:grid; gap:7px; min-width:0; font-size:13px; }
+.progressive-options-grid label:has(input[type=checkbox]) { display:flex; align-items:flex-start; grid-column:1/-1; }
+.progressive-options-grid p,.progressive-options-grid small,.progressive-options-grid fieldset { grid-column:1/-1; }
+.progressive-options-grid>.mail-source-folder-list { grid-column:1/-1; }
+.settings-main-actions { display:flex; flex-wrap:wrap; gap:10px; grid-column:1/-1; }
+.workspace-settings-form>.settings-overview,.workspace-settings-form>.mail-settings-source,.workspace-settings-form>.settings-maintenance { grid-column:1/-1; }
+.workspace-settings-form>.settings-overview { margin:0; color:var(--muted, #687380); }
+.system-status.workspace-connections { display:block; position:relative; margin-left:auto; }
+.system-status>summary { display:flex; align-items:center; gap:8px; cursor:pointer; padding:8px 10px; border:1px solid var(--border, #d8dfe5); border-radius:8px; font-size:12px; background:var(--surface); list-style:none; }
+.system-status>summary::-webkit-details-marker { display:none; }
+.system-status>summary:after { content:'⌄'; }
+.system-status[open]>summary:after { content:'⌃'; }
+.system-status>summary>small { color:var(--muted, #687380); font-size:11px; }
+.system-status>summary>i { height:7px; width:7px; border-radius:50%; background:var(--muted, #687380); }
+.system-status.ok>summary>i { background:#008575; }
+.system-status.warning>summary>i { background:#d58315; }
+.system-status.error>summary>i { background:#c93e42; }
+.system-status-services { position:absolute; right:0; top:calc(100% + 8px); z-index:60; width:min(420px,calc(100vw - 32px)); max-height:calc(100dvh - 100px); overflow-y:auto; padding:12px; border:1px solid var(--border, #d8dfe5); border-radius:10px; background:var(--surface, #fff); box-shadow:0 8px 28px #0002; display:grid; gap:8px; }
+.system-status-services .workspace-mail-activity { margin:0; width:auto; }
+.system-status-services .workspace-connection { align-items:flex-start; }
+.system-status-services .workspace-connection>i { margin-top:5px; }
+.system-status-services .workspace-connection strong,.system-status-services .workspace-connection small { white-space:normal; }
+.system-status-services .workspace-connection p,.system-status-help { margin:7px 0 0; font-size:11px; line-height:1.5; color:var(--muted, #687380); overflow-wrap:anywhere; }
+.mail-activity-details>summary { display:flex; align-items:center; gap:7px; cursor:pointer; font-size:11px; }
+.mail-activity-details>summary strong { display:flex; align-items:center; gap:6px; }
+.mail-activity-details>summary>span[role=status] { color:var(--muted, #687380); }
+.mail-activity-expand { margin-left:auto; color:var(--muted, #687380); font-size:10px; }
+.mail-activity-details[open]>summary { margin-bottom:10px; }
+.mail-activity-details>button { border:0; background:transparent; color:var(--accent); padding:8px 0 0; cursor:pointer; font-size:11px; }
+.mail-activity-live p { margin:8px 0 5px; font-size:11px; }
+.mail-activity-live progress { width:100%; accent-color:var(--accent, #b68634); }
+.workspace-mail-activity>p[role=alert] { color:var(--danger, #a73131); margin:8px 0 0; white-space:normal; }
+.memory-recovery { padding:14px; border:1px solid var(--border, #dce5ef); border-radius:10px; margin-bottom:16px; }
+.memory-recovery-summary { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px; font-size:13px; }
+.memory-recovery-summary>span { margin-left:auto; color:var(--muted, #687380); font-size:12px; }
+.memory-recovery>div[role=status]>p { font-size:12px; margin:10px 0; }
+.memory-recovery>p[role=alert] { color:var(--danger, #a73131); }
+.memory-recovery>.progressive-options { margin-top:10px; }
+@media(max-width:530px) { .system-status>summary { flex-wrap:wrap; } .system-status-services { right:-8px; } }

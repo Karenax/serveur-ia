@@ -1,0 +1,700 @@
+{
+  "format": "agent-document-sqlite-schema",
+  "tables": {
+    "project_document_job_artifacts": {
+      "checks": [
+        "length(sha256) = 64 and sha256 not glob '*[^0-9a-f]*'",
+        "size_bytes between 1 and 52428800"
+      ],
+      "columns": {
+        "attempt_id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(36)"
+        },
+        "created_at": {
+          "default": "",
+          "nullable": false,
+          "type": "DATETIME"
+        },
+        "filename": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(255)"
+        },
+        "id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(36)"
+        },
+        "item_id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(36)"
+        },
+        "job_id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(36)"
+        },
+        "project_id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(36)"
+        },
+        "provenance": {
+          "default": "",
+          "nullable": false,
+          "type": "TEXT"
+        },
+        "sha256": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(64)"
+        },
+        "size_bytes": {
+          "default": "",
+          "nullable": false,
+          "type": "INTEGER"
+        },
+        "storage_key": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(80)"
+        }
+      },
+      "foreign_keys": [
+        {
+          "columns": [
+            "project_id",
+            "job_id",
+            "item_id",
+            "attempt_id"
+          ],
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION",
+          "table": "project_document_job_attempts",
+          "targets": [
+            "project_id",
+            "job_id",
+            "item_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "project_id"
+          ],
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION",
+          "table": "projects",
+          "targets": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": {
+        "ix_project_document_job_artifacts_job_id": {
+          "columns": [
+            "job_id"
+          ],
+          "unique": false
+        },
+        "ix_project_document_job_artifacts_project_id": {
+          "columns": [
+            "project_id"
+          ],
+          "unique": false
+        }
+      },
+      "primary_key": [
+        "id"
+      ],
+      "unique": [
+        [
+          "attempt_id"
+        ],
+        [
+          "project_id",
+          "attempt_id",
+          "id"
+        ],
+        [
+          "storage_key"
+        ]
+      ]
+    },
+    "project_document_job_attempts": {
+      "checks": [
+        "number >= 1"
+      ],
+      "columns": {
+        "actor_id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(120)"
+        },
+        "created_at": {
+          "default": "",
+          "nullable": false,
+          "type": "DATETIME"
+        },
+        "id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(36)"
+        },
+        "item_id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(36)"
+        },
+        "job_id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(36)"
+        },
+        "number": {
+          "default": "",
+          "nullable": false,
+          "type": "INTEGER"
+        },
+        "project_id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(36)"
+        }
+      },
+      "foreign_keys": [
+        {
+          "columns": [
+            "project_id",
+            "job_id",
+            "item_id"
+          ],
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION",
+          "table": "project_document_job_items",
+          "targets": [
+            "project_id",
+            "job_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "project_id"
+          ],
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION",
+          "table": "projects",
+          "targets": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": {
+        "ix_project_document_job_attempts_item_id": {
+          "columns": [
+            "item_id"
+          ],
+          "unique": false
+        },
+        "ix_project_document_job_attempts_job_id": {
+          "columns": [
+            "job_id"
+          ],
+          "unique": false
+        },
+        "ix_project_document_job_attempts_project_id": {
+          "columns": [
+            "project_id"
+          ],
+          "unique": false
+        }
+      },
+      "primary_key": [
+        "id"
+      ],
+      "unique": [
+        [
+          "item_id",
+          "number"
+        ],
+        [
+          "project_id",
+          "job_id",
+          "item_id",
+          "id"
+        ]
+      ]
+    },
+    "project_document_job_events": {
+      "checks": [
+        "revision >= 1"
+      ],
+      "columns": {
+        "actor_id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(120)"
+        },
+        "created_at": {
+          "default": "",
+          "nullable": false,
+          "type": "DATETIME"
+        },
+        "detail": {
+          "default": "",
+          "nullable": false,
+          "type": "TEXT"
+        },
+        "id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(36)"
+        },
+        "job_id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(36)"
+        },
+        "kind": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(32)"
+        },
+        "project_id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(36)"
+        },
+        "revision": {
+          "default": "",
+          "nullable": false,
+          "type": "INTEGER"
+        }
+      },
+      "foreign_keys": [
+        {
+          "columns": [
+            "project_id",
+            "job_id"
+          ],
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION",
+          "table": "project_document_jobs",
+          "targets": [
+            "project_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "project_id"
+          ],
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION",
+          "table": "projects",
+          "targets": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": {
+        "ix_project_document_job_events_job_id": {
+          "columns": [
+            "job_id"
+          ],
+          "unique": false
+        },
+        "ix_project_document_job_events_project_id": {
+          "columns": [
+            "project_id"
+          ],
+          "unique": false
+        }
+      },
+      "primary_key": [
+        "id"
+      ],
+      "unique": [
+        [
+          "job_id",
+          "revision"
+        ]
+      ]
+    },
+    "project_document_job_items": {
+      "checks": [
+        "document_id in ('ce_request','customer_satisfaction_fixed_price','customer_satisfaction_product','manufacturing_specification','offer_lt_simple','tdao','tdsp','user_manual')",
+        "length(sha256) = 64 and sha256 not glob '*[^0-9a-f]*'",
+        "position between 0 and 7",
+        "status in ('queued','running','succeeded','failed','cancelled','interrupted')"
+      ],
+      "columns": {
+        "document_id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(64)"
+        },
+        "draft_version_id": {
+          "default": "",
+          "nullable": true,
+          "type": "VARCHAR(36)"
+        },
+        "id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(36)"
+        },
+        "job_id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(36)"
+        },
+        "last_attempt_id": {
+          "default": "",
+          "nullable": true,
+          "type": "VARCHAR(36)"
+        },
+        "link_id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(36)"
+        },
+        "position": {
+          "default": "",
+          "nullable": false,
+          "type": "INTEGER"
+        },
+        "project_id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(36)"
+        },
+        "sha256": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(64)"
+        },
+        "snapshot": {
+          "default": "",
+          "nullable": false,
+          "type": "TEXT"
+        },
+        "status": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(16)"
+        }
+      },
+      "foreign_keys": [
+        {
+          "columns": [
+            "project_id",
+            "job_id"
+          ],
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION",
+          "table": "project_document_jobs",
+          "targets": [
+            "project_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "project_id"
+          ],
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION",
+          "table": "projects",
+          "targets": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": {
+        "ix_project_document_job_items_job_id": {
+          "columns": [
+            "job_id"
+          ],
+          "unique": false
+        },
+        "ix_project_document_job_items_project_id": {
+          "columns": [
+            "project_id"
+          ],
+          "unique": false
+        }
+      },
+      "primary_key": [
+        "id"
+      ],
+      "unique": [
+        [
+          "job_id",
+          "document_id"
+        ],
+        [
+          "job_id",
+          "position"
+        ],
+        [
+          "project_id",
+          "job_id",
+          "id"
+        ]
+      ]
+    },
+    "project_document_job_receipts": {
+      "checks": [
+        "(outcome = 'succeeded' and artifact_id is not null and error = '') or (outcome != 'succeeded' and artifact_id is null)",
+        "outcome in ('succeeded','failed','interrupted')"
+      ],
+      "columns": {
+        "artifact_id": {
+          "default": "",
+          "nullable": true,
+          "type": "VARCHAR(36)"
+        },
+        "attempt_id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(36)"
+        },
+        "created_at": {
+          "default": "",
+          "nullable": false,
+          "type": "DATETIME"
+        },
+        "error": {
+          "default": "",
+          "nullable": false,
+          "type": "TEXT"
+        },
+        "id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(36)"
+        },
+        "item_id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(36)"
+        },
+        "job_id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(36)"
+        },
+        "outcome": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(16)"
+        },
+        "project_id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(36)"
+        }
+      },
+      "foreign_keys": [
+        {
+          "columns": [
+            "project_id",
+            "attempt_id",
+            "artifact_id"
+          ],
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION",
+          "table": "project_document_job_artifacts",
+          "targets": [
+            "project_id",
+            "attempt_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "project_id",
+            "job_id",
+            "item_id",
+            "attempt_id"
+          ],
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION",
+          "table": "project_document_job_attempts",
+          "targets": [
+            "project_id",
+            "job_id",
+            "item_id",
+            "id"
+          ]
+        },
+        {
+          "columns": [
+            "project_id"
+          ],
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION",
+          "table": "projects",
+          "targets": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": {
+        "ix_project_document_job_receipts_job_id": {
+          "columns": [
+            "job_id"
+          ],
+          "unique": false
+        },
+        "ix_project_document_job_receipts_project_id": {
+          "columns": [
+            "project_id"
+          ],
+          "unique": false
+        }
+      },
+      "primary_key": [
+        "id"
+      ],
+      "unique": [
+        [
+          "attempt_id"
+        ]
+      ]
+    },
+    "project_document_jobs": {
+      "checks": [
+        "length(sha256) = 64 and sha256 not glob '*[^0-9a-f]*'",
+        "revision >= 1 and total between 1 and 8",
+        "status in ('queued','running','completed','failed','cancelled','interrupted')"
+      ],
+      "columns": {
+        "active_attempt_id": {
+          "default": "",
+          "nullable": true,
+          "type": "VARCHAR(36)"
+        },
+        "actor_id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(120)"
+        },
+        "cancel_requested": {
+          "default": "0",
+          "nullable": false,
+          "type": "BOOLEAN"
+        },
+        "command_id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(36)"
+        },
+        "created_at": {
+          "default": "",
+          "nullable": false,
+          "type": "DATETIME"
+        },
+        "execution_blocked": {
+          "default": "0",
+          "nullable": false,
+          "type": "BOOLEAN"
+        },
+        "id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(36)"
+        },
+        "project_id": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(36)"
+        },
+        "revision": {
+          "default": "",
+          "nullable": false,
+          "type": "INTEGER"
+        },
+        "sha256": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(64)"
+        },
+        "snapshot": {
+          "default": "",
+          "nullable": false,
+          "type": "TEXT"
+        },
+        "status": {
+          "default": "",
+          "nullable": false,
+          "type": "VARCHAR(16)"
+        },
+        "total": {
+          "default": "",
+          "nullable": false,
+          "type": "INTEGER"
+        },
+        "updated_at": {
+          "default": "",
+          "nullable": false,
+          "type": "DATETIME"
+        }
+      },
+      "foreign_keys": [
+        {
+          "columns": [
+            "project_id"
+          ],
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION",
+          "table": "projects",
+          "targets": [
+            "id"
+          ]
+        }
+      ],
+      "indexes": {
+        "ix_project_document_jobs_project_id": {
+          "columns": [
+            "project_id"
+          ],
+          "unique": false
+        }
+      },
+      "primary_key": [
+        "id"
+      ],
+      "unique": [
+        [
+          "project_id",
+          "command_id"
+        ],
+        [
+          "project_id",
+          "id"
+        ]
+      ]
+    }
+  },
+  "triggers": {
+    "protect_project_document_job_artifacts_delete": "CREATE TRIGGER protect_project_document_job_artifacts_delete BEFORE DELETE ON project_document_job_artifacts BEGIN SELECT RAISE(ABORT, 'Document queue history is retained'); END",
+    "protect_project_document_job_artifacts_update": "CREATE TRIGGER protect_project_document_job_artifacts_update BEFORE UPDATE ON project_document_job_artifacts WHEN NEW.id IS NOT OLD.id OR NEW.project_id IS NOT OLD.project_id OR NEW.job_id IS NOT OLD.job_id OR NEW.item_id IS NOT OLD.item_id OR NEW.attempt_id IS NOT OLD.attempt_id OR NEW.storage_key IS NOT OLD.storage_key OR NEW.filename IS NOT OLD.filename OR NEW.sha256 IS NOT OLD.sha256 OR NEW.size_bytes IS NOT OLD.size_bytes OR NEW.provenance IS NOT OLD.provenance OR NEW.created_at IS NOT OLD.created_at BEGIN SELECT RAISE(ABORT, 'Document queue snapshot is immutable'); END",
+    "protect_project_document_job_attempts_delete": "CREATE TRIGGER protect_project_document_job_attempts_delete BEFORE DELETE ON project_document_job_attempts BEGIN SELECT RAISE(ABORT, 'Document queue history is retained'); END",
+    "protect_project_document_job_attempts_update": "CREATE TRIGGER protect_project_document_job_attempts_update BEFORE UPDATE ON project_document_job_attempts WHEN NEW.id IS NOT OLD.id OR NEW.project_id IS NOT OLD.project_id OR NEW.job_id IS NOT OLD.job_id OR NEW.item_id IS NOT OLD.item_id OR NEW.number IS NOT OLD.number OR NEW.actor_id IS NOT OLD.actor_id OR NEW.created_at IS NOT OLD.created_at BEGIN SELECT RAISE(ABORT, 'Document queue snapshot is immutable'); END",
+    "protect_project_document_job_events_delete": "CREATE TRIGGER protect_project_document_job_events_delete BEFORE DELETE ON project_document_job_events BEGIN SELECT RAISE(ABORT, 'Document queue history is retained'); END",
+    "protect_project_document_job_events_update": "CREATE TRIGGER protect_project_document_job_events_update BEFORE UPDATE ON project_document_job_events WHEN NEW.id IS NOT OLD.id OR NEW.project_id IS NOT OLD.project_id OR NEW.job_id IS NOT OLD.job_id OR NEW.revision IS NOT OLD.revision OR NEW.kind IS NOT OLD.kind OR NEW.actor_id IS NOT OLD.actor_id OR NEW.detail IS NOT OLD.detail OR NEW.created_at IS NOT OLD.created_at BEGIN SELECT RAISE(ABORT, 'Document queue snapshot is immutable'); END",
+    "protect_project_document_job_items_delete": "CREATE TRIGGER protect_project_document_job_items_delete BEFORE DELETE ON project_document_job_items BEGIN SELECT RAISE(ABORT, 'Document queue history is retained'); END",
+    "protect_project_document_job_items_update": "CREATE TRIGGER protect_project_document_job_items_update BEFORE UPDATE ON project_document_job_items WHEN NEW.id IS NOT OLD.id OR NEW.project_id IS NOT OLD.project_id OR NEW.job_id IS NOT OLD.job_id OR NEW.document_id IS NOT OLD.document_id OR NEW.link_id IS NOT OLD.link_id OR NEW.draft_version_id IS NOT OLD.draft_version_id OR NEW.position IS NOT OLD.position OR NEW.snapshot IS NOT OLD.snapshot OR NEW.sha256 IS NOT OLD.sha256 BEGIN SELECT RAISE(ABORT, 'Document queue snapshot is immutable'); END",
+    "protect_project_document_job_receipts_delete": "CREATE TRIGGER protect_project_document_job_receipts_delete BEFORE DELETE ON project_document_job_receipts BEGIN SELECT RAISE(ABORT, 'Document queue history is retained'); END",
+    "protect_project_document_job_receipts_update": "CREATE TRIGGER protect_project_document_job_receipts_update BEFORE UPDATE ON project_document_job_receipts WHEN NEW.id IS NOT OLD.id OR NEW.project_id IS NOT OLD.project_id OR NEW.job_id IS NOT OLD.job_id OR NEW.item_id IS NOT OLD.item_id OR NEW.attempt_id IS NOT OLD.attempt_id OR NEW.artifact_id IS NOT OLD.artifact_id OR NEW.outcome IS NOT OLD.outcome OR NEW.error IS NOT OLD.error OR NEW.created_at IS NOT OLD.created_at BEGIN SELECT RAISE(ABORT, 'Document queue snapshot is immutable'); END",
+    "protect_project_document_jobs_delete": "CREATE TRIGGER protect_project_document_jobs_delete BEFORE DELETE ON project_document_jobs BEGIN SELECT RAISE(ABORT, 'Document queue history is retained'); END",
+    "protect_project_document_jobs_update": "CREATE TRIGGER protect_project_document_jobs_update BEFORE UPDATE ON project_document_jobs WHEN NEW.id IS NOT OLD.id OR NEW.project_id IS NOT OLD.project_id OR NEW.command_id IS NOT OLD.command_id OR NEW.snapshot IS NOT OLD.snapshot OR NEW.sha256 IS NOT OLD.sha256 OR NEW.actor_id IS NOT OLD.actor_id OR NEW.total IS NOT OLD.total OR NEW.created_at IS NOT OLD.created_at BEGIN SELECT RAISE(ABORT, 'Document queue snapshot is immutable'); END"
+  },
+  "version": 1
+}
