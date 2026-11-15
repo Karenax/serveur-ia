@@ -11,6 +11,16 @@ disponibles. L’APK Android publié le 26 octobre peut encore afficher les anci
 actions : elles ne sont plus prises en charge par le serveur. Leurs retraits
 d’interface sont dans les sources Android, en attente d’un nouvel APK.
 
+## Utiliser Agent dans Kiara 4 pour Windows
+
+Télécharger **Kiara 4.0.5** depuis la console serveur. Le code de connexion est disponible dans **Clients & accès** côté serveur. Dans Kiara, ouvrir **Agent** pour retrouver les projets autorisés et leurs documents.
+
+- **Mails.** Les nouveaux messages Thunderbird arrivent via la liaison du poste associé. Classer les propositions dans **À classer**. Après un rejet, retrouver le message dans **Options → Dossier → Mails rejetés**. Depuis un mail classé, **Détails du mail → Préparer une réponse** crée un brouillon dans Thunderbird.
+- **Réunions.** Capturer le microphone ou la sortie système dans le Studio, arrêter la capture, puis relire la transcription et le compte rendu avant de publier.
+- **Assistant.** Choisir un projet et ouvrir les citations pour consulter les sources. **Arrêter la réponse** interrompt la demande dès la recherche des sources.
+
+[Architecture et validations d’Agent](ARCHITECTURE-ACTUELLE.md#intégration-agent)
+
 ## Choisir son espace
 
 Dans **Mémoire et rappels**, choisir **Personnel** ou un projet. Les souvenirs,

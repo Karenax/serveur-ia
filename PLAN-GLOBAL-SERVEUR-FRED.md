@@ -6,6 +6,18 @@ ont depuis été retirées. Les rappels et le bilan consultable restent disponib
 L’[architecture courante](ARCHITECTURE-ACTUELLE.md) et le
 [guide utilisateur](GUIDE-ASSISTANT-KIARA.md) décrivent le périmètre actuel.
 
+## Suivi Agent
+
+Au 15 novembre 2026, Agent est disponible dans Kiara 4.0.5 et dans le web privé. Les 11 projets, la recherche EG2 et les citations ont été vérifiés avec Fred. Fred a également validé la recette Thunderbird sur son poste et l’installation de Kiara 4.0.5 sans droits administrateur. Les deux runtimes LiteRT ont été supprimés. [Architecture et responsabilités](ARCHITECTURE-ACTUELLE.md#intégration-agent)
+
+- **Distribution Windows.** Qualifier la mise à jour sur un second environnement, la reprise de Voix Max, l’installation sans WebView2 préexistant et la signature Authenticode.
+- **Réunions et accès.** Vérifier Réunions et WireGuard depuis un second poste et confirmer le périmètre d’un accès réduit au web privé.
+- **Données historiques.** Retrouver le partage d’origine et le PDF source CDC manquant. Les projets et les extraits déjà restaurés restent consultables.
+- **Sauvegarde.** Vérifier la copie NAS et la restauration isolée du passage prévu le 16 novembre à 3 h.
+- **Reporté.** Les imports Sage sur les exports réels restent à reprendre ultérieurement.
+
+## Historique des lots
+
 L’[extension de l’assistant Kiara du 25 octobre 2026](PLAN-INTEGRATION-ASSISTANT-KIARA.md)
 intègre la mémoire en conversation, les actions vocales, les rappels, les bilans,
 l’activation expérimentale « Bonjour Kiara » et les images pendant le vocal.

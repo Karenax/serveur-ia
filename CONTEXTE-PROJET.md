@@ -1,8 +1,12 @@
 # Contexte de reprise — serveur Kiara
 
-Mise à jour : 4 novembre 2026.
+Mise à jour du 15 novembre 2026.
 
-État courant : **serveur/Windows 3.5.60**, **APK Android 1.0.25/code 26**.
+**Kiara 4.0.5** est le client Windows publié. Agent tourne côté serveur avec les 11 projets restaurés. Le lanceur et le client Windows de transition utilisent la base **3.5.63**. Voir [l’intégration Agent](ARCHITECTURE-ACTUELLE.md#intégration-agent) et [le plan global](PLAN-GLOBAL-SERVEUR-FRED.md#suivi-agent).
+
+## État historique du 4 novembre 2026
+
+Versions de cette livraison : **serveur/Windows 3.5.60**, **APK Android 1.0.25/code 26**.
 Les quatre EXE personnels actifs ont été reconditionnés et testés ; signature et
 téléchargement authentifié sont vérifiés. Données, clés, réglages, sauvegardes et
 processus Qwen sont conservés. Voir la

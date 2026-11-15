@@ -1,12 +1,14 @@
 # Kiara — architecture et versions actuelles
 
-Référence du 11 novembre 2026 : serveur, Windows et Linux 3.5.62, APK Android 1.0.26/code 27.
+Référence du 15 novembre 2026. Kiara 4.0.5 est le client Windows publié. Le lanceur et le canal Windows de transition utilisent la base 3.5.63.
 
 ## Versions et responsabilités
 
 | Composant | Version ou contrat | Rôle |
 |---|---|---|
-| Serveur, Windows et Linux | 3.5.62, dans `shared/kiara_shared/version.py` | Application et distribution Windows |
+| Lanceur et client Windows de transition | 3.5.63 | Services Kiara et passage vers Kiara 4 |
+| Client Windows Kiara 4 | 4.0.5 | Application Tauri, téléchargements et mises à jour Windows |
+| Linux | 3.5.62, dernière référence documentée | Client Linux historique |
 | Android | 1.0.26, code 27 | Enveloppe Java/WebView et interface partagée |
 | Contrat agent | 4 | Conversation, outils et approbations existants |
 | Identifiants de commandes | Version 2 négociée par `/v1/status` | Rétention bornée et refus du rejeu après expiration |
@@ -33,6 +35,16 @@ Les [essais de performance](maintenance/2026-11-03-rtx4080/ESSAIS-0156.md)
 documentent ce choix. La P2200 encode les images ; les sauvegardes de prompt et
 le cache de conversation restent actifs.
 
+## Intégration Agent
+
+- **Accès.** Le lanceur supervise Agent. Kiara 4 affiche ses fonctions dans la fenêtre Windows et le web privé les sert sous `/agent/` sur le domaine Kiara existant. Les accès utilisent le code Kiara et les habilitations par projet. Le contrôle de production avec Fred couvre les 11 projets restaurés.
+- **Données.** Les bases ERP et Brain et les fichiers de projet sont côté serveur. Les nouveaux documents rejoignent les dossiers clients sur D:. La sauvegarde chiffrée inclut Agent et les dossiers clients. La copie NAS du dernier passage vérifié a été restaurée dans un dossier isolé.
+- **Recherche.** Qwen local répond avec des citations tirées des sources autorisées. EG2 calcule les embeddings sur la P2200. Les images et l’audio sont recherchés à partir du texte extrait. Les deux anciens runtimes LiteRT ont été retirés.
+- **Mails et réunions.** La liaison Thunderbird collecte les dossiers sélectionnés sur le poste associé. Les imports, le classement manuel, le rejet et le brouillon ont été validés sur le poste Fred. Le classement automatique s’applique à partir d’un score de 75 %. Réunions dans Kiara 4.0.5 a passé la recette de capture, transcription, relecture et publication du compte rendu.
+- **Distribution.** La console propose l’installateur Kiara 4.0.5. Fred a vérifié son installation sans droits administrateur. La transition depuis le canal Windows historique passe par la 3.5.63, puis Kiara 4 utilise son canal de mise à jour habituel. Le manifeste d’actualisation est signé. La signature Authenticode de l’installateur reste à prévoir.
+
+Le [plan global](PLAN-GLOBAL-SERVEUR-FRED.md) reprend les vérifications qui restent à faire et le report des imports Sage.
+
 ## Organisation du code
 
 Le serveur reste un monolithe modulaire, avec des processus séparés pour les moteurs. `lanceur/app.py` pilote la console et `remote.py` la passerelle. Workspace garde la transaction et le contrôle d’accès ; les opérations sont réparties dans `workspace_project.py`, `workspace_document.py`, `workspace_conversation.py`, `workspace_job.py`, `workspace_memory.py` et `workspace_knowledge.py`.
@@ -45,7 +57,8 @@ Les sources HTML/CSS/JS Windows restent la base de l’interface. Android fourni
 
 ## Autorités des données
 
-- Workspace SQLite : projets, documents, souvenirs, conversations publiées, commandes et notifications.
+- ERP et Brain d’Agent portent le portefeuille Agent et ses données métier.
+- Workspace SQLite porte les espaces privés Kiara, les accès, les souvenirs, les conversations publiées, les commandes et les notifications.
 - Historique protégé du client : copie locale et brouillons pour le fonctionnement hors ligne ; les conflits se résolvent par synchronisation.
 - Sessions Hermes : état natif du moteur et projection liée au périmètre Kiara.
 - Index EG2, chunks et exports : données dérivées, invalidables ou reconstructibles.

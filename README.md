@@ -1,7 +1,7 @@
 # Serveur IA
 
 Référence courante : [architecture, versions et compatibilités](ARCHITECTURE-ACTUELLE.md).
-Version du 11 novembre 2026 : **serveur/Windows/Linux 3.5.62 et Android 1.0.26/code 27**.
+Au 15 novembre 2026, le téléchargement Windows courant est **Kiara 4.0.5**. Le lanceur et le canal Windows de transition utilisent la base **3.5.63**.
 La [publication Windows](maintenance/2026-11-04-connexion-client/README.md)
 efface le message temporaire de connexion dès que le catalogue est retrouvé.
 Les lots EG2 de 32 textes et la file de 16 demandes en attente sont conservés.
@@ -36,6 +36,10 @@ depuis Windows et Android.
 L’attente de « Bonjour Kiara » reste expérimentale et limitée à l’application
 visible ; les alertes Android hors application sont facultatives et non exactes.
 
+L’[intégration métier d’Agent](ARCHITECTURE-ACTUELLE.md#intégration-agent)
+réunit le portefeuille, les mails Thunderbird, les réunions, les documents et
+la recherche avec citations dans Kiara 4. Les données métier d’Agent sont conservées et traitées côté serveur.
+
 Le [plan global](PLAN-GLOBAL-SERVEUR-FRED.md) découpe en lots les sauvegardes, la gestion des appareils, le tableau de bord, la recherche documentaire, la voix, les notifications et les outils de l’assistant. Le [contexte de reprise](CONTEXTE-PROJET.md) conserve les décisions, l’état actuel et les prochaines étapes. Les lots 0 à 4 sont implantés : sauvegardes quotidiennes côté serveur, restauration guidée et gestion des appareils. Consulter le [mode d’emploi](lanceur/SAUVEGARDES-APPAREILS.md) et les [preuves](preuves/lots-0-4/VALIDATION.md). Les **lots 6 et 8 sont également achevés et en service** : recherche avec passages cités et boîte de notifications persistante. Consulter leur [mode d’emploi](lanceur/RECHERCHE-NOTIFICATIONS.md) et les [preuves finales](preuves/lots-6-8/VALIDATION.md), dont 246 tests réussis. Versions de cette livraison historique : serveur/Windows **3.5.34**, Android **1.0.13, code 14**. Le [correctif du 14 octobre](maintenance/2026-10-14-opencode/README.md) rétablit l’affichage du modèle ajouté dans OpenCode 2. Le lot 7 comprend désormais la dictée et la conversation Windows/Android ; les essais physiques restants sont décrits dans les guides actuels. Hermes traite les conversations avec les outils Kiara autorisés ; les trois actions du correcteur utilisent directement Qwen. Le tableau de bord complet du lot 5 et les extensions des lots 9/10 restent planifiés.
 
 ## Organisation
@@ -51,7 +55,7 @@ Le [plan global](PLAN-GLOBAL-SERVEUR-FRED.md) découpe en lots les sauvegardes, 
 
 ## Utilisation locale
 
-Le poste d'origine utilise Windows et le dossier `F:\Serveur IA`. Certains scripts et configurations contiennent les chemins de ce poste : les adapter avant une installation ailleurs.
+Le serveur de production utilise le dépôt `D:\Serveur IA`. Les rapports historiques peuvent référencer les anciens chemins Windows. Adapter les réglages locaux au poste cible.
 
 `Serveur Qwen.cmd` lance `Start-Interface-Qwen.ps1`. Consulter `lanceur/LISEZ-MOI.txt`, `client-qwen/LISEZ-MOI.txt` et les rapports `RESULTATS-*.txt` pour les commandes et configurations mesurées. Les prérequis Python du lanceur et du client sont dans leurs fichiers `requirements*.txt`.
 
@@ -79,7 +83,7 @@ Les [preuves Small](preuves/voix-small-20261011/VALIDATION.md) et
 [preuves de la première conversation Windows](preuves/conversation-windows-20261011/VALIDATION.md)
 décrivent les anciennes livraisons et leurs moteurs de l’époque.
 
-La mémoire sémantique **EmbeddingGemma 2** est installée et activée sur le serveur : moteur CPU indépendant de Qwen/Strata, base de connaissances par projet et base hors projet séparées par accès. Les conversations synchronisées sont indexées automatiquement. [Utilisation et limites](lanceur/MEMOIRE-EG2.md), [validation](preuves/eg2-20261011/VALIDATION.md).
+La mémoire sémantique **EmbeddingGemma 2** est installée et activée sur le serveur : encodeur indépendant de Qwen/Strata, calcul sur la P2200 avec secours CPU, connaissances cloisonnées par projet et par accès. Les conversations synchronisées sont indexées automatiquement. [Utilisation et limites](lanceur/MEMOIRE-EG2.md), [validation](preuves/eg2-20261011/VALIDATION.md).
 
 Les données connues du serveur sont également regroupées dans un dossier privé par client, sous `lanceur/donnees-clients/<identifiant>/` : base individuelle, historiques, conversations, documents, souvenirs et configuration. Les chemins et dates de mise à jour sont affichés dans la console. [Organisation et fonctionnement](lanceur/DOSSIERS-CLIENTS.md).
 
