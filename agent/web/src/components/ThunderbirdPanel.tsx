@@ -138,7 +138,7 @@ function ThunderbirdMail({ reply, onUpdated, compose }: { reply?: ThunderbirdRep
     finally { operation.current=false;setBusy(false); }
   };
   return <section className="tb-panel" aria-label="Liaison Thunderbird">
-    <header><strong>Thunderbird</strong><span className={status?.connected ? "connected" : ""}>{status?.connected ? "Connecté à Agent" : "En attente de Thunderbird"}</span></header>
+    <header><strong>Thunderbird</strong><span className={status?.connected ? "connected" : ""}>{status?.connected ? "Connecté à Kiara" : "En attente de Thunderbird"}</span></header>
     {error && <p role="alert">{error}</p>}{notice && <p role="status">{notice}</p>}
     <div className={`tb-columns${compose || reply ? " tb-composer-first" : ""}`}>
       {status && !status.reply_only && <details className="tb-connection" open={!compose && !reply}><summary>Connexion et synchronisation</summary><details><summary>Dossiers à synchroniser ({folders.size})</summary><div className="tb-folders">

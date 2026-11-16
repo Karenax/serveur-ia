@@ -4,6 +4,11 @@ Préserver les modifications en cours. Les conventions et commandes de reconstru
 existantes sont décrites dans `RECONSTRUIRE-FRED.md` ; les contrôles de sources sont
 dans `maintenance/check_sources.py` et les tests UI partagés dans `client-qwen`.
 
+Lire `CONTEXTE-PROJET.md` pour l’état de reprise et
+`ARCHITECTURE-ACTUELLE.md` pour les responsabilités du serveur et des clients.
+Sur le poste Fred, travailler sur D:, y compris pour les compilations, caches,
+fichiers temporaires et recettes. E: sert aux archives et aux preuves conservées.
+
 ## UX/UI — Règles permanentes
 
 Toute interface nouvelle ou significativement modifiée doit être conçue pour son

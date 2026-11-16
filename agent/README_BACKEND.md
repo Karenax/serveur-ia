@@ -1,4 +1,7 @@
-# Exploitation et vérification d'Agent
+# Exploitation et vérification du service Projets de Kiara
+
+Sous Windows, suivre [Lancement et santé](#lancement-et-santé) pour le service
+intégré. Les notes datées documentent les versions antérieures.
 
 ## Contrôles de connexion espacés — 4 novembre 2026
 
@@ -285,13 +288,12 @@ synchronisation destructive qui retirerait des extensions installées du runtime
 
 ## Lancement et santé
 
-- `start-agent.cmd` ouvre l'interface et appelle le lanceur de service.
-- `start-agent-task.cmd` lance le superviseur avec `.venv` en priorité.
-- `scripts/agent_runtime.py status` distingue superviseur, PID et port.
-- `/health` contrôle Brain et ERP ; il ne garantit ni génération IA,
-  transcription, qualité de recherche ou indexation terminée.
-- Le serveur normal reste sur `127.0.0.1:8001` et enlève `AGENT_TESTING` de
-  l'environnement enfant. Les essais utilisent des bases et dossiers isolés.
+- `Start-Interface-Qwen.ps1` démarre le lanceur Kiara sous Windows.
+- Le lanceur gère le runtime, le port de boucle locale et les traitements du
+  service Projets. Configurer le service dans `project-service.json`.
+- La console Kiara expose l’état via `/api/project-service`. La sonde interne
+  `/health` vérifie Brain et ERP.
+- Les tests utilisent des bases et dossiers isolés.
 
 Le démarrage normal initialise les schémas et reprend les traitements activés.
 Pour une recette de consultation, utiliser une copie avec lifespan/écritures
@@ -356,13 +358,15 @@ sont pas effacés. L'export PDF reste disponible.
 
 ## Sauvegarde et reprise
 
-Arrêter Agent avant une sauvegarde coordonnée. Choisir un nouveau répertoire,
-extérieur aux données sources ; ne jamais écraser une sauvegarde existante.
+Pour effectuer une sauvegarde appairée ou une restauration de Kiara, suivre la
+[procédure du lanceur](../audits/2026-11-15-fusion-kiara/BASCULE.md). Depuis le
+sous-dossier du service Projets, les commandes ci-dessous vérifient une copie
+métier déjà préparée ou la restaurent dans un nouveau dossier sur D:.
+`$PythonMetier` désigne l’interpréteur du service Projets.
 
 ```powershell
-.venv/Scripts/python.exe scripts/agent_backup.py backup --output C:/AgentBackups/NOUVEAU_DOSSIER
-.venv/Scripts/python.exe scripts/agent_backup.py verify --source C:/AgentBackups/DOSSIER_EXISTANT
-.venv/Scripts/python.exe scripts/agent_backup.py restore --source C:/AgentBackups/DOSSIER_EXISTANT --output C:/AgentRestore/NOUVELLE_COPIE
+& $PythonMetier scripts/agent_backup.py verify --source D:/Kiara/essais/sauvegarde-projets
+& $PythonMetier scripts/agent_backup.py restore --source D:/Kiara/essais/sauvegarde-projets --output D:/Kiara/essais/restauration-projets
 ```
 
 La création vérifie automatiquement les empreintes en flux et l'intégrité des

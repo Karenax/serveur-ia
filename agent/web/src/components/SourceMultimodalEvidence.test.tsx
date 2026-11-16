@@ -11,7 +11,6 @@ vi.mock('./WorkspaceViews',async importOriginal=>{
   const actual=await importOriginal<typeof import('./WorkspaceViews')>();
   return {...actual,GlobalMeetingsView:()=>null,GlobalJobsView:()=>null,GlobalKnowledgeView:()=>null};
 });
-vi.mock('./AssistantPanel',()=>({AssistantPanel:()=>null}));
 vi.mock('./SettingsForms',()=>({AiSettingsForm:()=>null,MailSettingsForm:()=>null,MemorySettingsForm:()=>null}));
 vi.mock('./OperationsPanel',()=>({OperationsPanel:()=>null}));
 vi.mock('./ThunderbirdPanel',()=>({ThunderbirdPanel:()=>null}));

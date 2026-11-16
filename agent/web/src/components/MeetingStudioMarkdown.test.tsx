@@ -5,7 +5,6 @@ import {meetingSessions,type MeetingSession,type SessionCapabilities} from '../l
 import {markdownDraftKey} from '../lib/noteMarkdown';
 import type {NoteContent} from '../lib/projectNotes';
 
-vi.mock('./AssistantPanel',()=>({AssistantPanel:()=>null}));
 vi.mock('./MeetingAudioPanel',()=>({MeetingAudioPanel:()=>null}));
 const note=(text:string):NoteContent=>({version:1,blocks:[{type:'paragraph',align:'left',runs:[{text,marks:[],href:null,color:null}]}]});
 const a:MeetingSession={id:'markdown-a',title:'Séance A',kind:'note',project_id:'erp',brain_project_id:'brain',state:'created',revision:3,

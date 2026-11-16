@@ -7,7 +7,6 @@ import {meetingCapture} from '../lib/meetingCapture';
 
 // Keep the real Studio and audio/review panel together; no hardware or transport.
 vi.mock('./NoteRichEditor', () => ({NoteRichEditor: () => null, NoteContentView: () => null}));
-vi.mock('./AssistantPanel', () => ({AssistantPanel: () => null}));
 vi.mock('./MeetingCalendarContext', () => ({MeetingCalendarContext: () => null}));
 afterEach(() => {cleanup(); localStorage.clear(); vi.restoreAllMocks();});
 

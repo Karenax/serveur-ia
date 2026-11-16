@@ -1,6 +1,7 @@
-/* Agent permissions are administered locally, per existing Kiara client. */
+/* Project permissions are administered locally for each Kiara client. */
 (() => {
   const open=document.getElementById('agent-access-open'), panel=document.getElementById('agent-access-panel');
+  const endpoint=open.dataset.serviceEndpoint==='/api/project-service'?open.dataset.serviceEndpoint:'/api/agent-service';
   const node=(tag,text)=>{const item=document.createElement(tag);if(text)item.textContent=text;return item;};
   const option=(value,text)=>{const item=node('option',text);item.value=value;return item;};
   const field=(label,input)=>{const box=node('div');box.className='field';const title=node('label',label);title.htmlFor=input.id;box.append(title,input);return box;};
@@ -9,15 +10,15 @@
   async function show(){
     const ticket=++sequence;
     panel.hidden=false;panel.replaceChildren();
-    const status=node('p','Lecture des accès Agent…');status.setAttribute('role','status');panel.append(status);
+    const status=node('p','Chargement des droits…');status.setAttribute('role','status');panel.append(status);
     try{
-      const service=await request('/api/agent-service');
+      const service=await request(endpoint);
       if(ticket!==sequence)return;
-      if(!service.configured){status.textContent=service.configuration_error||'Le service Agent n’est pas encore configuré.';return;}
+      if(!service.configured){status.textContent=service.configuration_error||'Le service Projets n’est pas configuré.';return;}
       const running=service.running;
       if(!running){
-        const start=node('button','Démarrer Agent');start.type='button';start.className='button secondary';panel.append(start);
-        start.onclick=async()=>{start.disabled=true;status.textContent='Démarrage d’Agent…';try{await request('/api/agent-service',{action:'start'});await show();}catch(error){status.textContent=error.message;start.disabled=false;}};
+        const start=node('button','Démarrer le service Projets');start.type='button';start.className='button secondary';panel.append(start);
+        start.onclick=async()=>{start.disabled=true;status.textContent='Démarrage du service Projets…';try{await request(endpoint,{action:'start'});await show();}catch(error){status.textContent=error.message;start.disabled=false;}};
       }
       if(running){
         const enable=node('button','Activer les réunions');enable.type='button';enable.className='button secondary';
@@ -26,14 +27,14 @@
         enable.onclick=async()=>{
           enable.disabled=true;notice.textContent='Activation des réunions…';
           try{
-            await request('/api/agent-service',{action:'enable-meetings'});
+            await request(endpoint,{action:'enable-meetings'});
             notice.textContent='Les réunions sont activées dans Kiara.';
           }catch(error){
             notice.textContent=error.message;enable.disabled=false;
           }
         };
       }
-      const [catalogue,remote]=await Promise.all([running?request('/api/agent-service/catalogue'):Promise.resolve({projects:[],sessions:[]}),request('/api/remote')]);
+      const [catalogue,remote]=await Promise.all([running?request(endpoint+'/catalogue'):Promise.resolve({projects:[],sessions:[]}),request('/api/remote')]);
       if(ticket!==sequence)return;
       const unlinked=catalogue.projects.filter(project=>project.knowledge_linked===false);
       if(unlinked.length){
@@ -48,7 +49,7 @@
           if(!projectId)return;
           choice.disabled=true;link.disabled=true;notice.textContent='Liaison du projet…';
           try{
-            await request('/api/agent-service',{action:'link-project-knowledge',project_id:projectId});
+            await request(endpoint,{action:'link-project-knowledge',project_id:projectId});
             const selected=[...choice.options].find(item=>item.value===projectId);
             if(selected)selected.remove();
             choice.value='';
@@ -59,7 +60,7 @@
         panel.append(field('Projet sans base de connaissances',choice),link,notice);
       }
       const clients=remote.clients.filter(client=>!client.revoked&&!client.suspended);
-      if(!clients.length){status.textContent='Aucun client actif. Ajoutez un client pour lui donner accès à Agent.';return;}
+      if(!clients.length){status.textContent='Ajoutez un client pour lui donner accès aux projets.';return;}
       const thunderbird=node('form'), device=node('select'), saveDevice=node('button','Enregistrer le poste'), deviceStatus=node('p');
       device.id='agent-thunderbird-device';device.append(option('','Aucun poste'));
       for(const value of clients)device.append(option(value.id,value.name));
@@ -73,13 +74,13 @@
       thunderbird.onsubmit=async event=>{
         event.preventDefault();device.disabled=true;saveDevice.disabled=true;
         try{
-          await request('/api/agent-service',{action:'thunderbird-device',owner:device.value||null});
+          await request(endpoint,{action:'thunderbird-device',owner:device.value||null});
           deviceStatus.textContent=device.value?'Poste Thunderbird enregistré.':'Liaison Thunderbird retirée.';
         }catch(error){deviceStatus.textContent=error.message;}
         finally{device.disabled=false;saveDevice.disabled=false;}
       };
       if('thunderbird_device' in service)panel.append(thunderbird);
-      status.textContent=running?'Choisissez un client pour consulter ou modifier ses droits.':service.startup_error||'Agent est arrêté. Vous pouvez retirer un accès ou démarrer Agent pour modifier les droits.';
+      status.textContent=running?'Choisissez un client pour consulter ou modifier ses droits.':service.startup_error||'Le service Projets est arrêté. Vous pouvez encore retirer un accès.';
       const form=node('form'),client=node('select'),role=node('select'),all=node('input'),projects=node('fieldset'),session=node('select');
       let currentPolicy=null;
       client.id='agent-access-client';client.append(option('','Choisir un client…'));
@@ -96,7 +97,7 @@
         const input=node('input'),label=node('label'),row=node('div');input.type='checkbox';input.id='agent-project-'+index;input.value=project.id;
         row.className='agent-project-option';label.htmlFor=input.id;label.textContent=[project.code,project.title].filter(Boolean).join(' · ');row.append(input,label);projects.append(row);boxes.push(input);
       }
-      if(!boxes.length)projects.append(node('p','Aucun projet Agent disponible.'));
+      if(!boxes.length)projects.append(node('p','Aucun projet disponible.'));
       session.id='agent-access-session';
       const populateSessions=actor=>{
         session.replaceChildren(option('','Aucune association'));
@@ -110,7 +111,7 @@
       populateSessions('');
       const hint=node('p','Associer une séance donne aussi accès aux autres séances personnelles du même ancien utilisateur. Cet accès demande l’autorisation sur tous les projets.');hint.className='muted';
       if(catalogue.sessions_truncated)hint.textContent+=' Seules les 1 000 séances les plus récentes sont proposées.';
-      const roleHint=node('p','L’administration d’Agent nécessite le rôle propriétaire et l’accès à tous les projets.');roleHint.className='muted';
+      const roleHint=node('p','Pour administrer les projets, attribuez le rôle Propriétaire et l’accès à tous les projets.');roleHint.className='muted';
       const details=node('div');details.hidden=true;details.append(field('Niveau d’accès',role),roleHint,allRow,projects,field('Séance personnelle à retrouver',session),hint);
       const save=node('button','Enregistrer les droits');save.className='button primary';save.type='submit';details.append(save);
       form.append(field('Client',client),details);panel.append(form);
@@ -121,7 +122,7 @@
         details.hidden=true;if(!client.value)return;
         status.textContent='Lecture des droits…';
         try{
-          const result=await request('/api/agent-service?owner='+encodeURIComponent(client.value));
+          const result=await request(endpoint+'?owner='+encodeURIComponent(client.value));
           if(current!==sequence)return;
           const policy=result.operator;
           currentPolicy=policy;
@@ -130,12 +131,12 @@
           for(const box of boxes)box.checked=Array.isArray(policy?.project_ids)&&policy.project_ids.includes(box.value);
           const actor=policy?.id&&policy.id!==client.value?policy.id:'';
           populateSessions(actor);details.hidden=false;refreshVisibility();
-          status.textContent=policy?(running?'Droits actuels chargés.':'Agent est arrêté. Choisissez « Aucun accès » pour retirer ces droits.'):'Ce client n’a pas accès à Agent.';
+          status.textContent=policy?(running?'Droits actuels chargés.':'Le service Projets est arrêté. Choisissez « Aucun accès » pour retirer ces droits.'):'Ce client n’a accès à aucun projet.';
         }catch(error){if(current===sequence)status.textContent=error.message;}
       };
       form.onsubmit=async event=>{
         event.preventDefault();if(!client.value)return;
-        if(!running&&role.value!=='none'){status.textContent='Démarrez Agent pour modifier les droits ; vous pouvez les retirer dès maintenant.';return;}
+        if(!running&&role.value!=='none'){status.textContent='Démarrez le service Projets pour modifier les droits. Vous pouvez encore les retirer.';return;}
         if(role.value!=='none'&&session.value&&!all.checked){status.textContent='Pour retrouver une séance personnelle, autorisez tous les projets.';return;}
         save.disabled=true;client.disabled=true;role.disabled=true;all.disabled=true;session.disabled=true;
         for(const box of boxes)box.disabled=true;
@@ -143,13 +144,13 @@
           const payload=role.value==='none'?{action:'revoke',owner:client.value,expected:currentPolicy}:{action:'access',owner:client.value,role:role.value,
             project_ids:all.checked?null:boxes.filter(box=>box.checked).map(box=>box.value),person_id:form.dataset.personId||null,
             agent_operator_id:session.value||null,expected:currentPolicy};
-          await request('/api/agent-service',payload);
+          await request(endpoint,payload);
           currentPolicy=payload.action==='revoke'?null:{id:payload.agent_operator_id||payload.owner,role:payload.role,
             project_ids:payload.project_ids,person_id:payload.person_id};
-          status.textContent=role.value==='none'?'Accès à Agent retiré.':'Droits Agent enregistrés.';
+          status.textContent=role.value==='none'?'Accès aux projets retiré.':'Droits enregistrés.';
         }catch(error){status.textContent=error.message;}finally{save.disabled=false;client.disabled=false;role.disabled=false;all.disabled=false;session.disabled=false;for(const box of boxes)box.disabled=false;}
       };
     }catch(error){if(ticket===sequence)status.textContent=error.message;}
   }
-  open.onclick=()=>{if(!panel.hidden){sequence++;panel.hidden=true;open.textContent='Configurer Agent';return;}open.textContent='Fermer';void show();};
+  open.onclick=()=>{if(!panel.hidden){sequence++;panel.hidden=true;open.setAttribute('aria-expanded','false');open.textContent='Gérer les droits';return;}open.setAttribute('aria-expanded','true');open.textContent='Fermer';void show();};
 })();

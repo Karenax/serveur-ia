@@ -1,9 +1,9 @@
 # Utiliser l’assistant Kiara
 
-Versions publiées au 4 novembre 2026 : **serveur/Windows 3.5.60**, **Android 1.0.25, code 26**.
-Mettre le client à jour pour retrouver les nouvelles commandes et la rubrique
-**Mémoire et rappels**. Sur Android, installer la mise à jour par-dessus
-l’application existante pour conserver son profil et ses conversations.
+Pour Windows et le web privé, ce guide prend **Kiara 4.0.8** comme référence.
+Les indications Android ci-dessous concernent les versions antérieures à la
+qualification finale de l’interface commune. Une mise à jour Android s’installe
+par-dessus l’application existante pour conserver le profil et les conversations.
 
 Les tâches, comptes rendus programmés et synthèses automatiques ont été retirés
 du serveur et du client Windows. Les rappels et **Faire le point** restent
@@ -11,19 +11,25 @@ disponibles. L’APK Android publié le 26 octobre peut encore afficher les anci
 actions : elles ne sont plus prises en charge par le serveur. Leurs retraits
 d’interface sont dans les sources Android, en attente d’un nouvel APK.
 
-## Utiliser Agent dans Kiara 4 pour Windows
+## Ouvrir Projets et Conversations dans Kiara
 
-Télécharger **Kiara 4.0.5** depuis la console serveur. Le code de connexion est disponible dans **Clients & accès** côté serveur. Dans Kiara, ouvrir **Agent** pour retrouver les projets autorisés et leurs documents.
+Télécharger **Kiara 4.0.8 pour Windows** depuis la console serveur. Le code de
+connexion est disponible dans **Clients & accès**. Ouvrir **Projets** pour voir
+le portefeuille autorisé et la fiche à quatre rubriques. Utiliser **Conversations**
+pour retrouver l’historique, reprendre un brouillon ou choisir un projet avant
+d’envoyer un message. Le mode éphémère permet un échange sans conservation dans
+l’historique.
 
 - **Mails.** Les nouveaux messages Thunderbird arrivent via la liaison du poste associé. Classer les propositions dans **À classer**. Après un rejet, retrouver le message dans **Options → Dossier → Mails rejetés**. Depuis un mail classé, **Détails du mail → Préparer une réponse** crée un brouillon dans Thunderbird.
 - **Réunions.** Capturer le microphone ou la sortie système dans le Studio, arrêter la capture, puis relire la transcription et le compte rendu avant de publier.
 - **Assistant.** Choisir un projet et ouvrir les citations pour consulter les sources. **Arrêter la réponse** interrompt la demande dès la recherche des sources.
 
-[Architecture et validations d’Agent](ARCHITECTURE-ACTUELLE.md#intégration-agent)
+[Architecture et validations de Kiara](ARCHITECTURE-ACTUELLE.md#projets-et-conversations)
 
 ## Choisir son espace
 
-Dans **Mémoire et rappels**, choisir **Personnel** ou un projet. Les souvenirs,
+Sous Windows, ouvrir **Réglages → Mémoire et rappels**, puis choisir
+**Personnel** ou un projet. Les souvenirs,
 rappels et commandes concernent cet espace. Pour une demande dans le chat ou en
 parlant, choisir le projet de la conversation avant l’envoi. Les données de deux
 accès personnels restent séparées, même si leurs appareils appartiennent à la
@@ -79,7 +85,7 @@ application forcée à l’arrêt, retrouver les événements à la prochaine co
 
 ## Reprendre un projet
 
-Choisir un projet dans **Mémoire et rappels**. **Faire le point** retrouve ses
+Choisir un projet dans **Réglages → Mémoire et rappels**. **Faire le point** retrouve ses
 décisions confirmées, souvenirs, documents et discussions récentes.
 Vérifier les sources et distinguer une décision confirmée d’une proposition.
 
@@ -110,8 +116,10 @@ avec sa voix, son microphone et le bruit de la pièce.
 
 ## Vérifications et limites
 
-Les tests logiciels, les paquets signés et leur publication sont documentés dans
-le [rapport d’intégration](maintenance/2026-10-25-assistant-integration/README.md).
+Les vérifications de la 4.0.8 sont documentées dans la
+[bascule Windows et web privé](audits/2026-11-15-fusion-kiara/BASCULE.md).
+Les essais de l’introduction des outils de l’assistant sont dans le
+[rapport historique](maintenance/2026-10-25-assistant-integration/README.md).
 Les essais physiques micro/caméra, veille et batterie Android restent à réaliser.
 Les temps de réponse peuvent rester longs ; aucune amélioration générale de
 latence n’est annoncée. Le [plan de suivi](PLAN-INTEGRATION-ASSISTANT-KIARA.md)

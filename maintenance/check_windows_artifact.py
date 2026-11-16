@@ -13,14 +13,32 @@ REQUIRED_SHARED = {
     'kiara_shared.voice_packs', 'kiara_shared.http_download',
     'kiara_shared.profiles', 'kiara_shared.releases', 'kiara_shared.version',
 }
+ROOT = Path(__file__).resolve().parents[1]
+UI_ASSETS = (
+    'chat.html', 'workspace.html', 'ui.css', 'ui.js', 'project-conversation.js',
+    'conversation.js', 'voice.js', 'corrector.js', 'attachments.js',
+    'selection.js', 'thinking.js', 'markdown.js', 'vendor/markdown-it.min.js',
+)
+THUNDERBIRD_ASSETS = ('manifest.json', 'core.js', 'background.js', 'options.html', 'options.js')
 
 
 def check(artifact, result):
     artifact = artifact.resolve()
-    archive = CArchiveReader(str(artifact)).open_embedded_archive('PYZ.pyz')
-    missing = REQUIRED_SHARED - archive.toc.keys()
+    archive = CArchiveReader(str(artifact))
+    modules = archive.open_embedded_archive('PYZ.pyz')
+    missing = REQUIRED_SHARED - modules.toc.keys()
     if missing:
         raise ValueError('Frozen client is missing: ' + ', '.join(sorted(missing)))
+    expected = {name: ROOT / 'client-qwen' / name for name in UI_ASSETS}
+    if artifact.name == 'kiara-relay.exe':
+        expected.update({
+            'thunderbird-agent/' + name: ROOT / 'agent/extensions/thunderbird-agent' / name
+            for name in THUNDERBIRD_ASSETS
+        })
+    for name, source in expected.items():
+        packaged = name.replace('/', '\\')
+        if packaged not in archive.toc or archive.extract(packaged) != source.read_bytes():
+            raise ValueError('Frozen client resource missing or different from source: ' + name)
     result.parent.mkdir(parents=True, exist_ok=True)
     result.unlink(missing_ok=True)
     process = subprocess.Popen([str(artifact), '--self-test', '--result', str(result.resolve())],

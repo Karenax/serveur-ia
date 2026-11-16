@@ -4,7 +4,7 @@ import {MessageContent} from './MessageContent';
 import {MemoryRecovery} from './MemoryRecovery';
 import {AsyncDownloadLink} from './AsyncDownloadLink';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
-import type { PortfolioRow } from "../lib/api";
+import { api, type PortfolioRow } from "../lib/api";
 import { workspaceApi, type WorkspaceCitation, type WorkspaceJob, type WorkspaceKnowledge, type WorkspacePage, type WorkspaceSource } from "../lib/workspaceApi";
 import { useDebouncedValue } from "../hooks/useDebouncedValue";
 import { Glyph, P } from "../os/icons";
@@ -426,22 +426,43 @@ function ProposalReview({item, onClose, onSaved}: {item: WorkspaceKnowledge; onC
 }
 
 export function GlobalKnowledgeView({rows, onOpenProject}: WorkspaceViewProps) {
-  const [mode, setMode] = useQueryState<"proposals" | "knowledge">("mode","knowledge","/app/knowledge");
-  const [demoted, setDemoted] = useQueryState<boolean>("demoted",false,"/app/knowledge");
-  const [reviewOnly, setReviewOnly] = useQueryState<boolean>("review",false,"/app/knowledge");
+  const knowledgePath = agentPath("/app/knowledge");
+  const [knowledgeProject, setKnowledgeProject] = useQueryState<string>("knowledge_project","",knowledgePath);
+  const [projectsOpen, setProjectsOpen] = useState(false);
+  const [projectList, setProjectList] = useState<Awaited<ReturnType<typeof workspaceApi.knowledgeProjects>>>([]);
+  const [canCreate, setCanCreate] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [projectNotice, setProjectNotice] = useState("");
+  const [projectError, setProjectError] = useState("");
+  useEffect(()=>{
+    if(!projectsOpen)return;
+    const controller=new AbortController();
+    setProjectError("");
+    setCanCreate(false);
+    workspaceApi.knowledgeProjects(controller.signal).then(projects=>{
+      if(!controller.signal.aborted)setProjectList(projects);
+    }).catch(error=>{if(!controller.signal.aborted)setProjectError(errorMessage(error));});
+    api.session().then(({operator})=>{
+      if(!controller.signal.aborted)setCanCreate(operator.role!=="reader"&&operator.project_ids===null);
+    }).catch(()=>{if(!controller.signal.aborted)setCanCreate(false);});
+    return ()=>controller.abort();
+  },[projectsOpen]);
+  const [mode, setMode] = useQueryState<"proposals" | "knowledge">("mode","knowledge",knowledgePath);
+  const [demoted, setDemoted] = useQueryState<boolean>("demoted",false,knowledgePath);
+  const [reviewOnly, setReviewOnly] = useQueryState<boolean>("review",false,knowledgePath);
   const [changing, setChanging] = useState('');
   const [changeError, setChangeError] = useState('');
-  const [project, setProject] = useQueryState<string>("project","","/app/knowledge");
-  const [search, setSearch] = useQueryState<string>("q","","/app/knowledge");
-  const [offset, setOffset] = useQueryState<number>("offset",0,"/app/knowledge");
+  const [project, setProject] = useQueryState<string>("project","",knowledgePath);
+  const [search, setSearch] = useQueryState<string>("q","",knowledgePath);
+  const [offset, setOffset] = useQueryState<number>("offset",0,knowledgePath);
   const q = useDebouncedValue(search);
   const [review, setReview] = useState<WorkspaceKnowledge | null>(null);
   const [proof, setProof] = useState<{id: string; citations: WorkspaceCitation[]} | null>(null);
   const selectedProject = rows.find(row => row.id === project);
   const loader = useCallback((signal: AbortSignal) => {
-    if (project && !selectedProject?.brain_project_id) return Promise.reject(new Error("Ce projet n’est plus lié au moteur de connaissance. Ouvrez sa rubrique Informations pour vérifier la liaison."));
-    return workspaceApi[mode]({project_id: selectedProject?.brain_project_id || undefined, offset, limit: PAGE_SIZE, q, status: mode === "proposals" ? "pending" : demoted ? "invalidated" : "validated", ...(mode === 'knowledge' && !demoted && reviewOnly ? {review_only: true} : {})}, signal);
-  }, [mode, project, selectedProject?.brain_project_id, offset, q, demoted, reviewOnly]);
+    if (project && !knowledgeProject && !selectedProject?.brain_project_id) return Promise.reject(new Error("Ce projet n’est plus lié au moteur de connaissance. Ouvrez sa rubrique Informations pour vérifier la liaison."));
+    return workspaceApi[mode]({project_id: knowledgeProject || selectedProject?.brain_project_id || undefined, offset, limit: PAGE_SIZE, q, status: mode === "proposals" ? "pending" : demoted ? "invalidated" : "validated", ...(mode === 'knowledge' && !demoted && reviewOnly ? {review_only: true} : {})}, signal);
+  }, [mode, project, knowledgeProject, selectedProject?.brain_project_id, offset, q, demoted, reviewOnly]);
   const state = useWorkspacePage(loader);
   const change = async (item: WorkspaceKnowledge) => {
     if(!item.project_id)return;
@@ -458,7 +479,32 @@ export function GlobalKnowledgeView({rows, onOpenProject}: WorkspaceViewProps) {
   return <section className="workspace-view" aria-label="Informations">
     <header className="workspace-view-heading"><div><h1>Informations</h1><p>Informations des mails, documents et réunions, avec leurs sources.</p></div><button type="button" aria-label="Actualiser les informations" onClick={state.reload}><Glyph d={P.sync} />Actualiser</button></header>
     <div className="workspace-view-tabs" role="group" aria-label="Informations à consulter"><button type="button" aria-pressed={mode === "knowledge"&&!demoted} onClick={() => {setMode("knowledge");setDemoted(false);setOffset(0);}}>Informations retenues</button><button type="button" aria-pressed={mode === "knowledge"&&demoted} onClick={() => {setMode("knowledge");setDemoted(true);setOffset(0);}}>Déclassées</button><button type="button" aria-pressed={mode === "proposals"} onClick={() => {setMode("proposals"); setOffset(0);}}>À vérifier</button></div>
-    <div className="workspace-view-toolbar"><ProjectFilter rows={rows} knowledge value={project} onChange={id => {setProject(id); setOffset(0);}} />
+    <details onToggle={event=>setProjectsOpen(event.currentTarget.open)}><summary>Projets de connaissance</summary>
+      <label>Projet de connaissance<select value={knowledgeProject} onChange={event=>{
+        setKnowledgeProject(event.target.value);setProject("");setOffset(0);
+      }}><option value="">Tous les projets</option>
+        {projectList.map(item=><option key={item.id} value={item.id}>{item.code} · {item.name}</option>)}
+      </select></label>
+      {canCreate&&<form onSubmit={event=>{
+        event.preventDefault();
+        const form=event.currentTarget,data=new FormData(form);
+        const code=String(data.get("code")||"").trim(),name=String(data.get("name")||"").trim();
+        if(creating||!code||!name)return;
+        setCreating(true);setProjectError("");setProjectNotice("");
+        void workspaceApi.createKnowledgeProject(code,name).then(item=>{
+          setProjectList(previous=>[...previous.filter(project=>project.id!==item.id),item]);
+          setKnowledgeProject(item.id);setProject("");setOffset(0);form.reset();
+          setProjectNotice("Projet de connaissance créé.");
+        }).catch(error=>setProjectError(errorMessage(error))).finally(()=>setCreating(false));
+      }}>
+        <label>Code du projet de connaissance<input name="code" className="input" required disabled={creating}/></label>
+        <label>Nom du projet de connaissance<input name="name" className="input" required disabled={creating}/></label>
+        <button type="submit" className="button" disabled={creating}>Créer le projet de connaissance</button>
+      </form>}
+      {projectNotice&&<p role="status">{projectNotice}</p>}{projectError&&<p role="alert">{projectError}</p>}
+    </details>
+    <div className="workspace-view-toolbar"><ProjectFilter rows={rows} knowledge value={project} onChange={id => {setKnowledgeProject("");setProject(id); setOffset(0);}} />
+      {knowledgeProject&&<a href={agentPath(`/app/sources?knowledge_project=${encodeURIComponent(knowledgeProject)}`)}>Sources du projet</a>}
       <label className="workspace-filter workspace-filter-search">Rechercher une information<input type="search" maxLength={300} placeholder={mode === "proposals" ? "Sujet, valeur ou motif…" : "Sujet ou valeur…"} value={search} onChange={event => {setSearch(event.target.value); setOffset(0);}} /></label>
       {mode === 'knowledge' && !demoted && <label className="workspace-review-filter"><input type="checkbox" checked={reviewOnly} onChange={event => {setReviewOnly(event.target.checked); setOffset(0);}} />À réexaminer seulement</label>}
     </div>

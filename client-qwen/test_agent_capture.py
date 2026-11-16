@@ -29,7 +29,7 @@ class CaptureTransferTests(unittest.TestCase):
             fragment.write_bytes(raw)
             remote.open.side_effect = [io.BytesIO(json.dumps({**receipt, 'session_id': 'another'}).encode()),
                                        io.BytesIO(json.dumps(receipt).encode())]
-            with self.assertRaisesRegex(ValueError, 'reçu Agent'):
+            with self.assertRaisesRegex(ValueError, 'reçu de Kiara'):
                 list(upload_journal(remote, directory, session))
             self.assertEqual(list(upload_journal(remote, directory, session)), [receipt])
             self.assertEqual(fragment.read_bytes(), raw)

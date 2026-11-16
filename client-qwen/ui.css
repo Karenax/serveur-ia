@@ -187,3 +187,18 @@ body[data-project-conversation] .chat-view :is(#messages,.conversation-top,.ws-p
 }
 body[data-project-conversation] .composer :is(.attachment-tools,#chat-attachments,#voice-start,#voice-cancel,#voice-status,#thinking) { display:none!important; }
 body[data-project-ephemeral="true"] :is(#ui-draft-status,#ui-draft-retry), body[data-project-conversation] #loaded-model { display:none!important; }
+
+.workspace-top .notifications-shortcut {
+  position: relative;
+  flex-shrink: 0;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px;
+}
+.workspace-top .notifications-shortcut .nav-text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}

@@ -70,7 +70,8 @@ def confirm(source_id: str, body: ResolutionConfirm, db: Session = Depends(get_d
     # rattachement + indexation evidence + extraction (chemin partagé avec le tri)
     deferred = body.defer_enrichment and s.source_type == "email"
     return resolve_source(db, None if deferred else get_memory_adapter(SessionLocal), s, p,
-                          get_section(db, "ai"), "validator", defer_enrichment=deferred)
+                          get_section(db, "ai"), "validator", defer_enrichment=deferred,
+                          pending_only=body.pending_only)
 
 
 # --- Proposals / validation ---

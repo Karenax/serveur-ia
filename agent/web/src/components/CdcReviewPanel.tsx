@@ -184,7 +184,7 @@ export function CdcReviewPanel(props: {
   // c = confirmer, t = à confirmer, n = non fourni, x = contradiction, r = rejeter.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (reviewRoot.current?.closest(".mac-window")?.classList.contains("inactive")) return;
+      if (!reviewRoot.current || reviewRoot.current.closest("[hidden], [inert]")) return;
       const t = e.target as HTMLElement;
       if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable)) return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;

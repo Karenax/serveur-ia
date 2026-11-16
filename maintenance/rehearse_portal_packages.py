@@ -18,16 +18,21 @@ PILOT_MESSAGES = [{"role": "user", "text": "Échange écrit pendant le pilote."}
 ROLLBACK_MESSAGES = PILOT_MESSAGES + [{"role": "assistant", "text": "Suite écrite après le retour arrière."}]
 
 
-def worker(phase, fixtures):
+def worker(phase, fixtures, expect_legacy):
+    agent_root = Path.cwd().resolve()
+    sys.path[:0] = [str(agent_root), str(agent_root.parent / "shared")]
     from fastapi.testclient import TestClient
-    from app.main import app
+    from app import main
+
+    if Path(main.__file__).resolve() != agent_root / "app" / "main.py":
+        raise RuntimeError(f"{phase}: le service chargé ne provient pas du paquet testé")
 
     def payload(response, status):
         if response.status_code != status:
             raise RuntimeError(f"{phase}: attendu {status}, reçu {response.status_code}: {response.text[:250]}")
         return response.json()
 
-    with TestClient(app) as client:
+    with TestClient(main.app) as client:
         token = payload(client.get("/api/v1/session"), 200)["token"]
         headers = {"X-Agent-Token": token}
         page = client.get("/app/projets")
@@ -36,8 +41,9 @@ def worker(phase, fixtures):
         script = client.get(asset)
         script.raise_for_status()
         legacy = "Redimensionner l’assistant" in script.text
-        assert legacy == (phase in {"previous", "rollback"})
-        result = {"bundle_sha256": hashlib.sha256(script.content).hexdigest()}
+        assert legacy == expect_legacy, f"{phase}: présence du panneau historique inattendue"
+        result = {"bundle_sha256": hashlib.sha256(script.content).hexdigest(),
+                  "service_sha256": hashlib.sha256(Path(main.__file__).read_bytes()).hexdigest()}
         if phase == "previous":
             for index in range(2):
                 project = payload(client.post("/api/v1/projects", headers=headers,
@@ -84,7 +90,7 @@ def unpack(archive, destination):
         package.extractall(destination)
 
 
-def rehearse(previous, candidate, report):
+def rehearse(previous, candidate, report, previous_has_conversations=False, same_web_bundle=False):
     with tempfile.TemporaryDirectory(prefix="kiara-retour-paquets-") as directory:
         root = Path(directory)
         data = root / "data"
@@ -100,40 +106,55 @@ def rehearse(previous, candidate, report):
                    PYTHONIOENCODING="utf-8")
         fixtures = {}
         evidence = {}
+        services = {}
         for phase, label in (("previous", "previous"), ("candidate", "candidate"),
                              ("rollback", "previous"), ("reopen-candidate", "candidate")):
             package = roots[label]
             env["PYTHONPATH"] = os.pathsep.join(str(package / name) for name in ("shared", "agent"))
             if fixtures:
                 env["AGENT_OPERATOR_PROJECT_IDS"] = json.dumps([fixtures["project0"]])
+            expect_legacy = label == "previous" and not previous_has_conversations
             run = subprocess.run([sys.executable, str(Path(__file__).resolve()), "--worker",
-                                  phase, json.dumps(fixtures)], cwd=package / "agent", env=env,
+                                  phase, json.dumps(fixtures), str(int(expect_legacy))], cwd=package / "agent", env=env,
                                  text=True, encoding="utf-8", capture_output=True, timeout=90)
             if run.returncode:
                 raise RuntimeError(f"{phase} a échoué:\n{run.stderr[-3500:]}")
             response = json.loads(run.stdout.splitlines()[-1])
             fixtures = response["fixtures"]
             evidence[phase] = response["bundle_sha256"]
+            services[phase] = response["service_sha256"]
         assert evidence["previous"] == evidence["rollback"]
         assert evidence["candidate"] == evidence["reopen-candidate"]
-        assert evidence["candidate"] != evidence["previous"]
-    result = {"verified_at": datetime.now(timezone.utc).isoformat(), "bundles": evidence,
+        assert (evidence["candidate"] == evidence["previous"]) == same_web_bundle
+        assert services["previous"] == services["rollback"]
+        assert services["candidate"] == services["reopen-candidate"]
+        if same_web_bundle:
+            assert services["candidate"] != services["previous"], "Service Projets identique dans les deux paquets."
+    result = {"verified_at": datetime.now(timezone.utc).isoformat(), "bundles": evidence, "services": services,
               "archives": {label: hashlib.sha256(path.read_bytes()).hexdigest()
                            for label, path in (("previous", previous), ("candidate", candidate))},
+              "previous_has_conversations": previous_has_conversations,
+              "same_web_bundle": same_web_bundle,
               "pilot_write_preserved": True, "rollback_write_preserved": True, "foreign_project_denied": True}
     report.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--worker", nargs=2, help=argparse.SUPPRESS)
+    parser.add_argument("--worker", nargs=3, help=argparse.SUPPRESS)
     parser.add_argument("--previous", type=Path)
     parser.add_argument("--candidate", type=Path)
     parser.add_argument("--report", type=Path)
+    parser.add_argument("--previous-has-conversations", action="store_true",
+                        help="Attendre un portail précédent déjà équipé de Conversations.")
+    parser.add_argument("--same-web-bundle", action="store_true",
+                        help="Attendre le même bundle web et deux versions du service Projets.")
     args = parser.parse_args()
     if args.worker:
-        print(json.dumps(worker(args.worker[0], json.loads(args.worker[1]))))
+        print(json.dumps(worker(args.worker[0], json.loads(args.worker[1]), args.worker[2] == "1")))
     elif args.previous and args.candidate and args.report:
-        rehearse(args.previous.resolve(strict=True), args.candidate.resolve(strict=True), args.report)
+        rehearse(args.previous.resolve(strict=True), args.candidate.resolve(strict=True), args.report,
+                 previous_has_conversations=args.previous_has_conversations,
+                 same_web_bundle=args.same_web_bundle)
     else:
         parser.error("--previous, --candidate et --report sont requis")

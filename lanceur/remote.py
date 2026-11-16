@@ -447,15 +447,16 @@ def serve_gateway(store, backend, port=GATEWAY_PORT, *, agent_web_origin=None, b
         return store.valid_owner(owner)
     web_handler = BaseHTTPRequestHandler
     if agent_web_origin:
-        from agent_web import agent_web_handler
-        web_handler = agent_web_handler(store, agent_web_origin, '' if browser_only else '/agent')
+        from agent_web import SHARED_PORTAL_PREFIXES, agent_web_handler, portal_prefix
+        prefixes = ('',) if browser_only else SHARED_PORTAL_PREFIXES
+        web_handler = agent_web_handler(store, agent_web_origin, prefixes)
 
     class Handler(web_handler):
         def agent_web_request(self):
             if getattr(self, '_browser_access', None):
                 return False
             path = urlsplit(self.path).path
-            return agent_web_origin and (browser_only or path == '/agent' or path.startswith('/agent/'))
+            return agent_web_origin and (browser_only or portal_prefix(path, prefixes) is not None)
 
         def browser_conversation(self, path, identity, active):
             bridge = store.agent_bridge
@@ -630,22 +631,20 @@ def serve_gateway(store, backend, port=GATEWAY_PORT, *, agent_web_origin=None, b
                 return self.respond(200,store.workspace.snapshot(self.identity))
             if self.path in ('/v1/client/kiara4/release', '/v1/client/kiara4/download', DESKTOP_RELEASE, DESKTOP_DOWNLOAD):
                 if not self.authorized(): return
-                from releases import DESKTOP_INSTALLER, WINDOWS_INSTALLER, windows_installer
-                desktop = self.path in (DESKTOP_RELEASE, DESKTOP_DOWNLOAD)
+                from releases import DESKTOP_INSTALLER, windows_installer
                 if self.path.endswith('/release'):
                     try:
-                        release, _ = windows_installer(store.home, desktop=desktop)
+                        release, _ = windows_installer(store.home)
                         return self.respond(200, release)
                     except ValueError as error:
                         return self.respond(503, {'error': {'message': str(error)}})
                 try:
-                    filename = DESKTOP_INSTALLER if desktop else WINDOWS_INSTALLER
-                    stream = (store.home / 'installateurs' / filename).open('rb')
+                    stream = (store.home / 'installateurs' / DESKTOP_INSTALLER).open('rb')
                 except OSError:
                     return self.respond(503, {'error': {'message': 'Installateur Kiara 4 indisponible.'}})
                 with stream:
                     try:
-                        release, _ = windows_installer(store.home, stream=stream, desktop=desktop)
+                        release, _ = windows_installer(store.home, stream=stream)
                     except ValueError as error:
                         return self.respond(503, {'error': {'message': str(error)}})
                     self.send_response(200)
@@ -761,7 +760,7 @@ def serve_gateway(store, backend, port=GATEWAY_PORT, *, agent_web_origin=None, b
                 if self.internal_agent and any(field in raw for field in (
                         'project_id', 'document_id', 'assistant_id', 'conversation_id', 'turn_id',
                         'text_transform', 'voice_conversation', 'voice_realtime')):
-                    raise ValueError('Paramètre de conversation Kiara interdit au service Agent.')
+                    raise ValueError('Paramètre de conversation Kiara interdit au service Projets.')
                 upstream_port, model, key = backend()
                 conversation=raw.pop('conversation_id',None)
                 turn=raw.pop('turn_id',None)

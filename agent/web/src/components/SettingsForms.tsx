@@ -121,6 +121,7 @@ export function MailSettingsForm() {
   const [busy,setBusy]=useState(false);
   const [search,setSearch]=useState("");
   const [account,setAccount]=useState("");
+  const [scanFolder,setScanFolder]=useState("");
   useEffect(()=>{
     let live=true;
     Promise.all([api.brainMailSettings(),request<any>("/v1/thunderbird/status")]).then(([m,value]:any[])=>{
@@ -153,6 +154,21 @@ export function MailSettingsForm() {
       }
     }catch(e:any){setError(String(e.message||e));}finally{setBusy(false);}
   };
+  const scanOnce=async(useDefault:boolean)=>{
+    if(!ready||busy)return;
+    setBusy(true);setError("");setMsg("");
+    try{
+      if(useDefault){
+        const {folder}=await request<{folder:string}>("/v1/ingest/default-folder");
+        setScanFolder(folder);
+      }else{
+        const result=await request<{scanned:number;imported?:number;duplicates?:number;error?:string}>(
+          "/v1/ingest/scan",{method:"POST",body:JSON.stringify({folder:scanFolder.trim()}),activity:"Analyse du dossier EML"},0);
+        if(result.error)throw new Error(result.error);
+        setMsg(`${result.scanned} mail(s) parcouru(s), ${result.imported??0} importé(s), ${result.duplicates??0} doublon(s).`);
+      }
+    }catch(e){setError(e instanceof Error?e.message:String(e));}finally{setBusy(false);}
+  };
   const selected=new Set(form.thunderbird_folder_ids);
   const validThreshold=Number.isFinite(form.auto_classification_threshold) && form.auto_classification_threshold>=.01 && form.auto_classification_threshold<=1;
   const folders=(status?.folders||[]).filter((f:any)=>(!account||f.account_id===account)&&`${f.path} ${f.name}`.toLocaleLowerCase().includes(search.toLocaleLowerCase()));
@@ -165,8 +181,8 @@ export function MailSettingsForm() {
       <section className="mail-source-folders mail-settings-source" aria-label="Dossiers Thunderbird">
         <p role="status"><strong>{status?.connected?"Thunderbird connecté":"Thunderbird fermé ou liaison indisponible"}</strong>
           {status?.last_seen&&` · Dernier contact : ${new Date(status.last_seen).toLocaleString("fr-FR")}`}</p>
-        <p>Thunderbird doit être ouvert pour synchroniser. Les mails déjà importés restent disponibles dans Agent.</p>
-        {status?.version&&status.version!=="0.2.0"&&<p>La sélection est protégée par Agent. Installez la liaison 0.2.0 pour appliquer aussi les réglages à la synchronisation automatique de Thunderbird.</p>}
+        <p>Thunderbird doit être ouvert pour synchroniser. Les mails déjà importés restent disponibles dans Kiara.</p>
+        {status?.version&&status.version!=="0.2.0"&&<p>La sélection est protégée par Kiara. Installez la liaison 0.2.0 pour appliquer aussi les réglages à la synchronisation automatique de Thunderbird.</p>}
         <details className="progressive-options"><summary>Choisir les dossiers · {selected.size} sélectionné(s)</summary><div className="progressive-options-grid">
         <label>Compte Thunderbird<select className="input" value={account} onChange={e=>setAccount(e.target.value)}><option value="">Tous les comptes</option>{(status?.accounts||[]).map((a:any)=><option key={a.id} value={a.id}>{a.name}</option>)}</select></label>
         <label>Rechercher un dossier<input className="input" type="search" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Réception, envoyés, projet…"/></label>
@@ -190,6 +206,14 @@ export function MailSettingsForm() {
       <button className="button primary" disabled={!ready||busy||!validThreshold} onClick={()=>void save()}>Enregistrer</button>
       <button className="button" disabled={!ready||busy||!validThreshold||(form.source==="thunderbird"&&!selected.size)} onClick={()=>void synchronize()}>{busy?"Traitement…":"Synchroniser maintenant"}</button>
     </div>
+    <details className="progressive-options"><summary>Analyser un dossier EML ponctuellement</summary>
+      <form onSubmit={event=>{event.preventDefault();if(scanFolder.trim())void scanOnce(false);}}>
+        <label>Dossier EML sur le serveur<input className="input" value={scanFolder} disabled={!ready||busy}
+          onChange={event=>setScanFolder(event.target.value)}/></label>
+        <button type="button" className="button" disabled={!ready||busy} onClick={()=>void scanOnce(true)}>Utiliser le dossier par défaut</button>
+        <button type="submit" className="button" disabled={!ready||busy||!scanFolder.trim()}>Analyser le dossier</button>
+      </form>
+    </details>
     {error&&<p role="alert">{error}</p>}{msg&&<p role="status">{msg}</p>}
   </div>;
 }

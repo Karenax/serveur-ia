@@ -9,10 +9,15 @@ import platform
 import subprocess
 import sys
 
+WINDOWS_EXTENSION_SOURCES = tuple('agent/extensions/thunderbird-agent/' + name for name in (
+    'manifest.json', 'core.js', 'background.js', 'options.html', 'options.js',
+))
+
 ROOT=Path(__file__).resolve().parents[1]
 SOURCE_DIRS=('lanceur','client-qwen','client-android','client-voice','maintenance')
 COMPONENT_DIRS={
-    'windows':('client-qwen','client-tauri','client-voice','shared','maintenance/2026-10-25-assistant-integration'),
+    'windows':('client-qwen','client-tauri','client-voice','shared','maintenance/2026-10-25-assistant-integration',
+               *WINDOWS_EXTENSION_SOURCES),
     'android':('client-android','client-qwen','maintenance/2026-10-25-assistant-integration'),
     'server':('lanceur','shared','maintenance/codex','agent/app','agent/backend','agent/scripts',
               'agent/extensions','agent/web/src','agent/web/public','agent/web/package.json',
@@ -57,6 +62,7 @@ def source_names(component, web_dist=None):
     for name in sorted(set(listed)):
         path=ROOT/name
         if not name or not path.is_file():continue
+        if component == 'server' and name == 'agent/scripts/agent_runtime.py':continue
         is_cargo_lock = component == 'windows' and name == 'client-tauri/Cargo.lock'
         if not is_cargo_lock and path.suffix.lower() not in SUFFIXES and not (path.suffix=='.txt' and (path.name.startswith('requirements') or path.name=='product-version.txt')):
             if not (component=='server' and name.startswith('agent/') and path.suffix.lower() in AGENT_SUFFIXES):continue
@@ -75,7 +81,7 @@ def source_names(component, web_dist=None):
         assets = dist / 'assets'
         if (not (dist / 'index.html').is_file()
                 or not any(assets.glob('*.js')) or not any(assets.glob('*.css'))):
-            raise ValueError('Frontend Agent absent. Construire agent/web avant de préparer le paquet serveur.')
+            raise ValueError('Interface Projets absente. Construire agent/web avant de préparer le paquet serveur.')
         for path in (dist, assets, dist / 'index.html', *sorted(assets.iterdir())):
             if path.is_symlink() or path.is_junction():
                 raise ValueError('Lien inattendu dans le frontend Agent compilé.')

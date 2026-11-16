@@ -8,25 +8,29 @@ import {navigateTabs} from '../lib/uiTabs';
 import type {WorkspaceCitation} from '../lib/workspaceApi';
 import {citationLocatorText} from '../lib/citationLinks';
 import {AsyncDownloadLink} from './AsyncDownloadLink';
+import {agentPath} from '../lib/agentRoutes';
 const fail=(error:unknown)=>error instanceof Error?error.message:String(error);
 const date=(value:string)=>{const parsed=new Date(value);return Number.isNaN(parsed.getTime())?value:parsed.toLocaleDateString('fr-FR');};
-const KINDS:Record<string,string>={document:'Document',mail:'Mail',note:'Note',meeting:'Réunion'};
+const KINDS:Record<string,string>={document:'Document',mail:'Mail',note:'Note',meeting:'Réunion',phone:'Téléphone'};
 const INDEX:Record<string,string>={indexed:'Indexée',completed:'Indexée',pending:'À indexer',queued:'En attente',running:'Indexation',failed:'Échec',not_indexed:'Non indexée',extracted:'Texte extrait',ocr_required:'Texte du scan à reconnaître',partially_extracted:'Texte partiellement extrait',ocr_extracted:'Texte OCR · relecture nécessaire',ocr_partial:'OCR partiel · relecture nécessaire',empty:'Sans texte',canonical_note:'Note du projet',projection_pending:'Projection en attente',multimodal_pending:'Sans texte'};
 const canRecognize=(source:LibrarySource)=>!!source.source_id&&!!source.version_id&&source.current&&source.file_format==='pdf'&&['ocr_required','partially_extracted','ocr_partial'].includes(source.extraction_status);
 const originalLabel=(source:LibrarySource)=>source.kind==='note'&&source.version_id?'Télécharger la version de note':'Ouvrir l’original';
 export type SourcesLibraryProps={rows:PortfolioRow[];active?:boolean;onOpenSource:(id:string,title?:string,evidence?:WorkspaceCitation[])=>void;onOpenProject?:(id:string,tab:string)=>void;onCreateMeeting?:(projectId?:string)=>boolean|void};
 export function SourcesLibrary({rows,active=true,onOpenSource,onOpenProject,onCreateMeeting}:SourcesLibraryProps){
   const tabId=useId();
-  const [page,setPage]=useState<SourcePage|null>(null),[project,setProject]=useQueryState<string>('project','','/app/sources'),[query,setQuery]=useQueryState<string>('q','','/app/sources'),[kind,setKind]=useQueryState<string>('kind','all','/app/sources');
-  const [label,setLabel]=useQueryState<string>('label','','/app/sources'),[status,setStatus]=useQueryState<string>('status','all','/app/sources'),[sort,setSort]=useQueryState<NonNullable<SourceFilters['sort']>>('sort','date_desc','/app/sources');
-  const [fileFormat,setFileFormat]=useQueryState<NonNullable<SourceFilters['file_format']>>('format','all','/app/sources');
-  const [offset,setOffset]=useQueryState<number>('offset',0,'/app/sources'),[tick,setTick]=useState(0),[loading,setLoading]=useState(false),[error,setError]=useState('');
-  const [indexing,setIndexing]=useQueryState<boolean>('indexing',false,'/app/sources');
-  const [view,setView]=useQueryState<'list'|'grid'|'graph'>('view','list','/app/sources'),[graph,setGraph]=useState<SourceGraph|null>(null);
+  const sourcesPath=agentPath('/app/sources');
+  const [knowledgeProject,setKnowledgeProject]=useQueryState<string>('knowledge_project','',sourcesPath);
+  const [page,setPage]=useState<SourcePage|null>(null),[project,setProject]=useQueryState<string>('project','',sourcesPath),[query,setQuery]=useQueryState<string>('q','',sourcesPath),[kind,setKind]=useQueryState<string>('kind','all',sourcesPath);
+  const [label,setLabel]=useQueryState<string>('label','',sourcesPath),[status,setStatus]=useQueryState<string>('status','all',sourcesPath),[sort,setSort]=useQueryState<NonNullable<SourceFilters['sort']>>('sort','date_desc',sourcesPath);
+  const [fileFormat,setFileFormat]=useQueryState<NonNullable<SourceFilters['file_format']>>('format','all',sourcesPath);
+  const [offset,setOffset]=useQueryState<number>('offset',0,sourcesPath),[tick,setTick]=useState(0),[loading,setLoading]=useState(false),[error,setError]=useState('');
+  const [indexing,setIndexing]=useQueryState<boolean>('indexing',false,sourcesPath);
+  const [view,setView]=useQueryState<'list'|'grid'|'graph'>('view','list',sourcesPath),[graph,setGraph]=useState<SourceGraph|null>(null);
   const [pageScope,setPageScope]=useState<string|undefined>(),[graphScope,setGraphScope]=useState<string|undefined>();
   const [selected,setSelectedState]=useState<string[]>([]),[labelDraft,setLabelDraft]=useState(''),[busy,setBusy]=useState('');
   const [imports,setImports]=useState(false),[url,setUrl]=useState(''),[driveFile,setDriveFile]=useState(''),[drive,setDrive]=useState<DriveConnection|null>(null);
   const [accessToken,setAccessToken]=useState(''),[notice,setNotice]=useState('');
+  const [assignment,setAssignment]=useState<{source:LibrarySource;destinations:Awaited<ReturnType<typeof fusionSources.destinations>>}|null>(null);
   const [recognizing,setRecognizing]=useState<string|null>(null);
   const [progress,setProgress]=useState<{done:number;total:number;success:number;unchanged:number;errors:string[]}|null>(null);
   const [calendar,setCalendar]=useState<{title:string;date:string;description:string}[]>([]);
@@ -38,7 +42,7 @@ export function SourcesLibrary({rows,active=true,onOpenSource,onOpenProject,onCr
   // Every existing selection path uses this updater, including page/clear/labels/pagination.
   const setSelected=(value:string[]|((previous:string[])=>string[]))=>{invalidateSemantic();setSelectedState(value);};
   const labelEditor=useRef<HTMLInputElement>(null),[focusLabels,setFocusLabels]=useState(false);
-  const brain=rows.find(row=>row.id===project)?.brain_project_id||undefined;
+  const brain=knowledgeProject||rows.find(row=>row.id===project)?.brain_project_id||undefined;
   const semanticScopeKey=JSON.stringify([brain??null,query.trim(),[...selected].sort(),active]);
   // A props-derived Brain change is witnessed synchronously, before effects or async callbacks.
   semanticCurrentScope.current=semanticScopeKey;
@@ -81,7 +85,7 @@ export function SourcesLibrary({rows,active=true,onOpenSource,onOpenProject,onCr
   };
   const importURL=()=>void run('Import du lien',async()=>{if(!brain||!url.trim())return;const result=await fusionSources.url(brain,url.trim());setUrl('');setTick(value=>value+1);
     setNotice(result.reinterpreted?'Interprétation au bon format conservée ; l’original et l’ancienne extraction restent consultables. L’état de traitement est visible dans la liste.':'Lien importé. L’état d’extraction et d’indexation est visible dans la liste.');});
-  const importDrive=()=>void run('Import Google Drive',async()=>{if(drive?.enabled!==true||!brain||!driveFile.trim())return;await fusionSources.drive(brain,driveFile.trim());setTick(value=>value+1);setDrive(await fusionSources.driveStatus());setNotice('Fichier Drive conservé dans Agent.');});
+  const importDrive=()=>void run('Import Google Drive',async()=>{if(drive?.enabled!==true||!brain||!driveFile.trim())return;await fusionSources.drive(brain,driveFile.trim());setTick(value=>value+1);setDrive(await fusionSources.driveStatus());setNotice('Fichier Drive conservé dans Kiara.');});
   const labelSelection=()=>void run('Enregistrement des labels',async()=>{
     const labels=labelDraft.split(',').map(value=>value.trim()).filter(Boolean);
     for(const id of selected)await fusionSources.labels(id,labels);setTick(value=>value+1);setSelected([]);setLabelDraft('');setNotice('Labels enregistrés.');
@@ -94,6 +98,12 @@ export function SourcesLibrary({rows,active=true,onOpenSource,onOpenProject,onCr
     setNotice('Sélectionnez une ou plusieurs sources, puis ouvrez leur éditeur de labels. Le remplacement reste explicite.');
   };
   const open=(source:LibrarySource)=>{if(source.source_id)onOpenSource(source.source_id,source.title);else if(source.erp_project_id)onOpenProject?.(source.erp_project_id,'documents');};
+  const assignmentAction=(source:LibrarySource)=>source.status==='resolution_pending'&&source.source_id&&
+    <button type="button" disabled={!!busy} onClick={()=>void run('Chargement des projets',async()=>{
+      const destinations=await fusionSources.destinations();
+      if(!destinations.length){setNotice('Aucun projet accessible pour ce rattachement.');return;}
+      setAssignment({source,destinations});
+    })}>Rattacher au projet</button>;
   const recognize=(source:LibrarySource)=>void run(`Reconnaissance de ${source.title}`,async()=>{
     setRecognizing(source.source_id!);
     try {
@@ -104,10 +114,30 @@ export function SourcesLibrary({rows,active=true,onOpenSource,onOpenProject,onCr
   return <section className="fusion-library" aria-label="Bibliothèque des sources">
     <header className="fusion-page-heading"><h1>Sources</h1>
       {recognizing&&<button type="button" onClick={()=>void fusionSources.cancelOcr(recognizing).then(()=>setNotice('Annulation demandée ; l’original et les pages traitées seront conservés.')).catch(failure=>setError(fail(failure)))}>Annuler la reconnaissance</button>}
-      <label className="fusion-project-current"><span className="fusion-sr-only">Projet</span><select value={project} disabled={!!busy} onChange={event=>filtered(()=>setProject(event.target.value))}><option value="">Tous les projets accessibles</option>
+      <label className="fusion-project-current"><span className="fusion-sr-only">Projet</span><select value={knowledgeProject?'knowledge':project} disabled={!!busy} onChange={event=>filtered(()=>{setKnowledgeProject('');setProject(event.target.value);})}><option value="">Tous les projets accessibles</option>
+        {knowledgeProject&&<option value="knowledge">Projet de connaissance sélectionné</option>}
         {rows.map(row=><option key={row.id} value={row.id} disabled={!row.brain_project_id}>{row.code} — {row.title}{!row.brain_project_id?' (connaissance à relier)':''}</option>)}</select></label>
       {onCreateMeeting&&<button type="button" className="fusion-primary" disabled={!!busy} title="Préparer une séance ; le micro démarre seulement à votre demande" onClick={()=>onCreateMeeting(rows.some(row=>row.id===project)?project:undefined)}>Nouvelle séance</button>}
       </header>
+    {assignment&&<form key={assignment.source.id} className="fusion-imports" aria-label="Rattacher la source"
+      onSubmit={event=>{
+        event.preventDefault();
+        const target=new FormData(event.currentTarget).get('project');
+        if(!assignment.source.source_id||typeof target!=='string'||!assignment.destinations.some(row=>row.id===target))return;
+        const sourceId=assignment.source.source_id;
+        void run('Rattachement',async()=>{
+          await fusionSources.attach(sourceId,target);
+          setAssignment(null);setTick(value=>value+1);setNotice('Source rattachée au projet.');
+        });
+      }}>
+      <strong>{assignment.source.title}</strong>
+      <label>Projet de destination<select autoFocus required name="project" defaultValue="" disabled={!!busy}>
+        <option value="">Choisir un projet</option>
+        {assignment.destinations.map(row=><option key={row.id} value={row.id}>{row.code} · {row.name}</option>)}
+      </select></label>
+      <button type="submit" disabled={!!busy}>Confirmer le rattachement</button>
+      <button type="button" disabled={!!busy} onClick={()=>setAssignment(null)}>Annuler</button>
+    </form>}
     <div className="fusion-library-tabs" role="tablist" aria-label="Présentation des sources" onKeyDown={navigateTabs}>
       <button type="button" role="tab" id={`${tabId}-list`} tabIndex={view==='graph'?-1:0} aria-controls={`${tabId}-panel`} aria-selected={view!=='graph'} onClick={()=>{setView('list');setOffset(0);}}>Liste des fichiers</button>
       <button type="button" role="tab" id={`${tabId}-graph`} tabIndex={view==='graph'?0:-1} aria-controls={`${tabId}-panel`} aria-selected={view==='graph'} onClick={()=>{setView('graph');setOffset(0);}}>Vue des relations</button>
@@ -160,15 +190,33 @@ export function SourcesLibrary({rows,active=true,onOpenSource,onOpenProject,onCr
     </div>
     {imports&&<section className="fusion-import-panel" aria-label="Ajouter des sources">
       <h2>Importer dans {rows.find(row=>row.id===project)?.code||'un projet'}</h2>
-      {!brain&&<p role="status">Choisissez un projet lié à la connaissance pour importer ses sources.</p>}
+      {!brain&&<p role="status">Choisissez un projet pour importer ses documents et liens.</p>}
       <div className="fusion-import-options"><label>Fichiers sélectionnés<input type="file" multiple disabled={!brain||!!busy} onChange={event=>{files(event.target.files);event.target.value='';}}/></label>
         <label>Dossier choisi<input type="file" multiple ref={element=>element?.setAttribute('webkitdirectory','')} disabled={!brain||!!busy} onChange={event=>{files(event.target.files,true);event.target.value='';}}/></label>
         <form onSubmit={event=>{event.preventDefault();importURL();}}><label>Page ou document web<input type="url" value={url} onChange={event=>setUrl(event.target.value)} placeholder="https://…" disabled={!!busy}/></label><button type="submit" disabled={!brain||!url.trim()||!!busy}>Importer le lien</button></form>
         {drive?.enabled===true&&<form onSubmit={event=>{event.preventDefault();importDrive();}}><label>Fichier Google Drive<input value={driveFile} onChange={event=>setDriveFile(event.target.value)} placeholder="Identifiant du fichier Drive" disabled={!!busy}/></label><button type="submit" disabled={!brain||!drive.configured||!driveFile.trim()||!!busy}>Importer à nouveau</button></form>}
       </div>
-      {drive?.enabled===true&&<><p className="fusion-meta">Google Drive : {drive.configured?'connecté à Agent':'connexion à configurer'}{drive.last_import?` · dernier import ${date(drive.last_import)}`:''}.</p>
-      <details><summary>Connexion avancée Google Drive</summary><p>Cette connexion appartient à Agent. Le jeton fourni par Google permet l’import explicite du fichier choisi.</p>
-        <form onSubmit={event=>{event.preventDefault();if(drive.enabled!==true)return;void run('Connexion Drive',async()=>{setDrive(await fusionSources.connectDrive(accessToken));setAccessToken('');setNotice('Connexion Agent enregistrée.');});}}>
+      {visiblePage?.can_import_audio&&<details><summary>Importer un enregistrement audio</summary>
+        <form aria-label="Importer un enregistrement audio" onSubmit={event=>{
+          event.preventDefault();
+          const form=event.currentTarget, body=new FormData(form);
+          if(brain)body.set('candidate_project_id',brain);
+          void run('Import audio',async()=>{
+            const result=await fusionSources.audio(body);
+            setTick(value=>value+1);form.reset();
+            setNotice(result.status==='duplicate'?'Cet enregistrement est déjà présent.':
+              result.status==='resolution_pending'?'Audio importé. Il reste à rattacher dans Sources.':'Audio importé dans le projet.');
+          });
+        }}>
+          <label>Enregistrement<input name="file" type="file" accept="audio/*,.wav,.mp3,.m4a,.webm,.ogg" required disabled={!!busy}/></label>
+          <label>Type d’enregistrement<select name="source_type" disabled={!!busy}><option value="meeting">Réunion</option><option value="phone">Téléphone</option></select></label>
+          <label>Transcription existante<textarea name="transcript" disabled={!!busy}/></label>
+          <button type="submit" disabled={!!busy}>Importer l’audio</button>
+        </form>
+      </details>}
+      {drive?.enabled===true&&<><p className="fusion-meta">Google Drive : {drive.configured?'connecté à Kiara':'connexion à configurer'}{drive.last_import?` · dernier import ${date(drive.last_import)}`:''}.</p>
+      <details><summary>Connexion avancée Google Drive</summary><p>Le jeton Google permet d’importer le fichier que vous sélectionnez.</p>
+        <form onSubmit={event=>{event.preventDefault();if(drive.enabled!==true)return;void run('Connexion Drive',async()=>{setDrive(await fusionSources.connectDrive(accessToken));setAccessToken('');setNotice('Connexion Google Drive enregistrée.');});}}>
           <label>Jeton d’accès Google<input type="password" autoComplete="off" value={accessToken} onChange={event=>setAccessToken(event.target.value)} disabled={!!busy}/></label>
           <button type="submit" disabled={accessToken.length<20||!!busy}>Enregistrer la connexion</button></form></details></>}
       <details><summary>Contexte de calendrier</summary><label>Exporter puis sélectionner un calendrier ICS<input type="file" accept=".ics,text/calendar" disabled={!!busy} onChange={event=>{
@@ -208,6 +256,7 @@ export function SourcesLibrary({rows,active=true,onOpenSource,onOpenProject,onCr
         <button type="button" className="fusion-source-title" onClick={()=>open(source)}>{source.title}</button>
         <SourceMetadata source={source}/><div className="fusion-labels">{source.labels.map(value=><button type="button" key={value} onClick={()=>filtered(()=>setLabel(value))}>{value}</button>)}</div>
         {canRecognize(source)&&<button type="button" disabled={!!busy} onClick={()=>recognize(source)}>Reconnaître le texte du scan</button>}
+        {assignmentAction(source)}
         {source.source_id?<AsyncDownloadLink href={fusionSources.original(source.source_id)}>{originalLabel(source)}</AsyncDownloadLink>:<span>Projection vers la connaissance en attente</span>}
       </article>)}</div>:<div className="fusion-table-scroll"><table><thead><tr>
         <th><input type="checkbox" aria-label="Sélectionner la page des sources" checked={visiblePage.items.some(source=>!!source.source_id)&&visiblePage.items.filter(source=>!!source.source_id).every(source=>selected.includes(source.id))}
@@ -222,6 +271,7 @@ export function SourcesLibrary({rows,active=true,onOpenSource,onOpenProject,onCr
           {source.erp_project_id&&onOpenProject?<button type="button" className="fusion-text-button" onClick={()=>onOpenProject(source.erp_project_id!,'documents')}>{source.project_code||'Projet'}</button>:<p>{source.project_code||'—'}</p>}
           <p>{INDEX[source.extraction_status]||source.extraction_status} · {INDEX[source.index_status]||source.index_status}</p>
           {canRecognize(source)&&<button type="button" disabled={!!busy} onClick={()=>recognize(source)}>Reconnaître le texte du scan</button>}
+          {assignmentAction(source)}
           </div></details></td>
         <td>{source.source_id?<AsyncDownloadLink href={fusionSources.original(source.source_id)} aria-label={`${originalLabel(source)} : ${source.title}`}>↗</AsyncDownloadLink>:<span>À projeter</span>}</td></tr>)}</tbody></table></div>:null}
       {visiblePage&&<nav className="fusion-pagination" aria-label="Pagination des sources"><span>{visiblePage.total?`${visiblePage.offset+1}–${Math.min(visiblePage.offset+visiblePage.limit,visiblePage.total)} sur ${visiblePage.total}`:'0 source'}</span>

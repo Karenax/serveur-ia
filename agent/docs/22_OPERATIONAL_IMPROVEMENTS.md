@@ -78,6 +78,10 @@ Preuves : `.ui-preview/pilots/backend-terminal-fixes-20261021/` et
 
 ## Supervision du backend
 
+Cette section conserve l’état du 10 octobre 2026. Le superviseur indépendant a
+été retiré du dépôt après la mise en production de Kiara 4.0.8. Le service
+Projets est désormais supervisé par le lanceur Kiara. [Exploitation actuelle](../../RECONSTRUIRE-FRED.md)
+
 Le 10 octobre 2026, les deux lanceurs Windows passent par
 `scripts/agent_runtime.py start`. Le superviseur indépendant lance uniquement
 `app.main:app` depuis `C:\Agent`, sur `127.0.0.1:8001`, et attend la sortie du

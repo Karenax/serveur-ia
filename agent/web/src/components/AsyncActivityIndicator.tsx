@@ -2,7 +2,7 @@ import { useEffect, useState, useSyncExternalStore } from 'react';
 import { getActivitySnapshot, subscribeActivity } from '../lib/asyncActivity';
 import './async-activity.css';
 
-/** Remains non-blocking and mounted once, across every Agent screen. */
+/** Remains non-blocking and mounted once, across every Kiara screen. */
 export function AsyncActivityIndicator() {
   const activity = useSyncExternalStore(subscribeActivity, getActivitySnapshot, () => null);
   const [visible,setVisible]=useState(false);

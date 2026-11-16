@@ -1,7 +1,8 @@
 # Reconstruire et vérifier Kiara
 
-Les constructions Windows/serveur 3.5.62 et Android 1.0.26/code 27 utilisent les
-sources locales et les clés de signature existantes. Chaque construction produit
+La livraison de référence est Kiara 4.0.8 pour Windows et le portail privé.
+La 4.0.7 constitue le point de retour Windows. Les clients Android et Linux
+gardent leur propre calendrier de qualification. Chaque construction produit
 `build-manifest.json` : empreintes des sources, empreinte du binaire, versions des
 paquets Python, Go, CMake, JDK, SDK/NDK Android et commit Hermes réellement utilisés.
 Les sources modifiées avant commit sont identifiées par leurs empreintes.
@@ -13,10 +14,10 @@ et compatibilités courantes.
 ## Préparer le poste
 
 1. Extraire le dépôt sur Windows, avec Git, PowerShell 7 ou Windows PowerShell 5.1,
-   Node.js ≥ 20 et Chrome. Le moteur de production Flash-Next est Strata officiel
-   **0.1.56 CUDA 12.9**, sous `F:/Kiara/moteurs/strata-0.1.56-cuda12`, avec le serveur
-   Python corrigé conservé sous `dependances/strata-0.1.43.1/source` : suivre
-   [sa configuration de production RTX 4080/DFlash2](maintenance/2026-11-03-rtx4080/default-mode/README.md).
+   Node.js ≥ 20 et Chrome. Sur le poste Fred, placer sur D: le dépôt, les outils,
+   les caches, les fichiers temporaires et les résultats de recette. E: est
+   réservé aux archives et aux preuves conservées. Utiliser les chemins de la
+   configuration locale du lanceur pour retrouver le moteur et les modèles.
    [dependances/moteurs.json](dependances/moteurs.json) conserve les références des
    dépôts historiques et de leurs patchs, décrites dans
    [dependances/README.md](dependances/README.md).
@@ -56,18 +57,28 @@ seul ne contient pas les SDK, moteurs, modèles et clés privées. Le manifeste 
 la construction réalisée ; il ne promet pas un binaire bit à bit identique sur un
 autre poste ou avec une autre clé.
 
-Pour activer Agent au démarrage du lanceur, créer `agent-service.json` dans
+Pour la livraison Windows, construire le client Tauri et le paquet serveur avec
+le portail compilé. Utiliser la validation de périmètre `windows` pour le
+manifeste de déploiement. La 4.0.8 publiée utilise le manifeste Ed25519 du canal
+avec un installateur sans Authenticode. Conserver l’installateur et le manifeste
+4.0.7 ainsi que l’index du portail précédent. [Construction Windows](client-tauri/README.md)
+[Procédure de bascule et preuves](audits/2026-11-15-fusion-kiara/BASCULE.md)
+
+Pour activer le service Projets au démarrage du lanceur, créer `project-service.json` dans
 `KIARA_DATA_DIR` (par défaut, le dossier `lanceur`). Renseigner `data` avec le
-chemin absolu du dossier Agent restauré qui contient `brain`, `erp` et `storage`,
+chemin absolu du dossier des données des projets qui contient `brain`, `erp` et `storage`,
 et `python` avec celui de l’exécutable Python du service. Le champ facultatif
 `speech_python` désigne le runtime audio.
 Le champ `speech_models` désigne le dossier des modèles audio et de leur rapport
-`audio-qualification.json`. `KIARA_AGENT_SPEECH_MODELS_DIR` prime sur le fichier.
+`audio-qualification.json`. `KIARA_PROJECT_SPEECH_MODELS_DIR` prime sur le fichier.
 Installer `agent/requirements-pdf.txt` dans le Python du service pour le rendu PDF.
 La recherche multimodale locale est obsolète. La recherche sémantique utilise
 EmbeddingGemma 2 via EG2, y compris pour le texte extrait des images et de l’audio.
-Les variables `KIARA_AGENT_DATA_DIR`, `KIARA_AGENT_PYTHON` et
-`KIARA_AGENT_SPEECH_PYTHON` priment sur les champs correspondants.
+Les variables `KIARA_PROJECT_DATA_DIR`, `KIARA_PROJECT_PYTHON` et
+`KIARA_PROJECT_SPEECH_PYTHON` priment sur les champs correspondants.
+Les variables de démarrage `KIARA_AGENT_*` restent lues lorsque la variable
+`KIARA_PROJECT_*` correspondante est absente. Pendant le pilote, conserver
+les anciennes valeurs pour un retour vers le lanceur précédent.
 Après modification du fichier, relancer le lanceur.
 Sous Windows, pour relancer uniquement le lanceur depuis une session de même
 niveau de droits, exécuter `& '.\Start-Interface-Qwen.ps1' -Redemarrer -SansNavigateur`.
@@ -76,23 +87,23 @@ en service. Lors de la première activation, elle vérifie aussi en lecture seul
 que le catalogue Kiara historique ne contient aucun projet ni document, puis
 relève les projets de la base ERP restaurée. À chaque redémarrage, le script
 compare les identifiants, codes, intitulés et états relevés avant l’arrêt
-au catalogue servi par Agent.
-La rubrique **Accès Agent** affiche les erreurs de configuration et de démarrage.
-Les journaux du processus sont dans `logs/service.log` sous le dossier de données Agent.
+au catalogue du service Projets.
+Dans **Clients & accès**, ouvrir **Droits sur les projets** pour consulter les erreurs de configuration et de démarrage.
+Les journaux du processus sont dans `logs/service.log` sous le dossier des données des projets.
 Pour la recette d’une restauration, `start_workers: false` suspend le démarrage
-automatique des traitements. La variable `KIARA_AGENT_START_WORKERS` accepte `0`
+automatique des traitements. La variable `KIARA_PROJECT_START_WORKERS` accepte `0`
 ou `1` et prime sur le fichier. Les traitements démarrent par défaut.
 Pour une reprise progressive, régler `start_workers` à `true` et renseigner
 `worker_groups` avec les groupes à démarrer parmi `mail`, `cdc`, `audio`,
 `documents`, `planning` et `knowledge`. Une liste vide les
-suspend tous. Sans ce champ, Agent applique le démarrage habituel.
+suspend tous. Sans ce champ, le service applique le démarrage habituel.
 Pour les documents de projet, `document_roots` et `document_write_roots`
-sont deux listes distinctes de chemins absolus vus par le service Agent.
+sont deux listes distinctes de chemins absolus vus par le service Projets.
 `document_drive_mappings` associe si nécessaire une lettre de lecteur
 au chemin absolu du partage sur le serveur. Les variables JSON
 `AGENT_DOCUMENT_ROOTS`, `AGENT_DOCUMENT_WRITE_ROOTS` et
 `AGENT_DOCUMENT_DRIVE_MAPPINGS` priment sur le fichier. Sans racines
-configurées, Agent désactive l’accès correspondant.
+configurées, le service désactive l’accès correspondant.
 Le champ `document_project_root` désigne le répertoire privé des dossiers
 clients. Kiara crée un sous-dossier par projet lors de la création ou de
 l’import. La configuration autorise le projet à lire et publier dans son
@@ -107,11 +118,11 @@ mêmes correspondances de lecteurs pour ses sources réseau.
 Pour activer le web privé, renseigner `web_origin` avec son origine HTTPS
 dédiée et, si nécessaire, `web_port` avec le port local (8767 par défaut).
 Le proxy HTTPS conserve l’en-tête `Host` et transmet au port d’écoute sur
-`127.0.0.1`. Les variables `KIARA_AGENT_WEB_ORIGIN` et `KIARA_AGENT_WEB_PORT`
+`127.0.0.1`. Les variables `KIARA_PROJECT_WEB_ORIGIN` et `KIARA_PROJECT_WEB_PORT`
 priment sur le fichier.
 Pour les imports Thunderbird, renseigner `thunderbird_device` avec l’identifiant
 de l’accès Kiara du poste prévu. Cet accès doit avoir le rôle Propriétaire sans
-restriction de projets. `KIARA_AGENT_THUNDERBIRD_DEVICE` prime sur le fichier.
+restriction de projets. `KIARA_PROJECT_THUNDERBIRD_DEVICE` prime sur le fichier.
 
 L’intégration de l’assistant ajoute des ressources de détection locale épinglées
 (sherpa-onnx 1.13.8, modèle int8, AAR Android) : exécuter
@@ -130,14 +141,17 @@ sélectionne son runtime privé validé par le pointeur
 `toolchain/hermes-security-runtime/runtime.json`, préparé avec le script et le
 patch de `maintenance/2026-10-21-correctifs-audit/`.
 
-Le point d’entrée complet, depuis la racine, est :
+Sur ce poste, le projet actif est `D:\Serveur IA`. Préparer sur **D:** les outils,
+caches, fichiers temporaires, builds, restaurations de recette et nouvelles preuves.
+**E:** est réservé au stockage des archives et des preuves finalisées. Pendant la
+suspension des accès à E:, conserver également les livrables et les preuves sur D:.
 
-Sur ce poste, le projet actif est `F:\Serveur IA`. La variable utilisateur
-`KIARA_EVIDENCE_DIR` dirige les nouvelles preuves vers `D:\Archives Kiara\preuves` ;
-`--output` reste prioritaire. Voir la [répartition après migration](maintenance/2026-11-04-migration-stockage/README.md).
+Depuis la racine, indiquer explicitement la sortie sur D:. `--output` est prioritaire
+sur `KIARA_EVIDENCE_DIR`, qui peut contenir un ancien chemin.
 
 ```powershell
-& '.\Strata-src\.venv\Scripts\python.exe' maintenance/verify_project.py
+$Recette = Join-Path $PWD ('toolchain\test-results\' + (Get-Date -Format 'yyyyMMdd-HHmmss'))
+& '.\Strata-src\.venv\Scripts\python.exe' maintenance/verify_project.py --output $Recette
 ```
 
 Il agrège les échecs et produit `validation.json` dans un répertoire d’exécution
@@ -210,10 +224,10 @@ Avant les tests locaux de transport WireGuard, lancer
 `& '.\client-qwen\Build-WireGuard.ps1'` depuis la racine. Les fixtures Windows
 et Android utilisent le pont reconstruit et son écoute UDP sur `127.0.0.1`.
 Avant de créer l’archive serveur, installer les dépendances verrouillées du
-frontend Agent avec `pnpm --dir agent/web install --frozen-lockfile`, puis
+portail Kiara avec `pnpm --dir agent/web install --frozen-lockfile`, puis
 compiler avec `pnpm --dir agent/web run build`. L’archive serveur contient
-l’interface compilée et les sources Agent. Les données et le fichier
-`lanceur/agent-service.json` se préparent sur le serveur cible.
+l’interface compilée et les sources du service Projets. Les données et le fichier
+`lanceur/project-service.json` se préparent sur le serveur cible. `agent-service.json` reste lu si le nouveau fichier est absent.
 
 ```powershell
 & '.\Strata-src\.venv\Scripts\python.exe' maintenance/prepare_go.py

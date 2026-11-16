@@ -415,7 +415,7 @@ def agent_windows_path(value, roots):
         if resolved.is_relative_to(resolved_root):
             if resolved.is_dir() or (resolved.is_file() and resolved.suffix.lower() in AGENT_OPEN_EXTENSIONS):
                 return resolved
-            raise PermissionError('Ce type de fichier ne peut pas être ouvert par Agent.')
+            raise PermissionError('Ce type de fichier ne peut pas être ouvert par Kiara.')
     raise PermissionError('Ce chemin est en dehors des dossiers autorisés sur ce poste.')
 
 
@@ -489,7 +489,9 @@ def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
             prefixes = ('/api/v1/', '/assets/', '/app/', '/v1/projects/', '/v1/sources/',
                         '/v1/settings/', '/v1/mail/', '/v1/triage/', '/v1/thunderbird/',
                         '/v1/proposals/', '/v1/search/')
-            return path in ('/app', '/v1/settings') or path.startswith(prefixes)
+            return (path in ('/app', '/v1/settings', '/v1/ingest/default-folder', '/v1/ingest/scan')
+                    or path.startswith(prefixes)
+                    or re.fullmatch(r'/v1/resolution/[A-Za-z0-9_-]{1,36}/confirm', path) is not None)
 
         def agent_authorized(self):
             if not self.local_request():
@@ -515,7 +517,7 @@ def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
                         or not hmac.compare_digest(provided, expected)):
                     return self.reply(403, {'detail': 'Liaison Thunderbird non appairée.'})
             elif not self.agent_authorized():
-                return self.reply(403, {'error': {'message': 'Ouvrez Agent depuis Kiara.'}})
+                return self.reply(403, {'error': {'message': 'Ouvrez Projets depuis la navigation Kiara.'}})
             if not bridge and self.command not in ('GET', 'HEAD'):
                 port = self.server.server_address[1]
                 if self.headers.get('Origin') not in (f'http://127.0.0.1:{port}', f'http://localhost:{port}'):
@@ -559,9 +561,10 @@ def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
                     if self.command == 'GET' and (path == '/app' or path.startswith('/app/')) and response.status == 200:
                         html = response.read(1024 * 1024 + 1)
                         if len(html) > 1024 * 1024 or b'<body>' not in html:
-                            raise ValueError('Page Agent invalide')
+                            raise ValueError('Page Projets invalide.')
                         capture = b' data-kiara-capture="true"' if desktop_capture else b''
-                        html = html.replace(b'<body>', b'<body data-kiara-desktop="true" data-kiara-project-conversation="true"' + capture + b'>', 1)
+                        windows = b' data-kiara-windows="true"' if sys.platform == 'win32' else b''
+                        html = html.replace(b'<body>', b'<body data-kiara-desktop="true" data-kiara-project-conversation="true"' + windows + capture + b'>', 1)
                     self.send_response(response.status if hasattr(response, 'status') else response.code)
                     for name in AGENT_RESPONSE_HEADERS:
                         value = response.headers.get(name)
@@ -583,7 +586,7 @@ def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
                         self.wfile.flush()
             except (OSError, ValueError, urllib.error.URLError):
                 if not started:
-                    self.reply(503, {'error': {'message': 'Service Agent indisponible.'}})
+                    self.reply(503, {'error': {'message': 'Le service Projets est indisponible.'}})
 
         def thunderbird_extension(self):
             if self.command not in ('GET', 'POST'):
@@ -665,7 +668,7 @@ def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
         def agent_open_path(self):
             origin = f'http://{self.headers.get("Host", "")}'
             if not self.agent_authorized() or self.headers.get('Origin') != origin:
-                return self.reply(403, {'detail': 'Ouvrez Agent depuis Kiara.'})
+                return self.reply(403, {'detail': 'Ouvrez Projets depuis la navigation Kiara.'})
             if sys.platform != 'win32':
                 return self.reply(403, {'detail': 'Ouvrez ce chemin depuis le poste Windows.'})
             try:
@@ -770,7 +773,7 @@ def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
             self.forward()
 
         def do_POST(self):
-            if self.path == '/client/agent/session':
+            if self.path in ('/client/project-session', '/client/agent/session'):
                 return self.agent_session()
             if self.path == '/api/v1/open-path':
                 return self.agent_open_path()
@@ -1202,7 +1205,7 @@ def install_close_guard(window):
                 if result.get('saved') or window.create_confirmation_dialog(APP_NAME,'Historique non enregistré : '+result.get('message','')+'\nExportez vos conversations pour les conserver. Fermer quand même ?'):
                     state['ready']=True;window.destroy()
                 else:state['pending']=False
-            try:window.evaluate_js("(async()=>{try{if(window.kiaraPrepareClose)await window.kiaraPrepareClose();else if(!window.dispatchEvent(new Event('beforeunload',{cancelable:true})))throw new Error('Des modifications sont en cours dans Agent.');return {saved:true};}catch(e){return {saved:false,message:e.message};}})()",callback=complete)
+            try:window.evaluate_js("(async()=>{try{if(window.kiaraPrepareClose)await window.kiaraPrepareClose();else if(!window.dispatchEvent(new Event('beforeunload',{cancelable:true})))throw new Error('Des modifications sont en cours dans Kiara.');return {saved:true};}catch(e){return {saved:false,message:e.message};}})()",callback=complete)
             except Exception as error:complete({'saved':False,'message':str(error)})
         threading.Thread(target=work,daemon=True).start()
         return False

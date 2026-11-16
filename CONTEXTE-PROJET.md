@@ -1,8 +1,26 @@
 # Contexte de reprise — serveur Kiara
 
-Mise à jour du 15 novembre 2026.
+Mise à jour du 16 novembre 2026.
 
-**Kiara 4.0.5** est le client Windows publié. Agent tourne côté serveur avec les 11 projets restaurés. Le lanceur et le client Windows de transition utilisent la base **3.5.63**. Voir [l’intégration Agent](ARCHITECTURE-ACTUELLE.md#intégration-agent) et [le plan global](PLAN-GLOBAL-SERVEUR-FRED.md#suivi-agent).
+La fusion est en production pour **Windows et le web privé** avec **Kiara 4.0.8**.
+Le lanceur Kiara supervise le service Projets et son catalogue de 11 projets.
+Conversations réunit le composeur, l’historique et l’assistant de projet, avec
+les brouillons et le mode éphémère. Projets propose la fiche à quatre rubriques
+dans le style Kiara. Le superviseur autonome a été retiré du dépôt.
+
+Le canal Windows utilise un manifeste Ed25519. La 4.0.8 a été publiée sans
+Authenticode et la **4.0.7** est conservée pour le retour arrière. La **3.5.63**
+reste la référence pour la transition des clients classiques. Android et Linux
+ont leur propre qualification, après Windows.
+
+Le dépôt de travail est `D:\Serveur IA`. Utiliser **D:** pour les constructions,
+caches, fichiers temporaires et recettes. **E:** est réservé aux archives et aux
+preuves conservées. Tant que les accès à E: sont suspendus, conserver aussi
+les nouvelles preuves sur D:. Voir [l’architecture](ARCHITECTURE-ACTUELLE.md#projets-et-conversations)
+et [la publication avec retour arrière](audits/2026-11-15-fusion-kiara/BASCULE.md).
+
+Les sections qui suivent conservent les états précédents avec leurs versions,
+leurs chemins et leurs conditions de recette.
 
 ## État historique du 4 novembre 2026
 
@@ -90,7 +108,7 @@ Le 13 octobre, la connexion WireGuard sur le réseau local a été réparée : l
 
 La consigne finale du 13 octobre conserve **192.168.1.41** : l’utilisateur adapte la redirection de port de la box à `.41`. Ne pas remettre les profils sur `.40`, occupée par un appareil Espressif. La tentative précédente de retour à `.40` a été rejetée par la détection de conflit de Windows puis annulée. Le script de configuration fixe a été relancé en administrateur et a réussi à **12 h 51 (Europe/Paris)** : `.41`, masque `/24`, passerelle et DNS `192.168.1.1`, DHCP IPv4 désactivé et configuration persistante. Preuves : [maintenance/2026-10-13-ip-fixe/verification.json](maintenance/2026-10-13-ip-fixe/verification.json). Les profils, WireGuard, HTTPS Cloudflare, les processus Qwen chargés et les clés ont été vérifiés après application.
 
-## Fonctionnement actuel
+## Fonctionnement documenté en octobre 2026
 
 - Réseau du PC : IP fixe persistante `192.168.1.41/24`, DHCP IPv4 désactivé, passerelle et DNS `192.168.1.1`. Les profils WireGuard utilisent `192.168.1.41:51820` sur le LAN. L’utilisateur adapte la redirection UDP 51820 de la box à `.41` ; cette règle n’a pas été vérifiée depuis un réseau extérieur.
 - Chat Strata direct avec le modèle local : [http://127.0.0.1:8080/](http://127.0.0.1:8080/), également accessible par **Ouvrir le chat** dans la console Kiara. Console : [http://127.0.0.1:8765/](http://127.0.0.1:8765/). Ces deux interfaces écoutent uniquement sur le PC serveur, en loopback.

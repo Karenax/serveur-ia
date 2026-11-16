@@ -23,6 +23,7 @@ it("importe des EML dans le projet choisi avec un accès limité", async () => {
   const form = screen.getByRole("form", {name:"Importer des mails EML"});
   expect(within(form).getByRole("combobox")).toBe(document.activeElement);
   expect(within(form).queryByRole("option", {name:/Divers/})).toBeNull();
+  expect(within(form).queryByRole("option", {name:/Détecter le projet/})).toBeNull();
   const submit = within(form).getByRole("button", {name:"Importer"}) as HTMLButtonElement;
   expect(submit.disabled).toBe(true);
   fireEvent.change(within(form).getByLabelText("Projet de destination"), {target:{value:"p1"}});
@@ -35,6 +36,23 @@ it("importe des EML dans le projet choisi avec un accès limité", async () => {
   expect(upload.mock.calls).toEqual(files.map(file => ["p1", file]));
   expect(p.onReload).toHaveBeenCalled();
   expect(screen.getByRole("form", {name:"Importer des mails EML"})).toBeTruthy();
+});
+
+it("importe un EML sans destination et indique où le rattacher", async () => {
+  vi.spyOn(api, "brainSourceDetail").mockResolvedValue({id:"source1",artifacts:[]});
+  const upload=vi.spyOn(api,"brainImportEml").mockResolvedValue({status:"resolution_pending"});
+  const p=props();p.projects=[];
+  render(<MailWorkspace {...p}/>);
+  openDetails("Options");
+  fireEvent.click(screen.getByRole("button",{name:"Importer des mails EML"}));
+  const form=screen.getByRole("form",{name:"Importer des mails EML"});
+  const file=new File([""],"à-classer.eml");
+  fireEvent.change(within(form).getByLabelText("Projet de destination"),{target:{value:"automatic"}});
+  fireEvent.change(within(form).getByLabelText("Fichiers EML"),{target:{files:[file]}});
+  fireEvent.submit(form);
+  await screen.findByText("1 mail importé. 1 à rattacher dans Sources.");
+  expect(upload).toHaveBeenCalledWith(null,file);
+  expect(p.onReload).toHaveBeenCalled();
 });
 
 it("ne propose pas l’import EML en lecture seule", () => {
@@ -197,7 +215,7 @@ it("écarte le mail ouvert sans l'affecter à un projet", async () => {
   await screen.findByText("Offre sans intérêt");
   fireEvent.change(screen.getByLabelText("Projet de classement"), { target: { value: "DISCARD" } });
   expect(discard).not.toHaveBeenCalled();
-  fireEvent.click(screen.getByRole("button", { name: "Supprimer le contenu d’Agent" }));
+  fireEvent.click(screen.getByRole("button", { name: "Supprimer le contenu de Kiara" }));
   await waitFor(() => expect(discard).toHaveBeenCalledWith("source1"));
   await waitFor(() => expect(p.onReload).toHaveBeenCalled());
   expect(p.onDecide).not.toHaveBeenCalled();
@@ -208,7 +226,7 @@ it("le dépôt sur Écarter utilise les IDs sources des seules propositions dép
   const discard = vi.spyOn(api, "brainDiscardSource").mockResolvedValue({ status: "discarded" });
   const p = props();
   render(<MailWorkspace {...p} />);
-  fireEvent.drop(screen.getByRole("button", { name: /Supprimer d’Agent/ }), {
+  fireEvent.drop(screen.getByRole("button", { name: /Supprimer de Kiara/ }), {
     dataTransfer: { getData: (type: string) => type === "application/x-triage-mails" ? '["proposal1"]' : "" },
   });
   await waitFor(() => expect(discard).toHaveBeenCalledWith("source1"));
@@ -297,7 +315,7 @@ it("rejette le mail courant directement sans classer sa destination présélecti
   const p=props();
   render(<MailWorkspace {...p}/>);
   openDetails("Options du mail");
-  fireEvent.click(screen.getByRole("button",{name:"Supprimer ce mail d’Agent"}));
+  fireEvent.click(screen.getByRole("button",{name:"Supprimer ce mail de Kiara"}));
   await waitFor(()=>expect(discard).toHaveBeenCalledWith("source1"));
   expect(p.onDecide).not.toHaveBeenCalled();
   await waitFor(()=>expect(p.onReload).toHaveBeenCalled());
@@ -308,7 +326,7 @@ it("conserve le mail et affiche l'erreur si le rejet échoue", async () => {
   vi.spyOn(api,"brainDiscardSource").mockRejectedValue(new Error("Rejet indisponible"));
   render(<MailWorkspace {...props()}/>);
   openDetails("Options du mail");
-  fireEvent.click(screen.getByRole("button",{name:"Supprimer ce mail d’Agent"}));
+  fireEvent.click(screen.getByRole("button",{name:"Supprimer ce mail de Kiara"}));
   await screen.findByText(/Rejet indisponible/);
   expect(screen.getByRole("heading",{name:"Offre publicitaire"})).toBeTruthy();
 });
@@ -327,7 +345,7 @@ it("ouvre les dossiers et les commandes secondaires à la demande sans décider 
   expect(selector.closest(".maildesk-decision")).not.toBeNull();
   expect(selector.compareDocumentPosition(classify) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   expect(screen.queryByText("Autre projet",{exact:true,selector:"summary"})).toBeNull();
-  expect((screen.getByRole("button",{name:"Supprimer ce mail d’Agent"}).closest("details") as HTMLDetailsElement).open).toBe(false);
+  expect((screen.getByRole("button",{name:"Supprimer ce mail de Kiara"}).closest("details") as HTMLDetailsElement).open).toBe(false);
   openDetails("Options");
   expect(screen.getByRole("combobox",{name:"Dossier de mails"})).toBeTruthy();
   expect((screen.getByRole("combobox",{name:"Dossier de mails"}).closest("details") as HTMLDetailsElement).open).toBe(true);
@@ -474,9 +492,9 @@ it.each(['direct','destination','depot'])('annuler la suppression %s ne purge au
   const discard=vi.spyOn(api,'brainDiscardSource');
   render(<MailWorkspace {...props()}/>);
   await screen.findByRole('heading',{name:'Offre publicitaire'});
-  if(chemin==='direct'){openDetails('Options du mail');fireEvent.click(screen.getByRole('button',{name:'Supprimer ce mail d’Agent'}));}
-  else if(chemin==='destination'){fireEvent.change(screen.getByLabelText('Projet de classement'),{target:{value:'DISCARD'}});fireEvent.click(screen.getByRole('button',{name:'Supprimer le contenu d’Agent'}));}
-  else fireEvent.drop(screen.getByRole('button',{name:/Supprimer d’Agent/}),{dataTransfer:{getData:(type:string)=>type==='application/x-triage-mails'?'["proposal1"]':''}});
+  if(chemin==='direct'){openDetails('Options du mail');fireEvent.click(screen.getByRole('button',{name:'Supprimer ce mail de Kiara'}));}
+  else if(chemin==='destination'){fireEvent.change(screen.getByLabelText('Projet de classement'),{target:{value:'DISCARD'}});fireEvent.click(screen.getByRole('button',{name:'Supprimer le contenu de Kiara'}));}
+  else fireEvent.drop(screen.getByRole('button',{name:/Supprimer de Kiara/}),{dataTransfer:{getData:(type:string)=>type==='application/x-triage-mails'?'["proposal1"]':''}});
   await waitFor(()=>expect(window.confirm).toHaveBeenCalledOnce());
   expect(discard).not.toHaveBeenCalled();
   expect(vi.mocked(window.confirm).mock.calls[0][0]).toContain('originaux dans votre messagerie sont conservés');

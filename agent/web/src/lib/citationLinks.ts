@@ -1,4 +1,4 @@
-/** Keep canonical version and scope pointers supplied by Agent; never open external URLs. */
+/** Keep canonical version and scope pointers supplied by the project service; never open external URLs. */
 export type CitationTarget={source_id?:string|null;source_url?:string;audio_url?:string|null;locator?:Record<string,unknown>};
 const id='[A-Za-z0-9_-]+';
 export const noteVersionUrl=(project:string,note:string,version:string)=>`/api/v1/projects/${encodeURIComponent(project)}/notes/${encodeURIComponent(note)}/versions/${encodeURIComponent(version)}`;

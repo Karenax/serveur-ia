@@ -6,14 +6,18 @@ ont depuis été retirées. Les rappels et le bilan consultable restent disponib
 L’[architecture courante](ARCHITECTURE-ACTUELLE.md) et le
 [guide utilisateur](GUIDE-ASSISTANT-KIARA.md) décrivent le périmètre actuel.
 
-## Suivi Agent
+## Suivi de Projets et de la fusion Windows
 
-Au 15 novembre 2026, Agent est disponible dans Kiara 4.0.5 et dans le web privé. Les 11 projets, la recherche EG2 et les citations ont été vérifiés avec Fred. Fred a également validé la recette Thunderbird sur son poste et l’installation de Kiara 4.0.5 sans droits administrateur. Les deux runtimes LiteRT ont été supprimés. [Architecture et responsabilités](ARCHITECTURE-ACTUELLE.md#intégration-agent)
+Au 16 novembre 2026, Kiara 4.0.8 est en production pour Windows et le web privé.
+Le service Projets est supervisé par le lanceur. Les 11 projets ont été retrouvés
+après redémarrage. Le cycle d’installation 4.0.7 → 4.0.8 → 4.0.7 a passé sur le
+poste Windows. [Architecture et responsabilités](ARCHITECTURE-ACTUELLE.md#projets-et-conversations)
+[Publication et retour arrière](audits/2026-11-15-fusion-kiara/BASCULE.md)
 
-- **Distribution Windows.** Qualifier la mise à jour sur un second environnement, la reprise de Voix Max, l’installation sans WebView2 préexistant et la signature Authenticode.
+- **Qualifications complémentaires.** Le second environnement Windows, la reprise de Voix Max et l’installation sans WebView2 préexistant restent à éprouver. La 4.0.8 a été publiée avec la signature Ed25519 du canal et sans Authenticode, sur décision de Fred.
 - **Réunions et accès.** Vérifier Réunions et WireGuard depuis un second poste et confirmer le périmètre d’un accès réduit au web privé.
 - **Données historiques.** Retrouver le partage d’origine et le PDF source CDC manquant. Les projets et les extraits déjà restaurés restent consultables.
-- **Sauvegarde.** Vérifier la copie NAS et la restauration isolée du passage prévu le 16 novembre à 3 h.
+- **Sauvegarde.** Une paire NAS a été répétée sur D: avec 11 identifiants et liens préservés. [Procédure et preuves](audits/2026-11-15-fusion-kiara/BASCULE.md)
 - **Reporté.** Les imports Sage sur les exports réels restent à reprendre ultérieurement.
 
 ## Historique des lots

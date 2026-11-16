@@ -107,7 +107,7 @@ class AgentWebTests(unittest.TestCase):
         self.assertEqual(self.request('HEAD', WINDOWS_DOWNLOAD, Cookie=cookie)[0], 401)
         self.assertNotIn('attachment', str(self.request('GET', WINDOWS_DOWNLOAD, Cookie=cookie)[1]))
 
-    def test_shared_gateway_keeps_browser_session_under_agent_prefix(self):
+    def test_shared_gateway_keeps_session_under_both_portal_prefixes(self):
         server = serve_gateway(self.store, lambda: None, port=0, agent_web_origin='https://agent.example.test')
         worker = threading.Thread(target=server.serve_forever, daemon=True)
         worker.start()
@@ -126,15 +126,30 @@ class AgentWebTests(unittest.TestCase):
         self.assertEqual(self.request('GET', '/agent/api/v1/session', Cookie=cookie)[0], 200)
         self.assertEqual(self.request('GET', '/v1/models', Cookie=cookie)[0], 401)
         self.check_conversations('/agent', cookie)
-        source = '/agent/v1/sources/fixture/raw'
-        self.assertEqual(self.request('GET', source, Range='bytes=1-3')[0], 401)
-        status, headers, body = self.request('GET', source, Cookie=cookie, Range='bytes=1-3')
-        self.assertEqual((status, body), (206, b'rig'))
-        self.assertEqual(headers['Content-Range'], 'bytes 1-3/5')
-        self.assertEqual(headers['Content-Disposition'], 'attachment; filename="original.txt"')
-        self.assertEqual(headers['Cache-Control'], 'private, no-store')
-        self.store.scope = ['other-project']
-        self.assertEqual(self.request('GET', source, Cookie=cookie, Range='bytes=1-3')[0], 403)
+        self.assertEqual(self.request('HEAD', '/kiara/')[0], 200)
+        self.assertEqual(self.request('GET', '/kiara')[1]['Location'], '/kiara/')
+        self.assertEqual(self.request('GET', '/kiara/app')[1]['Location'], '/kiara/')
+        self.assertEqual(self.request('GET', '/kiara/api/v1/session', Cookie=cookie)[0], 200)
+        self.check_conversations('/kiara', cookie)
+        status, headers, _ = self.request('POST', '/kiara/connexion', urlencode({'access': 'valid-token'}),
+                                         Origin='https://agent.example.test',
+                                         **{'Content-Type': 'application/x-www-form-urlencoded'})
+        self.assertEqual(status, 303)
+        self.assertEqual(headers['Location'], '/kiara/app/conversations')
+        self.assertEqual(self.request('GET', '/kiara/api/v1/session', Cookie=headers['Set-Cookie'].split(';', 1)[0])[0], 200)
+        allowed_scope = self.store.scope
+        for prefix in ('/agent', '/kiara'):
+            with self.subTest(prefix=prefix):
+                source = prefix + '/v1/sources/fixture/raw'
+                self.store.scope = allowed_scope
+                self.assertEqual(self.request('GET', source, Range='bytes=1-3')[0], 401)
+                status, headers, body = self.request('GET', source, Cookie=cookie, Range='bytes=1-3')
+                self.assertEqual((status, body), (206, b'rig'))
+                self.assertEqual(headers['Content-Range'], 'bytes 1-3/5')
+                self.assertEqual(headers['Content-Disposition'], 'attachment; filename="original.txt"')
+                self.assertEqual(headers['Cache-Control'], 'private, no-store')
+                self.store.scope = ['other-project']
+                self.assertEqual(self.request('GET', source, Cookie=cookie, Range='bytes=1-3')[0], 403)
 
     def test_dedicated_gateway_serves_conversations(self):
         server = serve_gateway(self.store, lambda: None, port=0,

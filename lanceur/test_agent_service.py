@@ -13,6 +13,18 @@ from agent_service import AgentService, service_configuration, web_configuration
 
 
 class AgentServiceTests(unittest.TestCase):
+    def test_project_process_never_inherits_testing_bypass(self):
+        with TemporaryDirectory() as folder, patch.dict(os.environ, {'AGENT_TESTING': '1'}):
+            root = Path(folder)
+            service = AgentService(None, root / 'data', root / 'python.exe')
+            (root / 'data/logs').mkdir(parents=True)
+            with patch.object(service, 'preflight', return_value={}), patch('agent_service.private_directory'), patch(
+                'agent_service.subprocess.Popen', side_effect=OSError('fixture intercepts process creation')
+            ) as start:
+                with self.assertRaisesRegex(OSError, 'fixture intercepts'):
+                    service._start()
+            self.assertNotIn('AGENT_TESTING', start.call_args.kwargs['env'])
+
     def test_selecting_a_thunderbird_device_preserves_its_project_grant(self):
         with TemporaryDirectory() as folder, patch.dict(os.environ, {}, clear=True):
             home = Path(folder)
@@ -53,6 +65,56 @@ class AgentServiceTests(unittest.TestCase):
             path.write_text('null', encoding='utf-8')
             with self.assertRaisesRegex(ValueError, 'agent-service.json'):
                 service_configuration(home)
+
+    def test_project_configuration_takes_precedence_for_reads_and_writes(self):
+        with TemporaryDirectory() as folder, patch.dict(os.environ, {}, clear=True):
+            home = Path(folder)
+            settings = {'data': str(home / 'data'), 'python': str(home / 'python.exe')}
+            legacy = home / 'agent-service.json'
+            original = json.dumps({**settings, 'web_origin': 'https://legacy.example.test'})
+            legacy.write_text(original, encoding='utf-8')
+            current = home / 'project-service.json'
+            current.write_text(json.dumps({**settings, 'web_origin': 'https://kiara.example.test'}), encoding='utf-8')
+            self.assertEqual(web_configuration(home), ('https://kiara.example.test', 8767))
+            service = AgentService(SimpleNamespace(home=home, lock=threading.RLock(), agent_bridge=None), **settings)
+            device = '0123456789abcdef'
+            with patch.object(service.access, 'operator_for', return_value={'role': 'editor'}):
+                service.set_thunderbird_device(device)
+            self.assertEqual(service_configuration(home)['thunderbird_device'], device)
+            self.assertEqual(legacy.read_text(encoding='utf-8'), original)
+            current.write_text('null', encoding='utf-8')
+            with self.assertRaisesRegex(ValueError, 'project-service.json'):
+                service_configuration(home)
+
+    def test_project_environment_overrides_also_support_a_legacy_rollback(self):
+        with TemporaryDirectory() as folder, patch.dict(os.environ, {}, clear=True):
+            home = Path(folder)
+            config = {
+                'data': str(home / 'data'), 'python': str(home / 'python.exe'),
+                'web_origin': 'https://kiara.example.test', 'start_workers': True,
+            }
+            original = json.dumps(config)
+            (home / 'agent-service.json').write_text(original, encoding='utf-8')
+            old = {'PYTHON': str(home / 'old-override.exe'), 'START_WORKERS': '0', 'WEB_PORT': '8878'}
+            os.environ.update({f'KIARA_AGENT_{key}': value for key, value in old.items()})
+            expected_service = service_configuration(home)
+            expected_web = web_configuration(home)
+
+            candidate = home / 'project-service.json'
+            candidate.write_text(original, encoding='utf-8')
+            os.environ.update({f'KIARA_PROJECT_{key}': value for key, value in old.items()})
+            self.assertEqual(service_configuration(home), expected_service)
+            self.assertEqual(web_configuration(home), expected_web)
+            os.environ['KIARA_PROJECT_START_WORKERS'] = '1'
+            os.environ['KIARA_PROJECT_WEB_ORIGIN'] = ''
+            self.assertTrue(service_configuration(home)['start_workers'])
+            self.assertIsNone(web_configuration(home))
+
+            candidate.unlink()
+            for key in (*old, 'WEB_ORIGIN'):
+                del os.environ[f'KIARA_PROJECT_{key}']
+            self.assertEqual(service_configuration(home), expected_service)
+            self.assertEqual(web_configuration(home), expected_web)
 
     def test_web_listener_settings_persist_and_keep_environment_overrides(self):
         with TemporaryDirectory() as folder, patch.dict(os.environ, {}, clear=True):
@@ -143,12 +205,12 @@ class AgentServiceTests(unittest.TestCase):
             root = home / 'clients'
             settings = {'AGENT_DOCUMENT_PROJECT_ROOT': json.dumps(str(root))}
             service = AgentService(None, home, home / 'python.exe', document_settings=settings)
-            with self.assertRaisesRegex(ValueError, 'dossier client Agent'):
+            with self.assertRaisesRegex(ValueError, 'dossier client'):
                 service.preflight()
             root.mkdir()
             self.assertEqual(service.preflight(), {})
             settings['AGENT_DOCUMENT_ROOTS'] = json.dumps([str(home)])
-            with self.assertRaisesRegex(ValueError, 'racines partagées'):
+            with self.assertRaisesRegex(ValueError, 'dossiers distincts'):
                 service.preflight()
 
     def test_worker_groups_can_be_selected_and_reject_unknown_names(self):

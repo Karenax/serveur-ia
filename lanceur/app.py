@@ -333,7 +333,7 @@ def serve(port=8765, controller=None):
                 return self.respond(200, inventory(controller))
             if path == '/api/devices':
                 return self.respond(200, controller.remote.metadata())
-            if path == '/api/agent-service':
+            if path in ('/api/project-service', '/api/agent-service'):
                 if not hmac.compare_digest(self.headers.get('X-Launcher-Token', ''), token):
                     return self.respond(403, {'error': 'Accès administrateur requis.'})
                 service = controller.agent_service
@@ -352,7 +352,7 @@ def serve(port=8765, controller=None):
                                           'configuration_error': getattr(controller, 'agent_configuration_error', ''),
                                           'startup_error': getattr(service, 'startup_error', ''),
                                           'operator': service.access.operator_for(owner) if service and owner else None})
-            if path == '/api/agent-service/catalogue':
+            if path in ('/api/project-service/catalogue', '/api/agent-service/catalogue'):
                 if not hmac.compare_digest(self.headers.get('X-Launcher-Token', ''), token):
                     return self.respond(403, {'error': 'Accès administrateur requis.'})
                 if not controller.agent_service:
@@ -413,7 +413,7 @@ def serve(port=8765, controller=None):
             if path == '/api/releases':
                 status = release_status(controller.home)
                 try:
-                    desktop, _ = windows_installer(controller.home, desktop=True)
+                    desktop, _ = windows_installer(controller.home)
                     status['desktop_version'] = desktop['version']
                 except ValueError:
                     status['desktop_version'] = None
@@ -426,7 +426,7 @@ def serve(port=8765, controller=None):
                     return self.respond(503, {'error': 'Installateur Kiara indisponible.'})
                 with stream:
                     try:
-                        release, _ = windows_installer(controller.home, stream=stream, desktop=True)
+                        release, _ = windows_installer(controller.home, stream=stream)
                     except ValueError as error:
                         return self.respond(503, {'error': str(error)})
                     self.send_response(200)
@@ -474,6 +474,7 @@ def serve(port=8765, controller=None):
                 data = (HOME / 'web' / filename).read_bytes()
                 if filename == 'index.html':
                     data = data.replace(b'__TOKEN__', token.encode())
+                    data = data.replace(b'__PROJECT_SERVICE_ENDPOINT__', b'/api/project-service')
                 content_type = 'text/html; charset=utf-8' if filename=='index.html' else 'text/css; charset=utf-8' if filename.endswith('.css') else 'application/javascript; charset=utf-8'
                 return self.respond(200, data, content_type)
             self.respond(404, {'error': 'Page introuvable.'})
@@ -515,14 +516,14 @@ def serve(port=8765, controller=None):
                     path = urlsplit(self.path).path
                     if path == '/api/voice':
                         result=controller.voice.configure(data.get('enabled'))
-                    elif path == '/api/agent-service':
+                    elif path in ('/api/project-service', '/api/agent-service'):
                         service = controller.agent_service
                         if service is None:
                             raise ValueError('Le service Projets de Kiara n’est pas configuré.')
                         action = data.get('action')
                         if action == 'access':
                             if 'project_ids' not in data or 'role' not in data:
-                                raise ValueError('Rôle et périmètre Agent requis.')
+                                raise ValueError('Indiquez le rôle et les projets autorisés.')
                             service.access.set_operator(data.get('owner'), role=data['role'],
                                                         project_ids=data['project_ids'], person_id=data.get('person_id'),
                                                         agent_operator_id=data.get('agent_operator_id'),
@@ -542,7 +543,7 @@ def serve(port=8765, controller=None):
                         elif action == 'stop':
                             service.stop()
                         else:
-                            raise ValueError('Commande Agent inconnue.')
+                            raise ValueError('Commande du service Projets inconnue.')
                         result = {'saved': True, 'running': service.running()}
                     elif path == '/api/local-network':
                         result = controller.local_network.configure(data.get('enabled'))

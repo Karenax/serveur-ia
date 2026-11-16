@@ -1,9 +1,13 @@
-# Agent — connaissance projet et ERP local
+# Kiara — service Projets
 
-Agent aide le chargé d'affaires à exploiter les documents, mails et réunions de
+Kiara aide le chargé d'affaires à exploiter les documents, mails et réunions de
 ses projets, puis à piloter CDC, bureau d'études, planning, atelier et livrables.
 Les informations gardent leurs preuves et les décisions humaines restent distinctes
 des propositions et informations retenues par défaut.
+
+Les notes datées ci-dessous décrivent les versions de l’interface antérieures à
+la fusion. Pour le démarrage et l’exploitation actuels, voir
+[Démarrer et vérifier](#démarrer-et-vérifier).
 
 ## Tri automatique des mails — 4 novembre 2026
 
@@ -77,7 +81,7 @@ La navigation principale conserve **Accueil, Projets, Mails et Réunions**.
 Informations, Suivi des analyses et Connexions & imports**, sous forme d'onglets
 au même niveau que Général, Mails, Clients et équipe et Apparence.
 
-## État courant — livraison du 23 octobre 2026
+## État historique — livraison du 23 octobre 2026
 
 Les corrections de sécurité sont suivies dans
 [le bilan des 18 constats](docs/60_SECURITY_REMEDIATION.md). La livraison Git du
@@ -90,7 +94,7 @@ Leurs connexions HTTP sont conservées, avec cette limite de confidentialité.
 La transcription directe reste provisoire et exige une relecture humaine ; la
 qualification historique n'est pas une garantie d'absence d'erreur.
 
-## Une application, un serveur
+## Architecture de la livraison du 23 octobre 2026
 
 - Agent écoute sur **127.0.0.1:8001**. FastAPI sert l'interface React construite
   dans `web/dist`, les routes Brain `/v1` et ERP `/api/v1`.
@@ -123,9 +127,10 @@ Les comptes rendus se téléchargent sans écraser de fichier sur le serveur.
 
 ## Démarrer et vérifier
 
-Après installation du profil verrouillé dans `.venv`, utiliser `start-agent.cmd`
-ou `start-agent-task.cmd`. Le lanceur privilégie l'environnement propre à Agent,
-reste sur loopback et n'hérite pas du contournement de test `AGENT_TESTING`.
+Sous Windows, démarrer Kiara avec `Start-Interface-Qwen.ps1` depuis la racine du
+dépôt. Le lanceur démarre le service Projets à partir de `project-service.json`.
+Voir [la procédure de reconstruction](../RECONSTRUIRE-FRED.md) pour préparer le
+runtime et les chemins de données.
 
 ```powershell
 .venv/Scripts/python.exe -m pytest tests/ -q

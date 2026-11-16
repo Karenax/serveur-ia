@@ -1,12 +1,12 @@
 {
   "format": 1,
   "entrypoint": "android-chat.html",
-  "sha256": "b58e07677ca9eb1bec24f653a99991aaee3584031e4c959607a0f475b9ce78ae",
+  "sha256": "9e38f817cdf45c0d7a75475b8b0f8c990906ea004636f6fd987d22c38e318260",
   "shared_sources": {
     "chat.html": "dc8c1027709509df6c5af22348d31a6fc3f747f6d77d86ee6835a2088fd3b91b",
-    "workspace.html": "4c451177f5acbf76c29f0144f8bd68cc05a8c918b7cbbb46b228dbf7154cf42e",
+    "workspace.html": "43242791571f606a751249cdeb9e592b7be37fda06440e207ff6e1c8e8896420",
     "ui.css": "4bf6e136bec80030e29327d274add299509a4e95ca736db5bd55d1a18c6c9867",
-    "ui.js": "462b00e6f0fb721b595bc9cb238b3ea8634dd861223e0715a29478f967607d18",
+    "ui.js": "7fa31b856d426390347f20589e989aacdf1aaa1d1889b022c915fb79a852d06f",
     "markdown.js": "48dd2beb1c941fe517b472959ff669a92ffa8cb51ca19fe8771c8281f366e21d",
     "corrector.js": "c060548757dbd84faf11439917a97f30d558b033b641e73359df1f9f3575f40f",
     "attachments.js": "8fb023f5c48e243b9f24d034c322a0ec53d7c391e2c73588a83c34a28a251867",
@@ -14,7 +14,7 @@
     "selection.js": "56571f9b8f13b6d34d087577f22d158bb59d7749dbfe0fd94352e50794f43df7",
     "voice.js": "9b1ff07e563008d71724a8f52fcc66227ef9795c296d50340faaf8db70606152",
     "conversation.js": "90686ea425a9de2433795f8491a9a021af5c78134c3519ff08acdd2bdffb2a27",
-    "project-conversation.js": "1fde391a4f33bd827d55862a4fac9ab344f890d9e925c62448078fd2cd082597",
+    "project-conversation.js": "4222af0e6c5d126bcc19649457b8df5382b0d42c89444b864d7f04ae01547450",
     "vendor/markdown-it.min.js": "635972b985228e8af9f0143647c68616b7a3bb09f6946e7e4a52e43dcf5e7be5"
   },
   "mobile_sources": {

@@ -13,7 +13,7 @@ const meetings:Meeting[]=[
   {id:'published-report',date:'2026-10-11',title:'Compte rendu publié',participants:'Paul',decisions:'Synthèse exacte du compte rendu ciblé',
     actions:[{id:'action',title:'Vérifier le matériel',owner:'Paul',due_date:'2026-10-16',task_id:null}],open_actions:1},
 ];
-const props={projectId:'p1',row,initialTab:'reviews' as const,reloadRows:vi.fn(async()=>{}),back:vi.fn(),sidebarNavigation:true};
+const props={projectId:'p1',row,initialTab:'reviews' as const,reloadRows:vi.fn(async()=>{}),back:vi.fn()};
 beforeEach(()=>{
   window.history.replaceState(null,'','/app/projects/p1/reviews');
   vi.spyOn(api,'detail').mockResolvedValue(detail);vi.spyOn(api,'cdcItems').mockResolvedValue([]);

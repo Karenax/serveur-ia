@@ -52,8 +52,12 @@ def test_attach_cannot_become_truth_and_confirmation_is_idempotent():
         attach_id = attach.id
     assert c.post(f"/v1/proposals/{attach_id}/accept", json={}).status_code == 400
     url = f"/v1/resolution/{source['source_id']}/confirm"
-    assert c.post(url, json={"project_id": a["id"]}).status_code == 200
-    assert c.post(url, json={"project_id": a["id"]}).json()["items"] == 0
+    waiting = c.get("/api/v1/workspace/sources", params={"status": "pending", "query": "Affectation humaine"})
+    assert waiting.status_code == 200
+    assert source["source_id"] in {row["source_id"] for row in waiting.json()["items"]}
+    assert c.post(url, json={"project_id": a["id"], "pending_only": True}).status_code == 200
+    assert c.post(url, json={"project_id": a["id"], "pending_only": True}).json()["items"] == 0
+    assert c.post(url, json={"project_id": b["id"], "pending_only": True}).status_code == 409
     with SessionLocal() as db:
         assert db.query(MemoryProjection).filter_by(source_id=source["source_id"]).count() == 1
     assert c.post(url, json={"project_id": b["id"]}).status_code == 200
@@ -182,8 +186,18 @@ def test_queues_progress_beyond_duplicate_first_batch(tmp_path):
 
 
 def test_html_contracts_foreign_keys_and_dataset_isolation():
-    for url in ["/ui", "/ui/pending", "/ui/proposals", "/ui/settings"]:
-        assert c.get(url).status_code == 200
+    home = c.get("/ui", follow_redirects=False)
+    assert home.status_code == 307
+    assert home.headers["location"] == "/app/knowledge"
+    pending = c.get("/ui/pending", follow_redirects=False)
+    assert pending.status_code == 307
+    assert pending.headers["location"] == "/app/sources?status=pending"
+    review = c.get("/ui/proposals?offset=200", follow_redirects=False)
+    assert review.status_code == 307
+    assert review.headers["location"] == "/app/knowledge?mode=proposals&offset=200"
+    response = c.get("/ui/settings", follow_redirects=False)
+    assert response.status_code == 307
+    assert response.headers["location"] == "/app/settings"
     for e in [engine, erp_engine]:
         with e.connect() as db:
             assert db.execute(text("PRAGMA foreign_keys")).scalar() == 1

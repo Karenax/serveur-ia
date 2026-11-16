@@ -12,7 +12,7 @@ const items: CdcItem[] = ["Premier", "Deuxième"].map((title, index) => ({
 }));
 
 function panel(inactive = false) {
-  return render(<section className={`mac-window${inactive ? " inactive" : ""}`}>
+  return render(<section hidden={inactive}>
     <CdcReviewPanel projectId="test" items={items} review={null}
       reviewKind="all" setReviewKind={vi.fn()} reviewStatus="all" setReviewStatus={vi.fn()}
       reviewQuery="" setReviewQuery={vi.fn()} selected={new Set()} setSelected={vi.fn()}
@@ -30,10 +30,10 @@ describe("Revue CDC", () => {
     await waitFor(() => expect(alert).toHaveBeenCalled());
     expect((screen.getByLabelText("Titre") as HTMLInputElement).value).toBe("Premier");
   });
-  it("ignore les raccourcis dans une fenêtre inactive", () => {
+  it("ignore les raccourcis quand la revue reste montée dans un onglet masqué", () => {
     const patch = vi.spyOn(api, "patchCdcItem").mockResolvedValue({});
     panel(true);
-    fireEvent.click(screen.getByRole("option", { name: /Premier/ }));
+    fireEvent.click(screen.getByText("Premier", { exact: true }));
     fireEvent.keyDown(window, { key: "c" });
     expect(patch).not.toHaveBeenCalled();
   });

@@ -1,14 +1,13 @@
-"""Agent - serveur unique : coeur de connaissance Project Brain + MiniPilot absorbé.
+"""Service Projets de Kiara : gestion et connaissances des projets.
 
 - Brain : `/v1/*` (REST), `/ui` (validation), `/docs`.
-- MiniPilot : `/api/v1/*` (ERP), `/` (React buildé), `/static`, `/assets`.
+- Projets : `/api/v1/*` (ERP), `/app` (interface Kiara), `/assets`.
 - Bases SQLite séparées, données préservées : Brain `./project_brain.db`,
   MiniPilot `MINIPILOT_HOME/minipilot.db` (défaut `~/.minipilot`).
 """
-from fastapi import FastAPI, Request, Depends
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, Depends, HTTPException
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 from contextlib import ExitStack, asynccontextmanager
 import json
 from pathlib import Path
@@ -16,7 +15,7 @@ from .config import settings
 from sqlalchemy.orm import Session
 from .db import init_db, get_db
 from .security import local_guard, session
-from .models import Project, Source, Proposal, KnowledgeItem
+from .models import Project
 from .routers.sources import router as sources_router, project_router as project_sources_router
 from .routers.ingest_folder import router as ingest_router
 from .routers.settings import router as settings_router
@@ -41,7 +40,6 @@ from .routers.core import (projects_router, knowledge_router, resolution_router,
 
 ROOT = Path(__file__).resolve().parent.parent
 MP_WEB_DIST = ROOT / "web" / "dist"
-MP_STATIC = ROOT / "backend" / "app" / "static"
 
 from backend.app.routers import (  # noqa: E402
     ai as mp_ai, brain as mp_brain, cdc as mp_cdc, meetings as mp_meetings,
@@ -152,13 +150,12 @@ async def lifespan(app: FastAPI):
         yield
 
 
-app = FastAPI(title="Agent (Brain + MiniPilot)", version="0.4.0", lifespan=lifespan)
+app = FastAPI(title="Kiara — Projets", version="0.4.0", lifespan=lifespan)
 app.middleware("http")(local_guard)
 from .http_protection import HTTPProtection  # noqa: E402
 app.add_middleware(HTTPProtection)
 app.get("/api/v1/session")(session)
 
-templates = Jinja2Templates(directory=str(ROOT / "app" / "templates"))
 
 app.include_router(sources_router)
 app.include_router(project_sources_router)
@@ -243,60 +240,55 @@ def health():
                          "app": "agent", "databases": states}, status_code=200 if ready else 503)
 
 
-@app.get("/ui", response_class=HTMLResponse)
-def ui_home(request: Request, db: Session = Depends(get_db)):
-    n_proj = db.query(Project).count()
-    n_pending = db.query(Source).filter_by(status="resolution_pending").count()
-    n_prop = db.query(Proposal).filter_by(status="pending").count()
-    n_know = db.query(KnowledgeItem).filter_by(status="validated").count()
-    projects = db.query(Project).all()
-    return templates.TemplateResponse(request=request, name="home.html", context={"request": request, "n_proj": n_proj,
-                                                    "n_pending": n_pending, "n_prop": n_prop,
-                                                    "n_know": n_know, "projects": projects})
+@app.get("/ui", include_in_schema=False)
+def ui_home():
+    return RedirectResponse("/app/knowledge")
 
 
-@app.get("/ui/pending", response_class=HTMLResponse)
-def ui_pending(request: Request, db: Session = Depends(get_db)):
-    rows = db.query(Source).filter_by(status="resolution_pending").all()
-    projects = db.query(Project).all()
-    return templates.TemplateResponse(request=request, name="pending.html", context={"request": request, "rows": rows, "projects": projects})
+@app.get("/ui/pending", include_in_schema=False)
+def ui_pending():
+    return RedirectResponse("/app/sources?status=pending")
 
 
-@app.get("/ui/proposals", response_class=HTMLResponse)
-def ui_proposals(request: Request, offset: int = 0, db: Session = Depends(get_db)):
-    rows = db.query(Proposal).filter(Proposal.status == "pending", Proposal.kind != "project_attach").order_by(Proposal.created_at.desc()).offset(max(0, offset)).limit(200).all()
-    return templates.TemplateResponse(request=request, name="proposals.html", context={"request": request, "rows": rows, "offset": max(0, offset)})
+@app.get("/ui/proposals", include_in_schema=False)
+def ui_proposals(offset: int = 0):
+    return RedirectResponse(f"/app/knowledge?mode=proposals&offset={max(0, offset)}")
 
 
-@app.get("/ui/projects/{pid}", response_class=HTMLResponse)
-def ui_project(request: Request, pid: str, db: Session = Depends(get_db)):
+@app.get("/ui/projects/{pid}", include_in_schema=False)
+def ui_project(pid: str, db: Session = Depends(get_db)):
+    from urllib.parse import urlencode
+    from backend.app.db import SessionLocal as ErpSession
+    from backend.app.models import BrainLink
+    from .services.project_access import filter_erp
+
     p = db.query(Project).filter_by(id=pid).first()
-    know = db.query(KnowledgeItem).filter_by(project_id=pid, status="validated").all() if p else []
-    srcs = db.query(Source).filter_by(project_id=pid).all() if p else []
-    return templates.TemplateResponse(request=request, name="project.html", context={"request": request, "project": p,
-                                                       "know": know, "srcs": srcs})
+    if p is None:
+        raise HTTPException(status_code=404, detail="Projet introuvable.")
+    with ErpSession() as erp:
+        links = filter_erp(erp.query(BrainLink.project_id), BrainLink.project_id)
+        matches = links.filter_by(brain_project_id=pid).limit(2).all()
+    if len(matches) == 1:
+        return RedirectResponse(f"/app/projets/{matches[0].project_id}/documents/connaissance")
+    return RedirectResponse("/app/knowledge?" + urlencode({"knowledge_project": pid}))
 
 
-@app.get("/ui/settings", response_class=HTMLResponse)
-def ui_settings(request: Request, db: Session = Depends(get_db)):
-    from .services.settings_service import get_all
-    data = get_all(db)
-    return templates.TemplateResponse(request=request, name="settings.html", context={"request": request, "data": data})
+@app.get("/ui/settings", include_in_schema=False)
+def ui_settings():
+    return RedirectResponse("/app/settings")
 
 
-# --- MiniPilot absorbé : frontend React + statiques ---
+# Interface Kiara et fichiers du bundle.
 @app.get("/", response_class=HTMLResponse)
 @app.get("/app", response_class=HTMLResponse, include_in_schema=False)
 @app.get("/app/{path:path}", response_class=HTMLResponse, include_in_schema=False)
 def mp_index() -> str:
     dist_index = MP_WEB_DIST / "index.html"
-    if dist_index.exists():
+    try:
         return dist_index.read_text(encoding="utf-8")
-    fallback = MP_STATIC / "index.html"
-    return fallback.read_text(encoding="utf-8")
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=503, detail="L’interface Projets de Kiara est indisponible.") from exc
 
 
-if MP_STATIC.exists():
-    app.mount("/static", StaticFiles(directory=str(MP_STATIC)), name="mp-static")
 if (MP_WEB_DIST / "assets").exists():
     app.mount("/assets", StaticFiles(directory=str(MP_WEB_DIST / "assets")), name="mp-assets")

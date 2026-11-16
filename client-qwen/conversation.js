@@ -23,7 +23,11 @@
     </aside></div>`;
   document.querySelector('.workspace').append(page);
   const navigation=wsElement('button','Vocal','nav-button');navigation.dataset.viewButton='voice';
-  document.querySelector('[data-view-button="chat"]').after(navigation);
+  navigation.type='button';
+  if(platformCapabilities.platform==='windows'){
+    navigation.className='secondary voice-button';
+    $('send').before(navigation);
+  }else document.querySelector('[data-view-button="chat"]').after(navigation);
   uiNavTitles.voice='Vocal';uiPaths.voice='M9 5a3 3 0 0 1 6 0v7a3 3 0 0 1-6 0V5m-3 6v1a6 6 0 0 0 12 0v-1M12 18v4m-4 0h8';
   navigation.onclick=()=>showView('voice');
   const ongoing=wsElement('button','Vocal en cours','secondary');ongoing.id='voice-ongoing';ongoing.type='button';ongoing.hidden=true;

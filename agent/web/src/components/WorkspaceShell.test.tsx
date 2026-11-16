@@ -81,6 +81,82 @@ it("propose le retour aux conversations uniquement dans le client Kiara", () => 
   }
 });
 
+it("reprend le thème des Conversations et renvoie vers son réglage sous Windows", () => {
+  localStorage.setItem("fred-theme","dark");
+  localStorage.setItem("agent-ui-theme","light");
+  window.history.replaceState(null,"","/app/settings?settings=appearance");
+  document.body.dataset.kiaraDesktop="true";
+  document.body.dataset.kiaraWindows="true";
+  try {
+    const {container}=setup();
+    expect(container.querySelector(".workspace-shell")?.getAttribute("data-workspace-theme")).toBe("dark");
+    expect(screen.getByRole("link",{name:"Thème de Kiara"}).getAttribute("href")).toBe("/chat#apparence");
+    expect(localStorage.getItem("agent-ui-theme")).toBe("light");
+  } finally {
+    delete document.body.dataset.kiaraDesktop;
+    delete document.body.dataset.kiaraWindows;
+  }
+});
+
+it("place les notifications dans l’en-tête Windows et protège les corrections ouvertes", () => {
+  window.history.replaceState(null,"","/app/activite");
+  document.body.dataset.kiaraDesktop="true";
+  document.body.dataset.kiaraWindows="true";
+  try {
+    setup();
+    const notification=screen.getByRole("link",{name:"Notifications"});
+    expect(notification.closest("header")).toBeTruthy();
+    expect(notification.getAttribute("href")).toBe("/chat#notifications");
+    const correction=screen.getByRole("main");
+    correction.dataset.workspaceDirty="true";
+    expect(fireEvent.click(notification)).toBe(false);
+    expect(screen.getByText("Enregistrez ou fermez la modification en cours avant de revenir à Conversations.")).toBeTruthy();
+  } finally {
+    delete document.body.dataset.kiaraDesktop;
+    delete document.body.dataset.kiaraWindows;
+  }
+});
+
+it("ouvre directement la liste Projets à l’entrée du portail Windows", () => {
+  document.body.dataset.kiaraDesktop="true";
+  document.body.dataset.kiaraWindows="true";
+  try {
+    setup();
+    expect(window.location.pathname).toBe("/app/projets");
+    const menu=screen.getByRole("navigation",{name:"Grandes rubriques"});
+    expect(within(menu).getAllByRole("link").map(link=>link.textContent)).toEqual([
+      "Conversations","Projets","Mails","Réunions","Activité"
+    ]);
+    fireEvent.click(within(menu).getByRole("link",{name:"Activité"}));
+    expect(screen.getByRole("heading",{name:"À traiter"})).toBeTruthy();
+    fireEvent.click(screen.getByRole("link",{name:"Kiara"}));
+    expect(window.location.pathname).toBe("/app/projets");
+    fireEvent.click(screen.getByRole("button",{name:"Accès rapide aux rubriques"}));
+    expect(screen.queryByRole("button",{name:/^Accueil/})).toBeNull();
+  } finally {
+    delete document.body.dataset.kiaraDesktop;
+    delete document.body.dataset.kiaraWindows;
+  }
+});
+
+it("propose l’assistant dans les fiches Windows avec le projet déjà sélectionné", () => {
+  document.body.dataset.kiaraDesktop="true";
+  document.body.dataset.kiaraWindows="true";
+  document.body.dataset.kiaraProjectConversation="true";
+  try {
+    setup();
+    expect(screen.queryByRole("link",{name:"Assistant de projet"})).toBeNull();
+    fireEvent.click(screen.getByRole("button",{name:"A-100 · Projet A-100"}));
+    expect(screen.getByRole("link",{name:"Assistant de projet"}).getAttribute("href")).toBe("/chat#projet=erp-a");
+    fireEvent.click(screen.getByRole("link",{name:"Mails"}));
+    expect(screen.queryByRole("link",{name:"Assistant de projet"})).toBeNull();
+  } finally {
+    delete document.body.dataset.kiaraDesktop;
+    delete document.body.dataset.kiaraWindows;
+    delete document.body.dataset.kiaraProjectConversation;
+  }
+});
+
 it('ouvre le Studio commun filtré depuis le projet puis permet le retour à toutes les réunions',async()=>{
   window.history.replaceState(null,'','/app/projects/erp-a/reviews');
   function ProjectStudio(){return <a href={meetingWorkspaceHref('erp-a')} onClick={event=>{if(requestMeetingWorkspace('erp-a'))event.preventDefault();}}>Studio du projet</a>;}
@@ -230,8 +306,7 @@ function chooseExtraSetting(name:string) {
 
 it("ouvre les rubriques de la fiche en conservant le brouillon et l’URL",()=>{
   window.history.replaceState(null,"","/app/projects/erp-b/cdc");
-  const project=vi.fn(ProjectDraft);setup(project);
-  expect(project.mock.calls[project.mock.calls.length-1]?.[0].kiaraPresentation).toBe(true);
+  setup(ProjectDraft);
   expect(screen.getByText("Rubrique projet : cdc")).toBeTruthy();
   fireEvent.change(screen.getByRole("textbox",{name:"Brouillon erp-b"}),{target:{value:"À conserver"}});
   fireEvent.click(screen.getByRole("button",{name:"Documents du projet"}));
@@ -360,11 +435,11 @@ it("désactive le polling de la vue des traitements lorsqu'elle est cachée", ()
 
 it("ouvre le composeur commun avec le projet courant sur le portail privé", () => {
   document.body.dataset.kiaraWebConversations = "true";
-  window.history.replaceState(null, "", "/agent/app/projects/erp-a/pilotage");
+  window.history.replaceState(null, "", "/kiara/app/projects/erp-a/pilotage");
   try {
     setup();
     expect(screen.getByRole("link", {name: "Assistant de projet"}).getAttribute("href"))
-      .toBe("/agent/app/conversations#projet=erp-a");
+      .toBe("/kiara/app/conversations#projet=erp-a");
     expect(screen.queryByRole("button", {name: "Assistant"})).toBeNull();
   } finally { delete document.body.dataset.kiaraWebConversations; }
 });

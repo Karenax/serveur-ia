@@ -310,7 +310,7 @@ def catalog(db, *, query="", project_id=None, source_type="all", file_format="al
         detected_format = actual_file_format(source.source_type, meta, source.mime_type)
         if file_format != "all" and (detected_format or "unknown") != file_format:
             continue
-        if status != "all" and source.status != status:
+        if status != "all" and source.status != ("resolution_pending" if status == "pending" else status):
             continue
         if query.casefold() not in (title + " " + (source.author or "")).casefold():
             continue

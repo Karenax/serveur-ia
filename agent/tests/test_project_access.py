@@ -27,6 +27,15 @@ from backend.app.services import project_identity as identity
 client = TestClient(app)
 
 
+def test_missing_project_bundle_reports_unavailability(tmp_path, monkeypatch):
+    monkeypatch.setattr(web_application, "MP_WEB_DIST", tmp_path)
+    for path in ("/", "/app", "/app/projets"):
+        response = client.get(path)
+        assert response.status_code == 503
+        assert response.json()["detail"] == "L’interface Projets de Kiara est indisponible."
+    assert client.get("/static/index.html").status_code == 404
+
+
 @pytest.fixture
 def context(monkeypatch):
     monkeypatch.delenv("AGENT_OPERATOR_PROJECT_IDS", raising=False)
@@ -66,6 +75,22 @@ def role(monkeypatch, value, projects=None):
     monkeypatch.setenv("AGENT_OPERATOR_ID", "test-operator")
     if projects is not None:
         monkeypatch.setenv("AGENT_OPERATOR_PROJECT_IDS", json.dumps(projects))
+
+
+def test_legacy_knowledge_project_link_opens_the_authorized_kiara_project(context, monkeypatch):
+    project, other = context["pids"]
+    brain = context["bids"][0]
+    with ERP() as db:
+        db.get(BrainLink, other).brain_project_id = brain
+        db.commit()
+    url = f"/ui/projects/{brain}"
+    overview = client.get(url, follow_redirects=False)
+    assert overview.status_code == 307
+    assert overview.headers["location"] == f"/app/knowledge?knowledge_project={brain}"
+    role(monkeypatch, "reader", [project])
+    response = client.get(url, follow_redirects=False)
+    assert response.status_code == 307
+    assert response.headers["location"] == f"/app/projets/{project}/documents/connaissance"
 
 
 def test_portal_rollback_preserves_writes_and_project_scopes(context, monkeypatch):

@@ -26,7 +26,7 @@ import { withActivity } from "../lib/asyncActivity";
 import "../project-kiara-preview.css";
 import {MEETING_WORKSPACE_EVENT} from '../lib/meetingWorkspace';
 
-export type ProjectWorkspaceProps = {projectId:string; initialTab:ProjectTab | "import"; row?:PortfolioRow; reloadRows:()=>Promise<void>; back:()=>void; onTabChange?:(tab:ProjectTab | "import")=>boolean|void; sidebarNavigation?:boolean;kiaraPresentation?:boolean};
+export type ProjectWorkspaceProps = {projectId:string; initialTab:ProjectTab | "import"; row?:PortfolioRow; reloadRows:()=>Promise<void>; back:()=>void; onTabChange?:(tab:ProjectTab | "import")=>boolean|void;};
 export type ProjectCreateProps = {reload:()=>Promise<void> | void;close:()=>void;onCreated?:(id:string)=>Promise<void>};
 export type MailPanelProps = {rows?:PortfolioRow[]; active?:boolean; reloadProjects?:()=>Promise<void>};
 type Props = {canCreateProject?:boolean; portfolioLoading?:boolean; portfolioUnavailable?:boolean; rows:PortfolioRow[]; reload:()=>Promise<void>; error?:string; ProjectPanel:ComponentType<ProjectWorkspaceProps>; MailPanel:ComponentType<MailPanelProps>; CreatePanel:ComponentType<ProjectCreateProps>; SagePanel:ComponentType};
@@ -46,9 +46,14 @@ const settingsAreaPages:WorkspaceRoute['page'][] = ["settings","stats","preparat
 const mainSettings = [["ai","Général"],["mail","Mails"],["references","Clients et équipe"],["appearance","Apparence"],["sources","Sources"],["knowledge","Informations"],["jobs","Suivi des analyses"],["imports","Connexions & imports"]];
 const extraSettings = [["stats","Statistiques"],["preparation","Réunions et transcription"],["memory","Recherche dans les documents"],["deliverables","Modèles de livrables"],["documents","Modèles de documents"],["operations","Sauvegardes et maintenance"]];
 const sparkle = ["m12 3 3 6 6 3-6 3-3 6-3-6-6-3 6-3z"];
+const bell = ["M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"];
 const settingsIcon = ["M4 6h16M4 12h16M4 18h16",'<circle cx="8" cy="6" r="2" fill="currentColor"/>','<circle cx="16" cy="12" r="2" fill="currentColor"/>','<circle cx="10" cy="18" r="2" fill="currentColor"/>'];
 function preference(key:string, fallback:string) { try {return localStorage.getItem(key) || fallback;} catch {return fallback;} }
 function savePreference(key:string,value:string) { try {localStorage.setItem(key,value);} catch {/* preference stays in this session */} }
+function readWorkspaceRoute(windows:boolean):WorkspaceRoute {
+  const route=parseWorkspaceRoute(window.location.pathname,window.location.search);
+  return windows&&route.page==="home"?{page:"projects"}:route;
+}
 function navigationBreakpoints() {
   return typeof window.matchMedia === 'function'
     ? {fusionNarrow:!window.matchMedia('(min-width:671px)').matches, standardNarrow:window.matchMedia('(max-width:850px)').matches}
@@ -56,9 +61,10 @@ function navigationBreakpoints() {
 }
 
 export function WorkspaceShell({rows,reload,error,canCreateProject=true,portfolioLoading=false,portfolioUnavailable=false,ProjectPanel,MailPanel,CreatePanel,SagePanel}:Props) {
-  const [route,setRoute] = useState<WorkspaceRoute>(()=>parseWorkspaceRoute(window.location.pathname,window.location.search));
+  const windows = document.body.dataset.kiaraWindows === "true";
+  const [route,setRoute] = useState(()=>readWorkspaceRoute(windows));
   const showProjectPresentation = route.page === "projects" || route.page === "project";
-  const [visited,setVisited] = useState<WorkspaceRoute[]>(()=>[parseWorkspaceRoute(window.location.pathname,window.location.search)]);
+  const [visited,setVisited] = useState<WorkspaceRoute[]>(()=>[route]);
   const [mobileMenu,setMobileMenu] = useState(false);
   const [navigationViewport,setNavigationViewport] = useState(navigationBreakpoints);
   const fusionWorkspace = route.page==='sources'||route.page==='meetings';
@@ -85,6 +91,7 @@ export function WorkspaceShell({rows,reload,error,canCreateProject=true,portfoli
     if (document.body.dataset.kiaraDesktop === "true") {
       if (shared === "system") return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
       if (shared === "light" || shared === "dark") return shared;
+      if (windows) return "light";
     }
     return preference("agent-ui-theme","light");
   });
@@ -140,11 +147,15 @@ export function WorkspaceShell({rows,reload,error,canCreateProject=true,portfoli
       return existing<0?[...previous,next]:previous.map((r,i)=>i===existing?next:r);
     });setMobileMenu(false);setNotice("");
   },[]);
-  const navigate = useCallback((next:WorkspaceRoute)=>{
+  const canLeaveCurrentView = useCallback(()=>{
     if(documentsBusy){setNotice("Réglages documentaires en cours. Attendre le résultat avant de changer de rubrique.");return false;}
     if(deliverablesBusy){setNotice("Opération sur les livrables en cours. Attendre son résultat avant de changer de rubrique.");return false;}
     const correction=document.querySelector('[data-workspace-dirty="true"]');
     if (correction && !window.confirm("Une correction est ouverte. Changer de rubrique en conservant ce brouillon ?")) return false;
+    return true;
+  },[deliverablesBusy,documentsBusy]);
+  const navigate = useCallback((next:WorkspaceRoute)=>{
+    if(!canLeaveCurrentView())return false;
     if (window.location.pathname === workspacePath({page:'projects'})) projectListQuery.current = window.location.search;
     const target = workspacePath(next);
     const listQuery = next.page === 'projects' ? projectListQuery.current : '';
@@ -154,7 +165,14 @@ export function WorkspaceShell({rows,reload,error,canCreateProject=true,portfoli
     applyRoute(next);
     window.dispatchEvent(new Event('agent:querychange'));
     return true;
-  },[applyRoute,deliverablesBusy,documentsBusy]);
+  },[applyRoute,canLeaveCurrentView]);
+  const guardConversationLink = (event: React.MouseEvent<HTMLAnchorElement>)=>{
+    if(!windows||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
+    if(document.querySelector('[data-workspace-dirty="true"]')){
+      setNotice("Enregistrez ou fermez la modification en cours avant de revenir à Conversations.");
+      event.preventDefault();
+    }else if(!canLeaveCurrentView())event.preventDefault();
+  };
   const openProject = useCallback((id:string,tab:string="pilotage")=>{
     if (tab==="deliverables") tab="documents";
     if (["tasks", "milestones", "planning"].includes(tab)) tab="planification";
@@ -193,15 +211,22 @@ export function WorkspaceShell({rows,reload,error,canCreateProject=true,portfoli
     } else if(!agentLocation(window.location.pathname).startsWith("/app")) {
       window.history.replaceState(null,"",workspacePath(route));
     }
-    const pop=()=>applyRoute(parseWorkspaceRoute(window.location.pathname,window.location.search));
+    const pop=()=>applyRoute(readWorkspaceRoute(windows));
     window.addEventListener("popstate",pop);return()=>window.removeEventListener("popstate",pop);
-  },[applyRoute]);
+  },[applyRoute,windows]);
   useEffect(()=>{
     const previousTheme=document.body.dataset.theme;
     document.body.removeAttribute("data-theme");document.body.classList.add("agent-workspace-body");
     return()=>{document.body.classList.remove("agent-workspace-body");if(previousTheme)document.body.dataset.theme=previousTheme;};
   },[]);
-  useEffect(()=>{savePreference("agent-ui-theme",theme);},[theme]);
+  useEffect(()=>{if(!windows)savePreference("agent-ui-theme",theme);},[theme,windows]);
+  useEffect(()=>{
+    if(!windows||preference("fred-theme","")!=="system")return;
+    const query=window.matchMedia?.("(prefers-color-scheme: dark)");
+    const apply=(event: MediaQueryListEvent)=>setTheme(event.matches?"dark":"light");
+    query?.addEventListener("change",apply);
+    return()=>query?.removeEventListener("change",apply);
+  },[windows]);
   useEffect(()=>{savePreference("agent-ui-density",density);},[density]);
   useEffect(()=>{savePreference("agent-project-favorites",JSON.stringify(favorites));},[favorites]);
   useEffect(()=>{
@@ -226,7 +251,7 @@ export function WorkspaceShell({rows,reload,error,canCreateProject=true,portfoli
   }, [route.page, current?.code]);
   const favorite=(id:string)=>setFavorites(ids=>ids.includes(id)?ids.filter(v=>v!==id):[...ids,id]);
   const conversationsPath = conversationsHref();
-  const projectAssistantPath = projectConversationHref(current?.id);
+  const projectAssistantPath = !windows || current ? projectConversationHref(current?.id) : null;
   const importArchive=async(file:File)=>{
     if(importing)return;setImporting(true);setNotice("");
     try{await withActivity("Importation d’une archive de projet…",async()=>{const data=JSON.parse(await file.text());const result:any=await api.importJson(data);await reload();setNotice("Archive importée. Les projets existants sont conservés.");if(result.project_id || result.id)openProject(result.project_id || result.id);});}
@@ -244,13 +269,19 @@ export function WorkspaceShell({rows,reload,error,canCreateProject=true,portfoli
   };
 
   const studioHere=route.page==='meetings'&&studioOpen;
-  const breadcrumb=<nav className="workspace-breadcrumb" aria-label="Fil d’Ariane"><a href={agentPath("/app/")} onClick={e=>{if(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault();navigate({page:"home"});}}>Espace de travail</a><Glyph d={P.chevR} size={12}/><span>{route.page==="project"?`${current?.code||"Projet"} · ${current?.client_name||"Client à renseigner"}`:pageLabels[route.page]}</span></nav>;
+  const portalEntry:WorkspaceRoute={page:windows?"projects":"home"};
+  const openPortalEntry=(event: React.MouseEvent<HTMLAnchorElement>)=>{
+    if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
+    event.preventDefault();
+    navigate(portalEntry);
+  };
+  const breadcrumb=<nav className="workspace-breadcrumb" aria-label="Fil d’Ariane"><a href={workspacePath(portalEntry)} onClick={openPortalEntry}>{windows?"Projets":"Espace de travail"}</a><Glyph d={P.chevR} size={12}/><span>{route.page==="project"?`${current?.code||"Projet"} · ${current?.client_name||"Client à renseigner"}`:pageLabels[route.page]}</span></nav>;
   return <div ref={shellRef} className={`workspace-shell ${density==="compact"?"workspace-compact":""}`} data-workspace-theme={theme} data-kiara-navigation="true" data-project-presentation={showProjectPresentation ? "kiara" : undefined} data-fusion-workspace={fusionWorkspace?route.page:undefined} data-meeting-studio={studioHere?'true':undefined}>
     <a className="workspace-skip" href="#workspace-main">Aller au contenu</a>
     {mobileMenu&&<button className="workspace-menu-backdrop" type="button" aria-label="Fermer le menu" onClick={()=>setMobileMenu(false)}/>}
     <aside className={`workspace-sidebar ${mobileMenu?"is-open":""}`} aria-label="Menu principal" aria-hidden={narrow&&!mobileMenu?true:undefined} inert={narrow&&!mobileMenu}>
-      <a className="workspace-brand" href={agentPath("/app/")} onClick={e=>{if(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault();navigate({page:"home"});}}><span aria-hidden="true">K</span>Kiara</a>
-      <nav aria-label="Grandes rubriques">{conversationsPath&&<a href={conversationsPath}><Glyph d={P.chevL}/><span>Conversations</span></a>}{navigation.filter(n=>n.page!=="home"&&!settingsPages.includes(n.page)).map(n=><div className="workspace-nav-group" key={n.page}><a href={workspacePath({page:n.page})} aria-current={route.page===n.page||(n.page==="projects"&&route.page==="project")?"page":undefined} className={n.page==="projects"&&route.page==="project"?"workspace-nav-parent-active":undefined} onClick={e=>{if(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault();navigate({page:n.page});}}><Glyph d={n.icon}/><span>{n.label}</span></a>
+      <a className="workspace-brand" href={workspacePath(portalEntry)} onClick={openPortalEntry}><span aria-hidden="true">K</span>Kiara</a>
+      <nav aria-label="Grandes rubriques">{conversationsPath&&<a href={conversationsPath} onClick={guardConversationLink}><Glyph d={P.chevL}/><span>Conversations</span></a>}{navigation.filter(n=>n.page!=="home"&&!settingsPages.includes(n.page)).map(n=><div className="workspace-nav-group" key={n.page}><a href={workspacePath({page:n.page})} aria-current={route.page===n.page||(n.page==="projects"&&route.page==="project")?"page":undefined} className={n.page==="projects"&&route.page==="project"?"workspace-nav-parent-active":undefined} onClick={e=>{if(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault();navigate({page:n.page});}}><Glyph d={n.icon}/><span>{n.label}</span></a>
       </div>)}</nav>
       {!!favorites.length&&<details className="workspace-favorites"><summary>Projets favoris</summary>{favorites.filter(id=>rows.some(r=>r.id===id)).slice(0,8).map(id=>{const r=rows.find(p=>p.id===id)!;return <button key={id} type="button" onClick={()=>openProject(id)}><ProjectFolder code={r.code}/><span>{r.code}<small>{r.title}</small></span></button>;})}</details>}
       <div className="workspace-sidebar-foot"><nav><a href={agentPath("/app/settings")} aria-current={route.page==="settings"?"page":undefined} className={settingsAreaPages.includes(route.page)?"workspace-nav-parent-active":undefined} onClick={e=>{if(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault();navigate({page:"settings"});}}><Glyph d={settingsIcon}/><span>Réglages</span></a></nav><span className="workspace-local"><i/>{document.body.dataset.kiaraDesktop==='true' ? 'Serveur Kiara' : 'Espace de travail'}</span></div>
@@ -260,7 +291,8 @@ export function WorkspaceShell({rows,reload,error,canCreateProject=true,portfoli
       <button type="button" className="workspace-search-trigger" aria-label="Rechercher dans Kiara" title="Recherche globale · Ctrl K" onClick={()=>navigate({page:"search"})}><Glyph d={P.search}/><span>Rechercher…</span></button>
       <button type="button" className="workspace-icon-button" aria-label="Accès rapide aux rubriques" title="Accès rapide aux rubriques" onClick={()=>setCommandOpen(true)}><Glyph d={P.grid}/></button>
       <ConnectionStatus onOpenJobs={()=>navigate({page:"jobs"})}/>
-      {projectAssistantPath && <a className="button secondary workspace-assistant-toggle" aria-label="Assistant de projet" href={projectAssistantPath}><Glyph d={sparkle}/><span>Assistant de projet</span></a>}
+      {windows && <a className="workspace-icon-button" href="/chat#notifications" onClick={guardConversationLink} aria-label="Notifications" title="Notifications"><Glyph d={bell}/></a>}
+      {projectAssistantPath && <a className="button secondary workspace-assistant-toggle" aria-label="Assistant de projet" href={projectAssistantPath} onClick={guardConversationLink}><Glyph d={sparkle}/><span>Assistant de projet</span></a>}
     </header>
     <div className="workspace-area"><main id="workspace-main" ref={mainRef} className="workspace-main">
       {route.page!=="mail"&&route.page!=="activity"&&!studioHere&&!showProjectPresentation&&breadcrumb}
@@ -281,7 +313,7 @@ export function WorkspaceShell({rows,reload,error,canCreateProject=true,portfoli
         return <div key={key} hidden={!visible} className="workspace-cached-view" data-workspace-view={key}>
           {view.page==="home"&&<><div className="workspace-page-header"><h1>Accueil</h1><button type="button" className="button primary" onClick={()=>navigate({page:"projects"})}><Glyph d={P.folder}/>Ouvrir les projets</button></div><section className="workspace-section"><div className="workspace-section-heading"><h2>À traiter</h2></div><ActionDashboard onOpen={openProject}/></section><details className="workspace-overview-options"><summary>Chiffres des projets</summary><div className="workspace-stat-grid"><button onClick={()=>navigate({page:"projects"})} type="button"><span>Projets en cours</span><strong>{rows.filter(r=>r.status==="active").length}</strong></button><button onClick={()=>{setProjectFilter("review");navigate({page:"projects"});}} type="button"><span>Exigences à vérifier</span><strong>{rows.reduce((n,r)=>n+(r.unconfirmed||0),0)}</strong></button><button onClick={()=>navigate({page:"projects"})} type="button"><span>Heures restantes</span><strong>{Math.round(rows.filter(r=>r.status==="active").reduce((n,r)=>n+r.raf,0))} <small>h</small></strong></button></div></details><section className="workspace-section"><div className="workspace-section-heading"><h2>Projets en cours</h2><button className="workspace-text-button" type="button" onClick={()=>navigate({page:"projects"})}>Tous les projets →</button></div>{portfolio(true)}</section></>}
           {view.page==="projects"&&<><div className="workspace-page-header"><h1>Projets</h1>{canCreateProject&&<button className="button primary" type="button" onClick={()=>navigate({page:"create"})}>＋ Nouveau projet</button>}</div><div className="workspace-toolbar"><input className="input" aria-label="Rechercher un projet" placeholder="Code, titre ou client…" value={projectQuery} onChange={e=>setProjectQuery(e.target.value)}/><select className="input" aria-label="État des projets" value={projectFilter} onChange={e=>setProjectFilter(e.target.value)}><option value="active">Actifs</option><option value="all">Tous</option><option value="closed">Archivés</option><option value="late">En retard</option><option value="review">À examiner</option></select></div>{portfolio()}{filtered.length>0&&<p className="kiara-project-count" role="status">{filtered.length} {filtered.length===1?"projet":"projets"}</p>}</>}
-          {view.page==="project"&&<ProjectPanel projectId={view.projectId!} initialTab={view.tab||"pilotage"} row={rows.find(r=>r.id===view.projectId)} reloadRows={reload} back={()=>navigate({page:"projects"})} kiaraPresentation onTabChange={tab=>tab==="import"?navigate({page:"imports"}):openProject(view.projectId!,tab)}/>}
+          {view.page==="project"&&<ProjectPanel projectId={view.projectId!} initialTab={view.tab||"pilotage"} row={rows.find(r=>r.id===view.projectId)} reloadRows={reload} back={()=>navigate({page:"projects"})} onTabChange={tab=>tab==="import"?navigate({page:"imports"}):openProject(view.projectId!,tab)}/>}
           {view.page==="mail"&&<><div className="workspace-page-header"><h1>Mails</h1></div><MailPanel rows={rows} active={visible} reloadProjects={reload}/></>}
           {view.page==="meetings"&&<GlobalMeetingsView rows={rows} onOpenProject={openProject} active={visible} initialProjectId={visible?route.projectId:view.projectId} creationRequest={requestedCreation} onStudioOpenChange={setStudioOpen} studioNavigation={breadcrumb}/>}
           {view.page==="sources"&&<SourcesLibrary rows={rows} active={visible} onOpenSource={(sourceId,title,evidence)=>setSource({sourceId,title,evidence})} onOpenProject={openProject} onCreateMeeting={createMeeting}/>}
@@ -291,7 +323,7 @@ export function WorkspaceShell({rows,reload,error,canCreateProject=true,portfoli
           {view.page==="search"&&<SearchView rows={rows} onOpenProject={openProject} active={visible}/>}
           {view.page==="activity"&&<>
             <div className="workspace-page-header"><h1>Activité</h1>
-              {document.body.dataset.kiaraDesktop==='true'&&<a className="button secondary" href="/chat#notifications">Notifications</a>}
+              {!windows&&document.body.dataset.kiaraDesktop==='true'&&<a className="button secondary" href="/chat#notifications">Notifications</a>}
             </div>
             <section className="workspace-section">
               <div className="workspace-section-heading"><h2>À traiter</h2></div>
@@ -304,12 +336,12 @@ export function WorkspaceShell({rows,reload,error,canCreateProject=true,portfoli
           {view.page==="create"&&canCreateProject&&<><div className="workspace-page-header"><div><h1>Nouveau projet</h1><p>Créer un projet ou reprendre un dossier technique existant.</p></div><button className="button secondary" onClick={()=>navigate({page:"projects"})}>Retour au portefeuille</button></div><CreatePanel reload={reload} close={()=>navigate({page:"projects"})} onCreated={projectCreated}/></>}
           {view.page==="imports"&&<><div className="workspace-page-header"><div><h1>Connexions & imports</h1><p>Sage, Thunderbird et dossiers réseau.</p></div></div><nav className="workspace-tabs" aria-label="Connexions">{[["sage","Import Sage"],["thunderbird","Thunderbird"],["network","Dossiers réseau"],["archives","Archives JSON"]].map(([id,label])=><button type="button" key={id} aria-pressed={integrationsTab===id} onClick={()=>setIntegrationsTab(id)}>{label}</button>)}</nav><section hidden={integrationsTab!=="archives"} className="card"><h2>Reprendre une archive de projet</h2><p>Importer une sauvegarde JSON dans le portefeuille.</p><button type="button" className="button secondary" disabled={importing} onClick={()=>importFile.current?.click()}><Glyph d={P.download}/>Importer une archive JSON</button><input ref={importFile} type="file" accept="application/json,.json" hidden onChange={e=>{const f=e.target.files?.[0];if(f)void importArchive(f);}}/></section><div hidden={integrationsTab!=="sage"}><SagePanel/></div><div hidden={integrationsTab!=="thunderbird"}><ThunderbirdPanel/></div><div hidden={integrationsTab!=="network"}><EmptyState title="Les dossiers sont associés à chaque projet" detail="Choisissez explicitement un projet pour ouvrir ses Documents et gérer ses liens réseau."/>{rows.map(r=><button className="button secondary" key={r.id} type="button" onClick={()=>openProject(r.id,"documents")}>{r.code} · Documents</button>)}</div></>}
           {["settings","stats","preparation"].includes(view.page)&&<>
-            <div hidden={settingsTab!=="stats"}>{settingsTab==="stats"&&<FusionInsights rows={rows} active={visible} initialTab="stats"/>}</div><div hidden={settingsTab!=="preparation"}>{settingsTab==="preparation"&&<FusionInsights rows={rows} active={visible} initialTab="preparation"/>}</div><div hidden={settingsTab!=="ai"}><AiSettingsForm/></div><div hidden={settingsTab!=="mail"}><MailSettingsForm/></div><div hidden={settingsTab!=="memory"}><MemorySettingsForm/></div><div hidden={settingsTab!=="references"}>{referencesStarted&&<ProjectReferenceSettings/>}</div><div hidden={settingsTab!=="deliverables"}>{deliverablesStarted&&<DeliverableSettings active={visible&&settingsTab==="deliverables"} onBusy={setDeliverablesBusy}/>}</div><div hidden={settingsTab!=="documents"}>{documentsStarted&&<DocumentSettings active={visible&&settingsTab==="documents"} onBusy={setDocumentsBusy}/>}</div><div hidden={settingsTab!=="operations"}><OperationsPanel/></div><section hidden={settingsTab!=="appearance"} className="card"><h2>Apparence</h2><div className="workspace-toolbar"><label>Thème<select className="input" value={theme} onChange={e=>setTheme(e.target.value)}><option value="light">Clair</option><option value="dark">Sombre</option></select></label><label>Densité<select className="input" value={density} onChange={e=>setDensity(e.target.value)}><option value="comfortable">Confortable</option><option value="compact">Compacte</option></select></label></div><p>Préférences enregistrées dans ce navigateur.</p></section></>}
+            <div hidden={settingsTab!=="stats"}>{settingsTab==="stats"&&<FusionInsights rows={rows} active={visible} initialTab="stats"/>}</div><div hidden={settingsTab!=="preparation"}>{settingsTab==="preparation"&&<FusionInsights rows={rows} active={visible} initialTab="preparation"/>}</div><div hidden={settingsTab!=="ai"}><AiSettingsForm/></div><div hidden={settingsTab!=="mail"}><MailSettingsForm/></div><div hidden={settingsTab!=="memory"}><MemorySettingsForm/></div><div hidden={settingsTab!=="references"}>{referencesStarted&&<ProjectReferenceSettings/>}</div><div hidden={settingsTab!=="deliverables"}>{deliverablesStarted&&<DeliverableSettings active={visible&&settingsTab==="deliverables"} onBusy={setDeliverablesBusy}/>}</div><div hidden={settingsTab!=="documents"}>{documentsStarted&&<DocumentSettings active={visible&&settingsTab==="documents"} onBusy={setDocumentsBusy}/>}</div><div hidden={settingsTab!=="operations"}><OperationsPanel/></div><section hidden={settingsTab!=="appearance"} className="card"><h2>Apparence</h2><div className="workspace-toolbar">{windows?<a className="button secondary" href="/chat#apparence" onClick={guardConversationLink}>Thème de Kiara</a>:<label>Thème<select className="input" value={theme} onChange={e=>setTheme(e.target.value)}><option value="light">Clair</option><option value="dark">Sombre</option></select></label>}<label>Densité<select className="input" value={density} onChange={e=>setDensity(e.target.value)}><option value="comfortable">Confortable</option><option value="compact">Compacte</option></select></label></div><p>Préférences enregistrées dans ce navigateur.</p></section></>}
         </div>;
       })}
     </main>
     </div></div>
-    <dialog ref={commandDialog} className="workspace-command" aria-label="Recherche et navigation" onCancel={()=>setCommandOpen(false)} onClose={()=>setCommandOpen(false)}><div className="workspace-section-heading"><h2>Rechercher dans Kiara</h2><button type="button" className="workspace-icon-button" aria-label="Fermer la recherche" onClick={()=>setCommandOpen(false)}>×</button></div><input ref={commandInput} className="input" aria-label="Recherche globale" placeholder="Projet, rubrique, exigence, tâche…" value={command} onChange={e=>setCommand(e.target.value)}/><div className="workspace-command-results">{commandDestinations.filter(n=>n.label.toLowerCase().includes(command.toLowerCase())).map(n=><button type="button" key={n.page} onClick={()=>selectCommand({page:n.page})}><Glyph d={n.icon}/>{n.label}<small>Rubrique</small></button>)}{rows.filter(r=>`${r.code} ${r.title}`.toLowerCase().includes(command.toLowerCase())).slice(0,8).map(r=><button type="button" key={r.id} onClick={()=>selectCommand({page:"project",projectId:r.id,tab:"pilotage"})}><ProjectFolder code={r.code}/>{r.code} · {r.title}<small>Projet</small></button>)}{searching&&<p role="status">Recherche dans les éléments du projet…</p>}{searchError&&<ErrorState message={searchError}/>} {hits.slice(0,20).map((h,i)=><button type="button" key={`${h.type}:${i}`} onClick={()=>{setCommandOpen(false);openProject(h.project_id,h.tab);}}><Glyph d={P.search}/>{h.label}<small>{h.type}</small></button>)}</div><p className="workspace-muted">Échap pour fermer · la recherche métier respecte le projet affiché.</p></dialog>
+    <dialog ref={commandDialog} className="workspace-command" aria-label="Recherche et navigation" onCancel={()=>setCommandOpen(false)} onClose={()=>setCommandOpen(false)}><div className="workspace-section-heading"><h2>Rechercher dans Kiara</h2><button type="button" className="workspace-icon-button" aria-label="Fermer la recherche" onClick={()=>setCommandOpen(false)}>×</button></div><input ref={commandInput} className="input" aria-label="Recherche globale" placeholder="Projet, rubrique, exigence, tâche…" value={command} onChange={e=>setCommand(e.target.value)}/><div className="workspace-command-results">{commandDestinations.filter(n=>(!windows||n.page!=="home")&&n.label.toLowerCase().includes(command.toLowerCase())).map(n=><button type="button" key={n.page} onClick={()=>selectCommand({page:n.page})}><Glyph d={n.icon}/>{n.label}<small>Rubrique</small></button>)}{rows.filter(r=>`${r.code} ${r.title}`.toLowerCase().includes(command.toLowerCase())).slice(0,8).map(r=><button type="button" key={r.id} onClick={()=>selectCommand({page:"project",projectId:r.id,tab:"pilotage"})}><ProjectFolder code={r.code}/>{r.code} · {r.title}<small>Projet</small></button>)}{searching&&<p role="status">Recherche dans les éléments du projet…</p>}{searchError&&<ErrorState message={searchError}/>} {hits.slice(0,20).map((h,i)=><button type="button" key={`${h.type}:${i}`} onClick={()=>{setCommandOpen(false);openProject(h.project_id,h.tab);}}><Glyph d={P.search}/>{h.label}<small>{h.type}</small></button>)}</div><p className="workspace-muted">Échap pour fermer · la recherche métier respecte le projet affiché.</p></dialog>
     {source&&<SourceInspector sourceId={source.sourceId} title={source.title} evidence={source.evidence} onClose={()=>setSource(null)}/>}
   </div>;
 }

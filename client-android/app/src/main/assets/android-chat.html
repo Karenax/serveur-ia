@@ -780,7 +780,7 @@ $('ws-create-project').onsubmit=e=>{
 for(const id of ['ws-project-title','ws-project-instructions'])$(id).oninput=()=>{ws.projectDirty=true;$('ws-project-status').textContent='Consignes à enregistrer';};
 async function wsSaveProject(archived){const p=ws.data.projects.find(p=>p.id===ws.project);await wsAction('project_save',{id:p.id,title:$('ws-project-title').value,instructions:$('ws-project-instructions').value,archived:archived??!!p.archived,revision:ws.projectRevision});ws.projectDirty=false;await wsRefresh();$('ws-project-status').textContent='Projet enregistré';}
 $('ws-project-form').onsubmit=e=>{e.preventDefault();wsTry(()=>wsSaveProject());};$('ws-project-archive').onclick=()=>wsTry(async()=>{await wsFlush();const p=ws.data.projects.find(p=>p.id===ws.project);await wsSaveProject(!p.archived);});
-$('ws-agent-project-open').onclick=()=>wsTry(()=>uiOpenAgent('/app/projects/'+encodeURIComponent(ws.project)+'/pilotage'));
+$('ws-agent-project-open').onclick=()=>wsTry(()=>uiOpenProjectWorkspace('/app/projects/'+encodeURIComponent(ws.project)+'/pilotage'));
 $('ws-agent-project-archive').onclick=()=>wsTry(async()=>{
   const project=ws.data.projects.find(p=>p.id===ws.project);
   if(!project?.can_edit)return;
@@ -814,7 +814,7 @@ $('ws-new-document').onclick=()=>wsTry(async()=>{await wsFlush();const r=await w
 $('ws-upload').onchange=()=>wsTry(async()=>{try{const file=$('ws-upload').files[0];if(!file)return;if(file.size>2*1024*1024)throw new Error('Maximum 2 Mo par fichier.');const data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result.split(',')[1]);reader.onerror=()=>reject(new Error('Lecture du fichier impossible.'));reader.readAsDataURL(file);});$('ws-project-status').textContent='Import et extraction du fichier…';const r=await wsAction('document_upload',{project:ws.project,title:file.name,data});await wsRefresh();await wsOpenDocument(r.id);}finally{$('ws-upload').value='';}});
 $('ws-document-delete').onclick=()=>wsTry(async()=>{if(!confirm('Supprimer ce document et son index du serveur ?'))return;await wsFlush();await wsAction('document_delete',{id:ws.document.id,revision:ws.document.revision});ws.document=null;ws.dirty=false;$('ws-document-editor').hidden=true;await api('/client/draft',{draft:null});await wsRefresh();});
 $('ws-document-chat').onclick=()=>wsTry(async()=>{if(busy)throw new Error('Attendez la fin de la réponse.');await wsFlush();$('new').click();const c=wsCurrent();c.project_id=ws.project;c.document_id=ws.document.id;save();wsChatSelections();showView('chat');$('ws-panel').click();});
-function wsDrawSources(container,sources){container.replaceChildren();for(const s of sources){const row=wsElement('div',undefined,'ws-source');row.append(wsElement('strong',s.title||s.url||'Source'));if(Number.isInteger(s.page)&&s.page>0)row.append(wsElement('span',' · page '+s.page));if(s.revision)row.append(wsElement('span',' · révision '+s.revision));if(s.level)row.append(wsElement('span',' · '+s.level));row.append(wsElement('p',s.text||''));if(s.source_id)row.append(wsButton('Ouvrir le passage cité',()=>wsOpenSource(s.source_id)));else if(s.agent_source_id&&platformCapabilities.platform!=='android')row.append(wsButton('Voir la source',()=>uiOpenAgent('/app/sources?source='+encodeURIComponent(s.agent_source_id))));else if(s.document)row.append(wsElement('small','Référence ancienne : version non vérifiable.','muted'));if(s.url){try{const parsed=new URL(s.url);if(parsed.protocol==='https:'){const a=wsElement('a','Ouvrir la source');a.href=parsed.href;a.target='_blank';a.rel='noopener noreferrer';row.append(a);}}catch{}}container.append(row);}}
+function wsDrawSources(container,sources){container.replaceChildren();for(const s of sources){const row=wsElement('div',undefined,'ws-source');row.append(wsElement('strong',s.title||s.url||'Source'));if(Number.isInteger(s.page)&&s.page>0)row.append(wsElement('span',' · page '+s.page));if(s.revision)row.append(wsElement('span',' · révision '+s.revision));if(s.level)row.append(wsElement('span',' · '+s.level));row.append(wsElement('p',s.text||''));if(s.source_id)row.append(wsButton('Ouvrir le passage cité',()=>wsOpenSource(s.source_id)));else if(s.agent_source_id&&platformCapabilities.platform!=='android')row.append(wsButton('Voir la source',()=>uiOpenProjectWorkspace('/app/sources?source='+encodeURIComponent(s.agent_source_id))));else if(s.document)row.append(wsElement('small','Référence ancienne : version non vérifiable.','muted'));if(s.url){try{const parsed=new URL(s.url);if(parsed.protocol==='https:'){const a=wsElement('a','Ouvrir la source');a.href=parsed.href;a.target='_blank';a.rel='noopener noreferrer';row.append(a);}}catch{}}container.append(row);}}
 const wsSourceDialog=wsElement('dialog',undefined,'fred-source-dialog');wsSourceDialog.id='fred-source-dialog';wsSourceDialog.setAttribute('aria-labelledby','fred-source-title');document.body.append(wsSourceDialog);
 async function wsOpenSource(id){const s=await wsAction('source_get',{source_id:id});wsSourceDialog.replaceChildren();const title=wsElement('h2',s.title||'Passage cité'),meta=wsElement('p',(s.page?'Page '+s.page+' · ':'')+'Révision '+s.revision,'muted'),notice=wsElement('p',s.message||({current:'Ce passage correspond à la version actuelle.',modified:'Le document a été modifié depuis cette citation.',unavailable:'La source est devenue indisponible.'})[s.status]),passage=wsElement('pre',s.passage||s.text||'','fred-source-passage');title.id='fred-source-title';wsSourceDialog.append(title,meta,notice,passage);if(s.status==='modified')wsSourceDialog.append(wsElement('p','Révision actuelle : '+s.current_revision));if(s.status!=='unavailable'&&s.document&&s.project)wsSourceDialog.append(wsButton('Ouvrir le document actuel',async()=>{await wsSelectProject(s.project);await wsOpenDocument(s.document);showView('projects');wsSourceDialog.close();}));wsSourceDialog.append(wsButton('Fermer',()=>wsSourceDialog.close()));if(!wsSourceDialog.open)wsSourceDialog.showModal();}
 
@@ -825,7 +825,7 @@ const originalButtons=buttons;buttons=function(){originalButtons();wsChatSelecti
 $('ws-refresh').onclick=()=>wsTry(()=>wsRefresh());
 async function wsPoll(){if(document.hidden||!connected||busy||historySyncPending||conversationActionPending||wsDraggedConversation)return;if(!ws.bootstrapDone){await wsBootstrap();return;}try{await wsRefresh();}catch(e){error('Actualisation indisponible : '+e.message);}}
 let wsBootstrapping=false;
-async function wsBootstrap(){if(wsBootstrapping||ws.bootstrapDone)return;wsBootstrapping=true;try{await clientReady;if(!connected)return;await wsRefresh();const r=await api('/client/draft');ws.bootstrapDone=true;if(r.draft){const d=r.draft;await wsSelectProject(d.project);await wsOpenDocument(d.id);$('ws-document-title').value=d.title;$('ws-document-text').value=d.text;ws.dirty=true;ws.conflict=ws.document.revision!==d.revision;ws.document.revision=d.revision;$('ws-document-status').classList.toggle('ws-warning',ws.conflict);$('ws-document-status').textContent='Brouillon local récupéré'+(ws.conflict?' : comparer avec le serveur avant enregistrement.':'.');showView('projects');}render();drawLibrary();}catch(e){error(e);}finally{wsBootstrapping=false;}}
+async function wsBootstrap(){if(wsBootstrapping||ws.bootstrapDone)return;wsBootstrapping=true;try{await clientReady;if(!connected&&platformCapabilities.platform!=='web')return;await wsRefresh();const r=await api('/client/draft');ws.bootstrapDone=true;if(r.draft){const d=r.draft;await wsSelectProject(d.project);await wsOpenDocument(d.id);$('ws-document-title').value=d.title;$('ws-document-text').value=d.text;ws.dirty=true;ws.conflict=ws.document.revision!==d.revision;ws.document.revision=d.revision;$('ws-document-status').classList.toggle('ws-warning',ws.conflict);$('ws-document-status').textContent='Brouillon local récupéré'+(ws.conflict?' : comparer avec le serveur avant enregistrement.':'.');showView('projects');}render();drawLibrary();}catch(e){error(e);}finally{wsBootstrapping=false;}}
 wsBootstrap();setInterval(wsPoll,5000);
 // Conversation actions share one lock so a reply or history sync cannot change their target.
 function wsConversationRecord(id){
@@ -1005,7 +1005,7 @@ async function fredInboxLoad(){if(fredInbox.busy)return;fredInbox.busy=true;try{
 window.fredOpenNotification=async target=>{
   if(target?.kind==='document'){await wsFlush();await wsSelectProject(target.project);await wsOpenDocument(target.id);showView('projects');}
   else if(target?.kind==='agent_project'&&wsIsAgentProject(target.project)){
-    if(platformCapabilities.platform!=='android')await uiOpenAgent('/app/projects/'+encodeURIComponent(target.project)+'/reviews');
+    if(platformCapabilities.platform!=='android')await uiOpenProjectWorkspace('/app/projects/'+encodeURIComponent(target.project)+'/reviews');
     else{await wsRefresh();await wsSelectProject(target.project);showView('projects');}
   }else{showView('notifications');await fredInboxLoad();}
 };
@@ -1150,7 +1150,7 @@ const uiNavTitles={notifications:'Notifications',chat:'Conversations',projects:'
 const uiNavigationLabels=new WeakMap();
 uiNavTitles.assistant='Mémoire et rappels';uiPaths.assistant='M4 4h7v16H4V4m9 0h7v16h-7V4M7 8h1m8 0h1M7 12h1m8 0h1';
 uiNavTitles.agent='Espace de travail';uiPaths.agent=uiPaths.projects;
-async function uiOpenAgent(path){
+async function uiOpenProjectWorkspace(path){
   if(busy)throw new Error('Attendez la fin de la réponse.');
   if(ws.projectDirty)throw new Error('Enregistrez les consignes du projet avant de continuer.');
   window.uiCheckPendingEdits?.();
@@ -1161,7 +1161,7 @@ async function uiOpenAgent(path){
     window.location.assign(config.web_prefix+(path||'/app'));
     return;
   }
-  const result=await api('/client/agent/session',{});
+  const result=await api('/client/project-session',{});
   await window.voiceFinishForClose?.();
   window.location.assign(path||result.url);
 }
@@ -1169,13 +1169,13 @@ if(platformCapabilities.platform!=='android'){
   const openAgent=wsElement('button',null,'nav-button');
   openAgent.type='button';openAgent.id='open-agent';openAgent.dataset.viewButton='agent';
   openAgent.append(uiIcon('projects'),wsElement('span','Espace de travail','nav-text'));
-  openAgent.onclick=()=>wsTry(()=>uiOpenAgent());
+  openAgent.onclick=()=>wsTry(()=>uiOpenProjectWorkspace());
   const projectButton=document.querySelector('[data-view-button="projects"]');
   projectButton.parentNode.insertBefore(openAgent,projectButton.nextSibling);
   const openLocalProjects = projectButton.onclick;
   projectButton.onclick = () => {
     if(ws.data?.project_catalogue?.interface==='projects-v1' && ws.data.project_catalogue.state==='ready') {
-      return wsTry(()=>uiOpenAgent('/app/projets'));
+      return wsTry(()=>uiOpenProjectWorkspace('/app/projets'));
     }
     return openLocalProjects();
   };
@@ -1197,7 +1197,7 @@ if(platformCapabilities.platform!=='android'){
         const button = wsElement('button',null,'nav-button');
         button.type = 'button';
         button.append(uiIcon(label),wsElement('span',label,'nav-text'));
-        button.onclick = () => wsTry(() => uiOpenAgent(path));
+        button.onclick = () => wsTry(() => uiOpenProjectWorkspace(path));
         return button;
       });
       projectButton.after(...links);
@@ -2789,7 +2789,7 @@ contextRefresh();
     opening = true; update();
     try {
       await uiPersistPreferences();
-      if (!['android','web'].includes(platformCapabilities.platform)) await api('/client/agent/session', {});
+      if (!['android','web'].includes(platformCapabilities.platform)) await api('/client/project-session', {});
       const [catalogue, knowledge] = await Promise.all([
         request('/api/v1/project-catalogue').then(response => response.json()),
         request('/api/v1/brain/projects').then(response => response.json()).catch(failure => {

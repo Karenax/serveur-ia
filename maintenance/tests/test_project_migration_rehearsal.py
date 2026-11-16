@@ -1,4 +1,5 @@
 from contextlib import closing
+import json
 import sqlite3
 import tempfile
 import unittest
@@ -47,6 +48,15 @@ class ProjectMigrationRehearsalTests(unittest.TestCase):
                 self.assertEqual(sorted(registry.execute('SELECT * FROM projects')), first)
                 registry.execute('DROP TRIGGER stop_insert')
                 self.assertEqual(rehearse(source, erp, brain, registry), report)
+                for key, expected in ((p2, '0 projet(s) introuvable(s), 1'),
+                                      ('missing', '1 projet(s) introuvable(s), 0')):
+                    history = json.dumps({'conversations': [{'project_id': key}]})
+                    source.execute('INSERT INTO client_histories VALUES (?, ?, 1, 0)', (owner_a, history))
+                    with self.assertRaises(ValueError) as error:
+                        rehearse(source, erp, brain, registry)
+                    self.assertIn(expected, str(error.exception))
+                    self.assertEqual(sorted(registry.execute('SELECT * FROM projects')), first)
+                    source.execute('DELETE FROM client_histories WHERE owner=?', (owner_a,))
                 erp.execute('INSERT INTO projects VALUES (?)', (p1,))
                 with self.assertRaisesRegex(ValueError, 'collision'):
                     rehearse(source, erp, brain, registry)

@@ -302,30 +302,37 @@ export function MailWorkspace(props: Props) {
     if (tools.current) tools.current.open = false;
   };
   const importEml = async () => {
-    if (props.readOnly || locked || operation.current || !emlProject || !emlFiles.length) return;
+    const automatic = emlProject === "automatic";
+    if (props.readOnly || locked || operation.current || !emlProject || !emlFiles.length ||
+        (automatic ? props.scoped : !emlProjects.some(project => project.id === emlProject))) return;
     operation.current = true;
     setSourceBusy(true);
     setLocalError("");
     setLocalNotice("Import des mails en cours…");
     let imported = 0;
     let duplicates = 0;
+    let pending = 0;
     const failures: string[] = [];
     try {
       for (const file of emlFiles) {
         try {
-          const result = await api.brainImportEml(emlProject, file);
+          const result = await api.brainImportEml(automatic ? null : emlProject, file);
           if (result.status === "duplicate") duplicates++;
-          else imported++;
+          else {
+            imported++;
+            if (result.status === "resolution_pending") pending++;
+          }
         } catch (error) {
           failures.push(`${file.name} — ${errorText(error)}`);
         }
       }
       if (imported) {
-        changeFolder(`project:${emlProject}`);
+        if (!automatic) changeFolder(`project:${emlProject}`);
         await refresh();
       }
       const summary = [`${imported} mail${imported === 1 ? "" : "s"} importé${imported === 1 ? "" : "s"}.`,
-        duplicates ? `${duplicates} déjà présent${duplicates === 1 ? "" : "s"}.` : ""].filter(Boolean).join(" ");
+        duplicates ? `${duplicates} déjà présent${duplicates === 1 ? "" : "s"}.` : "",
+        pending ? `${pending} à rattacher dans Sources.` : ""].filter(Boolean).join(" ");
       if (!failures.length) {
         setEmlOpen(false);
         tools.current?.querySelector("summary")?.focus();
@@ -341,7 +348,7 @@ export function MailWorkspace(props: Props) {
   };
   const rejectCurrent = async () => {
     if (!active?.pending || props.readOnly || locked || operation.current) return;
-    if (!window.confirm("Retirer ce mail de la file et l’exclure des prochains classements ? Son contenu reste dans Agent et Thunderbird.")) return;
+    if (!window.confirm("Retirer ce mail de la file et l’exclure des prochains classements ? Son contenu reste dans Kiara et Thunderbird.")) return;
     operation.current = true;
     setSourceBusy(true); setLocalError(""); setLocalNotice("");
     try {
@@ -354,8 +361,8 @@ export function MailWorkspace(props: Props) {
   };
   const discard = async (ids: string[]) => {
     if (!ids.length || locked || operation.current) return;
-    if (!window.confirm(`Supprimer le contenu de ${ids.length === 1 ? 'ce mail' : `ces ${ids.length} mails`} d’Agent ?\n\nLes informations exclusivement issues de ces mails seront aussi supprimées. Les originaux dans votre messagerie sont conservés. Une sauvegarde technique est créée pour permettre une récupération ; cette action ne peut pas être annulée dans cette vue.\n\nPour garder ces mails sans projet, choisissez Divers. Continuer la suppression ?`)) return;
-    operation.current = true; setSourceBusy(true); setLocalError(""); setLocalNotice("Suppression du mail d’Agent…");
+    if (!window.confirm(`Supprimer le contenu de ${ids.length === 1 ? 'ce mail' : `ces ${ids.length} mails`} de Kiara ?\n\nLes informations exclusivement issues de ces mails seront aussi supprimées. Les originaux dans votre messagerie sont conservés. Une sauvegarde technique est créée pour permettre une récupération ; cette action ne peut pas être annulée dans cette vue.\n\nPour garder ces mails sans projet, choisissez Divers. Continuer la suppression ?`)) return;
+    operation.current = true; setSourceBusy(true); setLocalError(""); setLocalNotice("Suppression du mail de Kiara…");
     let done = 0; let cleanupPending = false;
     try {
       for (const id of ids) {
@@ -364,8 +371,8 @@ export function MailWorkspace(props: Props) {
         done++;
       }
       setActiveId(null); setTarget(""); props.onClearSelected(); setClassifiedSelected(new Set());
-      setLocalNotice(`${done} mail(s) supprimé(s) d’Agent et exclus des analyses et de la connaissance.${cleanupPending ? " Nettoyage externe encore en attente." : ""}`);
-    } catch (e) { setLocalError(`${done} mail(s) supprimé(s) d’Agent. ${errorText(e)}`); }
+      setLocalNotice(`${done} mail(s) supprimé(s) de Kiara et exclus des analyses et de la connaissance.${cleanupPending ? " Nettoyage externe encore en attente." : ""}`);
+    } catch (e) { setLocalError(`${done} mail(s) supprimé(s) de Kiara. ${errorText(e)}`); }
     finally {
       props.onClearSelected(); setClassifiedSelected(new Set());
       await refresh(); setSourceBusy(false); operation.current = false; classifiedDrag.current = [];
@@ -514,7 +521,7 @@ export function MailWorkspace(props: Props) {
           <Glyph d={SPARK} size={16} /><span>{props.triaging ? "Analyse en cours…" : "Analyser les nouveaux"}</span></button>
         }
         <details ref={tools} className="maildesk-tools"><summary aria-label="Autres actions">Options</summary><div>
-          {!props.readOnly && emlProjects.length > 0 && <button type="button" disabled={locked} onClick={showEmlImport}>Importer des mails EML</button>}
+          {!props.readOnly && (!props.scoped || emlProjects.length > 0) && <button type="button" disabled={locked} onClick={showEmlImport}>Importer des mails EML</button>}
           {!props.scoped && !props.readOnly && <>
           <button type="button" disabled={syncing} onClick={() => void scan()}>{syncing ? "Synchronisation…" : "Synchroniser les mails"}</button>
           <button type="button" onClick={() => { setReply(undefined); setThunderbirdOpen(true); if(tools.current)tools.current.open=false; }}>Nouveau message</button>
@@ -535,6 +542,7 @@ export function MailWorkspace(props: Props) {
       <label>Projet de destination<select autoFocus required value={emlProject} disabled={sourceBusy}
         onChange={event => setEmlProject(event.target.value)}>
         <option value="">Choisir un projet</option>
+        {!props.scoped && <option value="automatic">Détecter le projet automatiquement</option>}
         {emlProjects.map(project => <option key={project.id} value={project.id}>{project.code} · {project.name}</option>)}
       </select></label>
       <label>Fichiers EML<input type="file" accept=".eml,message/rfc822" multiple required disabled={sourceBusy}
@@ -574,11 +582,11 @@ export function MailWorkspace(props: Props) {
                     <option value="">Choisir une destination…</option>
                     {rankedProjects.map(project=><option key={project.id} value={project.id}>{project.code} — {project.name}</option>)}
                     {target.startsWith("erp:") && <option value={target}>{props.portfolio.find(p=>`erp:${p.id}`===target)?.code}</option>}
-                    {!props.scoped && <option value="DISCARD">Supprimer d’Agent (supprime le contenu)</option>}
+                    {!props.scoped && <option value="DISCARD">Supprimer de Kiara</option>}
                     {props.onCreateProject && <option value="CREATE">＋ Créer un projet…</option>}</select>
                 </label>
-                <div className="maildesk-decision-main"><div className="maildesk-focus-score"><div><span>{target==="DISCARD" ? "Contenu à supprimer d’Agent" : targetOverride ? "Projet choisi" : active.pending ? "Projet proposé" : "Projet du mail"}</span><strong>{target==="DISCARD"?"Supprimer d’Agent":destination?.code||"Choisir un projet"}</strong>{destination && <small>{"name" in destination ? destination.name : destination.title}</small>}</div></div>
-                  <button type="button" className="maildesk-primary" disabled={locked || projectForm || !target || target==="CREATE"} onClick={()=>void validateCurrent()}>{validating?"Classement…":target==="DISCARD"?"Supprimer le contenu d’Agent":active.pending?"Classer et suivant":"Enregistrer le classement"}</button>
+                <div className="maildesk-decision-main"><div className="maildesk-focus-score"><div><span>{target==="DISCARD" ? "Contenu à supprimer de Kiara" : targetOverride ? "Projet choisi" : active.pending ? "Projet proposé" : "Projet du mail"}</span><strong>{target==="DISCARD"?"Supprimer de Kiara":destination?.code||"Choisir un projet"}</strong>{destination && <small>{"name" in destination ? destination.name : destination.title}</small>}</div></div>
+                  <button type="button" className="maildesk-primary" disabled={locked || projectForm || !target || target==="CREATE"} onClick={()=>void validateCurrent()}>{validating?"Classement…":target==="DISCARD"?"Supprimer le contenu de Kiara":active.pending?"Classer et suivant":"Enregistrer le classement"}</button>
                 </div>
                 {active.pending && <button type="button" className="maildesk-reject" disabled={locked || projectForm}
                   onClick={()=>void rejectCurrent()}>Rejeter le mail</button>}
@@ -603,12 +611,12 @@ export function MailWorkspace(props: Props) {
             </button>;
           })()}
           <button type="button" className={`maildesk-project discard${props.dragOver === "mini:DISCARD" ? " drop-target" : ""}`}
-            title="Supprimer le contenu d’Agent et empêcher sa réanalyse" disabled={locked}
+            title="Supprimer le contenu de Kiara et empêcher sa réanalyse" disabled={locked}
             onClick={() => setTarget("DISCARD")}
             onDragOver={(e) => { e.preventDefault(); props.onDragOver("mini:DISCARD"); }} onDragLeave={() => props.onDragOver(null)}
             onDrop={(e) => drop(e, "DISCARD", null)}>
             <span className="maildesk-project-icon"><Glyph d={P.trash} size={20} /></span>
-            <span><b>Supprimer d’Agent</b><small>Supprime la copie dans Agent</small></span>
+            <span><b>Supprimer de Kiara</b><small>Supprime la copie importée dans Kiara</small></span>
           </button>
         </div>}
         {active && <div className="maildesk-classification-options">
@@ -616,12 +624,12 @@ export function MailWorkspace(props: Props) {
                   {targetScore!=null && <p>{target==="DISCARD" ? "Score de suppression proposée" : "Score de correspondance"} : {focusPercent(targetScore)}</p>}
                   <p>{target===active.pending.target_project_id ? classificationReason(active.pending.reason) : targetEvidence?.length ? "Indices repérés pour ce projet." : target===suggestedTarget && !targetOverride ? "Ce projet présente les meilleurs indices disponibles. Vérifiez le classement avant de valider." : "Cette destination est choisie manuellement."}</p>
                   {!!targetEvidence?.length && <ul>{targetEvidence.map(evidence=><li key={evidence.key}>{evidence.label}</li>)}</ul>}
-                  {active.pending.discard_suggestion?.probability!=null && <div className="maildesk-discard-estimate"><p>Suggestion de suppression : {focusPercent(active.pending.discard_suggestion.probability)}</p><p>{active.pending.discard_suggestion.reason}</p><small>Estimation issue des mails déjà classés ou supprimés d’Agent ; elle reste à vérifier.</small></div>}
+                  {active.pending.discard_suggestion?.probability!=null && <div className="maildesk-discard-estimate"><p>Suggestion de suppression : {focusPercent(active.pending.discard_suggestion.probability)}</p><p>{active.pending.discard_suggestion.reason}</p><small>Estimation issue des mails déjà classés ou supprimés de Kiara ; elle reste à vérifier.</small></div>}
                 </details>}
                 {!props.scoped && <details className="maildesk-mail-options"><summary>Options du mail</summary><div className="maildesk-secondary-actions">
                   <button type="button" className="maildesk-secondary" aria-label="Classer dans Divers" disabled={locked || !diversProject} onClick={()=>void validateCurrent(diversProject!.id)}>Classer dans Divers</button>
-                  <button type="button" className="maildesk-reject" disabled={locked} onClick={()=>void discard([active.id])}>Supprimer ce mail d’Agent</button>
-                </div><p>La suppression retire le contenu de ce mail d’Agent et l’exclut des analyses.</p></details>}
+                  <button type="button" className="maildesk-reject" disabled={locked} onClick={()=>void discard([active.id])}>Supprimer ce mail de Kiara</button>
+                </div><p>La suppression retire le contenu de ce mail de Kiara et l’exclut des analyses.</p></details>}
                 {projectForm && <form className="maildesk-create-project" aria-label="Créer un projet depuis ce mail" onSubmit={event=>{event.preventDefault();void createProject();}}>
                   <strong>Nouveau projet</strong><p>Créez sa destination sans quitter ce mail, puis validez son affectation.</p>
                   <div className="maildesk-create-project-fields"><label htmlFor={`${projectFormId}-code`}>Code du projet <small>(facultatif)</small>

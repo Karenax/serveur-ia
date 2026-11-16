@@ -86,6 +86,7 @@ $config = @{
     bundle = @{
         active = $true
         targets = @('nsis')
+        useLocalToolsDir = $true
         externalBin = $externalBinaries
         windows = @{ nsis = @{ installMode = 'currentUser'; languages = @('French'); installerHooks = 'installer-hooks.nsh' } }
     }

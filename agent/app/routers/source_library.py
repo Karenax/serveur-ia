@@ -81,8 +81,12 @@ def sources(query: str = Query("", max_length=2000), project_id: str | None = No
             source_type: str = "all", file_format: library.FileFormat = "all", label: str = "", status: str = "all",
             sort: Literal["title_asc", "title_desc", "date_asc", "date_desc"] = "date_desc",
             offset: int = Query(0, ge=0), limit: int = Query(50, ge=1, le=200), db: Session = Depends(get_db)):
-    return library.catalog(db, query=query, project_id=project_id, source_type=source_type, file_format=file_format,
-                           label=label, status=status, sort=sort, offset=offset, limit=limit)
+    from ..services.project_access import current_operator
+    operator = current_operator()
+    result = library.catalog(db, query=query, project_id=project_id, source_type=source_type, file_format=file_format,
+                             label=label, status=status, sort=sort, offset=offset, limit=limit)
+    result["can_import_audio"] = operator.role != "reader" and operator.project_ids is None
+    return result
 
 
 @router.post("/imports/file", status_code=201)

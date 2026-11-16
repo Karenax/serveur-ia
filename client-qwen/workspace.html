@@ -1,5 +1,6 @@
 <template id="ws-layout">
-<section class="settings-view" data-view="projects" hidden><h2>Projets</h2><p>Un espace pour vos documents, vos discussions et vos idées.</p>
+<section class="settings-view" data-view="projects" hidden><h2>Projets</h2>
+<button id="ws-open-portfolio" type="button" class="secondary" hidden>Ouvrir le portefeuille</button>
 <div class="page-toolbar"><div class="ws-project-tools"><input id="ws-project-search" class="ws-field" type="search" placeholder="Rechercher un projet…" aria-label="Rechercher un projet"><label><input id="ws-archived" type="checkbox"> Archivés</label></div><div class="ws-toolbar"><button id="ui-project-create" class="secondary primary" type="button">＋ Nouveau projet</button><button type="button" class="icon-button" aria-label="Actualiser les projets" title="Actualiser" id="ws-refresh">↻</button></div></div>
 <form id="ws-create-project" class="ui-create-project" hidden><input class="ws-field" id="ws-project-name" maxlength="120" placeholder="Nom du projet" aria-label="Nom du nouveau projet" required><button class="secondary primary">Créer</button></form>
 <div class="ws-grid"><div id="ws-project-list" class="ws-list"></div><div><p id="ws-project-empty" class="ws-project-empty">Sélectionnez un projet pour retrouver votre travail.<br>Ou créez votre premier espace.</p><div id="ws-project-detail" hidden>
@@ -36,10 +37,11 @@ for(const [view,title] of [['projects','Projets']]){const b=wsElement('button',t
 const originalShowView=showView;showView=function(name){originalShowView(name);if(name==='projects'){$('workspace-heading').textContent='Projets';wsRefresh().catch(e=>error(e));}if(name!=='chat')$('ws-side').hidden=true;};
 const wsSettings=wsElement('section',undefined,'settings-view');wsSettings.dataset.view='settings';wsSettings.hidden=true;
 const wsSettingsNav=wsElement('nav',undefined,'ws-toolbar');wsSettingsNav.setAttribute('aria-label','Réglages du client');wsSettings.append(wsElement('h2','Réglages'),wsSettingsNav);
+const wsSettingsSections=[...platformCapabilities.settings];
 for(const name of platformCapabilities.settings){const b=document.querySelector('[data-view-button="'+name+'"]');b.className='secondary';wsSettingsNav.append(b);const pane=document.querySelector('[data-view="'+name+'"]');pane.style.padding='0';pane.style.overflow='visible';wsSettings.append(pane);}
 document.querySelector('.workspace').append(wsSettings);
 const wsSettingsButton=wsElement('button','Réglages','nav-button');wsSettingsButton.dataset.viewButton='settings';document.querySelector('#client-navigation').append(wsSettingsButton);
-const wsShowViewOnce=showView;showView=function(name){const selected=name==='settings'?'access':name;wsShowViewOnce(selected);wsSettings.hidden=!platformCapabilities.settings.includes(selected);wsSettingsButton.classList.toggle('active',!wsSettings.hidden);if(!wsSettings.hidden)$('workspace-heading').textContent='Réglages · '+({access:'Mon accès',connection:'Connexion',updates:'Mises à jour',api:'API locale'})[selected];};
+const wsShowViewOnce=showView;showView=function(name){const selected=name==='settings'?'access':name;wsShowViewOnce(selected);wsSettings.hidden=!wsSettingsSections.includes(selected);wsSettingsButton.classList.toggle('active',!wsSettings.hidden);if(!wsSettings.hidden)$('workspace-heading').textContent='Réglages · '+({access:'Mon accès',connection:'Connexion',updates:'Mises à jour',api:'API locale',assistant:'Mémoire et rappels'})[selected];};
 wsSettingsButton.onclick=()=>showView('settings');
 const originalDrawLibrary=drawLibrary;drawLibrary=function(){originalDrawLibrary();wsChatSelections();};
 const wsFillProjectOnce=wsFillProject;wsFillProject=function(){wsFillProjectOnce();ws.projectRevision=ws.data?.projects.find(p=>p.id===ws.project)?.revision;};
@@ -54,6 +56,15 @@ function wsIsAgentProject(id){
   const kind=ws.data?.projects.find(project=>project.id===id)?.project_kind;
   if(kind==='managed'||kind==='private')return kind==='managed';
   return /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/.test(id);
+}
+function wsUsesUnifiedProjectPage(){
+  return platformCapabilities.platform==='windows'&&ws.data?.project_catalogue?.interface==='projects-v1';
+}
+function wsProjectPage(id, section='overview'){
+  const project=encodeURIComponent(id);
+  const meetings=section==='meetings';
+  if(wsUsesUnifiedProjectPage())return `/app/projets/${project}/${meetings?'reunions':'vue-ensemble'}`;
+  return `/app/projects/${project}/${meetings?'reviews':'pilotage'}`;
 }
 function wsVisibleProjects(){const query=$('ws-project-search').value.toLocaleLowerCase();return (ws.data?.projects||[]).filter(p=>(!p.archived||$('ws-archived').checked)&&[p.title,p.code,p.instructions].join(' ').toLocaleLowerCase().includes(query));}
 function wsDrawProjects(){
@@ -138,7 +149,7 @@ $('ws-create-project').onsubmit=e=>{
 for(const id of ['ws-project-title','ws-project-instructions'])$(id).oninput=()=>{ws.projectDirty=true;$('ws-project-status').textContent='Consignes à enregistrer';};
 async function wsSaveProject(archived){const p=ws.data.projects.find(p=>p.id===ws.project);await wsAction('project_save',{id:p.id,title:$('ws-project-title').value,instructions:$('ws-project-instructions').value,archived:archived??!!p.archived,revision:ws.projectRevision});ws.projectDirty=false;await wsRefresh();$('ws-project-status').textContent='Projet enregistré';}
 $('ws-project-form').onsubmit=e=>{e.preventDefault();wsTry(()=>wsSaveProject());};$('ws-project-archive').onclick=()=>wsTry(async()=>{await wsFlush();const p=ws.data.projects.find(p=>p.id===ws.project);await wsSaveProject(!p.archived);});
-$('ws-agent-project-open').onclick=()=>wsTry(()=>uiOpenAgent('/app/projects/'+encodeURIComponent(ws.project)+'/pilotage'));
+$('ws-agent-project-open').onclick=()=>wsTry(()=>uiOpenProjectWorkspace(wsProjectPage(ws.project)));
 $('ws-agent-project-archive').onclick=()=>wsTry(async()=>{
   const project=ws.data.projects.find(p=>p.id===ws.project);
   if(!project?.can_edit)return;
@@ -172,7 +183,7 @@ $('ws-new-document').onclick=()=>wsTry(async()=>{await wsFlush();const r=await w
 $('ws-upload').onchange=()=>wsTry(async()=>{try{const file=$('ws-upload').files[0];if(!file)return;if(file.size>2*1024*1024)throw new Error('Maximum 2 Mo par fichier.');const data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result.split(',')[1]);reader.onerror=()=>reject(new Error('Lecture du fichier impossible.'));reader.readAsDataURL(file);});$('ws-project-status').textContent='Import et extraction du fichier…';const r=await wsAction('document_upload',{project:ws.project,title:file.name,data});await wsRefresh();await wsOpenDocument(r.id);}finally{$('ws-upload').value='';}});
 $('ws-document-delete').onclick=()=>wsTry(async()=>{if(!confirm('Supprimer ce document et son index du serveur ?'))return;await wsFlush();await wsAction('document_delete',{id:ws.document.id,revision:ws.document.revision});ws.document=null;ws.dirty=false;$('ws-document-editor').hidden=true;await api('/client/draft',{draft:null});await wsRefresh();});
 $('ws-document-chat').onclick=()=>wsTry(async()=>{if(busy)throw new Error('Attendez la fin de la réponse.');await wsFlush();$('new').click();const c=wsCurrent();c.project_id=ws.project;c.document_id=ws.document.id;save();wsChatSelections();showView('chat');$('ws-panel').click();});
-function wsDrawSources(container,sources){container.replaceChildren();for(const s of sources){const row=wsElement('div',undefined,'ws-source');row.append(wsElement('strong',s.title||s.url||'Source'));if(Number.isInteger(s.page)&&s.page>0)row.append(wsElement('span',' · page '+s.page));if(s.revision)row.append(wsElement('span',' · révision '+s.revision));if(s.level)row.append(wsElement('span',' · '+s.level));row.append(wsElement('p',s.text||''));if(s.source_id)row.append(wsButton('Ouvrir le passage cité',()=>wsOpenSource(s.source_id)));else if(s.agent_source_id&&platformCapabilities.platform!=='android')row.append(wsButton('Voir la source',()=>uiOpenAgent('/app/sources?source='+encodeURIComponent(s.agent_source_id))));else if(s.document)row.append(wsElement('small','Référence ancienne : version non vérifiable.','muted'));if(s.url){try{const parsed=new URL(s.url);if(parsed.protocol==='https:'){const a=wsElement('a','Ouvrir la source');a.href=parsed.href;a.target='_blank';a.rel='noopener noreferrer';row.append(a);}}catch{}}container.append(row);}}
+function wsDrawSources(container,sources){container.replaceChildren();for(const s of sources){const row=wsElement('div',undefined,'ws-source');row.append(wsElement('strong',s.title||s.url||'Source'));if(Number.isInteger(s.page)&&s.page>0)row.append(wsElement('span',' · page '+s.page));if(s.revision)row.append(wsElement('span',' · révision '+s.revision));if(s.level)row.append(wsElement('span',' · '+s.level));row.append(wsElement('p',s.text||''));if(s.source_id)row.append(wsButton('Ouvrir le passage cité',()=>wsOpenSource(s.source_id)));else if(s.agent_source_id&&platformCapabilities.platform==='windows')row.append(wsButton('Voir la source',()=>window.kiaraProjectConversation.openWindowsSource(s.agent_source_id,s.text)));else if(s.agent_source_id&&platformCapabilities.platform!=='android')row.append(wsButton('Voir la source',()=>uiOpenProjectWorkspace('/app/sources?source='+encodeURIComponent(s.agent_source_id))));else if(s.document)row.append(wsElement('small','Référence ancienne : version non vérifiable.','muted'));if(s.url){try{const parsed=new URL(s.url);if(parsed.protocol==='https:'){const a=wsElement('a','Ouvrir la source');a.href=parsed.href;a.target='_blank';a.rel='noopener noreferrer';row.append(a);}}catch{}}container.append(row);}}
 const wsSourceDialog=wsElement('dialog',undefined,'fred-source-dialog');wsSourceDialog.id='fred-source-dialog';wsSourceDialog.setAttribute('aria-labelledby','fred-source-title');document.body.append(wsSourceDialog);
 async function wsOpenSource(id){const s=await wsAction('source_get',{source_id:id});wsSourceDialog.replaceChildren();const title=wsElement('h2',s.title||'Passage cité'),meta=wsElement('p',(s.page?'Page '+s.page+' · ':'')+'Révision '+s.revision,'muted'),notice=wsElement('p',s.message||({current:'Ce passage correspond à la version actuelle.',modified:'Le document a été modifié depuis cette citation.',unavailable:'La source est devenue indisponible.'})[s.status]),passage=wsElement('pre',s.passage||s.text||'','fred-source-passage');title.id='fred-source-title';wsSourceDialog.append(title,meta,notice,passage);if(s.status==='modified')wsSourceDialog.append(wsElement('p','Révision actuelle : '+s.current_revision));if(s.status!=='unavailable'&&s.document&&s.project)wsSourceDialog.append(wsButton('Ouvrir le document actuel',async()=>{await wsSelectProject(s.project);await wsOpenDocument(s.document);showView('projects');wsSourceDialog.close();}));wsSourceDialog.append(wsButton('Fermer',()=>wsSourceDialog.close()));if(!wsSourceDialog.open)wsSourceDialog.showModal();}
 
@@ -181,9 +192,9 @@ $('ws-memory-form').onsubmit=e=>{e.preventDefault();wsTry(async()=>{await wsActi
 const originalDraw=draw;draw=function(message,container){const view=originalDraw(message,container);if(!container&&message.role==='assistant'&&message.content&&!wsIsAgentProject(wsCurrent()?.project_id))view.article.append(wsButton('Enregistrer comme document',async()=>{const p=wsCurrent()?.project_id;if(!p)throw new Error('Choisissez un projet dans la discussion.');const r=await wsAction('document_create',{project:p,title:wsCurrent().title,text:message.content});await wsRefresh();await wsSelectProject(p);await wsOpenDocument(r.id);showView('projects');}));return view;};
 const originalButtons=buttons;buttons=function(){originalButtons();wsChatSelections();};
 $('ws-refresh').onclick=()=>wsTry(()=>wsRefresh());
-async function wsPoll(){/* kiara-slot:platform-expression-24 */if(!connected||busy||historySyncPending||conversationActionPending||wsDraggedConversation)/* /kiara-slot:platform-expression-24 */return;if(!ws.bootstrapDone){await wsBootstrap();return;}try{await wsRefresh();}catch(e){error('Actualisation indisponible : '+e.message);}}
+async function wsPoll(){/* kiara-slot:platform-expression-24 */if((!connected&&platformCapabilities.platform!=='web')||busy||historySyncPending||conversationActionPending||wsDraggedConversation)/* /kiara-slot:platform-expression-24 */return;if(!ws.bootstrapDone){await wsBootstrap();return;}try{await wsRefresh();}catch(e){error('Actualisation indisponible : '+e.message);}}
 let wsBootstrapping=false;
-async function wsBootstrap(){if(wsBootstrapping||ws.bootstrapDone)return;wsBootstrapping=true;try{await clientReady;if(!connected)return;await wsRefresh();const r=await api('/client/draft');ws.bootstrapDone=true;if(r.draft){const d=r.draft;await wsSelectProject(d.project);await wsOpenDocument(d.id);$('ws-document-title').value=d.title;$('ws-document-text').value=d.text;ws.dirty=true;ws.conflict=ws.document.revision!==d.revision;ws.document.revision=d.revision;$('ws-document-status').classList.toggle('ws-warning',ws.conflict);$('ws-document-status').textContent='Brouillon local récupéré'+(ws.conflict?' : comparer avec le serveur avant enregistrement.':'.');showView('projects');}render();drawLibrary();}catch(e){error(e);}finally{wsBootstrapping=false;}}
+async function wsBootstrap(){if(wsBootstrapping||ws.bootstrapDone)return;wsBootstrapping=true;try{await clientReady;if(!connected&&platformCapabilities.platform!=='web')return;await wsRefresh();const r=await api('/client/draft');ws.bootstrapDone=true;if(r.draft){const d=r.draft;await wsSelectProject(d.project);await wsOpenDocument(d.id);$('ws-document-title').value=d.title;$('ws-document-text').value=d.text;ws.dirty=true;ws.conflict=ws.document.revision!==d.revision;ws.document.revision=d.revision;$('ws-document-status').classList.toggle('ws-warning',ws.conflict);$('ws-document-status').textContent='Brouillon local récupéré'+(ws.conflict?' : comparer avec le serveur avant enregistrement.':'.');showView('projects');}render();drawLibrary();}catch(e){error(e);}finally{wsBootstrapping=false;}}
 wsBootstrap();setInterval(wsPoll,5000);
 // Conversation actions share one lock so a reply or history sync cannot change their target.
 function wsConversationRecord(id){
@@ -291,7 +302,10 @@ function wsDrawSidebarProjects(){
   for(const p of ws.data?.projects.filter(p=>!p.archived)||[]){
     const group=wsElement('details',undefined,'sidebar-project');group.dataset.projectDrop=p.id;group.open=open.has(p.id);
     const summary=wsElement('summary',p.title);summary.title='Déposer une conversation dans '+p.title;
-    const view=wsButton('Ouvrir le projet',async()=>{await wsSelectProject(p.id);showView('projects');});
+    const view=wsButton('Ouvrir le projet',async()=>{
+      if(wsUsesUnifiedProjectPage()&&wsIsAgentProject(p.id))return uiOpenProjectWorkspace(wsProjectPage(p.id));
+      await wsSelectProject(p.id);showView('projects');
+    });
     group.append(summary,view);
     const local=library.filter(c=>c.project_id===p.id&&!c.archived&&!isCorrection(c)),known=new Set(library.filter(c=>c.project_id===p.id).map(c=>c.id.replaceAll('-','')));
     for(const c of local)group.append(wsConversationButton(c));
@@ -363,7 +377,7 @@ async function fredInboxLoad(){if(fredInbox.busy)return;fredInbox.busy=true;try{
 window.fredOpenNotification=async target=>{
   if(target?.kind==='document'){await wsFlush();await wsSelectProject(target.project);await wsOpenDocument(target.id);showView('projects');}
   else if(target?.kind==='agent_project'&&wsIsAgentProject(target.project)){
-    if(platformCapabilities.platform!=='android')await uiOpenAgent('/app/projects/'+encodeURIComponent(target.project)+'/reviews');
+    if(platformCapabilities.platform!=='android')await uiOpenProjectWorkspace(wsProjectPage(target.project,'meetings'));
     else{await wsRefresh();await wsSelectProject(target.project);showView('projects');}
   }else{showView('notifications');await fredInboxLoad();}
 };
@@ -406,9 +420,15 @@ assistantPane.innerHTML=`<h2>Mémoire et rappels</h2>
 document.querySelector('.workspace').append(assistantPane);
 for(const field of assistantPane.querySelectorAll('input:not([type="checkbox"]),textarea,select'))field.classList.add('ws-field');
 const assistantNav=wsElement('button','Mémoire et rappels','nav-button');assistantNav.dataset.viewButton='assistant';
-$('client-navigation').insertBefore(assistantNav,document.querySelector('[data-view-button="notifications"]'));assistantNav.onclick=()=>showView('assistant');
+if(platformCapabilities.platform==='windows'){
+  wsSettingsSections.push('assistant');
+  assistantNav.className='secondary';
+  wsSettingsNav.append(assistantNav);
+  wsSettings.append(assistantPane);
+}else $('client-navigation').insertBefore(assistantNav,document.querySelector('[data-view-button="notifications"]'));
+assistantNav.onclick=()=>showView('assistant');
 const assistantShowView=showView;
-showView=function(name){assistantShowView(name);if(name==='assistant'){$('workspace-heading').textContent='Mémoire et rappels';assistantTry(()=>assistantLoad());}};
+showView=function(name){assistantShowView(name);if(name==='assistant'){if(platformCapabilities.platform!=='windows')$('workspace-heading').textContent='Mémoire et rappels';assistantTry(()=>assistantLoad());}};
 function assistantScope(){return $('assistant-project').value||null;}
 function assistantRequestKey(){return clientRequestId();}
 async function assistantCommand(operation,values={}){

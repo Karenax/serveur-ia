@@ -1,4 +1,4 @@
-"""Synchronize durable Windows capture fragments with the Agent meeting service."""
+"""Synchronize durable Windows capture fragments with the Kiara meetings service."""
 
 import hashlib
 import json
@@ -371,5 +371,5 @@ def upload_fragment(remote, directory, session_id, packet):
     accepted = {'track': track, 'seq': sequence, 'sha256': digest, 'size_bytes': size}
     if (not isinstance(receipt, dict) or receipt.get('acknowledged') is not True
             or receipt.get('session_id') != session_id or receipt.get('accepted_chunk') != accepted):
-        raise ValueError('Le reçu Agent ne correspond pas au fragment conservé.')
+        raise ValueError('Le reçu de Kiara ne correspond pas au fragment conservé.')
     return receipt

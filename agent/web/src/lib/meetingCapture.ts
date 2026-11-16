@@ -25,7 +25,7 @@ export class IndexedAudioChunks implements DurableChunkStore {
       };
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(new Error('Le stockage audio local ne peut pas être ouvert.'));
-      request.onblocked = () => reject(new Error('Fermez les autres pages Agent pour ouvrir le stockage audio.'));
+      request.onblocked = () => reject(new Error('Fermez les autres pages Kiara pour ouvrir le stockage audio.'));
     }).catch(error => {this.opening = undefined; throw error;});
     return this.opening;
   }
@@ -73,7 +73,7 @@ export async function acquireCaptureLock() {
   if (!navigator.locks?.request) throw new Error('Ce navigateur ne permet pas de protéger le microphone entre les onglets. Utilisez Chrome ou Edge, ou importez un audio.');
   return new Promise<() => void>((resolve, reject) => {
     void navigator.locks.request('agent-durable-meeting-capture', {ifAvailable: true}, async lock => {
-      if (!lock) {reject(new Error('Une réunion enregistre déjà dans un autre onglet Agent.')); return;}
+      if (!lock) {reject(new Error('Une réunion enregistre déjà dans un autre onglet Kiara.')); return;}
       await new Promise<void>(release => resolve(release));
     }).catch(reject);
   });

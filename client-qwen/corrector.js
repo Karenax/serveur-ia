@@ -4,7 +4,12 @@ correctorPane.innerHTML='<div class="corrector-heading"><div><h2>Correcteur de f
 document.querySelector('.workspace').append(correctorPane);
 uiPaths.corrector='M4 20l4-1L21 6l-3-3L5 16l-1 4M9 8l2 2 4-4M4 3h5';uiNavTitles.corrector='Correcteur';
 const correctorNav=wsElement('button','Correcteur','nav-button');correctorNav.dataset.viewButton='corrector';correctorNav.onclick=()=>showView('corrector');
-document.querySelector('#client-navigation').insertBefore(correctorNav,document.querySelector('[data-view-button="assistant"]')||document.querySelector('[data-view-button="notifications"]'));uiDecorateNavigation();
+correctorNav.type='button';
+if(platformCapabilities.platform==='windows'){
+  correctorNav.className='secondary voice-button';
+  $('send').before(correctorNav);
+}else document.querySelector('#client-navigation').insertBefore(correctorNav,document.querySelector('[data-view-button="assistant"]')||document.querySelector('[data-view-button="notifications"]'));
+uiDecorateNavigation();
 let correctorRunning=false,correctorDirty=false,correctorDraftTimer=null,correctorAnswer={content:''},correctorSelectedId,correctorChatId=null;
 window.correctorSelection=()=>correctorSelectedId;
 window.generationCancelBody=()=>correctorRunning?{text_transform:true}:{};

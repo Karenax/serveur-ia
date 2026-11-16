@@ -46,21 +46,18 @@ def manifest(home=HOME):
     write_json(source.parent/'release.json',result)
     return result
 
-WINDOWS_INSTALLER_VERSION = '4.0.0'
-WINDOWS_INSTALLER = f'Kiara_{WINDOWS_INSTALLER_VERSION}_x64-setup.exe'
-DESKTOP_INSTALLER_VERSION = '4.0.5'
+DESKTOP_INSTALLER_VERSION = '4.0.8'
 DESKTOP_INSTALLER = f'Kiara_{DESKTOP_INSTALLER_VERSION}_x64-setup.exe'
 
 
-def windows_installer(home, *, stream=None, desktop=False):
+def windows_installer(home, *, stream=None):
     folder = home / 'installateurs'
-    number = DESKTOP_INSTALLER_VERSION if desktop else WINDOWS_INSTALLER_VERSION
-    release = read_json(folder / (f'kiara-{number}.json' if desktop else 'kiara-4.json'), {})
+    release = read_json(folder / f'kiara-{DESKTOP_INSTALLER_VERSION}.json', {})
     try:
         verify_release(release, public(home, create=False))
-        if release['version'] != number:
+        if release['version'] != DESKTOP_INSTALLER_VERSION:
             raise ValueError
-        source = folder / (DESKTOP_INSTALLER if desktop else WINDOWS_INSTALLER)
+        source = folder / DESKTOP_INSTALLER
         if stream is None:
             with source.open('rb') as opened:
                 _verify_installer(opened, source, release)

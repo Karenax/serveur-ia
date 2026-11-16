@@ -29,6 +29,7 @@ class ProjectOut(BaseModel):
 class ResolutionConfirm(BaseModel):
     project_id: str
     defer_enrichment: bool = False
+    pending_only: bool = False
 
 
 class ProposalDecision(BaseModel):

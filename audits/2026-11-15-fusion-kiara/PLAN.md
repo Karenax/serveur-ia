@@ -4,6 +4,20 @@
 
 [Audit de la fusion](RAPPORT.md)
 
+## État au 16 novembre 2026
+
+La première bascule, pour Windows et le portail privé, est en production avec
+la 4.0.8. Conversations réunit composeur, historique, brouillons et assistant
+de projet, et conserve le mode éphémère. La liste et la fiche Projets
+utilisent le style Kiara, avec les rubriques Vue d’ensemble, Pilotage, Documents
+et Réunions. Le lanceur exploite le service Projets et retrouve les 11 projets
+après redémarrage. Les accès historiques nécessaires aux clients installés et
+au retour 4.0.7 restent compatibles.
+
+Les étapes ci-dessous conservent l’historique des lots. La procédure de
+bascule consigne les contrôles Windows, la recette HTTPS, le retour et les
+points reportés pour Android et Linux. [Bascule Windows et retour arrière](BASCULE.md)
+
 ## État cible
 
 Kiara a un dépôt de référence, une procédure de construction, une entrée d’exploitation et une interface utilisateur commune. Les clients manipulent le même catalogue de projets et chaque type de donnée a un propriétaire défini. Windows, le web privé, Android et Linux affichent les actions compatibles avec leurs capacités et leurs autorisations. L’administration du serveur partage le vocabulaire et les composants visuels de Kiara.
@@ -170,6 +184,10 @@ Ramener la console à cinq destinations. **Vue d’ensemble** porte l’état du
 
 **Sortie du lot** — Ouvrir un projet, une citation ou une réunion garde la même navigation, le thème et la session. Les cinq destinations principales sont stables et les actions d’un objet sont accessibles dans son contexte.
 
+Dans le client Windows, la barre principale affiche Conversations, Projets, Mails, Réunions et Activité quand le serveur annonce la navigation commune. Vocal et Correcteur sont accessibles dans le composeur. La cloche ouvre les notifications depuis l’en-tête et Mémoire et rappels se trouve dans les Réglages. La recette Windows sur les sources couvre cette navigation, le portefeuille, l’historique, les brouillons et le mode éphémère.
+
+Le document original cité par l’assistant de projet se télécharge depuis Conversations. La recette WebView2 lance le binaire Windows 4.0.7 extrait avec une interface de test locale et vérifie le fichier obtenu ainsi que la reprise du même échange éphémère. Les tests du relais vérifient séparément le contrôle de session, les octets et les en-têtes des deux routes d’originaux. La recette du paquet Windows final doit réunir ces composants.
+
 ### 4. Unifier l’exploitation et le nom
 
 1. Donner au service un nom de domaine Kiara et une configuration commune, avec lecteurs de transition pour l’ancien fichier et les variables déjà déployées. Réunir l’état de santé et la supervision. Harmoniser les délais de redémarrage, les diagnostics et les budgets d’inférence.
@@ -242,6 +260,14 @@ La présentation reprend Segoe UI, la barre de 238 px et les neutres clair/sombr
 ## Migration à blanc et navigation commune
 
 La recette a ouvert en lecture seule les trois bases du serveur et réalisé des instantanés SQLite dans un dossier temporaire privé. Les contrôles d’intégrité et de clés étrangères passent. La base des espaces privés contient **zéro ancien projet**. Les quatre archives locales du 9 au 15 novembre dont le catalogue indique une vérification contiennent également zéro projet, document et conversation publiée dans ce périmètre. Les deux historiques personnels en base ont été examinés pour leurs rattachements, avec zéro référence de projet à remapper. Le portefeuille métier compte **11 projets et 11 liens vers Brain**, tous résolus avec les identifiants existants.
+
+Le rejeu sur les trois bases restaurées depuis la paire NAS du 16 novembre à
+03 h 00 confirme les 11 identifiants, les 11 liens vers les connaissances et
+l’absence de référence d’historique orpheline ou affectée au mauvais
+propriétaire. Le rapport agrégé se trouve dans
+`D:\Kiara\essais\catalogue-nas-recette-windows-4.0.7\recette.json`.
+
+La répétition refuse désormais tout rattachement d’historique à un projet introuvable ou à l’espace privé d’un autre propriétaire avant de modifier le catalogue. Les deux refus ont été vérifiés sur données fictives. La répétition de cette vérification sur les trois instantanés NAS confirme les 11 projets, les 11 liens et l’absence de rattachement à corriger.
 
 La [commande de répétition](../../maintenance/rehearse_project_migration.py) crée un catalogue de recette. La conception retient chaque projet privé et ses objets dans son stockage propriétaire. Le futur catalogue peut les référencer par ID et owner en préservant la portée personnelle. La recette n’étend donc aucun accès ERP à un dossier privé. Aucun regroupement par titre n’est autorisé. La répétition donne les mêmes identifiants et les mêmes compteurs. Le [test d’interruption et de périmètre](../../maintenance/tests/test_project_migration_rehearsal.py) couvre deux projets homonymes avec propriétaires distincts, l’archivage, un document et sa citation, une conversation, une mémoire, l’annulation transactionnelle et le refus d’une collision d’identifiants. Aucune écriture sur les bases en service.
 

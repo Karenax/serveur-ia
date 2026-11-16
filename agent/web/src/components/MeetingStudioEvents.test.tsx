@@ -10,7 +10,6 @@ const note=(text:string):NoteContent=>({version:1,blocks:[{type:'paragraph',alig
 vi.mock('./NoteRichEditor',()=>({NoteRichEditor:({content,onChange}:{content:NoteContent;onChange:(content:NoteContent)=>void|boolean})=>
   <textarea aria-label="Note humaine" value={content.blocks[0]?.type==='paragraph'?content.blocks[0].runs.map(run=>run.text).join(''):''}
     onChange={event=>onChange(note(event.target.value))}/>,NoteContentView:()=>null}));
-vi.mock('./AssistantPanel',()=>({AssistantPanel:()=>null}));
 vi.mock('./MeetingAudioPanel',()=>({MeetingAudioPanel:()=>null}));
 vi.mock('./MeetingNotePublication',()=>({MeetingNotePublication:()=>null}));
 vi.mock('./MeetingCalendarContext',()=>({MeetingCalendarContext:()=>null}));

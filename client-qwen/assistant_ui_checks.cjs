@@ -21,7 +21,9 @@ module.exports=async({page,state,android,errors})=>{
     return route.fulfill({json:result});
   });
   if(android)await page.locator('#ui-sidebar-toggle').click();
-  await page.locator('[data-view-button="assistant"]').click();
+  const memory=page.locator('[data-view-button="assistant"]');
+  if(!android&&!await memory.isVisible())await page.locator('[data-view-button="settings"]').click();
+  await memory.click();
   await page.waitForFunction(()=>document.getElementById('assistant-status').textContent==='À jour.');
   assert.equal(await page.locator('#assistant-memories').innerText(),'Aucun souvenir dans cet espace.');
   await page.locator('#assistant-memory-add summary').click();

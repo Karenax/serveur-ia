@@ -20,7 +20,7 @@ def write_archive(snapshot, target, password):
     snapshot = Path(snapshot).resolve(strict=True)
     target = Path(target).resolve()
     if target.is_relative_to(snapshot) or target.exists():
-        raise ValueError('Choisissez un nouveau fichier en dehors des données Agent.')
+        raise ValueError('Choisissez un nouveau fichier en dehors des données Projets.')
     salt = secrets.token_bytes(16)
     key = cipher(password, salt)
     with tempfile.NamedTemporaryFile(dir=target.parent, delete=False) as stream:
@@ -73,7 +73,7 @@ def _decrypt(source, output, password):
         except InvalidToken as error:
             raise ValueError('Sauvegarde Agent invalide ou phrase incorrecte.') from error
         if data[:8] != struct.pack('>Q', index) or len(data) > BLOCK + 8:
-            raise ValueError('Ordre des données Agent invalide.')
+            raise ValueError('Ordre des données Projets invalide.')
         if len(data) == 8:
             if source.read(1):
                 raise ValueError('Données après la fin de la sauvegarde Agent.')

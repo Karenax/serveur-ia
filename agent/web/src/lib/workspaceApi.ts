@@ -54,6 +54,9 @@ function pageUrl(path: string, filters: WorkspaceFilter = {}) {
 }
 
 export const workspaceApi = {
+  knowledgeProjects: (signal?: AbortSignal) => request<{id:string;code:string;name:string}[]>("/api/v1/brain/projects",{signal}),
+  createKnowledgeProject: (code:string,name:string) => request<{id:string;code:string;name:string}>(
+    "/v1/projects",{method:"POST",body:JSON.stringify({code,name})}),
   meetings: (filters: WorkspaceFilter = {}, signal?: AbortSignal,quiet=false) => request<WorkspacePage<WorkspaceMeeting>>(pageUrl("meetings", filters), {signal,activity:quiet?false:undefined}),
   jobs: (filters: WorkspaceFilter = {}, signal?: AbortSignal,quiet=false) => request<WorkspacePage<WorkspaceJob>>(pageUrl("jobs", filters), {signal,activity:quiet?false:undefined}),
   proposals: (filters: WorkspaceFilter = {}, signal?: AbortSignal) => request<WorkspacePage<WorkspaceKnowledge>>(pageUrl("proposals", filters), {signal}),

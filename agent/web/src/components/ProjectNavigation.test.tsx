@@ -50,14 +50,14 @@ it('signale l’échec de la sauvegarde du projet et permet de réessayer', asyn
     downloads.push(this.download);
   });
   try {
-    render(<ProjectWindow {...props} initialTab="pilotage" sidebarNavigation />);
+    render(<ProjectWindow {...props} initialTab="pilotage" />);
     fireEvent.click(await screen.findByText('Options du projet'));
     fireEvent.click(screen.getByRole('button', { name: 'Sauvegarder le projet' }));
     expect((await screen.findByRole('alert')).textContent).toBe('La sauvegarde du projet a échoué.');
     expect(downloads).toEqual([]);
 
     fireEvent.click(screen.getByRole('button', { name: 'Réessayer la sauvegarde' }));
-    await waitFor(() => expect(downloads).toEqual(['minipilot-AFF-01.json']));
+    await waitFor(() => expect(downloads).toEqual(['Kiara-Projet-AFF-01.json']));
     expect(screen.queryByRole('alert')).toBeNull();
     expect(exportProject.mock.calls).toEqual([['p1'], ['p1']]);
     expect(createObjectURL).toHaveBeenCalledOnce();
@@ -67,16 +67,16 @@ it('signale l’échec de la sauvegarde du projet et permet de réessayer', asyn
   }
 });
 
-it('masque seulement la grande navigation dans le projet à menu latéral',async()=>{
-  const view=render(<ProjectWindow {...props} initialTab="pilotage" sidebarNavigation/>);
-  await screen.findByRole('region',{name:'Résumé de test'});
-  expect(screen.queryByRole('navigation',{name:'Sous-modules du projet'})).toBeNull();
-  view.rerender(<ProjectWindow {...props} initialTab="pilotage"/>);
-  expect(within(screen.getByRole('navigation',{name:'Sous-modules du projet'})).getAllByRole('button')).toHaveLength(7);
+it('affiche les quatre rubriques de la fiche Kiara', async () => {
+  render(<ProjectWindow {...props} initialTab="pilotage"/>);
+  const navigation = await screen.findByRole('navigation', { name: 'Rubriques du projet' });
+  expect(within(navigation).getAllByRole('button').map(button => button.textContent))
+    .toEqual(['Vue d’ensemble', 'Pilotage', 'Documents', 'Réunions']);
+  expect(screen.queryByRole('navigation', { name: 'Sous-modules du projet' })).toBeNull();
 });
 
 it('conserve une création de document entre Notes et À remettre pendant le rechargement',async()=>{
-  render(<ProjectWindow {...props} initialTab="documents" sidebarNavigation/>);
+  render(<ProjectWindow {...props} initialTab="documents"/>);
   fireEvent.click(await screen.findByRole('button',{name:'Nouveau livrable'}));
   fireEvent.change(screen.getByLabelText('Intitulé du livrable'),{target:{value:'Notice à conserver'}});
   fireEvent.click(screen.getByRole('tab',{name:'Notes'}));await screen.findByText('Notes du projet');
@@ -93,7 +93,7 @@ it('garde la rubrique active lorsque le changement de navigation est refusé',as
   const change=vi.fn(()=>false);render(<ProjectWindow {...props} initialTab="documents" onTabChange={change}/>);
   fireEvent.click(await screen.findByRole('button',{name:'Nouveau livrable'}));
   fireEvent.change(screen.getByLabelText('Intitulé du livrable'),{target:{value:'Brouillon conservé'}});
-  fireEvent.click(within(screen.getByRole('navigation',{name:'Sous-modules du projet'})).getByRole('button',{name:'Planning'}));
+  fireEvent.click(within(screen.getByRole('navigation',{name:'Rubriques du projet'})).getByRole('button',{name:'Pilotage'}));
   expect(change).toHaveBeenCalledWith('planification');
   expect(screen.getByRole('tab',{name:'À remettre'}).getAttribute('aria-selected')).toBe('true');
   expect((screen.getByLabelText('Intitulé du livrable') as HTMLInputElement).value).toBe('Brouillon conservé');
@@ -103,7 +103,7 @@ it('garde la rubrique active lorsque le changement de navigation est refusé',as
 it('conserve les choix du catalogue en revenant de Notes pendant une lecture en cours',async()=>{
   vi.spyOn(identityApi,'read').mockResolvedValue({project_id:'p1',typology_id:null,references:{}} as ProjectIdentity);
   vi.spyOn(deliverableApi,'types').mockResolvedValue({items:[],total:0,offset:0,limit:25,can_manage:true});
-  render(<ProjectWindow {...props} initialTab="documents" sidebarNavigation/>);
+  render(<ProjectWindow {...props} initialTab="documents"/>);
   fireEvent.click(await screen.findByRole('button',{name:'Ajouter depuis les modèles'}));
   const form=await screen.findByRole('form',{name:'Sélection des livrables'});
   const label='Désélectionner les types absents de mes choix, en conservant leurs données';
@@ -119,6 +119,7 @@ it('conserve les choix du catalogue en revenant de Notes pendant une lecture en 
 
 it('ne prépare pas une ouverture ciblée lorsque la navigation vers Documents est refusée',async()=>{
   const change=vi.fn(()=>false),view=render(<ProjectWindow {...props} initialTab="pilotage" onTabChange={change}/>);
+  fireEvent.click(await screen.findByText('Suivi détaillé du projet'));
   fireEvent.click(await screen.findByRole('button',{name:'Ouvrir le document du résumé'}));
   expect(change).toHaveBeenCalledWith('documents');expect(deliverableApi.detail).not.toHaveBeenCalled();
   view.rerender(<ProjectWindow {...props} initialTab="documents" onTabChange={change}/>);
@@ -129,6 +130,7 @@ it('ne prépare pas une ouverture ciblée lorsque la navigation vers Documents e
 
 it('ouvre le même panneau Documents depuis le résumé et un contrôle de jalon',async()=>{
   const view=render(<ProjectWindow {...props} initialTab="pilotage"/>);
+  fireEvent.click(await screen.findByText('Suivi détaillé du projet'));
   fireEvent.click(await screen.findByRole('button',{name:'Ouvrir le document du résumé'}));
   await screen.findByRole('region',{name:'Livrable ouvert depuis le cockpit'});
   expect(screen.getByRole('tab',{name:'À remettre'}).getAttribute('aria-selected')).toBe('true');
@@ -142,7 +144,7 @@ it('ouvre le même panneau Documents depuis le résumé et un contrôle de jalon
 });
 
 it('conserve les outils de planning sans les présenter comme des onglets quotidiens',async()=>{
-  render(<ProjectWindow {...props} initialTab="planification" sidebarNavigation/>);
+  render(<ProjectWindow {...props} initialTab="planification"/>);
   const tabs=await screen.findByRole('tablist',{name:'Planification'});
   expect(within(tabs).getAllByRole('tab').map(button=>button.textContent)).toEqual(['Échéances 0','Tâches 0']);
   fireEvent.click(screen.getByText('Outils du planning'));fireEvent.click(screen.getByRole('button',{name:'Planning de référence et écarts'}));

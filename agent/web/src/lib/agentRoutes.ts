@@ -1,10 +1,12 @@
+const portalPrefix = (path: string): string => /^\/(kiara|agent)(?=\/)/.exec(path)?.[0] ?? '';
+
 export function agentPath(path: string): string {
-  return window.location.pathname.startsWith('/agent/') && /^\/(?:app|api\/v1|v1|assets)(?:[/?#]|$)/.test(path)
-    ? `/agent${path}` : path;
+  return /^\/(?:app|api\/v1|v1|assets)(?:[/?#]|$)/.test(path)
+    ? portalPrefix(window.location.pathname) + path : path;
 }
 
 export function agentLocation(path: string): string {
-  return path.startsWith('/agent/') ? path.slice('/agent'.length) : path;
+  return path.slice(portalPrefix(path).length);
 }
 
 export function agentFetch(path: string, init?: RequestInit): Promise<Response> {

@@ -51,14 +51,15 @@ class AgentAdminTests(unittest.TestCase):
         self.thread.start()
         self.url = f'http://127.0.0.1:{self.server.server_address[1]}'
         with urllib.request.urlopen(self.url, timeout=5) as response:
-            self.token = re.search(r'name="launcher-token" content="([^"]+)"', response.read().decode())[1]
+            self.page = response.read().decode()
+            self.token = re.search(r'name="launcher-token" content="([^"]+)"', self.page)[1]
 
     def tearDown(self):
         self.server.shutdown()
         self.server.server_close()
         self.thread.join(3)
 
-    def request(self, data=None, *, token=True, origin=None, path='/api/agent-service'):
+    def request(self, data=None, *, token=True, origin=None, path='/api/project-service'):
         headers = {'X-Launcher-Token': self.token} if token else {}
         if origin:
             headers['Origin'] = origin
@@ -110,11 +111,12 @@ class AgentAdminTests(unittest.TestCase):
         self.assertEqual(self.calls, ['enable-meetings'])
 
     def test_catalogue_is_only_available_to_authenticated_admin(self):
-        path = '/api/agent-service/catalogue'
-        self.assertEqual(self.request(token=False, path=path)[0], 403)
-        status, body = self.request(path=path)
-        self.assertEqual(status, 200)
-        self.assertEqual(body['projects'][0]['title'], 'Projet fictif')
+        for path in ('/api/project-service/catalogue', '/api/agent-service/catalogue'):
+            with self.subTest(path=path):
+                self.assertEqual(self.request(token=False, path=path)[0], 403)
+                status, body = self.request(path=path)
+                self.assertEqual(status, 200)
+                self.assertEqual(body['projects'][0]['title'], 'Projet fictif')
 
     def test_configuration_error_requires_admin(self):
         self.controller.agent_service = None
@@ -132,6 +134,10 @@ class AgentAdminTests(unittest.TestCase):
         self.assertEqual(body['document_project_root'], r'D:\Kiara\dossiers-clients')
         self.controller.agent_service.start_workers = False
         self.assertEqual(self.request()[1]['worker_groups'], [])
+
+    def test_console_advertises_project_service(self):
+        self.assertIn('data-service-endpoint="/api/project-service"', self.page)
+        self.assertNotIn('Configurer Agent', self.page)
 
 
 if __name__ == '__main__':

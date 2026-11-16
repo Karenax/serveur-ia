@@ -16,7 +16,7 @@ const page: EvidencePage = {items: [{id: 's1', kind: 'source', source_id: 's1', 
 
 function setup() {render(<SearchView rows={[]} active onOpenProject={vi.fn()} />);}
 function submit(q = 'retard livraison') {
-  fireEvent.change(screen.getByRole('searchbox', {name: 'Rechercher dans Agent'}), {target: {value: q}});
+  fireEvent.change(screen.getByRole('searchbox', {name: 'Rechercher dans Kiara'}), {target: {value: q}});
   fireEvent.click(screen.getByRole('button', {name: 'Rechercher'}));
 }
 it('affiche la progression, évite les doubles clics et ouvre la source', async () => {
@@ -52,7 +52,7 @@ it('reprend la page et les critères exacts après rechargement',async()=>{
   vi.mocked(searchEvidence).mockResolvedValue({...page,offset:25});
   setup();
   await waitFor(()=>expect(searchEvidence).toHaveBeenLastCalledWith(expect.objectContaining({q:'capteur',project_id:'p1',offset:25}),expect.any(AbortSignal)));
-  expect(screen.getByRole('searchbox',{name:'Rechercher dans Agent'})).toHaveProperty('value','capteur');
+  expect(screen.getByRole('searchbox',{name:'Rechercher dans Kiara'})).toHaveProperty('value','capteur');
 });
 it('annule la requête et ignore sa réponse tardive', async () => {
   let done!: (value: EvidencePage) => void;

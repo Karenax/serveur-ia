@@ -478,7 +478,7 @@ class BackupManager:
         agent_metadata = None
         try:
             if companion is not None:
-                self._phase('agent', 'Sauvegarde et vérification des données Agent.')
+                self._phase('agent', 'Sauvegarde et vérification des données Projets.')
                 agent.backup_archive(companion, password)
                 agent_metadata = {'size': companion.stat().st_size, 'sha256': _hash_file(companion)}
                 document['agent'] = agent_metadata

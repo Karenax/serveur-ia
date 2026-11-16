@@ -1,5 +1,9 @@
 # Client Windows Kiara 4
 
+La version publiée est **4.0.8**. Elle utilise le manifeste Ed25519 du canal
+Kiara et un installateur sans Authenticode. La version **4.0.7** reste disponible
+pour le retour arrière. [Bascule et preuves](../audits/2026-11-15-fusion-kiara/BASCULE.md)
+
 Dans le client classique 3.5.62, ouvrir **Mises à jour** et installer la
 3.5.63. Dans cette dernière, cliquer sur **Passer à Kiara 4**. Le client
 vérifie l’installateur, l’exécute pour le compte Windows courant et ouvre
@@ -12,7 +16,7 @@ paquet du serveur, enregistre les changements en cours et redémarre après
 l’installation pour le compte Windows courant. Une 4.0.0 ou 4.0.1 déjà installée
 doit recevoir ce premier paquet via le téléchargement ci-dessous.
 
-Pour une installation manuelle, se connecter à la page Agent de Kiara et
+Pour une installation manuelle, ouvrir **Clients & accès** dans la console Kiara et
 choisir **Télécharger Kiara 4 pour Windows**. Au premier lancement,
 coller le code fourni depuis **Clients & accès** dans la console serveur.
 Le même installateur convient à tous les utilisateurs.
@@ -24,6 +28,9 @@ vont dans `toolchain/tauri-work` sur le disque de travail. `-WorkRoot` permet de
 choisir un autre dossier de travail. Par défaut, `-ToolsRoot` pointe vers
 `toolchain` dans le dépôt. Pour fournir une autre installation de MSVC et Rust,
 indiquez le dossier d’outils du disque de travail.
+Sur ce poste, Cargo et Rust 1.99.0 sont sous `toolchain/Rust/cargo/bin` et Tauri CLI
+2.12.2 sous `toolchain/TauriCLI-2.12.2`. Le script met aussi le cache des outils NSIS
+dans le répertoire de compilation. [Configuration du cache Tauri](https://v2.tauri.app/reference/config/#uselocaltoolsdir)
 
 Depuis la racine du dépôt actif :
 
@@ -51,7 +58,7 @@ Le mode `--local-url http://127.0.0.1:PORT/chat` utilise un serveur de recette
 démarré séparément. L’option `--hidden` masque la fenêtre pour l’automatisation.
 L’option `--profile-exe` permet de choisir le fichier sans ouvrir la boîte de
 sélection. En mode avec relais, la fenêtre attend la sauvegarde des conversations
-et des brouillons avant de l’arrêter. Si l’enregistrement échoue ou si Agent
+et des brouillons avant de l’arrêter. Si l’enregistrement échoue ou si Kiara
 signale des modifications en attente, Kiara demande de confirmer la fermeture.
 Les fonctions natives et la distribution signée restent à qualifier.
 
@@ -66,7 +73,8 @@ documents pris en charge.
 Le script assemble un installateur NSIS en français pour le compte Windows
 courant. Il prend le relais compilé par `Build-Client.ps1` et utilise Tauri CLI
 2.12.2. L’installateur se trouve sous
-`E:\Kiara-Integration\Build\tauri-prototype\x86_64-pc-windows-msvc\debug\bundle\nsis`.
+`toolchain/tauri-work/Build/tauri-prototype/x86_64-pc-windows-msvc/debug/bundle/nsis`
+dans le dépôt sur D: avec les paramètres par défaut.
 
 ```powershell
 .\client-tauri\Build-Installer.ps1 `
@@ -84,19 +92,21 @@ identifiants du service de signature hors des arguments, car Tauri écrit la
 configuration de construction sur disque. Le script vérifie la signature
 Authenticode du relais, du helper, de l’application et du paquet NSIS, puis
 affiche le SHA-256 du paquet. L’installateur `Kiara_<version>_x64-setup.exe` se trouve sous
-`E:\Kiara-Integration\Build\tauri-prototype\x86_64-pc-windows-msvc\release\bundle\nsis`.
+`toolchain/tauri-work/Build/tauri-prototype/x86_64-pc-windows-msvc/release/bundle/nsis`
+dans le dépôt sur D: avec les paramètres par défaut.
 
 ## Helper WASAPI
 
-Compiler le helper Agent avec un environnement Windows Python 3.13 qui contient
+Compiler le composant de capture avec un environnement Windows Python 3.13 qui contient
 PyInstaller 6.22.3 et les versions de PyAV, NumPy et PyAudioWPatch verrouillées
 dans `agent/requirements-audio.txt`. Le script vérifie que le binaire peut
 inventorier les périphériques WASAPI. Passer le binaire à `Build-Installer.ps1`
-avec `-AgentCapture` pour le livrer aux côtés du relais.
+avec `-AgentCapture` pour le livrer aux côtés du relais. Dans l’exemple, `$PythonAudio`
+désigne le chemin de l’interpréteur de cet environnement sur D:.
 
 ```powershell
 .\client-tauri\Build-AgentCapture.ps1 `
-  -Python 'E:\Kiara-Integration\Toolchain\Agent-Audio-Build\Scripts\python.exe' `
+  -Python $PythonAudio `
   -OutputDirectory 'D:\Kiara\integration-agent\wasapi'
 ```
 
@@ -107,4 +117,4 @@ Cette commande utilise le profil Kiara importé sous le compte Windows courant.
 Elle conserve les fichiers locaux et vérifie chaque reçu du serveur. Dans Kiara,
 les commandes de la séance pilotent la capture Windows. Si la connexion se coupe
 pendant l’arrêt, le relais reprend le transfert des fragments dès qu’il peut joindre
-Agent, y compris après un redémarrage de Kiara.
+le serveur, y compris après un redémarrage de Kiara.

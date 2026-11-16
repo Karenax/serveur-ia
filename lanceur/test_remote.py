@@ -131,6 +131,35 @@ class RemoteTests(unittest.TestCase):
     def request(self, path, body=None, token=None):
         headers = {'Authorization': 'Bearer ' + (token or self.access['token']), 'Content-Type': 'application/json','X-Qwen-Session':self.session}
         return urllib.request.urlopen(urllib.request.Request(self.url + path, json.dumps(body).encode() if body is not None else None, headers), timeout=5)
+
+    def test_both_windows_update_routes_serve_the_same_signed_installer(self):
+        import hashlib
+        from kiara_shared.releases import DESKTOP_DOWNLOAD, DESKTOP_RELEASE
+        from releases import DESKTOP_INSTALLER, DESKTOP_INSTALLER_VERSION
+        from signing import sign
+
+        payload = b'windows installer fixture'
+        directory = self.store.home / 'installateurs'
+        directory.mkdir()
+        (directory / DESKTOP_INSTALLER).write_bytes(payload)
+        manifest = sign({'version': DESKTOP_INSTALLER_VERSION, 'protocol': 4,
+                         'bytes': len(payload), 'sha256': hashlib.sha256(payload).hexdigest()}, self.store.home)
+        (directory / f'kiara-{DESKTOP_INSTALLER_VERSION}.json').write_text(json.dumps(manifest), encoding='utf-8')
+
+        for release, download in ((DESKTOP_RELEASE, DESKTOP_DOWNLOAD),
+                                  ('/v1/client/kiara4/release', '/v1/client/kiara4/download')):
+            with self.subTest(route=release):
+                with self.request(release) as response:
+                    self.assertEqual(json.load(response), manifest)
+                with self.request(download) as response:
+                    self.assertEqual(response.read(), payload)
+                with self.assertRaises(urllib.error.HTTPError) as error:
+                    self.request(download, token='invalid')
+                try:
+                    self.assertEqual(error.exception.code, 401)
+                finally:
+                    error.exception.close()
+
     def test_key_never_stored_in_plaintext_and_revocation(self):
         self.assertNotIn(self.access['token'], self.store.path.read_text())
         self.assertNotIn('hash', self.store.metadata()['clients'][0])

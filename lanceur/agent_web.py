@@ -1,4 +1,4 @@
-"""Browser sessions for Agent on a dedicated HTTPS origin behind a local proxy."""
+"""Browser sessions for Kiara on a dedicated HTTPS origin behind a local proxy."""
 
 import hashlib
 import html
@@ -63,7 +63,14 @@ def validate_origin(origin):
     return url
 
 
-def agent_web_handler(store, origin, prefix=''):
+SHARED_PORTAL_PREFIXES = ('/kiara', '/agent')
+
+
+def portal_prefix(path, prefixes):
+    return next((prefix for prefix in prefixes if path == prefix or path.startswith(prefix + '/')), None)
+
+
+def agent_web_handler(store, origin, prefixes=('',)):
     url = validate_origin(origin)
     sessions = BrowserSessions()
     installer = Path(store.home) / "installateurs" / WINDOWS_INSTALLER
@@ -98,6 +105,7 @@ def agent_web_handler(store, origin, prefix=''):
             return '/app/conversations' if getattr(self, 'browser_conversation', None) else '/app'
 
         def page(self, code=200, message='', signed_in=False, *, windows=False):
+            prefix = self.portal_prefix
             action = prefix + '/connexion' + ('?destination=windows' if windows else '')
             content = (
                 f'<p><a href="{prefix}{self.entry_path()}">Ouvrir Kiara</a></p><form method="post" action="{prefix}/deconnexion">'
@@ -129,7 +137,7 @@ def agent_web_handler(store, origin, prefix=''):
                 return self.respond(503, {'detail': 'Impossible de lire l’installateur Kiara.'})
             with stream:
                 try:
-                    release, _ = windows_installer(store.home, stream=stream, desktop=True)
+                    release, _ = windows_installer(store.home, stream=stream)
                 except ValueError:
                     return self.respond(503, {'detail': 'Impossible de vérifier l’installateur Kiara.'})
                 self.send_response(200)
@@ -180,7 +188,7 @@ def agent_web_handler(store, origin, prefix=''):
             if token is None:
                 return self.page(503, 'Connexion indisponible. Réessayez dans un instant.', windows=windows)
             destination = WINDOWS_DOWNLOAD if windows else self.entry_path()
-            return self.send_content(303, b'', 'text/plain', cookie=token, location=prefix+destination)
+            return self.send_content(303, b'', 'text/plain', cookie=token, location=self.portal_prefix+destination)
 
         def dispatch(self):
             if self.headers.get_all('Host') != [url.netloc] or not self.path.startswith('/') or self.path.startswith('//'):
@@ -190,9 +198,13 @@ def agent_web_handler(store, origin, prefix=''):
                     or (self.command not in ('GET', 'HEAD') and origin_header != [origin])):
                 return self.respond(403, {'detail': 'Cette requête doit provenir du portail Kiara.'})
             parsed = urlsplit(self.path)
+            prefix = portal_prefix(parsed.path, prefixes)
+            if prefix is None:
+                return self.respond(404, {'detail': 'Page Kiara indisponible.'})
+            self.portal_prefix = prefix
             if prefix and parsed.path == prefix and self.command in ('GET', 'HEAD'):
                 return self.send_content(303, b'', 'text/plain', location=prefix+'/')
-            if prefix and not parsed.path.startswith(prefix+'/'):
+            if prefix and parsed.path == prefix:
                 return self.respond(404, {'detail': 'Page Kiara indisponible.'})
             path = parsed.path[len(prefix):]
             if path in (OLD_WINDOWS_DOWNLOAD, PREVIOUS_WINDOWS_DOWNLOAD) and self.command in ('GET', 'HEAD'):

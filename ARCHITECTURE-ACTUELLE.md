@@ -1,21 +1,21 @@
 # Kiara — architecture et versions actuelles
 
-Référence du 15 novembre 2026. Kiara 4.0.5 est le client Windows publié. Le lanceur et le canal Windows de transition utilisent la base 3.5.63.
+Référence du 16 novembre 2026. Kiara 4.0.8 est le client Windows publié avec le portail privé unifié. Le canal de transition du client classique utilise la 3.5.63. Les prochaines qualifications Linux et Android sont indépendantes de cette publication Windows.
 
 ## Versions et responsabilités
 
 | Composant | Version ou contrat | Rôle |
 |---|---|---|
 | Lanceur et client Windows de transition | 3.5.63 | Services Kiara et passage vers Kiara 4 |
-| Client Windows Kiara 4 | 4.0.5 | Application Tauri, téléchargements et mises à jour Windows |
+| Client Windows Kiara 4 | 4.0.8 | Application Tauri, téléchargements et mises à jour Windows ; retour 4.0.7 |
 | Linux | 3.5.62, dernière référence documentée | Client Linux historique |
 | Android | 1.0.26, code 27 | Enveloppe Java/WebView et interface partagée |
-| Contrat agent | 4 | Conversation, outils et approbations existants |
+| Contrat de conversation | 4 | Conversations, outils et approbations existants |
 | Identifiants de commandes | Version 2 négociée par `/v1/status` | Rétention bornée et refus du rejeu après expiration |
 | Base Workspace | Schéma 2 | Données canoniques et migrations versionnées |
 | Paquet partagé | `kiara-shared` 0.1.0 | Validation, HTTP, fichiers protégés, signatures et contrôleur vocal |
 | Go du pont | 1.27.3 | Transport WireGuard et proxies bornés |
-| Moteur de production | Strata 0.1.56 CUDA 12.9 | Couches denses et DFlash2 sur RTX 4080, experts sur deux P100 ; serveur Python 0.1.43.1 corrigé et encodeur P2200 conservés |
+| Inférence locale | Strata, selon la configuration du lanceur | Exécution des modèles et état du moteur séparés du portail et du client |
 | Hermes privé | Commit `79651b71bd56efd76d06f3de1df64dde09b58ff3`, patch et verrous locaux | Agent natif et outils autorisés |
 | Synthèse | Phonon 0.4.1, voix Tiphaine | Voix française sur CPU |
 | Reconnaissance Low Windows | Parakeet v3 | Dictée et conversation locales |
@@ -24,24 +24,26 @@ Référence du 15 novembre 2026. Kiara 4.0.5 est le client Windows publié. Le l
 
 L’état effectivement installé et les empreintes des livrables sont dans les manifestes de construction et de déploiement. Cette table ne remplace pas leurs preuves de publication.
 
-Le [profil GPU par défaut du 3 novembre](maintenance/2026-11-03-rtx4080/default-mode/README.md)
-utilise NVIDIA 581.80 sur les quatre cartes. Le modèle IQ4_XS et la table PLE/Ngram
-sont sur F:, ainsi que le moteur permanent sous `F:/Kiara/moteurs/strata-0.1.56-cuda12`.
-Le contexte par défaut est de 393 216 tokens avec YaRN ×1,5 et un cache KV INT8. Le KV complet réside en RAM avec
+Le [profil GPU du 3 novembre](maintenance/2026-11-03-rtx4080/default-mode/README.md)
+documente la configuration de test à quatre cartes et ses anciens chemins. Les
+emplacements actifs dépendent de la configuration locale du lanceur. Sur le poste
+Fred, les compilations, caches et recettes sont sur D:. E: est réservé aux archives
+et aux preuves conservées.
+Dans ce profil historique, le contexte était de 393 216 tokens avec YaRN ×1,5 et un cache KV INT8. Le KV complet résidait en RAM avec
 20480 cellules par couche d'attention conservées en VRAM. Le cache d'experts du
-GPU principal et ceux des deux P100 sont automatiques. DFlash2 remplace la couche
-MTP, avec fenêtre 6 et seuil 0,8 ; son pack vérifié est sous `F:/Kiara/modeles/dflash2/`.
+GPU principal et ceux des deux P100 étaient automatiques. DFlash2 remplaçait la couche
+MTP, avec fenêtre 6 et seuil 0,8 dans cette configuration.
 Les [essais de performance](maintenance/2026-11-03-rtx4080/ESSAIS-0156.md)
-documentent ce choix. La P2200 encode les images ; les sauvegardes de prompt et
-le cache de conversation restent actifs.
+documentent ce choix et le rôle de la P2200 pour l’encodage des images.
 
-## Intégration Agent
+## Projets et Conversations
 
-- **Accès.** Le lanceur supervise Agent. Kiara 4 affiche ses fonctions dans la fenêtre Windows et le web privé les sert sous `/agent/` sur le domaine Kiara existant. Les accès utilisent le code Kiara et les habilitations par projet. Le contrôle de production avec Fred couvre les 11 projets restaurés.
-- **Données.** Les bases ERP et Brain et les fichiers de projet sont côté serveur. Les nouveaux documents rejoignent les dossiers clients sur D:. La sauvegarde chiffrée inclut Agent et les dossiers clients. La copie NAS du dernier passage vérifié a été restaurée dans un dossier isolé.
+- **Accès** — Le lanceur supervise le service Projets. Le portail privé Kiara s’ouvre sous `/kiara/` depuis le pilote du 16 novembre. Les anciens liens sous `/agent/` restent compatibles. Les accès utilisent le code Kiara et les habilitations par projet. Le contrôle de production a retrouvé les 11 projets.
+- **Données** — Les bases ERP et Brain et les fichiers de projet sont côté serveur. Les nouveaux documents rejoignent les dossiers clients sur D:. La sauvegarde chiffrée inclut les deux bases et les dossiers clients. Une copie NAS a été restaurée dans un dossier isolé.
 - **Recherche.** Qwen local répond avec des citations tirées des sources autorisées. EG2 calcule les embeddings sur la P2200. Les images et l’audio sont recherchés à partir du texte extrait. Les deux anciens runtimes LiteRT ont été retirés.
 - **Mails et réunions.** La liaison Thunderbird collecte les dossiers sélectionnés sur le poste associé. Les imports, le classement manuel, le rejet et le brouillon ont été validés sur le poste Fred. Le classement automatique s’applique à partir d’un score de 75 %. Réunions dans Kiara 4.0.5 a passé la recette de capture, transcription, relecture et publication du compte rendu.
-- **Distribution.** La console propose l’installateur Kiara 4.0.5. Fred a vérifié son installation sans droits administrateur. La transition depuis le canal Windows historique passe par la 3.5.63, puis Kiara 4 utilise son canal de mise à jour habituel. Le manifeste d’actualisation est signé. La signature Authenticode de l’installateur reste à prévoir.
+- **Interface.** Conversations réunit le composeur, l’historique et l’assistant de projet. Les brouillons personnels et de projet et le mode éphémère sont accessibles depuis le même espace. Projets conserve la liste et la fiche à quatre rubriques dans le style Kiara. Le panneau d’assistance historique a été retiré.
+- **Distribution.** La console sert la 4.0.8 avec son manifeste Ed25519 et l’installateur publié sans Authenticode. La 4.0.7 est conservée en retour et les clients classiques passent par la 3.5.63. [Vérifications de publication](audits/2026-11-15-fusion-kiara/BASCULE.md)
 
 Le [plan global](PLAN-GLOBAL-SERVEUR-FRED.md) reprend les vérifications qui restent à faire et le report des imports Sage.
 
@@ -57,7 +59,7 @@ Les sources HTML/CSS/JS Windows restent la base de l’interface. Android fourni
 
 ## Autorités des données
 
-- ERP et Brain d’Agent portent le portefeuille Agent et ses données métier.
+- ERP et Brain portent le portefeuille de projets Kiara et ses données métier.
 - Workspace SQLite porte les espaces privés Kiara, les accès, les souvenirs, les conversations publiées, les commandes et les notifications.
 - Historique protégé du client : copie locale et brouillons pour le fonctionnement hors ligne ; les conflits se résolvent par synchronisation.
 - Sessions Hermes : état natif du moteur et projection liée au périmètre Kiara.

@@ -32,7 +32,13 @@
   let active = false, opening = false, pending = false, controller = null, thread = null;
   const fresh = ephemeral => ({ephemeral, id:null, revision:0, project:project.value, messages:[], draft:'', unsaved:false});
   const drafts = new Map();
-  window.kiaraProjectConversation = {get active(){return active;}};
+  window.kiaraProjectConversation = {
+    get active(){return active;},
+    async openWindowsSource(sourceId, excerpt) {
+      await api('/client/project-session', {});
+      return openSource({source_id:sourceId,excerpt});
+    }
+  };
   function draftKey(value) {
     return value.id ? 'project-thread:'+value.id : 'project-draft:'+value.project;
   }
@@ -55,7 +61,13 @@
     }
     return response;
   }
+  function validSourceId(id) {
+    return typeof id === 'string' && /^[A-Za-z0-9_-]{1,128}$/.test(id);
+  }
   async function openSource(citation) {
+    if (!validSourceId(citation.source_id)) {
+      throw new Error('Référence de source invalide.');
+    }
     const title = wsElement('h2', 'Source du projet'); title.id = 'fred-source-title';
     const content = wsElement('div');
     const close = wsButton('Fermer', () => wsSourceDialog.close());
@@ -79,9 +91,14 @@
       const originalPath = source.metadata?.note_version_id
         ? '/api/v1/workspace/sources/'+sourceId+'/original'
         : '/v1/sources/'+sourceId+'/raw';
-      const download = wsButton('Télécharger l’original', () => {
-        androidRequireBridge().downloadProjectOriginal(originalPath, source.metadata?.filename || 'source-'+citation.source_id);
-      });
+      const filename = source.metadata?.filename || 'source-'+citation.source_id;
+      const download = platformCapabilities.platform === 'android'
+        ? wsButton('Télécharger l’original', () => androidRequireBridge().downloadProjectOriginal(originalPath, filename))
+        : wsElement('a', 'Télécharger l’original');
+      if (download instanceof HTMLAnchorElement) {
+        download.href = originalPath;
+        download.download = filename;
+      }
       content.append(download);
     } catch (failure) {
       if (!controller.signal.aborted) state.textContent = failure.message;
@@ -108,8 +125,8 @@
         evidence.append(wsElement('summary', 'Sources'));
         for (const source of message.citations) {
           const item = wsElement('p', source.excerpt || source.project_code || 'Source du projet');
-          if (typeof source.source_id === 'string' && /^[A-Za-z0-9_-]{1,128}$/.test(source.source_id)) {
-            if (platformCapabilities.platform === 'android') {
+          if (validSourceId(source.source_id)) {
+            if (['android','windows'].includes(platformCapabilities.platform)) {
               item.append(' ', wsButton('Voir la source', () => openSource(source)));
             } else {
               const link = wsElement('a', 'Voir la source');
@@ -172,7 +189,7 @@
     opening = true; update();
     try {
       await uiPersistPreferences();
-      if (!['android','web'].includes(platformCapabilities.platform)) await api('/client/agent/session', {});
+      if (!['android','web'].includes(platformCapabilities.platform)) await api('/client/project-session', {});
       const [catalogue, knowledge] = await Promise.all([
         request('/api/v1/project-catalogue').then(response => response.json()),
         request('/api/v1/brain/projects').then(response => response.json()).catch(failure => {
@@ -181,29 +198,22 @@
         })
       ]);
       const targets = new Map(catalogue.map(item => [item.id, item.brain_project_id || 'erp:'+item.id]));
+      const target = erpId ? targets.get(erpId) : undefined;
+      if (erpId && !target) throw new Error('Ce projet est indisponible. Vérifiez votre accès au projet.');
       project.replaceChildren(new Option('Tous mes projets',''));
       for (const item of catalogue) project.add(new Option(item.title,targets.get(item.id)));
       const represented = new Set(targets.values());
       for (const item of knowledge) if (!represented.has(item.id)) project.add(new Option(item.name,item.id));
-      if (erpId) project.value = targets.get(erpId) || '';
+      if (target) project.value = target;
       active = true; document.body.dataset.projectConversation = 'true';
       prompt.placeholder = 'Posez une question sur le projet…';
-      setThread(thread || fresh(true));
-      if (erpId) {
-        const target = targets.get(erpId);
-        if (target && thread.project !== target) {
-          project.value = target;
-          setThread(fresh(true));
-        } else if (!target) {
-          project.selectedIndex = -1;
-          status.textContent = 'Ce projet n’a pas de sources reliées. Choisissez un autre projet.';
-        }
-      }
+      setThread(thread && (!target || thread.project === target) ? thread : fresh(true));
       showView('chat');
       await refreshThreads();
       prompt.focus();
     } catch (failure) { error(failure); }
     finally { opening = false; update(); }
+    return active;
   }
   function leave() {
     if (!active) return true;
@@ -216,7 +226,12 @@
     error(''); buttons(); prompt.focus();
     return true;
   }
-  toggle.onclick = () => { if (active) leave(); else void open(); };
+  toggle.onclick = () => {
+    if (active) return leave();
+    const linkedProject = projectFromHash();
+    if (linkedProject !== undefined) void openLinkedProject(linkedProject);
+    else void open();
+  };
   const projectChat = $('ws-project-chat');
   const openProjectChat = projectChat.onclick;
   projectChat.onclick = event => {
@@ -401,10 +416,15 @@
   };
   function openRequestedProject() {
     if (requestedProject !== undefined && !active && !opening && !toggle.hidden && !conversationLocked()) {
-      history.replaceState(history.state, '', location.pathname + location.search);
       const id = requestedProject;
       requestedProject = undefined;
-      void open(id);
+      void openLinkedProject(id);
+    }
+  }
+  async function openLinkedProject(id) {
+    const hash = location.hash;
+    if (await open(id) && location.hash === hash) {
+      history.replaceState(history.state, '', location.pathname + location.search);
     }
   }
   void clientReady.then(openRequestedProject);

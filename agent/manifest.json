@@ -3594,13 +3594,10 @@
       "document": "docs/35_PROJECT_KNOWLEDGE_ANALYSIS.md"
     },
     "backend_supervisor": {
-      "command": "python scripts/agent_runtime.py start|status|stop",
-      "entrypoint": "start-agent-task.cmd",
-      "port": 8001,
-      "restart_delay_seconds": "5; exponential backoff capped at 60",
-      "single_instance": "OS file lock",
-      "logs": "logs/runtime",
-      "document": "docs/22_OPERATIONAL_IMPROVEMENTS.md"
+      "entrypoint": "../Start-Interface-Qwen.ps1",
+      "configuration": "project-service.json",
+      "logs": "logs/service.log dans le dossier des données Projets",
+      "document": "../RECONSTRUIRE-FRED.md"
     },
     "mail_enrichment_workers": {
       "extraction": "mail-extraction-worker",
@@ -3805,7 +3802,7 @@
     },
     "actions": "/api/v1/actions",
     "memory_default": "eg2",
-    "brain_settings_ui": "/ui/settings",
+    "brain_settings_ui": "/app/settings",
     "meeting_audio": {
       "ui": "RÃ©unions / projet explicite / RÃ©unions & revues",
       "api": "/api/v1/projects/{pid}/recordings",
@@ -3842,7 +3839,7 @@
       "preferred_direction": "local ASR, local LLM, local TTS; implementation pending",
       "cloud_enabled": false
     },
-    "runtime_checkout": "C:/Agent",
+    "runtime_checkout": "Kiara, service Projets dans le sous-dossier agent",
     "interface_restore": {
       "date": "2026-10-05",
       "source": "worktree 264b",
@@ -3851,13 +3848,13 @@
       "data_paths_unchanged": true
     },
     "launchers": {
-      "manual": "C:/Agent/start-agent.cmd",
-      "background": "C:/Agent/start-agent-task.cmd",
+      "manual": "../Start-Interface-Qwen.ps1",
+      "background": "Lanceur Kiara, service Projets supervisé",
       "worktree_role": "prepare changes; integrate and test before runtime activation"
     },
     "project_planning": {
       "api": "/api/v1/projects/{id}/planning/*",
-      "registration_scope": "Agent canonical 8001",
+      "registration_scope": "Service Projets de Kiara",
       "runtime_activated": true,
       "features": [
         "shared revisions",
@@ -3883,7 +3880,7 @@
     "project_deliverables": {
       "document": "docs/32_XPILOT_PROJECT_DELIVERABLES.md",
       "runtime_activated": true,
-      "registration_scope": "Agent canonical 8001; qualified L3 delivered",
+      "registration_scope": "Service Projets de Kiara",
       "data": "nine additive tables; portable metadata storage_path; six immutable triggers; shared planning CAS",
       "catalogue": "paged versioned type administration; typology composition CAS; 11 reference types / 67 checks",
       "finance": "excluded; historical data preserved",

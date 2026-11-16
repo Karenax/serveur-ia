@@ -61,6 +61,25 @@ def rehearse(workspace, erp, brain, registry):
     if any(key not in managed or target not in brain_ids for key, target in links):
         raise ValueError('Un lien entre le portefeuille et les connaissances est orphelin.')
 
+    project_references = {'private': 0, 'managed': 0, 'missing': 0, 'owner_mismatch': 0}
+    if workspace.execute("SELECT 1 FROM sqlite_schema WHERE name='client_histories'").fetchone():
+        for owner, history in workspace.execute('SELECT owner, history FROM client_histories'):
+            for conversation in json.loads(history).get('conversations', []):
+                key = conversation.get('project_id')
+                if key is None:
+                    continue
+                if key in private:
+                    kind = 'private' if private[key] == owner else 'owner_mismatch'
+                else:
+                    kind = 'managed' if key in managed else 'missing'
+                project_references[kind] += 1
+    if project_references['owner_mismatch'] or project_references['missing']:
+        raise ValueError(
+            f"Rattachements d’historique à résoudre avant la migration : "
+            f"{project_references['missing']} projet(s) introuvable(s), "
+            f"{project_references['owner_mismatch']} hors du périmètre privé."
+        )
+
     # Keep each private object and its citations in the owning store. The
     # catalogue records an explicit routing decision and keeps the original ID.
     with registry:
@@ -77,18 +96,6 @@ def rehearse(workspace, erp, brain, registry):
                 "SELECT id FROM projects WHERE kind='private' AND owner=?", (owner,))}
             if visible != {key for key, expected in private.items() if expected == owner}:
                 raise ValueError('Le catalogue change le périmètre d’un espace privé.')
-    project_references = {'private': 0, 'managed': 0, 'missing': 0, 'owner_mismatch': 0}
-    if workspace.execute("SELECT 1 FROM sqlite_schema WHERE name='client_histories'").fetchone():
-        for owner, history in workspace.execute('SELECT owner, history FROM client_histories'):
-            for conversation in json.loads(history).get('conversations', []):
-                key = conversation.get('project_id')
-                if key is None:
-                    continue
-                if key in private:
-                    kind = 'private' if private[key] == owner else 'owner_mismatch'
-                else:
-                    kind = 'managed' if key in managed else 'missing'
-                project_references[kind] += 1
     return {
         'history_project_references': project_references,
         'private_projects': len(private), 'private_owners': len(set(private.values())),

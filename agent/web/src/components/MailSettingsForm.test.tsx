@@ -60,3 +60,21 @@ it("permet une demande manuelle même si la synchronisation automatique est dés
  await waitFor(()=>expect(request).toHaveBeenCalledWith("/v1/thunderbird/sync",expect.objectContaining({method:"POST",body:'{"folder_ids":["in"]}'})));
  expect(api.brainScanGlobal).not.toHaveBeenCalled();
 });
+it("analyse ponctuellement un dossier serveur sans modifier la synchronisation",async()=>{
+ vi.mocked(request).mockImplementation(async path=>{
+   if(path==="/v1/ingest/default-folder")return {folder:"D:/dossier-recette"};
+   if(path==="/v1/ingest/scan")return {scanned:3,imported:2,duplicates:1};
+   return status;
+ });
+ render(<MailSettingsForm/>);
+ await screen.findByText("Thunderbird connecté");
+ fireEvent.click(screen.getByText("Analyser un dossier EML ponctuellement"));
+ fireEvent.click(screen.getByRole("button",{name:"Utiliser le dossier par défaut"}));
+ await waitFor(()=>expect(screen.getByLabelText("Dossier EML sur le serveur")).toHaveProperty("value","D:/dossier-recette"));
+ fireEvent.click(screen.getByRole("button",{name:"Analyser le dossier"}));
+ await screen.findByText("3 mail(s) parcouru(s), 2 importé(s), 1 doublon(s).");
+ expect(request).toHaveBeenCalledWith("/v1/ingest/scan",expect.objectContaining({
+   method:"POST",body:'{"folder":"D:/dossier-recette"}'
+ }),0);
+ expect(api.saveBrainMailSettings).not.toHaveBeenCalled();
+});

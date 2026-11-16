@@ -339,16 +339,22 @@ def auto_classify_pending(db: Session, ai_cfg: dict | None = None) -> dict:
 
 def resolve_source(db: Session, mem, source: Source, project: Project,
                    ai_cfg: dict | None, actor: str, defer_enrichment: bool = False,
-                   accepted_proposal_id: str | None = None) -> dict:
+                   accepted_proposal_id: str | None = None, pending_only: bool = False) -> dict:
     """Rattache une source à un projet : evidence + extraction + clôture."""
     import asyncio
     from .projections import enqueue, process
     from fastapi import HTTPException
     # Verrou d'écriture conditionnel : une exclusion ne peut être réactivée.
-    active = db.query(Source).filter(Source.id == source.id, Source.status.notin_(("discarded", "rejected"))).update(
+    candidate = db.query(Source).filter(Source.id == source.id, Source.status.notin_(("discarded", "rejected")))
+    if pending_only:
+        candidate = candidate.filter((Source.status == "resolution_pending") |
+                                     ((Source.status == "resolved") & (Source.project_id == project.id)))
+    active = candidate.update(
         {Source.status: Source.status}, synchronize_session=False)
     if not active:
         db.rollback()
+        if pending_only:
+            raise HTTPException(409, "La source n’est plus à rattacher. Actualisez la liste.")
         raise HTTPException(409, "Ce mail a été écarté et ne peut plus être classé")
     db.refresh(source)
     previous = source.project_id

@@ -69,9 +69,9 @@
  agentRestoreForm.append(agentRestoreSubmit);agentRestore.append(agentRestoreForm);backup.append(agentRestore);
  agentRestoreForm.onsubmit=e=>{e.preventDefault();if(!agentRestoreForm.reportValidity())return;run(async()=>{
   const password=byId('agent-archive-password').value;byId('agent-archive-password').value='';
-  status(feedback,'Restauration des données Agent en cours…');
+  status(feedback,'Restauration des données Projets en cours…');
   const restored=await api('/api/backups/agent-restore',{file:byId('agent-archive-file').value.trim(),directory:byId('agent-archive-directory').value.trim(),password});
-  status(feedback,'Données Agent restaurées dans '+restored.directory);
+  status(feedback,'Données Projets restaurées dans '+restored.directory);
  });};
  const inventory=node('details',null,'topic-card');inventory.id='backup-inventory';inventory.append(node('summary','Données du serveur et périmètre de sauvegarde'));const inventoryBody=node('div');inventoryBody.id='backup-inventory-body';inventory.append(inventoryBody);backup.append(inventory);
  inventory.addEventListener('toggle',async()=>{if(!inventory.open)return;try{const value=await api('/api/inventory');inventoryBody.replaceChildren();const counts=value.storage||{};inventoryBody.append(node('p',`${counts.history_count??'—'} conversations · ${counts.projects??'—'} projets · ${counts.documents??'—'} documents · ${size(counts.workspace_bytes)} d’espaces de travail`,'muted'));const list=node('ul',null,'maintenance-list');for(const file of value.files||[])list.append(node('li',file.name+' · '+(file.exists?size(file.size):'Absent')+' · '+(file.included?'Inclus':'Exclu')));inventoryBody.append(list);for(const text of value.decisions||[])inventoryBody.append(node('p',text,'muted'));}catch(error){status(inventoryBody,error.message,true);}});
@@ -107,7 +107,7 @@
    const details=node('details',null,'backup-file-detail');details.append(node('summary','Emplacement et empreinte'),node('p',archive.file,'maintenance-path'));if(secondary.file)details.append(node('p','Copie secondaire : '+secondary.file,'maintenance-path'));if(archive.sha256)details.append(node('code',archive.sha256,'maintenance-hash'));
    if(archive.agent){
     details.append(node('p',archive.agent.file,'maintenance-path'),node('code',archive.agent.sha256,'maintenance-hash'));
-    details.append(button('Préparer la restauration Agent',()=>{
+    details.append(button('Préparer la restauration des Projets',()=>{
      agentRestore.open=true;byId('agent-archive-file').value=archive.agent.file;byId('agent-archive-directory').focus();
     }));
    }

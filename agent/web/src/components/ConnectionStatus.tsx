@@ -29,7 +29,7 @@ export function ConnectionStatus({onOpenJobs}:{onOpenJobs?:()=>void}) {
       } catch {
         if(!stopped && !refreshAgain){
           failures+=1;
-          setStatus(previous=>previous && failures<3?previous:{refreshing:false,services:Object.fromEntries(["llm","embedding","memory"].map(key=>[key,{state:"unknown",detail:"État indisponible : le serveur Agent ne répond pas"}])) as Connections["services"]});
+          setStatus(previous=>previous && failures<3?previous:{refreshing:false,services:Object.fromEntries(["llm","embedding","memory"].map(key=>[key,{state:"unknown",detail:"État indisponible : le service Projets ne répond pas"}])) as Connections["services"]});
         }
       } finally {
         pending=false;

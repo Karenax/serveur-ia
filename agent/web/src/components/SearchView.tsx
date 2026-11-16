@@ -36,10 +36,10 @@ export function SearchView({rows, active, onOpenProject}: {rows: PortfolioRow[];
   function submit(event: FormEvent) {event.preventDefault(); if (!busy && filters.q.trim().length >= 2) void run({...filters, q: filters.q.trim(), offset: 0});}
   const changed = submitted && Object.entries(filters).some(([key, value]) => key !== 'offset' && value !== submitted[key as keyof SearchFilters]);
   const field = (key: keyof SearchFilters, value: string) => setFilters(previous => ({...previous, [key]: value, offset: 0}));
-  return <section aria-label="Recherche dans Agent" className="agent-search">
+  return <section aria-label="Recherche dans Kiara" className="agent-search">
     <div className="workspace-page-header"><div><h1>Recherche</h1><p>Retrouvez un passage, un mail ou une connaissance avec vos mots ou une référence exacte.</p></div></div>
     <form onSubmit={submit}>
-      <label className="agent-search-query">Rechercher dans Agent<input ref={input} className="input" type="search" minLength={2} maxLength={500} required value={filters.q} onChange={e => field('q', e.target.value)} placeholder="Retard de livraison, exigence technique, référence…" /></label>
+      <label className="agent-search-query">Rechercher dans Kiara<input ref={input} className="input" type="search" minLength={2} maxLength={500} required value={filters.q} onChange={e => field('q', e.target.value)} placeholder="Retard de livraison, exigence technique, référence…" /></label>
       <div className="agent-search-filters">
         <label>Projet<select className="input" value={filters.project_id} onChange={e => field('project_id', e.target.value)}><option value="">Tous les projets autorisés</option>{projects.map(p => <option key={p.id} value={p.id}>{p.code} · {p.name}</option>)}</select></label>
         <label>Type<select className="input" value={filters.source_type} onChange={e => field('source_type', e.target.value)}><option value="all">Toutes les sources et connaissances</option><option value="email">Mails</option><option value="document">Documents</option><option value="meeting">Réunions</option><option value="phone">Appels</option><option value="knowledge">Connaissances retenues</option></select></label>

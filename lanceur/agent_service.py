@@ -1,4 +1,4 @@
-"""Own the local Agent process and expose it through the Kiara gateway."""
+"""Own the local Kiara project service and expose it through the Kiara gateway."""
 
 import http.client
 import json
@@ -32,35 +32,44 @@ DOCUMENT_FIELDS = {
 }
 
 
-def _read_configuration(home):
+def project_service_configuration_path(home):
+    current = home / 'project-service.json'
+    legacy = home / 'agent-service.json'
+    return current if current.exists() or not legacy.exists() else legacy
+
+
+def _read_configuration(path):
     try:
-        with (home / 'agent-service.json').open(encoding='utf-8-sig') as stream:
+        with path.open(encoding='utf-8-sig') as stream:
             values = json.load(stream)
     except FileNotFoundError:
         return None
     except (OSError, ValueError) as error:
-        raise ValueError('Le fichier agent-service.json est illisible.') from error
+        raise ValueError(f'Le fichier {path.name} est illisible.') from error
     if not isinstance(values, dict):
-        raise ValueError('Vérifiez les champs de agent-service.json.')
+        raise ValueError(f'Vérifiez les champs de {path.name}.')
     return values
 
 
+def _project_environment(suffix, default=None):
+    return os.environ.get(f'KIARA_PROJECT_{suffix}', os.environ.get(f'KIARA_AGENT_{suffix}', default))
+
+
 def service_configuration(home):
-    variables = {'data': 'KIARA_AGENT_DATA_DIR', 'python': 'KIARA_AGENT_PYTHON',
-                 'speech_python': 'KIARA_AGENT_SPEECH_PYTHON',
-                 'speech_models': 'KIARA_AGENT_SPEECH_MODELS_DIR',
-                 'thunderbird_device': 'KIARA_AGENT_THUNDERBIRD_DEVICE',
-                 'start_workers': 'KIARA_AGENT_START_WORKERS'}
-    values = _read_configuration(home)
+    variables = {'data': 'DATA_DIR', 'python': 'PYTHON', 'speech_python': 'SPEECH_PYTHON',
+                 'speech_models': 'SPEECH_MODELS_DIR', 'thunderbird_device': 'THUNDERBIRD_DEVICE',
+                 'start_workers': 'START_WORKERS'}
+    path = project_service_configuration_path(home)
+    values = _read_configuration(path)
     if values is not None and values.keys() - variables.keys() - WEB_FIELDS - DOCUMENT_FIELDS.keys() - {'worker_groups'}:
-        raise ValueError('Vérifiez les champs de agent-service.json.')
+        raise ValueError(f'Vérifiez les champs de {path.name}.')
     file_settings = values or {}
-    settings = {key: os.environ.get(variable) or file_settings.get(key) for key, variable in variables.items()}
+    settings = {key: _project_environment(suffix) or file_settings.get(key) for key, suffix in variables.items()}
     workers = settings['start_workers']
     if workers in ('0', '1'):
         settings['start_workers'] = workers == '1'
     elif workers is not None and type(workers) is not bool:
-        raise ValueError('start_workers doit être un booléen dans agent-service.json ou 0/1 dans KIARA_AGENT_START_WORKERS.')
+        raise ValueError(f'start_workers doit être un booléen dans {path.name} ou 0/1 dans KIARA_PROJECT_START_WORKERS.')
     document_settings = {}
     for key, (variable, kind) in DOCUMENT_FIELDS.items():
         override = os.environ.get(variable)
@@ -73,7 +82,7 @@ def service_configuration(home):
             if key == 'document_project_root' and value and not Path(value).is_absolute():
                 raise ValueError
         except ValueError as error:
-            raise ValueError(f'Configuration documentaire Agent invalide pour {key} ({variable}).') from error
+            raise ValueError(f'Configuration documentaire de Kiara invalide pour {key} ({variable}).') from error
         document_settings[variable] = json.dumps(value)
     if values is None and not document_settings and all(value is None for value in settings.values()):
         return None
@@ -83,7 +92,7 @@ def service_configuration(home):
         if value is None and key not in ('data', 'python'):
             continue
         if not isinstance(value, str) or not Path(value).is_absolute():
-            raise ValueError(f'Indiquez un chemin absolu pour {key} dans agent-service.json ou {variables[key]}.')
+            raise ValueError(f'Indiquez un chemin absolu pour {key} dans {path.name} ou KIARA_PROJECT_{variables[key]}.')
     if document_settings:
         settings['document_settings'] = document_settings
     if 'worker_groups' in file_settings:
@@ -92,19 +101,19 @@ def service_configuration(home):
 
 
 def web_configuration(home):
-    values = _read_configuration(home) or {}
-    origin = os.environ.get('KIARA_AGENT_WEB_ORIGIN', values.get('web_origin'))
+    values = _read_configuration(project_service_configuration_path(home)) or {}
+    origin = _project_environment('WEB_ORIGIN', values.get('web_origin'))
     if origin is None or origin == '':
         return None
     if not isinstance(origin, str):
-        raise ValueError('Origine HTTPS Agent invalide.')
+        raise ValueError('Origine HTTPS de Kiara invalide.')
     from agent_web import validate_origin
     validate_origin(origin)
-    port = os.environ.get('KIARA_AGENT_WEB_PORT', values.get('web_port', 8767))
+    port = _project_environment('WEB_PORT', values.get('web_port', 8767))
     if isinstance(port, str) and port.isascii() and port.isdecimal():
         port = int(port)
     if type(port) is not int or not 0 <= port <= 65535:
-        raise ValueError('Port local du web Agent invalide.')
+        raise ValueError('Port local du portail Kiara invalide.')
     return origin, port
 
 
@@ -116,17 +125,17 @@ class AgentService:
         self.data = Path(data).resolve()
         self.python = Path(python).resolve()
         if inference_port is not None and (type(inference_port) is not int or not 1 <= inference_port <= 65535):
-            raise ValueError('Port d’inférence Agent invalide')
+            raise ValueError('Port d’inférence du service Projets invalide')
         self.inference_port = inference_port
-        self.speech_python = speech_python or os.environ.get('KIARA_AGENT_SPEECH_PYTHON')
-        self.speech_models = speech_models or os.environ.get('KIARA_AGENT_SPEECH_MODELS_DIR')
+        self.speech_python = speech_python or _project_environment('SPEECH_PYTHON')
+        self.speech_models = speech_models or _project_environment('SPEECH_MODELS_DIR')
         self.start_workers = start_workers is not False
         self.worker_groups = None if worker_groups is None else tuple(validate_groups(worker_groups))
         self.document_settings = document_settings or {}
-        self.thunderbird_device = thunderbird_device or os.environ.get('KIARA_AGENT_THUNDERBIRD_DEVICE') or None
+        self.thunderbird_device = thunderbird_device or _project_environment('THUNDERBIRD_DEVICE') or None
         if self.thunderbird_device is not None and (
                 not isinstance(self.thunderbird_device, str) or not re.fullmatch('[0-9a-f]{16}', self.thunderbird_device)):
-            raise ValueError('Identifiant du poste Thunderbird invalide dans la configuration Agent.')
+            raise ValueError('Identifiant du poste Thunderbird invalide dans la configuration du service Projets.')
         self.inference_token = None
         self.access = AgentAccess(store)
         self.lock = threading.RLock()
@@ -149,13 +158,13 @@ class AgentService:
                            env=env, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
                            check=True, creationflags=HIDDEN)
         except subprocess.CalledProcessError as error:
-            raise ValueError('La sauvegarde ou restauration native Agent a échoué.') from error
+            raise ValueError('La sauvegarde ou la restauration des données des projets a échoué.') from error
 
     def backup_archive(self, target, password):
         from agent_archive import extract_archive, write_archive
         target = Path(target).resolve()
         if target.is_relative_to(self.data) or target.exists():
-            raise ValueError('Choisissez une nouvelle archive hors du dossier de données Agent.')
+            raise ValueError('Choisissez une nouvelle archive hors du dossier des données des projets.')
         with TemporaryDirectory(prefix='agent-backup-', dir=self.data.parent) as folder:
             stage = Path(folder)
             private_directory(stage)
@@ -190,7 +199,7 @@ class AgentService:
         from agent_archive import extract_archive
         parent = Path(parent).resolve(strict=True)
         if parent.is_relative_to(self.data):
-            raise ValueError('Choisissez un dossier hors des données Agent actives.')
+            raise ValueError('Choisissez un dossier hors des données des projets en service.')
         with TemporaryDirectory(prefix='agent-restore-', dir=parent) as folder:
             stage = Path(folder)
             private_directory(stage)
@@ -199,7 +208,7 @@ class AgentService:
             try:
                 extract_archive(source, snapshot, password)
             except BadZipFile as error:
-                raise ValueError('Le contenu de la sauvegarde Agent est illisible.') from error
+                raise ValueError('Le contenu de la sauvegarde des projets est illisible.') from error
             recovery = parent / ('agent-restaure-' + secrets.token_hex(8))
             recovery.mkdir()
             destination = recovery / 'data'
@@ -218,19 +227,20 @@ class AgentService:
         if identity is not None and (not isinstance(identity, str) or not re.fullmatch('[0-9a-f]{16}', identity)):
             raise ValueError('Choisissez un poste Kiara actif.')
         with self.lock, self.store.lock:
-            if os.environ.get('KIARA_AGENT_THUNDERBIRD_DEVICE'):
+            if _project_environment('THUNDERBIRD_DEVICE'):
                 raise ValueError('Le poste Thunderbird est défini dans la configuration de démarrage.')
             if identity is not None:
                 operator = self.access.operator_for(identity)
                 if not operator or operator['role'] == 'reader':
-                    raise ValueError('Ce poste doit avoir un accès Agent avec droit de modification.')
+                    raise ValueError('Ce poste doit avoir le droit de modifier les projets.')
             home = self.store.home
-            settings = _read_configuration(home) or {}
+            path = project_service_configuration_path(home)
+            settings = _read_configuration(path) or {}
             if identity is None:
                 settings.pop('thunderbird_device', None)
             else:
                 settings['thunderbird_device'] = identity
-            write_json(home / 'agent-service.json', settings)
+            write_json(path, settings)
             self.thunderbird_device = identity
             if self.store.agent_bridge is not None:
                 self.store.agent_bridge.thunderbird_device = identity
@@ -239,7 +249,7 @@ class AgentService:
         """Enable the meeting workspace from the local launcher administration."""
         with self.lock:
             if not self.running():
-                raise ValueError('Démarrez Agent avant d’activer les réunions.')
+                raise ValueError('Démarrez le service Projets avant d’activer les réunions.')
             bridge = self.store.agent_bridge
             operator = {'id': 'kiara-service', 'role': 'owner', 'project_ids': None, 'person_id': None}
             path = '/api/v1/workspace/fusion-settings'
@@ -253,20 +263,20 @@ class AgentService:
             body = {'enabled': True, **{key: current[key] for key in keys}}
             result = self._admin_request(bridge, operator, path, 'PUT', body)
             if result.get('enabled') is not True:
-                raise ValueError('Agent n’a pas activé les réunions. Vérifiez la configuration du service.')
+                raise ValueError('Impossible d’activer les réunions. Vérifiez la configuration du service Projets.')
 
     def link_project_knowledge(self, project_id):
         if not isinstance(project_id, str) or not re.fullmatch(r'[A-Za-z0-9_-]{1,128}', project_id):
-            raise ValueError('Choisissez un projet Agent.')
+            raise ValueError('Choisissez un projet.')
         with self.lock:
             if not self.running():
-                raise ValueError('Demarrez Agent avant de relier un projet.')
+                raise ValueError('Démarrez le service Projets avant de relier un projet.')
             bridge = self.store.agent_bridge
             operator = {'id': 'kiara-service', 'role': 'owner', 'project_ids': None, 'person_id': None}
             path = f'/api/v1/projects/{project_id}/brain/ensure'
             result = self._admin_request(bridge, operator, path, 'POST')
             if result.get('linked') is not True or not result.get('brain_project_id'):
-                raise ValueError('Agent ne confirme pas la liaison du projet.')
+                raise ValueError('La liaison du projet n’a pas été confirmée.')
 
     def _admin_request(self, bridge, operator, path, method, body=None):
         connection = http.client.HTTPConnection('127.0.0.1', bridge.port, timeout=20)
@@ -280,23 +290,23 @@ class AgentService:
             limit = 128 * 1024
             raw = response.read(limit + 1)
             if len(raw) > limit:
-                raise ValueError('La réponse d’Agent est trop volumineuse.')
+                raise ValueError('La réponse du service Projets est trop volumineuse.')
             payload = json.loads(raw)
             if not isinstance(payload, dict):
-                raise ValueError('La réponse d’Agent est invalide.')
+                raise ValueError('La réponse du service Projets est invalide.')
             if response.status != 200:
                 detail = payload.get('detail')
-                raise ValueError(detail if isinstance(detail, str) else 'Agent a refusé la commande.')
+                raise ValueError(detail if isinstance(detail, str) else 'Le service Projets a refusé la commande.')
             return payload
         except (OSError, http.client.HTTPException, json.JSONDecodeError) as error:
-            raise ValueError('Agent ne répond pas correctement.') from error
+            raise ValueError('Le service Projets ne répond pas correctement.') from error
         finally:
             connection.close()
 
     def management_data(self):
         with self.lock:
             if not self.running():
-                raise ValueError('Le service Agent est indisponible.')
+                raise ValueError('Le service Projets est indisponible.')
             bridge = self.store.agent_bridge
             operator = {'id': 'kiara-service', 'role': 'owner', 'project_ids': None, 'person_id': None}
             results = []
@@ -307,15 +317,15 @@ class AgentService:
                     response = connection.getresponse()
                     payload = response.read(4 * 1024 * 1024 + 1)
                     if response.status != 200 or len(payload) > 4 * 1024 * 1024:
-                        raise ValueError('Lecture du catalogue Agent impossible.')
+                        raise ValueError('Impossible de lire le catalogue des projets.')
                     results.append(json.loads(payload))
                 except (OSError, http.client.HTTPException, json.JSONDecodeError) as error:
-                    raise ValueError('Lecture du catalogue Agent impossible.') from error
+                    raise ValueError('Impossible de lire le catalogue des projets.') from error
                 finally:
                     connection.close()
             projects, sessions = results
             if not isinstance(projects, list) or not isinstance(sessions, dict) or not isinstance(sessions.get('sessions'), list):
-                raise ValueError('Réponse du catalogue Agent invalide.')
+                raise ValueError('La réponse du catalogue des projets est invalide.')
             return {'projects': [{'id': row['id'], 'code': row['code'], 'title': row['title'], 'status': row['status'],
                                   'knowledge_linked': bool(row.get('brain_project_id'))}
                                  for row in projects], 'sessions': sessions['sessions'],
@@ -327,42 +337,42 @@ class AgentService:
                 self._start()
             except (OSError, ValueError, RuntimeError) as error:
                 self.startup_error = (str(error) if isinstance(error, (ValueError, RuntimeError))
-                                      else 'Agent ne peut pas démarrer. Vérifiez les droits du dossier de données et du runtime.')
+                                      else 'Le service Projets ne démarre pas. Vérifiez les droits du dossier des données et de l’environnement Python.')
                 raise
             self.startup_error = ''
 
     def preflight(self):
-        """Validate the configured service files without starting Agent."""
-        for path, label in ((self.python, 'Python d’Agent'),
+        """Validate the configured service files without starting the project service."""
+        for path, label in ((self.python, 'l’interpréteur Python'),
                             (self.data / 'brain/project_brain.db', 'base Brain'),
                             (self.data / 'erp/minipilot.db', 'base MiniPilot')):
             if not path.is_file():
-                raise ValueError(f'Agent ne trouve pas {label}. Vérifiez agent-service.json.')
+                raise ValueError(f'Service Projets : {label} introuvable. Vérifiez sa configuration.')
         if not (self.data / 'storage').is_dir():
-            raise ValueError('Stockage Agent introuvable')
+            raise ValueError('Stockage des projets introuvable.')
         if self.document_project_root:
             root = Path(self.document_project_root)
             try:
                 if not root.is_dir() or root.resolve(strict=True) != root:
-                    raise ValueError('Le dossier client Agent est introuvable ou redirigé.')
+                    raise ValueError('Le dossier client est introuvable ou redirigé.')
             except (OSError, RuntimeError) as error:
-                raise ValueError('Le dossier client Agent est inaccessible.') from error
+                raise ValueError('Le dossier client est inaccessible.') from error
             for setting in ('AGENT_DOCUMENT_ROOTS', 'AGENT_DOCUMENT_WRITE_ROOTS'):
                 for value in json.loads(self.document_settings.get(setting, '[]')):
                     shared = Path(value).resolve()
                     if root.is_relative_to(shared) or shared.is_relative_to(root):
-                        raise ValueError('Les racines partagées doivent être distinctes du dossier client Agent.')
+                        raise ValueError('Utilisez des dossiers distincts pour les partages et le dossier client.')
         env = {}
         speech = self.speech_python
         if speech:
             speech_python = Path(speech).resolve()
             if not speech_python.is_file():
-                raise ValueError('Runtime audio Agent introuvable')
+                raise ValueError('Environnement Python audio introuvable.')
             env['PB_SPEECH_PYTHON'] = str(speech_python)
         if self.speech_models:
             models = Path(self.speech_models).resolve()
             if not (models / 'models.json').is_file():
-                raise ValueError('Configuration des modèles audio Agent introuvable.')
+                raise ValueError('Configuration des modèles audio introuvable.')
             env['PB_SPEECH_MODELS_DIR'] = str(models)
         return env
 
@@ -432,7 +442,7 @@ class AgentService:
                     connection.close()
                 time.sleep(.2)
             self.stop()
-            raise RuntimeError('Le service Agent ne répond pas au contrôle de santé')
+            raise RuntimeError('Le service Projets ne répond pas au contrôle de santé.')
 
     def _watch(self, process):
         """Remove the bridge and inference credential when this child exits."""

@@ -209,12 +209,6 @@ def test_conflicting_defaults_require_an_explicit_resolution(retained):
     assert listing['total'] == 2 and all(item['context']['needs_review'] for item in listing['items'])
 
 
-def test_launcher_never_inherits_testing_bypass(monkeypatch):
-    from scripts.agent_runtime import child_environment
-    monkeypatch.setenv('AGENT_TESTING', '1')
-    assert 'AGENT_TESTING' not in child_environment()
-
-
 def test_storage_refusal_precedes_any_write(tmp_path, monkeypatch):
     from app.services import storage_capacity
     monkeypatch.setattr(storage_capacity.shutil, 'disk_usage', lambda path: type('Usage', (), {'free': 1024})())

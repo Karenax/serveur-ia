@@ -1,7 +1,7 @@
 # Serveur IA
 
 Référence courante : [architecture, versions et compatibilités](ARCHITECTURE-ACTUELLE.md).
-Au 15 novembre 2026, le téléchargement Windows courant est **Kiara 4.0.5**. Le lanceur et le canal Windows de transition utilisent la base **3.5.63**.
+Au 16 novembre 2026, le téléchargement Windows courant est **Kiara 4.0.8**. Le portail privé et le client Windows donnent accès aux espaces Conversations et Projets de Kiara. La **4.0.7** est conservée pour le retour arrière, et la **3.5.63** pour la transition du client classique. [Bascule Windows et retour arrière](audits/2026-11-15-fusion-kiara/BASCULE.md)
 La [publication Windows](maintenance/2026-11-04-connexion-client/README.md)
 efface le message temporaire de connexion dès que le catalogue est retrouvé.
 Les lots EG2 de 32 textes et la file de 16 demandes en attente sont conservés.
@@ -36,9 +36,9 @@ depuis Windows et Android.
 L’attente de « Bonjour Kiara » reste expérimentale et limitée à l’application
 visible ; les alertes Android hors application sont facultatives et non exactes.
 
-L’[intégration métier d’Agent](ARCHITECTURE-ACTUELLE.md#intégration-agent)
+L’espace [Projets de Kiara](ARCHITECTURE-ACTUELLE.md#projets-et-conversations)
 réunit le portefeuille, les mails Thunderbird, les réunions, les documents et
-la recherche avec citations dans Kiara 4. Les données métier d’Agent sont conservées et traitées côté serveur.
+la recherche avec citations. Les données métier sont conservées et traitées côté serveur.
 
 Le [plan global](PLAN-GLOBAL-SERVEUR-FRED.md) découpe en lots les sauvegardes, la gestion des appareils, le tableau de bord, la recherche documentaire, la voix, les notifications et les outils de l’assistant. Le [contexte de reprise](CONTEXTE-PROJET.md) conserve les décisions, l’état actuel et les prochaines étapes. Les lots 0 à 4 sont implantés : sauvegardes quotidiennes côté serveur, restauration guidée et gestion des appareils. Consulter le [mode d’emploi](lanceur/SAUVEGARDES-APPAREILS.md) et les [preuves](preuves/lots-0-4/VALIDATION.md). Les **lots 6 et 8 sont également achevés et en service** : recherche avec passages cités et boîte de notifications persistante. Consulter leur [mode d’emploi](lanceur/RECHERCHE-NOTIFICATIONS.md) et les [preuves finales](preuves/lots-6-8/VALIDATION.md), dont 246 tests réussis. Versions de cette livraison historique : serveur/Windows **3.5.34**, Android **1.0.13, code 14**. Le [correctif du 14 octobre](maintenance/2026-10-14-opencode/README.md) rétablit l’affichage du modèle ajouté dans OpenCode 2. Le lot 7 comprend désormais la dictée et la conversation Windows/Android ; les essais physiques restants sont décrits dans les guides actuels. Hermes traite les conversations avec les outils Kiara autorisés ; les trois actions du correcteur utilisent directement Qwen. Le tableau de bord complet du lot 5 et les extensions des lots 9/10 restent planifiés.
 
@@ -61,7 +61,7 @@ Le serveur de production utilise le dépôt `D:\Serveur IA`. Les rapports histor
 
 Sur le PC serveur, le [chat Strata](http://127.0.0.1:8080/) permet de discuter directement avec Qwen local ; la [console Kiara](http://127.0.0.1:8765/) propose aussi **Ouvrir le chat**. Ces interfaces écoutent sur `127.0.0.1`. Le PC est configuré en IP fixe **192.168.1.41/24**, DHCP IPv4 désactivé, passerelle et DNS `192.168.1.1`. WireGuard utilise le port UDP **51820** ; les profils corrigés privilégient `192.168.1.41:51820` sur le réseau local. [Configuration et vérification](maintenance/2026-10-13-ip-fixe/README.md).
 
-Le moteur actuel est Strata officiel **0.1.56 CUDA 12.9**, installé dans `F:/Kiara/moteurs/strata-0.1.56-cuda12`, avec RTX 4080 principale, deux P100 pour les experts et DFlash2. Le **serveur Python 0.1.43.1 corrigé et l’encodeur P2200** restent conservés dans `dependances/strata-0.1.43.1`. Les réglages et preuves sont dans [le profil de production du 3 novembre](maintenance/2026-11-03-rtx4080/default-mode/README.md). Les anciens moteurs et leurs références restent conservés.
+Le moteur et ses chemins sont sélectionnés par la configuration locale du lanceur. Sur le poste Fred, utiliser D: pour le travail, les compilations, les caches et les recettes. E: est réservé aux archives et aux preuves conservées. Les références Strata et leurs correctifs sont documentés dans [l’inventaire des moteurs](dependances/README.md).
 
 Les moteurs Strata et llama.cpp restent des dépôts distincts. Leurs sources, outils CUDA et environnements Python doivent être installés séparément. Les références et patchs enregistrés dans `dependances/` permettent de retrouver les versions et modifications locales.
 

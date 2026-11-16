@@ -38,6 +38,42 @@ it('nomme et télécharge la version exacte d’une note conservée hors du rapp
   expect(screen.getByText('Version conservée · version hors rappel courant')).toBeTruthy();
 });
 afterEach(()=>{cleanup();vi.restoreAllMocks();});
+it('importe un audio téléphonique avec sa transcription depuis Sources',async()=>{
+  vi.mocked(fusionSources.list).mockResolvedValue({items:[source],total:1,offset:0,limit:25,has_next:false,labels:[],can_import_audio:true});
+  const upload=vi.spyOn(fusionSources,'audio').mockResolvedValue({status:'resolution_pending'});
+  render(<SourcesLibrary rows={rows} onOpenSource={vi.fn()}/>);
+  fireEvent.click(screen.getByRole('button',{name:'Ajouter une source'}));
+  fireEvent.click(await screen.findByText('Importer un enregistrement audio'));
+  const form=screen.getByRole('form',{name:'Importer un enregistrement audio'});
+  fireEvent.change(within(form).getByLabelText('Type d’enregistrement'),{target:{value:'phone'}});
+  fireEvent.change(within(form).getByLabelText('Transcription existante'),{target:{value:'Texte fictif'}});
+  fireEvent.submit(form);
+  await screen.findByText('Audio importé. Il reste à rattacher dans Sources.');
+  expect(upload.mock.calls[0][0].get('source_type')).toBe('phone');
+  expect(upload.mock.calls[0][0].get('transcript')).toBe('Texte fictif');
+  expect(upload.mock.calls[0][0].has('candidate_project_id')).toBe(false);
+});
+it('rattache une source en attente à un projet accessible depuis la bibliothèque',async()=>{
+  window.history.replaceState(null,'','/kiara/app/sources?status=pending');
+  try {
+    vi.mocked(fusionSources.list).mockResolvedValue({items:[{...source,status:'resolution_pending'}],
+      total:1,offset:0,limit:25,has_next:false,labels:[]});
+    vi.spyOn(fusionSources,'destinations').mockResolvedValue([{id:'brain-seul',code:'B-42',name:'Projet de connaissance'}]);
+    const attach=vi.spyOn(fusionSources,'attach').mockResolvedValue({source_id:'source-1',project_id:'brain-seul'});
+    render(<SourcesLibrary rows={rows} onOpenSource={vi.fn()}/>);
+    await screen.findByRole('button',{name:'Note validée'});
+    expect(fusionSources.list).toHaveBeenCalledWith(expect.objectContaining({status:'pending'}),expect.anything());
+    fireEvent.click(screen.getByLabelText('Détails de Note validée'));
+    fireEvent.click(screen.getByRole('button',{name:'Rattacher au projet'}));
+    fireEvent.change(await screen.findByLabelText('Projet de destination'),{target:{value:'brain-seul'}});
+    fireEvent.click(screen.getByRole('button',{name:'Confirmer le rattachement'}));
+    await screen.findByText('Source rattachée au projet.');
+    expect(attach).toHaveBeenCalledOnce();
+    expect(attach).toHaveBeenCalledWith('source-1','brain-seul');
+  } finally {
+    window.history.replaceState(null,'','/');
+  }
+});
 it('filtre avec identité Brain et ouvre la source canonique sans confondre le projet ERP',async()=>{
   const open=vi.fn();render(<SourcesLibrary rows={rows} onOpenSource={open}/>);
   await screen.findByRole('button',{name:'Note validée'});

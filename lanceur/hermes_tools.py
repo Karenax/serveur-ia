@@ -113,13 +113,13 @@ class FredTools:
         project, document = context.get('project_id'), context.get('document_id')
         if is_agent_project_id(project):
             if document:
-                raise Denied('Choisissez les documents de ce projet dans Agent.')
+                raise Denied('Choisissez les documents dans la fiche du projet.')
             if self.workspace.agent_catalogue is None:
-                raise Denied('Catalogue Agent indisponible.')
+                raise Denied('Catalogue Projets indisponible.')
             catalogue = self.workspace.agent_catalogue(owner)
             p = next((row for row in catalogue['projects'] if row['id'] == project), None)
             if not p or p.get('archived'):
-                raise Denied('Projet Agent indisponible pour cet outil.')
+                raise Denied('Projet indisponible pour cet outil.')
             return
         with self.workspace.db() as db:
             if project:
@@ -233,7 +233,7 @@ class FredTools:
             catalogue = w.agent_catalogue(owner)
             p = next((row for row in catalogue['projects'] if row['id'] == project), None)
             if not p or p.get('archived'):
-                raise Denied('Projet Agent indisponible pour cet outil.')
+                raise Denied('Projet indisponible pour cet outil.')
             return {'project': {key: p[key] for key in ('id', 'title')}, 'documents': []}
         if is_agent_project_id(project) and name in ('fred_document_search', 'fred_knowledge_search', 'fred_source_get'):
             if name == 'fred_source_get':

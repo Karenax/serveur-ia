@@ -34,7 +34,7 @@ export function ProjectKnowledgePanel({projectId,active=true}:{projectId:string;
         {!!data.items.length&&<div className="knowledge-table"><table><thead><tr><th>Fonction / contrainte / exigence</th><th>Évaluation proposée</th><th>Justification</th></tr></thead><tbody>{data.items.map(row=><tr key={row.id}><td>{row.human_id&&<small>{row.human_id} · </small>}{row.title}</td><td>{states[row.state]||row.state}</td><td><p>{row.reason}</p>{row.proofs.map((proof,index)=><Evidence key={index} proof={proof}/>)}</td></tr>)}</tbody></table></div>}
         {!data.total&&<p>Aucune fonction, contrainte ou exigence CDC à évaluer sur ce projet.</p>}
         <Pagination offset={offset} total={data.total} limit={20} onChange={setOffset}/></>}
-      <details><summary>Fonctionnement de l’analyse</summary><p>Passage automatique toutes les {data.interval_hours} h, projet par projet, lorsque le modèle est libre dans Agent. Prochain passage : {dateLabel(data.next_due)}.</p></details>
+      <details><summary>Fonctionnement de l’analyse</summary><p>Passage automatique toutes les {data.interval_hours} h, projet par projet, lorsque le modèle est disponible. Prochain passage : {dateLabel(data.next_due)}.</p></details>
     </>}</div></details>
   </section>;
 }

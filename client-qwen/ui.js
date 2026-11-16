@@ -10,33 +10,31 @@ function uiIcon(name){const svg=document.createElementNS('http://www.w3.org/2000
 const uiNavTitles={notifications:'Notifications',chat:'Conversations',projects:'Projets',settings:'Réglages'};
 const uiNavigationLabels=new WeakMap();
 uiNavTitles.assistant='Mémoire et rappels';uiPaths.assistant='M4 4h7v16H4V4m9 0h7v16h-7V4M7 8h1m8 0h1M7 12h1m8 0h1';
-uiNavTitles.agent='Espace de travail';uiPaths.agent=uiPaths.projects;
-async function uiOpenAgent(path){
+async function uiOpenProjectWorkspace(path){
   if(busy)throw new Error('Attendez la fin de la réponse.');
   if(ws.projectDirty)throw new Error('Enregistrez les consignes du projet avant de continuer.');
   window.uiCheckPendingEdits?.();
   await wsFlush();save();await flushHistory();
+  if(platformCapabilities.platform==='windows'||platformCapabilities.platform==='web')await uiPersistPreferences();
   if(platformCapabilities.platform==='web'){
-    await uiPersistPreferences();
     await window.voiceFinishForClose?.();
     window.location.assign(config.web_prefix+(path||'/app'));
     return;
   }
-  const result=await api('/client/agent/session',{});
+  const result=await api('/client/project-session',{});
   await window.voiceFinishForClose?.();
   window.location.assign(path||result.url);
 }
 if(platformCapabilities.platform!=='android'){
-  const openAgent=wsElement('button',null,'nav-button');
-  openAgent.type='button';openAgent.id='open-agent';openAgent.dataset.viewButton='agent';
-  openAgent.append(uiIcon('projects'),wsElement('span','Espace de travail','nav-text'));
-  openAgent.onclick=()=>wsTry(()=>uiOpenAgent());
+  const openPortfolio=$('ws-open-portfolio');
+  openPortfolio.onclick=()=>wsTry(()=>uiOpenProjectWorkspace());
   const projectButton=document.querySelector('[data-view-button="projects"]');
-  projectButton.parentNode.insertBefore(openAgent,projectButton.nextSibling);
+  const nav=document.querySelector('#client-navigation');
+  const notifications=nav.querySelector('[data-view-button="notifications"]');
   const openLocalProjects = projectButton.onclick;
   projectButton.onclick = () => {
     if(ws.data?.project_catalogue?.interface==='projects-v1' && ws.data.project_catalogue.state==='ready') {
-      return wsTry(()=>uiOpenAgent('/app/projets'));
+      return wsTry(()=>uiOpenProjectWorkspace('/app/projets'));
     }
     return openLocalProjects();
   };
@@ -51,14 +49,23 @@ if(platformCapabilities.platform!=='android'){
     drawProjects();
     const catalogue = ws.data?.project_catalogue;
     const enabled = catalogue?.state === 'ready' && catalogue.navigation === 'kiara-v1';
-    openAgent.hidden = catalogue?.interface === 'projects-v1' && catalogue.state === 'ready';
+    openPortfolio.hidden = catalogue?.interface === 'projects-v1' && catalogue.state === 'ready';
+    if (platformCapabilities.platform === 'windows') {
+      if (enabled && notifications.parentNode === nav) {
+        notifications.classList.add('notifications-shortcut');
+        $('connection').before(notifications);
+      } else if (!enabled && notifications.parentNode !== nav) {
+        notifications.classList.remove('notifications-shortcut');
+        nav.append(notifications);
+      }
+    }
     if (enabled && !links.length) {
       links = entries.map(([label,path,icon]) => {
         uiPaths[label] = icon;
         const button = wsElement('button',null,'nav-button');
         button.type = 'button';
         button.append(uiIcon(label),wsElement('span',label,'nav-text'));
-        button.onclick = () => wsTry(() => uiOpenAgent(path));
+        button.onclick = () => wsTry(() => uiOpenProjectWorkspace(path));
         return button;
       });
       projectButton.after(...links);
@@ -66,8 +73,21 @@ if(platformCapabilities.platform!=='android'){
     for (const button of links) button.hidden = !enabled;
   };
 }
-if (location.hash === '#notifications') {
+if (platformCapabilities.platform !== 'windows' && location.hash === '#notifications') {
   void clientReady.then(() => showView('notifications'));
+}
+if (platformCapabilities.platform === 'windows') {
+  const openChatDestination = () => {
+    if (location.hash === '#notifications') {
+      showView('notifications');
+      return;
+    }
+    if (location.hash !== '#apparence') return;
+    showView('settings');
+    $('ui-theme').focus();
+  };
+  window.addEventListener('hashchange', openChatDestination);
+  void clientReady.then(openChatDestination);
 }
 function uiDecorateNavigation(){for(const button of document.querySelectorAll('[data-view-button]')){button.removeAttribute('aria-selected');if(button.classList.contains('active'))button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');}for(const b of document.querySelectorAll('.nav-button')){const name=b.dataset.viewButton;if(!uiNavTitles[name])continue;const unchangedSignature=JSON.stringify([name,uiNavTitles[name],b.dataset.unreadCount||0,b.dataset.unread==='true'||b.textContent.includes('résultats disponibles')]);if(uiNavigationLabels.get(b)===unchangedSignature&&b.querySelector('.nav-text'))continue;uiNavigationLabels.set(b,unchangedSignature);if(name==='notifications'){const count=Number(b.dataset.unreadCount||0);b.replaceChildren(uiIcon(name),wsElement('span',uiNavTitles[name],'nav-text'));if(count)b.append(wsElement('span',String(count),'fred-nav-count'));b.title='Notifications'+(count?' · '+count+' non lues':'');continue;}b.replaceChildren(uiIcon(name),wsElement('span',uiNavTitles[name],'nav-text'));b.title=uiNavTitles[name];}}
 $('new').prepend(uiIcon('new'));$('ui-sidebar-toggle').append(uiIcon('sidebar'));

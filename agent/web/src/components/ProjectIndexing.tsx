@@ -9,8 +9,8 @@ export function ProjectIndexing({active=true,projectId}:{active?:boolean;project
       if(!controller.signal.aborted){setStatus(value);setError('');}}catch(cause){if(!controller.signal.aborted)setError((cause as Error).message);}finally{pending=false;}};
     void read();const timer=setInterval(()=>void read(),15000);return()=>{controller.abort();clearInterval(timer);};},[active,projectId]);
   return <section className="fusion-multimodal" aria-label="Indexation automatique des projets"><h2>Indexation automatique des projets</h2>
-    <p>Quand vous classez un mail ou importez un document dans un projet, Agent prépare automatiquement son texte pour la recherche avec EG2 sur le serveur configuré. Aucun dossier réseau n’est parcouru.</p>
-    <p>Le serveur calcule les empreintes de recherche. Leur index est conservé dans Agent pour retrouver les passages ; le LLM utilise ensuite ces passages pour répondre.</p>
+    <p>Quand vous classez un mail ou importez un document dans un projet, Kiara prépare automatiquement son texte pour la recherche avec EG2 sur le serveur configuré. Aucun dossier réseau n’est parcouru.</p>
+    <p>Kiara indexe les passages utiles pour les retrouver dans la recherche et les réponses.</p>
     {error&&<p role="alert">{error}</p>}{status?.error&&<p role="alert">{status.error}</p>}
     {!status&&!error&&<p role="status">Vérification des index…</p>}
     {status&&<><p role="status">{status.compute==='network'?'Calcul sur le serveur réseau':'Calcul sur ce PC'} · {status.indexed??'Non vérifié'} / {status.sources} sources indexées</p>

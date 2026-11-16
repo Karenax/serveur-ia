@@ -212,11 +212,12 @@ export const api = {
     `/v1/mail/page?scope=resolved&limit=100&offset=${offset}&q=${encodeURIComponent(q)}&sort=${sort}${projectId ? `&project_id=${encodeURIComponent(projectId)}` : ""}`),
   rejectedMailPage: (offset = 0, q = "", sort = "newest") => request<MailPage<SourceMail>>(
     `/v1/mail/page?scope=rejected&limit=100&offset=${offset}&q=${encodeURIComponent(q)}&sort=${sort}`),
-  brainImportEml: (projectId: string, file: File) => {
+  brainImportEml: (projectId: string | null, file: File) => {
     const body = new FormData();
     body.append("file", file);
-    return request<{status: "resolved" | "duplicate"}>(
-      `/v1/projects/${encodeURIComponent(projectId)}/import-eml`, {method: "POST", body, activity: "Import du mail"},
+    return request<{status: "resolved" | "duplicate" | "resolution_pending"}>(
+      projectId ? `/v1/projects/${encodeURIComponent(projectId)}/import-eml` : "/v1/sources/upload-eml",
+      {method: "POST", body, activity: "Import du mail"},
     );
   },
   brainSourceDetail: (sourceId: string, signal?: AbortSignal) =>

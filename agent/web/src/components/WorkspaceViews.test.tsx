@@ -1,6 +1,6 @@
 import { afterEach, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen, waitFor,within } from "@testing-library/react";
-import type { PortfolioRow } from "../lib/api";
+import { api, type PortfolioRow } from "../lib/api";
 import { workspaceApi, type DurableTriageJob, type WorkspaceJob, type WorkspaceKnowledge, type WorkspaceMeeting } from "../lib/workspaceApi";
 import { GlobalJobsView, GlobalKnowledgeView, GlobalMeetingsView, SourceInspector } from "./WorkspaceViews";
 import {meetingSessions,type MeetingSession,type SessionCapabilities} from '../lib/meetingSessions';
@@ -9,6 +9,26 @@ import {notesApi,type NoteVersion} from '../lib/projectNotes';
 import {fusionInsights,type FusionSettings} from '../lib/fusionInsights';
 
 afterEach(() => {cleanup(); vi.restoreAllMocks();});
+
+it("ouvre et crée un projet de connaissance autonome dans Informations",async()=>{
+  window.history.replaceState(null,"","/kiara/app/knowledge?knowledge_project=ancien");
+  try {
+    vi.spyOn(api,"session").mockResolvedValue({operator:{role:"owner",project_ids:null}});
+    vi.spyOn(workspaceApi,"knowledgeProjects").mockResolvedValue([{id:"ancien",code:"ANC",name:"Projet historique"}]);
+    const load=vi.spyOn(workspaceApi,"knowledge").mockResolvedValue({items:[],total:0});
+    const create=vi.spyOn(workspaceApi,"createKnowledgeProject").mockResolvedValue({id:"nouveau",code:"REC",name:"Projet fictif"});
+    render(<GlobalKnowledgeView rows={rows} onOpenProject={vi.fn()}/>);
+    await waitFor(()=>expect(load).toHaveBeenCalledWith(expect.objectContaining({project_id:"ancien"}),expect.anything()));
+    const menu=screen.getByText("Projets de connaissance").closest("details")!;
+    menu.open=true;fireEvent(menu,new Event("toggle"));
+    fireEvent.change(await screen.findByLabelText("Code du projet de connaissance"),{target:{value:"REC"}});
+    fireEvent.change(screen.getByLabelText("Nom du projet de connaissance"),{target:{value:"Projet fictif"}});
+    fireEvent.click(screen.getByRole("button",{name:"Créer le projet de connaissance"}));
+    await screen.findByText("Projet de connaissance créé.");
+    expect(create).toHaveBeenCalledWith("REC","Projet fictif");
+    expect(screen.getByRole("link",{name:"Sources du projet"}).getAttribute("href")).toBe("/kiara/app/sources?knowledge_project=nouveau");
+  } finally {window.history.replaceState(null,"","/");}
+});
 
 it('restaure les filtres Informations après rechargement sans modifier une autre rubrique', async()=>{
   window.history.replaceState({},'', '/app/knowledge?project=erp-a&q=capteur&offset=25');

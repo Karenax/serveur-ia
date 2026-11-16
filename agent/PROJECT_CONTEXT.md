@@ -1,10 +1,14 @@
-# Contexte courant — Agent 0.4.0
+# Contexte du service Projets de Kiara
 
-Mis à jour le 23 octobre 2026 pour la livraison des corrections de sécurité.
-Ce document est un index de l'état courant ; les qualifications datées gardent
-leur portée et ne deviennent pas des observations en direct.
+Depuis la 4.0.8 Windows, le dépôt de référence est `D:\Serveur IA`. Le
+lanceur Kiara supervise le service Projets et publie le portail privé. Les
+commandes, ports et résultats de qualification ci-dessous décrivent l’état
+historique du 23 octobre 2026. [Architecture actuelle](../ARCHITECTURE-ACTUELLE.md)
+[Reconstruction et exploitation](../RECONSTRUIRE-FRED.md)
 
-## Produit et architecture
+## Qualification historique du 23 octobre 2026
+
+### Produit et architecture de cette livraison
 
 Projet canonique : `C:/Agent`. Un dépôt, un serveur Agent sur **8001** servant
 Brain `/v1`, ERP `/api/v1` et React `web/dist`. XPilot sur **8000** est externe ;
@@ -16,7 +20,7 @@ forment pas une transaction distribuée. Dans Kiara, l’index reconstructible E
 sert la recherche sémantique et les citations. LiteRT est obsolète depuis le
 14 novembre 2026. Les sauvegardes et restaurations excluent son ancien index.
 
-## Portée et limites acceptées
+### Portée et limites acceptées
 
 - Réunions : capture, transcription, notes, relecture, publication et exports.
   Le direct est provisoire et exige une relecture humaine ; aucune garantie de
@@ -37,7 +41,7 @@ sert la recherche sémantique et les citations. LiteRT est obsolète depuis le
 - Sauvegarde : copie coordonnée hors ligne, vérification d'empreintes et de
   bases, restauration sur répertoire neuf. DPAPI dépend du compte Windows.
 
-## Corrections et livraison
+### Corrections et livraison
 
 Le [suivi des 18 constats](docs/60_SECURITY_REMEDIATION.md) fait autorité pour
 les correctifs de cet audit : exports sans écrasement, GET sans mutation,
@@ -53,7 +57,7 @@ fichiers. Ces contrôles ne qualifient pas un nouveau microphone ou modèle IA.
 Les décisions d'entreprise sur rétention, droits du poste et enregistrement
 restent à formaliser ; aucune durée de purge ni licence n'est inventée.
 
-## Ordre de lecture
+### Références de cette qualification
 
 1. [README](README.md), produit et architecture.
 2. [Exploitation](README_BACKEND.md), installation verrouillée et reprise.

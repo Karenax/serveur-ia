@@ -1,4 +1,4 @@
-"""Package server sources and the built Agent web interface for deployment."""
+"""Package Kiara server sources and the built Projets web interface for deployment."""
 import argparse
 from pathlib import Path
 import zipfile

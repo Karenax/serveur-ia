@@ -29,7 +29,7 @@
 .meeting-pane-empty{padding:40px 26px;text-align:center;color:var(--muted,#7a8696);max-width:420px;margin:0 auto}.meeting-pane-empty>span{display:block;font-size:35px;color:#8cb8ed;margin-bottom:15px}.meeting-pane-empty h3{font-size:16px;color:var(--text,#566b82);font-weight:500}.meeting-pane-empty p{font-size:13px;line-height:1.8}
 .meeting-enhanced-pane>.meeting-studio-notice{margin:15px}.meeting-suggestion{padding:20px;border-bottom:1px solid var(--border,#edf0f4)}.meeting-suggestion>button{margin:10px 7px 0 0;font-size:12px}
 .meeting-assistant-pane>nav{display:flex;padding:10px 10px 0;gap:2px;border-bottom:1px solid var(--border,#e5eaf2);flex-wrap:wrap}.meeting-assistant-pane>nav>button{font-size:12px;min-height:36px;border:0;border-radius:7px 7px 0 0;flex:1;white-space:nowrap}.meeting-assistant-pane>nav>button[aria-selected=true]{background:var(--surface-hover,#e9f1ff);color:var(--text,#205da6);box-shadow:inset 0 -2px var(--focus-ring-color,var(--accent,#00796c))}
-.meeting-assistant-pane>[role=tabpanel]{padding:17px;min-height:390px}.meeting-assistant-pane>[role=tabpanel]>label{margin-bottom:13px}.meeting-assistant-pane textarea{width:100%;resize:vertical}.meeting-assistant-pane form button{margin-top:9px}.meeting-assistant-pane .mac-assistant{position:static;width:100%;height:auto;max-height:none;min-width:0;border:0;box-shadow:none}.meeting-assistant-pane .meeting-audio{padding:0;background:transparent;border:0;min-width:0}
+.meeting-assistant-pane>[role=tabpanel]{padding:17px;min-height:390px}.meeting-assistant-pane>[role=tabpanel]>label{margin-bottom:13px}.meeting-assistant-pane textarea{width:100%;resize:vertical}.meeting-assistant-pane form button{margin-top:9px}.meeting-assistant-pane .meeting-audio{padding:0;background:transparent;border:0;min-width:0}
 .meeting-chat-log article{padding:12px 0;border-bottom:1px solid var(--border,#edf0f4);overflow-wrap:anywhere}.meeting-chat-log h3{font-size:13px}.meeting-citations{margin:12px 0;font-size:12px}.meeting-citations details{padding:8px 10px;background:var(--surface-muted,#f4f7fb);border-radius:6px;margin:5px 0}.meeting-citations summary{cursor:pointer;color:var(--text,#406187)}.meeting-citations blockquote{margin:10px 0;padding-left:9px;border-left:2px solid #9dbdeb;white-space:pre-wrap}.meeting-citations a{color:var(--accent,#00796c)}
 .meeting-live-transcript ol{list-style:none;margin:12px 0;padding:0}.meeting-live-transcript li{padding:12px 0;border-bottom:1px solid var(--border,#edf0f4)}.meeting-live-transcript li>span{font-size:11px;color:var(--muted,#647184);margin-left:7px}.meeting-live-transcript li>p{white-space:pre-wrap;line-height:1.7;overflow-wrap:anywhere}
 .meeting-transcript-follow{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0;background:var(--surface,#fff);font-size:11px;color:var(--muted,#647184)}
@@ -203,7 +203,7 @@
   .meeting-studio[data-focused-panel=true] .meeting-studio-status p { margin:5px 0; }
 }
 
-/* Keep meeting actions on the same theme tokens as the rest of Agent. */
+/* Keep meeting actions on the same theme tokens as the rest of Kiara. */
 .meeting-studio .meeting-start:hover:not(:disabled){background:color-mix(in srgb,var(--button-primary-bg,var(--meeting-accent)) 90%,var(--text));color:var(--button-primary-text,#fff)}
 .meeting-studio .meeting-studio-heading{margin-bottom:4px;gap:6px 8px}
 .meeting-studio .meeting-studio-heading>.meeting-browser-setup{flex-basis:auto;width:auto;padding:0;border:0;background:transparent}

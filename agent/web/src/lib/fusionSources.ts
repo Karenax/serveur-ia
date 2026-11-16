@@ -2,7 +2,7 @@ import { request } from './http';
 export type LibrarySource = {id:string;source_id:string|null;kind:string;title:string;project_id:string;project_code?:string|null;
   erp_project_id?:string|null;note_id?:string|null;labels:string[];status:string;current:boolean;date:string;mime_type?:string|null;file_format?:FileFormat|null;
   extraction_status:string;index_status:string;provider?:string|null;version_id?:string|null;source_url?:string};
-export type SourcePage = {items:LibrarySource[];total:number;offset:number;limit:number;has_next:boolean;labels:string[]};
+export type SourcePage = {items:LibrarySource[];total:number;offset:number;limit:number;has_next:boolean;labels:string[];can_import_audio?:boolean};
 export type FileFormat = 'pdf'|'png'|'jpeg'|'webp'|'txt'|'md'|'csv'|'docx'|'doc'|'xlsx'|'xls'|'xlsm'|'pptx'|'ppt'|'html'|'wav'|'mp3'|'m4a'|'webm'|'ogg'|'eml';
 export const FILE_FORMATS:Record<FileFormat,string>={pdf:'PDF',png:'PNG',jpeg:'JPEG',webp:'WebP',txt:'TXT',md:'Markdown',csv:'CSV',
   docx:'DOCX',doc:'DOC',xlsx:'XLSX',xls:'XLS',xlsm:'XLSM',pptx:'PPTX',ppt:'PPT',html:'HTML',wav:'WAV',mp3:'MP3',m4a:'M4A',webm:'WebM',ogg:'OGG',eml:'EML'};
@@ -18,6 +18,12 @@ export type CalendarEvent = {uid:string;summary?:string;dtstart?:string;dtend?:s
 export type SourceSearchHit = {id:string;source_id:string;project_id:string;modality:string;text:string;excerpt:string;locator:Record<string,unknown>;score:number;source_url:string;profile_key:string};
 const root='/api/v1/workspace/sources';
 export const fusionSources={
+  audio:(body:FormData)=>request<{status:'resolved'|'resolution_pending'|'duplicate'}>(
+    '/v1/sources/upload-audio',{method:'POST',body,activity:'Import de l’audio'},0),
+  destinations:()=>request<{id:string;code:string;name:string}[]>('/api/v1/brain/projects'),
+  attach:(sourceId:string,projectId:string)=>request<{source_id:string;project_id:string}>(
+    `/v1/resolution/${encodeURIComponent(sourceId)}/confirm`,
+    {method:'POST',body:JSON.stringify({project_id:projectId,pending_only:true})}),
   list:(filters:SourceFilters={},signal?:AbortSignal)=>{
     const query=new URLSearchParams();Object.entries({...filters,limit:filters.limit??25}).forEach(([key,value])=>{
       if(value!==undefined&&value!=='')query.set(key,String(value));});

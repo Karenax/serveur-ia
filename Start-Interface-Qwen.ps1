@@ -11,13 +11,27 @@ $python = if ($env:KIARA_RUNTIME_PYTHON) {
 $app = Join-Path $root 'lanceur\app.py'
 $pendingRelease = Join-Path $root 'client-qwen\dist\release-pending.json'
 $pendingBridge = Join-Path $root 'client-qwen\dist\wireguard-bridge-pending.exe'
-$agentConfig = Join-Path $dataDirectory 'agent-service.json'
+$agentConfig = Join-Path $dataDirectory 'project-service.json'
+if (!(Test-Path -LiteralPath $agentConfig)) {
+    $agentConfig = Join-Path $dataDirectory 'agent-service.json'
+}
 $expectedAgentProjects = $null
 $expectedAgentRuntime = $null
+
+function Invoke-ProjectService([string]$BaseUrl, [hashtable]$Headers, [int]$TimeoutSec, [switch]$Catalogue) {
+    $suffix = if ($Catalogue) { '/catalogue' } else { '' }
+    try {
+        return Invoke-RestMethod "$BaseUrl/api/project-service$suffix" -Headers $Headers -TimeoutSec $TimeoutSec
+    } catch {
+        if ([int]$_.Exception.Response.StatusCode -ne 404) { throw }
+        return Invoke-RestMethod "$BaseUrl/api/agent-service$suffix" -Headers $Headers -TimeoutSec $TimeoutSec
+    }
+}
+
 $existing = $null
 try { $existing = Invoke-RestMethod ($url + '/health') -TimeoutSec 2 } catch {}
 if ($VerifierBascule -and ($existing.service -ne 'qwen-launcher' -or !(Test-Path -LiteralPath $agentConfig -PathType Leaf))) {
-    throw 'Le controle de bascule exige un lanceur actif et une configuration Agent.'
+    throw 'Le controle de bascule exige un lanceur actif et une configuration du service Projets.'
 }
 if (($Redemarrer -or $VerifierBascule) -and $existing.service -eq 'qwen-launcher') {
     if (!(Test-Path -LiteralPath $python -PathType Leaf) -or !(Test-Path -LiteralPath $app -PathType Leaf)) {
@@ -29,7 +43,7 @@ if (($Redemarrer -or $VerifierBascule) -and $existing.service -eq 'qwen-launcher
         $session = [regex]::Match($page.Content, '<meta name="launcher-token" content="([^"]+)">')
         if (!$session.Success) { throw 'Jeton de la console locale absent.' }
         $headers = @{ 'X-Launcher-Token' = $session.Groups[1].Value }
-        $agentBeforeRestart = Invoke-RestMethod ($url + '/api/agent-service') -Headers $headers -TimeoutSec 5
+        $agentBeforeRestart = Invoke-ProjectService $url $headers 5
         $preflight = @'
 from contextlib import closing
 from html.parser import HTMLParser
@@ -64,14 +78,14 @@ try:
     assets = FrontendAssets()
     assets.feed((dist / 'index.html').read_text(encoding='utf-8'))
     if not assets.modules or not assets.styles:
-        raise ValueError('Frontend Agent incomplet. Recompiler agent/web.')
+        raise ValueError('Portail Kiara incomplet. Recompiler agent/web.')
     for reference in assets.modules + assets.styles:
         url = urlsplit(reference)
         file = (dist / url.path.lstrip('/')).resolve()
         if (url.scheme or url.netloc or not url.path.startswith('/assets/')
                 or not file.is_relative_to((dist / 'assets').resolve())
                 or not file.is_file() or not file.stat().st_size):
-            raise ValueError('Ressource du frontend Agent manquante ou invalide. Recompiler agent/web.')
+            raise ValueError('Ressource du portail Kiara manquante ou invalide. Recompiler agent/web.')
     erp = service.data / 'erp' / 'minipilot.db'
     with closing(sqlite3.connect(erp.as_uri() + '?mode=ro', uri=True, timeout=3)) as db:
         catalogue = [dict(id=identity, code=code, title=title, status=status)
@@ -96,16 +110,16 @@ except (OSError, ValueError, sqlite3.Error) as error:
 '@
         $phase = if ($agentBeforeRestart.configured) { 'restart' } else { 'initial' }
         $checked = $preflight | & $python -B - $root $dataDirectory $phase
-        if ($LASTEXITCODE -ne 0) { throw 'La configuration Agent doit etre corrigee avant le redemarrage.' }
-        Write-Output 'Frontend Agent : ressources principales presentes.'
+        if ($LASTEXITCODE -ne 0) { throw 'La configuration du service Projets doit etre corrigee avant le redemarrage.' }
+        Write-Output 'Portail Kiara : ressources principales presentes.'
         $cutover = ConvertFrom-Json -InputObject $checked
         $expectedAgentRuntime = $cutover.runtime
         $expectedAgentProjects = @($cutover.catalogue)
-        Write-Output "Projets ERP Agent attendus : $($expectedAgentProjects.Count)."
+        Write-Output "Projets attendus : $($expectedAgentProjects.Count)."
         if ($phase -eq 'initial') {
             Write-Output 'Catalogue Kiara historique : 0 projet, 0 document.'
             if ($cutover.agent_grants -eq 0) {
-                Write-Output 'Aucune habilitation Agent enregistree. Attribuer les premiers acces dans Acces Agent apres activation.'
+                Write-Output 'Aucun droit sur les projets enregistre. Attribuez les droits dans Clients & acces apres activation.'
             }
         }
     }
@@ -126,13 +140,13 @@ except (OSError, ValueError, sqlite3.Error) as error:
         $busy = $remote.active -ne 0 -or $remote.agent_active -gt 0 -or $backup.job.state -eq 'running'
         if (!$busy -or $VerifierBascule -or (Get-Date) -ge $deadline) { break }
         if (!$waiting) {
-            Write-Output 'Attente de la fin des requetes Kiara et Agent ou de la sauvegarde.'
+            Write-Output 'Attente de la fin des requetes Kiara ou de la sauvegarde.'
             $waiting = $true
         }
         Start-Sleep -Milliseconds 500
     } while ($true)
     if ($busy) {
-        throw 'Kiara ou Agent traite une requete ou une maintenance.'
+        throw 'Kiara traite une requete ou effectue une maintenance.'
     }
     if ($VerifierBascule) {
         Write-Output 'Controle de bascule reussi.'
@@ -196,7 +210,7 @@ if ($Redemarrer) {
         $deadline = (Get-Date).AddSeconds(75)
         do {
             try {
-                $agent = Invoke-RestMethod ($url + '/api/agent-service') -Headers $headers -TimeoutSec 3
+                $agent = Invoke-ProjectService $url $headers 3
             } catch {
                 if ($_.Exception.Response) { throw }
                 $agent = $null
@@ -205,33 +219,33 @@ if ($Redemarrer) {
             }
             if ($agent.configuration_error) { throw $agent.configuration_error }
             if ($agent.startup_error) { throw $agent.startup_error }
-            if (!$agent.configured) { throw "Le lanceur n'a pas charge la configuration Agent." }
+            if (!$agent.configured) { throw "Le lanceur n'a pas charge la configuration du service Projets." }
             if (!$agent.running) { Start-Sleep -Milliseconds 500 }
         } while (!$agent.running -and (Get-Date) -lt $deadline)
-        if (!$agent.running) { throw 'Agent ne repond pas apres le redemarrage du lanceur.' }
+        if (!$agent.running) { throw 'Le service Projets ne repond pas apres le redemarrage du lanceur.' }
         if ($null -ne $expectedAgentRuntime) {
             if ($agent.document_project_root -cne $expectedAgentRuntime.document_project_root -or
                 (($null -eq $agent.worker_groups) -ne ($null -eq $expectedAgentRuntime.worker_groups)) -or
                 (($agent.worker_groups -join ',') -cne ($expectedAgentRuntime.worker_groups -join ','))) {
-                throw 'Les groupes de traitements ou le dossier client charges par Agent different de la configuration.'
+                throw 'Les groupes de traitements ou le dossier client charges par le service Projets different de la configuration.'
             }
             if ($null -ne $expectedAgentRuntime.web) {
                 $sharedAgentWeb = $expectedAgentRuntime.web[1] -eq 0
                 $expectedWebPort = if ($sharedAgentWeb) { 8766 } else { $expectedAgentRuntime.web[1] }
                 if ($agent.web_error -or $agent.web_origin -cne $expectedAgentRuntime.web[0] -or
                     $agent.web_port -ne $expectedWebPort) {
-                    throw 'Le web prive Agent ne correspond pas a la configuration.'
+                    throw 'Le portail prive Kiara ne correspond pas a la configuration.'
                 }
-                $webPath = if ($sharedAgentWeb) { '/agent/' } else { '/' }
+                $webPath = if ($sharedAgentWeb) { '/kiara/' } else { '/' }
                 $listener = 'http://127.0.0.1:' + $agent.web_port + $webPath
                 $webHost = $agent.web_origin.Substring('https://'.Length)
                 $probe = Invoke-WebRequest -UseBasicParsing -Uri $listener -Method Head -Headers @{Host=$webHost} -TimeoutSec 5
                 if ($probe.StatusCode -ne 200 -or $probe.Headers['Cache-Control'] -notcontains 'no-store') {
-                    throw 'Le listener local du web prive Agent ne repond pas comme attendu.'
+                    throw 'Le listener local du portail prive Kiara ne repond pas comme attendu.'
                 }
             }
         }
-        $catalogue = Invoke-RestMethod ($url + '/api/agent-service/catalogue') -Headers $headers -TimeoutSec 25
+        $catalogue = Invoke-ProjectService $url $headers 25 -Catalogue
         if ($null -ne $expectedAgentProjects) {
             $expected = [System.Collections.Generic.Dictionary[string,object]]::new([StringComparer]::Ordinal)
             foreach ($project in $expectedAgentProjects) { $expected.Add([string]$project.id, $project) }
@@ -241,13 +255,13 @@ if ($Redemarrer) {
                 if (!$expected.TryGetValue($identity, [ref]$saved) -or
                     $saved.code -cne $project.code -or $saved.title -cne $project.title -or
                     $saved.status -cne $project.status) {
-                    throw 'Le catalogue Agent ne correspond pas aux projets ERP releves avant la bascule.'
+                    throw 'Le catalogue des projets ne correspond pas aux projets ERP releves avant la bascule.'
                 }
                 [void]$expected.Remove($identity)
             }
-            if ($expected.Count) { throw 'Certains projets ERP manquent dans le catalogue Agent.' }
+            if ($expected.Count) { throw 'Certains projets ERP manquent dans le catalogue des projets.' }
         }
-        Write-Output "Service Agent actif. Projets dans le catalogue : $(@($catalogue.projects).Count)."
+        Write-Output "Service Projets actif. Projets dans le catalogue : $(@($catalogue.projects).Count)."
     }
     $remote = Invoke-RestMethod ($url + '/api/remote') -TimeoutSec 5
     if (!$remote.gateway_available -or ($remote.enabled -and !$remote.connection.running)) {

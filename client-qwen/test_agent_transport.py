@@ -32,6 +32,14 @@ class AgentTransportTests(unittest.TestCase):
                 result.headers = http.client.HTTPMessage()
                 result.headers['Content-Type'] = 'application/json'
                 result.headers['Content-Length'] = str(len(result.getvalue()))
+                if request.full_url.endswith(('/v1/sources/source-recette/raw', '/api/v1/workspace/sources/source-recette/original')):
+                    original = b'\x00\xff\r\nOriginal de recette'
+                    result = io.BytesIO(original)
+                    result.status = 200
+                    result.headers = http.client.HTTPMessage()
+                    result.headers['Content-Type'] = 'application/octet-stream'
+                    result.headers['Content-Length'] = str(len(original))
+                    result.headers['Content-Disposition'] = "attachment; filename*=UTF-8''Pi%C3%A8ce%20originale.pdf"
                 if request.full_url.endswith('/documents/prepare-copy'):
                     result.headers['X-Agent-Source-Sha256'] = 'a' * 64
                     result.headers['X-Agent-Values-Sha256'] = 'b' * 64
@@ -67,8 +75,10 @@ class AgentTransportTests(unittest.TestCase):
 
     def test_session_and_business_requests_require_local_authorization(self):
         self.assertEqual(self.call('GET', '/app')[0], 403)
-        self.assertEqual(self.call('POST', '/client/agent/session', '{}', {'Content-Type': 'application/json'})[0], 401)
-        status, headers, _ = self.call('POST', '/client/agent/session', '{}', {
+        for route in ('/client/project-session', '/client/agent/session'):
+            with self.subTest(route=route):
+                self.assertEqual(self.call('POST', route, '{}', {'Content-Type': 'application/json'})[0], 401)
+        status, headers, _ = self.call('POST', '/client/project-session', '{}', {
             'Content-Type': 'application/json', 'Authorization': 'Bearer local-key'})
         self.assertEqual(status, 200)
         cookie = headers['Set-Cookie'].split(';', 1)[0]
@@ -76,6 +86,7 @@ class AgentTransportTests(unittest.TestCase):
         status, _, html = self.call('GET', '/app', headers={'Cookie': cookie})
         self.assertEqual(status, 200)
         self.assertIn(b'data-kiara-desktop="true"', html)
+        self.assertEqual(b'data-kiara-windows="true"' in html, sys.platform == 'win32')
         path = '/api/v1/projects?limit=5'
         self.assertEqual(self.call('PATCH', path, 'abc', {'Cookie': cookie, 'Origin': 'https://example.com'})[0], 403)
         status, _, _ = self.call('PATCH', path, 'abc', {
@@ -84,6 +95,12 @@ class AgentTransportTests(unittest.TestCase):
         self.assertEqual(self.calls[-1][0], 'PATCH')
         self.assertTrue(self.calls[-1][1].endswith('/v1/business' + path))
         self.assertEqual(self.calls[-1][2:], ('text/plain', b'abc'))
+        resolution = '/v1/resolution/source-recette/confirm'
+        self.assertEqual(self.call('POST', resolution, '{}')[0], 403)
+        status, _, _ = self.call('POST', resolution, '{}', {
+            'Cookie': cookie, 'Origin': f'http://127.0.0.1:{self.port}', 'Content-Type': 'application/json'})
+        self.assertEqual(status, 200)
+        self.assertTrue(self.calls[-1][1].endswith('/v1/business' + resolution))
 
     def test_desktop_version_is_visible_through_authenticated_state(self):
         self.remote.version = '3.5.63'
@@ -114,6 +131,26 @@ class AgentTransportTests(unittest.TestCase):
         self.assertEqual(headers['X-Agent-Values-Sha256'], 'b' * 64)
         self.assertEqual(headers['X-Agent-Link-Sha256'], 'c' * 64)
         self.assertEqual(headers['X-Agent-Network-Published'], 'false')
+
+    def test_original_documents_are_forwarded_only_with_a_project_session(self):
+        status, headers, _ = self.call('POST', '/client/project-session', '{}', {
+            'Authorization': 'Bearer local-key', 'Content-Type': 'application/json'})
+        self.assertEqual(status, 200)
+        cookie = headers['Set-Cookie'].split(';', 1)[0]
+        routes = ('/v1/sources/source-recette/raw', '/api/v1/workspace/sources/source-recette/original')
+        for route in routes:
+            with self.subTest(route=route):
+                call_count = len(self.calls)
+                self.assertEqual(self.call('GET', route)[0], 403)
+                self.assertEqual(len(self.calls), call_count)
+                status, response_headers, body = self.call('GET', route, headers={'Cookie': cookie})
+                self.assertEqual(status, 200)
+                self.assertEqual(response_headers['Content-Type'], 'application/octet-stream')
+                self.assertEqual(response_headers['Content-Length'], str(len(body)))
+                self.assertEqual(response_headers['Content-Disposition'],
+                                 "attachment; filename*=UTF-8''Pi%C3%A8ce%20originale.pdf")
+                self.assertEqual(body, b'\x00\xff\r\nOriginal de recette')
+                self.assertTrue(self.calls[-1][1].endswith('/v1/business' + route))
 
     def test_thunderbird_uses_its_own_pairing_and_exact_bridge_routes(self):
         route = '/v1/thunderbird/bridge/heartbeat'

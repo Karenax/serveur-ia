@@ -32,12 +32,17 @@ def execute(command, *, cwd, env, stream, timeout):
         return 124
 
 
-def definitions(output, business_python=None):
+def definitions(output, business_python=None, npm_cli=None):
     spec=json.loads((ROOT/'client-qwen/wireguard-toolchain.json').read_text(encoding='utf-8'))
     go=ROOT/'client-qwen/wireguard-tools/versions'/spec['version']/'go/bin/go.exe'
     shell=['powershell.exe','-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-Command']
     business_python = str(business_python or PYTHON)
+    npm = ['node', str(npm_cli.resolve(strict=True))] if npm_cli else ['npm.cmd']
     web = ROOT / 'agent/web'
+    windows_tests = [path.stem for path in sorted((ROOT/'client-qwen').glob('test_*.py'))
+                     if path.name != 'test_linux_support.py']
+    windows_server_tests = [path.stem for path in sorted((ROOT/'lanceur').glob('test_*.py'))
+                            if path.name != 'test_android_updates.py']
     return {
         'business': [[business_python, '-m', 'pytest', 'tests', '-p', 'no:cacheprovider']],
         'business-restore': [[business_python, '-m', 'pytest', 'tests/test_project_note_backup.py',
@@ -55,18 +60,23 @@ def definitions(output, business_python=None):
         'sources':[[str(PYTHON),'maintenance/check_sources.py']],
         'runtimes':[[str(PYTHON),'maintenance/verrous_runtime.py','check']],
         'server':[[str(PYTHON),'-m','unittest','discover','-s','lanceur','-v']],
+        'server-windows':[[str(PYTHON),'-m','unittest','-v',*windows_server_tests]],
         'windows':[[str(PYTHON),'-m','unittest','discover','-s','client-qwen','-v']],
+        'windows-client':[[str(PYTHON),'-m','unittest','-v',*windows_tests]],
         'voice':[[str(PYTHON),'-m','unittest','discover','-s','client-voice','-v']],
         'android':[[str(PYTHON),'-m','unittest','discover','-s','client-android/tests','-v'],
                    [str(PYTHON),'client-android/scripts/Prepare-Assets.py','--check']],
-        'ui':[['npm.cmd','--prefix','client-qwen','test'],['npm.cmd','--prefix','client-qwen','run','ux:check:all']],
+        'ui':[npm+['--prefix','client-qwen','test'],npm+['--prefix','client-qwen','run','ux:check:all']],
+        'ui-windows':[['node','client-qwen/test_ux_recovery_ui.cjs','--windows-only'],
+                      ['node','client-qwen/test_conversation_ui.cjs','--voice-workspace'],
+                      ['node','client-qwen/test_conversation_ui.cjs','--assistant-integration']],
         'android-lint':[shell+["$ErrorActionPreference='Stop'\n. '.\\client-qwen\\android-outils\\Environnement-Android.ps1'\n& '.\\toolchain\\gradle-8.13\\bin\\gradle.bat' --offline --no-daemon --console=plain -p client-android lintDebug\nexit $LASTEXITCODE"]],
         'go':[[str(go),'test','-count=1','-v','.']],
         'go-security':[[str(go),'run','golang.org/x/vuln/cmd/govulncheck@v1.9.0','-json','.'],
                        [str(PYTHON),str(ROOT/'maintenance/summarize_go_security.py'),str(output/'go-security-1.txt'),'--output',str(output/'go-security.json')]],
         'maintenance':[[str(PYTHON),'-m','unittest','discover','-s','maintenance/tests','-v']],
         'dependencies':[[str(PYTHON),'maintenance/check_dependencies.py','--output',str(output/'python-security.json')],
-                        ['npm.cmd','--prefix','client-qwen','audit','--json']],
+                        npm+['--prefix','client-qwen','audit','--json']],
     }
 
 
@@ -75,6 +85,7 @@ def main():
     parser.add_argument('--output',type=Path)
     parser.add_argument('--checks',nargs='+')
     parser.add_argument('--business-python', type=Path, help='Python environment with the project-service dependencies')
+    parser.add_argument('--npm-cli', type=Path, help='Path to npm-cli.js when npm.cmd is unavailable')
     parser.add_argument('--reuse-server-log',type=Path,help='Explicitly reuse a completed full server suite; recorded as reused evidence')
     parser.add_argument('--server-recheck-logs',type=Path,nargs='+',default=[],help='Successful verbose reruns covering every failure in the complete server log')
     parser.add_argument('--client-executable',type=Path,help='Use an isolated built client in server packaging tests')
@@ -83,7 +94,8 @@ def main():
     evidence_root=Path(os.environ.get('KIARA_EVIDENCE_DIR',str(ROOT/'toolchain/test-results'))).expanduser()
     output=(args.output or evidence_root/datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S')).resolve()
     output.mkdir(parents=True,exist_ok=True)
-    checks=definitions(output,args.business_python);selected=args.checks or list(checks)
+    checks=definitions(output,args.business_python,args.npm_cli)
+    selected=args.checks or [name for name in checks if name not in {'server-windows', 'ui-windows', 'windows-client'}]
     if set(selected)-set(checks):parser.error('Unknown check: '+','.join(sorted(set(selected)-set(checks))))
     env={**os.environ,'PYTHON_EXE':str(PYTHON),'PYTHONIOENCODING':'utf-8','UI_PROOF_DIRECTORY':str(output/'ui'),
          'GOPATH':str(ROOT/'client-qwen/wireguard-tools/workspace'),'GOCACHE':str(ROOT/'client-qwen/wireguard-tools/cache'),
@@ -104,7 +116,8 @@ def main():
             log=output/f'{name}-{number}.txt';started=time.monotonic()
             with log.open('w',encoding='utf-8') as stream:
                 try:
-                    cwd = {'business': ROOT/'agent', 'business-restore': ROOT/'agent', 'business-web': ROOT/'agent/web'}.get(name, ROOT)
+                    cwd = {'business': ROOT/'agent', 'business-restore': ROOT/'agent', 'business-web': ROOT/'agent/web',
+                           'windows-client': ROOT/'client-qwen'}.get(name, ROOT)
                     if name == 'package-server' and number == 1:
                         cwd = ROOT/'agent/web'
                     if name in ('go','go-security') and number == 1:
@@ -113,7 +126,13 @@ def main():
                     if name in ('business', 'business-restore', 'transport'):
                         modules = ('agent', 'shared') if name.startswith('business') else ('lanceur', 'client-qwen', 'shared')
                         check_env = {**env, 'PYTHONPATH': os.pathsep.join(str(ROOT/module) for module in modules)}
-                    timeout = 3600 if name in ('server', 'business', 'tauri') else 1200 if name == 'android-lint' else 600
+                    if name == 'windows-client':
+                        check_env = {**env, 'PYTHONPATH': str(ROOT/'shared')}
+                    if name == 'server-windows':
+                        check_env = {**env, 'PYTHONPATH': os.pathsep.join(
+                            value for value in (str(ROOT/'lanceur'), env.get('PYTHONPATH')) if value
+                        )}
+                    timeout = 3600 if name in ('server', 'server-windows', 'business', 'tauri') else 1200 if name == 'android-lint' else 600
                     code=execute(command,cwd=cwd,env=check_env,stream=stream,timeout=timeout)
                 except OSError as error:stream.write(type(error).__name__+': '+str(error));code=127
             results.append({'check':name,'command':command,'returncode':code,'passed':code==0,
