@@ -1,4 +1,4 @@
-.meeting-studio{--meeting-accent:var(--accent,#00796c);--meeting-wash:var(--surface-muted,#f4f7fb);color:var(--text,#263342);min-width:0;font:14px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+.meeting-studio{--meeting-accent:var(--accent,#00796c);--meeting-wash:var(--surface-muted,#f4f7fb);color:var(--text,#263342);min-width:0;font:14px/1.55 var(--font-ui)}
 .meeting-studio button,.meeting-capture-bar button,.meeting-create-form button{font:inherit;cursor:pointer;min-height:38px;padding:7px 13px;border-radius:8px;border:1px solid var(--border,#dce3ea);background:var(--surface,#fff);color:var(--text,#263342)}
 .meeting-studio button:hover:not(:disabled),.meeting-capture-bar button:hover:not(:disabled){background:var(--surface-hover,#eaf2ff);border-color:var(--accent,#00796c)}
 .meeting-studio button:disabled,.meeting-create-form button:disabled{opacity:.55;cursor:default}

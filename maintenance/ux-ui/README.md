@@ -19,8 +19,11 @@ tâche. Les cinq skills locaux complètent `frontend-design` d'Anthropic et
 le design existant et la demande utilisateur priment sur les préférences esthétiques
 amont. Les écrans API/admin gardent les paramètres techniques réellement utiles.
 
-Le client utilise HTML/CSS/JavaScript sans framework UI, Segoe UI/system-ui et des
-variables clair/sombre dans `client-qwen/ui.css`. Android réutilise ces sources via
+Le client utilise HTML/CSS/JavaScript sans framework UI et des variables
+clair/sombre dans `client-qwen/ui.css`. Le portail et le client reprennent
+Segoe UI, la police de Serveur IA, avec la police système en secours. Le réglage
+**Police des conversations** personnalise le texte des échanges et du correcteur.
+Android réutilise les sources du client via
 `client-android/scripts/Prepare-Assets.py`, avec `mobile-ui/android.css`. La console
 est dans `lanceur/web`. Les tests UI existants et Playwright 1.62.1 sont conservés.
 

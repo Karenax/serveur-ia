@@ -1,5 +1,5 @@
 .async-activity-live { position: fixed; right: 20px; bottom: 20px; z-index: 10000; pointer-events: none; max-width: min(380px, calc(100vw - 32px)); }
-.async-activity-indicator { position: relative; display: flex; align-items: center; gap: 12px; padding: 14px 18px 17px; border: 1px solid #38516b; border-radius: 12px; overflow: hidden; background: #142434; color: #f5f9ff; box-shadow: 0 6px 24px #0003; font: 14px/1.4 system-ui, sans-serif; }
+.async-activity-indicator { position: relative; display: flex; align-items: center; gap: 12px; padding: 14px 18px 17px; border: 1px solid #38516b; border-radius: 12px; overflow: hidden; background: #142434; color: #f5f9ff; box-shadow: 0 6px 24px #0003; font: 14px/1.4 var(--font-ui); }
 .async-activity-indicator strong { display: block; font-weight: 600; }
 .async-activity-indicator small { display: block; margin-top: 2px; color: #c1d2e5; }
 .async-activity-spinner { flex: 0 0 18px; width: 18px; height: 18px; border: 2px solid #61768b; border-top-color: #6cb6ff; border-radius: 50%; animation: async-activity-spin .85s linear infinite; }

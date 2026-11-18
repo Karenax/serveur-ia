@@ -1,5 +1,5 @@
 .agent-workspace-body { background:#f4f6f8; }
-.workspace-shell { --ink:#1c2933; --text:var(--ink); --muted:#586977; --accent:#00796c; --primary:var(--accent); --border:#dce3e8; --line:var(--border); --surface:#fff; --surface-muted:#f4f7f8; --surface-hover:#eaf3f1; --danger:#b03038; --bg:#f5f7f9; color:var(--ink); background:var(--bg); font-family:Inter,"Segoe UI",sans-serif; min-height:100vh; font-size:14px; line-height:1.5; display:grid; grid-template-columns:238px minmax(0,1fr); }
+.workspace-shell { --ink:#1c2933; --text:var(--ink); --muted:#586977; --accent:#00796c; --primary:var(--accent); --border:#dce3e8; --line:var(--border); --surface:#fff; --surface-muted:#f4f7f8; --surface-hover:#eaf3f1; --danger:#b03038; --bg:#f5f7f9; color:var(--ink); background:var(--bg);  min-height:100vh; font-size:14px; line-height:1.5; display:grid; grid-template-columns:238px minmax(0,1fr); }
 .workspace-shell[data-workspace-theme=dark] { --ink:#e5edf2; --muted:#a6b6c2; --accent:#68d3bf; --border:#33424e; --surface:#1b2933; --surface-muted:#22323e; --surface-hover:#28453e; --danger:#ff9399; --bg:#14212b; color-scheme:dark; }
 .workspace-shell *, .workspace-shell *::before, .workspace-shell *::after { box-sizing:border-box; }
 .workspace-shell { --paper:var(--surface);--red:var(--accent);--button-primary-bg:var(--accent);--button-primary-text:var(--surface);--button-secondary-bg:var(--surface);--button-secondary-text:var(--ink);--icon-button-bg:var(--surface);--icon-button-hover-bg:var(--surface-hover);--icon-button-text:var(--muted);--focus-ring-color:var(--accent); }
@@ -44,7 +44,7 @@
 .workspace-body { min-width:0; }
 .workspace-topbar { position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:14px;padding:16px 28px;background:var(--surface);border-bottom:1px solid var(--border);min-height:76px; }
 .workspace-search-trigger { display:flex;align-items:center;gap:10px;color:var(--muted);background:var(--surface-muted);border:1px solid var(--border);border-radius:8px;padding:9px 12px;cursor:pointer;min-width:240px;max-width:410px;flex:1; }
-.workspace-search-trigger kbd { margin-left:auto;border:1px solid var(--border);background:var(--surface);padding:1px 5px;border-radius:4px;font:11px "Segoe UI",sans-serif; }
+.workspace-search-trigger kbd { margin-left:auto;border:1px solid var(--border);background:var(--surface);padding:1px 5px;border-radius:4px;font:11px var(--font-ui); }
 .workspace-context { width:230px!important;margin-left:auto; }
 .workspace-connections { display:flex;gap:8px;margin-left:auto;flex-shrink:0; }
 .workspace-connections + .workspace-context { margin-left:0; }
@@ -119,7 +119,7 @@
 .workspace-shell .workspace-project-link { display:inline-flex;align-items:center;gap:10px;border:0;background:transparent;padding:0;text-align:left;color:var(--ink);font-size:13px!important;font-weight:650;cursor:pointer; }
 .workspace-project-folder { display:block;flex-shrink:0;width:44px;height:36px;overflow:visible; }
 .workspace-project-folder path { fill:var(--surface-hover,#eaf3f1);stroke:var(--accent,#00796c);stroke-width:1.2; }
-.workspace-project-folder text { fill:var(--accent,#00796c);font:700 12px "Segoe UI",sans-serif;font-variant-numeric:tabular-nums; }
+.workspace-project-folder text { fill:var(--accent,#00796c);font:700 12px var(--font-ui);font-variant-numeric:tabular-nums; }
 .workspace-portfolio td:first-child>small { margin-left:54px; }
 .workspace-project-link:hover { color:var(--accent); }
 .workspace-portfolio .numeric { font-variant-numeric:tabular-nums; }
@@ -174,7 +174,7 @@
 .workspace-compact .workspace-portfolio td { padding:11px 14px; }
 .workspace-compact .workspace-main { padding:18px 25px 40px; }
 .workspace-compact .workspace-page-header { margin-bottom:20px; }
-.workspace-boot { display:grid;place-items:center;min-height:100vh;background:#f5f7f9;color:#1c2933;font:16px "Segoe UI",sans-serif; }
+.workspace-boot { display:grid;place-items:center;min-height:100vh;background:#f5f7f9;color:#1c2933;font:16px var(--font-ui); }
 .workspace-boot>div { text-align:center;max-width:480px;padding:32px; }
 .workspace-boot strong { display:block;font-size:32px;margin-bottom:18px; }
 @media (max-width:1250px) { .workspace-shell:not([data-kiara-navigation="true"]) { grid-template-columns:205px minmax(0,1fr); } .workspace-main { padding:22px 22px 48px; } .workspace-context { width:190px!important; } }

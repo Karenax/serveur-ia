@@ -1,5 +1,7 @@
 :root {
-  font-family: "DM Sans", sans-serif;
+  --font-ui: "Segoe UI", system-ui, sans-serif;
+  --font-mono: Consolas, monospace;
+  font-family: var(--font-ui);
   color: #17191f;
   background: #f5f5f2;
   font-synthesis: none;
@@ -88,12 +90,6 @@ h2,
 h3,
 p {
   margin-top: 0;
-}
-h1,
-h2,
-h3,
-.logo {
-  font-family: "Manrope", sans-serif;
 }
 button {
   cursor: pointer;
@@ -1059,7 +1055,6 @@ a:focus-visible {
 }
 .kpi-card strong {
   display: block;
-  font-family: "Manrope";
   font-size: 27px;
   line-height: 1.2;
   margin: 4px 0;
@@ -1705,7 +1700,6 @@ a:focus-visible {
   text-align: center;
 }
 .empty-state strong {
-  font-family: "Manrope";
   font-size: 18px;
   color: #363941;
 }
@@ -1916,7 +1910,6 @@ a:focus-visible {
   width: 48px;
   height: 48px;
   border-radius: 13px;
-  font-family: "Manrope";
   font-weight: 800;
   font-size: 12px;
   flex: none;

@@ -35,6 +35,16 @@ sur les écrans web de Conversations, reprendre les fichiers sous `client-qwen`
 dans `sources-conversations-4.0.9.zip`. Les données et le portail Projets
 gardent leur procédure de reprise décrite ci-dessous.
 
+### Typographie du portail
+
+Le 18 novembre à 13 h 22, Segoe UI a été rétablie sur le portail chargé par
+Kiara 4.0.10, avec la police système en secours. La recette a vérifié Projets,
+Notes, Mails et Réunions dans Chrome et WebView2 en 720p, 1080p et 1440p.
+Les 238 tests ciblés du portail passent. La publication des ressources a
+conservé le processus Qwen et le catalogue de 11 projets. Le rapport de
+production et l’index précédent se trouvent sous
+`D:\KRecette\typographie-serveur-ia`.
+
 ## Livraison Windows et web du 18 novembre 2026
 
 **Kiara 4.0.9** a été activée à 11 h 43, heure de Paris. Le canal classique
