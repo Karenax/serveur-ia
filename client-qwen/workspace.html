@@ -39,6 +39,9 @@ const wsSettings=wsElement('section',undefined,'settings-view');wsSettings.datas
 const wsSettingsNav=wsElement('nav',undefined,'ws-toolbar');wsSettingsNav.setAttribute('aria-label','Réglages du client');wsSettings.append(wsElement('h2','Réglages'),wsSettingsNav);
 const wsSettingsSections=[...platformCapabilities.settings];
 for(const name of platformCapabilities.settings){const b=document.querySelector('[data-view-button="'+name+'"]');b.className='secondary';wsSettingsNav.append(b);const pane=document.querySelector('[data-view="'+name+'"]');pane.style.padding='0';pane.style.overflow='visible';wsSettings.append(pane);}
+if(platformCapabilities.platform==='web'){
+  for(const name of ['connection','updates','api'])document.querySelector(`[data-view-button="${name}"]`)?.remove();
+}
 document.querySelector('.workspace').append(wsSettings);
 const wsSettingsButton=wsElement('button','Réglages','nav-button');wsSettingsButton.dataset.viewButton='settings';document.querySelector('#client-navigation').append(wsSettingsButton);
 const wsShowViewOnce=showView;showView=function(name){const selected=name==='settings'?'access':name;wsShowViewOnce(selected);wsSettings.hidden=!wsSettingsSections.includes(selected);wsSettingsButton.classList.toggle('active',!wsSettings.hidden);if(!wsSettings.hidden)$('workspace-heading').textContent='Réglages · '+({access:'Mon accès',connection:'Connexion',updates:'Mises à jour',api:'API locale',assistant:'Mémoire et rappels'})[selected];};

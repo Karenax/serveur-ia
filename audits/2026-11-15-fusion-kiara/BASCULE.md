@@ -1,5 +1,40 @@
 # Bascule de Kiara et retour arrière
 
+## Correctif d’interface 4.0.10
+
+La comparaison de la 4.0.9 avec la 4.0.8 a porté sur Conversations, Vocal,
+le Correcteur, l’historique et l’Assistant de projet. Les contrôles du
+portail privé ont utilisé le rendu du serveur avec des données fictives.
+
+| Priorité | Régression constatée | Correction |
+| --- | --- | --- |
+| P1 | Vocal et Correcteur étaient dans les options de rédaction. Le seul micro visible démarrait la dictée. | Boutons Vocal et Correcteur dans le composeur Windows. Le clavier ouvre Vocal et place le focus sur son titre. |
+| P1 | En 720p, les ondes repoussaient le bouton de démarrage du vocal sous la partie visible. | La visualisation s’ajuste à la hauteur disponible pour garder le bouton de démarrage visible. |
+| P1 | Les commandes de reprise d’historique et d’enregistrement d’un échange projet dépendaient d’un menu fermé. | Les actions de reprise et le statut d’enregistrement restent visibles lorsque l’intervention est nécessaire. Le rattachement des sources se fait depuis l’Assistant de projet. |
+| P1 | Après une réflexion sans réponse finale, le menu extérieur masquait l’action proposée. | « Réessayer sans réflexion » s’affiche lors de l’erreur si le modèle permet ce réglage. |
+| P1 | Le web privé présentait des commandes microphone et des rubriques d’appareil sans relais local. | Vocal explique où ouvrir le client Windows. Les entrées Connexion au serveur, Mises à jour et API locale sont retirées de la navigation du navigateur. |
+| P2 | Le modèle, la réflexion, les sources et les choix de session projet avaient perdu leur accès direct. Le bouton Historique occupait toute une ligne de la barre. | Le modèle, la réflexion, les sources disponibles, l’historique de projet et le mode éphémère sont accessibles dans leurs vues. Historique et Nouvelle conversation partagent la barre, avec retour du focus au clavier. |
+
+La recette a ouvert Conversations et Vocal dans WebView2 en 1280 × 720,
+1920 × 1080 et 2560 × 1440. Aux mêmes tailles, le rendu du web privé a passé
+le parcours Historique au clavier et l’ouverture de l’aide Vocal. Les suites
+du client Windows et de la passerelle web ont donné 309 et 5 réussites.
+Les scénarios vocaux Low et Max utilisent une reconnaissance et un son
+simulés. L’essai sur microphone physique reste à faire.
+
+La **4.0.10** a été activée le 18 novembre à 12 h 15, heure de Paris. Le
+téléchargement de production correspond au manifeste Ed25519 du canal et au
+SHA-256 `c734c954382430787ddd7e65d58fc14f3a5f8ffc96a4812895f7ff7fde52b362`.
+Les entrées `/kiara/` et `/agent/` répondent en HTTPS. Les 11 projets sont
+présents et Qwen a gardé son processus pendant la bascule.
+
+Les preuves de recette et de bascule sont sous
+`D:\KRecette\correctif-interface-4.0.10`. Le script `publier.ps1 -Retour`
+rétablit le canal Windows 4.0.9 en conservant Qwen chargé. Pour revenir aussi
+sur les écrans web de Conversations, reprendre les fichiers sous `client-qwen`
+dans `sources-conversations-4.0.9.zip`. Les données et le portail Projets
+gardent leur procédure de reprise décrite ci-dessous.
+
 ## Livraison Windows et web du 18 novembre 2026
 
 **Kiara 4.0.9** a été activée à 11 h 43, heure de Paris. Le canal classique

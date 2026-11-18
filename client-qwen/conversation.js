@@ -2,6 +2,17 @@
 (()=>{
   const android=!!window.AndroidClient,linux=config.platform==='linux';
   const row=document.querySelector('.send-row'),prompt=$('prompt');if(!row||!prompt)return;
+  const navigation=wsElement('button','Vocal','nav-button');navigation.dataset.viewButton='voice';
+  navigation.type='button';
+  uiNavTitles.voice='Vocal';uiPaths.voice='M9 5a3 3 0 0 1 6 0v7a3 3 0 0 1-6 0V5m-3 6v1a6 6 0 0 0 12 0v-1M12 18v4m-4 0h8';
+  if(platformCapabilities.platform==='web'){
+    const help=wsElement('section',undefined,'settings-view');help.dataset.view='voice';help.hidden=true;
+    help.append(wsElement('h2','Vocal'),wsElement('p','Pour dicter ou parler avec Kiara, ouvrez l’application Kiara sur Windows.'));
+    document.querySelector('.workspace').append(help);
+    document.querySelector('[data-view-button="chat"]').after(navigation);
+    navigation.onclick=()=>showView('voice');
+    return;
+  }
   // The written composer remains the submission transport, with dictation in chat.
   const page=wsElement('section',undefined,'voice-view');page.dataset.view='voice';page.hidden=true;
   page.setAttribute('aria-labelledby','voice-title');
@@ -22,14 +33,12 @@
       <p id="voice-preferences-status" role="status"></p><button id="voice-preferences-retry" type="button" class="secondary" hidden>Réessayer l’enregistrement</button>
     </aside></div>`;
   document.querySelector('.workspace').append(page);
-  const navigation=wsElement('button','Vocal','nav-button');navigation.dataset.viewButton='voice';
-  navigation.type='button';
   if(platformCapabilities.platform==='windows'){
     navigation.className='secondary voice-button';
-    (document.getElementById('composerOptionsMenu')||document.querySelector('.composer-bottom')).append(navigation);
+    navigation.title='Ouvrir le mode vocal';
+    $('send').before(navigation);
   }else document.querySelector('[data-view-button="chat"]').after(navigation);
-  uiNavTitles.voice='Vocal';uiPaths.voice='M9 5a3 3 0 0 1 6 0v7a3 3 0 0 1-6 0V5m-3 6v1a6 6 0 0 0 12 0v-1M12 18v4m-4 0h8';
-  navigation.onclick=()=>showView('voice');
+  navigation.onclick=()=>{showView('voice');if(!page.hidden){$('voice-title').tabIndex=-1;$('voice-title').focus();}};
   const ongoing=wsElement('button','Vocal en cours','secondary');ongoing.id='voice-ongoing';ongoing.type='button';ongoing.hidden=true;
   ongoing.onclick=()=>{showView('voice');$('voice-title').tabIndex=-1;$('voice-title').focus();};document.querySelector('.workspace-top').append(ongoing);
   const showPreviousView=showView;showView=function(name){if(name==='voice'&&isCorrection(library.find(c=>c.id===currentId))){if(conversationLocked()){error('Terminez la correction avant d’ouvrir le vocal.');return;}showPreviousView('chat');}showPreviousView(name);if(!page.hidden){$('workspace-heading').textContent='Vocal';if(!android&&!maxInfo&&!maxChecking)refreshMax();}else if(settingsDialog.open)settingsDialog.close();drawVoice();};

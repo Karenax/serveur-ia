@@ -29,9 +29,11 @@
   optionsSummary.title = "Options de l'assistant de projet";
   const optionsBody = wsElement('div', undefined, 'menu-body');
   options.append(optionsSummary, optionsBody);
-  optionsBody.append(label('Éphémère ', temporary), label('Historique de projet ', saved),
-    label('Inclure les sources à confirmer ', includeEvidence), prepareProject, retrySave, saveCopy, reopenSaved);
-  controls.append(label('Projet ', project), newThread, options, status);
+  optionsBody.append(label('Inclure les sources à confirmer ', includeEvidence));
+  const recovery = wsElement('div', undefined, 'project-conversation-recovery');
+  recovery.append(prepareProject, retrySave, saveCopy, reopenSaved);
+  controls.append(label('Projet ', project), newThread, label('Éphémère ', temporary),
+    label('Historique de projet ', saved), options, status, recovery);
   toolbar.append(toggle);
   workspace.prepend(toolbar);
   toolbar.after(controls);
@@ -174,6 +176,7 @@
     $('send').hidden = pending;
     prepareProject.hidden = !project.value.startsWith('erp:');
     prepareProject.disabled = pending || thread.unsaved;
+    recovery.hidden = prepareProject.hidden && retrySave.hidden && saveCopy.hidden && reopenSaved.hidden;
     $('send').disabled = pending || thread.unsaved || project.selectedIndex < 0 || !prepareProject.hidden;
     $('cancel').hidden = !controller;
     $('cancel').disabled = !controller;

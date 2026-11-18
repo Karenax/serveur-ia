@@ -2,19 +2,20 @@
 
 Mise à jour du 18 novembre 2026.
 
-**Kiara 4.0.9** est en production pour **Windows et le web privé** depuis le
-18 novembre 2026 à 11 h 43 (heure de Paris).
+**Kiara 4.0.10** est en production pour **Windows et le web privé**. Le
+correctif du 18 novembre rétablit l’accès direct au Vocal, au Correcteur et
+aux commandes de conversation et de récupération. [Audit du correctif](audits/2026-11-15-fusion-kiara/BASCULE.md#correctif-dinterface-4010)
 Le lanceur Kiara supervise le service Projets et son catalogue de 11 projets.
 Conversations réunit le composeur, l’historique et l’assistant de projet, avec
 les brouillons et le mode éphémère. Projets propose la fiche à quatre rubriques
 dans le style Kiara. Le superviseur autonome a été retiré du dépôt.
 
 Le canal Windows utilise un manifeste Ed25519 et un installateur sans
-Authenticode. La **4.0.8** est conservée pour le retour. La **3.5.63** reste la
+Authenticode. La **4.0.9** est conservée pour le retour. La **3.5.63** reste la
 référence du canal classique. Les paquets Linux et Android ont leur propre
 qualification et suivent un calendrier distinct.
 
-La livraison ajoute **Notes** à l’accueil et à la navigation, avec un carnet
+La livraison 4.0.9 a ajouté **Notes** à l’accueil et à la navigation, avec un carnet
 personnel, les notes des projets actifs et le collage direct d’images. Elle
 regroupe aussi les corrections récentes du portail, des réunions et des
 sauvegardes. Le catalogue de 11 projets et les deux entrées HTTPS ont été vérifiés

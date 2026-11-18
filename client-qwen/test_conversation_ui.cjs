@@ -176,8 +176,9 @@ async function main(){
       await page.evaluate(sel=>{
         const target=document.querySelector(sel);
         if(!target)return;
+        const toggledMenu=target.closest('summary')?.parentElement;
         for(let menu=target.closest('details');menu;menu=menu.parentElement?.closest('details')){
-          if(!menu.open)menu.open=true;
+          if(menu!==toggledMenu&&!menu.open)menu.open=true;
         }
       },selector);
     }
@@ -187,6 +188,17 @@ async function main(){
       return page.locator(selector)[name](...args);
     };
     await page.goto('http://127.0.0.1:'+server.address().port);await page.waitForFunction(()=>!document.getElementById('conversation-start')?.disabled);
+    if(!android&&!linux&&!baseline){
+      const vocal=page.getByRole('button',{name:'Vocal',exact:true});
+      for(const control of [vocal,page.getByRole('button',{name:/^(Dicter|Installer la dictée)$/}),page.getByRole('button',{name:'Correcteur',exact:true}),page.getByLabel('Modèle de cette conversation'),page.locator('#thinking'),page.locator('#history-status')]){
+        await control.waitFor({state:'visible'});
+        assert.equal(await control.evaluate(el=>!!el.closest('details:not([open])')),false);
+      }
+      await vocal.press('Enter');
+      assert.equal(await page.evaluate(()=>document.activeElement.id),'voice-title');
+      await page.getByRole('button',{name:'Conversations',exact:true}).click();
+      await vocal.waitFor({state:'visible'});
+    }
     if(linux&&process.argv.includes('--capture-test'))return await require('./linux_capture_checks.cjs')({page,state,errors,until,voiceUI});
     if(!linux&&!android&&process.argv.includes('--capture-test'))return await require('./windows_capture_checks.cjs')({page,state,errors,until,voiceUI});
     if(linux)return await require('./linux_voice_checks.cjs')({page,state,errors,until,sleep,voiceUI});

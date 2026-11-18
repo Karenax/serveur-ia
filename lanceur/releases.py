@@ -46,7 +46,7 @@ def manifest(home=HOME):
     write_json(source.parent/'release.json',result)
     return result
 
-DESKTOP_INSTALLER_VERSION = '4.0.9'
+DESKTOP_INSTALLER_VERSION = '4.0.10'
 DESKTOP_INSTALLER = f'Kiara_{DESKTOP_INSTALLER_VERSION}_x64-setup.exe'
 
 

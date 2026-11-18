@@ -71,7 +71,10 @@ if(platformCapabilities.platform!=='android'){
       if (event.key === 'Escape' && history.open) { event.preventDefault(); event.stopPropagation(); history.open = false; summary.focus(); }
     });
     history.addEventListener('click', event => {
-      if (event.target.closest('.conversation-item')) history.open = false;
+      if (event.target.closest('.conversation-item')) {
+        history.open = false;
+        summary.focus();
+      }
     });
     document.addEventListener('click', event => { if (!history.contains(event.target)) history.open = false; });
     toolbar.append($('new'), history);
@@ -247,16 +250,11 @@ function uiApplyPreferences(values){
 uiThemeSelect.addEventListener('change',()=>uiPersistPreferences().catch(e=>error(e)));
 $('ui-sidebar-toggle').addEventListener('click',()=>uiPersistPreferences().catch(e=>error(e)));
 
-const uiSendRow=document.querySelector('.send-row');
-// Les réglages secondaires du composeur vivent dans un unique menu discret :
-// ne restent en façade que la pièce jointe, le menu, la dictée et l'envoi.
 const uiComposerMenu=$('composerOptionsMenu')||document.querySelector('.composer-options-body');
 uiComposerMenu.prepend(pickers);
 const uiDocumentControls=wsElement('div',undefined,'ws-pickers');uiDocumentControls.id='ui-document-controls';uiDocumentControls.hidden=true;uiDocumentControls.append($('ws-chat-document').parentElement,$('ws-publish'),$('ws-panel'));document.querySelector('.composer').insertBefore(uiDocumentControls,document.querySelector('.composer-bottom'));
 const uiChatSelections=wsChatSelections;wsChatSelections=function(){uiChatSelections();uiDocumentControls.hidden=!wsCurrent()?.project_id;};wsChatSelections();
-// La réflexion figure déjà dans le menu d'options du composeur (chat.html).
-
-const uiSourceButton=wsElement('button','Sources','context-details');uiSourceButton.type='button';uiSourceButton.hidden=true;pickers.append(uiSourceButton);const uiOriginalSources=workspaceShowSources;workspaceShowSources=function(sources){ws.lastSources=sources;uiSourceButton.hidden=!sources.length;uiSourceButton.textContent='Sources · '+sources.length;};uiSourceButton.onclick=()=>uiOriginalSources(ws.lastSources||[]);
+const uiSourceButton=wsElement('button','Sources','context-details');uiSourceButton.type='button';uiSourceButton.hidden=true;document.querySelector('.composer-bottom').append(uiSourceButton);const uiOriginalSources=workspaceShowSources;workspaceShowSources=function(sources){ws.lastSources=sources;uiSourceButton.hidden=!sources.length;uiSourceButton.textContent='Sources · '+sources.length;};uiSourceButton.onclick=()=>uiOriginalSources(ws.lastSources||[]);
 let uiConversation=null;
 const uiRender=render;render=function(){uiComposerSync();uiRender();document.querySelector('.chat-view').classList.toggle('is-empty',!messages.length);if(uiConversation!==currentId){uiSourceButton.hidden=true;$('ws-side').hidden=true;uiConversation=currentId;}uiDecorateNavigation();};
 const uiDrawLibrary=drawLibrary;drawLibrary=function(){uiComposerSync();uiDrawLibrary();document.querySelector('.chat-view').classList.toggle('is-empty',!messages.length);};

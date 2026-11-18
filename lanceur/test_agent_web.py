@@ -179,7 +179,7 @@ class AgentWebTests(unittest.TestCase):
         value['history'] = {'currentId': 'd' * 32, 'conversations': [
             {'id': 'd' * 32, 'title': 'Recette', 'messages': []}]}
         body = json.dumps(value)
-        self.assertEqual(self.request('POST', history, body, Cookie=cookie)[0], 403)
+        self.assertEqual(self.request('POST', history, Cookie=cookie)[0], 403)
         headers = {'Cookie': cookie, 'Origin': 'https://agent.example.test',
                    'Content-Type': 'application/json'}
         self.assertEqual(self.request('POST', history, body, **headers)[0], 200)

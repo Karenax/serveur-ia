@@ -1,5 +1,6 @@
 /* Dictation only. Sending text remains the composer's explicit action. */
 (()=>{
+  if(platformCapabilities.platform==='web')return;
   const prompt=document.getElementById('prompt'),row=document.querySelector('.send-row');
   if(!prompt||!row)return;
   const button=document.createElement('button');button.id='voice-start';button.type='button';button.className='secondary voice-button icon-voice-button';button.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path></svg>';button.setAttribute('aria-label','Dicter');button.title='Dictée locale en français';

@@ -24,7 +24,6 @@ async function checkWindowsOriginal(page){
  assert.equal(fs.readFileSync(await download.path(),'utf8'),'Original fictif');
  await source.getByRole('button',{name:'Fermer',exact:true}).click();
  assert.equal(page.url(),url);
- await page.locator('.project-conversation-options').evaluate(d=>{if(!d.open)d.open=true;});
  assert(await page.getByRole('checkbox',{name:'Éphémère'}).isChecked());
 }
 async function check(browser,platform){
@@ -152,7 +151,16 @@ async function check(browser,platform){
       if(process.env.UI_PROOF_DIRECTORY)fs.mkdirSync(process.env.UI_PROOF_DIRECTORY,{recursive:true});
       for(const [width,height] of [[1280,720],[1920,1080],[2560,1440]]){
         await page.setViewportSize({width,height});
+        await page.getByLabel('Modèle de cette conversation').waitFor({state:'visible'});
+        const vocal=page.getByRole('button',{name:'Vocal',exact:true});
+        await vocal.click({trial:true});
         if(process.env.UI_PROOF_DIRECTORY)await page.screenshot({path:path.join(process.env.UI_PROOF_DIRECTORY,`webview2-${width}x${height}.png`)});
+        await vocal.press('Enter');
+        assert.equal(await page.evaluate(()=>document.activeElement.id),'voice-title');
+        const start=await page.locator('#conversation-start').boundingBox();
+        assert(start && start.y>=0 && start.y+start.height<=height,'Vocal must start without scrolling');
+        if(process.env.UI_PROOF_DIRECTORY)await page.screenshot({path:path.join(process.env.UI_PROOF_DIRECTORY,`vocal-webview2-${width}x${height}.png`)});
+        await page.getByRole('button',{name:'Conversations',exact:true}).click();
       }
     }
     await page.getByRole('button',{name:'Assistant de projet',exact:true}).click();
@@ -229,7 +237,7 @@ async function check(browser,platform){
   await openMenu(page,'#ui-composer-options-menu');
   await page.evaluate(async()=>{const old=historyRevision;historyRevision='stale';try{await flushHistory();}catch{}});
   assert.equal(await page.evaluate(()=>historyBlocked),true);assert.equal(await page.locator('#history-conflict-merge').isVisible(),true);assert.equal(await page.locator('#send').isDisabled(),true);
-  await page.locator('#history-conflict-merge').evaluate(el=>el.click());await ready();
+  await page.getByRole('button',{name:'Fusionner et reprendre l’historique'}).click();await ready();
   assert.equal(await page.evaluate(()=>historyBlocked),false);assert.equal(await page.locator('#history-conflict-merge').isVisible(),false);assert.equal(await page.locator('#send').isDisabled(),false);
   await page.locator('[data-view-button="projects"]').click();await page.locator('#ws-project-list button').click();await page.locator('[data-project-tab="instructions"]').click();await page.locator('#ws-project-instructions').fill('Consigne à enregistrer');
   warned=false;page.once('dialog',async d=>{warned=d.type()==='beforeunload';await d.dismiss();});await page.reload({timeout:1500}).catch(()=>{});assert(warned,'Unsaved instructions must warn');
@@ -310,7 +318,6 @@ async function check(browser,platform){
    await page.evaluate(async()=>{showView('chat');await wsRefresh();});
    await page.locator('#prompt').fill('Brouillon personnel à préserver');await draftSaved();
    await page.getByRole('button',{name:'Assistant de projet',exact:true}).click();
-   await openMenu(page,'.project-conversation-options');
    const projects=page.getByRole('combobox',{name:'Projet',exact:true});
    await projects.selectOption('erp:projet-a-relier');
    assert.equal(state.projectLinks,0);
@@ -322,7 +329,6 @@ async function check(browser,platform){
    assert.equal(await page.locator('#prompt').inputValue(),'Brouillon du projet à relier');
    await projects.selectOption('brain-autonome');
    await page.getByRole('combobox',{name:'Projet',exact:true}).selectOption('brain-recette');
-   await openMenu(page,'.project-conversation-options');
    assert(await page.getByRole('checkbox',{name:'Éphémère'}).isChecked());
    await openMenu(page,'.project-conversation-options');
    await page.getByRole('checkbox',{name:'Inclure les sources à confirmer'}).uncheck();
@@ -347,10 +353,8 @@ async function check(browser,platform){
    assert(!JSON.stringify(state.preferences).includes('Ne pas conserver'));
    assert(!JSON.stringify(state.history).includes('Ne pas conserver'));
    await page.getByRole('button',{name:'Assistant de projet',exact:true}).click();
-   await openMenu(page,'.project-conversation-options');
    await page.getByRole('combobox',{name:'Historique de projet'}).selectOption('historical');
    await page.getByText('Première réponse',{exact:true}).waitFor();
-   await openMenu(page,'.project-conversation-options');
    assert.equal(await page.getByRole('checkbox',{name:'Éphémère'}).isChecked(),false);
    await page.locator('#prompt').fill('Suite du fil enregistré');
    await page.locator('#composer').evaluate(form=>form.requestSubmit());
@@ -364,7 +368,6 @@ async function check(browser,platform){
    await page.getByText('Révision modifiée par un autre poste.',{exact:true}).waitFor();
    assert.equal(state.projectWrites,1);
    page.once('dialog',dialog=>dialog.accept());
-   await openMenu(page,'.project-conversation-options');
    await page.getByRole('button',{name:'Relire la version enregistrée'}).click();
    await page.waitForFunction(()=>!document.querySelector('.project-conversation-switch button').disabled);
    assert.equal(await page.getByText('Suite en conflit',{exact:true}).count(),0);
