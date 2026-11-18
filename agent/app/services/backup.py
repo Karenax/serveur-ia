@@ -63,6 +63,8 @@ def verify_backup(source):
             if db.execute('PRAGMA integrity_check').fetchone()[0] != 'ok' or db.execute('PRAGMA foreign_key_check').fetchone():
                 raise ValueError('Base sauvegardée invalide')
     client_directory_backup.validate(manifest, source / 'erp/minipilot.db')
+    from .personal_note_backup import validate as validate_personal_notes
+    validate_personal_notes(source / 'erp/minipilot.db')
     return {'status': 'verified', 'files': len(manifest['files']),
             'verified_at': datetime.now(timezone.utc).isoformat()}
 
@@ -82,6 +84,8 @@ def create_backup(output: Path, brain_db: Path, erp_home: Path, storage: Path, *
     # Qualify committed note history and all managed originals before output.
     # The SQLite snapshot below is qualified again to detect intervening edits.
     collect_note_files(erp_home / 'minipilot.db', erp_home)
+    from .personal_note_backup import validate as validate_personal_notes
+    validate_personal_notes(erp_home / 'minipilot.db')
     from .storage_capacity import require_capacity
     estimate = brain_db.stat().st_size
     for directory in (erp_home, storage):
@@ -95,6 +99,7 @@ def create_backup(output: Path, brain_db: Path, erp_home: Path, storage: Path, *
     output.mkdir(parents=True)
     backup_sqlite(brain_db, output / "brain" / "project_brain.db")
     backup_sqlite(erp_home / "minipilot.db", output / "erp" / "minipilot.db")
+    validate_personal_notes(output / 'erp/minipilot.db')
     from .meeting_session_backup import collect as collect_sessions, validate as validate_sessions
     session_files = collect_sessions(output / 'brain/project_brain.db', storage)
     from .document_backup import validate_document_history
@@ -184,6 +189,8 @@ def restore_backup(source: Path, output: Path):
             if db.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
                 raise ValueError("Base de sauvegarde invalide")
     client_directory_backup.validate(manifest, source / 'erp/minipilot.db')
+    from .personal_note_backup import validate as validate_personal_notes
+    validate_personal_notes(source / 'erp/minipilot.db')
     from .note_backup import validate_files as validate_note_files, freeze_restored_commands
     validate_note_files(source / 'erp/minipilot.db', source, manifest)
     from .meeting_session_backup import validate as validate_sessions, relocate as relocate_sessions

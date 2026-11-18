@@ -10,9 +10,9 @@ from ..services import project_notes as service
 router = APIRouter(prefix='/api/v1/projects/{project_id}/notes', tags=['project-notes'])
 
 
-def _command(db, action, *args):
+def _command(db, action, *args, **kwargs):
     try:
-        result = action(db, *args)
+        result = action(db, *args, **kwargs)
         db.commit()
         return result
     except IntegrityError as exc:

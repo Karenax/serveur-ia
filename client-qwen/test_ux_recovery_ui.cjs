@@ -6,7 +6,9 @@ const read=name=>fs.readFileSync(path.join(__dirname,name),'utf8');
 const script=name=>'<script nonce="ux">'+read(name).replaceAll('</script','<\\/script')+'</script>';
 const windows=read('chat.html').replace('__UI_CSS__',read('ui.css')).replace('</head>',()=>script('vendor/markdown-it.min.js')+script('markdown.js')+'</head>').replace('</body>',()=>read('workspace.html')+['ui.js','attachments.js','corrector.js','selection.js','thinking.js','voice.js','conversation.js','project-conversation.js'].map(script).join('')+'</body>');
 const windowsShell=process.env.KIARA_UX_WINDOWS_EXE;
-const windowsOnly=Boolean(windowsShell)||process.argv.includes('--windows-only');
+const desktopAudit=process.argv.includes('--desktop-audit');
+const linuxOnly=process.argv.includes('--linux-only');
+const windowsOnly=Boolean(windowsShell)||process.argv.includes('--windows-only')||linuxOnly;
 const python=process.env.PYTHON_EXE||path.join(__dirname,'../toolchain/eg2-python/Scripts/python.exe');
 const android=windowsOnly?null:execFileSync(python,['-c',"import importlib.util,sys; from pathlib import Path; s=importlib.util.spec_from_file_location('assets',sys.argv[1]); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); print(m.prepare(Path(sys.argv[2])),end='')",path.join(__dirname,'../client-android/scripts/Prepare-Assets.py'),__dirname],{encoding:'utf8',maxBuffer:6e6,env:{...process.env,PYTHONIOENCODING:'utf-8'}});
 async function checkWindowsOriginal(page){
@@ -22,11 +24,15 @@ async function checkWindowsOriginal(page){
  assert.equal(fs.readFileSync(await download.path(),'utf8'),'Original fictif');
  await source.getByRole('button',{name:'Fermer',exact:true}).click();
  assert.equal(page.url(),url);
+ await page.locator('.project-conversation-options').evaluate(d=>{if(!d.open)d.open=true;});
  assert(await page.getByRole('checkbox',{name:'Éphémère'}).isChecked());
 }
 async function check(browser,platform){
- const config={key:'synthetic-ux',storage:'ux-'+platform,model:'model-ux',version:'fixture',...(platform==='android'?{platform}:{})};
- const html=(platform==='android'?android:windows).replace('__CONFIG__',JSON.stringify(config)).replaceAll('__NONCE__','ux');
+ const config={key:'synthetic-ux',storage:'ux-'+platform,model:'model-ux',version:'fixture',...(['android','linux'].includes(platform)?{platform}:{})};
+ const base=platform==='linux'?windows.replace('</body>',()=>script('linux_features.js')+'</body>'):(platform==='android'?android:windows);
+ const html=base.replace('__CONFIG__',JSON.stringify(config)).replaceAll('__NONCE__','ux');
+ // Ouvre un menu discret (détails) avant d'interagir avec un contrôle qu'il contient.
+ const openMenu=(target,selector)=>target.locator(selector).evaluate(d=>{if(!d.open)d.open=true;});
  const project={id:'a'.repeat(32),title:'Projet fictif UX',instructions:'',revision:1,documents:[],memories:[],conversations:[]};
  const managed={id:'11111111-2222-3333-4444-555555555555',title:'Projet Agent fictif',code:'ERP-42',instructions:'',can_edit:true,documents:[],memories:[],conversations:[]};
  const state={history:null,revision:'1',preferences:{},failPreferences:false,failDelete:false};
@@ -124,6 +130,7 @@ async function check(browser,platform){
   await new Promise(resolve=>probe.close(resolve));
   state.managed='ready';
   state.projectConversation=true;
+  if(desktopAudit)state.modernNavigation=true;
   const shell=spawn(windowsShell,['--local-url','http://127.0.0.1:'+server.address().port+'/chat','--hidden'],{
    env:{...process.env,WEBVIEW2_USER_DATA_FOLDER:profile,WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS:'--remote-debugging-port='+debugPort},windowsHide:true
   });
@@ -139,8 +146,18 @@ async function check(browser,platform){
     const context=webview.contexts()[0];
     context.setDefaultTimeout(10000);
     const page=context.pages()[0]||await context.waitForEvent('page',{timeout:5000});
+    if(desktopAudit){
+      await page.waitForFunction(()=>document.body.dataset.kiaraUnifiedNavigation==='true');
+      assert.deepEqual(await page.locator('#client-navigation .nav-button:visible').allTextContents(),['Conversations','Projets','Notes','Mails','Réunions','Activité']);
+      if(process.env.UI_PROOF_DIRECTORY)fs.mkdirSync(process.env.UI_PROOF_DIRECTORY,{recursive:true});
+      for(const [width,height] of [[1280,720],[1920,1080],[2560,1440]]){
+        await page.setViewportSize({width,height});
+        if(process.env.UI_PROOF_DIRECTORY)await page.screenshot({path:path.join(process.env.UI_PROOF_DIRECTORY,`webview2-${width}x${height}.png`)});
+      }
+    }
     await page.getByRole('button',{name:'Assistant de projet',exact:true}).click();
     await page.getByRole('combobox',{name:'Projet',exact:true}).selectOption('brain-recette');
+    await openMenu(page,'.project-conversation-options');
     await page.getByRole('checkbox',{name:'Inclure les sources à confirmer'}).uncheck();
     await page.locator('#prompt').fill('Contrôle du document original');
     await page.locator('#composer').evaluate(form=>form.requestSubmit());
@@ -168,9 +185,10 @@ async function check(browser,platform){
   await page.goto('http://127.0.0.1:'+server.address().port);await ready();
   assert.match(await page.evaluate(()=>clientRequestId()),/^v2_[a-f0-9]{32}$/);
   await page.evaluate(()=>commandNonceVersion=1);assert.match(await page.evaluate(()=>clientRequestId()),/^[a-f0-9]{32}$/);await page.evaluate(()=>commandNonceVersion=2);
-  assert.deepEqual(await page.evaluate(()=>[...document.querySelectorAll('#client-navigation .nav-button')].map(b=>b.dataset.viewButton)),platform==='windows'?['chat','projects','notifications']:['chat','voice','projects','corrector','assistant','notifications']);
-  if(platform==='windows'){
+  assert.deepEqual(await page.evaluate(()=>[...document.querySelectorAll('#client-navigation .nav-button')].map(b=>b.dataset.viewButton)),platform!=='android'?['chat','projects','notifications']:['chat','voice','projects','corrector','assistant','notifications']);
+  if(platform!=='android'){
    for(const view of ['voice','corrector']){
+    await openMenu(page,'#ui-composer-options-menu');
     await page.locator('#composer [data-view-button="'+view+'"]').click();
     await page.locator('[data-view="'+view+'"]:not([hidden])').waitFor();
     await sidebar();await page.locator('[data-view-button="chat"]').click();
@@ -190,8 +208,10 @@ async function check(browser,platform){
    await page.locator('#prompt').fill('');await draftSaved();
   }
   assert.equal(await page.locator('#ui-document-controls').isVisible(),false);
+  await openMenu(page,'#ui-composer-options-menu');
   await page.locator('#ws-chat-project').selectOption(project.id);await page.waitForFunction(()=>!conversationActionPending&&document.getElementById('ui-document-controls').hidden===false);await ready();
   assert.equal(await page.locator('#ui-document-controls').isVisible(),true);assert.equal(await page.locator('#ws-publish').isVisible(),true);
+  await openMenu(page,'#ui-composer-options-menu');
   await page.locator('#ws-chat-project').selectOption('');await page.waitForFunction(()=>!conversationActionPending&&document.getElementById('ui-document-controls').hidden===true);await ready();
   assert.equal(await page.locator('#ui-document-controls').isVisible(),false);
   const first=await page.evaluate(()=>currentId);await page.locator('#prompt').fill('Brouillon de la conversation A');await draftSaved();
@@ -206,9 +226,10 @@ async function check(browser,platform){
   state.failPreferences=false;await page.locator('#ui-draft-retry').click();await draftSaved();assert(!await page.locator('#ui-draft-retry').isVisible());await page.reload();await ready();assert.equal(await page.locator('#prompt').inputValue(),'Brouillon après une panne');
   await page.locator('#prompt').fill('');await draftSaved();await page.reload();await ready();assert.equal(await page.locator('#prompt').inputValue(),'');assert(!state.preferences.conversation_drafts[second]);
   await page.locator('#prompt').fill('Brouillon à restaurer après annulation');await draftSaved();await page.locator('#ui-conversation-menu summary').click();await page.locator('#delete-conversation').click();await ready();await draftSaved();assert(!state.preferences.conversation_drafts[second]);await page.locator('#undo-delete').click();await ready();assert.equal(await page.locator('#prompt').inputValue(),'Brouillon à restaurer après annulation');await page.locator('#prompt').fill('');await draftSaved();
+  await openMenu(page,'#ui-composer-options-menu');
   await page.evaluate(async()=>{const old=historyRevision;historyRevision='stale';try{await flushHistory();}catch{}});
   assert.equal(await page.evaluate(()=>historyBlocked),true);assert.equal(await page.locator('#history-conflict-merge').isVisible(),true);assert.equal(await page.locator('#send').isDisabled(),true);
-  await page.locator('#history-conflict-merge').click();await ready();
+  await page.locator('#history-conflict-merge').evaluate(el=>el.click());await ready();
   assert.equal(await page.evaluate(()=>historyBlocked),false);assert.equal(await page.locator('#history-conflict-merge').isVisible(),false);assert.equal(await page.locator('#send').isDisabled(),false);
   await page.locator('[data-view-button="projects"]').click();await page.locator('#ws-project-list button').click();await page.locator('[data-project-tab="instructions"]').click();await page.locator('#ws-project-instructions').fill('Consigne à enregistrer');
   warned=false;page.once('dialog',async d=>{warned=d.type()==='beforeunload';await d.dismiss();});await page.reload({timeout:1500}).catch(()=>{});assert(warned,'Unsaved instructions must warn');
@@ -239,6 +260,7 @@ async function check(browser,platform){
    assert.equal(await page.evaluate(()=>window.androidBack()),true);assert.equal(await page.evaluate(()=>document.getElementById('voice-settings-dialog').open),false);
    await page.evaluate(()=>showView('chat'));
   }
+  if(!desktopAudit){
   for(const width of [390,768]){
    await page.setViewportSize({width,height:width===390?844:1024});
    // Let the resize/media-query handler settle before opening the mobile drawer.
@@ -250,7 +272,9 @@ async function check(browser,platform){
   }
   await page.setViewportSize({width:390,height:844});await sidebar();await page.locator('[data-view-button="chat"]').click();await page.waitForTimeout(250);
   const send=await page.locator('#send').boundingBox();assert(send.x>300&&send.x+send.width<=390,'Send remains at the right edge');
+  } else {await page.setViewportSize({width:1280,height:720});await page.evaluate(()=>showView('chat'));}
   state.managed='ready';await page.evaluate(()=>wsRefresh());
+  await openMenu(page,'#ui-composer-options-menu');
   await page.locator('#ws-chat-project').selectOption(managed.id);
   await page.waitForFunction(id=>wsCurrent().project_id===id&&!conversationActionPending,managed.id);
   assert(await page.locator('#ws-publish').isEnabled());
@@ -286,6 +310,7 @@ async function check(browser,platform){
    await page.evaluate(async()=>{showView('chat');await wsRefresh();});
    await page.locator('#prompt').fill('Brouillon personnel à préserver');await draftSaved();
    await page.getByRole('button',{name:'Assistant de projet',exact:true}).click();
+   await openMenu(page,'.project-conversation-options');
    const projects=page.getByRole('combobox',{name:'Projet',exact:true});
    await projects.selectOption('erp:projet-a-relier');
    assert.equal(state.projectLinks,0);
@@ -297,7 +322,9 @@ async function check(browser,platform){
    assert.equal(await page.locator('#prompt').inputValue(),'Brouillon du projet à relier');
    await projects.selectOption('brain-autonome');
    await page.getByRole('combobox',{name:'Projet',exact:true}).selectOption('brain-recette');
+   await openMenu(page,'.project-conversation-options');
    assert(await page.getByRole('checkbox',{name:'Éphémère'}).isChecked());
+   await openMenu(page,'.project-conversation-options');
    await page.getByRole('checkbox',{name:'Inclure les sources à confirmer'}).uncheck();
    await page.locator('#prompt').fill('Ne pas conserver cet échange');
    await page.locator('#composer').evaluate(form=>form.requestSubmit());
@@ -320,8 +347,10 @@ async function check(browser,platform){
    assert(!JSON.stringify(state.preferences).includes('Ne pas conserver'));
    assert(!JSON.stringify(state.history).includes('Ne pas conserver'));
    await page.getByRole('button',{name:'Assistant de projet',exact:true}).click();
+   await openMenu(page,'.project-conversation-options');
    await page.getByRole('combobox',{name:'Historique de projet'}).selectOption('historical');
    await page.getByText('Première réponse',{exact:true}).waitFor();
+   await openMenu(page,'.project-conversation-options');
    assert.equal(await page.getByRole('checkbox',{name:'Éphémère'}).isChecked(),false);
    await page.locator('#prompt').fill('Suite du fil enregistré');
    await page.locator('#composer').evaluate(form=>form.requestSubmit());
@@ -335,6 +364,7 @@ async function check(browser,platform){
    await page.getByText('Révision modifiée par un autre poste.',{exact:true}).waitFor();
    assert.equal(state.projectWrites,1);
    page.once('dialog',dialog=>dialog.accept());
+   await openMenu(page,'.project-conversation-options');
    await page.getByRole('button',{name:'Relire la version enregistrée'}).click();
    await page.waitForFunction(()=>!document.querySelector('.project-conversation-switch button').disabled);
    assert.equal(await page.getByText('Suite en conflit',{exact:true}).count(),0);
@@ -349,12 +379,39 @@ async function check(browser,platform){
    await page.getByRole('button',{name:'Conversations personnelles'}).click();
    assert.equal(await page.locator('#prompt').inputValue(),'Brouillon personnel à préserver');
   }
-  if(platform==='windows'){
+  if(platform==='windows'||platform==='linux'){
    state.modernNavigation=true;
    managed.archived=false;
    await page.evaluate(async()=>{showView('projects');await wsRefresh();});
    assert.equal(await page.locator('#ws-open-portfolio').isVisible(),false);
-   assert.deepEqual(await page.locator('#client-navigation .nav-button:visible').allTextContents(),['Conversations','Projets','Mails','Réunions','Activité']);
+   assert.deepEqual(await page.locator('#client-navigation .nav-button:visible').allTextContents(),['Conversations','Projets','Notes','Mails','Réunions','Activité']);
+   assert.equal(await page.locator('.brand strong').textContent(),'Kiara');
+   const navigationGeometry=await page.locator('#client-navigation [data-view-button="chat"]').evaluate(node=>{
+    const box=node.getBoundingClientRect(),css=getComputedStyle(node);return {x:box.x,width:box.width,height:box.height,font:css.fontSize,padding:css.padding};
+   });
+   const settingsGeometry=await page.locator('.sidebar-settings [data-view-button="settings"]').evaluate(node=>{
+    const box=node.getBoundingClientRect(),css=getComputedStyle(node);return {x:box.x,width:box.width,height:box.height,font:css.fontSize,padding:css.padding};
+   });
+   assert.deepEqual(settingsGeometry,navigationGeometry,'Le bouton Réglages conserve la même géométrie que la navigation.');
+   assert.equal(await page.locator('.conversation-toolbar #new').count(),1);
+   assert.equal(await page.locator('.conversation-history-menu #conversation-list').count(),1);
+   state.managed='unavailable';await page.evaluate(()=>wsRefresh());
+   assert.deepEqual(await page.locator('#client-navigation .nav-button:visible').allTextContents(),['Conversations','Projets','Notes','Mails','Réunions','Activité']);
+   state.managed='ready';await page.evaluate(()=>wsRefresh());
+   if(process.env.UI_PROOF_DIRECTORY){
+    fs.mkdirSync(process.env.UI_PROOF_DIRECTORY,{recursive:true});
+    const previousViewport=page.viewportSize();await page.evaluate(()=>showView('chat'));
+    for(const [width,height] of (desktopAudit?[[1280,720],[1920,1080],[2560,1440]]:[[1440,900],[390,844]])){
+      await page.setViewportSize({width,height});if(width<850)await sidebar();
+      await page.screenshot({path:path.join(process.env.UI_PROOF_DIRECTORY,`${platform}-${width}x${height}.png`)});
+      if(width<850)await page.evaluate(()=>uiCloseSidebar(false));
+    }
+    await page.setViewportSize({width:1280,height:720});
+    await page.locator('.conversation-history-menu > summary').click();
+    await page.screenshot({path:path.join(process.env.UI_PROOF_DIRECTORY,`${platform}-historique.png`)});
+    await page.keyboard.press('Escape');assert.equal(await page.locator('.conversation-history-menu > summary').evaluate(el=>document.activeElement===el),true);
+    await page.setViewportSize(previousViewport);
+   }
    assert.equal(await page.locator('#client-navigation [data-view-button="notifications"]').count(),0);
    await page.locator('.workspace-top [data-view-button="notifications"]').click();
    await page.locator('[data-view="notifications"]:not([hidden])').waitFor();
@@ -375,9 +432,18 @@ async function check(browser,platform){
    assert.equal(state.preferences.conversation_drafts[conversationId],draft);
    await page.goto(chatUrl);await ready();
    assert.equal(await page.locator('#prompt').inputValue(),draft);
+   await page.route('**/app/settings',route=>route.fulfill({body:'Réglages Kiara de recette'}));
+   await sidebar();await page.locator('[data-view-button="settings"]').click();
+   await page.waitForURL('**/app/settings');
+   assert.equal(state.preferences.conversation_drafts[conversationId],draft);
+   await page.goto(new URL('/chat#reglages',chatUrl).href);await ready();
+   await page.locator('[data-view="access"]:not([hidden])').waitFor();
+   await page.goto(chatUrl);await ready();assert.equal(await page.locator('#prompt').inputValue(),draft);
    const overviewPath='/app/projets/'+managed.id+'/vue-ensemble';
    await page.route('**'+overviewPath,route=>route.fulfill({body:'Vue d’ensemble du projet de recette'}));
    await sidebar();
+   await page.evaluate(()=>uiCloseSidebar(false));
+   await page.locator('.conversation-history-menu > summary').click();
    const projectGroup=page.locator('#ws-sidebar-projects details').filter({hasText:managed.title});
    await projectGroup.locator('summary').click();
    await projectGroup.getByRole('button',{name:'Ouvrir le projet',exact:true}).click();
@@ -400,11 +466,13 @@ async function check(browser,platform){
    const projectPicker=page.getByRole('combobox',{name:'Projet',exact:true});
    await projectPicker.waitFor();
    assert.equal(await projectPicker.inputValue(),'brain-recette');
+   await openMenu(page,'.project-conversation-options');
    assert(await page.getByRole('checkbox',{name:'Éphémère'}).isChecked());
    await page.waitForURL(new URL('/chat',chatUrl).href);
    await page.getByRole('button',{name:'Conversations personnelles'}).click();
    assert.equal(await page.locator('#prompt').inputValue(),draft);
    await page.evaluate(()=>workspaceShowSources([{title:'Source de recette',agent_source_id:'source-recette',text:'Passage de recette'}]));
+   await openMenu(page,'#ui-composer-options-menu');
    await page.getByRole('button',{name:'Sources · 1',exact:true}).click();
    await page.locator('#ws-side').getByRole('button',{name:'Voir la source',exact:true}).click();
    const citedSource=page.getByRole('dialog',{name:'Notice de recette'});
@@ -413,7 +481,14 @@ async function check(browser,platform){
    assert.equal(await page.locator('#prompt').inputValue(),draft);
    assert.equal(new URL(page.url()).pathname,'/chat');
   }
-  if(platform==='windows'){
+  if(platform==='windows'||platform==='linux'){
+   // A portal change shares this local preference; an older server value must
+   // not undo it when Conversations is reopened.
+   state.preferences.sidebar_collapsed=true;
+   await page.evaluate(()=>localStorage.setItem('fred-sidebar-collapsed','false'));
+   await page.goto(new URL('/chat',page.url()).href);await ready();
+   assert.equal(await page.evaluate(()=>document.body.classList.contains('sidebar-collapsed')),false);
+   state.preferences.sidebar_collapsed=false;
    await page.goto(new URL('/chat#apparence',page.url()).href);
    const theme=page.getByLabel('Thème de l’interface');
    await theme.waitFor();
@@ -422,7 +497,7 @@ async function check(browser,platform){
    await page.waitForFunction(()=>document.documentElement.dataset.theme==='dark'&&!uiPreferencesPending);
    assert.equal(state.preferences.theme,'dark');
   }
-  assert.deepEqual(errors,[]);console.log(JSON.stringify({platform,passed:true,scenarios:['per-conversation drafts and reload','failed persistence blocks silent reload','cleared draft stays cleared','instructions unload warning','memory edit survives refresh','delete cancel/error/success','named source dialog','drawer focus at 390 and 768','one main landmark','right-aligned send','project history and ephemeral privacy',...(platform==='windows'?['single project entry opens the current portfolio','shared appearance link']:[])]}));
+  assert.deepEqual(errors,[]);console.log(JSON.stringify({platform,passed:true,scenarios:['per-conversation drafts and reload','failed persistence blocks silent reload','cleared draft stays cleared','instructions unload warning','memory edit survives refresh','delete cancel/error/success','named source dialog',...(desktopAudit?['desktop 720p through WQHD']:['drawer focus at 390 and 768','right-aligned send']),'one main landmark','project history and ephemeral privacy',...(platform!=='android'?['single project entry opens the current portfolio','shared appearance link']:[])]}));
  }finally{await context.close();await new Promise(r=>server.close(r));}
 }
-(async()=>{if(windowsShell)return check(null,'windows');const browser=await chromium.launch(options);try{await check(browser,'windows');if(!windowsOnly)await check(browser,'android');}finally{await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1;});
+(async()=>{if(windowsShell)return check(null,'windows');const browser=await chromium.launch(options);try{if(!linuxOnly)await check(browser,'windows');if(linuxOnly)await check(browser,'linux');else if(!windowsOnly)await check(browser,'android');}finally{await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1;});

@@ -123,3 +123,70 @@ it("utilise le callback courant à la fin du traitement après un changement de 
   expect(initial.onSettled).not.toHaveBeenCalled();
   expect(updated.onSettled).toHaveBeenCalledTimes(1);
 });
+
+it("suspend le suivi en quittant Mails et reprend sans appliquer une réponse ancienne", async () => {
+  vi.spyOn(workspaceApi, "latestTriage").mockResolvedValue({job});
+  let resolveOld: (value: DurableTriageJob) => void = () => {};
+  let oldSignal: AbortSignal | undefined;
+  const details = vi.spyOn(workspaceApi, "triageJob").mockImplementationOnce((_id, signal) => {
+    oldSignal = signal;
+    return new Promise(resolve => {resolveOld = resolve;});
+  }).mockResolvedValue({...job, status:"completed", processed:12});
+  const cancel = vi.spyOn(workspaceApi, "cancelTriage");
+  const callbacks = options();
+  const hook = renderHook(({active}) => useDurableMailTriage({...callbacks,active}), {initialProps:{active:true}});
+  await flush();await tick();
+  hook.rerender({active:false});
+  expect(oldSignal?.aborted).toBe(true);
+  await act(async () => {resolveOld({...job, processed:9});await vi.advanceTimersByTimeAsync(10000);});
+  expect(details).toHaveBeenCalledTimes(1);
+  expect(callbacks.onProgress).toHaveBeenLastCalledWith(expect.objectContaining({processed:8}));
+  expect(cancel).not.toHaveBeenCalled();
+  hook.rerender({active:true});await flush();
+  expect(details).toHaveBeenCalledTimes(2);
+  expect(callbacks.onProgress).toHaveBeenLastCalledWith(expect.objectContaining({processed:12,status:"completed"}));
+  expect(callbacks.onSettled).toHaveBeenCalledTimes(1);
+});
+
+it("suspend le suivi quand la fenêtre est masquée et le reprend immédiatement", async () => {
+  const hidden = vi.spyOn(document, 'hidden', 'get').mockReturnValue(false);
+  vi.spyOn(workspaceApi, "latestTriage").mockResolvedValue({job});
+  let oldSignal: AbortSignal | undefined;
+  const details = vi.spyOn(workspaceApi, "triageJob").mockImplementationOnce((_id, signal) => {
+    oldSignal = signal;return new Promise(() => {});
+  }).mockResolvedValue({...job, processed:10});
+  const callbacks = options();
+  renderHook(() => useDurableMailTriage(callbacks));
+  await flush();await tick();
+  hidden.mockReturnValue(true);
+  act(() => document.dispatchEvent(new Event('visibilitychange')));
+  expect(oldSignal?.aborted).toBe(true);
+  await act(async () => {await vi.advanceTimersByTimeAsync(10000);});
+  expect(details).toHaveBeenCalledTimes(1);
+  hidden.mockReturnValue(false);
+  act(() => document.dispatchEvent(new Event('visibilitychange')));
+  await flush();
+  expect(details).toHaveBeenCalledTimes(2);
+  expect(callbacks.onProgress).toHaveBeenLastCalledWith(expect.objectContaining({processed:10}));
+});
+
+it("conserve une commande en cours pendant la navigation et actualise au retour", async () => {
+  const latest = vi.spyOn(workspaceApi, "latestTriage").mockResolvedValue({job:null});
+  let resolveStart: (value: DurableTriageJob) => void = () => {};
+  vi.spyOn(workspaceApi, "startTriage").mockImplementation(() => new Promise(resolve => {resolveStart = resolve;}));
+  const cancel = vi.spyOn(workspaceApi, "cancelTriage");
+  const callbacks = options();
+  const hook = renderHook(({active}) => useDurableMailTriage({...callbacks,active}), {initialProps:{active:true}});
+  await flush();
+  let started: Promise<void> | undefined;
+  act(() => {started=hook.result.current.start(false);});
+  hook.rerender({active:false});
+  const completed={...job,status:"completed" as const,processed:12};
+  await act(async () => {resolveStart(completed);await started;});
+  expect(callbacks.onProgress).toHaveBeenLastCalledWith(expect.objectContaining({processed:12,status:"completed"}));
+  expect(callbacks.onSettled).not.toHaveBeenCalled();
+  expect(cancel).not.toHaveBeenCalled();
+  latest.mockResolvedValue({job:completed});
+  hook.rerender({active:true});await flush();
+  expect(callbacks.onSettled).toHaveBeenCalledTimes(1);
+});

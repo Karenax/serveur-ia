@@ -26,6 +26,7 @@ import threading
 import time
 
 from cryptography.fernet import InvalidToken
+from backup_retention import recover as recover_retention, remove as remove_retained_archive
 from core import read_json, write_json
 from operations import FILES, VERSION, cipher, registered_profile_ids
 from wg_crypto import private_directory, protect
@@ -41,6 +42,36 @@ EXCLUDED = ['Modèles, caches et binaires reconstructibles',
             'Clé Android de signature : récupération séparée',
             'Sessions en cours et état des processus']
 MANAGED_NAME = re.compile(r'^fred-\d{8}-\d{6}-[0-9a-f]{24}\.qwenbackup$')
+
+
+def _project_backup_status(controller):
+    """Read only the standalone Projets backup marker, without disclosing paths."""
+    data = getattr(getattr(controller, 'agent_service', None), 'data', None)
+    if not data:
+        return {'state': 'unavailable'}
+    marker = Path(data) / 'storage' / 'backup-status.json'
+    try:
+        with marker.open('rb') as stream:
+            raw = stream.read(65537)
+        if len(raw) > 65536:
+            raise ValueError('Marqueur trop volumineux')
+        value = json.loads(raw)
+        if not isinstance(value, dict):
+            raise ValueError('Marqueur invalide')
+        result = {'state': 'recorded', 'status': value.get('status') if value.get('status') in ('verified', 'verification_failed') else 'unknown'}
+        for key in ('created_at', 'verified_at'):
+            candidate = value.get(key)
+            if isinstance(candidate, str) and len(candidate) <= 64:
+                try:
+                    dt.datetime.fromisoformat(candidate.replace('Z', '+00:00'))
+                except ValueError:
+                    continue
+                result[key] = candidate
+        return result
+    except FileNotFoundError:
+        return {'state': 'none'}
+    except (OSError, ValueError, TypeError, UnicodeError):
+        return {'state': 'unavailable'}
 
 
 def _iso(timestamp):
@@ -120,9 +151,13 @@ class BackupManager:
             raise ValueError('Catalogue de sauvegardes invalide.')
         if self.data['job'].get('state') == 'running':
             self.data['job'].update(state='failed', phase='interrupted', finished_at=_iso(time.time()),
-                                    message='Sauvegarde interrompue par l’arrêt du serveur ; nouvel essai prévu.')
+                                    message='Sauvegarde interrompue par l’arrêt du serveur ; prochaine tentative à l’horaire prévu.')
             self.data['last_error'] = self.data['job']['message']
-            if self.data['job'].get('kind') == 'automatic': self.data['retry_due'] = time.time()
+            if self.data['job'].get('kind') == 'automatic' and self.data['config']['enabled']:
+                self.data['next_due'] = self.next_due(self.data['config'], time.time())
+        # Retire the former five-minute retry, including one persisted before upgrade.
+        self.data['retry_due'] = 0
+        recover_retention(self)
         # A completed atomic archive can precede the catalogue update after a power failure.
         self._reconcile()
         self._save()
@@ -131,20 +166,33 @@ class BackupManager:
         write_json(self.path, self.data)
 
     def _reconcile(self):
+        warning = 'La recherche d’archives absentes du catalogue est incomplète. Vérifiez l’accès du compte serveur au dossier, puis redémarrez le serveur.'
+        self.data['reconcile_warning'] = ''
         destination = Path(self.data['config']['destination'])
-        if not destination.is_dir(): return
+        if not destination.is_dir():
+            self.data['reconcile_warning'] = warning
+            return
         known = {record.get('file') for record in self.data['catalog']}
-        for path in destination.glob('*.qwenbackup'):
-            if str(path.resolve()) not in known:
-                with path.open('rb') as stream: header = stream.read(11)
-                if header not in (HEADER, LEGACY_HEADER) or path.stat().st_size > MAX_ARCHIVE: continue
-                identity = path.stem.rsplit('-', 1)[1] if MANAGED_NAME.fullmatch(path.name) else hashlib.sha256(str(path.resolve()).encode()).hexdigest()[:24]
-                stamp = path.stat().st_mtime
-                self.data['catalog'].append({'id': identity, 'file': str(path.resolve()),
-                    'timestamp': stamp, 'created_at': _iso(stamp), 'kind': 'recovered', 'protected': True,
-                    'version': 2 if header == HEADER else 1, 'size': path.stat().st_size, 'sha256': _hash_file(path), 'verified': False,
-                    'summary': {'included': [], 'excluded': EXCLUDED, 'counts': {}},
-                    'secondary': {'status': 'disabled', 'file': '', 'attempts': 0, 'error': ''}})
+        try:
+            for name in os.listdir(destination):
+                if not name.lower().endswith('.qwenbackup'): continue
+                path = destination / name
+                try:
+                    resolved = str(path.resolve())
+                    if resolved in known: continue
+                    with path.open('rb') as stream: header = stream.read(11)
+                    stat = path.stat()
+                    if header not in (HEADER, LEGACY_HEADER) or stat.st_size > MAX_ARCHIVE: continue
+                    identity = path.stem.rsplit('-', 1)[1] if MANAGED_NAME.fullmatch(path.name) else hashlib.sha256(resolved.encode()).hexdigest()[:24]
+                    self.data['catalog'].append({'id': identity, 'file': resolved,
+                        'timestamp': stat.st_mtime, 'created_at': _iso(stat.st_mtime), 'kind': 'recovered', 'protected': True,
+                        'version': 2 if header == HEADER else 1, 'size': stat.st_size, 'sha256': _hash_file(path), 'verified': False,
+                        'summary': {'included': [], 'excluded': EXCLUDED, 'counts': {}},
+                        'secondary': {'status': 'disabled', 'file': '', 'attempts': 0, 'error': ''}})
+                except OSError:
+                    self.data['reconcile_warning'] = warning
+        except OSError:
+            self.data['reconcile_warning'] = warning
 
     @staticmethod
     def next_due(config, now):
@@ -165,6 +213,9 @@ class BackupManager:
         result['last_success'] = _iso(result['last_success'])
         result.pop('retry_due', None)
         result['catalog'] = sorted(result['catalog'], key=lambda r: r['timestamp'], reverse=True)
+        from restore_evidence import status as restoration_status
+        result['last_restore_verification'] = restoration_status(self.directory, result['catalog'])
+        result['project_backup'] = _project_backup_status(self.controller)
         result['recovery_phrase_required'] = result['config']['enabled'] and not self.secret_path.exists()
         result['server_required'] = True
         return result
@@ -235,7 +286,14 @@ class BackupManager:
                     if path.stem not in registered: continue
                     if path.suffix == '.fred-android': profiles[path.stem] = _read_json_checked(path, 65536)
                     elif path.suffix == '.exe' and path.stat().st_size >= 16:
-                        with path.open('rb') as stream:
+                        try:
+                            stream = path.open('rb')
+                        except PermissionError:
+                            # Restored profiles are also checked against the live access
+                            # registry and vault before an archive can be accepted.
+                            if path.stem in profiles: continue
+                            raise
+                        with stream:
                             stream.seek(-16, 2); footer = stream.read(16)
                             if footer[4:] != b'QWENPROFILE1': continue
                             size = struct.unpack('<I', footer[:4])[0]
@@ -560,7 +618,7 @@ class BackupManager:
                 message = _message(error)
                 self.data['job'].update(state='failed', phase='failed', message=message, finished_at=_iso(time.time()))
                 self.data['last_error'] = message
-                if kind == 'automatic': self.data['retry_due'] = time.time() + 300
+                if kind == 'automatic': self.data['retry_due'] = 0
                 self._save()
         finally:
             password = None
@@ -612,6 +670,9 @@ class BackupManager:
 
     def prune(self):
         with self.lock:
+            if not recover_retention(self):
+                self._save()
+                return []
             candidates = sorted([r for r in self.data['catalog'] if r.get('verified') and r.get('kind') == 'automatic'],
                                 key=lambda r: r['timestamp'], reverse=True)
             if not candidates: return []
@@ -625,6 +686,10 @@ class BackupManager:
                     if bucket not in buckets and len(buckets) < count:
                         buckets.append(bucket); keep.add(record['id'])
             removed = []
+            previous_error = self.data.get('last_error', '')
+            def incomplete():
+                if not self.data.get('last_error'):
+                    self.data['last_error'] = 'Nettoyage incomplet : une archive ou sa copie est manquante, inaccessible ou modifiée.'
             for record in candidates:
                 if record['id'] in keep or record.get('protected'): continue
                 # A failed copy remains eligible for retries; never delete its sole source.
@@ -632,26 +697,31 @@ class BackupManager:
                 path = Path(record['file'])
                 if not MANAGED_NAME.fullmatch(path.name): continue
                 try:
-                    if path.exists() and _hash_file(path) != record['sha256']: continue
+                    if not path.is_file() or _hash_file(path) != record['sha256']:
+                        incomplete(); continue
                     secondary = record.get('secondary', {})
                     second_path = Path(secondary['file']) if secondary.get('file') else None
-                    if second_path and (second_path.name != path.name or not MANAGED_NAME.fullmatch(second_path.name)): continue
+                    if secondary.get('status') == 'copied' and not second_path:
+                        incomplete(); continue
+                    if second_path and (second_path.name != path.name or not MANAGED_NAME.fullmatch(second_path.name)):
+                        incomplete(); continue
+                    if second_path and (not second_path.is_file() or path.samefile(second_path) or _hash_file(second_path) != record['sha256']):
+                        incomplete(); continue
                     agent = record.get('agent')
                     companions = []
                     if agent:
                         primary = path.with_suffix('.kiara-agent')
-                        if Path(agent['file']) != primary: continue
+                        if Path(agent['file']) != primary:
+                            incomplete(); continue
                         companions = [primary] + ([second_path.with_suffix('.kiara-agent')] if second_path else [])
-                        if any(p.exists() and _hash_file(p) != agent['sha256'] for p in companions): continue
-                    for companion in companions:
-                        companion.unlink(missing_ok=True)
-                    path.unlink(missing_ok=True)
-                    if second_path and second_path.exists() and _hash_file(second_path) == record['sha256']:
-                        second_path.unlink()
-                    self.data['catalog'].remove(record); removed.append(record['id'])
-                except OSError:
-                    self.data['last_error'] = 'Nettoyage incomplet ; certains points précédents sont conservés.'
-            if removed: self._save()
+                        if any(not p.is_file() or _hash_file(p) != agent['sha256'] for p in companions):
+                            incomplete(); continue
+                    if not remove_retained_archive(self, record): break
+                    removed.append(record['id'])
+                    if self.data.get('retention_warning'): break
+                except (OSError, ValueError, KeyError, TypeError):
+                    incomplete()
+            if removed or self.data.get('last_error', '') != previous_error: self._save()
             return removed
 
     def tick(self, now=None):
@@ -661,7 +731,7 @@ class BackupManager:
         if self.gate.locked(): return False
         with self.lock:
             cfg = copy.deepcopy(self.data['config'])
-            due = self.data['retry_due'] or self.data['next_due']
+            due = self.data['next_due']
         if cfg['enabled'] and due and now >= due:
             try:
                 password = protect(self.secret_path.read_bytes(), decrypt=True).decode('utf-8')
@@ -674,7 +744,8 @@ class BackupManager:
             except Exception:
                 with self.lock:
                     self.data['last_error'] = 'Sauvegarde automatique indisponible : vérifier la phrase protégée et la destination.'
-                    self.data['retry_due'] = now + 300
+                    self.data['retry_due'] = 0
+                    self.data['next_due'] = self.next_due(cfg, now)
                     self._save()
                 return False
         if now - self.last_retry_check < 30: return False

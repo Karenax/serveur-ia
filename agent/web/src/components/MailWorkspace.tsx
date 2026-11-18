@@ -56,6 +56,8 @@ const CLASSIFIED_REFRESH_MS = 15_000;
 const ENVELOPE = ["M3 5h18v14H3z", "m3 5 9 7 9-7"];
 const SPARK = "m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5Z";
 const PAPERCLIP = "m8 13 7-7a3 3 0 0 1 4 4l-9 9a5 5 0 0 1-7-7l9-9m-6 12 8-8";
+const MORE = ["M12 5h.01", "M12 12h.01", "M12 19h.01"];
+const INFO = ['<circle cx="12" cy="12" r="9"/>', "M12 11v5M12 8h.01"];
 const errorText = (e: unknown) => e instanceof Error ? e.message : String(e);
 const senderName = (sender: string) => sender.replace(/<[^>]*>/g, "").replace(/^\"|\"$/g, "").trim() || sender;
 const hue = (text: string) => [...text].reduce((n, char) => n + char.charCodeAt(0) * 7, 0) % 360;
@@ -167,17 +169,23 @@ export function MailWorkspace(props: Props) {
   }, [searchQuery, sort, sourceProject]);
   useEffect(() => {
     if (pending || props.active === false) {setSourceLoading(false); return;}
-    let inFlight = false;
+    let disposed = false, timer:number|undefined, controller:AbortController|null = null;
+    const schedule = () => {
+      if (!disposed && !document.hidden && timer === undefined)
+        timer = window.setTimeout(() => {timer=undefined;void fetchPage(true);}, CLASSIFIED_REFRESH_MS);
+    };
     const fetchPage = async (background = false) => {
-      if (inFlight) return;
-      inFlight = true;
+      if (disposed || document.hidden || controller) return;
+      if (operation.current) {schedule();return;}
+      const current = new AbortController();
+      controller = current;
       const generation = ++sourceGeneration.current;
       if (!background) setSourceLoading(true);
       try {
         const page = rejected
-          ? await api.rejectedMailPage(sourceOffset, searchQuery, sort)
-          : await api.classifiedMailPage(sourceOffset, searchQuery, sort, sourceProject);
-        if (generation !== sourceGeneration.current) return;
+          ? await api.rejectedMailPage(sourceOffset, searchQuery, sort, current.signal)
+          : await api.classifiedMailPage(sourceOffset, searchQuery, sort, sourceProject, current.signal);
+        if (disposed || current.signal.aborted || generation !== sourceGeneration.current) return;
         const mapped = page.rows.map(row => {
           const target = appliedTargets.current.get(row.source_id);
           if (target === row.project_id) appliedTargets.current.delete(row.source_id);
@@ -191,19 +199,31 @@ export function MailWorkspace(props: Props) {
         setSourcePageError("");
         if (!visible.length && sourceOffset > 0) setSourceOffset(total ? Math.floor((total - 1) / 100) * 100 : 0);
       } catch (error) {
-        if (generation === sourceGeneration.current) setSourcePageError(errorText(error));
+        if (!disposed && !current.signal.aborted && generation === sourceGeneration.current) setSourcePageError(errorText(error));
       } finally {
-        inFlight = false;
-        if (generation === sourceGeneration.current) setSourceLoading(false);
+        if (controller === current) {
+          controller = null;
+          if (!disposed) {if (generation === sourceGeneration.current) setSourceLoading(false);schedule();}
+        }
       }
     };
-    void fetchPage();
-    const timer = window.setInterval(() => {
-      if (!document.hidden && !operation.current) void fetchPage(true);
-    }, CLASSIFIED_REFRESH_MS);
-    return () => {
-      window.clearInterval(timer);
+    const stop = () => {
       sourceGeneration.current++;
+      if (timer !== undefined) window.clearTimeout(timer);
+      timer = undefined;
+      controller?.abort();controller = null;
+      if (!disposed) setSourceLoading(false);
+    };
+    const visibility = () => {
+      if (document.hidden) stop();
+      else {if (timer !== undefined) window.clearTimeout(timer);timer=undefined;void fetchPage(true);}
+    };
+    document.addEventListener('visibilitychange', visibility);
+    if (!document.hidden) void fetchPage();
+    return () => {
+      disposed = true;
+      document.removeEventListener('visibilitychange', visibility);
+      stop();
     };
   }, [sourceOffset, sourcesRevision, props.stats?.pending_sources, sourceProject, searchQuery, sort, pending, rejected, props.active]);
 
@@ -520,7 +540,7 @@ export function MailWorkspace(props: Props) {
         {!props.scoped && !props.readOnly && <button type="button" className="maildesk-primary" aria-label={props.triaging ? "Analyse des mails en cours" : "Analyser les nouveaux mails"} disabled={props.triaging || locked} onClick={() => {if(tools.current)tools.current.open=false;props.onRunTriage(false);}}>
           <Glyph d={SPARK} size={16} /><span>{props.triaging ? "Analyse en cours…" : "Analyser les nouveaux"}</span></button>
         }
-        <details ref={tools} className="maildesk-tools"><summary aria-label="Autres actions">Options</summary><div>
+        <details ref={tools} className="maildesk-tools"><summary aria-label="Options des mails" title="Options des mails"><Glyph d={MORE} size={16}/><span className="sr-only">Options des mails</span>Options</summary><div>
           {!props.readOnly && (!props.scoped || emlProjects.length > 0) && <button type="button" disabled={locked} onClick={showEmlImport}>Importer des mails EML</button>}
           {!props.scoped && !props.readOnly && <>
           <button type="button" disabled={syncing} onClick={() => void scan()}>{syncing ? "Synchronisation…" : "Synchroniser les mails"}</button>
@@ -551,7 +571,7 @@ export function MailWorkspace(props: Props) {
       <button type="button" className="maildesk-secondary" disabled={sourceBusy} onClick={() => setEmlOpen(false)}>Fermer</button>
     </form>}
     {thunderbirdSetup && <div className="maildesk-compose"><button type="button" className="maildesk-secondary" onClick={()=>setThunderbirdSetup(false)}>Fermer les réglages Thunderbird</button><ThunderbirdPanel extensionOnly /></div>}
-    {thunderbirdOpen && <div className="maildesk-compose"><button type="button" className="maildesk-secondary" onClick={()=>setThunderbirdOpen(false)}>Fermer le message</button><ThunderbirdPanel key={reply?.sourceId || "new"} compose reply={reply} onUpdated={() => { void refresh(); }} /></div>}
+      {thunderbirdOpen && <div className="maildesk-compose"><button type="button" className="maildesk-secondary" onClick={()=>setThunderbirdOpen(false)}>Fermer le message</button><ThunderbirdPanel key={reply?.sourceId || "new"} compose active={props.active !== false} reply={reply} onUpdated={() => { void refresh(); }} /></div>}
     {showAnalysis && <section className="maildesk-analysis-progress" aria-label="Progression de l’analyse des mails">
       <div className="maildesk-analysis-summary">
         <strong aria-live="polite">{props.triageProgress ? `${props.triageProgress.processed} / ${props.triageProgress.total} mails traités` : props.triaging ? "Analyse en cours…" : "Analyse terminée"}</strong>
@@ -626,7 +646,7 @@ export function MailWorkspace(props: Props) {
                   {!!targetEvidence?.length && <ul>{targetEvidence.map(evidence=><li key={evidence.key}>{evidence.label}</li>)}</ul>}
                   {active.pending.discard_suggestion?.probability!=null && <div className="maildesk-discard-estimate"><p>Suggestion de suppression : {focusPercent(active.pending.discard_suggestion.probability)}</p><p>{active.pending.discard_suggestion.reason}</p><small>Estimation issue des mails déjà classés ou supprimés de Kiara ; elle reste à vérifier.</small></div>}
                 </details>}
-                {!props.scoped && <details className="maildesk-mail-options"><summary>Options du mail</summary><div className="maildesk-secondary-actions">
+                {!props.scoped && <details className="maildesk-mail-options"><summary aria-label="Options du mail" title="Options du mail"><Glyph d={MORE} size={16}/><span className="sr-only">Actions secondaires du mail</span>Options du mail</summary><div className="maildesk-secondary-actions">
                   <button type="button" className="maildesk-secondary" aria-label="Classer dans Divers" disabled={locked || !diversProject} onClick={()=>void validateCurrent(diversProject!.id)}>Classer dans Divers</button>
                   <button type="button" className="maildesk-reject" disabled={locked} onClick={()=>void discard([active.id])}>Supprimer ce mail de Kiara</button>
                 </div><p>La suppression retire le contenu de ce mail de Kiara et l’exclut des analyses.</p></details>}
@@ -652,7 +672,7 @@ export function MailWorkspace(props: Props) {
                 <div className="maildesk-message-meta">
                   <strong title={detail?.sender || active.sender}>{senderName(detail?.sender || active.sender) || "Expéditeur non renseigné"}</strong>
                   <time title={fullDate(detail?.received_at || active.date)}>{shortDate(detail?.received_at || active.date)}</time>
-                  <details key={active.id} className="maildesk-message-details"><summary>Détails du mail</summary><div>
+                  <details key={active.id} className="maildesk-message-details"><summary aria-label="Détails du mail" title="Détails du mail"><Glyph d={INFO} size={16}/><span className="sr-only">En-têtes et pièces jointes</span>Détails du mail</summary><div>
                     <dl><dt>De</dt><dd>{detail?.sender || active.sender || "Expéditeur non renseigné"}</dd>
                       <dt>{detail?.recipients ? "À" : "Destinataires"}</dt><dd>{(detail?.recipients?.to || detail?.participants || []).join(", ") || (detailLoading ? "Chargement…" : "Non renseignés")}</dd>
                       {!!detail?.recipients?.cc.length && <><dt>Copie</dt><dd>{detail.recipients.cc.join(", ")}</dd></>}

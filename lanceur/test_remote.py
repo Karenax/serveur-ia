@@ -159,6 +159,15 @@ class RemoteTests(unittest.TestCase):
                     self.assertEqual(error.exception.code, 401)
                 finally:
                     error.exception.close()
+        (directory / DESKTOP_INSTALLER).write_bytes(b'altered installer')
+        for route in (DESKTOP_RELEASE, DESKTOP_DOWNLOAD, '/v1/client/kiara4/release', '/v1/client/kiara4/download'):
+            with self.subTest(route=route, corrupted=True):
+                with self.assertRaises(urllib.error.HTTPError) as error:
+                    self.request(route)
+                try:
+                    self.assertEqual(error.exception.code, 503)
+                finally:
+                    error.exception.close()
 
     def test_key_never_stored_in_plaintext_and_revocation(self):
         self.assertNotIn(self.access['token'], self.store.path.read_text())

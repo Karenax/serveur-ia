@@ -14,6 +14,7 @@ import os
 import re
 from pathlib import Path
 import secrets
+import stat
 import subprocess
 import struct
 import sys
@@ -423,9 +424,12 @@ def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
     from conversation_service import ConversationService, DictationService
     from advanced_voice import AdvancedVoice, choose_execution
     from max_installation import MaxInstallation, max_home
+    linux_system_audio = None
     default_max_home=Path(os.environ.get('LOCALAPPDATA',str(Path.home())))/'QwenClient/voice-max'
     if sys.platform.startswith('linux'):
         from linux_support import services
+        from linux_system_audio import LinuxSystemAudio
+        linux_system_audio = LinuxSystemAudio()
         advanced,voice,conversation,wakeword,max_installation=services()
     else:
         advanced=AdvancedVoice(max_home(default_max_home))
@@ -522,6 +526,17 @@ def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
                 port = self.server.server_address[1]
                 if self.headers.get('Origin') not in (f'http://127.0.0.1:{port}', f'http://localhost:{port}'):
                     return self.reply(403, {'error': {'message': 'Commande locale refusée.'}})
+            if not bridge and self.path == '/api/v1/kiara/linux-system-audio' and linux_system_audio:
+                if self.command != 'POST':
+                    return self.reply(405, {'detail': 'Commande audio indisponible.'})
+                try:
+                    value = json_body(self, 4096)
+                    if set(value) != {'action', 'lease_id'} or value['action'] not in ('start', 'stop'):
+                        raise ValueError('Commande audio invalide.')
+                    result = linux_system_audio.start(value['lease_id']) if value['action'] == 'start' else linux_system_audio.stop(value['lease_id'])
+                    return self.reply(200, result)
+                except (OSError, ValueError) as error:
+                    return self.reply(400, {'detail': str(error) or 'Boucle audio indisponible.'})
             if managed and sys.platform == 'win32' and self.path == '/api/v1/kiara/thunderbird-extension':
                 return self.thunderbird_extension()
             native_path = re.fullmatch(r'/api/v1/meeting-sessions/([0-9a-f-]{36})/native-capture/(status|start|pause|resume|stop)', self.path)
@@ -564,7 +579,8 @@ def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
                             raise ValueError('Page Projets invalide.')
                         capture = b' data-kiara-capture="true"' if desktop_capture else b''
                         windows = b' data-kiara-windows="true"' if sys.platform == 'win32' else b''
-                        html = html.replace(b'<body>', b'<body data-kiara-desktop="true" data-kiara-project-conversation="true"' + windows + capture + b'>', 1)
+                        linux_audio = b' data-kiara-linux-system-audio="true"' if linux_system_audio else b''
+                        html = html.replace(b'<body>', b'<body data-kiara-desktop="true" data-kiara-project-conversation="true"' + windows + capture + linux_audio + b'>', 1)
                     self.send_response(response.status if hasattr(response, 'status') else response.code)
                     for name in AGENT_RESPONSE_HEADERS:
                         value = response.headers.get(name)
@@ -704,16 +720,17 @@ def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
             nonce = secrets.token_urlsafe(24)
             config = json.dumps({'key':key, 'model':remote.model, 'version':remote.version, 'storage':hashlib.sha256(key.encode()).hexdigest()[:20], 'platform':'linux' if sys.platform.startswith('linux') else 'windows'}, ensure_ascii=False).replace('<', '\\u003c')
             template = Path(getattr(sys, '_MEIPASS', Path(__file__).parent)) / 'chat.html'
-            scripts=('ui.js','attachments.js','corrector.js','selection.js','thinking.js','voice.js','conversation.js','project-conversation.js')+ (('linux_features.js',) if sys.platform.startswith('linux') else ())
+            scripts=('ui.js','attachments.js','corrector.js','selection.js','thinking.js','voice.js','conversation.js','project-conversation.js')+ (('linux_features.js',) if sys.platform.startswith('linux') else ()) + ('portal_conflict_archive.js','portal_conflict_review.js','portal_conflict_library.js','portal_origin_recovery.js','portal_audio_conflict_archive.js','portal_audio_conflict_library.js')
             presentation = ''.join('<script nonce="__NONCE__">'+(template.parent/name).read_text(encoding='utf-8')+'</script>' for name in scripts)
             markdown=''.join('<script nonce="__NONCE__">'+path.read_text(encoding='utf-8').replace('</script','<\\/script')+'</script>' for path in (template.parent/'vendor/markdown-it.min.js',template.parent/'markdown.js'))
-            content = template.read_text(encoding='utf-8').replace('</head>',markdown+'</head>').replace('</body>',(template.parent/'workspace.html').read_text(encoding='utf-8')+presentation+'</body>').replace('__UI_CSS__',(template.parent/'ui.css').read_text(encoding='utf-8')).replace('__CONFIG__', config).replace('__NONCE__', nonce).encode()
+            css = ''.join((template.parent/name).read_text(encoding='utf-8') for name in ('ui.css','portal_conflict_library.css'))
+            content = template.read_text(encoding='utf-8').replace('</head>',markdown+'</head>').replace('</body>',(template.parent/'workspace.html').read_text(encoding='utf-8')+presentation+'</body>').replace('__UI_CSS__',css).replace('__CONFIG__', config).replace('__NONCE__', nonce).encode()
             self.send_response(200)
             self.send_header('Content-Type', 'text/html; charset=utf-8')
             self.send_header('Content-Length', str(len(content)))
             self.send_header('Cache-Control', 'no-store')
             self.send_header('X-Content-Type-Options', 'nosniff')
-            self.send_header('Content-Security-Policy', f"default-src 'none'; script-src 'nonce-{nonce}'; style-src 'nonce-{nonce}'; connect-src 'self'; img-src data:; frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
+            self.send_header('Content-Security-Policy', f"default-src 'none'; script-src 'nonce-{nonce}'; style-src 'nonce-{nonce}'; connect-src 'self'; img-src data:; media-src blob:; frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
             self.end_headers()
             self.wfile.write(content)
 
@@ -1066,6 +1083,7 @@ def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
     conversation.max_models=max_capture_models
     server.advanced_voice=advanced
     server.desktop_capture=desktop_capture
+    server.linux_system_audio=linux_system_audio
     server.max_installation=max_installation
     server.daemon_threads = True
     if desktop_capture:
@@ -1079,6 +1097,9 @@ class LocalHTTPServer(BoundedHTTPServer):
 
     def server_close(self):
         if getattr(self, 'desktop_capture', None):self.desktop_capture.close()
+        if getattr(self, 'linux_system_audio', None):
+            try:self.linux_system_audio.close()
+            except ValueError:pass  # The worker also cleans up on relay exit.
         if hasattr(self, "max_installation"):self.max_installation.close()
         if hasattr(self, "conversation"):self.conversation.close()
         if hasattr(self, "wakeword"):self.wakeword.close()
@@ -1129,11 +1150,36 @@ def client_settings(profile):
         return data
     except (OSError,ValueError,KeyError):return {}
 
+
+class LocalSettingsUnreadable(ValueError):
+    """Existing client settings must be preserved until they can be read."""
+
+
+def read_settings_for_update(profile):
+    """Never treat unreadable existing settings as a new, empty profile."""
+    path = settings_path(profile)
+    try:
+        if path.is_symlink():
+            raise LocalSettingsUnreadable('Réglages locaux illisibles. Le fichier original est conservé.')
+        raw = path.read_bytes()
+    except FileNotFoundError:
+        return {}
+    except OSError as error:
+        raise LocalSettingsUnreadable('Réglages locaux illisibles. Le fichier original est conservé.') from error
+    try:
+        data = json.loads(protect(raw, decrypt=True))
+        if not isinstance(data, dict):
+            raise ValueError('invalid settings')
+        return data
+    except (OSError, ValueError, TypeError, UnicodeError, RuntimeError) as error:
+        raise LocalSettingsUnreadable('Réglages locaux illisibles. Le fichier original est conservé.') from error
+
+
 def save_endpoint(profile,endpoint=None):
     from file_lock import locked
     path=settings_path(profile)
     with locked(path):
-        values=client_settings(profile)
+        values=read_settings_for_update(profile)
         values['connection_selected']=True
         if endpoint:values['endpoint']=validate_connection_endpoint(endpoint)
         else:values.pop('endpoint',None)
@@ -1164,7 +1210,7 @@ def save_preferences(profile,values):
     from file_lock import locked
     path=settings_path(profile)
     with locked(path):
-        settings=client_settings(profile)
+        settings=read_settings_for_update(profile)
         if 'conversation_drafts' in values:
             drafts={**settings.get('preferences',{}).get('conversation_drafts',{})}
             for key,text in values['conversation_drafts'].items():
@@ -1179,18 +1225,47 @@ def save_preferences(profile,values):
 
 def _local_key(profile):
     path = settings_path(profile)
-    try:
-        data = client_settings(profile)
+    data = read_settings_for_update(profile)
+    if 'local_key' in data:
         key = data['local_key']
         if not isinstance(key, str) or len(key) < 32:
-            raise ValueError()
+            raise LocalSettingsUnreadable('Clé locale illisible. Les réglages originaux sont conservés.')
         return key
-    except (OSError, ValueError, KeyError):
-        key = 'local_' + secrets.token_urlsafe(32)
-        path.parent.mkdir(parents=True, exist_ok=True)
-        data=client_settings(profile);data['local_key']=key
-        history_store.atomic(path,protect(json.dumps(data)))
-        return key
+    key = 'local_' + secrets.token_urlsafe(32)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    data['local_key'] = key
+    history_store.atomic(path, protect(json.dumps(data)))
+    return key
+
+def _prepare_close_linux(window, timeout=90):
+    """Await the page's save barrier without eval, which Kiara's CSP forbids."""
+    identifier = secrets.token_hex(16)
+    token = json.dumps(identifier)
+    window.run_js("""(() => {
+      const id = %s;
+      window.__kiaraCloseGuard = {id, pending: true};
+      (async () => {
+        let result;
+        try {
+          if (window.kiaraPrepareClose) await window.kiaraPrepareClose();
+          else if (!window.dispatchEvent(new Event('beforeunload', {cancelable:true})))
+            throw new Error('Des modifications sont en cours dans Kiara.');
+          result = {saved:true};
+        } catch (error) { result = {saved:false, message:String((error && error.message) || error)}; }
+        if (window.__kiaraCloseGuard?.id === id) window.__kiaraCloseGuard = {id, pending:false, result};
+      })();
+    })()""" % token)
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        value = window.run_js('JSON.stringify(window.__kiaraCloseGuard || null)')
+        if isinstance(value, str):
+            try: value = json.loads(value)
+            except ValueError: value = None
+        if isinstance(value, dict) and value.get('id') == identifier and value.get('pending') is False:
+            return value.get('result')
+        time.sleep(0.1)
+    return {'saved':False, 'message':'La sauvegarde ne répond pas encore.'}
+
 
 def install_close_guard(window):
     """Flush the full history before WebView closes, including histories over 64 KiB."""
@@ -1205,7 +1280,11 @@ def install_close_guard(window):
                 if result.get('saved') or window.create_confirmation_dialog(APP_NAME,'Historique non enregistré : '+result.get('message','')+'\nExportez vos conversations pour les conserver. Fermer quand même ?'):
                     state['ready']=True;window.destroy()
                 else:state['pending']=False
-            try:window.evaluate_js("(async()=>{try{if(window.kiaraPrepareClose)await window.kiaraPrepareClose();else if(!window.dispatchEvent(new Event('beforeunload',{cancelable:true})))throw new Error('Des modifications sont en cours dans Kiara.');return {saved:true};}catch(e){return {saved:false,message:e.message};}})()",callback=complete)
+            try:
+                if sys.platform.startswith('linux'):
+                    complete(_prepare_close_linux(window))
+                else:
+                    window.evaluate_js("(async()=>{try{if(window.kiaraPrepareClose)await window.kiaraPrepareClose();else if(!window.dispatchEvent(new Event('beforeunload',{cancelable:true})))throw new Error('Des modifications sont en cours dans Kiara.');return {saved:true};}catch(e){return {saved:false,message:e.message};}})()",callback=complete)
             except Exception as error:complete({'saved':False,'message':str(error)})
         threading.Thread(target=work,daemon=True).start()
         return False
@@ -1214,7 +1293,8 @@ def install_close_guard(window):
 
 def window_geometry():
     """Keep the initial window inside the Windows work area, including scaled displays."""
-    width,height=1200,780
+    # Leave room for the desktop panel and window decorations at 720p.
+    width,height=(1100,650) if sys.platform.startswith('linux') else (1200,780)
     if sys.platform == 'win32':
         try:
             area=wintypes.RECT()
@@ -1230,19 +1310,49 @@ def thunderbird_extension_source():
     return Path(__file__).resolve().parent.parent / 'agent' / 'extensions' / 'thunderbird-agent'
 
 
-def open_local_relay(profile, *, managed=False):
+class LocalOriginPortUnavailable(ValueError):
+    """The recorded portal origin cannot be opened without switching ports."""
+
+
+class LocalOriginIncompatible(ValueError):
+    """A fixed integration conflicts with the recorded portal origin."""
+
+
+def portal_recovery_fixed_port(profile):
+    """Keep an existing Thunderbird pairing during a future origin inventory."""
+    settings = read_settings_for_update(profile)
+    return LOCAL_API_PORT if settings.get('thunderbird_token') else None
+
+
+def open_local_relay(profile, *, managed=False, required_port=None):
     if managed and sys.platform == 'win32' and (thunderbird_extension_source() / 'manifest.json').is_file():
         from thunderbird_integration import manage
         try:
             manage(profile, thunderbird_extension_source())
         except (OSError, ValueError, KeyError, TypeError):
             pass  # The Thunderbird panel can report the error without blocking Kiara startup.
-    settings = client_settings(profile)
+    settings = read_settings_for_update(profile)
+    if settings.get('endpoint'):
+        try:
+            settings['endpoint'] = validate_connection_endpoint(settings['endpoint'])
+        except (ValueError, TypeError):
+            # Keep other settings (notably Thunderbird's fixed port) while
+            # asking for a valid address; do not change the original file.
+            settings.pop('endpoint', None)
+            settings['connection_selected'] = False
     remote = Remote(profile, endpoint=settings.get('endpoint'),
                     connection_required=not (settings.get('connection_selected') or settings.get('endpoint')))
     try:
-        key = local_key(profile)
         last_port = LOCAL_API_PORT if settings.get('thunderbird_token') else LOCAL_API_LAST_PORT
+        if required_port is not None:
+            if type(required_port) is not int or not LOCAL_API_PORT <= required_port <= last_port:
+                raise LocalOriginIncompatible('Le port local enregistré est incompatible avec cet accès.')
+        key = local_key(profile)
+        if required_port is not None:
+            try:
+                return remote, serve_local(remote, key, required_port, managed=managed)
+            except OSError as error:
+                raise LocalOriginPortUnavailable(f'Le port local {required_port} est occupé. Fermez l’application qui l’utilise puis réessayez.') from error
         for port in range(LOCAL_API_PORT, last_port + 1):
             try:
                 return remote, serve_local(remote, key, port, managed=managed)
@@ -1293,8 +1403,23 @@ def select_relay_profile():
 
 def relay_stdio(executable=None, version=VERSION):
     validate_version(version)
-    profile_path = relay_profile_path()
-    if executable is not None:
+    linux = sys.platform.startswith('linux')
+    profile_path = None if linux else relay_profile_path()
+    profile_can_be_checked = True
+    if linux:
+        if executable is not None:
+            raise ValueError('Utilisez le profil Linux existant pour cet appareil.')
+        from linux_support import data_home
+        try:
+            profile_state = (data_home() / 'profile.enc').lstat()
+            profile_can_be_checked = stat.S_ISREG(profile_state.st_mode)
+        except FileNotFoundError:
+            print('KIARA_RELAY_SELECT_PROFILE', flush=True)
+        except OSError:
+            profile_can_be_checked = False  # An inaccessible profile is never treated as a fresh one.
+        profile = read_profile()
+        imported = False
+    elif executable is not None:
         profile = read_profile(executable)
         imported = True
     else:
@@ -1307,14 +1432,136 @@ def relay_stdio(executable=None, version=VERSION):
             if profile is None:
                 print('KIARA_RELAY_CANCELLED', flush=True)
                 return
-    remote, server = open_local_relay(profile, managed=True)
-    remote.managed_relay = True
-    remote.version = version
-    if os.environ.get('KIARA_DESKTOP_UPDATES') == '1':
-        from updater import DesktopUpdate
-        remote.desktop_update = DesktopUpdate(profile_path.parent / 'desktop-updates', sys.stdin.buffer, sys.stdout.buffer)
-    worker = threading.Thread(target=server.serve_forever, daemon=True)
+    if linux:
+        from linux_support import lock_desktop_profile, ProfileAlreadyOpen, ProfileLockError
+        lock_target = profile
+    else:
+        from windows_profile_guard import lock_desktop_profile, ProfileAlreadyOpen, ProfileLockError
+        lock_target = settings_path(profile)
     try:
+        guard = lock_desktop_profile(lock_target)
+    except ProfileAlreadyOpen:
+        print('KIARA_RELAY_PROFILE_IN_USE', flush=True)
+        return
+    except ProfileLockError:
+        print('KIARA_RELAY_PROFILE_LOCK_UNAVAILABLE', flush=True)
+        return
+    print('KIARA_RELAY_PROFILE_LOCKED', flush=True)
+    remote = server = worker = None
+    control = None
+    try:
+        from portal_origin_state import read_origin, reserve_fresh_origin, fresh_tauri_storage_absent, OriginStateError, OriginPortsBusy
+        origin_settings = settings_path(profile)
+        marker = origin_settings.with_suffix('.tauri-origin.json')
+        try:
+            required_port = read_origin(marker)
+        except OriginStateError:
+            print('KIARA_RELAY_ORIGIN_INVALID', flush=True)
+            return
+        recovery_test = os.environ.get('KIARA_TEST_RECOVERY') == '1' or os.environ.get('KIARA_TEST_RECOVERY_FULL') == '1'
+        fresh_origin = (profile_can_be_checked and (linux or bool(os.environ.get('LOCALAPPDATA'))) and required_port is None and not recovery_test
+                        and fresh_tauri_storage_absent(origin_settings, linux=linux))
+        if recovery_test:
+            # Explicitly opt-in prototype; the packaged candidates do not
+            # include a qualified recovery flow. Never enable for distribution.
+            from portal_recovery_stdio import QtLegacyStoragePresent, recovery_assets, resolve_port, resolve_port_full
+            from portal_origin_session import OriginSessionError
+            from portal_recovery_broker import RecoveryUnavailable
+            from relay_control_stream import RelayControlStream
+            from portal_migration_job import (MigrationConflict, MigrationRestart, MigrationArchiveUnavailable,
+                                              MigrationReceiverUnavailable, MigrationJobError)
+            from portal_migration_state import MigrationStateError
+            control = RelayControlStream(sys.stdin.buffer)
+            try:
+                assets_dir = Path(sys._MEIPASS) if getattr(sys, 'frozen', False) else Path(__file__).resolve().parent
+                if os.environ.get('KIARA_TEST_RECOVERY_FULL') == '1':
+                    required_port = resolve_port_full(profile, control, sys.stdout, assets_dir)
+                else:
+                    required_port = resolve_port(profile, control, sys.stdout, recovery_assets(assets_dir))
+            except LocalSettingsUnreadable:
+                print('KIARA_RELAY_SETTINGS_UNREADABLE', flush=True)
+                return
+            except OriginStateError:
+                print('KIARA_RELAY_ORIGIN_INVALID', flush=True)
+                return
+            except QtLegacyStoragePresent:
+                print('KIARA_RELAY_QT_STORAGE', flush=True)
+                return
+            except MigrationConflict:
+                print('KIARA_RELAY_RECOVERY_CONFLICT', flush=True)
+                return
+            except MigrationRestart:
+                print('KIARA_RELAY_RECOVERY_RESTART', flush=True)
+                return
+            except MigrationArchiveUnavailable:
+                print('KIARA_RELAY_ARCHIVE_UNAVAILABLE', flush=True)
+                return
+            except MigrationReceiverUnavailable:
+                print('KIARA_RELAY_RECEIVER_UNAVAILABLE', flush=True)
+                return
+            except (OriginSessionError, RecoveryUnavailable, MigrationJobError, MigrationStateError, OSError, ValueError):
+                print('KIARA_RELAY_RECOVERY_UNAVAILABLE', flush=True)
+                return
+        if not recovery_test and required_port is None and not fresh_origin:
+            from portal_origin_session import resolve_origin, recovery_offer, OriginNeedsRecovery, OriginSessionError
+            from portal_recovery_stdio import recovery_assets
+            from portal_recovery_broker import RecoveryUnavailable
+            from relay_control_stream import RelayControlStream
+            try:
+                if not profile_can_be_checked or (not linux and not os.environ.get('LOCALAPPDATA')):
+                    raise OriginSessionError('Le stockage local ne peut pas être vérifié.')
+                try:
+                    origin_settings.with_suffix('.tauri-migration').lstat()
+                except FileNotFoundError:
+                    pass
+                else:
+                    raise OriginSessionError('Une récupération antérieure doit être vérifiée.')
+                fixed = portal_recovery_fixed_port(profile)
+                assets_dir = Path(sys._MEIPASS) if getattr(sys, 'frozen', False) else Path(__file__).resolve().parent
+                assets = recovery_assets(assets_dir)
+                control = RelayControlStream(sys.stdin.buffer)
+                def announce_inventory(descriptor):
+                    print(recovery_offer(origin_settings.stem, descriptor['token']), flush=True)
+                required_port = resolve_origin(marker, assets, announce_inventory, control.cancelled,
+                                               fixed_port=fixed, timeout=120)
+            except LocalSettingsUnreadable:
+                print('KIARA_RELAY_SETTINGS_UNREADABLE', flush=True)
+                return
+            except OriginNeedsRecovery:
+                print('KIARA_RELAY_ORIGIN_MULTIPLE', flush=True)
+                return
+            except (OriginSessionError, OriginStateError, RecoveryUnavailable, OSError, ValueError):
+                print('KIARA_RELAY_RECOVERY_UNAVAILABLE', flush=True)
+                return
+        if fresh_origin:
+            try:
+                required_port = reserve_fresh_origin(origin_settings, linux=linux)
+            except OriginPortsBusy:
+                print('KIARA_RELAY_ORIGIN_BUSY', flush=True)
+                return
+            except OriginStateError:
+                print('KIARA_RELAY_ORIGIN_INVALID', flush=True)
+                return
+        options = {'managed': not linux}
+        if required_port is not None:
+            options['required_port'] = required_port
+        try:
+            remote, server = open_local_relay(profile, **options)
+        except LocalOriginPortUnavailable:
+            print('KIARA_RELAY_ORIGIN_BUSY', flush=True)
+            return
+        except LocalOriginIncompatible:
+            print('KIARA_RELAY_ORIGIN_INVALID', flush=True)
+            return
+        except LocalSettingsUnreadable:
+            print('KIARA_RELAY_SETTINGS_UNREADABLE', flush=True)
+            return
+        remote.managed_relay = not linux
+        remote.version = version
+        if not linux and os.environ.get('KIARA_DESKTOP_UPDATES') == '1':
+            from updater import DesktopUpdate
+            remote.desktop_update = DesktopUpdate(profile_path.parent / 'desktop-updates', control or sys.stdin.buffer, sys.stdout.buffer)
+        worker = threading.Thread(target=server.serve_forever, daemon=True)
         if imported:
             history_store.atomic(profile_path, protect(json.dumps(profile, ensure_ascii=False)))
         worker.start()
@@ -1323,13 +1570,19 @@ def relay_stdio(executable=None, version=VERSION):
         if remote.desktop_update:
             remote.desktop_update.wait(remote)
         else:
-            sys.stdin.buffer.read(1)
+            (control or sys.stdin.buffer).read(1)
     finally:
-        if worker.is_alive():
-            server.shutdown()
-            worker.join()
-        server.server_close()
-        remote.close()
+        try:
+            if worker and worker.is_alive():
+                server.shutdown()
+                worker.join()
+            if server:
+                server.server_close()
+            if remote:
+                remote.close()
+        finally:
+            if guard:
+                guard.close()
 
 
 def main():
@@ -1420,10 +1673,18 @@ def main():
             plan.with_name('error.txt').write_text(str(error),encoding='utf-8')
             root=tk.Tk();root.withdraw();messagebox.showerror('Mise à jour '+APP_NAME,str(error),parent=root);root.destroy()
         return
-    remote=None;server=None
+    if sys.platform.startswith('linux'):
+        raise SystemExit('Ouvrez Kiara avec le client Tauri.')
+    remote=None;server=None;profile_guard=None
     try:
         import webview
         profile=read_profile()
+        if sys.platform.startswith('linux'):
+            from linux_support import lock_desktop_profile
+            profile_guard=lock_desktop_profile(profile)
+        else:
+            from windows_profile_guard import lock_desktop_profile
+            profile_guard=lock_desktop_profile(settings_path(profile))
         remote,server=open_local_relay(profile)
         threading.Thread(target=server.serve_forever,daemon=True).start()
         window=webview.create_window(APP_NAME+' · '+VERSION,f'http://127.0.0.1:{server.server_port}/chat',background_color='#ffffff',text_select=True,**window_geometry())
@@ -1432,7 +1693,8 @@ def main():
         if '--update-ack' in sys.argv:
             def acknowledge():
                 path=Path(sys.argv[sys.argv.index('--update-ack')+1])
-                if not window.evaluate_js("typeof api==='function' && !!document.getElementById('composer') && !!document.getElementById('client-navigation')"):raise ValueError('Interface cliente non initialisée.')
+                read_js = window.run_js if sys.platform.startswith('linux') else window.evaluate_js
+                if not read_js("typeof api==='function' && !!document.getElementById('composer') && !!document.getElementById('client-navigation')"):raise ValueError('Interface cliente non initialisée.')
                 temporary=path.with_suffix('.tmp');temporary.write_text(json.dumps({'version':VERSION,'ready':True}),encoding='utf-8');temporary.replace(path)
                 from updater import cleanup_legacy_update
                 threading.Thread(target=cleanup_legacy_update,args=(path,),daemon=True).start()
@@ -1443,7 +1705,8 @@ def main():
             def verify_window():
                 time.sleep(1)
                 try:
-                    result=window.evaluate_js("JSON.stringify({title:document.title,login:!!document.getElementById('client-navigation'),update:!!document.getElementById('update-apply'),chat:!!document.getElementById('composer'),state:document.getElementById('account-status').textContent,history:typeof bootstrap==='function',projects:!!document.getElementById('ws-project-list'),assistants:!!document.getElementById('ws-assistants'),textSelection:getComputedStyle(document.body).userSelect,copySelection:!!document.getElementById('copy-selection'),thinkingModes:document.querySelectorAll('#thinking-bar input[type=radio]').length,thinkingInline:document.querySelector('.send-row').contains(document.getElementById('thinking')),documentMenu:!!document.getElementById('ui-context-panel'),attachmentPlus:document.getElementById('attach-file').textContent==='+'})")
+                    read_js = window.run_js if sys.platform.startswith('linux') else window.evaluate_js
+                    result=read_js("JSON.stringify({title:document.title,login:!!document.getElementById('client-navigation'),update:!!document.getElementById('update-apply'),chat:!!document.getElementById('composer'),state:document.getElementById('account-status').textContent,history:typeof bootstrap==='function',projects:!!document.getElementById('ws-project-list'),assistants:!!document.getElementById('ws-assistants'),textSelection:getComputedStyle(document.body).userSelect,copySelection:!!document.getElementById('copy-selection'),thinkingModes:document.querySelectorAll('#thinking-bar input[type=radio]').length,thinkingInline:document.querySelector('.send-row').contains(document.getElementById('thinking')),documentMenu:!!document.getElementById('ui-context-panel'),attachmentPlus:document.getElementById('attach-file').textContent==='+'})")
                     if isinstance(result,str):result=json.loads(result)
                     assert result['login'] and result['update'] and result['chat'] and result['history'],result
                     assert result['projects'] and not result['assistants'],result
@@ -1455,6 +1718,11 @@ def main():
         webview.start(gui='qt' if sys.platform.startswith('linux') else 'edgechromium',private_mode=False,storage_path=str(storage))
     except Exception as error:
         hint='\nVérifiez les dépendances Linux et le trousseau de votre session.' if sys.platform.startswith('linux') else '\nSi WebView2 manque, installer Microsoft Edge WebView2 Runtime.'
+        if sys.platform.startswith('linux'):
+            from linux_support import ProfileLockError
+        else:
+            from windows_profile_guard import ProfileLockError
+        if isinstance(error, ProfileLockError):hint=''
         root=tk.Tk();root.withdraw();messagebox.showerror(APP_NAME,str(error)+hint,parent=root);root.destroy()
     finally:
         if remote:remote.close()
@@ -1467,6 +1735,7 @@ def main():
                 root=tk.Tk();root.withdraw()
                 messagebox.showerror(APP_NAME, 'Kiara 4 est installé. Ouvrez-le depuis le menu Démarrer.\n'+str(error),parent=root)
                 root.destroy()
+        if profile_guard:profile_guard.close()
 
 if __name__ == '__main__':
     try:main()

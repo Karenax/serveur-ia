@@ -21,8 +21,28 @@ choisir **Télécharger Kiara 4 pour Windows**. Au premier lancement,
 coller le code fourni depuis **Clients & accès** dans la console serveur.
 Le même installateur convient à tous les utilisateurs.
 
-Le processus ne dispose d'aucune commande native exposée au contenu web. La
-navigation de la fenêtre est limitée à l'origine locale fournie au démarrage.
+Le candidat Windows de recette verrouille le profil avant l’ouverture des
+données. Il détecte aussi une ancienne fenêtre WebView2 déjà ouverte avec le
+même profil. Fermer les anciennes versions avant de lancer Kiara : elles ne
+participent pas au nouveau verrou et peuvent encore démarrer après sa vérification.
+Le client et son relais doivent provenir du même installateur.
+
+Les brouillons de réunion et fragments audio locaux du portail dépendent aussi
+du port du relais local. Dans le candidat, Kiara vérifie les origines Tauri et
+enregistre le port lorsqu'une seule contient des données. Si plusieurs origines
+contiennent des données ou si une origine ne peut pas être vérifiée, le démarrage
+s'arrête sans les effacer ; leur fusion automatique reste à qualifier. Conserver
+les données et éviter de remplacer un brouillon qui semble absent.
+Sous Linux, le paquet de recette utilise uniquement Tauri. Le verrou protège
+le profil contre une autre instance Tauri ; fermer les anciennes versions,
+qui ne prennent pas nécessairement ce verrou. Tauri et son relais doivent
+provenir du même paquet complet.
+
+La navigation de la fenêtre est limitée à l’origine locale fournie au démarrage.
+Sous Linux, seule la commande native de zoom est exposée au contenu de cette
+origine et à la fenêtre Kiara ; Windows utilise le zoom natif de WebView2.
+Pour agrandir ou réduire le contenu, utiliser Ctrl avec + ou - ; Ctrl + 0
+rétablit la taille normale. Les incréments dépendent du système.
 Les caches Cargo et npm, les fichiers temporaires et les résultats de compilation
 vont dans `toolchain/tauri-work` sur le disque de travail. `-WorkRoot` permet de
 choisir un autre dossier de travail. Par défaut, `-ToolsRoot` pointe vers

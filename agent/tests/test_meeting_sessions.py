@@ -197,6 +197,40 @@ def test_chunk_ack_replays_hash_and_sequences_then_finalizes_staging(stores):
         assert final['transcript_provisional']
 
 
+def test_command_receipt_404_distinguishes_missing_receipt_from_hidden_project(stores, monkeypatch):
+    brain, _, pid, _ = stores
+    monkeypatch.setenv('AGENT_OPERATOR_ID', 'local')
+    monkeypatch.setenv('AGENT_OPERATOR_ROLE', 'owner')
+    monkeypatch.delenv('AGENT_OPERATOR_PROJECT_IDS', raising=False)
+    with brain() as db:
+        row = create(db, project_id=pid)
+        command_id = key()
+        studio.execute_command(db, row['id'], 'finalize', Command(command_id=command_id, expected_revision=row['revision']))
+    app = FastAPI()
+    app.include_router(router)
+    def dependency():
+        with brain() as db:
+            yield db
+    app.dependency_overrides[get_db] = dependency
+    client = TestClient(app)
+    base = f"/api/v1/meeting-sessions/{row['id']}/commands"
+    receipt = client.get(f'{base}/{command_id}').json()
+    assert receipt['id'] == command_id and receipt['kind'] == 'finalize' and receipt['status'] == 'completed'
+    assert receipt['result']['id'] == row['id'] and receipt['result']['state'] == 'completed'
+    missing = client.get(f'{base}/{key()}')
+    assert missing.status_code == 404 and missing.json()['detail'] == 'Commande introuvable dans cette séance'
+    monkeypatch.setenv('AGENT_OPERATOR_ID', 'other-operator')
+    other = client.get(f'{base}/{command_id}')
+    assert other.status_code == 403 and other.json()['detail'] == 'Reçu réservé à son opérateur'
+    replay = client.post(f"/api/v1/meeting-sessions/{row['id']}/finalize",
+                         json={'command_id': command_id, 'expected_revision': row['revision']})
+    assert replay.status_code == 409 and replay.json()['detail'] == 'Clé de commande réutilisée avec un autre contenu.'
+    monkeypatch.setenv('AGENT_OPERATOR_ID', 'local')
+    monkeypatch.setenv('AGENT_OPERATOR_PROJECT_IDS', '[]')
+    hidden = client.get(f'{base}/{command_id}')
+    assert hidden.status_code == 404 and hidden.json()['detail'] == 'Projet introuvable'
+
+
 def test_missing_sequence_rejected_without_trapping_capture(stores):
     brain, _, _, _ = stores
     with brain() as db:

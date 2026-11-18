@@ -2,6 +2,7 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import type { ComponentProps } from "react";
 import { api } from "../lib/api";
+import * as http from "../lib/http";
 import { MailWorkspace } from "./MailWorkspace";
 
 beforeEach(()=>{vi.spyOn(window,"confirm").mockReturnValue(true);vi.spyOn(api, "mailProjectUsage").mockResolvedValue({projects:[]});});
@@ -81,7 +82,7 @@ it("permet de relire un mail rejeté dans un accès limité aux projets", async 
   openDetails("Options");
   fireEvent.change(screen.getByLabelText("Dossier de mails"), {target:{value:"rejected"}});
   await screen.findByRole("heading", {name:"Mail conservé après rejet"});
-  expect(archive).toHaveBeenCalledWith(0, "", "newest");
+  expect(archive).toHaveBeenCalledWith(0, "", "newest", expect.any(AbortSignal));
   expect(screen.queryByRole("button", {name:"Enregistrer le classement"})).toBeNull();
   expect(screen.queryByRole("button", {name:"Rejeter le mail"})).toBeNull();
 });
@@ -182,6 +183,22 @@ function openDetails(label: string) {
   fireEvent.click(screen.getByText(label, {exact:true,selector:"summary"}));
 }
 
+it('suspend le suivi du vrai compositeur Thunderbird lorsque Mails est quitté et conserve le message',async()=>{
+  const request=vi.spyOn(http,'request').mockImplementation(async(url)=>{
+    if(url==='/v1/thunderbird/status')return {connected:true,folders:[],accounts:[],jobs:[]} as never;
+    throw new Error('Route fictive non utilisée');
+  });
+  const p=props(),view=render(<MailWorkspace {...p} active/>);
+  openDetails('Options');fireEvent.click(screen.getByRole('button',{name:'Nouveau message'}));
+  const input=await screen.findByLabelText('Message');fireEvent.change(input,{target:{value:'Brouillon Mails conservé'}});
+  await waitFor(()=>expect(request.mock.calls.filter(([url])=>url==='/v1/thunderbird/status')).toHaveLength(1));
+  const signal=request.mock.calls.find(([url])=>url==='/v1/thunderbird/status')![1]!.signal as AbortSignal;
+  view.rerender(<MailWorkspace {...p} active={false}/>);expect(signal.aborted).toBe(true);
+  view.rerender(<MailWorkspace {...p} active/>);
+  await waitFor(()=>expect(request.mock.calls.filter(([url])=>url==='/v1/thunderbird/status')).toHaveLength(2));
+  expect((screen.getByLabelText('Message') as HTMLTextAreaElement).value).toBe('Brouillon Mails conservé');
+});
+
 it("garde les résultats trouvés par le serveur au-delà de l'aperçu et affiche le total", () => {
   const p = {...props(), query: "tolérance", queueTotal: 253, pageHasNext: true};
   render(<MailWorkspace {...p} />);
@@ -263,6 +280,59 @@ it("actualise les mails classés sans rouvrir le dossier pour un accès limité"
   } finally {
     vi.useRealTimers();
   }
+});
+
+it.each([
+  ['classified','classifiedMailPage'],
+  ['rejected','rejectedMailPage'],
+] as const)("suspend et reprend les mails %s sans appliquer une ancienne réponse", async (folder,method) => {
+  vi.useFakeTimers();
+  const hidden=vi.spyOn(document,'hidden','get').mockReturnValue(false);
+  try {
+    vi.spyOn(api,'brainSourceDetail').mockResolvedValue({id:'source1',artifacts:[]});
+    const old={source_id:'source1',project_id:'p1',author:'client@example.com',metadata:{subject:'Mail initial'}};
+    const recent={...old,source_id:'source2',metadata:{subject:'Mail récent'}};
+    const initial={rows:[old],total:1,has_next:false,offset:0,limit:100};
+    let resolveOld!:(value:typeof initial)=>void,oldSignal:AbortSignal|undefined;
+    const fetchPage=vi.spyOn(api,method).mockResolvedValueOnce(initial).mockImplementationOnce((...args:unknown[])=>{
+      oldSignal=args[args.length-1] as AbortSignal;return new Promise<typeof initial>(resolve=>{resolveOld=resolve;});
+    }).mockResolvedValue({...initial,rows:[recent,old],total:2});
+    const p=props(),view=render(<MailWorkspace {...p} active/>);
+    openDetails('Options');fireEvent.change(screen.getByLabelText('Dossier de mails'),{target:{value:folder}});
+    await act(async()=>{});
+    expect(screen.getByRole('heading',{name:'Mail initial'})).toBeTruthy();
+    await act(async()=>{await vi.advanceTimersByTimeAsync(15_000);});
+    expect(fetchPage).toHaveBeenCalledTimes(2);
+    hidden.mockReturnValue(true);act(()=>document.dispatchEvent(new Event('visibilitychange')));
+    expect(oldSignal?.aborted).toBe(true);
+    await act(async()=>{resolveOld({...initial,rows:[{...old,metadata:{subject:'Mail périmé'}}]});await vi.advanceTimersByTimeAsync(30_000);});
+    expect(fetchPage).toHaveBeenCalledTimes(2);
+    expect(screen.getByRole('heading',{name:'Mail initial'})).toBeTruthy();
+    expect(screen.queryByRole('heading',{name:'Mail périmé'})).toBeNull();
+    hidden.mockReturnValue(false);act(()=>document.dispatchEvent(new Event('visibilitychange')));await act(async()=>{});
+    expect(fetchPage).toHaveBeenCalledTimes(3);
+    expect(screen.getByText('Mail 2 / 2')).toBeTruthy();
+    view.rerender(<MailWorkspace {...p} active={false}/>);
+    await act(async()=>{await vi.advanceTimersByTimeAsync(30_000);});
+    expect(fetchPage).toHaveBeenCalledTimes(3);
+    view.rerender(<MailWorkspace {...p} active/>);await act(async()=>{});
+    expect(fetchPage).toHaveBeenCalledTimes(4);
+  } finally {vi.useRealTimers();}
+});
+
+it("attend le retour de la fenêtre avant de charger un dossier classé monté masqué",async()=>{
+  const hidden=vi.spyOn(document,'hidden','get').mockReturnValue(true);
+  vi.spyOn(api,'brainSourceDetail').mockResolvedValue({id:'source1',artifacts:[]});
+  const fetchPage=vi.spyOn(api,'classifiedMailPage').mockResolvedValue({
+    rows:[{source_id:'source1',project_id:'p1',author:'client@example.com',metadata:{subject:'Mail conservé'}}],
+    total:1,has_next:false,offset:0,limit:100,
+  });
+  render(<MailWorkspace {...props()} scoped readOnly/>);
+  await act(async()=>{});
+  expect(fetchPage).not.toHaveBeenCalled();
+  hidden.mockReturnValue(false);act(()=>document.dispatchEvent(new Event('visibilitychange')));
+  expect(await screen.findByRole('heading',{name:'Mail conservé'})).toBeTruthy();
+  expect(fetchPage).toHaveBeenCalledTimes(1);
 });
 
 it("un mail classé peut être déplacé vers un nouveau projet ERP via la même résolution de cible",async()=>{

@@ -23,8 +23,15 @@
   function label(text, input) {
     const element = wsElement('label', text); element.append(input); return element;
   }
-  controls.append(label('Projet ', project), label('Éphémère ', temporary), label('Historique de projet ', saved),
-    newThread, label('Inclure les sources à confirmer ', includeEvidence), prepareProject, retrySave, saveCopy, reopenSaved, status);
+  const options = wsElement('details', undefined, 'menu project-conversation-options');
+  const optionsSummary = wsElement('summary', '···');
+  optionsSummary.setAttribute('aria-label', "Options de l'assistant de projet");
+  optionsSummary.title = "Options de l'assistant de projet";
+  const optionsBody = wsElement('div', undefined, 'menu-body');
+  options.append(optionsSummary, optionsBody);
+  optionsBody.append(label('Éphémère ', temporary), label('Historique de projet ', saved),
+    label('Inclure les sources à confirmer ', includeEvidence), prepareProject, retrySave, saveCopy, reopenSaved);
+  controls.append(label('Projet ', project), newThread, options, status);
   toolbar.append(toggle);
   workspace.prepend(toolbar);
   toolbar.after(controls);

@@ -22,7 +22,7 @@ from backend.app.schemas import DomainInput, IsoDate
 from .ai_client import chat_json, chat_text
 from .settings_service import get_section
 from scripts import speech_runtime
-from app.operational_limits import CAPTURE_DURATION_MS
+from app.operational_limits import AUDIO_IMPORT_BYTES, CAPTURE_DURATION_MS, MIB
 
 ROOT = Path(__file__).resolve().parents[2]
 BUSY = {"queued", "running"}
@@ -95,7 +95,7 @@ def runtime_status(*, models_dir=None):
     except (OSError, ValueError, KeyError, TypeError) as exc:
         ready, detail = False, str(exc)
     return {"ready": ready, "model": model_name, "device": selected_device, "python": str(python),
-            "models_dir": str(models), "max_upload_mb": 50, "max_duration_minutes": 120,
+            "models_dir": str(models), "max_upload_mb": AUDIO_IMPORT_BYTES // MIB, "max_duration_minutes": 120,
             **({"runtime_profile": profile} if profile else {}),
             "detail": ("Profil CUDA configuré ; chargement et qualité à vérifier" if selected_device == "cuda" else
                        "Prêt : transcription et séparation des voix locales") if ready else

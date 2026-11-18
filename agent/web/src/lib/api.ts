@@ -106,7 +106,7 @@ async function req(path: string, init?: RequestInit & {activity?:string|false}, 
 }
 
 export const api = {
-  session: () => request<{operator:{role:string;project_ids:string[]|null}}>('/api/v1/session'),
+  session: (signal?:AbortSignal,timeoutMs=0) => request<{operator:{role:string;project_ids:string[]|null}}>('/api/v1/session',{signal},timeoutMs),
   portfolio: (quiet=false) => req("/portfolio",quiet?{activity:false}:undefined) as Promise<PortfolioRow[]>,
   createProject: (code: string, title: string) =>
     req("/projects", { method: "POST", body: JSON.stringify({ code, title }) }),
@@ -208,10 +208,10 @@ export const api = {
   pendingMailPage: (offset = 0, q = "", sort = "newest") => request<MailPage<PendingMail>>(
     `/v1/mail/page?scope=pending&limit=200&offset=${offset}&q=${encodeURIComponent(q)}&sort=${sort}`),
   mailProjectUsage: () => request<{projects:{project_id:string;score:number;count:number;last_used:string}[]}>("/v1/mail/project-usage"),
-  classifiedMailPage: (offset = 0, q = "", sort = "newest", projectId?: string) => request<MailPage<SourceMail>>(
-    `/v1/mail/page?scope=resolved&limit=100&offset=${offset}&q=${encodeURIComponent(q)}&sort=${sort}${projectId ? `&project_id=${encodeURIComponent(projectId)}` : ""}`),
-  rejectedMailPage: (offset = 0, q = "", sort = "newest") => request<MailPage<SourceMail>>(
-    `/v1/mail/page?scope=rejected&limit=100&offset=${offset}&q=${encodeURIComponent(q)}&sort=${sort}`),
+  classifiedMailPage: (offset = 0, q = "", sort = "newest", projectId?: string, signal?:AbortSignal) => request<MailPage<SourceMail>>(
+    `/v1/mail/page?scope=resolved&limit=100&offset=${offset}&q=${encodeURIComponent(q)}&sort=${sort}${projectId ? `&project_id=${encodeURIComponent(projectId)}` : ""}`, {signal},30000),
+  rejectedMailPage: (offset = 0, q = "", sort = "newest", signal?:AbortSignal) => request<MailPage<SourceMail>>(
+    `/v1/mail/page?scope=rejected&limit=100&offset=${offset}&q=${encodeURIComponent(q)}&sort=${sort}`, {signal},30000),
   brainImportEml: (projectId: string | null, file: File) => {
     const body = new FormData();
     body.append("file", file);

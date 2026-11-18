@@ -19,6 +19,22 @@ function caret(element:HTMLElement,offset=0){
 }
 afterEach(()=>{cleanup();localStorage.clear();vi.restoreAllMocks();});
 
+it('places a binary clipboard image after the active block and keeps text paste working',()=>{
+  const onPasteImage=vi.fn(),onChange=vi.fn();
+  render(<NoteRichEditor content={{version:1,blocks:[paragraph('A'),paragraph('B'),paragraph('C')]}}
+    projectId="p" noteId="n" onChange={onChange} onPasteImage={onPasteImage}/>);
+  const second=screen.getByRole('textbox',{name:'Texte du bloc 2'});
+  const image=new File(['png'],'capture.png',{type:'image/png'});
+  fireEvent.paste(second,{clipboardData:{files:[image],getData:()=>''}});
+  expect(onPasteImage).toHaveBeenCalledExactlyOnceWith(image,2);
+  expect(onChange).not.toHaveBeenCalled();
+  caret(second,1);
+  fireEvent.paste(second,{clipboardData:{files:[],getData:()=> ' suite'}});
+  const edited=onChange.mock.lastCall?.[0] as NoteContent;
+  const block=edited.blocks[1];
+  expect(block.type==='paragraph'&&block.runs.map(run=>run.text).join('')).toBe('B suite');
+});
+
 it('splits a formatted paragraph with Enter and merges it back without losing marks',()=>{
   render(<Editor initial={{version:1,blocks:[{type:'paragraph',align:'center',runs:[run('Réserve '),run('12 Nm',['bold'])]}]}}/>);
   const first=screen.getByRole('textbox',{name:'Texte du bloc 1'});caret(first,8);fireEvent.keyDown(first,{key:'Enter'});

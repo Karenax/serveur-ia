@@ -3,7 +3,7 @@ import type {SessionCommand} from './meetingSessions';
 export type BrowserReservationCommand = SessionCommand & {owner_id: string};
 export type BrowserReservation = {
   session_id: string; owner_id: string; reserve: BrowserReservationCommand;
-  acknowledged: boolean; release?: BrowserReservationCommand;
+  acknowledged: boolean; release?: BrowserReservationCommand; linux_loopback_id?: string;
 };
 export interface BrowserReservationStore {
   read(): BrowserReservation | null;
@@ -23,7 +23,8 @@ export class LocalBrowserReservation implements BrowserReservationStore {
       Number.isInteger(body.expected_revision) && body.expected_revision >= 1;
     if (!value || typeof value.session_id !== 'string' || !uuid.test(value.owner_id) ||
         typeof value.acknowledged !== 'boolean' || !validCommand(value.reserve) ||
-        (value.release !== undefined && !validCommand(value.release))) {
+        (value.release !== undefined && !validCommand(value.release)) ||
+        (value.linux_loopback_id !== undefined && (typeof value.linux_loopback_id !== 'string' || !uuid.test(value.linux_loopback_id)))) {
       throw new Error('La réservation audio conservée doit être vérifiée ; aucun microphone ne sera ouvert.');
     }
     return value;

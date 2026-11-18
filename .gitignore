@@ -66,6 +66,9 @@
 **/audit.json
 /lanceur/*.json
 /lanceur/donnees-clients/
+/lanceur/diagnostics/
+/client-linux/kiara-relay
+*.tsbuildinfo
 /lanceur/hermes-fred/
 !/lanceur/base-strata.json
 !/lanceur/reglages-par-defaut.json

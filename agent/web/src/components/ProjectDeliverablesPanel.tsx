@@ -4,6 +4,7 @@ import { useDebouncedValue } from '../hooks/useDebouncedValue';
 import { Pagination, PersonPicker } from './IdentityPickers';
 import { PlanningRelationPicker, useAlive, focusPlanning } from './PlanningTasksPanel';
 import { ErrorState, LoadingState } from './Ui';
+import { Icon } from '../os/icons';
 import { DeliverableChecklist } from './DeliverableChecklist';
 import { DeliverableValidation } from './DeliverableValidation';
 import { DeliverableVersions } from './DeliverableVersions';
@@ -47,14 +48,13 @@ function DeliverableList({projectId,active=true,onSaved,focus,onFocusHandled}:De
     <header className="planning-heading"><div><h2>Documents à remettre</h2></div>{page&&<button type="button" className="button secondary" disabled={loading||filtersDisabled} onClick={()=>{setSelecting(true);setNotice('');}}>Ajouter depuis les modèles</button>}{page?.can_edit&&<button type="button" className="button primary" disabled={loading||filtersDisabled} onClick={()=>{setCreating(true);setNotice('');}}>Nouveau livrable</button>}</header>
     <div className="planning-toolbar"><label>Rechercher un livrable<input className="input" type="search" value={search} maxLength={200} disabled={filtersDisabled} onChange={e=>{setSearch(e.target.value);setOffset(0);}}/></label>
       <label>Statut documentaire<select className="input" value={status} disabled={filtersDisabled} onChange={e=>{setStatus(e.target.value as DocumentStatus|'');setOffset(0);}}><option value="">Tous</option>{Object.entries(documentLabels).map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label>
-    </div>
-    <details className="deliverable-filters"><summary>Filtres et options</summary><div className="planning-form-grid">
+<details className="deliverable-filters discrete-icon-menu icon-menu-details"><summary className="discrete-icon-summary icon-menu-summary" aria-label="Filtres et options des livrables" title="Filtres et options des livrables"><Icon name="sliders" size={16} /></summary><div className="planning-form-grid discrete-icon-menu-panel icon-menu-popover">
       <label>Catégorie<select className="input" value={category} disabled={filtersDisabled} onChange={e=>{setCategory(e.target.value as Category|'');setOffset(0);}}><option value="">Toutes</option>{Object.entries(categoryLabels).map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label>
       <label className="identity-checkbox"><input type="checkbox" checked={inactive} disabled={filtersDisabled} onChange={e=>{setInactive(e.target.checked);setOffset(0);}}/>Inclure les livrables désélectionnés</label>
       <button type="button" className="button secondary sm" disabled={loading||filtersDisabled} onClick={()=>setTick(value=>value+1)}>Actualiser la liste</button>
       <PersonPicker label="Filtrer par responsable" value={responsible} onChange={value=>{setResponsible(value);setOffset(0);}} disabled={filtersDisabled}/>
       <PersonPicker label="Filtrer par vérificateur" value={verifier} onChange={value=>{setVerifier(value);setOffset(0);}} disabled={filtersDisabled}/>
-      <PlanningRelationPicker projectId={projectId} kind="milestones" label="Filtrer par jalon" value={milestone} onChange={value=>{setMilestone(value);setOffset(0);}} disabled={filtersDisabled}/></div></details>
+      <PlanningRelationPicker projectId={projectId} kind="milestones" label="Filtrer par jalon" value={milestone} onChange={value=>{setMilestone(value);setOffset(0);}} disabled={filtersDisabled}/></div></details></div>
     {notice&&<p role="status" className="planning-notice">{notice}</p>}{error&&<ErrorState message={error} retry={()=>setTick(value=>value+1)}/>}{loading&&<LoadingState label="Chargement des livrables"/>}{opening&&<p role="status">Ouverture du livrable…</p>}
     {creating&&page&&<DeliverableEditor projectId={projectId} revision={page.revision} onCancel={()=>{if(abandon(container.current))setCreating(false);}} onSaved={()=>{setCreating(false);saved();}}/>}
     {selected&&<DeliverableSheet key={`${selected.id}-${openedFocus?.requestId||0}`} projectId={projectId} active={active} initial={selected} focus={openedFocus} onBusy={setSheetBusy} onClose={()=>{if(abandon(container.current))setSelected(null);}} onSaved={saved}/>}

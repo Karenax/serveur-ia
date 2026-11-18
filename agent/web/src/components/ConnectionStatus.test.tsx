@@ -86,6 +86,37 @@ it('relit le statut si le test se termine pendant une requête précédente',asy
   expect(request).toHaveBeenCalledTimes(2);
 });
 
+it('suspend le statut masqué, ignore une réponse ancienne et relit au retour',async()=>{
+  vi.useFakeTimers();
+  const hidden=vi.spyOn(document,'hidden','get').mockReturnValue(false);
+  let finish!:(value:unknown)=>void;
+  vi.mocked(request).mockResolvedValueOnce(connections('ok'))
+    .mockImplementationOnce(()=>new Promise(resolve=>{finish=resolve;}))
+    .mockResolvedValue(connections('error'));
+  render(<ConnectionStatus/>);await act(async()=>{});
+  fireEvent.click(screen.getByText('État du système'));
+  await act(async()=>{await vi.advanceTimersByTimeAsync(60000);});
+  const signal=vi.mocked(request).mock.calls[1][1]!.signal as AbortSignal;
+  hidden.mockReturnValue(true);act(()=>document.dispatchEvent(new Event('visibilitychange')));
+  expect(signal.aborted).toBe(true);
+  await act(async()=>{finish(connections('warning'));await vi.advanceTimersByTimeAsync(120000);});
+  expect(request).toHaveBeenCalledTimes(2);
+  expect(screen.getByRole('status',{name:'Assistant IA : Accessible'})).toBeTruthy();
+  hidden.mockReturnValue(false);act(()=>document.dispatchEvent(new Event('visibilitychange')));await act(async()=>{});
+  expect(request).toHaveBeenCalledTimes(3);
+  expect(screen.getByRole('status',{name:'Assistant IA : Indisponible'})).toBeTruthy();
+});
+
+it('attend le retour de la fenêtre avant la première lecture du statut',async()=>{
+  const hidden=vi.spyOn(document,'hidden','get').mockReturnValue(true);
+  vi.mocked(request).mockResolvedValue(connections('ok'));
+  render(<ConnectionStatus/>);await act(async()=>{});
+  expect(request).not.toHaveBeenCalled();
+  hidden.mockReturnValue(false);act(()=>document.dispatchEvent(new Event('visibilitychange')));
+  expect(await screen.findByText('À vérifier')).toBeTruthy();
+  expect(request).toHaveBeenCalledTimes(1);
+});
+
 it('regroupe le suivi des mails et garde les erreurs visibles dans le témoin unique',async()=>{
   const open=vi.fn();
   const service={state:'ok',detail:'Accessible'};

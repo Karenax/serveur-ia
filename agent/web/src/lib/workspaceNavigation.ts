@@ -5,7 +5,7 @@ export const projectTabLabels: Record<ProjectTab, string> = {
   pilotage: "Vue d’ensemble", cdc: "CDC & BE", planification: "Planning", atelier: "Atelier",
   reviews: "Réunions & revues", documents: "Documents", connaissance: "Informations",
 };
-export const workspacePages = ["home", "projects", "mail", "meetings", "activity", "sources", "stats", "preparation", "knowledge", "search", "jobs", "imports", "settings", "create"] as const;
+export const workspacePages = ["home", "projects", "notes", "mail", "meetings", "activity", "sources", "stats", "preparation", "knowledge", "search", "jobs", "imports", "settings", "create"] as const;
 export const projectSections = [
   {slug:"vue-ensemble", tab:"pilotage", label:"Vue d’ensemble"},
   {slug:"pilotage", tab:"planification", label:"Pilotage"},
@@ -52,5 +52,6 @@ export function workspacePath(route: WorkspaceRoute) {
 }
 
 export function routeKey(route: WorkspaceRoute) {
+  if (route.page === "settings" || route.page === "stats" || route.page === "preparation") return "settings";
   return route.page === "project" ? `project:${route.projectId}` : route.page;
 }

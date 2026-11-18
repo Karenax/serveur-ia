@@ -170,6 +170,17 @@ class NoteRestore(Command):
         return str(UUID(value))
 
 
+class NotePaste(NoteSave):
+    expected_revision: int = Field(ge=0)
+    insert_at: int = Field(ge=0, le=499)
+
+    @model_validator(mode='after')
+    def valid_position(self):
+        if self.insert_at > len(self.content.blocks) or len(self.content.blocks) >= 500:
+            raise ValueError('La note ne dispose plus de place pour cette image')
+        return self
+
+
 def content_text(content: NoteContent):
     lines = []
     for block in content.blocks:

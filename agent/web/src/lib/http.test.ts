@@ -11,6 +11,40 @@ function abortableFetch() {
 }
 
 describe("Transport local", () => {
+  it("distingue une réponse HTTP refusée d’une erreur réseau", async () => {
+    vi.stubGlobal('fetch',vi.fn().mockResolvedValueOnce(new Response(JSON.stringify({detail:'Révision différente'}),{status:409}))
+      .mockRejectedValueOnce(new TypeError('Connexion interrompue')));
+    const {request}=await import('./http');
+    const {HttpError}=await import('./httpError');
+    await expect(request('/v1/test',{activity:false})).rejects.toMatchObject({name:'HttpError',status:409,message:'Révision différente'});
+    try {await request('/v1/test',{activity:false});throw new Error('La lecture aurait dû échouer');}
+    catch (error) {expect(error).toBeInstanceOf(TypeError);expect(error).not.toBeInstanceOf(HttpError);}
+  });
+  it("borne une lecture de session quand son appelant demande un délai", async () => {
+    vi.useFakeTimers();const fetch=abortableFetch();vi.stubGlobal('fetch',fetch);
+    const {api}=await import('./api');
+    const pending=api.session(undefined,20000);
+    const rejected=expect(pending).rejects.toMatchObject({name:'AbortError'});
+    await vi.advanceTimersByTimeAsync(19999);
+    expect(fetch.mock.calls[0][1]?.signal?.aborted).toBe(false);
+    await vi.advanceTimersByTimeAsync(1);await rejected;
+    expect(fetch.mock.calls[0][1]?.signal?.aborted).toBe(true);
+  });
+  it("libère les lectures de réunions et traitements bloquées après leur délai", async () => {
+    vi.useFakeTimers();
+    const fetch=abortableFetch();vi.stubGlobal("fetch",fetch);
+    const {workspaceApi}=await import("./workspaceApi");
+    const {api}=await import("./api");
+    const pending=[workspaceApi.jobs({},undefined,true),workspaceApi.meetings({},undefined,true),
+      workspaceApi.latestTriage(undefined,true),workspaceApi.triageJob('fictif',undefined,true),
+      api.classifiedMailPage(),api.rejectedMailPage()];
+    const outcomes=Promise.all(pending.map(value=>value.then(()=>"success",error=>error.name)));
+    await vi.advanceTimersByTimeAsync(29_999);
+    expect(fetch.mock.calls.every(([,init])=>!init?.signal?.aborted)).toBe(true);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(await outcomes).toEqual(["AbortError","AbortError","AbortError","AbortError","AbortError","AbortError"]);
+    expect(fetch.mock.calls.every(([,init])=>init?.signal?.aborted)).toBe(true);
+  });
   it("ne coupe pas une opération longue au bout de six minutes par défaut", async () => {
     vi.useFakeTimers();vi.stubGlobal("fetch", abortableFetch());
     const external = new AbortController();

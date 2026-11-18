@@ -1,0 +1,302 @@
+[
+  {
+    "file": "web/src/App.tsx",
+    "line": 1446,
+    "rule": "input-name",
+    "message": "Champ sans association de label repérée : vérifier son nom accessible."
+  },
+  {
+    "file": "web/src/App.tsx",
+    "line": 1447,
+    "rule": "input-name",
+    "message": "Champ sans association de label repérée : vérifier son nom accessible."
+  },
+  {
+    "file": "web/src/components/CdcReviewPanel.tsx",
+    "line": 327,
+    "rule": "keyboard-click",
+    "message": "Contrôle cliquable non natif : vérifier accès clavier, rôle et focus."
+  },
+  {
+    "file": "web/src/components/CdcReviewPanel.tsx",
+    "line": 369,
+    "rule": "button-name",
+    "message": "Bouton sans texte ou nom accessible repéré (vérifier les composants enfants)."
+  },
+  {
+    "file": "web/src/components/DeliverableChecklist.tsx",
+    "line": 31,
+    "rule": "long-copy",
+    "message": "Texte de 178 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/DeliverableDefinitionEditor.tsx",
+    "line": 29,
+    "rule": "long-copy",
+    "message": "Texte de 143 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/DeliverableDefinitionEditor.tsx",
+    "line": 54,
+    "rule": "long-copy",
+    "message": "Texte de 156 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/DeliverableDefinitionEditor.tsx",
+    "line": 58,
+    "rule": "long-copy",
+    "message": "Texte de 141 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/DeliverableSelection.tsx",
+    "line": 42,
+    "rule": "long-copy",
+    "message": "Texte de 183 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/DeliverableSelection.tsx",
+    "line": 52,
+    "rule": "long-copy",
+    "message": "Texte de 175 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/DeliverableTypologyComposition.tsx",
+    "line": 39,
+    "rule": "long-copy",
+    "message": "Texte de 196 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/DeliverableValidation.tsx",
+    "line": 21,
+    "rule": "long-copy",
+    "message": "Texte de 157 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/DeliverableVersions.tsx",
+    "line": 59,
+    "rule": "long-copy",
+    "message": "Texte de 158 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/DocumentBatchPanel.tsx",
+    "line": 101,
+    "rule": "long-copy",
+    "message": "Texte de 207 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/DocumentBatchPanel.tsx",
+    "line": 118,
+    "rule": "button-name",
+    "message": "Bouton sans texte ou nom accessible repéré (vérifier les composants enfants)."
+  },
+  {
+    "file": "web/src/components/DocumentBatchPanel.tsx",
+    "line": 125,
+    "rule": "long-copy",
+    "message": "Texte de 157 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/DocumentSettings.tsx",
+    "line": 41,
+    "rule": "long-copy",
+    "message": "Texte de 155 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/FusionInsights.tsx",
+    "line": 91,
+    "rule": "long-copy",
+    "message": "Texte de 212 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/FusionInsights.tsx",
+    "line": 101,
+    "rule": "long-copy",
+    "message": "Texte de 222 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/FusionInsights.tsx",
+    "line": 104,
+    "rule": "long-copy",
+    "message": "Texte de 169 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/FusionReadiness.tsx",
+    "line": 50,
+    "rule": "long-copy",
+    "message": "Texte de 185 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/MeetingNotePublication.tsx",
+    "line": 63,
+    "rule": "long-copy",
+    "message": "Texte de 186 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/MeetingStudio.tsx",
+    "line": 688,
+    "rule": "button-name",
+    "message": "Bouton sans texte ou nom accessible repéré (vérifier les composants enfants)."
+  },
+  {
+    "file": "web/src/components/MilestoneDeliverableGates.tsx",
+    "line": 13,
+    "rule": "long-copy",
+    "message": "Texte de 168 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/MilestonesPanel.tsx",
+    "line": 98,
+    "rule": "long-copy",
+    "message": "Texte de 150 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/NativeMeetingCapture.tsx",
+    "line": 194,
+    "rule": "long-copy",
+    "message": "Texte de 146 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/NativeMeetingCapture.tsx",
+    "line": 210,
+    "rule": "long-copy",
+    "message": "Texte de 146 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/NoteImportPanel.tsx",
+    "line": 87,
+    "rule": "long-copy",
+    "message": "Texte de 166 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/NoteImportPanel.tsx",
+    "line": 94,
+    "rule": "long-copy",
+    "message": "Texte de 166 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/NoteRichEditor.tsx",
+    "line": 288,
+    "rule": "long-copy",
+    "message": "Texte de 177 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/NoteRichEditor.tsx",
+    "line": 346,
+    "rule": "keyboard-click",
+    "message": "Contrôle cliquable non natif : vérifier accès clavier, rôle et focus."
+  },
+  {
+    "file": "web/src/components/OfflineModeDialog.tsx",
+    "line": 37,
+    "rule": "long-copy",
+    "message": "Texte de 142 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/PlanningBaselinesPanel.tsx",
+    "line": 51,
+    "rule": "long-copy",
+    "message": "Texte de 317 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/PlanningBaselinesPanel.tsx",
+    "line": 68,
+    "rule": "long-copy",
+    "message": "Texte de 142 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/PlanningChanges.tsx",
+    "line": 64,
+    "rule": "long-copy",
+    "message": "Texte de 155 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/PlanningDefinitionEditor.tsx",
+    "line": 40,
+    "rule": "long-copy",
+    "message": "Texte de 185 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/PlanningDefinitionEditor.tsx",
+    "line": 65,
+    "rule": "long-copy",
+    "message": "Texte de 202 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/PlanningMilestonesPanel.tsx",
+    "line": 89,
+    "rule": "long-copy",
+    "message": "Texte de 171 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/PlanningTemplateApplication.tsx",
+    "line": 26,
+    "rule": "long-copy",
+    "message": "Texte de 217 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/ProjectIndexing.tsx",
+    "line": 12,
+    "rule": "long-copy",
+    "message": "Texte de 196 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/ProjectNotesPanel.tsx",
+    "line": 38,
+    "rule": "button-name",
+    "message": "Bouton sans texte ou nom accessible repéré (vérifier les composants enfants)."
+  },
+  {
+    "file": "web/src/components/ProjectReviewsPanel.tsx",
+    "line": 46,
+    "rule": "button-name",
+    "message": "Bouton sans texte ou nom accessible repéré (vérifier les composants enfants)."
+  },
+  {
+    "file": "web/src/components/SettingsForms.tsx",
+    "line": 72,
+    "rule": "technical-copy",
+    "message": "Texte technique potentiellement visible : vérifier le contexte métier."
+  },
+  {
+    "file": "web/src/components/SettingsForms.tsx",
+    "line": 185,
+    "rule": "long-copy",
+    "message": "Texte de 146 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/SourcesLibrary.tsx",
+    "line": 170,
+    "rule": "long-copy",
+    "message": "Texte de 153 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/ThunderbirdPanel.tsx",
+    "line": 51,
+    "rule": "long-copy",
+    "message": "Texte de 148 caractères : vérifier son utilité et sa concision."
+  },
+  {
+    "file": "web/src/components/WorkspaceShell.tsx",
+    "line": 286,
+    "rule": "button-name",
+    "message": "Bouton sans texte ou nom accessible repéré (vérifier les composants enfants)."
+  },
+  {
+    "file": "web/src/components/WorkspaceShell.tsx",
+    "line": 314,
+    "rule": "button-name",
+    "message": "Bouton sans texte ou nom accessible repéré (vérifier les composants enfants)."
+  },
+  {
+    "file": "web/src/components/WorkspaceShell.tsx",
+    "line": 337,
+    "rule": "input-name",
+    "message": "Champ sans association de label repérée : vérifier son nom accessible."
+  },
+  {
+    "file": "web/src/components/WorkspaceViews.tsx",
+    "line": 305,
+    "rule": "button-name",
+    "message": "Bouton sans texte ou nom accessible repéré (vérifier les composants enfants)."
+  }
+]

@@ -1,4 +1,5 @@
 import { request } from "./http";
+import type {VerifiedProjectAudio} from './projectAudioDrafts';
 
 export type TranscriptSegment = {id: string; start: number; end: number; speaker: string; text: string};
 export type MeetingEvidence = {text: string; segment_id: string; quote: string};
@@ -19,6 +20,7 @@ export const meetingAudio = {
   list: (project: string,quiet=false) => request<RecordingListItem[]>(path(project),quiet?{activity:false}:{}),
   get: (project: string, id: string, signal?: AbortSignal,quiet=false) => request<MeetingRecording>(path(project, id), {signal,activity:quiet?false:undefined}),
   upload: (project: string, body: FormData) => request<MeetingRecording>(path(project), {method: "POST", body}),
+  integrity: (project: string, id: string) => request<VerifiedProjectAudio>(path(project, id) + '/audio-integrity', {cache:'no-store'}),
   transcribe: (project: string, id: string) => request<MeetingRecording>(path(project, id) + "/transcribe", {method: "POST"}),
   cancel: (project: string, id: string) => request<MeetingRecording>(path(project, id) + "/cancel", {method: "POST"}),
   review: (project: string, id: string, revision: number, segments: TranscriptSegment[], speaker_names: Record<string, string>, validate: boolean) =>

@@ -1,5 +1,6 @@
 import { agentFetch } from './agentRoutes';
 import { beginActivity, automaticRequestActivity } from './asyncActivity';
+import { HttpError } from './httpError';
 
 export type RequestOptions = RequestInit & { activity?: string | false };
 let session: Promise<string> | undefined;
@@ -37,7 +38,7 @@ export async function request<T>(url: string, init: RequestOptions = {}, timeout
       if (!response.ok) {
         if (response.status === 403) session = undefined;
         const detail = data.detail;
-        throw new Error(typeof detail === "string" ? detail : detail?.message ?? JSON.stringify(detail ?? data));
+        throw new HttpError(response.status,typeof detail === "string" ? detail : detail?.message ?? JSON.stringify(detail ?? data));
       }
       return data as T;
     } finally {

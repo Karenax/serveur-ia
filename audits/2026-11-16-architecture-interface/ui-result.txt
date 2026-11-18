@@ -1,0 +1,63 @@
+{
+  "views": [
+    {
+      "name": "desktop",
+      "width": 1440,
+      "height": 900,
+      "overflow": false,
+      "headings": [
+        "Projets"
+      ],
+      "buttons": [
+        {
+          "name": "AUD-2 · Étude de faisabilité du nouvel atelier",
+          "width": 223.390625,
+          "height": 19.5
+        }
+      ]
+    },
+    {
+      "name": "tablet",
+      "width": 768,
+      "height": 1024,
+      "overflow": false,
+      "headings": [
+        "Projets"
+      ],
+      "buttons": []
+    },
+    {
+      "name": "mobile",
+      "width": 390,
+      "height": 844,
+      "overflow": false,
+      "headings": [
+        "Projets"
+      ],
+      "buttons": []
+    }
+  ],
+  "hiddenPolling": {
+    "durationMs": 4709,
+    "requests": [
+      {
+        "url": "/api/v1/projects/audit-1/cdc/jobs",
+        "time": 1794857031749
+      },
+      {
+        "url": "/api/v1/projects/audit-2/cdc/jobs",
+        "time": 1794857032308
+      },
+      {
+        "url": "/api/v1/projects/audit-1/cdc/jobs",
+        "time": 1794857033742
+      },
+      {
+        "url": "/api/v1/projects/audit-2/cdc/jobs",
+        "time": 1794857034305
+      }
+    ],
+    "mountedProjectViews": 2
+  },
+  "errors": []
+}

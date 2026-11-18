@@ -28,12 +28,19 @@ export function DocumentPublicationPanel(props:Props){
     documentApi.workspace(projectId,linkOffset,controller.signal).then(value=>{if(!controller.signal.aborted)setLinks(value.links);})
       .catch(e=>{if(!controller.signal.aborted)setError(message(e));});return()=>controller.abort();
   },[projectId,linkOffset,active,editable]);
-  useEffect(()=>{if(!active)return;const controller=new AbortController();let timer:number|undefined;
-    async function refresh(quiet=false){try{const value=await (quiet?publicationApi.list(projectId,jobId,artifactId,offset,controller.signal,true):publicationApi.list(projectId,jobId,artifactId,offset,controller.signal));
-      if(controller.signal.aborted)return;setHistory(previous=>previous&&previous.job_revision>value.job_revision?previous:value);setReadError('');
-      timer=window.setTimeout(()=>void refresh(true),5000);
-    }catch(e){if(!controller.signal.aborted){setReadError(message(e));timer=window.setTimeout(()=>void refresh(true),10_000);}}}
-    void refresh();return()=>{controller.abort();window.clearTimeout(timer);};
+  useEffect(()=>{if(!active)return;let stopped=false,loading=false,controller:AbortController|null=null,timer:number|undefined;
+    const stop=()=>{window.clearTimeout(timer);timer=undefined;controller?.abort();controller=null;loading=false;};
+    async function refresh(quiet=false){
+      if(stopped||document.hidden||loading)return;
+      controller?.abort();const current=new AbortController();controller=current;loading=true;let delay=5000;
+      try{const value=await (quiet?publicationApi.list(projectId,jobId,artifactId,offset,current.signal,true):publicationApi.list(projectId,jobId,artifactId,offset,current.signal));
+        if(current.signal.aborted)return;setHistory(previous=>previous&&previous.job_revision>value.job_revision?previous:value);setReadError('');
+      }catch(e){if(!current.signal.aborted){setReadError(message(e));delay=10_000;}}
+      finally{if(controller===current){loading=false;if(!stopped&&!document.hidden)timer=window.setTimeout(()=>void refresh(true),delay);}}
+    }
+    const visibility=()=>{if(document.hidden){stop();return;}window.clearTimeout(timer);timer=undefined;void refresh(true);};
+    document.addEventListener('visibilitychange',visibility);if(!document.hidden)void refresh();
+    return()=>{stopped=true;document.removeEventListener('visibilitychange',visibility);stop();};
   },[projectId,jobId,artifactId,active,offset,tick,revision]);
   useEffect(()=>{if(!pending||!history)return;const known=history.items.find(row=>row.command_id===pending.command_id);
     if(known&&['succeeded','abandoned'].includes(known.state)){

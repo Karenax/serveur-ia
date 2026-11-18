@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { Detail } from '../App';
+import { api, type CdcReview, type PortfolioRow, type ProjectDetail } from '../lib/api';
 import { cockpitApi, type CockpitStructure } from '../lib/projectCockpit';
 import { planningApi, type PlanningInfo, type PlanningTask } from '../lib/projectPlanning';
 import { identityApi } from '../lib/projectIdentity';
@@ -33,7 +35,30 @@ beforeEach(()=>{
   vi.spyOn(deliverableApi,'detail').mockResolvedValue(document);
   vi.spyOn(deliverableApi,'milestoneGates').mockResolvedValue({items:[],total:0,offset:0,limit:25,milestone_id:'m1',revision:7,can_validate:true,checks_total:0,blocking_total:0});
 });
-afterEach(()=>{cleanup();vi.restoreAllMocks();});
+afterEach(()=>{cleanup();vi.useRealTimers();vi.restoreAllMocks();});
+
+it('suspend le suivi du vrai cockpit lorsque la fiche projet est inactive puis le reprend sans perdre la saisie',async()=>{
+  vi.useFakeTimers();
+  vi.spyOn(api,'cdcReview').mockResolvedValue({reviewed:0,total:0} as CdcReview);
+  const detailProps={current:{id:'p1',code:'TEST-0806',title:'Moteur',status:'active',client_name:'Recette'} as PortfolioRow,
+    detail:{id:'p1',tasks:[],milestones:[],deliverables:[],planning_revision:7} as unknown as ProjectDetail,
+    items:[],sources:[],meetings:[],tab:'pilotage' as const,setTab:vi.fn(),cdcTab:'sources' as const,setCdcTab:vi.fn(),
+    analyze:vi.fn(),analyzing:false,analyzeMsg:'',aiStatus:null,jobs:[],jobsError:'',cancelJob:vi.fn(),retryJob:vi.fn(),
+    editing:false,setEditing:vi.fn(),back:vi.fn(),refresh:vi.fn(async()=>{})};
+  const view=render(<Detail {...detailProps} active/>);
+  await act(async()=>{});
+  expect(projectKnowledgeApi.read).toHaveBeenCalledTimes(1);
+  const signal=vi.mocked(projectKnowledgeApi.read).mock.calls[0][2]!;
+  fireEvent.change(screen.getByLabelText('Rechercher dans le projet'),{target:{value:'Recherche à conserver'}});
+  view.rerender(<Detail {...detailProps} active={false}/>);
+  expect(signal.aborted).toBe(true);
+  await act(async()=>{await vi.advanceTimersByTimeAsync(45000);});
+  expect(projectKnowledgeApi.read).toHaveBeenCalledTimes(1);
+  view.rerender(<Detail {...detailProps} active/>);
+  await act(async()=>{});
+  expect(projectKnowledgeApi.read).toHaveBeenCalledTimes(2);
+  expect((screen.getByLabelText('Rechercher dans le projet') as HTMLInputElement).value).toBe('Recherche à conserver');
+});
 
 it('affiche les compteurs complets et charge les listes indépendamment du graphe',async()=>{
   let resolve!:(value:CockpitStructure)=>void;

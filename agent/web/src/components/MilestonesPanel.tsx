@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { api } from "../lib/api";
 import { milestoneApi, type DateField, type Milestone, type MilestoneCandidate, type MilestoneChange,
   type MilestoneEvidence, type MilestoneReview } from "../lib/milestones";
-import { SourceInspector } from "./WorkspaceViews";
+import { SourceInspector } from "./SourceInspector";
 import { Glyph, P } from "../os/icons";
 import "../milestones.css";
 
@@ -32,23 +32,28 @@ export function MilestonesPanel({projectId, rows, refresh, active = true,reviewO
   }, [projectId]);
   useEffect(() => {
     if (!active) return;
-    let live = true, timer: ReturnType<typeof setTimeout>, previousJob = "",previousPlanningRevision:number|undefined;
-    const controller = new AbortController();
+    let live = true, loading=false, timer: ReturnType<typeof setTimeout>|undefined, previousJob = "",previousPlanningRevision:number|undefined;
+    let controller:AbortController|null=null;
+    const stop=()=>{clearTimeout(timer);timer=undefined;controller?.abort();controller=null;loading=false;};
     const load = async (quiet=false) => {
+      if(!live||document.hidden||loading)return;
+      controller?.abort();const current=new AbortController();controller=current;loading=true;
       try {
-        const value = await (quiet?milestoneApi.review(projectId,controller.signal,true):milestoneApi.review(projectId, controller.signal));
-        if (!live) return;
+        const value = await (quiet?milestoneApi.review(projectId,current.signal,true):milestoneApi.review(projectId,current.signal));
+        if (!live||current.signal.aborted) return;
         setReview(value);
         const currentJob = JSON.stringify([value.job?.id, value.job?.status, value.job?.processed]);
         if (previousJob && previousJob !== currentJob) refreshRef.current();
         previousJob = currentJob;
         if(previousPlanningRevision!==undefined&&previousPlanningRevision!==value.planning_revision)refreshRef.current();
         previousPlanningRevision=value.planning_revision;
-      } catch (cause) {if (live) setError(errorMessage(cause));}
-      finally {if (live) timer = setTimeout(()=>void load(true), document.hidden ? 15000 : 4000);}
+      } catch (cause) {if (live&&!current.signal.aborted) setError(errorMessage(cause));}
+      finally {if(controller===current){loading=false;if(live&&!document.hidden)timer=setTimeout(()=>void load(true),4000);}}
     };
-    void load();
-    return () => {live = false; controller.abort(); clearTimeout(timer);};
+    const visibility=()=>{if(document.hidden){stop();return;}clearTimeout(timer);timer=undefined;void load(true);};
+    document.addEventListener('visibilitychange',visibility);
+    if(!document.hidden)void load();
+    return () => {live=false;document.removeEventListener('visibilitychange',visibility);stop();};
   }, [projectId, active]);
   const run = async (key: string, action: () => Promise<unknown>) => {
     if (busy) return;

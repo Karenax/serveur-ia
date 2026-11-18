@@ -136,6 +136,38 @@ it('le fallback5s fonctionne quand le transport SSE est indisponible et reste mu
   view.unmount();const after=vi.mocked(meetingSessions.get).mock.calls.length;
   await tick(10_000);expect(vi.mocked(meetingSessions.get).mock.calls).toHaveLength(after);expect(fetch).not.toHaveBeenCalled();
 });
+it('le contrôle de secours borne les lectures, les annule au masquage et conserve la note',async()=>{
+  let finish!:(value:MeetingSession)=>void;const slow=new Promise<MeetingSession>(resolve=>{finish=resolve;});
+  vi.mocked(meetingSessions.get).mockResolvedValueOnce(row).mockReturnValueOnce(slow).mockReturnValueOnce(slow).mockResolvedValue(changed());
+  render(<MeetingStudio {...props()}/>);await tick();
+  fireEvent.change(screen.getByLabelText('Note humaine'),{target:{value:'Brouillon conservé pendant le masquage.'}});
+  await tick(5000);
+  const calls=vi.mocked(meetingSessions.get).mock.calls,firstSignal=calls[calls.length-1][1]!;
+  await tick(10_000);const before=calls.length;expect(before).toBe(3);const secondSignal=calls[calls.length-1][1]!;
+  hidden=true;await act(async()=>{document.dispatchEvent(new Event('visibilitychange'));});expect(firstSignal.aborted).toBe(true);expect(secondSignal.aborted).toBe(true);
+  await tick(10_000);expect(meetingSessions.get).toHaveBeenCalledTimes(before);
+  hidden=false;await act(async()=>{document.dispatchEvent(new Event('visibilitychange'));});await tick();
+  expect(vi.mocked(meetingSessions.get).mock.calls.length).toBeGreaterThan(before);
+  await act(async()=>{finish(row);});await tick();
+  fireEvent.click(screen.getByRole('tab',{name:'Transcription'}));
+  expect(screen.getByText(changed().segments![0].text)).toBeTruthy();
+  expect(screen.getByLabelText('Note humaine')).toHaveProperty('value','Brouillon conservé pendant le masquage.');
+});
+it('le flux reprend immédiatement même si une lecture annulée ne se termine pas',async()=>{
+  let finish!:(value:MeetingSession)=>void;const slow=new Promise<MeetingSession>(resolve=>{finish=resolve;});
+  vi.mocked(meetingSessions.get).mockResolvedValueOnce(row).mockReturnValueOnce(slow).mockResolvedValue(changed());
+  render(<MeetingStudio {...props()}/>);await tick();
+  await emit(feeds[0]);
+  const calls=vi.mocked(meetingSessions.get).mock.calls,oldSignal=calls[calls.length-1][1]!;
+  hidden=true;await act(async()=>{document.dispatchEvent(new Event('visibilitychange'));});expect(oldSignal.aborted).toBe(true);
+  hidden=false;await act(async()=>{document.dispatchEvent(new Event('visibilitychange'));});await tick();
+  const before=vi.mocked(meetingSessions.get).mock.calls.length;
+  await act(async()=>{feeds[feeds.length-1].options.onConnected?.();});await tick();
+  expect(vi.mocked(meetingSessions.get).mock.calls.length).toBeGreaterThan(before);
+  await act(async()=>{finish(row);});await tick();
+  fireEvent.click(screen.getByRole('tab',{name:'Transcription'}));
+  expect(screen.getByText(changed().segments![0].text)).toBeTruthy();
+});
 it('la reprise explicite utilise la dernière révision et conserve le brouillon humain sans réenregistrer l’audio',async()=>{
   const failed={...row,chunks:[{id:'failed',track:'mic' as const,sequence:0,sha256:'a'.repeat(64),size_bytes:32044,start_ms:0,duration_ms:1000,
     created_at:'2026-10-12T03:00:00Z',speech_status:'failed' as const,speech_error:'Échec fictif'}]};

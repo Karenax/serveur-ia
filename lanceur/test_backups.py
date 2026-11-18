@@ -213,15 +213,40 @@ class BackupsTests(unittest.TestCase):
         self.assertFalse(self.b.tick())
         self.assertGreater(self.b.data['next_due'], time.time())
 
-    def test_interrupted_automatic_job_is_durable_and_retried(self):
+    def test_inaccessible_client_uses_validated_restored_profile(self):
+        clients = self.home / 'clients'
+        clients.mkdir(exist_ok=True)
+        executable = clients / (self.owner + '.exe')
+        executable.write_bytes(b'x' * 16)
+        original_open = Path.open
+        def open_with_denial(path, *args, **kwargs):
+            if path == executable:
+                raise PermissionError('fixture')
+            return original_open(path, *args, **kwargs)
+        with patch.object(Path, 'open', open_with_denial):
+            self.assertTrue(self.backup()['id'])
+            (self.c.wireguard.directory / 'profils-restaures.dpapi').unlink()
+            with self.assertRaises(ValueError):
+                self.backup()
+
+    def test_failed_automatic_job_does_not_retry_after_five_minutes(self):
+        self.b.configure({'enabled': True, 'password': PHRASE})
+        self.b.data['next_due'] = time.time() - 1
+        with patch.object(self.b, '_create', side_effect=ValueError('fixture')):
+            self.assertTrue(self.b.tick()); self.join()
+        self.assertEqual(self.b.status()['job']['state'], 'failed')
+        self.assertEqual(self.b.data['retry_due'], 0)
+        self.assertFalse(self.b.tick(now=time.time() + 300))
+
+    def test_interrupted_automatic_job_waits_for_normal_schedule(self):
         self.b.configure({'enabled': True, 'password': PHRASE})
         with self.b.lock:
             self.b.data['job'] = {'state': 'running', 'kind': 'automatic', 'message': ''}
             self.b._save()
         self.b.close(); self.b = BackupManager(self.c)
         self.assertEqual(self.b.status()['job']['state'], 'failed')
-        self.assertTrue(self.b.tick()); self.join()
-        self.assertEqual(self.b.status()['job']['state'], 'succeeded')
+        self.assertFalse(self.b.tick())
+        self.assertGreater(self.b.data['next_due'], time.time())
 
     def test_bad_dpapi_secret_does_not_start_or_leak_error_and_retries_are_bounded(self):
         self.b.configure({'enabled': True, 'password': PHRASE})
@@ -229,7 +254,9 @@ class BackupsTests(unittest.TestCase):
         self.b.data['next_due'] = time.time() - 1
         self.assertFalse(self.b.tick())
         self.assertEqual(self.b.status()['catalog'], [])
-        self.assertGreater(self.b.data['retry_due'], time.time() + 200)
+        self.assertEqual(self.b.data['retry_due'], 0)
+        self.assertGreater(self.b.data['next_due'], time.time() + 300)
+        self.assertFalse(self.b.tick(now=time.time() + 300))
         self.assertNotIn('broken-secret', json.dumps(self.b.status()))
 
     def test_next_due_daily_and_weekly_local_time(self):

@@ -1,5 +1,5 @@
 import {afterEach,beforeEach,it,expect,vi} from "vitest";
-import {render,screen,fireEvent,waitFor,cleanup} from "@testing-library/react";
+import {act,render,screen,fireEvent,waitFor,cleanup} from "@testing-library/react";
 import {MailSettingsForm} from "./SettingsForms";
 import {api} from "../lib/api";
 import {request} from "../lib/http";
@@ -77,4 +77,39 @@ it("analyse ponctuellement un dossier serveur sans modifier la synchronisation",
    method:"POST",body:'{"folder":"D:/dossier-recette"}'
  }),0);
  expect(api.saveBrainMailSettings).not.toHaveBeenCalled();
+});
+
+it("suspend le statut Thunderbird hors de la vue et conserve les réglages non enregistrés",async()=>{
+ vi.useFakeTimers();let hidden=false;
+ vi.spyOn(document,'hidden','get').mockImplementation(()=>hidden);
+ const view=render(<MailSettingsForm active/>);
+ try{
+   await act(async()=>{});
+   fireEvent.change(screen.getByLabelText("Source des mails"),{target:{value:"folder"}});
+   fireEvent.change(screen.getByLabelText("Dossier des e-mails (côté serveur)"),{target:{value:"D:/brouillon-fictif"}});
+   let finish!:(value:unknown)=>void;
+   vi.mocked(request).mockReturnValueOnce(new Promise(resolve=>{finish=resolve;}));
+   const before=vi.mocked(request).mock.calls.length;
+   await act(async()=>{await vi.advanceTimersByTimeAsync(30000);});
+   expect(request).toHaveBeenCalledTimes(before+1);
+   const calls=vi.mocked(request).mock.calls;
+   const signal=calls[calls.length-1][1]!.signal as AbortSignal;
+   view.rerender(<MailSettingsForm active={false}/>);
+   expect(signal.aborted).toBe(true);
+   await act(async()=>{await vi.advanceTimersByTimeAsync(60000);});
+   expect(request).toHaveBeenCalledTimes(before+1);
+   view.rerender(<MailSettingsForm active/>);await act(async()=>{});
+   expect(request).toHaveBeenCalledTimes(before+2);
+   await act(async()=>{finish({...status,connected:false});});
+   expect(screen.getByLabelText("Dossier des e-mails (côté serveur)")).toHaveProperty('value','D:/brouillon-fictif');
+   fireEvent.change(screen.getByLabelText("Source des mails"),{target:{value:"thunderbird"}});
+   expect(screen.getByText('Thunderbird connecté')).toBeTruthy();
+   fireEvent.change(screen.getByLabelText("Source des mails"),{target:{value:"folder"}});
+   hidden=true;act(()=>document.dispatchEvent(new Event('visibilitychange')));
+   await act(async()=>{await vi.advanceTimersByTimeAsync(60000);});
+   expect(request).toHaveBeenCalledTimes(before+2);
+   hidden=false;await act(async()=>{document.dispatchEvent(new Event('visibilitychange'));});
+   expect(request).toHaveBeenCalledTimes(before+3);
+   expect(api.saveBrainMailSettings).not.toHaveBeenCalled();
+ }finally{view.unmount();vi.useRealTimers();}
 });

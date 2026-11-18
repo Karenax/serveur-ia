@@ -1,12 +1,12 @@
 import { agentPath, projectConversationHref } from '../lib/agentRoutes';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import type { PortfolioRow } from '../lib/api';
-import { beginActivity, withActivity } from '../lib/asyncActivity';
+import { withActivity } from '../lib/asyncActivity';
 import { AsyncDownloadLink } from './AsyncDownloadLink';
 import { meetingCapture } from '../lib/meetingCapture';
 import { hasDesktopCapture, meetingSessions, sessionAudioUrl, sessionExportUrl, sessionCommand, type MeetingSession, type SessionAnswer,
   type SessionCapabilities, type SessionScope, type SessionSuggestion,type SessionAutomaticEnhancement,type SessionQuestionProgress,type MeetingTrack } from '../lib/meetingSessions';
-import { blankNote, validNoteContent, type NoteContent } from '../lib/projectNotes';
+import { validNoteContent, type NoteContent } from '../lib/projectNotes';
 import { NoteContentView, NoteRichEditor } from './NoteRichEditor';
 import { MeetingAudioPanel } from './MeetingAudioPanel';
 import { ChatMarkdown } from './ChatMarkdown';
@@ -19,44 +19,20 @@ import { MeetingQuestionProgress } from './MeetingQuestionProgress';
 import {citationSourceUrl,citationReaderUrl,citationAudioUrl,citationLocatorText,isNoteVersionUrl} from '../lib/citationLinks';
 import {NoteVersionPreview} from './NoteVersionPreview';
 import {useTranscriptFollow} from '../lib/useTranscriptFollow';
+import {nativeSessionPhase, sessionStateLabel, sessionCaptureNotice} from '../lib/meetingSessionState';
+import {useMeetingSessionUpdates} from '../hooks/useMeetingSessionUpdates';
+import { Glyph } from '../os/icons';
+import {useMeetingSessionSnapshot, meetingErrorText as errorText,
+  meetingNoteFrom as noteFrom, meetingDraftKey as draftKey} from '../hooks/useMeetingSessionSnapshot';
+import {useMeetingOperation} from '../hooks/useMeetingOperation';
+import {createMeetingTransitions} from '../lib/meetingTransitions';
+import {linuxSystemAudioAvailable} from '../lib/linuxSystemAudio';
 import './project-notes.css';
 import '../meeting-studio.css';
 
-const errorText = (error: unknown) => error instanceof Error ? error.message : String(error);
-class SessionReadFailure extends Error {
-  constructor(failure: unknown) {super(errorText(failure)); this.name='SessionReadFailure';}
-}
 const clock = (seconds: number) => `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`;
-const SESSION_STATES: Record<string, string> = {created: 'À préparer', recording: 'Enregistrement', paused: 'En pause',
-  finalizing: 'Consolidation', completed: 'Conservée', interrupted: 'Interrompue', cancelled: 'Arrêtée'};
-function nativeSessionPhase(row:MeetingSession){
-  const native=row.native_capture;
-  if(native?.session_id===row.id&&['recording','paused'].includes(row.state)){
-    if(native.error||native.state==='interrupted'||['interrupted','interruption-unpersisted'].includes(native.problem_code||''))return 'interrupted';
-    if(native.process_alive===null||native.state==='unknown'||native.problem_code==='status-unknown')return 'unknown';
-    if(native.state==='starting')return 'starting';
-    if(native.process_alive===false||native.state==='stopped')return 'stopped';
-    if(native.state==='paused')return 'paused';
-    if(native.state==='recording')return 'recording';
-  }
-  return null;
-}
-function sessionStateLabel(row:MeetingSession){
-  const phase=nativeSessionPhase(row);
-  if(phase)return {starting:'Ouverture audio en cours',interrupted:'Capture interrompue · conservation à vérifier',
-    unknown:'État audio à vérifier',stopped:'Capture arrêtée · conservation à vérifier',paused:'En pause',recording:'Enregistrement'}[phase];
-  return SESSION_STATES[row.state]||row.state;
-}
-function sessionCaptureNotice(row:MeetingSession){
-  const phase=nativeSessionPhase(row);
-  if(phase==='starting')return 'L’ouverture audio est en cours.';
-  if(phase&&['interrupted','unknown','stopped'].includes(phase))return 'La capture audio et sa conservation restent à vérifier.';
-  if(phase==='paused')return 'L’enregistrement est en pause.';
-  return row.state==='recording'?'L’enregistrement continue.':row.state==='paused'?'L’enregistrement est en pause.':
-    row.state==='completed'?'L’enregistrement est terminé et conservé.':'Les fragments audio restent conservés.';
-}
-const noteFrom = (row: MeetingSession) => row.note ?? row.staged_note;
-const draftKey = (id: string) => `agent.meeting-note.v1.${id}`;
+const MORE = ["M12 5h.01", "M12 12h.01", "M12 19h.01"];
+const MICROPHONE = ['<rect x="9" y="2" width="6" height="11" rx="3"/>', "M5 11a7 7 0 0 0 14 0M12 18v4M8 22h8"];
 const contextStorageKey=(id:string)=>`agent.meeting-discussion-context.v1.${id}`;
 function savedContext(id:string){
   try{const value=JSON.parse(localStorage.getItem(contextStorageKey(id))||'null');
@@ -73,37 +49,7 @@ function textOf(content: NoteContent) {
     : block.runs.map(run => run.text).join('')).join('\n');
 }
 
-export function MeetingCaptureBar({onOpen}: {onOpen: (sessionId: string) => void}) {
-  const capture = useSyncExternalStore(meetingCapture.subscribe, meetingCapture.getSnapshot);
-  const [operation, setOperation] = useState('');
-  const [error, setError] = useState('');
-  useEffect(() => {void meetingCapture.recover().catch(() => undefined);}, []);
-  useEffect(()=>{
-    const protect=(event:BeforeUnloadEvent)=>{if(!['idle','completed'].includes(capture.phase)){event.preventDefault();event.returnValue='';}};
-    window.addEventListener('beforeunload',protect);return()=>window.removeEventListener('beforeunload',protect);
-  },[capture.phase]);
-  if (!capture.sessionId || ['idle', 'completed'].includes(capture.phase)) return null;
-  const run = async (label: string, task: () => Promise<unknown>) => {
-    setOperation(label); setError(''); try {await task();} catch (failure) {setError(errorText(failure));} finally {setOperation('');}
-  };
-  return <section className="meeting-capture-bar" aria-label="Capture de réunion active">
-    <span><strong>{capture.title || 'Réunion'}</strong> · {clock(capture.seconds)} · {capture.tracks.map(track => track === 'mic' ? 'Micro' : 'Audio partagé').join(' + ')}
-      {capture.pending > 0 && ` · ${capture.pending} fragment(s) à synchroniser`}</span>
-    <button type="button" onClick={() => onOpen(capture.sessionId!)}>Revenir à la séance</button>
-    {capture.phase === 'starting' && <button type="button" onClick={() => void run('Annulation du démarrage', () => meetingCapture.stop())}>Annuler le démarrage audio</button>}
-    {capture.phase === 'recording' && <button type="button" disabled={!!operation} onClick={() => void run('Pause', () => meetingCapture.pause())}>Pause</button>}
-    {capture.phase === 'ready' && <>
-      <span role="status">Partage audio prêt à confirmer</span>
-      <button type="button" disabled={!!operation} onClick={() => void run('Partage audio', () => meetingCapture.activatePrepared())}>Choisir l’audio du PC et démarrer</button>
-      <button type="button" disabled={!!operation} onClick={() => void run('Annulation', () => meetingCapture.cancelPrepared())}>Annuler la préparation audio</button>
-    </>}
-    {capture.phase === 'paused' && <button type="button" disabled={!!operation} onClick={() => void run('Reprise', () => meetingCapture.resume())}>Reprendre</button>}
-    {['recording', 'paused'].includes(capture.phase) && <button type="button" disabled={!!operation} onClick={() => void run('Conservation', () => meetingCapture.stop())}>Arrêter et conserver</button>}
-    {capture.phase === 'pending' && <button type="button" disabled={!!operation} onClick={() => void run('Synchronisation', () => meetingCapture.retryAndFinalize())}>Synchroniser et finaliser</button>}
-    {operation && <span role="status">{operation}…</span>}
-    {(error || capture.error) && <p role="alert">{error || capture.error}</p>}
-  </section>;
-}
+export { MeetingCaptureBar } from './MeetingCaptureBar';
 
 type Props = {sessionId: string; rows: PortfolioRow[]; capabilities: SessionCapabilities; onClose: () => void;
   navigation?: ReactNode;
@@ -111,31 +57,16 @@ type Props = {sessionId: string; rows: PortfolioRow[]; capabilities: SessionCapa
   onOpenSource?:(citation:NonNullable<SessionAnswer['citations']>[number])=>void;
   onChanged?: () => void; onOpenProject: (id: string, tab: string) => void; active?: boolean};
 export function MeetingStudio({sessionId, rows, capabilities, onClose, onChanged, onOpenProject,onOpenSource,active=true,navigation,sessionList,onSelectSession,onNewSession}: Props) {
-  const [session, setSession] = useState<MeetingSession | null>(null);
-  const [content, setContent] = useState<NoteContent>(blankNote);
-  const [noteTitle, setNoteTitle] = useState('');
   const [noteSearch,setNoteSearch]=useState('');
-  const draftRef = useRef({content: blankNote(), title: ''});
-  const [dirty, setDirty] = useState(false);
   const [markdownDraft, setMarkdownDraft] = useState({pending: false, valid: true});
-  const dirtyRef = useRef(false);
-  const rowRef = useRef<MeetingSession | null>(null);
-  const currentSessionId = useRef(sessionId);
-  currentSessionId.current = sessionId;
-  const sessionReadSequence = useRef(0);
-  const acceptedReadSequence = useRef(0);
-  const readOutcomeSequence = useRef(0);
-  const restoredDraftSession = useRef<string | null>(null);
-  const [noteConflict, setNoteConflict] = useState(false);
-  const [recovered, setRecovered] = useState(false);
   const [error, setError] = useState('');
-  const [sessionReadError, setSessionReadError] = useState('');
-  const [eventReadError, setEventReadError] = useState('');
+  const alive = useRef(true);
+  const {session, content, setContent, noteTitle, setNoteTitle, draftRef, dirty, setDirty, dirtyRef, rowRef,
+    currentSessionId, noteConflict, setNoteConflict, recovered, setRecovered, sessionReadError, pendingNote,
+    project, setProject, accept, readSession} = useMeetingSessionSnapshot(sessionId, alive, setError);
   const [sourceReadError, setSourceReadError] = useState('');
   const [notice, setNotice] = useState('');
-  const [operation, setOperation] = useState('');
-  const pendingNote = useRef<Parameters<typeof meetingSessions.saveNote>[1] | null>(null);
-  const [project, setProject] = useState('');
+  const {operation,run} = useMeetingOperation(alive, setError);
   const [layout, setLayout] = useState<'editor' | 'enhanced' | 'assistant' | 'complete'>(() => {
     try {const saved = localStorage.getItem('agent-meeting-layout-v2');
       return saved === 'assistant' || saved === 'complete' || saved === 'enhanced' ? saved : 'editor';} catch {return 'editor';}
@@ -161,7 +92,6 @@ export function MeetingStudio({sessionId, rows, capabilities, onClose, onChanged
   const historyReadSequence=useRef(0);
   const [liveAnswers, setLiveAnswers] = useState<SessionAnswer[]>([]);
   const capture = useSyncExternalStore(meetingCapture.subscribe, meetingCapture.getSnapshot);
-  const alive = useRef(true);
   const audio = useRef<HTMLAudioElement>(null);
   const pendingAudioSeek=useRef<{url:string;seconds:number}|null>(null);
   useEffect(()=>{pendingAudioSeek.current=null;},[sessionId,layout,tab]);
@@ -217,51 +147,6 @@ export function MeetingStudio({sessionId, rows, capabilities, onClose, onChanged
   const replies=conversation.key===contextKey?conversation.items:[];
   const clearReplies=()=>setConversation({key:contextKey,items:[]});
 
-  const accept = useCallback((row: MeetingSession) => {
-    if (row.id !== currentSessionId.current) return false;
-    const previous = rowRef.current;
-    if (previous?.id === row.id && (row.revision < previous.revision ||
-        (row.event_cursor !== undefined && previous.event_cursor !== undefined && row.event_cursor < previous.event_cursor))) return false;
-    if (previous && previous.id !== row.id) {dirtyRef.current = false; setDirty(false); pendingNote.current = null; setNoteConflict(false); setRecovered(false);}
-    rowRef.current = row; setSession(row); setProject(row.project_id || '');
-    const note = noteFrom(row);
-    if (!dirtyRef.current) {const next = {content: note?.content ?? blankNote(), title: note?.title || row.title};
-      draftRef.current = next; setContent(next.content); setNoteTitle(next.title);}
-    else if (previous && row.note_id && previous.note_version_id !== row.note_version_id) setNoteConflict(true);
-    if (restoredDraftSession.current !== row.id) {
-      restoredDraftSession.current = row.id;
-      try {
-        const raw = localStorage.getItem(draftKey(row.id));
-        if (raw) {
-          const draft = JSON.parse(raw);
-          if (draft.session_id !== row.id || !validNoteContent(draft.content) || typeof draft.title !== 'string') throw new Error('Brouillon incompatible');
-          if (JSON.stringify(draft.content) !== JSON.stringify(note?.content) || draft.title !== note?.title) {
-            setContent(draft.content); setNoteTitle(draft.title); dirtyRef.current = true; setDirty(true); setRecovered(true);
-            draftRef.current = {content: draft.content, title: draft.title};
-            setNoteConflict(draft.note_version_id !== row.note_version_id || draft.revision !== row.revision);
-            pendingNote.current = draft.command ?? null;
-          }
-        }
-      } catch {setError('Un brouillon local ne peut pas être relu. Il reste conservé sur cet appareil.');}
-    }
-    return true;
-  }, []);
-  const readSession = useCallback(async (signal?: AbortSignal,quiet=false) => {
-    const sequence = ++sessionReadSequence.current;
-    try {
-      const row = await (quiet?meetingSessions.get(sessionId,signal,true):signal ? meetingSessions.get(sessionId, signal) : meetingSessions.get(sessionId));
-      if (!signal?.aborted && alive.current && currentSessionId.current === sessionId && sequence >= acceptedReadSequence.current && accept(row)) {
-        acceptedReadSequence.current = sequence;
-        if(sequence >= readOutcomeSequence.current){readOutcomeSequence.current=sequence;setSessionReadError('');}
-      }
-      return rowRef.current?.id === sessionId ? rowRef.current : row;
-    } catch(failure) {
-      if(!signal?.aborted&&alive.current&&currentSessionId.current===sessionId&&sequence>=readOutcomeSequence.current){
-        readOutcomeSequence.current=sequence;setSessionReadError(errorText(failure));
-      }
-      throw new SessionReadFailure(failure);
-    }
-  }, [sessionId, accept]);
   const reload = useCallback(async (signal?: AbortSignal,quiet=false) => {
     const row = await readSession(signal,quiet);
     if (signal?.aborted || !alive.current || currentSessionId.current !== sessionId) return row;
@@ -277,61 +162,7 @@ export function MeetingStudio({sessionId, rows, capabilities, onClose, onChanged
     void readSession().catch(() => undefined);
     return () => {alive.current = false;};
   }, [sessionId, readSession]);
-  useEffect(() => {
-    if(!active)return;
-    const timer = setInterval(() => {if (!document.hidden) void reload(undefined,true).catch(() => undefined);}, 5000);
-    return () => clearInterval(timer);
-  }, [reload,active]);
-  useEffect(()=>{
-    if(!active||typeof meetingSessions.watchEvents!=='function')return;
-    let disposed=false,controller:AbortController|null=null,reading=false,queued=false,cursor=0;
-    let retry:ReturnType<typeof setTimeout>|undefined;
-    const refresh=async()=>{
-      if(reading||disposed||document.hidden||!controller||controller.signal.aborted)return;
-      reading=true;
-      const current=controller;
-      try{
-        while(queued&&!disposed&&!document.hidden&&!current.signal.aborted){
-          queued=false;
-          const row=await reload(current.signal,true);
-          if((row.event_cursor??0)<cursor){queued=true;break;}
-        }
-      }catch{/* The canonical polling fallback remains available; retain this wake-up. */queued=true;}
-      finally{
-        reading=false;
-        if(queued&&!disposed&&!document.hidden&&controller&&!controller.signal.aborted){
-          retry=setTimeout(()=>{retry=undefined;void refresh();},500);
-        }
-      }
-    };
-    const requestRefresh=()=>{queued=true;if(retry)clearTimeout(retry);retry=undefined;void refresh();};
-    const visible=()=>{
-      if(disposed)return;
-      controller?.abort();controller=null;
-      if(retry)clearTimeout(retry);retry=undefined;
-      if(document.hidden)return;
-      const current=new AbortController();controller=current;
-      cursor=Math.max(cursor,rowRef.current?.id===sessionId?rowRef.current.event_cursor??0:0);
-      void meetingSessions.watchEvents(sessionId,{
-        after:cursor,signal:current.signal,
-        onConnected:()=>{if(!disposed&&controller===current&&!current.signal.aborted){setEventReadError('');requestRefresh();}},
-        onEvent:event=>{
-          if(disposed||controller!==current||current.signal.aborted||event.id<=cursor)return;
-          cursor=event.id;
-          const known=rowRef.current?.id===sessionId?rowRef.current.event_cursor??0:0;
-          if(event.id>known)requestRefresh();
-        },
-        onError:failure=>{
-          if(!disposed&&controller===current&&!current.signal.aborted&&!failure.retryable){
-            setEventReadError(failure.message);current.abort();
-          }
-        },
-      }).catch(()=>{/* The five-second snapshot fallback also supports older servers. */});
-    };
-    visible();
-    document.addEventListener('visibilitychange',visible);
-    return()=>{disposed=true;controller?.abort();if(retry)clearTimeout(retry);document.removeEventListener('visibilitychange',visible);};
-  },[active,sessionId,reload]);
+  const eventReadError = useMeetingSessionUpdates({sessionId, active, rowRef, reload});
   useEffect(()=>{
     const controller=new AbortController(),generation=auxiliaryGeneration.current,request=++auxiliaryRequest.current;
     void Promise.all([meetingSessions.enhancements(sessionId,controller.signal),meetingSessions.liveAnswers(sessionId,controller.signal)])
@@ -356,22 +187,28 @@ export function MeetingStudio({sessionId, rows, capabilities, onClose, onChanged
   const hasConversation=conversation.key===contextKey&&conversation.items.length>0;
   useEffect(()=>{
     if(!active||tab!=='chat'||!['assistant','complete'].includes(layout)||!hasConversation||historyLoading)return;
-    const controller=new AbortController(),key=contextKey;let inFlight=false;
+    const key=contextKey;let disposed=false,controller:AbortController|null=null,timer:ReturnType<typeof setInterval>|undefined;
     const refresh=async()=>{
-      if(inFlight)return;inFlight=true;const request=++historyReadSequence.current;
+      if(disposed||document.hidden||controller)return;
+      const current=new AbortController();controller=current;const request=++historyReadSequence.current;
       try{
-        const value=await meetingSessions.askHistory(sessionId,scope,scope==='sources'?selectedSources:[],controller.signal,true);
-        if(!controller.signal.aborted&&currentContext.current===key&&request===historyReadSequence.current){
+        const value=await meetingSessions.askHistory(sessionId,scope,scope==='sources'?selectedSources:[],current.signal,true);
+        if(!current.signal.aborted&&currentContext.current===key&&request===historyReadSequence.current){
           setConversation({key,items:value.items.map(result=>({query:result.query||'',scope,result}))});setHistoryError('');
         }
       }catch(failure){
-        if(!controller.signal.aborted&&currentContext.current===key&&request===historyReadSequence.current){
+        if(!current.signal.aborted&&currentContext.current===key&&request===historyReadSequence.current){
           setConversation({key,items:[]});setHistoryError(errorText(failure));
         }
-      }finally{inFlight=false;}
+      }finally{if(controller===current)controller=null;}
     };
-    const timer=setInterval(()=>void refresh(),3000);
-    return()=>{controller.abort();clearInterval(timer);};
+    const visibility=()=>{
+      if(document.hidden){controller?.abort();controller=null;if(timer!==undefined)clearInterval(timer);timer=undefined;}
+      else if(timer===undefined){void refresh();timer=setInterval(()=>void refresh(),3000);}
+    };
+    if(!document.hidden)timer=setInterval(()=>void refresh(),3000);
+    document.addEventListener('visibilitychange',visibility);
+    return()=>{disposed=true;controller?.abort();if(timer!==undefined)clearInterval(timer);document.removeEventListener('visibilitychange',visibility);};
   },[active,tab,layout,hasConversation,historyLoading,sessionId,scope,sourceKey,contextKey]);
   useEffect(()=>{
     if(scope!=='sources'){setSourceReadError('');return;}const controller=new AbortController();const timer=setTimeout(()=>{
@@ -418,11 +255,6 @@ export function MeetingStudio({sessionId, rows, capabilities, onClose, onChanged
     draftRef.current = {content: next, title};
     dirtyRef.current = true; setDirty(true); setContent(next); setNoteTitle(title);
     const persisted = persistDraft(next, title); setNotice(persisted ? 'Brouillon conservé sur cet appareil' : ''); return persisted;
-  };
-  const run = async (label: string, task: () => Promise<void>) => {
-    if (operation) return; setOperation(label); setError('');
-    const finish=beginActivity(label);
-    try {await task();} catch (failure) {if (alive.current&&!(failure instanceof SessionReadFailure)) setError(errorText(failure));} finally {finish();if (alive.current) setOperation('');}
   };
   const save = async () => {
     if (markdownDraft.pending) return;
@@ -481,22 +313,13 @@ export function MeetingStudio({sessionId, rows, capabilities, onClose, onChanged
     const result = await meetingSessions.assign(sessionId, {...sessionCommand(row.revision), project_id: project});
     accept(result); onChanged?.(); setNotice('Séance rattachée au projet.');
   });
-  const start = () => void run('Démarrage', async () => {
-    await meetingCapture.start(sessionId, {system: systemAudio, deviceId:browserMicrophone||undefined, maxBytes: (capabilities.capture.max_capture_mb ?? capabilities.capture.max_upload_mb) * 1024 * 1024,
-      maxMinutes: capabilities.capture.max_duration_minutes}); await reload(); setLayout('assistant'); setTab('transcript');
-  });
-  const importAudio = async (file: File) => {
-    if (file.size > capabilities.capture.max_upload_mb * 1024 * 1024) throw new Error(`L’audio dépasse ${capabilities.capture.max_upload_mb} Mo.`);
-    const row = await reload(); const form = new FormData(); const hash = await crypto.subtle.digest('SHA-256', await file.arrayBuffer());
-    form.append('file', file); form.append('command_id', crypto.randomUUID());
-    form.append('sha256', Array.from(new Uint8Array(hash), byte => byte.toString(16).padStart(2, '0')).join(''));
-    form.append('start_ms', '0'); form.append('duration_ms', '0');
-    const receipt = await meetingSessions.chunk(row.id, 'mic', 0, form);
-    if (!receipt.acknowledged || receipt.session_id !== row.id || receipt.accepted_chunk?.size_bytes !== file.size ||
-      receipt.accepted_chunk.sha256 !== form.get('sha256')) throw new Error('L’acquittement de l’audio importé ne correspond pas au fichier.');
-    const latest = await meetingSessions.get(row.id); accept(await meetingSessions.command(row.id, 'finalize', sessionCommand(latest.revision)));
-    onChanged?.();
-  };
+  const transitions = createMeetingTransitions({sessionId, reload, accept, run, setNotice, onChanged,
+    captureOptions:{system:systemAudio, deviceId:browserMicrophone||undefined,
+      maxBytes:(capabilities.capture.max_capture_mb ?? capabilities.capture.max_upload_mb)*1024*1024,
+      maxMinutes:capabilities.capture.max_duration_minutes},
+    maxUploadMb:capabilities.capture.max_upload_mb,
+    showTranscript:()=>{setLayout('assistant');setTab('transcript');},
+    showSummary:()=>{setLayout('assistant');setTab('summary');}});
   const ask = (questions = false) => void run(questions ? 'Recherche de réponse' : 'Recherche et rédaction', async () => {
     if (!query.trim()) return;
     const text = query.trim(),key=contextKey,generation=contextGeneration.current; const row = await reload();
@@ -575,7 +398,7 @@ export function MeetingStudio({sessionId, rows, capabilities, onClose, onChanged
             <button type="button" disabled={!!operation || ['accepted', 'rejected'].includes(suggestion.status)} onClick={() => decision(suggestion, 'reject')}>Écarter</button>
           </>}</article>;
   const nativeAudioContext=<>
-      {(capabilities.native_capture||hasDesktopCapture())&&<NativeMeetingCapture session={session} capabilities={capabilities.native_capture} onChanged={row=>{if(row.state==='recording'&&rowRef.current?.state!=='recording'){setLayout('assistant');setTab('transcript');}accept(row);}} onAvailability={setNativeBusy} onRecoveryControls={setNativeRecoveryControls} browserBusy={!['idle','completed','error'].includes(capture.phase)}/>}
+      {(capabilities.native_capture||hasDesktopCapture())&&<NativeMeetingCapture session={session} capabilities={capabilities.native_capture} active={active} onChanged={row=>{if(row.state==='recording'&&rowRef.current?.state!=='recording'){setLayout('assistant');setTab('transcript');}accept(row);}} onAvailability={setNativeBusy} onRecoveryControls={setNativeRecoveryControls} browserBusy={!['idle','completed','error'].includes(capture.phase)}/>}
       {session.transcription_admission?.suspended&&<p className="meeting-studio-notice" role="status">
         {sessionCaptureNotice(session)}{' '}
         {session.state==='completed'?'La transcription directe a été suspendue.':'La transcription directe est suspendue.'}{' '}
@@ -597,18 +420,15 @@ export function MeetingStudio({sessionId, rows, capabilities, onClose, onChanged
       </nav>
       <div className="meeting-audio-pill" aria-label="État de l’audio"><span className={captureHere && capture.phase === 'recording' ? 'meeting-recording-dot' : ''}>●</span>
         <strong>{!captureHere&&session.chunks?.some(chunk=>chunk.duration_ms===0)?'Durée inconnue':clock(captureHere ? capture.seconds : session.duration_seconds)}</strong>
-        {captureHere && capture.phase === 'recording' && <button type="button" disabled={!!operation} onClick={() => void run('Pause', () => meetingCapture.pause())} aria-label="Mettre l’enregistrement en pause">Ⅱ</button>}
-        {captureHere && capture.phase === 'paused' && <button type="button" disabled={!!operation} onClick={() => void run('Reprise', () => meetingCapture.resume())}>Reprendre</button>}
-        {captureHere && ['recording', 'paused'].includes(capture.phase) && <button type="button" disabled={!!operation} onClick={() => void run('Conservation', async () => {await meetingCapture.stop(); await reload(); onChanged?.();})}>Arrêter</button>}
+        {captureHere && capture.phase === 'recording' && <button type="button" disabled={!!operation} onClick={transitions.pause} aria-label="Mettre l’enregistrement en pause">Ⅱ</button>}
+        {captureHere && capture.phase === 'paused' && <button type="button" disabled={!!operation} onClick={transitions.resume}>Reprendre</button>}
+        {captureHere && ['recording', 'paused'].includes(capture.phase) && <button type="button" disabled={!!operation} onClick={transitions.stop}>Arrêter</button>}
       </div>
       {session.kind==='note'&&session.state==='created'&&<button type="button" className="meeting-end-note" aria-label="Terminer la prise de notes"
         disabled={!!operation||dirty||markdownDraft.pending||captureBusy||nativeBusy||nativeRecoveryControls}
-        onClick={()=>void run('Conservation de la séance',async()=>{
-          const row=await reload();accept(await meetingSessions.command(sessionId,'finalize',sessionCommand(row.revision)));
-          setLayout('assistant');setTab('summary');onChanged?.();
-        })}>Terminer</button>}
+        onClick={transitions.finishNotes}>Terminer</button>}
       <details ref={preparation} className="meeting-preparation" onKeyDown={event=>{if(event.key==='Escape'){event.preventDefault();event.stopPropagation();closePreparation();}}}>
-      <summary ref={preparationSummary} aria-label="Préparation">Options</summary>
+      <summary ref={preparationSummary} aria-label="Options de la réunion" title="Options de la réunion"><Glyph d={MORE} size={16}/></summary>
       <div className="meeting-studio-setup" role="region" aria-label="Commandes et état de la séance" tabIndex={0}>
       {navigation}
       <p className="meeting-studio-eyebrow">{title ? `${title.code} · ${title.title}` : 'Séance à rattacher'}</p>
@@ -639,27 +459,27 @@ export function MeetingStudio({sessionId, rows, capabilities, onClose, onChanged
     </div>
       </details>
       {!captureBusy && !session.recording_id && (['created','interrupted'].includes(session.state)||(session.state==='paused'&&!session.chunks?.length)) && <details className="meeting-browser-setup" open={!capabilities.native_capture?.installed}>
-        <summary>{capabilities.native_capture?.installed?'Autre audio':'Audio : navigateur ou fichier'}</summary>
+        <summary aria-label="Options audio et microphone" title="Options audio et microphone"><Glyph d={MICROPHONE} size={16}/></summary>
         <div className="meeting-studio-controls">
           <label>Microphone du navigateur<select value={browserMicrophone} disabled={!!operation||nativeBusy||browserCaptureUnavailable} onChange={event=>setBrowserMicrophone(event.target.value)}>
             <option value="">Microphone par défaut</option>{browserDevices.map((device,index)=><option key={device.deviceId} value={device.deviceId}>{device.label||`Microphone ${index+1} (nom visible après autorisation)`}</option>)}</select></label>
-          <button className="meeting-start" type="button" disabled={!!operation || nativeBusy || browserCaptureUnavailable || !capabilities.enabled} onClick={start}>{systemAudio?'Préparer le partage audio':capabilities.native_capture?.installed?'Enregistrer au microphone (navigateur)':'Démarrer la réunion au microphone'}</button>
+          <button className="meeting-start" type="button" disabled={!!operation || nativeBusy || browserCaptureUnavailable || !capabilities.enabled} onClick={transitions.start}>{systemAudio?'Préparer le partage audio':capabilities.native_capture?.installed?'Enregistrer au microphone (navigateur)':'Démarrer la réunion au microphone'}</button>
           <label className="meeting-file-choice">Importer un audio<input type="file" accept="audio/*,.m4a,.opus,.mp4,.webm" disabled={!!operation||nativeBusy}
-            onChange={event => {const file = event.target.files?.[0]; if (file) void run('Import et conservation de l’audio', () => importAudio(file)); event.target.value = '';}} /></label>
+            onChange={event => {const file = event.target.files?.[0]; if (file) transitions.importAudio(file); event.target.value = '';}} /></label>
           <label className="meeting-system-choice"><input type="checkbox" checked={systemAudio} disabled={!!operation||nativeBusy||browserCaptureUnavailable} onChange={event => setSystemAudio(event.target.checked)} />Partager aussi l’audio système</label>
         </div>
-        <p>Au démarrage, autorisez le microphone. Pour le son du PC, sélectionnez aussi la fenêtre et son audio.</p>
+        <p>{linuxSystemAudioAvailable()?'Au démarrage, autorisez le microphone. Le son du PC utilise la sortie audio par défaut.':'Au démarrage, autorisez le microphone. Pour le son du PC, sélectionnez aussi la fenêtre et son audio.'}</p>
         {browserDevicesError&&<p role="status">{browserDevicesError}</p>}
       </details>}
       {session.state==='completed'&&!nativeRecoveryControls?<details className="meeting-audio-context"><summary>Audio conservé · état et transcription</summary>{nativeAudioContext}</details>:nativeAudioContext}
 
     </header>
     <div className="meeting-studio-status">
-      {captureHere && capture.phase === 'starting' && <button type="button" onClick={() => void meetingCapture.stop()}>Annuler le démarrage audio</button>}
+      {captureHere && capture.phase === 'starting' && <button type="button" onClick={transitions.cancelStart}>Annuler le démarrage audio</button>}
       {captureHere && capture.phase === 'ready' && <section aria-label="Confirmer le partage audio">
-        <p>Choisissez la fenêtre ou l’onglet et cochez son audio. L’enregistrement commencera après votre choix.</p>
-        <button type="button" disabled={!!operation} onClick={() => void run('Partage audio', async () => {accept(await meetingCapture.activatePrepared());})}>Choisir l’audio du PC et démarrer</button>
-        <button type="button" disabled={!!operation} onClick={() => void run('Annulation', async () => {await meetingCapture.cancelPrepared(); await reload();})}>Annuler la préparation audio</button>
+        <p>{linuxSystemAudioAvailable()?'Le microphone et tous les sons de la sortie audio par défaut au démarrage seront enregistrés sur deux pistes. Autorisez les demandes audio.':'Choisissez la fenêtre ou l’onglet et cochez son audio. L’enregistrement commencera après votre choix.'}</p>
+        <button type="button" disabled={!!operation} onClick={transitions.activatePrepared}>{linuxSystemAudioAvailable()?'Autoriser les sources et démarrer':'Choisir l’audio du PC et démarrer'}</button>
+        <button type="button" disabled={!!operation} onClick={transitions.cancelPrepared}>Annuler la préparation audio</button>
       </section>}
       {(error || (captureHere && capture.error)) && <p className="meeting-studio-error" role="alert">{error || capture.error}</p>}
       {sessionReadError&&<p className="meeting-studio-error" role="alert">Lecture de la séance indisponible : {sessionReadError}</p>}
@@ -672,12 +492,8 @@ export function MeetingStudio({sessionId, rows, capabilities, onClose, onChanged
       {session.issues?.length > 0 && <p className="meeting-studio-notice">{session.issues.join(' · ')}</p>}
       {automatic?.error&&<p role="alert">{automatic.error}</p>}
       {automaticReadError&&<p role="alert">Lecture des données de séance indisponible : {automaticReadError}</p>}
-      {['recording','paused','interrupted','finalizing'].includes(session.state)&&!nativeBusy&&!nativeRecoveryControls&&(!captureHere||capture.phase==='error')&&<button type="button" disabled={!!operation} onClick={()=>void run('Consolidation de la séance',async()=>{
-        const row=await reload();accept(await meetingSessions.command(sessionId,'finalize',sessionCommand(row.revision)));onChanged?.();
-      })}>Conserver les fragments reçus et finaliser</button>}
-      {captureHere && capture.phase === 'pending' && <button type="button" disabled={!!operation} onClick={() => void run('Récupération', async () => {
-        await meetingCapture.retryAndFinalize(); await reload(); onChanged?.();
-      })}>Synchroniser les fragments conservés</button>}
+      {['recording','paused','interrupted','finalizing'].includes(session.state)&&!nativeBusy&&!nativeRecoveryControls&&(!captureHere||capture.phase==='error')&&<button type="button" disabled={!!operation} onClick={transitions.finalizeReceived}>Conserver les fragments reçus et finaliser</button>}
+      {captureHere && capture.phase === 'pending' && <button type="button" disabled={!!operation} onClick={transitions.recover}>Synchroniser les fragments conservés</button>}
     </div>
     <div className={`meeting-studio-body${sessionList&&onSelectSession?' meeting-with-index':''}`}>
       {sessionList&&onSelectSession&&<aside className="meeting-note-index" aria-label="Notes et séances">
@@ -685,7 +501,7 @@ export function MeetingStudio({sessionId, rows, capabilities, onClose, onChanged
         {onNewSession&&<button className="meeting-new-note" type="button" onClick={()=>leave(onNewSession)}>＋ Nouvelle note</button>}
         <small>{sessionList.length} séance{sessionList.length>1?'s':''}</small>
         <ul>{sessionList.map(item=>item.id===session.id?session:item).filter(item=>(item.id===sessionId?noteTitle||item.title:item.title).toLocaleLowerCase('fr').includes(noteSearch.toLocaleLowerCase('fr'))).map(item=><li key={item.id}>
-          <button type="button" aria-current={item.id===sessionId?'page':undefined} onClick={()=>{if(item.id!==sessionId)leave(()=>onSelectSession(item.id));}}>
+          <button type="button" aria-label={`Ouvrir la séance ${item.title}`} aria-current={item.id===sessionId?'page':undefined} onClick={()=>{if(item.id!==sessionId)leave(()=>onSelectSession(item.id));}}>
             <strong>{item.id===sessionId?noteTitle||item.title:item.title}</strong><small>{item.date} · {sessionStateLabel(item)}</small>
           </button></li>)}</ul>
       </aside>}
@@ -764,6 +580,7 @@ export function MeetingStudio({sessionId, rows, capabilities, onClose, onChanged
           </>}
           <div hidden={tab!=='summary'&&tab!=='transcript'}>{session.recording_id && session.project_id &&
             <MeetingAudioPanel projectId={session.project_id} initialRecordingId={session.recording_id}
+              viewActive={active&&(tab==='summary'||tab==='transcript')}
               workspaceView={tab==='summary'?'summary':'transcript'} onWorkspaceViewChange={setTab}
               onPublished={() => {void reload(); onChanged?.();}} />}</div>
           <section hidden={tab!=='transcript'} className="meeting-live-transcript" aria-label="Transcription de la séance">
@@ -778,14 +595,7 @@ export function MeetingStudio({sessionId, rows, capabilities, onClose, onChanged
             {(session.transcription_admission?.recoverable_direct_chunks!==undefined
               ?session.transcription_admission.recoverable_direct_chunks>0:session.chunks?.some(chunk=>chunk.speech_status==='failed'||chunk.speech_status==='retained'))&&<button type="button"
               disabled={!!operation||capabilities.transcription.enabled!==true||session.state==='cancelled'}
-              onClick={()=>void run('Reprise de la transcription',async()=>{
-                const row=await reload();
-                const result=await meetingSessions.retryTranscription(sessionId,sessionCommand(row.revision));
-                accept(result.session);
-                setNotice(`${result.retried_chunks} fragment(s) admis pour transcription ; audio et corrections conservés.`
-                  +(result.remaining_recoverable_chunks?` ${result.remaining_recoverable_chunks} fragment(s) restent à reprendre.`:'')
-                  +(result.admission_blocked_reason?' La capacité est momentanément indisponible ; l’audio reste conservé.':''));
-              })}>Reprendre un lot de transcription</button>}
+              onClick={transitions.retryTranscription}>Reprendre un lot de transcription</button>}
             {session.transcription_batch&&session.transcription_batch.state!=='idle'&&<div className="meeting-studio-notice" role="status" aria-label="État du traitement complet">
               <p>Traitement complet : {session.transcription_batch.completed_chunks} / {session.transcription_batch.selected_chunks} fragment(s) traités.
                 {session.transcription_batch.state==='completed'?' Traitement terminé ; relecture nécessaire.':
@@ -794,19 +604,13 @@ export function MeetingStudio({sessionId, rows, capabilities, onClose, onChanged
                   session.transcription_batch.state==='failed'||session.transcription_batch.state==='interrupted'?' Traitement interrompu ; audio et texte conservés.':' Traitement en cours.'}</p>
               {session.transcription_batch.error&&<p>{session.transcription_batch.error}</p>}
               {['admitted','running','cancelling'].includes(session.transcription_batch.state)&&<button type="button"
-                disabled={!!operation||session.transcription_batch.state==='cancelling'} onClick={()=>void run('Annulation du traitement complet',async()=>{
-                  const current=await reload(),result=await meetingSessions.cancelBatchTranscription(sessionId,sessionCommand(current.revision));
-                  accept(result.session);setNotice('Annulation demandée ; les originaux et les transcriptions déjà conservées restent disponibles.');
-                })}>Annuler le traitement complet</button>}
+                disabled={!!operation||session.transcription_batch.state==='cancelling'} onClick={transitions.cancelBatch}>Annuler le traitement complet</button>}
             </div>}
             {session.state==='completed'&&session.chunks?.some(chunk=>chunk.speech_status==='retained'||chunk.speech_status==='failed'||chunk.speech_status==='pending')&&
               !['admitted','running','cancelling'].includes(session.transcription_batch?.state||'')&&<div>
                 <p>Le traitement complet utilise l’audio sauvegardé, sans ouvrir de microphone. Il peut prendre du temps et reste annulable.</p>
                 <button type="button" disabled={!!operation||capabilities.transcription.session_batch_ready!==true}
-                  onClick={()=>void run('Transcription de l’audio conservé',async()=>{
-                    const current=await reload(),result=await meetingSessions.batchTranscription(sessionId,sessionCommand(current.revision));
-                    accept(result.session);setNotice('Traitement complet demandé ; audio et corrections conservés.');
-                  })}>Transcrire l’audio conservé</button>
+                  onClick={transitions.transcribeAudio}>Transcrire l’audio conservé</button>
                 {capabilities.transcription.session_batch_ready!==true&&<p>Le moteur de transcription locale doit être installé pour ce traitement.</p>}
               </div>}
             {!!session.segments?.length&&<p>{session.transcript_provisional||session.segments.some(segment=>!segment.finalized) ? 'Texte provisoire ; la consolidation finale reste nécessaire.' : 'Segments stabilisés ; la relecture humaine reste nécessaire.'}</p>}

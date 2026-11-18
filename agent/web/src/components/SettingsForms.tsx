@@ -112,7 +112,7 @@ export function AiSettingsForm() {
   );
 }
 
-export function MailSettingsForm() {
+export function MailSettingsForm({active=true}:{active?:boolean} = {}) {
   const [form,setForm]=useState({source:"thunderbird",folder:"",auto_scan:true,scan_interval_minutes:5,auto_classification_threshold:.75,thunderbird_folder_ids:[] as string[]});
   const [status,setStatus]=useState<any>(null);
   const [msg,setMsg]=useState("");
@@ -132,9 +132,25 @@ export function MailSettingsForm() {
         thunderbird_folder_ids:m.thunderbird_folder_ids??value.sync?.folder_ids??(value.folders||[]).filter((f:any)=>/(?:^|\/)INBOX$/i.test(f.path)).map((f:any)=>f.id)});
       setStatus(value);setReady(true);
     }).catch(e=>{if(live)setError(String(e.message||e));});
-    const timer=window.setInterval(()=>{if(!document.hidden)void request<any>("/v1/thunderbird/status",{activity:false},20000).then(value=>{if(live)setStatus(value);}).catch(e=>{if(live)setError(String(e.message||e));});},30000);
-    return()=>{live=false;window.clearInterval(timer);};
+    return()=>{live=false;};
   },[]);
+  useEffect(()=>{
+    if(!active||!ready)return;
+    let live=true,controller:AbortController|null=null,timer:number|undefined;
+    const stop=()=>{controller?.abort();controller=null;if(timer!==undefined){window.clearInterval(timer);timer=undefined;}};
+    const load=()=>{
+      if(!live||document.hidden)return;
+      controller?.abort();const current=new AbortController();controller=current;
+      void request<any>("/v1/thunderbird/status",{signal:current.signal,activity:false},20000)
+        .then(value=>{if(live&&!current.signal.aborted)setStatus(value);})
+        .catch(e=>{if(live&&!current.signal.aborted)setError(String(e.message||e));})
+        .finally(()=>{if(controller===current)controller=null;});
+    };
+    const start=()=>{if(!live||document.hidden||timer!==undefined)return;load();timer=window.setInterval(load,30000);};
+    const visibility=()=>{if(document.hidden)stop();else start();};
+    document.addEventListener('visibilitychange',visibility);start();
+    return()=>{live=false;document.removeEventListener('visibilitychange',visibility);stop();};
+  },[active,ready]);
   const save=async()=>{
     if(!ready||busy)return;
     setBusy(true);setError("");setMsg("");
@@ -218,7 +234,7 @@ export function MailSettingsForm() {
   </div>;
 }
 
-export function MemorySettingsForm() {
+export function MemorySettingsForm({active=true}:{active?:boolean} = {}) {
   const [form, setForm] = useState({engine: "eg2", prefix: "pb", embedding_provider: "openai_compatible",
     embedding_model: "text-embedding-embeddinggemma-2", embedding_endpoint: "http://192.9.110.115:1234",
     index_path: "", timeout_s: 120, batch_size: 8});
@@ -248,7 +264,7 @@ export function MemorySettingsForm() {
       <label>Chemin de l’index (SQLite) <input className="input" value={form.index_path} disabled={busy || !state} placeholder="stockage EG2 par défaut" onChange={e => setForm(f => ({...f, index_path: e.target.value}))}/></label>
       <p>Un changement de profil exige une reconstruction. Les sources et les validations sont conservées.</p>
     </div></details>
-    <div className="settings-maintenance"><MemoryRecovery/></div>
+    <div className="settings-maintenance"><MemoryRecovery active={active}/></div>
     {msg && <p role="status">{msg}</p>}
   </div>;
 }

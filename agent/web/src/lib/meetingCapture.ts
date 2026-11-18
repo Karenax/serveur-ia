@@ -1,70 +1,21 @@
 import {LocalBrowserReservation, type BrowserReservation, type BrowserReservationStore} from './browserCaptureReservation';
 import { meetingSessions, sessionCommand, type MeetingSession, type MeetingTrack } from './meetingSessions';
-
-export type DurableAudioChunk = {
-  id: string; session_id: string; track: MeetingTrack; seq: number; command_id: string; blob: Blob;
-  sha256: string; start_ms: number; duration_ms: number; created_at: string;
-};
-export interface DurableChunkStore {
-  ready(): Promise<void>;
-  put(chunk: DurableAudioChunk): Promise<void>;
-  list(sessionId?: string): Promise<DurableAudioChunk[]>;
-  acknowledge(id: string): Promise<void>;
-}
-
-/** Only acknowledged cache fragments are removed. The backend retains the original audio. */
-export class IndexedAudioChunks implements DurableChunkStore {
-  private opening?: Promise<IDBDatabase>;
-  private database() {
-    this.opening ??= new Promise<IDBDatabase>((resolve, reject) => {
-      if (typeof indexedDB === 'undefined') {reject(new Error('Le stockage audio durable est indisponible dans ce navigateur. Importez un fichier audio.')); return;}
-      const request = indexedDB.open('agent-meeting-audio-v1', 1);
-      request.onupgradeneeded = () => {
-        const store = request.result.createObjectStore('chunks', {keyPath: 'id'});
-        store.createIndex('session_id', 'session_id');
-      };
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(new Error('Le stockage audio local ne peut pas être ouvert.'));
-      request.onblocked = () => reject(new Error('Fermez les autres pages Kiara pour ouvrir le stockage audio.'));
-    }).catch(error => {this.opening = undefined; throw error;});
-    return this.opening;
-  }
-  async ready() {await this.database();}
-  async put(chunk: DurableAudioChunk) {
-    const db = await this.database();
-    await new Promise<void>((resolve, reject) => {
-      const tx = db.transaction('chunks', 'readwrite'); tx.objectStore('chunks').put(chunk);
-      tx.oncomplete = () => resolve();
-      tx.onerror = tx.onabort = () => reject(new Error('Le fragment audio n’a pas pu être sauvegardé sur cet appareil.'));
-    });
-  }
-  async list(sessionId?: string) {
-    const db = await this.database();
-    return new Promise<DurableAudioChunk[]>((resolve, reject) => {
-      const store = db.transaction('chunks', 'readonly').objectStore('chunks');
-      const request = sessionId ? store.index('session_id').getAll(sessionId) : store.getAll();
-      request.onsuccess = () => resolve((request.result as DurableAudioChunk[]).sort((a, b) => a.track.localeCompare(b.track) || a.seq - b.seq));
-      request.onerror = () => reject(new Error('Les fragments audio conservés ne peuvent pas être lus.'));
-    });
-  }
-  async acknowledge(id: string) {
-    const db = await this.database();
-    await new Promise<void>((resolve, reject) => {
-      const tx = db.transaction('chunks', 'readwrite'); tx.objectStore('chunks').delete(id);
-      tx.oncomplete = () => resolve();
-      tx.onerror = tx.onabort = () => reject(new Error('L’acquittement du fragment audio doit être repris.'));
-    });
-  }
-}
+import {needsPcmAudioRecorder, PcmAudioRecorder} from './pcmAudioRecorder';
+import {IndexedAudioChunks, type DurableAudioChunk, type DurableChunkStore} from './meetingAudioStore';
+import {isProjectAudioSession} from './projectAudioId';
+import {linuxSystemAudio} from './linuxSystemAudio';
+export {IndexedAudioChunks} from './meetingAudioStore';
+export type {DurableAudioChunk, DurableChunkStore} from './meetingAudioStore';
 
 type CaptureApi = Pick<typeof meetingSessions, 'get' | 'command' | 'chunk' | 'browserReserve' | 'browserRelease' | 'commandReceipt'>;
 export type CaptureSnapshot = {
   sessionId: string | null; title: string; phase: 'idle' | 'ready' | 'starting' | 'recording' | 'paused' | 'stopping' | 'pending' | 'completed' | 'error';
   tracks: MeetingTrack[]; seconds: number; totalBytes: number; savedBytes: number; pending: number; error: string;
 };
-type CaptureEnvironment = {
+export type CaptureEnvironment = {
   devices: () => MediaDevices; recorder: () => typeof MediaRecorder; now: () => number;
   lock: () => Promise<() => void>; hash: (blob: Blob) => Promise<string>;
+  linuxSystemAudio: typeof linuxSystemAudio;
 };
 export type CaptureOptions = {microphone?: boolean; system?: boolean; deviceId?: string; maxBytes?: number; maxMinutes?: number};
 const message = (error: unknown) => error instanceof Error ? error.message : String(error);
@@ -96,7 +47,8 @@ export class MeetingCaptureController {
   private environment: CaptureEnvironment;
   private state: CaptureSnapshot = {sessionId: null, title: '', phase: 'idle', tracks: [], seconds: 0, totalBytes: 0, savedBytes: 0, pending: 0, error: ''};
   private listeners = new Set<() => void>();
-  private recorders = new Map<MeetingTrack, MediaRecorder>();
+  private recorders = new Map<MeetingTrack, MediaRecorder | PcmAudioRecorder>();
+  private producedTracks = new Set<MeetingTrack>();
   private streams: MediaStream[] = [];
   private releaseLock?: () => void;
   private persistence = Promise.resolve();
@@ -116,7 +68,7 @@ export class MeetingCaptureController {
     this.store = options.store ?? new IndexedAudioChunks(); this.api = options.api ?? meetingSessions;
     this.environment = {
       devices: () => navigator.mediaDevices, recorder: () => MediaRecorder, now: () => performance.now(),
-      lock: acquireCaptureLock, hash: audioHash, ...options.environment,
+      lock: acquireCaptureLock, hash: audioHash, linuxSystemAudio, ...options.environment,
     };
   }
   getSnapshot = () => this.state;
@@ -140,7 +92,7 @@ export class MeetingCaptureController {
         error: 'Une réservation audio est conservée. Vérifiez sa libération avant de démarrer une autre capture.'});
     }
     const recoveryState = this.state;
-    const chunks = await this.store.list();
+    const chunks = (await (this.store.listStudio ? this.store.listStudio() : this.store.list())).filter(chunk => !isProjectAudioSession(chunk.session_id));
     if (this.state !== recoveryState) return;
     if (chunks.length) {
       const first = reservation ? chunks.find(chunk => chunk.session_id === reservation.session_id) : chunks[0];
@@ -211,11 +163,20 @@ export class MeetingCaptureController {
     this.reservationStore.clear(); this.reservation = undefined; this.prepared = undefined;
     } finally {if (acquiredHere) {this.releaseLock?.(); this.releaseLock = undefined;}}
   }
+  private async releaseLinuxSystemAudio() {
+    const held=this.reservation;
+    if(!held?.linux_loopback_id)return;
+    if(!this.releaseLock)this.releaseLock=await this.environment.lock();
+    const result=await this.environment.linuxSystemAudio.stop(held.linux_loopback_id);
+    if(result.closed!==true)throw new Error('La fermeture de la boucle audio reste à vérifier.');
+    const next={...held};delete next.linux_loopback_id;
+    this.reservationStore.write(next);this.reservation=next;
+  }
   async cancelPrepared() {
     if (this.state.phase !== 'ready') return;
     this.closeStreams();
     try {
-      await this.releaseReservation();
+      await this.releaseLinuxSystemAudio();await this.releaseReservation();
       this.update({phase: 'idle', sessionId: null, tracks: [], error: ''});
     } catch (error) {this.update({phase: 'pending', error: message(error)}); throw error;}
     finally {this.releaseMedia();}
@@ -223,7 +184,7 @@ export class MeetingCaptureController {
   private async runStart(sessionId: string, options: CaptureOptions, prepared = false) {
     if (!prepared && ['ready', 'starting', 'recording', 'paused', 'stopping', 'pending'].includes(this.state.phase)) throw new Error('Une capture ou une récupération est déjà ouverte.');
     this.update({phase: 'starting', sessionId, error: '', seconds: 0, totalBytes: 0, savedBytes: 0, pending: 0, tracks: []});
-    this.durabilityFailed = false; this.sequences.clear(); this.ends.clear(); this.recorders.clear(); this.stops.clear();
+    this.durabilityFailed = false; this.sequences.clear(); this.ends.clear(); this.recorders.clear(); this.producedTracks.clear(); this.stops.clear();
     let session: MeetingSession;
     let declaredRecording = false;
     try {
@@ -253,16 +214,38 @@ export class MeetingCaptureController {
       const devices = this.environment.devices(); const Recorder = this.environment.recorder();
       if (!devices?.getUserMedia || !Recorder) throw new Error('Capture audio indisponible dans ce navigateur. Importez un fichier.');
       const tracks: [MeetingTrack, MediaStream][] = [];
-      if (options.system) {
-        if (!devices.getDisplayMedia) throw new Error('La capture système n’est pas disponible dans ce navigateur.');
-        const media = await devices.getDisplayMedia({video: true, audio: true}); this.streams.push(media);
-        if (!media.getAudioTracks().length) throw new Error('Aucune piste audio système partagée. Choisissez une surface avec son audio.');
-        tracks.push(['system', new MediaStream(media.getAudioTracks())]);
-      }
-      if (this.stopRequested) throw new Error('Démarrage audio annulé.');
-      if (options.microphone !== false) {
-        const media = await devices.getUserMedia({audio: options.deviceId ? {deviceId: {exact: options.deviceId}} : true});
-        this.streams.push(media); tracks.push(['mic', media]);
+      if(options.system&&this.environment.linuxSystemAudio.available()){
+        if(options.microphone===false)throw new Error('Choisissez aussi le microphone pour autoriser les deux sources audio.');
+        const mic=await devices.getUserMedia({audio:options.deviceId?{deviceId:{exact:options.deviceId}}:true});
+        this.streams.push(mic);
+        if(this.stopRequested)throw new Error('Démarrage audio annulé.');
+        const id=crypto.randomUUID(),held={...this.reservation!,linux_loopback_id:id};
+        this.reservationStore.write(held);this.reservation=held;
+        const prepared=await this.environment.linuxSystemAudio.start(id);
+        const label='Kiara_sortie_'+id.replace(/-/g,'');
+        if(prepared.lease_id!==id||prepared.label!==label)throw new Error('La source audio système ne correspond pas à cette capture.');
+        if(this.stopRequested)throw new Error('Démarrage audio annulé.');
+        const matches=(await devices.enumerateDevices()).filter(device=>device.kind==='audioinput'&&device.label===label&&device.deviceId);
+        if(matches.length!==1)throw new Error('La sortie audio système n’est pas disponible dans le navigateur.');
+        const deviceId=matches[0].deviceId;
+        const system=await devices.getUserMedia({audio:{deviceId:{exact:deviceId},echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+        this.streams.push(system);
+        const systemTracks=system.getAudioTracks();
+        if(systemTracks.length!==1||systemTracks[0].getSettings().deviceId!==deviceId)
+          throw new Error('La sortie audio système obtenue ne correspond pas à celle choisie.');
+        tracks.push(['system',system],['mic',mic]);
+      }else{
+        if (options.system) {
+          if (!devices.getDisplayMedia) throw new Error('La capture système n’est pas disponible dans ce navigateur.');
+          const media = await devices.getDisplayMedia({video: true, audio: true}); this.streams.push(media);
+          if (!media.getAudioTracks().length) throw new Error('Aucune piste audio système partagée. Choisissez une surface avec son audio.');
+          tracks.push(['system', new MediaStream(media.getAudioTracks())]);
+        }
+        if (this.stopRequested) throw new Error('Démarrage audio annulé.');
+        if (options.microphone !== false) {
+          const media = await devices.getUserMedia({audio: options.deviceId ? {deviceId: {exact: options.deviceId}} : true});
+          this.streams.push(media); tracks.push(['mic', media]);
+        }
       }
       if (this.stopRequested) throw new Error('Démarrage audio annulé.');
       if (!tracks.length) throw new Error('Sélectionnez au moins une piste audio.');
@@ -278,13 +261,16 @@ export class MeetingCaptureController {
       this.started = this.environment.now(); this.pausedAt = 0; this.pausedMs = 0;
       for (const [track, media] of tracks) {
         const mimeType = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4'].find(type => Recorder.isTypeSupported?.(type));
-        const recorder = new Recorder(media, mimeType ? {mimeType, audioBitsPerSecond: 32000} : {audioBitsPerSecond: 32000});
+        const recorder = needsPcmAudioRecorder(navigator.userAgent, Recorder)
+          ? new PcmAudioRecorder(media)
+          : new Recorder(media, mimeType ? {mimeType, audioBitsPerSecond: 32000} : {audioBitsPerSecond: 32000});
         const previous = session.chunks?.filter(chunk => chunk.track === track) ?? [];
         this.sequences.set(track, previous.length ? Math.max(...previous.map(chunk => chunk.sequence)) + 1 : 0);
         this.ends.set(track, 0);
         const stopped = new Promise<void>(resolve => {recorder.onstop = () => resolve();});
         recorder.ondataavailable = event => {
           if (!event.data.size) return;
+          this.producedTracks.add(track);
           const seq = this.sequences.get(track)!; this.sequences.set(track, seq + 1);
           const start = this.ends.get(track)!; const end = this.elapsed(); this.ends.set(track, end);
           this.update({totalBytes: this.state.totalBytes + event.data.size});
@@ -330,7 +316,7 @@ export class MeetingCaptureController {
       }
       if (this.reservation) {
         if (this.reservation.acknowledged) {
-          try {await this.releaseReservation();}
+          try {await this.releaseLinuxSystemAudio();await this.releaseReservation();}
           catch (releaseError) {this.update({phase: 'pending', error: `${message(error)} · Réservation à libérer : ${message(releaseError)}`});}
         } else this.update({phase: 'pending', error: `${message(error)} · Réservation à vérifier, aucun microphone ouvert.`});
       }
@@ -368,7 +354,7 @@ export class MeetingCaptureController {
       const chunks = await this.store.list(sessionId);
       for (const chunk of chunks) {
         const form = new FormData();
-        const extension = chunk.blob.type.includes('mp4') ? 'm4a' : chunk.blob.type.includes('ogg') ? 'ogg' : 'webm';
+        const extension = chunk.blob.type.includes('wav') ? 'wav' : chunk.blob.type.includes('mp4') ? 'm4a' : chunk.blob.type.includes('ogg') ? 'ogg' : 'webm';
         form.append('file', chunk.blob, `${chunk.track}-${chunk.seq}.${extension}`); form.append('command_id', chunk.command_id);
         form.append('sha256', chunk.sha256); form.append('start_ms', String(chunk.start_ms)); form.append('duration_ms', String(chunk.duration_ms));
         const receipt = await this.api.chunk(chunk.session_id, chunk.track, chunk.seq, form);
@@ -397,13 +383,25 @@ export class MeetingCaptureController {
       this.recorders.forEach(recorder => {if (recorder.state !== 'inactive') recorder.stop();});
       await Promise.all(this.stops.values()); this.closeStreams(); await this.persistence;
       try {
+        await this.releaseLinuxSystemAudio();
         await this.releaseReservation();
         await this.syncPending(sessionId);
         if ((await this.store.list(sessionId)).length) await this.syncPending(sessionId);
         if ((await this.store.list(sessionId)).length || this.durabilityFailed) {
           this.update({phase: 'pending'}); return null;
         }
+        const missing = [...this.recorders.keys()].filter(track => !this.producedTracks.has(track));
+        if (missing.length) {
+          const labels = missing.map(track => track === 'mic' ? 'microphone' : 'audio partagé').join(' et ');
+          this.update({phase: 'error', error: `Aucun fragment reçu pour ${labels}. Vérifiez la source audio avant de finaliser la séance.`});
+          return null;
+        }
         const row = await this.api.get(sessionId);
+        if (!this.recorders.size && !row.total_bytes && !row.chunks?.length && !this.state.savedBytes) {
+          // Cancelling a prepared or in-flight start must not complete an empty session.
+          this.update({phase: 'idle', sessionId: null, title: '', tracks: [], error: '', pending: 0});
+          return row;
+        }
         const finalized = row.state === 'completed' ? row : await this.api.command(sessionId, 'finalize', sessionCommand(row.revision));
         this.update({phase: 'completed', error: '', pending: 0});
         return finalized;

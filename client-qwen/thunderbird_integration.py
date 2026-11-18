@@ -80,7 +80,7 @@ def distribution_policy():
 
 
 def manage(profile, source, *, enable=False, inspect=False):
-    from client import client_settings, protect, settings_path
+    from client import read_settings_for_update, protect, settings_path
     from kiara_shared.file_lock import locked
     from kiara_shared.history_store import atomic
 
@@ -94,7 +94,7 @@ def manage(profile, source, *, enable=False, inspect=False):
     folder = settings.parent / f'thunderbird-{settings.stem}'
     output = folder / f'agent-thunderbird-{version}.xpi'
     with locked(settings.parent / 'thunderbird-policy'), locked(settings):
-        values = client_settings(profile)
+        values = read_settings_for_update(profile)
         policies = policy(winreg.HKEY_CURRENT_USER)
         registered = policies.get(EXTENSION_ID)
         current = registered.get('install_url', '') if isinstance(registered, dict) else ''

@@ -3,6 +3,8 @@ import { request } from './http';
 import { beginActivity } from './asyncActivity';
 import type { NoteContent, NoteDetail } from './projectNotes';
 import {subscribeSessionEvents} from './sessionEvents';
+import {HttpError} from './httpError';
+import {matchesMeetingCommandReceipt, matchesMeetingCommandResult, type DurableAction} from './meetingCommandReceipts';
 
 export type MeetingSessionState = 'created' | 'recording' | 'paused' | 'finalizing' | 'completed' | 'interrupted' | 'cancelled';
 export type MeetingTrack = 'mic' | 'system';
@@ -73,7 +75,7 @@ export const sessionCommand = (revision: number): SessionCommand => ({command_id
 export const hasDesktopCapture = () => document.body.dataset.kiaraCapture === 'true';
 export const sessionAudioUrl = (id: string, track: MeetingTrack) => `${path(id)}/audio?track=${track}`;
 export const sessionExportUrl=(id:string)=>`${path(id)}/export`;
-async function durableCommand<T>(id:string,action:string,body:Record<string,unknown>,url:string):Promise<T>{
+async function durableCommand<T>(id:string,action:DurableAction,body:Record<string,unknown>,url:string):Promise<T>{
   const owner=body.browser_capture_owner_id;
   const key=`agent.meeting-command.v1.${id}.${action}${owner?`.owner.${owner}.revision.${body.expected_revision}`:''}`;
   const previous=localStorage.getItem(key);
@@ -82,6 +84,7 @@ async function durableCommand<T>(id:string,action:string,body:Record<string,unkn
   if(!previous)localStorage.setItem(key,JSON.stringify(payload));
   try{
     const result=await request<T>(url,{method:'POST',body:JSON.stringify(payload)},0);
+    if(!matchesMeetingCommandResult(result,id,action,owner))throw new Error('Réponse de séance incohérente ; commande conservée pour vérification.');
     // A successful HTTP stop may only have drained the helper: conservation can
     // still be pending. Keep its original identity until the session is complete.
     if(action!=='native-stop'||(result as {state?:string})?.state==='completed')localStorage.removeItem(key);
@@ -92,13 +95,18 @@ async function durableCommand<T>(id:string,action:string,body:Record<string,unkn
     const finish=beginActivity('Vérification de la commande de réunion…',{delayMs:800});
     try{
       const response=await agentFetch(`${path(id)}/commands/${encodeURIComponent(String(payload.command_id))}`,{credentials:'same-origin'});
-      // A native receipt can be hidden by operator/project authorization. Its
-      // absence cannot establish that an uncertain capture command never ran.
-      if(response.status===404&&!action.startsWith('native-'))localStorage.removeItem(key);
+      // A 404 may hide the session, and a request lost in transit may still
+      // arrive after this read. Release only a confirmed stale-revision
+      // precondition with an explicitly absent receipt.
+      if(response.status===404&&!action.startsWith('native-')&&failure instanceof HttpError&&failure.status===409&&
+        failure.message==='La séance a changé ; conserver la saisie et recharger.'){
+        const missing=await response.json() as {detail?:unknown}|null;
+        if(missing?.detail==='Commande introuvable dans cette séance')localStorage.removeItem(key);
+      }
       else if(response.ok){const receipt=await response.json();
-        const matching=(!action.startsWith('native-')&&!owner||receipt.id===payload.command_id)&&(receipt.status!=='completed'||!owner||receipt.result?.browser_capture?.owner_id===owner&&receipt.result?.browser_capture?.can_control===true);
+        const matching=matchesMeetingCommandReceipt(receipt,id,action,payload.command_id,owner);
         if(matching&&receipt.status==='rejected')localStorage.removeItem(key);
-        else if(matching&&receipt.status==='completed'&&(action!=='native-stop'||receipt.result?.state==='completed')){localStorage.removeItem(key);return receipt.result as T;}}
+        else if(matching&&receipt.status==='completed'){localStorage.removeItem(key);return receipt.result as T;}}
     }catch{/* Offline receipt remains recoverable. */}finally{finish();}
     throw failure;
   }

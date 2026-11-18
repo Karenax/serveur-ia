@@ -40,6 +40,7 @@ export const P = {
   grid: GRID4,
   list: ["M4 6h16M4 12h16M4 18h16"],
   folder: ["M3 6V4h7l2 3h9v13H3z"],
+  note: ["M6 3h12v18H6zM9 8h6M9 12h6M9 16h4"],
   download: ["M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"],
   trash: ["M3 6h18M9 6V3h6v3M6 6l1 15h10l1-15M10 10v7M14 10v7"],
   chevL: ["m14 5-7 7 7 7"],
@@ -62,7 +63,24 @@ export const P = {
     "M12 9v4M12 17h.01",
   ],
   check: ["M20 6 9 17l-5-5"],
+  // Menus d'options / filtres : icônes filaires discrètes (voir <Icon>).
+  more: [
+    '<circle cx="5" cy="12" r="1.6" fill="currentColor" stroke="none"/>',
+    '<circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/>',
+    '<circle cx="19" cy="12" r="1.6" fill="currentColor" stroke="none"/>',
+  ],
+  sliders: [
+    "M3 7h18M3 17h18",
+    '<circle cx="9" cy="7" r="2.2" fill="var(--surface, #fff)"/>',
+    '<circle cx="15" cy="17" r="2.2" fill="var(--surface, #fff)"/>',
+  ],
+  filter: ["M3 5h18l-7 8v6l-4 2v-8z"],
 };
+
+/** Icône filaire discrète référencée par son nom (menus d'options et de filtres). */
+export function Icon({ name, size = 16 }: { name: keyof typeof P; size?: number }) {
+  return <Glyph d={P[name]} size={size} />;
+}
 
 /* ── Tuiles applicatives ─────────────────────────────────────────── */
 

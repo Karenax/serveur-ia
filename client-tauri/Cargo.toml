@@ -9,3 +9,7 @@ tauri-build = { version = "2", features = [] }
 
 [dependencies]
 tauri = { version = "2", features = [] }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+tauri = { version = "2", features = ["dynamic-acl"] }
+gtk = "0.18.2"

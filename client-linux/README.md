@@ -18,8 +18,14 @@ pas installé sur Linux. Le mot d’appel expérimental « Bonjour Kiara » est 
 Sous Linux, le microphone se ferme pendant la réponse de Kiara puis se rouvre
 automatiquement. L’interruption par la parole est désactivée pour éviter que
 Kiara ne retranscrive le son de ses haut-parleurs. Couper le micro ou raccrocher
-ferme le processus de capture. La sélection d’une zone de l’écran reste
-indisponible ; les images enregistrées sont joignables dans le chat et le vocal.
+ferme le processus de capture. Dans le vocal, « Choisir une capture » ouvre le
+portail de capture du bureau Linux. Selon le bureau, celui-ci propose une zone,
+une fenêtre ou capture directement l’écran entier. Kiara permet ensuite de
+choisir localement une zone, à la souris ou par coordonnées. Vérifiez l’aperçu et retirez-le si nécessaire :
+l’image n’est jointe qu’à la prochaine question. Le portail peut conserver une
+copie locale de la capture. Si le portail est absent, joignez une image enregistrée.
+Cette fonction nécessite `xdg-desktop-portal` et un backend de capture adapté au
+bureau graphique ; elle peut ne pas être proposée par tous les environnements.
 Les mises à jour sont manuelles :
 les EXE Windows proposés par le serveur ne sont jamais installés sous Linux.
 
@@ -28,10 +34,11 @@ les EXE Windows proposés par le serveur ne sont jamais installés sous Linux.
 Installer les prérequis système (Ubuntu 24.04) :
 
 ```sh
-sudo apt install python3 python3-venv python3-tk gnome-keyring pulseaudio-utils libegl1 libopengl0 libxcb-cursor0 libnss3 libasound2t64
+sudo apt install python3 python3-venv python3-tk gnome-keyring pulseaudio-utils gstreamer1.0-pulseaudio libegl1 libopengl0 libxcb-cursor0 libnss3 libasound2t64 libgtk-3-0 libwebkit2gtk-4.1-0
 ```
 
-Télécharger **l’archive complète** `Kiara-linux-amd64-3.5.62-vocal.tar.gz`.
+Télécharger **l’archive complète Tauri** du client Linux. Le paquet de recette
+se nomme `Kiara-linux-amd64-4.0.9-tauri.tar.gz`.
 Le dossier `client-linux` du dépôt contient les sources de l’installateur :
 le copier seul ne permet pas d’installer l’application.
 
@@ -39,25 +46,53 @@ Depuis le dossier contenant l’archive téléchargée, extraire le paquet dans 
 emplacement que vous conserverez, puis ouvrir son dossier :
 
 ```sh
-tar -xzf Kiara-linux-amd64-3.5.62-vocal.tar.gz
+tar -xzf Kiara-linux-amd64-4.0.9-tauri.tar.gz
 cd Kiara-linux-amd64
 python3 installer.py
-./start.sh
+./start-tauri.sh
 ```
+
+Le raccourci `./start.sh` ouvre aussi le client Tauri. Le profil, le trousseau
+et les données locales restent séparés du dossier d’installation. Si des
+données d’une ancienne interface sont détectées, la récupération expérimentale
+s’arrête et les conserve ; elle ne les migre pas automatiquement.
+
+Le client Tauri empêche l’ouverture simultanée du même profil Linux, avant le
+chargement de ses données. Fermez les anciennes versions avant de le lancer.
+Si un brouillon local ou un audio en attente semble absent
+après relance, ne pas le remplacer : un changement de port du relais peut le
+masquer. Conserver le profil et les anciennes versions en attendant une
+procédure de récupération vérifiée.
+
+Le candidat vérifie les origines Tauri avant de choisir le port d'un profil
+existant. Il s'arrête sans modifier les données si plusieurs origines sont
+utilisées ou si la vérification échoue ; leur fusion reste à qualifier.
 
 Le fichier `build-manifest.json` et les dossiers `client` et `shared` doivent
 être présents à côté de `installer.py`. Si le manifeste est absent, reprendre
 l’extraction de l’archive complète ; ne pas créer un manifeste vide.
 
-L’installateur télécharge les bibliothèques Python/Qt et de reconnaissance depuis PyPI, crée un
+L’installateur télécharge les bibliothèques Python de reconnaissance depuis PyPI, crée un
 environnement isolé dans le dossier extrait et ajoute Kiara au menu des
 applications de votre session. Il ne demande pas sudo. Un bureau avec service
 Secret Service et trousseau déverrouillé est nécessaire (GNOME Keyring ou service
-compatible). Ne pas désactiver le bac à sable Chromium pour lancer l’application.
+compatible). Le paquet Tauri utilise WebKitGTK et requiert ses bibliothèques système.
+Ne pas désactiver le bac à sable
+du moteur web pour lancer l’application.
+
+Pour enregistrer une réunion dans le portail Tauri, accepter la demande d’accès
+au microphone. Lorsque WebKitGTK ne propose pas WebM, Kiara utilise des fragments
+WAV PCM pour conserver l’audio. Le paquet GStreamer ci-dessus permet l’accès à
+PulseAudio ; sa présence ne remplace pas la vérification du microphone sur le poste.
+Pour enregistrer aussi le son du PC, sélectionner l’option correspondante et
+autoriser les deux sources audio. Kiara enregistre le microphone et tous les sons
+de la sortie par défaut au démarrage sur deux pistes distinctes. Si la sortie
+change, arrêter la capture puis démarrer une nouvelle séance. La boucle est
+retirée à la fin de la capture ; le périphérique de sortie par défaut ne change
+pas. Cette fonction exige `pactl` et un serveur PulseAudio ou compatible qui
+accepte les sources de boucle. Vérifiez son fonctionnement sur votre poste.
 
 Les bibliothèques natives sont installées depuis leurs paquets binaires.
-`proxy_tools`, dépendance Python pure de pywebview, est explicitement autorisée
-en sources car son éditeur ne fournit pas de paquet binaire.
 
 Au premier lancement, choisir le client personnel `.exe` fourni par
 l’administrateur. Il est lu sans être exécuté ; seul son accès est importé et
@@ -69,7 +104,8 @@ sur deux appareils peut interrompre leurs connexions WireGuard.
 
 Choisir le microphone et la sortie audio dans les réglages Linux. La session
 graphique doit disposer de PipeWire avec `pipewire-pulse` (standard sur Ubuntu
-24.04) ou de PulseAudio ; aucun service audio système n’est reconfiguré par Kiara.
+24.04) ou de PulseAudio. Pour le son du PC en réunion, Kiara crée une source de
+boucle temporaire dans la session audio sans changer la sortie par défaut.
 
 Ouvrir **Vocal**, garder **Low**, puis cliquer **Installer le vocal** : environ
 680 Mo de modèles publics sont téléchargés une seule fois et vérifiés par leurs
@@ -102,7 +138,7 @@ ne supprimer les données personnelles qu’après sauvegarde.
 Depuis la racine du dépôt, avec le Python de construction :
 
 ```powershell
-& '.\toolchain\build-python\Scripts\python.exe' maintenance/package_linux_client.py
+& '.\toolchain\build-python\Scripts\python.exe' maintenance/package_linux_client.py --tauri-binary '<binaire-Linux>' --tauri-version '<version>'
 ```
 
 Le constructeur utilise le Go épinglé de `wireguard-toolchain.json`, vérifie les
@@ -133,6 +169,5 @@ la synchronisation et la fermeture avec sauvegarde. La validation native Linux
 reste nécessaire avant diffusion générale. Le paquet a été préparé depuis Windows ;
 aucune validation graphique ou matérielle Linux n’est annoncée.
 
-Références : [installation pywebview](https://pywebview.flowrl.com/guide/installation),
-[trousseau Secret Service](https://keyring.readthedocs.io/en/stable/).
+Référence : [trousseau Secret Service](https://keyring.readthedocs.io/en/stable/).
 La capture utilise [parec de PulseAudio](https://www.freedesktop.org/wiki/Software/PulseAudio/Documentation/User/).

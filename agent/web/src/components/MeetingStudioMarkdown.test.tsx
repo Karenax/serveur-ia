@@ -1,3 +1,4 @@
+import {installPublicationLocksForTest} from '../test/publicationLocks';
 import {afterEach,beforeEach,expect,it,vi} from 'vitest';
 import {cleanup,fireEvent,render,screen,waitFor} from '@testing-library/react';
 import {MeetingStudio} from './MeetingStudio';
@@ -14,7 +15,7 @@ const a:MeetingSession={id:'markdown-a',title:'Séance A',kind:'note',project_id
 const b:MeetingSession={...a,id:'markdown-b',title:'Séance B',note_id:'note-b',note:{...a.note!,id:'note-b',title:'Note B',content:note('Cote B à confirmer.')}};
 const capabilities:SessionCapabilities={enabled:true,capture:{durable:true,max_upload_mb:50,max_duration_minutes:120,tracks:['mic','system'],browser_permission_required:true},
   transcription:{batch_ready:false,live_ready:false,detail:'Essai fictif sans audio'},notes:{staging:true,erp_projection:true},assistant:{ready:true}};
-beforeEach(()=>{localStorage.clear();vi.spyOn(meetingSessions,'watchEvents').mockResolvedValue(undefined);vi.spyOn(meetingSessions,'get').mockImplementation(async id=>id===a.id?a:b);
+beforeEach(()=>{installPublicationLocksForTest();localStorage.clear();vi.spyOn(meetingSessions,'watchEvents').mockResolvedValue(undefined);vi.spyOn(meetingSessions,'get').mockImplementation(async id=>id===a.id?a:b);
   vi.spyOn(meetingSessions,'askHistory').mockResolvedValue({items:[]});vi.spyOn(meetingSessions,'enhancements').mockResolvedValue({items:[]});vi.spyOn(meetingSessions,'liveAnswers').mockResolvedValue({items:[]});});
 afterEach(()=>{cleanup();vi.restoreAllMocks();});
 

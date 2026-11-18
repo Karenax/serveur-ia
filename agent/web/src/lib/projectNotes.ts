@@ -16,6 +16,7 @@ export type NotePage<T>={items:T[];total:number;limit:number;offset:number};
 export type NotesList=NotePage<NoteSummary>&{available:boolean;can_edit?:boolean;operator_id?:string};
 export type NoteCreate={command_id:string;title:string;content:NoteContent};
 export type NoteSave=NoteCreate&{expected_revision:number;attachment_ids:string[]};
+export type NotePaste=NoteSave&{insert_at:number};
 export type NoteRestore={command_id:string;expected_revision:number;version_id:string};
 export type NotePending={kind:'create';payload:NoteCreate}|{kind:'save';payload:NoteSave}|{kind:'restore';payload:NoteRestore};
 export type NoteResult={note:NoteDetail;command_id:string;command_revision:number;replayed:boolean};
@@ -23,8 +24,10 @@ export type NoteHistory={id:string;revision:number;title:string;actor_id:string|
 export type NoteVersion=NoteHistory&{project_id:string;note_id:string;value:{title:string;content:NoteContent};attachment_bindings:Record<string,string>};
 export type NoteAttachment={id:string;project_id:string;note_id:string;filename:string;size_bytes:number;content_type:string;sha256:string};
 export class NoteHttpError extends Error { constructor(public status:number,message:string){super(message);} }
-const root=(projectId:string)=>`/api/v1/projects/${encodeURIComponent(projectId)}/notes`;
+export const personalNotesScope='personal';
+const root=(projectId:string)=>projectId===personalNotesScope?'/api/v1/notes/personal':`/api/v1/projects/${encodeURIComponent(projectId)}/notes`;
 export const noteUrl=(projectId:string,noteId:string)=>`${root(projectId)}/${encodeURIComponent(noteId)}`;
+export type NotesProject={id:string;code:string;title:string;has_notes:boolean};
 
 export async function noteRequest<T>(url:string,init:RequestInit={},timeoutMs=60_000):Promise<T>{
   const finish=['GET','HEAD'].includes((init.method||'GET').toUpperCase())?()=>{}:beginActivity('Enregistrement de la note…');
@@ -44,6 +47,7 @@ export async function noteRequest<T>(url:string,init:RequestInit={},timeoutMs=60
 }
 const call=noteRequest;
 export const notesApi={
+  catalogue:(signal?:AbortSignal)=>call<{projects:NotesProject[];can_edit:boolean}>('/api/v1/notes/projects',{signal}),
   list:(projectId:string,query='',offset=0,signal?:AbortSignal)=>call<NotesList>(`${root(projectId)}?query=${encodeURIComponent(query)}&offset=${offset}&limit=30`,{signal}),
   read:(projectId:string,noteId:string,signal?:AbortSignal)=>call<NoteDetail>(noteUrl(projectId,noteId),{signal}),
   execute:(projectId:string,noteId:string,pending:NotePending,signal?:AbortSignal)=>call<NoteResult>(
@@ -52,6 +56,16 @@ export const notesApi={
   history:(projectId:string,noteId:string,offset=0,signal?:AbortSignal)=>call<NotePage<NoteHistory>>(`${noteUrl(projectId,noteId)}/history?offset=${offset}&limit=20`,{signal}),
   version:(projectId:string,noteId:string,versionId:string,signal?:AbortSignal)=>call<NoteVersion>(`${noteUrl(projectId,noteId)}/versions/${encodeURIComponent(versionId)}`,{signal}),
   attachments:(projectId:string,noteId:string,signal?:AbortSignal)=>call<{items:NoteAttachment[]}>(`${noteUrl(projectId,noteId)}/attachments`,{signal}),
+  paste:(projectId:string,noteId:string,payload:NotePaste,file:File,signal?:AbortSignal)=>{
+    const form=new FormData();
+    form.set('command',new Blob([JSON.stringify(payload)],{type:'application/json'}),'note.json');
+    form.set('file',file,file.name);
+    const path=noteId==='new'?root(projectId):noteUrl(projectId,noteId);
+    return call<NoteResult>(`${path}/paste-image`,{method:'POST',body:form,signal});
+  },
+  copy:(noteId:string,projectId:string,versionId:string,signal?:AbortSignal)=>call<NoteDetail>(
+    `${noteUrl(personalNotesScope,noteId)}/copy-to-project`,{method:'POST',signal,
+      body:JSON.stringify({project_id:projectId,version_id:versionId})}),
 };
 export const blankNote=():NoteContent=>({version:1,blocks:[{type:'paragraph',align:'left',runs:[]}]});
 export const safeNoteLink=(value:string)=>{

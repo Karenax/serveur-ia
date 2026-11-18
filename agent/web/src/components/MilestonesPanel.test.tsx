@@ -1,10 +1,11 @@
 import { afterEach, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { api } from "../lib/api";
 import { milestoneApi, type Milestone, type MilestoneReview } from "../lib/milestones";
 import { MilestonesPanel } from "./MilestonesPanel";
 
-afterEach(() => {cleanup(); vi.restoreAllMocks();});
+const originalHidden=Object.getOwnPropertyDescriptor(document,"hidden");
+afterEach(() => {cleanup();vi.useRealTimers();vi.restoreAllMocks();if(originalHidden)Object.defineProperty(document,"hidden",originalHidden);else Reflect.deleteProperty(document,"hidden");});
 const rows: Milestone[] = [{id: "fat", title: "FAT", due_date: "2026-10-20", contractual_date: "2026-10-18",
   forecast_date: "2026-10-20", actual_date: "", variance_days: 2, state: "scheduled"}];
 const review: MilestoneReview = {pending_total: 1, job: null, candidates: [{id: "c1", title: "FAT", date_type: "forecast_date",
@@ -62,4 +63,25 @@ it("sépare les résultats de deux projets pendant une requête retardée", asyn
   await waitFor(() => expect(load).toHaveBeenCalledWith("p2", expect.any(AbortSignal)));
   resolve(review);
   await waitFor(() => expect(screen.queryByText("FAT reportée au 22/10/2026.")).toBeNull());
+});
+
+it("suspend les lectures en arrière-plan et reprend sans appliquer une réponse tardive",async()=>{
+  vi.useFakeTimers();Object.defineProperty(document,"hidden",{configurable:true,value:true});
+  let finishOld!:(value:MilestoneReview)=>void;
+  const read=vi.spyOn(milestoneApi,"review").mockReturnValueOnce(new Promise(resolve=>{finishOld=resolve;}))
+    .mockResolvedValue({candidates:[],pending_total:0,job:null});
+  render(<MilestonesPanel projectId="p1" rows={rows} refresh={vi.fn()}/>);
+  await act(async()=>{});expect(read).not.toHaveBeenCalled();
+  Object.defineProperty(document,"hidden",{configurable:true,value:false});
+  await act(async()=>{document.dispatchEvent(new Event("visibilitychange"));});
+  expect(read).toHaveBeenCalledTimes(1);const first=read.mock.calls[0][1]!;
+  Object.defineProperty(document,"hidden",{configurable:true,value:true});
+  await act(async()=>{document.dispatchEvent(new Event("visibilitychange"));});
+  expect(first.aborted).toBe(true);
+  await act(async()=>{await vi.advanceTimersByTimeAsync(45000);});expect(read).toHaveBeenCalledTimes(1);
+  Object.defineProperty(document,"hidden",{configurable:true,value:false});
+  await act(async()=>{document.dispatchEvent(new Event("visibilitychange"));});
+  expect(read).toHaveBeenCalledTimes(2);expect(screen.getByText(/Aucune date à valider/)).toBeTruthy();
+  await act(async()=>{finishOld(review);});
+  expect(screen.queryByText("FAT reportée au 22/10/2026.")).toBeNull();
 });

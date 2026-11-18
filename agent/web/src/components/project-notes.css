@@ -14,3 +14,15 @@
 @keyframes note-saving{to{transform:rotate(360deg)}}@media(prefers-reduced-motion:reduce){.note-save-status.saving:before{animation:none}}
 @media(max-width:850px){.note-workspace{grid-template-columns:minmax(0,1fr)}.note-index ul{max-height:260px}.note-index .identity-pagination{flex-wrap:wrap}.note-rich-editor{padding:10px}.note-toolbar{padding:8px}.note-session,.note-workspace{gap:12px}}
 .note-import,.note-source{padding:16px;border:1px solid var(--border,#d8e2ec);border-radius:12px;background:var(--surface,#fff);margin-bottom:16px;min-width:0}.note-import label,.note-attachments>label{display:grid;gap:6px;margin:10px 0;min-width:0}.note-import-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.note-import select,.note-import input{min-width:0;max-width:100%}.note-source-files{list-style:none;max-height:240px;overflow:auto;padding:0}.note-source-files li{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--border,#d8e2ec);overflow-wrap:anywhere}.note-source-files small{color:var(--muted,#566777)}.note-import-preview{padding:16px;margin-top:16px;background:var(--surface-subtle,#f2f5f8);border-radius:10px}.note-image-placeholder{padding:16px;border:1px dashed var(--border,#d8e2ec);border-radius:8px;color:var(--muted,#566777)}.note-source dl div{display:flex;flex-wrap:wrap;gap:8px}.note-source dd{margin:0;overflow-wrap:anywhere}.note-source details li{overflow-wrap:anywhere}.note-attachments li{justify-content:space-between;align-items:center}.note-attachments small{display:block;margin-top:5px}.note-import .document-confirm{display:flex;align-items:flex-start;gap:8px}.note-import .document-confirm input{margin-top:5px}@media(max-width:650px){.note-import-fields{grid-template-columns:minmax(0,1fr)}.note-import,.note-source{padding:12px}.note-import-preview{padding:10px}}
+
+.notes-page-header {margin-bottom:16px}
+.notes-tabs {margin-bottom:0}
+.notes-tabs button[aria-selected=true] {color:var(--accent);border-bottom-color:var(--accent);font-weight:650}
+.notes-tabs button:focus-visible {outline:2px solid var(--accent);outline-offset:-3px}
+.notes-draft-title {font-size:1.15rem;margin:16px 0 0}
+.note-project-picker {min-width:0}
+.note-project-picker summary {cursor:pointer;color:var(--text)}
+.note-project-picker form,.note-project-start {display:flex;flex-wrap:wrap;align-items:end;gap:12px;margin:12px 0}
+.note-project-picker label {display:grid;gap:6px;max-width:100%;flex:0 1 320px;min-width:0}
+.note-project-picker select {width:100%;min-width:0;text-overflow:ellipsis}
+.note-project-picker form p {flex-basis:100%;color:var(--muted);margin:0}

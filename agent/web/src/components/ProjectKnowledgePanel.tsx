@@ -9,11 +9,20 @@ const dateLabel=(value?:string|null)=>value?new Date(value).toLocaleString('fr-F
 function Evidence({proof}:{proof:Proof}) {return <details><summary>Voir le justificatif</summary><blockquote>{proof.quote}</blockquote><small>{proof.sources.length?`Sources : ${proof.sources.join(', ')}`:'Validation manuelle'} · Référence : {proof.knowledge_id}</small></details>;}
 export function ProjectKnowledgePanel({projectId,active=true}:{projectId:string;active?:boolean}) {
   const [data,setData]=useState<KnowledgeAnalysis|null>(null),[error,setError]=useState(''),[offset,setOffset]=useState(0),[tick,setTick]=useState(0);
-  useEffect(()=>{if(!active)return;const controller=new AbortController();let timer:ReturnType<typeof setTimeout>;
-    const load=async(quiet=false)=>{try {const result=await (quiet?projectKnowledgeApi.read(projectId,offset,controller.signal,true):projectKnowledgeApi.read(projectId,offset,controller.signal));if(controller.signal.aborted)return;setData(result);setError('');}
-      catch(e){if(!controller.signal.aborted)setError(e instanceof Error?e.message:'Analyse indisponible');}
-      finally {if(!controller.signal.aborted)timer=setTimeout(()=>void load(true),15000);}};
-    void load();return()=>{controller.abort();clearTimeout(timer);};
+  useEffect(()=>{if(!active)return;
+    let stopped=false,loading=false,controller:AbortController|null=null,timer:ReturnType<typeof setTimeout>|undefined;
+    const stop=()=>{clearTimeout(timer);timer=undefined;controller?.abort();controller=null;loading=false;};
+    const load=async(quiet=false)=>{
+      if(stopped||document.hidden||loading)return;
+      controller?.abort();const current=new AbortController();controller=current;loading=true;
+      try {const result=await (quiet?projectKnowledgeApi.read(projectId,offset,current.signal,true):projectKnowledgeApi.read(projectId,offset,current.signal));if(current.signal.aborted)return;setData(result);setError('');}
+      catch(e){if(!current.signal.aborted)setError(e instanceof Error?e.message:'Analyse indisponible');}
+      finally {if(controller===current){loading=false;if(!stopped&&!document.hidden)timer=setTimeout(()=>void load(true),15000);}}
+    };
+    const visibility=()=>{if(document.hidden){stop();return;}clearTimeout(timer);timer=undefined;void load(true);};
+    document.addEventListener('visibilitychange',visibility);
+    if(!document.hidden)void load();
+    return()=>{stopped=true;document.removeEventListener('visibilitychange',visibility);stop();};
   },[projectId,active,offset,tick]);
   useEffect(()=>{setData(null);setOffset(0);setError('');},[projectId]);
   return <section className="project-knowledge" aria-label="Informations à vérifier">

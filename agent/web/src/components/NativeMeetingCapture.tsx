@@ -55,24 +55,32 @@ function recoveryMessage(item:NativeCaptureItem|null|undefined,notice?:NativeCap
 function stopCommand(row:MeetingSession,notice?:NativeCaptureRecovery){
   return row.native_recovery?.find(item=>item.session_id===row.id)?.pending_stop||notice?.pending_stop||sessionCommand(row.revision);
 }
-function useCaptureStatus(id?:string,initial?:NativeCaptureStatus){
+function useCaptureStatus(id?:string,initial?:NativeCaptureStatus,enabled=true){
   const [status,setStatus]=useState<NativeCaptureStatus|null>(initial||null),[readError,setReadError]=useState(''),[tick,setTick]=useState(0),[loaded,setLoaded]=useState(false);
   const sequence=useRef(0);
   const invalidate=useCallback(()=>{sequence.current++;},[]);
   const refresh=useCallback(()=>{sequence.current++;setTick(value=>value+1);},[]);
   useEffect(()=>{
-    const controller=new AbortController();let alive=true;
-    const load=(quiet=false)=>{const current=++sequence.current;
+    if(!enabled)return;
+    let alive=true,request:AbortController|null=null,timer:number|undefined;
+    const stop=()=>{sequence.current++;request?.abort();request=null;if(timer!==undefined){window.clearInterval(timer);timer=undefined;}};
+    const load=(quiet=false)=>{
+      if(!alive||document.hidden)return;
+      request?.abort();
+      const controller=new AbortController();request=controller;const current=++sequence.current;
       const read=id?Promise.all([quiet?meetingSessions.nativeStatus(id,controller.signal,true):meetingSessions.nativeStatus(id,controller.signal),quiet?meetingSessions.nativeStatus(undefined,controller.signal,true):meetingSessions.nativeStatus(undefined,controller.signal)])
         .then(([selected,global])=>{const value=captureStatus(selected),workspace=captureStatus(global);
           return {...value,active:workspace.active??value.active,owners:workspace.owners??value.owners,recovery:workspace.recovery??value.recovery};})
         :(quiet?meetingSessions.nativeStatus(undefined,controller.signal,true):meetingSessions.nativeStatus(undefined,controller.signal)).then(captureStatus);
       void read.then(value=>{if(alive&&!controller.signal.aborted&&current===sequence.current){setStatus(value);setLoaded(true);setReadError('');}})
-        .catch(failure=>{if(alive&&!controller.signal.aborted&&current===sequence.current)setReadError(failureText(failure));});
+        .catch(failure=>{if(alive&&!controller.signal.aborted&&current===sequence.current)setReadError(failureText(failure));})
+        .finally(()=>{if(request===controller){request=null;controller.abort();}});
     };
-    load();const timer=setInterval(()=>load(true),5000);
-    return()=>{alive=false;controller.abort();sequence.current++;clearInterval(timer);};
-  },[id,tick]);
+    const start=(quiet=false)=>{if(!alive||document.hidden||timer!==undefined)return;load(quiet);timer=window.setInterval(()=>load(true),5000);};
+    const visibility=()=>{if(document.hidden)stop();else start(true);};
+    document.addEventListener('visibilitychange',visibility);start();
+    return()=>{alive=false;document.removeEventListener('visibilitychange',visibility);stop();};
+  },[id,tick,enabled]);
   return {status,readError,invalidate,refresh,loaded};
 }
 function useCommandLifetime(){
@@ -133,11 +141,11 @@ export function NativeCaptureBar({onOpen}:{onOpen:(id:string)=>void}){
   </section>;
 }
 
-type CaptureProps={session:MeetingSession;capabilities?:NativeCaptureStatus;onChanged:(row:MeetingSession)=>void;browserBusy:boolean;
+type CaptureProps={session:MeetingSession;capabilities?:NativeCaptureStatus;onChanged:(row:MeetingSession)=>void;browserBusy:boolean;active?:boolean;
   onAvailability?:(busy:boolean)=>void;onRecoveryControls?:(available:boolean)=>void};
 export function NativeMeetingCapture(props:CaptureProps){return <SessionNativeCapture key={props.session.id} {...props}/>;}
-function SessionNativeCapture({session,capabilities,onChanged,browserBusy,onAvailability,onRecoveryControls}:CaptureProps){
-  const {status,readError,invalidate,refresh,loaded}=useCaptureStatus(session.id,capabilities),{live,operation,read}=useCommandLifetime();
+function SessionNativeCapture({session,capabilities,onChanged,browserBusy,onAvailability,onRecoveryControls,active:visible=true}:CaptureProps){
+  const {status,readError,invalidate,refresh,loaded}=useCaptureStatus(session.id,capabilities,visible),{live,operation,read}=useCommandLifetime();
   const [source,setSource]=useState<'system'|'mic'|'both'>('system'),[system,setSystem]=useState(''),[mic,setMic]=useState(''),[busy,setBusy]=useState(''),[error,setError]=useState(''),[preflightError,setPreflightError]=useState('');
   const [pendingStart,setPendingStart]=useState(()=>{try{return JSON.parse(localStorage.getItem(commandKey(session.id,'start'))||'null');}catch{return null;}});
   const [pendingStop,setPendingStop]=useState(()=>!!localStorage.getItem(commandKey(session.id,'stop')));

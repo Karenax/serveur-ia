@@ -11,6 +11,8 @@ it("vérifie la sauvegarde puis relit son état en gardant les détails accessib
   vi.spyOn(api,"verifyBackup").mockResolvedValue({status:"verified"});
   render(<OperationsPanel/>);
   await screen.findByText("Vérification à effectuer");
+  expect(screen.getByText(/Dernière sauvegarde du service Projets/)).toBeTruthy();
+  expect(screen.getByText(/brouillons non synchronisés/)).toBeTruthy();
   expect(screen.getByText("Espace disque et sauvegardes de migration").closest("details")).toHaveProperty("open",false);
   fireEvent.click(screen.getByRole("button",{name:"Vérifier la dernière sauvegarde"}));
   await waitFor(()=>expect(api.verifyBackup).toHaveBeenCalledOnce());

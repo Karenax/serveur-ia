@@ -23,17 +23,24 @@ export function DocumentBatchPanel({projectId,active,canEdit,disabled,choice,pre
   const action=useRef<AbortController|null>(null),alive=useAlive();
   useEffect(()=>()=>action.current?.abort(),[]);
   useEffect(()=>{if(!active){action.current?.abort();setBusy(null);onBusy(false);}},[active,onBusy]);
-  useEffect(()=>{if(!active)return;const controller=new AbortController();let timer:number|undefined;
+  useEffect(()=>{if(!active)return;let stopped=false,loading=false,controller:AbortController|null=null,timer:number|undefined;
+    const stop=()=>{window.clearTimeout(timer);timer=undefined;controller?.abort();controller=null;loading=false;};
     async function refresh(quiet=false){
-      try{const value=await (quiet?documentJobApi.list(projectId,offset,controller.signal,true):documentJobApi.list(projectId,offset,controller.signal));
-        const current=selected?await (quiet?documentJobApi.detail(projectId,selected,controller.signal,true):documentJobApi.detail(projectId,selected,controller.signal)):null;
-        if(controller.signal.aborted)return;setJobs(value);setReadError('');if(current)setDetail(previous=>
+      if(stopped||document.hidden||loading)return;
+      const request=new AbortController();controller=request;loading=true;let delay=10_000;
+      try{const value=await (quiet?documentJobApi.list(projectId,offset,request.signal,true):documentJobApi.list(projectId,offset,request.signal));
+        if(request.signal.aborted)return;
+        const current=selected?await (quiet?documentJobApi.detail(projectId,selected,request.signal,true):documentJobApi.detail(projectId,selected,request.signal)):null;
+        if(request.signal.aborted)return;setJobs(value);setReadError('');if(current)setDetail(previous=>
           previous?.id===current.id&&previous.revision>current.revision?previous:current);
-        timer=window.setTimeout(()=>void refresh(true),value.items.some(row=>['queued','running'].includes(row.status))||
-          current&&['queued','running'].includes(current.status)?2000:10_000);
-      }catch(e){if(!controller.signal.aborted){setReadError(message(e));timer=window.setTimeout(()=>void refresh(true),10_000);}}
+        delay=value.items.some(row=>['queued','running'].includes(row.status))||
+          current&&['queued','running'].includes(current.status)?2000:10_000;
+      }catch(e){if(!request.signal.aborted)setReadError(message(e));}
+      finally{if(controller===request){loading=false;if(!stopped&&!document.hidden)timer=window.setTimeout(()=>void refresh(true),delay);}}
     }
-    void refresh();return()=>{controller.abort();window.clearTimeout(timer);};
+    const visibility=()=>{if(document.hidden){stop();return;}window.clearTimeout(timer);timer=undefined;void refresh(true);};
+    document.addEventListener('visibilitychange',visibility);if(!document.hidden)void refresh();
+    return()=>{stopped=true;document.removeEventListener('visibilitychange',visibility);stop();};
   },[projectId,active,offset,selected,tick]);
   useEffect(()=>{if(!active||!selected||!journal)return;const controller=new AbortController();
     Promise.all([documentJobApi.events(projectId,selected,eventOffset,controller.signal),

@@ -1,48 +1,58 @@
-import { agentLocation, agentPath } from './lib/agentRoutes';
+import { agentPath } from './lib/agentRoutes';
 import { PurchasesPanel, TrackingPanel, BomPanel } from "./components/WorkshopPanels";
 import { MemoryRetryButton } from "./components/MemoryRetryButton";
 import { AsyncDownloadLink } from './components/AsyncDownloadLink';
 import {meetingWorkspaceHref,requestMeetingWorkspace} from './lib/meetingWorkspace';
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {retryableLazy} from './lib/retryableLazy';
 import { api, type BrainAction, type BrainKnowledge, type SageStatus, type BrainLinkState, type CdcItem, type CdcReview, type CdcSource, type ProjectDetail, type CdcJob, type Meeting, type NetworkLink, type PortfolioRow } from "./lib/api";
-import { CdcReviewPanel } from "./components/CdcReviewPanel";
-export { CdcReviewPanel } from "./components/CdcReviewPanel";
 import { type TriageProgress } from "./lib/mailTriage";
 import { useDurableMailTriage } from "./hooks/useDurableMailTriage";
 import { useDebouncedValue } from "./hooks/useDebouncedValue";
 import { useCdcJobs } from "./hooks/useCdcJobs";
 import { CdcJobsPanel } from "./components/CdcJobsPanel";
 import { CdcSourceUpload } from "./components/CdcSourceUpload";
-import {SourceInspector} from "./components/WorkspaceViews";
+import {SourceInspector} from "./components/SourceInspector";
 import type {WorkspaceCitation} from "./lib/workspaceApi";
 import {kindLabel} from "./lib/businessLabels";
 import { TransferPanel } from "./components/TransferPanel";
 import { MeetingAudioPanel } from "./components/MeetingAudioPanel";
 import { ProjectReviewsPanel } from "./components/ProjectReviewsPanel";
-import { ProjectDocumentsPanel } from "./components/ProjectDocumentsPanel";
-import { ProjectNotesPanel } from "./components/ProjectNotesPanel";
 import { PlanningMilestonesPanel } from "./components/PlanningMilestonesPanel";
 import { PlanningTasksPanel } from "./components/PlanningTasksPanel";
 import { PlanningBaselinesPanel } from "./components/PlanningBaselinesPanel";
 import { PlanningTemplatesPanel } from "./components/PlanningTemplatesPanel";
 import { PlanningHistoryPanel } from "./components/PlanningHistoryPanel";
-import { ProjectDeliverablesPanel } from "./components/ProjectDeliverablesPanel";
 import type { DeliverableFocus } from "./lib/projectDeliverables";
 import { ProjectIdentityPanel } from "./components/ProjectIdentityPanel";
 import { ProjectCockpit } from "./components/ProjectCockpit";
-import { MailWorkspace } from "./components/MailWorkspace";
-import { WorkspaceShell, type ProjectCreateProps, type MailPanelProps } from "./components/WorkspaceShell";
+import { Icon } from "./os/icons";
+import "./styles/app.css";
+
+import type { ProjectCreateProps, MailPanelProps } from "./components/WorkspaceShell";
 import { mailProjects } from "./lib/mailProjects";
 import { parseWorkspaceRoute, projectTabLabels, projectSection, projectSections } from "./lib/workspaceNavigation";
 import { Badge, EmptyState, ErrorState, LoadingState } from "./components/Ui";
-import "./styles.css";
-import "./project-workspace.css";
-import "./project-cdc-analysis.css";
-import "./cdc-review.css";
-import "./minipilot.css";
-import "./workspace-shell.css";
+import {WorkspaceViewBoundary} from './components/WorkspaceViewBoundary';
 import { withActivity } from "./lib/asyncActivity";
+export {App} from './AppEntry';
+
+const MailWorkspace = retryableLazy(
+  () => import('./components/MailWorkspace').then(module=>({default:module.MailWorkspace})),
+  () => import('./components/MailWorkspace?kiara-retry=1').then(module=>({default:(module as unknown as typeof import('./components/MailWorkspace')).MailWorkspace})));
+export const CdcReviewPanel = retryableLazy(
+  () => import('./components/CdcReviewPanel').then(module=>({default:module.CdcReviewPanel})),
+  () => import('./components/CdcReviewPanel?kiara-retry=1').then(module=>({default:(module as unknown as typeof import('./components/CdcReviewPanel')).CdcReviewPanel})));
+const ProjectDocumentsPanel = retryableLazy(
+  () => import('./components/ProjectDocumentsPanel').then(module=>({default:module.ProjectDocumentsPanel})),
+  () => import('./components/ProjectDocumentsPanel?kiara-retry=1').then(module=>({default:(module as unknown as typeof import('./components/ProjectDocumentsPanel')).ProjectDocumentsPanel})));
+const ProjectNotesPanel = retryableLazy(
+  () => import('./components/ProjectNotesPanel').then(module=>({default:module.ProjectNotesPanel})),
+  () => import('./components/ProjectNotesPanel?kiara-retry=1').then(module=>({default:(module as unknown as typeof import('./components/ProjectNotesPanel')).ProjectNotesPanel})));
+const ProjectDeliverablesPanel = retryableLazy(
+  () => import('./components/ProjectDeliverablesPanel').then(module=>({default:module.ProjectDeliverablesPanel})),
+  () => import('./components/ProjectDeliverablesPanel?kiara-retry=1').then(module=>({default:(module as unknown as typeof import('./components/ProjectDeliverablesPanel')).ProjectDeliverablesPanel})));
 
 const KINDS = ["function", "constraint", "requirement", "data", "interface", "open_point"];
 
@@ -60,52 +70,10 @@ const TABS: { id: TabId; label: string }[] = [
   { id: "connaissance", label: projectTabLabels.connaissance },
 ];
 
-export function App() {
-  const [rows, setRows] = useState<PortfolioRow[] | null>(null);
-  const [error, setError] = useState("");
-  const loadGeneration = useRef(0);
-  const [canCreateProject, setCanCreateProject] = useState(false);
-  useEffect(() => {
-    let active = true;
-    const refreshPermissions = () => {
-      void api.session().then(({operator}) => {
-        if (active) setCanCreateProject(operator.role !== 'reader' && operator.project_ids === null);
-      }).catch(() => { if (active) setCanCreateProject(false); });
-    };
-    refreshPermissions();
-    window.addEventListener('focus', refreshPermissions);
-    return () => { active = false; window.removeEventListener('focus', refreshPermissions); };
-  }, []);
-
-
-  const load = useCallback(async (quiet = false) => {
-    const generation=++loadGeneration.current;
-    try {
-      setError("");
-      const result=await (quiet === true ? api.portfolio(true) : api.portfolio());
-      if(generation===loadGeneration.current)setRows(result);
-    } catch (e: any) {
-      if(generation===loadGeneration.current)setError(String(e.message || e));
-    }
-  }, []);
-  useEffect(() => {
-    load();
-    const refreshVisible = () => {if(!document.hidden)void load(true);};
-    const timer = window.setInterval(() => {
-      if (/^\/app\/?$|^\/app\/(projects|projets|mail)\/?$/.test(agentLocation(window.location.pathname)))refreshVisible();
-    }, 10_000);
-    window.addEventListener("focus",refreshVisible);
-    document.addEventListener("visibilitychange",refreshVisible);
-    return()=>{loadGeneration.current++;window.clearInterval(timer);window.removeEventListener("focus",refreshVisible);document.removeEventListener("visibilitychange",refreshVisible);};
-  }, [load]);
-
-  return <WorkspaceShell canCreateProject={canCreateProject} rows={rows ?? []} portfolioLoading={!rows && !error} portfolioUnavailable={!rows && !!error} reload={load} error={error} ProjectPanel={ProjectWindow}
-    MailPanel={MailApp} CreatePanel={ScanImport} SagePanel={SagePanel} />;
-}
-
 /* ── Détail projet (corps de la fenêtre projet) ─────────────────────── */
 
 export function Detail(props: {
+  active?: boolean;
   current: PortfolioRow;
   detail: ProjectDetail | null;
   items: CdcItem[];
@@ -205,8 +173,8 @@ export function Detail(props: {
           </p>
         </div>
         <span className="mp-spacer" />
-        <button type="button" className="button secondary" onClick={() => setTab('planification')}>Voir le planning</button>
-        <details className="project-options" onClick={event=>{if((event.target as HTMLElement).closest('button'))event.currentTarget.open=false;}}><summary>Options du projet</summary><div className="project-options-menu">
+        <details className="project-options discrete-icon-menu icon-menu-details" onClick={event=>{if((event.target as HTMLElement).closest('button'))event.currentTarget.open=false;}}><summary className="discrete-icon-summary icon-menu-summary" aria-label="Options du projet" title="Options du projet"><Icon name="more" size={16} /><span className="sr-only">Options du projet</span></summary><div className="project-options-menu icon-menu-popover">
+        <button type="button" className="button secondary sm" onClick={() => setTab('planification')}>Voir le planning</button>
         <button className="button secondary sm" onClick={() => {if(setTab('pilotage')===false)return;setPilotTab('identity');setIdentityVisited(true);}}>Fiche et équipe</button>
         <button
           className="button secondary sm"
@@ -274,7 +242,7 @@ export function Detail(props: {
           </section>
         </div>}
         <details hidden={pilotTab!=='cockpit'} className="kiara-project-cockpit">
-        <summary>Suivi détaillé du projet</summary><ProjectCockpit projectId={current.id} active={tab==='pilotage'&&pilotTab==='cockpit'} revision={detail?.planning_revision} onSaved={props.refresh}
+        <summary>Suivi détaillé du projet</summary><ProjectCockpit projectId={current.id} active={props.active !== false && tab==='pilotage'&&pilotTab==='cockpit'} revision={detail?.planning_revision} onSaved={props.refresh}
           onOpenDeliverable={openGateDeliverable}
           onOpenPlanning={()=>{if(setTab('planification')===false)return;setPlanTab('jalons');}} onOpenCdc={()=>{if(setTab('cdc')===false)return;props.setCdcTab('revue');}}/></details>
         {(pilotTab==='identity'||identityVisited)&&<div hidden={pilotTab!=='identity'}>{(
@@ -298,7 +266,7 @@ export function Detail(props: {
       )}<ProjectIdentityPanel projectId={current.id} onSaved={props.refresh}/></div>}</div>}
 
       {(tab === "documents" || visitedTabs.has("documents")) && <div hidden={tab !== "documents"}>{current && (
-        <ProjectDocumentViews projectId={current.id} active={tab==='documents'} view={documentView} setView={setDocumentView} onSaved={props.refresh} focus={deliverableFocus} onFocusHandled={consumeDeliverableFocus}/>
+        <ProjectDocumentViews projectId={current.id} active={props.active !== false && tab==='documents'} view={documentView} setView={setDocumentView} onSaved={props.refresh} focus={deliverableFocus} onFocusHandled={consumeDeliverableFocus}/>
       )}</div>}
 
       {(tab === "planification" || visitedTabs.has("planification")) && <div hidden={tab !== "planification"}>{current && (
@@ -321,7 +289,7 @@ export function Detail(props: {
                 {label}
               </button>
             ))}
-            <details className="project-options planning-tools" onClick={event=>{if((event.target as HTMLElement).closest('button'))event.currentTarget.open=false;}}><summary>Outils du planning</summary><div className="project-options-menu">
+            <details className="project-options planning-tools discrete-icon-menu icon-menu-details" onClick={event=>{if((event.target as HTMLElement).closest('button'))event.currentTarget.open=false;}}><summary className="discrete-icon-summary icon-menu-summary" aria-label="Outils du planning" title="Outils du planning"><Icon name="sliders" size={16} /><span className="sr-only">Outils du planning</span></summary><div className="project-options-menu icon-menu-popover">
               <button type="button" className="button secondary sm" aria-pressed={planTab==='planning'} onClick={()=>setPlanTab('planning')}>Dates et charge du projet</button>
               <button type="button" className="button secondary sm" aria-pressed={planTab==='models'} onClick={()=>setPlanTab('models')}>Modèles de planning</button>
               <button type="button" className="button secondary sm" aria-pressed={planTab==='baselines'} onClick={()=>setPlanTab('baselines')}>Planning de référence et écarts</button>
@@ -329,16 +297,16 @@ export function Detail(props: {
               <button type="button" className="button secondary sm" onClick={()=>{if(setTab('documents')===false)return;setDocumentView('deliverables');}}>Documents à remettre</button>
             </div></details>
           </div>
-          <div hidden={planTab !== "planning"}>{<PlanningTab projectId={current.id} active={tab === "planification" && planTab === "planning"} />}</div>
+          <div hidden={planTab !== "planning"}>{<PlanningTab projectId={current.id} active={props.active !== false && tab === "planification" && planTab === "planning"} />}</div>
           <div hidden={planTab !== "jalons"}>{(
-            <PlanningMilestonesPanel projectId={current.id} onSaved={props.refresh} active={tab === "planification" && planTab === "jalons"} onOpenDeliverable={openGateDeliverable} />
+            <PlanningMilestonesPanel projectId={current.id} onSaved={props.refresh} active={props.active !== false && tab === "planification" && planTab === "jalons"} onOpenDeliverable={openGateDeliverable} />
           )}</div>
           <div hidden={planTab !== "tasks"}>{(
-            <PlanningTasksPanel projectId={current.id} onSaved={props.refresh} active={tab === "planification" && planTab === "tasks"} />
+            <PlanningTasksPanel projectId={current.id} onSaved={props.refresh} active={props.active !== false && tab === "planification" && planTab === "tasks"} />
           )}</div>
-          <div hidden={planTab !== "baselines"}><PlanningBaselinesPanel projectId={current.id} onSaved={props.refresh} active={tab === "planification" && planTab === "baselines"}/></div>
-          <div hidden={planTab !== "history"}><PlanningHistoryPanel projectId={current.id} active={tab === "planification" && planTab === "history"}/></div>
-          <div hidden={planTab !== "models"}><PlanningTemplatesPanel projectId={current.id} onSaved={props.refresh} active={tab === "planification" && planTab === "models"}/></div>
+          <div hidden={planTab !== "baselines"}><PlanningBaselinesPanel projectId={current.id} onSaved={props.refresh} active={props.active !== false && tab === "planification" && planTab === "baselines"}/></div>
+          <div hidden={planTab !== "history"}><PlanningHistoryPanel projectId={current.id} active={props.active !== false && tab === "planification" && planTab === "history"}/></div>
+          <div hidden={planTab !== "models"}><PlanningTemplatesPanel projectId={current.id} onSaved={props.refresh} active={props.active !== false && tab === "planification" && planTab === "models"}/></div>
         </div>
       )}</div>}
 
@@ -414,6 +382,7 @@ export function Detail(props: {
           )}</div>
 
           <div hidden={props.cdcTab !== "revue"}>{(
+            <WorkspaceViewBoundary><Suspense fallback={<LoadingState label="Chargement de la revue CDC"/>}>
             <CdcReviewPanel
               projectId={current.id}
               items={items}
@@ -429,6 +398,7 @@ export function Detail(props: {
               refresh={props.refresh}
               reloadReview={loadReview}
             />
+            </Suspense></WorkspaceViewBoundary>
           )}</div>
 
           <div hidden={props.cdcTab !== "synthese"}>{(
@@ -488,7 +458,7 @@ export function Detail(props: {
       )}</div>}
 
       {(tab === "reviews" || visitedTabs.has("reviews")) && <div hidden={tab !== "reviews"}>{current && (
-        <ReviewsPanel key={current.id} projectId={current.id} active={tab === "reviews"} meetings={props.meetings} refresh={props.refresh} onOpenDocument={(id,title)=>{openGateDeliverable({deliverableId:id,checkId:'',milestoneId:'',milestoneTitle:`Revue · ${title}`,version:null,origin:'review'});}} />
+        <ReviewsPanel key={current.id} projectId={current.id} active={props.active !== false && tab === "reviews"} meetings={props.meetings} refresh={props.refresh} onOpenDocument={(id,title)=>{openGateDeliverable({deliverableId:id,checkId:'',milestoneId:'',milestoneTitle:`Revue · ${title}`,version:null,origin:'review'});}} />
       )}</div>}
 
       {(tab === "atelier" || visitedTabs.has("atelier")) && <div hidden={tab !== "atelier"}>{current && (
@@ -601,13 +571,13 @@ export function MailApp({rows, active = true, reloadProjects}: MailPanelProps = 
   const classificationLock = useRef(false);
   const decidedSources = useRef(new Set<string>());
   const hasLoaded = useRef(false);
-  const wasActive = useRef(active);
-
   const load = useCallback(async () => {
+    if (!active || document.hidden) return;
     const generation = ++loadGeneration.current;
     try {
       setError("");setPortfolioNotice("");
       const session=await api.session();
+      if (generation !== loadGeneration.current) return;
       const scoped=Array.isArray(session.operator.project_ids);
       const readOnly=session.operator.role==='reader';
       const [st, q, pr, pf, au] = await Promise.all([
@@ -653,12 +623,17 @@ export function MailApp({rows, active = true, reloadProjects}: MailPanelProps = 
     } finally {
       if (generation === loadGeneration.current) setLoading(false);
     }
-  }, [queueOffset, searchQuery, sort, rows]);
+  }, [queueOffset, searchQuery, sort, rows, active]);
   useEffect(() => {
-    load();
-    return () => {loadGeneration.current++;};
-  }, [load]);
-  useEffect(()=>{if(active && !wasActive.current)void load();wasActive.current=active;}, [active, load]);
+    if (!active) return;
+    const visibility = () => {
+      if (document.hidden) loadGeneration.current++;
+      else void load();
+    };
+    document.addEventListener('visibilitychange', visibility);
+    if (!document.hidden) void load();
+    return () => {document.removeEventListener('visibilitychange', visibility);loadGeneration.current++;};
+  }, [load, active]);
 
   const resolveTarget = async (target: string) => {
     const miniId = target.startsWith("erp:") ? target.slice(4)
@@ -689,7 +664,7 @@ export function MailApp({rows, active = true, reloadProjects}: MailPanelProps = 
     setSelected(previous=>new Set([...previous].filter(id=>!entries.some(entry=>entry.proposal_id===id))));
   };
 
-  const durableTriage = useDurableMailTriage({enabled:mailAccessReady&&!mailAccess.scoped&&!mailAccess.readOnly,onProgress: setTriageProgress,
+  const durableTriage = useDurableMailTriage({enabled:mailAccessReady&&!mailAccess.scoped&&!mailAccess.readOnly,active,onProgress: setTriageProgress,
     onRunning: setTriaging, onMessage: setMsg, onSettled: load});
   const runTriage = async (force: boolean) => {
     if (force && !window.confirm(
@@ -819,7 +794,7 @@ export function MailApp({rows, active = true, reloadProjects}: MailPanelProps = 
   if (error && !hasLoaded.current) return <ErrorState message={error} retry={load} />;
 
   return (
-    <>{portfolioNotice&&<p role="status" className="workspace-notice">{portfolioNotice}</p>}<MailWorkspace key={`${mailAccess.scoped}-${mailAccess.readOnly}`} active={active} scoped={mailAccess.scoped} readOnly={mailAccess.readOnly} queue={queue} projects={mailAccess.scoped ? projects : mailProjects(portfolio,projects)} portfolio={mailAccess.scoped ? portfolio.filter(project=>thumbLinks[project.id]?.linked) : portfolio} links={thumbLinks} stats={stats}
+    <>{portfolioNotice&&<p role="status" className="workspace-notice">{portfolioNotice}</p>}<WorkspaceViewBoundary><Suspense fallback={<LoadingState label="Chargement des mails"/>}><MailWorkspace key={`${mailAccess.scoped}-${mailAccess.readOnly}`} active={active} scoped={mailAccess.scoped} readOnly={mailAccess.readOnly} queue={queue} projects={mailAccess.scoped ? projects : mailProjects(portfolio,projects)} portfolio={mailAccess.scoped ? portfolio.filter(project=>thumbLinks[project.id]?.linked) : portfolio} links={thumbLinks} stats={stats}
       query={query} onQuery={value => {setQuery(value); setQueueOffset(0); setSelected(new Set());}}
       sort={sort} onSort={value => {setSort(value); setQueueOffset(0); setSelected(new Set());}} queueTotal={queueTotal} selected={selected} onToggle={toggleSelect}
       onSelectAll={selectAllFiltered} onClearSelected={() => setSelected(new Set())}
@@ -829,7 +804,7 @@ export function MailApp({rows, active = true, reloadProjects}: MailPanelProps = 
       dropping={dropping} autoInfo={autoInfo} message={[msg,error && `Actualisation impossible : ${error}`].filter(Boolean).join(" ")} onDecide={decide} onReject={reject}
       onResolveTarget={resolveTarget}
       onCreateProject={mailAccess.scoped ? undefined : createMailProject}
-      onDragStart={onDragStart} onDrop={onDropOnProject} dragOver={dragOver} onDragOver={setDragOver} /></>
+      onDragStart={onDragStart} onDrop={onDropOnProject} dragOver={dragOver} onDragOver={setDragOver} /></Suspense></WorkspaceViewBoundary></>
   );
 }
 
@@ -1010,9 +985,9 @@ export function ProjectDocumentViews({projectId,active,view,setView,onSaved,focu
     <button type="button" role="tab" aria-selected={view==='notes'} className={view==='notes'?'active':''} onClick={()=>show('notes')}>Notes</button>
     <span className="mp-spacer"/><button type="button" className="button secondary sm" aria-pressed={view==='prepare'} onClick={()=>show('prepare')}>Préparer un document</button>
   </div>
-    {(view==='deliverables'||visited.has('deliverables'))&&<div hidden={view!=='deliverables'}><ProjectDeliverablesPanel projectId={projectId} active={active&&view==='deliverables'} onSaved={onSaved} focus={focus} onFocusHandled={onFocusHandled}/></div>}
-    {(view==='prepare'||visited.has('prepare'))&&<div hidden={view!=='prepare'}><ProjectDocumentsPanel projectId={projectId} active={active&&view==='prepare'}/></div>}
-    {(view==='notes'||visited.has('notes'))&&<div hidden={view!=='notes'}><ProjectNotesPanel projectId={projectId} active={active&&view==='notes'}/></div>}
+    {(view==='deliverables'||visited.has('deliverables'))&&<div hidden={view!=='deliverables'}><WorkspaceViewBoundary><Suspense fallback={<LoadingState label="Chargement des livrables"/>}><ProjectDeliverablesPanel projectId={projectId} active={active&&view==='deliverables'} onSaved={onSaved} focus={focus} onFocusHandled={onFocusHandled}/></Suspense></WorkspaceViewBoundary></div>}
+    {(view==='prepare'||visited.has('prepare'))&&<div hidden={view!=='prepare'}><WorkspaceViewBoundary><Suspense fallback={<LoadingState label="Chargement de la préparation documentaire"/>}><ProjectDocumentsPanel projectId={projectId} active={active&&view==='prepare'}/></Suspense></WorkspaceViewBoundary></div>}
+    {(view==='notes'||visited.has('notes'))&&<div hidden={view!=='notes'}><WorkspaceViewBoundary><Suspense fallback={<LoadingState label="Chargement des notes"/>}><ProjectNotesPanel projectId={projectId} active={active&&view==='notes'}/></Suspense></WorkspaceViewBoundary></div>}
     {(view==='links'||visited.has('links'))&&<div hidden={view!=='links'}><LinksPanel projectId={projectId}/></div>}
   </div>;
 }
@@ -1327,12 +1302,12 @@ function ReviewsPanel({ projectId, meetings, refresh, active, onOpenDocument }: 
       <button type="button" role="tab" aria-selected={view==='meetings'} className={`mp-subtab ${view==='meetings'?'active':''}`} onClick={()=>{setView('meetings');setVisited(true);}}>Réunions et audio</button>
     </div>
     <div hidden={view!=='rlp'}><ProjectReviewsPanel projectId={projectId} active={active&&view==='rlp'} onSaved={refresh} onOpenDocument={onOpenDocument}/></div>
-    {visited&&<div hidden={view!=='meetings'}><LegacyMeetingsPanel projectId={projectId} meetings={meetings} refresh={refresh} initialMeetingId={initialMeetingId}/></div>}
+    {visited&&<div hidden={view!=='meetings'}><LegacyMeetingsPanel projectId={projectId} meetings={meetings} refresh={refresh} initialMeetingId={initialMeetingId} active={active&&view==='meetings'}/></div>}
   </div>;
 }
 
-function LegacyMeetingsPanel({ projectId, meetings, refresh, initialMeetingId }: {
-  projectId: string; meetings: Meeting[]; refresh: () => void; initialMeetingId?: string | null;
+function LegacyMeetingsPanel({ projectId, meetings, refresh, initialMeetingId, active }: {
+  projectId: string; meetings: Meeting[]; refresh: () => void; initialMeetingId?: string | null; active: boolean;
 }) {
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [title, setTitle] = useState("");
@@ -1356,7 +1331,7 @@ function LegacyMeetingsPanel({ projectId, meetings, refresh, initialMeetingId }:
 
   return (
     <div>
-      <MeetingAudioPanel key={projectId} projectId={projectId} onPublished={refresh} />
+      <MeetingAudioPanel key={projectId} projectId={projectId} onPublished={refresh} viewActive={active} />
       <details className="card progressive-options">
         <summary>Saisir un compte rendu</summary>
         <div className="inline-form">
@@ -1443,8 +1418,8 @@ function LegacyMeetingsPanel({ projectId, meetings, refresh, initialMeetingId }:
               </table>
               </div>
               <div className="inline-form">
-                <input className="input" placeholder="Nouvelle action" value={actionTitle} onChange={(e) => setActionTitle(e.target.value)} style={{ width: 260 }} />
-                <input className="input" placeholder="Pilote" value={actionOwner} onChange={(e) => setActionOwner(e.target.value)} style={{ width: 120 }} />
+                <label>Action<input className="input" placeholder="Nouvelle action" value={actionTitle} onChange={(e) => setActionTitle(e.target.value)} style={{ width: 260 }} /></label>
+                <label>Pilote<input className="input" placeholder="Nom du pilote" value={actionOwner} onChange={(e) => setActionOwner(e.target.value)} style={{ width: 120 }} /></label>
                 <button
                   className="button secondary"
                   onClick={async () => {
@@ -1520,7 +1495,7 @@ function PlanningTab({ projectId, active = true }: { projectId: string; active?:
 }
 
 /* Import Sage : configuration du partage + lancement + statut par source */
-function SagePanel() {
+export function SagePanel() {
   const [root, setRoot] = useState("");
   const [status, setStatus] = useState<SageStatus | null>(null);
   const [loading, setLoading] = useState(true);
@@ -1637,6 +1612,14 @@ function useProjectData(projectId: string, reloadRows: () => Promise<void> | voi
         api.detail(projectId), api.cdcItems(projectId), api.cdcSources(projectId), api.meetings(projectId),
       ]);
       if (request !== generation.current) return false;
+      const objectRows = (value: unknown) => Array.isArray(value) && value.every(row => row !== null && typeof row === 'object' && !Array.isArray(row));
+      if (!project || typeof project !== 'object' || project.id !== projectId ||
+          !objectRows(project.tasks) || !objectRows(project.milestones) || !objectRows(project.deliverables) ||
+          !objectRows(cdcItems) || !objectRows(cdcSources) || !objectRows(reviews) ||
+          project.tasks.some(task => typeof task.id !== 'string' || typeof task.title !== 'string' ||
+            typeof task.status !== 'string' || (task.due_date != null && typeof task.due_date !== 'string'))) {
+        throw new Error('Réponse du projet invalide. Les données et saisies affichées sont conservées.');
+      }
       setDetail(project); setItems(cdcItems); setSources(cdcSources); setMeetings(reviews);
       await reloadRows();
       return true;
@@ -1655,14 +1638,63 @@ function useProjectData(projectId: string, reloadRows: () => Promise<void> | voi
 }
 
 export function ProjectWindow(props: {
+  active?: boolean;
   projectId: string;
   initialTab: TabId;
   row?: PortfolioRow;
   reloadRows: () => Promise<void>;
   back: () => void;
   onTabChange?: (tab: TabId) => boolean | void;
+  registerCache?: (id: string, canRelease: () => boolean) => () => void;
 }) {
+  const cacheRoot = useRef<HTMLDivElement>(null);
+  const detailMounted = useRef(false);
+  const retained = useRef(props.initialTab !== 'pilotage');
+  if (props.initialTab !== 'pilotage') retained.current = true;
+  const retainOnInteraction = useCallback((event:React.SyntheticEvent) => {
+    const target = event.target;
+    const back = target instanceof Element && target.closest('.kiara-project-back');
+    if (back && ['click','pointerdown','mousedown','touchstart'].includes(event.type)) return;
+    if (back && event.type === 'keydown' && ['Enter',' '].includes((event as React.KeyboardEvent).key)) return;
+    retained.current = true;
+  }, []);
+  const canRelease = useCallback(() => {
+    const root = cacheRoot.current;
+    if (retained.current) return false;
+    // A view that has never rendered Detail has no project-local form or capture.
+    if (!root) return !detailMounted.current;
+    if (root.querySelector('[data-workspace-dirty="true"],[data-workspace-busy="true"],[data-mic-recording="true"],[aria-busy="true"],[contenteditable="true"],details[open],dialog[open]')) return false;
+    for (const field of root.querySelectorAll<HTMLInputElement|HTMLTextAreaElement>('input,textarea')) {
+      if (field instanceof HTMLInputElement && field.type === 'file') {if(field.files?.length)return false;}
+      else if (field instanceof HTMLInputElement && ['checkbox','radio'].includes(field.type)) {if(field.checked!==field.defaultChecked)return false;}
+      else if (field.value!==field.defaultValue) return false;
+    }
+    for (const select of root.querySelectorAll<HTMLSelectElement>('select')) {
+      const options = Array.from(select.options), declared = options.filter(option=>option.defaultSelected);
+      const defaults = declared.length ? declared : select.multiple ? [] : options.filter(option=>!option.disabled).slice(0,1);
+      if (options.some(option=>option.selected!==defaults.includes(option))) return false;
+    }
+    if (Array.from(root.querySelectorAll<HTMLMediaElement>('audio,video')).some(media=>!media.paused || !!media.srcObject)) return false;
+    return true;
+  }, []);
+  useLayoutEffect(() => props.registerCache?.(props.projectId,canRelease), [props.projectId,props.registerCache,canRelease]);
+  const row = props.row?.id === props.projectId ? props.row : undefined;
+  const lastRow = useRef<PortfolioRow | undefined>(row);
+  if (row) lastRow.current = row;
+  else if (lastRow.current?.id !== props.projectId) lastRow.current = undefined;
+  const available = !!row;
   const { detail, items, sources, meetings, error, refresh } = useProjectData(props.projectId, props.reloadRows);
+  const previousView = useRef({projectId: props.projectId, active: props.active !== false && available});
+  useEffect(() => {
+    const active = props.active !== false && available;
+    const previous = previousView.current;
+    previousView.current = {projectId: props.projectId, active};
+    // A cached project may have changed elsewhere while its view was hidden.
+    // Keep Detail mounted so unsaved forms and ongoing captures remain intact.
+    if (active && !previous.active && previous.projectId === props.projectId) void refresh();
+    // refresh is specific to this render; only a visibility transition triggers it.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.active, props.projectId, available]);
   const [tab, setTab] = useState<TabId>(TABS.some(t => t.id === props.initialTab) ? props.initialTab : "pilotage");
   const [cdcTab, setCdcTab] = useState<"sources" | "revue" | "synthese" | "controles" | "transfert">("sources");
   const [editing, setEditing] = useState(false);
@@ -1674,13 +1706,22 @@ export function ProjectWindow(props: {
     api.aiStatus().then((s: any) => setAiStatus({ reachable: !!s.reachable, detail: s.detail || "" }))
       .catch(() => setAiStatus(null));
   }, []);
-  const analysis = useCdcJobs(props.projectId, refresh);
-  if (!props.row) return <EmptyState title="Projet introuvable" detail="Il a peut-être été filtré ou supprimé." />;
+  const analysis = useCdcJobs(props.projectId, refresh, props.active !== false && available);
+  if (detail && lastRow.current) detailMounted.current = true;
+  if (!lastRow.current) return <EmptyState title="Projet introuvable" detail="Il a peut-être été filtré ou supprimé." />;
+  if (!available && !detail) return <EmptyState title="Projet introuvable" detail="Il a peut-être été filtré ou supprimé." />;
   if (error && !detail) return <ErrorState message={error} retry={refresh} />;
   if (!detail) return <LoadingState label="Chargement du projet" />;
   return (
-    <>{error && <ErrorState message={error} retry={refresh} />}<Detail
-      current={props.row}
+    <>{!available && <EmptyState title="Projet introuvable" detail="Il a peut-être été filtré ou supprimé. Les saisies ouvertes restent conservées pendant cette session." />}
+    {available && error && <ErrorState message={error} retry={refresh} />}
+    <div ref={cacheRoot} hidden={!available} inert={!available}
+      onClickCapture={retainOnInteraction} onPointerDownCapture={retainOnInteraction} onMouseDownCapture={retainOnInteraction}
+      onTouchStartCapture={retainOnInteraction} onKeyDownCapture={retainOnInteraction} onInputCapture={retainOnInteraction}
+      onChangeCapture={retainOnInteraction} onSubmitCapture={retainOnInteraction} onPasteCapture={retainOnInteraction}
+      onDropCapture={retainOnInteraction} onWheelCapture={retainOnInteraction}><Detail
+      active={props.active !== false && available}
+      current={lastRow.current}
       detail={detail}
       items={items}
       sources={sources}
@@ -1698,7 +1739,7 @@ export function ProjectWindow(props: {
       setEditing={setEditing}
       back={props.back}
       refresh={refresh}
-    /></>
+    /></div></>
   );
 }
 

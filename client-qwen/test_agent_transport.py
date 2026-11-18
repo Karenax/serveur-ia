@@ -73,6 +73,32 @@ class AgentTransportTests(unittest.TestCase):
         connection.close()
         return result
 
+    @unittest.skipUnless(sys.platform.startswith('linux'), 'Boucle audio réservée au relais Linux')
+    def test_linux_system_audio_requires_local_cookie_and_same_origin(self):
+        from linux_system_audio import LinuxSystemAudio
+        path = '/api/v1/kiara/linux-system-audio'
+        lease = '28a62875-2b27-4925-9a15-390032aee5b1'
+        payload = json.dumps({'action':'start','lease_id':lease})
+        local = f'http://127.0.0.1:{self.port}'
+        with patch.object(LinuxSystemAudio, 'start', return_value={'lease_id':lease,'label':'fictif'}) as start:
+            self.assertEqual(self.call('POST', path, payload, {'Content-Type':'application/json','Origin':local})[0], 403)
+            status, headers, _ = self.call('POST', '/client/project-session', '{}', {
+                'Content-Type':'application/json','Authorization':'Bearer local-key'})
+            self.assertEqual(status, 200)
+            cookie = headers['Set-Cookie'].split(';', 1)[0]
+            self.assertEqual(self.call('POST', path, payload, {'Content-Type':'application/json','Cookie':cookie,
+                                                               'Origin':'https://example.com'})[0], 403)
+            self.assertEqual(self.call('POST', path, payload, {'Content-Type':'application/json','Cookie':cookie})[0], 403)
+            self.assertEqual(self.call('GET', path, headers={'Cookie':cookie})[0], 405)
+            invalid = json.dumps({'action':'start','lease_id':lease,'extra':True})
+            headers = {'Content-Type':'application/json','Cookie':cookie,'Origin':local}
+            self.assertEqual(self.call('POST', path, invalid, headers)[0], 400)
+            start.assert_not_called()
+            status, _, raw = self.call('POST', path, payload, headers)
+            self.assertEqual(status, 200)
+            self.assertEqual(json.loads(raw)['lease_id'], lease)
+            start.assert_called_once_with(lease)
+
     def test_session_and_business_requests_require_local_authorization(self):
         self.assertEqual(self.call('GET', '/app')[0], 403)
         for route in ('/client/project-session', '/client/agent/session'):
@@ -87,6 +113,7 @@ class AgentTransportTests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertIn(b'data-kiara-desktop="true"', html)
         self.assertEqual(b'data-kiara-windows="true"' in html, sys.platform == 'win32')
+        self.assertEqual(b'data-kiara-linux-system-audio="true"' in html, sys.platform.startswith('linux'))
         path = '/api/v1/projects?limit=5'
         self.assertEqual(self.call('PATCH', path, 'abc', {'Cookie': cookie, 'Origin': 'https://example.com'})[0], 403)
         status, _, _ = self.call('PATCH', path, 'abc', {
@@ -109,6 +136,37 @@ class AgentTransportTests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertEqual(json.loads(body)['version'], '3.5.63')
         self.assertEqual(self.call('GET', '/api/v1/projects')[0], 403)
+
+    def test_chat_contains_read_only_local_recovery_library_under_its_csp(self):
+        status, headers, body = self.call('GET', '/chat')
+        self.assertEqual(status, 200)
+        page = body.decode('utf-8')
+        self.assertIn('kiaraPortalConflictArchive', page)
+        self.assertIn('kiaraPortalConflictReview', page)
+        self.assertIn('kiara-conflict-dialog', page)
+        self.assertIn('kiaraPortalAudioConflictArchive', page)
+        self.assertIn('Consulter les audios', page)
+        self.assertLess(page.index('root.kiaraPortalOriginRecovery = api'), page.index('root.kiaraPortalAudioConflictArchive = api'))
+        self.assertLess(page.index('root.kiaraPortalAudioConflictArchive = api'), page.index("'Consulter les audios'"))
+        self.assertIn("script-src 'nonce-", headers['Content-Security-Policy'])
+        self.assertIn("style-src 'nonce-", headers['Content-Security-Policy'])
+        self.assertIn('media-src blob:', headers['Content-Security-Policy'])
+        self.assertNotIn("'unsafe-inline'", headers['Content-Security-Policy'])
+
+    def test_unreadable_settings_are_preserved_by_local_api(self):
+        path = Path(self.folder.name) / 'fiction-settings.dpapi'
+        original = b'reglages chiffres fictifs illisibles'
+        path.write_bytes(original)
+        headers = {'Authorization': 'Bearer local-key', 'Content-Type': 'application/json'}
+        with patch.object(client, 'settings_path', return_value=path), \
+             patch.object(client, 'protect', side_effect=ValueError('cle fictive indisponible')):
+            for route, body in (('/client/preferences', '{"theme":"dark"}'),
+                                ('/client/endpoint', '{}')):
+                with self.subTest(route=route):
+                    status, _, payload = self.call('POST', route, body, headers)
+                    self.assertEqual(status, 400)
+                    self.assertIn('original est conservé', json.loads(payload)['error']['message'])
+                    self.assertEqual(path.read_bytes(), original)
 
     def test_denied_remote_access_does_not_open_a_local_session(self):
         error = urllib.error.HTTPError('http://agent.invalid', 403, 'Forbidden', {}, io.BytesIO(b'forbidden'))

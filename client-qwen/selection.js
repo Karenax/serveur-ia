@@ -1,7 +1,7 @@
 'use strict';
 // The same selection commands work in WebView2 and in the browser preview.
 let selectionText='',selectionTarget=null;
-const selectionCopy=wsElement('button',undefined,'secondary selection-copy-control');selectionCopy.id='copy-selection';selectionCopy.type='button';selectionCopy.disabled=true;selectionCopy.setAttribute('aria-label','Copier la sélection');selectionCopy.title='Copier la sélection · Ctrl+C';
+const selectionCopy=wsElement('button',undefined,'secondary selection-copy-control');selectionCopy.id='copy-selection';selectionCopy.type='button';selectionCopy.disabled=true;selectionCopy.hidden=true;selectionCopy.setAttribute('aria-label','Copier la sélection');selectionCopy.title='Copier la sélection · Ctrl+C';
 selectionCopy.append(wsElement('span','⧉'),wsElement('span','Copier la sélection','selection-copy-label'));
 document.querySelector('.workspace-top').insertBefore(selectionCopy,$('connection'));
 const selectionStatus=wsElement('div',undefined,'selection-status');selectionStatus.id='selection-status';selectionStatus.setAttribute('role','status');document.body.append(selectionStatus);
@@ -19,7 +19,7 @@ function selectionRead(){
   if(element?.closest('[hidden]'))return '';
   return selection.toString();
 }
-function selectionUpdate(){if(document.activeElement===selectionCopy||(!selectionMenu.hidden&&selectionMenu.contains(document.activeElement)))return;selectionText=selectionRead();selectionCopy.disabled=!selectionText;}
+function selectionUpdate(){if(document.activeElement===selectionCopy||(!selectionMenu.hidden&&selectionMenu.contains(document.activeElement)))return;selectionText=selectionRead();selectionCopy.disabled=!selectionText;selectionCopy.hidden=!selectionText;}
 function selectionClose(){selectionMenu.hidden=true;}
 let selectionStatusTimer;
 let copyingText=null;
@@ -53,4 +53,4 @@ for(const event of ['selectionchange','select','keyup','mouseup','focusin'])docu
 document.addEventListener('mousedown',e=>{if(!selectionMenu.contains(e.target))selectionClose();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')selectionClose();if((e.ctrlKey||e.metaKey)&&!e.altKey&&!e.shiftKey&&e.key.toLowerCase()==='c'){const text=selectionRead();if(text){e.preventDefault();selectionWrite(text);}}});
 document.addEventListener('scroll',selectionClose,true);window.addEventListener('resize',selectionClose);
-const selectionOriginalShowView=showView;showView=function(name){selectionClose();selectionText='';selectionCopy.disabled=true;selectionOriginalShowView(name);};
+const selectionOriginalShowView=showView;showView=function(name){selectionClose();selectionText='';selectionCopy.disabled=true;selectionCopy.hidden=true;selectionOriginalShowView(name);};

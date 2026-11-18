@@ -1,0 +1,36 @@
+/* Recovery is shown before the normal interface and needs its own small shell. */
+:root {color-scheme: light dark; font-family: "Segoe UI", system-ui, sans-serif;}
+body {margin: 0; color: #242423; background: #f7f7f5;}
+.recovery-review {box-sizing: border-box; max-width: 1100px; margin: auto; padding: 28px 32px;}
+.recovery-review h1 {font-size: 1.5rem; line-height: 1.2; margin: 0 0 10px;}
+.recovery-review p {line-height: 1.5; margin: 0 0 18px;}
+.recovery-review .recovery-review-guidance {margin-top: -10px; color: #53534f;}
+.recovery-versions {display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px;}
+.recovery-version h2 {font-size: 1rem; margin: 0 0 8px;}
+.recovery-version audio {display: block; width: 100%; max-width: 100%;}
+.recovery-version textarea {box-sizing: border-box; width: 100%; min-height: 260px; resize: vertical;
+  border: 1px solid #85857f; border-radius: 6px; padding: 12px; background: #fff; color: #242423;
+  font: inherit; line-height: 1.5;}
+.recovery-version details {margin-top: 8px;}
+.recovery-version summary {cursor: pointer; padding: 4px 0;}
+.recovery-version details p {margin: 8px 0;}
+.recovery-review .recovery-review-status {min-height: 1.5em; margin: 12px 0;}
+.recovery-review-actions {display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px;}
+.recovery-review button {min-height: 40px; padding: 8px 16px; border: 1px solid #85857f;
+  border-radius: 6px; font: inherit; font-weight: 600; cursor: pointer;}
+.recovery-review button:disabled {opacity: .65; cursor: wait;}
+.recovery-review .recovery-primary {background: #242423; border-color: #242423; color: #fff;}
+.recovery-review .recovery-secondary {background: #fff; color: #242423;}
+.recovery-review :focus-visible {outline: 3px solid #447ada; outline-offset: 2px;}
+@media (prefers-color-scheme: dark) {
+  body {color: #ececeb; background: #202021;}
+  .recovery-review .recovery-review-guidance {color: #c5c5c2;}
+  .recovery-version textarea {background: #262627; color: #ececeb; border-color: #999994;}
+  .recovery-review .recovery-secondary {background: #262627; color: #ececeb; border-color: #999994;}
+  .recovery-review .recovery-primary {background: #ececeb; border-color: #ececeb; color: #202021;}
+}
+@media (max-width: 760px) {
+  .recovery-review {padding: 20px;}
+  .recovery-versions {grid-template-columns: 1fr;}
+  .recovery-version textarea {min-height: 150px;}
+}

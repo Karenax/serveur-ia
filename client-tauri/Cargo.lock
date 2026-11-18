@@ -1665,6 +1665,7 @@ dependencies = [
 name = "kiara-tauri-prototype"
 version = "0.1.0"
 dependencies = [
+ "gtk",
  "tauri",
  "tauri-build",
 ]

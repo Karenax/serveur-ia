@@ -1,18 +1,25 @@
-import { useState,type ReactNode } from "react";
+import { useLayoutEffect,useRef,useState,type ReactNode } from "react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { api, type PortfolioRow } from "../lib/api";
+import { api, type CdcItem, type PortfolioRow } from "../lib/api";
 import { getActivitySnapshot } from "../lib/asyncActivity";
 import { identityApi } from "../lib/projectIdentity";
 import { deliverableApi } from "../lib/projectDeliverables";
 import { documentApi, type DocumentPreferences } from "../lib/projectDocuments";
 import {fusionSources} from '../lib/fusionSources';
+import {fusionInsights, type FusionSettings, type FusionStats} from '../lib/fusionInsights';
 import {meetingWorkspaceHref,requestMeetingWorkspace} from '../lib/meetingWorkspace';
 import { WorkspaceShell, type ProjectWorkspaceProps, type ProjectCreateProps } from "./WorkspaceShell";
+import { CdcReviewPanel } from "./CdcReviewPanel";
 
-vi.mock("./SettingsForms", () => ({AiSettingsForm: () => null, MailSettingsForm: () => null, MemorySettingsForm: () => null}));
-vi.mock("./OperationsPanel", () => ({OperationsPanel: () => null}));
-vi.mock("./ThunderbirdPanel", () => ({ThunderbirdPanel: () => null}));
+vi.mock("./SettingsForms", () => ({
+  AiSettingsForm: () => <input aria-label="Brouillon général de test" />,
+  MailSettingsForm: () => <input aria-label="Brouillon mails de test" />,
+  MemorySettingsForm: () => <input aria-label="Brouillon recherche de test" />,
+}));
+vi.mock("./OperationsPanel", () => ({OperationsPanel: () => <p>Maintenance de test</p>}));
+vi.mock("./SourceInspector", () => ({SourceInspector: () => null}));
+vi.mock("./ThunderbirdPanel", () => ({ThunderbirdPanel: ({active}:{active?:boolean}) => <span data-testid="thunderbird-activity" data-active={String(active)} />}));
 vi.mock("./ActionDashboard", () => ({ActionDashboard: () => <p>Actions de test</p>}));
 vi.mock("./WorkspaceViews", () => ({
   GlobalMeetingsView: ({initialProjectId,creationRequest,studioNavigation,onStudioOpenChange}:{initialProjectId?:string;creationRequest?:{key:number;projectId?:string}|null;studioNavigation?:ReactNode;onStudioOpenChange?:(open:boolean)=>void}) => {
@@ -62,10 +69,99 @@ function ProjectDraft({projectId, initialTab, onTabChange}: ProjectWorkspaceProp
     <button type="button" onClick={() => onTabChange?.("documents")}>Documents du projet</button>
   </section>;
 }
+function ReleasableProject({projectId,registerCache}:ProjectWorkspaceProps) {
+  const retained=useRef(false),[draft,setDraft]=useState('');
+  useLayoutEffect(()=>registerCache?.(projectId,()=>!retained.current),[projectId,registerCache]);
+  return <section aria-label={`Fiche ${projectId}`}><label>Saisie {projectId}<input value={draft} onChange={event=>{retained.current=true;setDraft(event.target.value);}}/></label></section>;
+}
+function UncertainProject({projectId,registerCache}:ProjectWorkspaceProps) {
+  const [draft,setDraft]=useState('');
+  useLayoutEffect(()=>registerCache?.(projectId,()=>{if(projectId==='p1')throw new Error('état inconnu');return true;}),[projectId,registerCache]);
+  return <label>Saisie {projectId}<input value={draft} onChange={event=>setDraft(event.target.value)}/></label>;
+}
+
+it('limite les fiches libérables sans évincer les brouillons après de nombreux projets',()=>{
+  const many=Array.from({length:12},(_,index)=>row(`p${index+1}`,`C-${String(index+1).padStart(2,'0')}`));
+  window.history.replaceState(null,'','/app/projets');
+  const {container}=render(<WorkspaceShell rows={many} reload={vi.fn().mockResolvedValue(undefined)} ProjectPanel={ReleasableProject}
+    MailPanel={()=>null} CreatePanel={()=>null} SagePanel={()=>null}/>);
+  const open=(index:number)=>fireEvent.click(screen.getByRole('button',{name:`C-${String(index).padStart(2,'0')} · Projet C-${String(index).padStart(2,'0')}`}));
+  const portfolio=()=>fireEvent.click(screen.getByRole('link',{name:'Projets'}));
+  open(1);fireEvent.change(screen.getByRole('textbox',{name:'Saisie p1'}),{target:{value:'Brouillon à conserver'}});portfolio();
+  for(let index=2;index<=12;index++){open(index);portfolio();}
+  expect(container.querySelectorAll('[data-workspace-view^="project:"]').length).toBeLessThanOrEqual(6);
+  expect(container.querySelector('[data-workspace-view="project:p1"]')).toBeTruthy();
+  expect(container.querySelector('[data-workspace-view="project:p2"]')).toBeNull();
+  open(1);expect((screen.getByRole('textbox',{name:'Saisie p1'}) as HTMLInputElement).value).toBe('Brouillon à conserver');
+});
+
+it('conserve les fiches qui ne déclarent pas explicitement leur état libérable',()=>{
+  const many=Array.from({length:8},(_,index)=>row(`p${index+1}`,`C-${String(index+1).padStart(2,'0')}`));
+  window.history.replaceState(null,'','/app/projets');
+  const {container}=render(<WorkspaceShell rows={many} reload={vi.fn().mockResolvedValue(undefined)} ProjectPanel={ProjectDraft}
+    MailPanel={()=>null} CreatePanel={()=>null} SagePanel={()=>null}/>);
+  for(let index=1;index<=8;index++){
+    fireEvent.click(screen.getByRole('button',{name:`C-${String(index).padStart(2,'0')} · Projet C-${String(index).padStart(2,'0')}`}));
+    fireEvent.click(screen.getByRole('link',{name:'Projets'}));
+  }
+  expect(container.querySelectorAll('[data-workspace-view^="project:"]')).toHaveLength(8);
+});
+
+it('conserve la fiche lorsque son contrôle de libération échoue',()=>{
+  const many=Array.from({length:8},(_,index)=>row(`p${index+1}`,`C-${String(index+1).padStart(2,'0')}`));
+  window.history.replaceState(null,'','/app/projets');
+  const {container}=render(<WorkspaceShell rows={many} reload={vi.fn().mockResolvedValue(undefined)} ProjectPanel={UncertainProject}
+    MailPanel={()=>null} CreatePanel={()=>null} SagePanel={()=>null}/>);
+  for(let index=1;index<=8;index++){
+    fireEvent.click(screen.getByRole('button',{name:`C-${String(index).padStart(2,'0')} · Projet C-${String(index).padStart(2,'0')}`}));
+    if(index===1)fireEvent.change(screen.getByRole('textbox',{name:'Saisie p1'}),{target:{value:'À préserver'}});
+    fireEvent.click(screen.getByRole('link',{name:'Projets'}));
+  }
+  expect(container.querySelector<HTMLInputElement>('[data-workspace-view="project:p1"] input')?.value).toBe('À préserver');
+  expect(container.querySelectorAll('[data-workspace-view^="project:"]').length).toBeLessThanOrEqual(6);
+});
+
+it('dépasse la limite plutôt que de supprimer plusieurs brouillons protégés',()=>{
+  const many=Array.from({length:8},(_,index)=>row(`p${index+1}`,`C-${String(index+1).padStart(2,'0')}`));
+  window.history.replaceState(null,'','/app/projets');
+  const {container}=render(<WorkspaceShell rows={many} reload={vi.fn().mockResolvedValue(undefined)} ProjectPanel={ReleasableProject}
+    MailPanel={()=>null} CreatePanel={()=>null} SagePanel={()=>null}/>);
+  for(let index=1;index<=8;index++){
+    fireEvent.click(screen.getByRole('button',{name:`C-${String(index).padStart(2,'0')} · Projet C-${String(index).padStart(2,'0')}`}));
+    fireEvent.change(screen.getByRole('textbox',{name:`Saisie p${index}`}),{target:{value:`Brouillon ${index}`}});
+    fireEvent.click(screen.getByRole('link',{name:'Projets'}));
+  }
+  expect(container.querySelectorAll('[data-workspace-view^="project:"]')).toHaveLength(8);
+  for(let index=1;index<=8;index++){
+    const input=container.querySelector<HTMLInputElement>(`[data-workspace-view="project:p${index}"] input`);
+    expect(input?.value).toBe(`Brouillon ${index}`);
+  }
+});
+
+it('évince la fiche libérable la moins récemment consultée',()=>{
+  const many=Array.from({length:7},(_,index)=>row(`p${index+1}`,`C-${String(index+1).padStart(2,'0')}`));
+  window.history.replaceState(null,'','/app/projets');
+  const {container}=render(<WorkspaceShell rows={many} reload={vi.fn().mockResolvedValue(undefined)} ProjectPanel={ReleasableProject}
+    MailPanel={()=>null} CreatePanel={()=>null} SagePanel={()=>null}/>);
+  const open=(index:number)=>fireEvent.click(screen.getByRole('button',{name:`C-${String(index).padStart(2,'0')} · Projet C-${String(index).padStart(2,'0')}`}));
+  const back=()=>fireEvent.click(screen.getByRole('link',{name:'Projets'}));
+  for(let index=1;index<=6;index++){open(index);back();}
+  open(1);back();open(7);back();
+  expect(container.querySelector('[data-workspace-view="project:p1"]')).toBeTruthy();
+  expect(container.querySelector('[data-workspace-view="project:p2"]')).toBeNull();
+  expect(container.querySelectorAll('[data-workspace-view^="project:"]')).toHaveLength(6);
+});
 function setup(ProjectPanel = ProjectDraft) {
   return render(<WorkspaceShell rows={rows} reload={vi.fn().mockResolvedValue(undefined)} ProjectPanel={ProjectPanel}
     MailPanel={() => <section aria-label="Mails de test">Liste des mails</section>} CreatePanel={() => null} SagePanel={() => null} />);
 }
+
+it('ne suit Thunderbird que lorsque sa rubrique Connexions est visible',()=>{
+  window.history.replaceState(null,'','/app/imports');setup();
+  const panel=screen.getByTestId('thunderbird-activity');expect(panel.dataset.active).toBe('false');
+  fireEvent.click(screen.getByRole('button',{name:'Thunderbird'}));expect(panel.dataset.active).toBe('true');
+  fireEvent.click(screen.getByRole('link',{name:'Mails'}));expect(panel.dataset.active).toBe('false');
+});
 
 it("propose le retour aux conversations uniquement dans le client Kiara", () => {
   const first = setup();
@@ -91,6 +187,7 @@ it("reprend le thème des Conversations et renvoie vers son réglage sous Window
     const {container}=setup();
     expect(container.querySelector(".workspace-shell")?.getAttribute("data-workspace-theme")).toBe("dark");
     expect(screen.getByRole("link",{name:"Thème de Kiara"}).getAttribute("href")).toBe("/chat#apparence");
+    expect(screen.getByRole("link",{name:"Compte et appareil"}).getAttribute("href")).toBe("/chat#reglages");
     expect(localStorage.getItem("agent-ui-theme")).toBe("light");
   } finally {
     delete document.body.dataset.kiaraDesktop;
@@ -125,7 +222,7 @@ it("ouvre directement la liste Projets à l’entrée du portail Windows", () =>
     expect(window.location.pathname).toBe("/app/projets");
     const menu=screen.getByRole("navigation",{name:"Grandes rubriques"});
     expect(within(menu).getAllByRole("link").map(link=>link.textContent)).toEqual([
-      "Conversations","Projets","Mails","Réunions","Activité"
+      "Conversations","Projets","Notes","Mails","Réunions","Activité"
     ]);
     fireEvent.click(within(menu).getByRole("link",{name:"Activité"}));
     expect(screen.getByRole("heading",{name:"À traiter"})).toBeTruthy();
@@ -134,6 +231,40 @@ it("ouvre directement la liste Projets à l’entrée du portail Windows", () =>
     fireEvent.click(screen.getByRole("button",{name:"Accès rapide aux rubriques"}));
     expect(screen.queryByRole("button",{name:/^Accueil/})).toBeNull();
   } finally {
+    delete document.body.dataset.kiaraDesktop;
+    delete document.body.dataset.kiaraWindows;
+  }
+});
+
+it("replie la barre Kiara avec Ctrl+B et partage l'état avec le client",()=>{
+  vi.stubGlobal('matchMedia',(query:string)=>({matches:false,addEventListener:()=>{},removeEventListener:()=>{}}));
+  document.body.dataset.kiaraDesktop="true";
+  document.body.dataset.kiaraWindows="true";
+  try{
+    setup();
+    const shell=document.querySelector<HTMLElement>('.workspace-shell')!;
+    const menu=screen.getByRole("navigation",{name:"Grandes rubriques"});
+    expect(within(menu).getAllByRole("link").map(link=>link.textContent)).toEqual([
+      "Conversations","Projets","Notes","Mails","Réunions","Activité"
+    ]);
+    const sidebar=screen.getByRole("complementary",{name:"Menu principal"});
+    expect(within(sidebar).getByRole("link",{name:"Réglages"})).toBeTruthy();
+    expect(within(sidebar).getByText("Serveur Kiara")).toBeTruthy();
+    expect(shell.getAttribute('data-sidebar-collapsed')).toBe('false');
+    fireEvent.click(screen.getByRole("button",{name:"Afficher ou masquer la navigation"}));
+    expect(shell.classList.contains('workspace-sidebar-collapsed')).toBe(true);
+    expect(shell.getAttribute('data-sidebar-collapsed')).toBe('true');
+    expect(localStorage.getItem("fred-sidebar-collapsed")).toBe("true");
+    fireEvent.keyDown(window,{key:'b',ctrlKey:true});
+    expect(shell.getAttribute('data-sidebar-collapsed')).toBe('false');
+    expect(localStorage.getItem("fred-sidebar-collapsed")).toBe("false");
+    const search=screen.getByRole('textbox',{name:'Rechercher un projet'});
+    fireEvent.keyDown(search,{key:'b',ctrlKey:true});
+    expect(shell.getAttribute('data-sidebar-collapsed')).toBe('false');
+    localStorage.setItem("fred-sidebar-collapsed","true");
+    setup();
+    expect(document.querySelectorAll('.workspace-shell')[1].getAttribute('data-sidebar-collapsed')).toBe('true');
+  }finally{
     delete document.body.dataset.kiaraDesktop;
     delete document.body.dataset.kiaraWindows;
   }
@@ -221,11 +352,11 @@ it("clôture le travail et conserve l’erreur existante quand la lecture de l�
   expect((screen.getByRole("button", { name: "Importer une archive JSON" }) as HTMLButtonElement).disabled).toBe(false);
 });
 
-it('protège la navigation Nouvelle séance depuis Sources, puis transmet le projet ERP au parcours existant',()=>{
+it('protège la navigation Nouvelle séance depuis Sources, puis transmet le projet ERP au parcours existant',async()=>{
   window.history.replaceState(null,'','/app/sources');
   vi.spyOn(fusionSources,'list').mockResolvedValue({items:[],total:0,offset:0,limit:25,has_next:false,labels:[]});
   const confirm=vi.spyOn(window,'confirm').mockReturnValue(false);
-  setup();fireEvent.change(screen.getByLabelText('Projet'),{target:{value:'erp-b'}});
+  setup();fireEvent.change(await screen.findByLabelText('Projet',{}, {timeout:5000}),{target:{value:'erp-b'}});
   const draft=document.createElement('div');draft.dataset.workspaceDirty='true';document.body.append(draft);
   try{
     fireEvent.click(screen.getByRole('button',{name:'Nouvelle séance'}));
@@ -233,20 +364,21 @@ it('protège la navigation Nouvelle séance depuis Sources, puis transmet le pro
     expect(screen.queryByRole('form',{name:'Préparation demandée depuis Sources'})).toBeNull();
     confirm.mockReturnValue(true);fireEvent.click(screen.getByRole('button',{name:'Nouvelle séance'}));
     expect(window.location.pathname).toBe('/app/meetings');
-    expect(screen.getByLabelText('Projet proposé').textContent).toBe('erp-b');
-    fireEvent.click(screen.getByRole('link',{name:'Réglages'}));
-    fireEvent.click(screen.getByRole('button',{name:'Sources'}));
-    fireEvent.change(screen.getByLabelText('Projet'),{target:{value:''}});
-    fireEvent.click(screen.getByRole('button',{name:'Nouvelle séance'}));
+    expect((await screen.findByLabelText('Projet proposé')).textContent).toBe('erp-b');
+    fireEvent.click(screen.getByRole('button',{name:'Rechercher dans Kiara'}));
+    fireEvent.click(screen.getByRole('button',{name:'Toutes les sources'}));
+    const library=screen.getByRole('region',{name:'Bibliothèque des sources'});
+    fireEvent.change(within(library).getByLabelText('Projet'),{target:{value:''}});
+    fireEvent.click(within(library).getByRole('button',{name:'Nouvelle séance'}));
     expect(window.location.pathname).toBe('/app/meetings');
     expect(screen.getByLabelText('Projet proposé').textContent).toBe('À rattacher');
   }finally{draft.remove();}
 });
 
-it('conserve le même retour protégé dans Préparation et rétablit le fil d’Ariane hors Studio',()=>{
+it('conserve le même retour protégé dans Préparation et rétablit le fil d’Ariane hors Studio',async()=>{
   window.history.replaceState(null,'','/app/meetings');const {container}=setup();
   expect(screen.getByRole('navigation',{name:'Fil d’Ariane'}).closest('.meeting-preparation')).toBeNull();
-  fireEvent.click(screen.getByRole('button',{name:'Ouvrir le Studio de test'}));
+  fireEvent.click(await screen.findByRole('button',{name:'Ouvrir le Studio de test'}));
   expect(container.querySelector('.workspace-shell')?.getAttribute('data-meeting-studio')).toBe('true');
   expect(screen.getAllByRole('navigation',{name:'Fil d’Ariane'})).toHaveLength(1);
   expect(screen.getByRole('navigation',{name:'Fil d’Ariane'}).closest('.meeting-preparation')).not.toBeNull();
@@ -272,7 +404,8 @@ it("garde le même seuil de menu entre les réunions, les sources et les projets
   expect(document.activeElement).toBe(screen.getByRole('button',{name:'Ouvrir le menu'}));
   fireEvent.click(screen.getByRole('button',{name:'Ouvrir le menu'}));
   fireEvent.click(screen.getByRole('link',{name:'Réglages'}));
-  fireEvent.click(screen.getByRole('button',{name:'Sources'}));
+  fireEvent.click(screen.getByRole('button',{name:'Rechercher dans Kiara'}));
+  fireEvent.click(screen.getByRole('button',{name:'Toutes les sources'}));
   expect(sidebar.getAttribute('aria-hidden')).toBe('true');
   fireEvent.click(screen.getByRole('button',{name:'Ouvrir le menu'}));
   fireEvent.click(screen.getByRole('link',{name:'Projets'}));
@@ -304,6 +437,54 @@ function chooseExtraSetting(name:string) {
   fireEvent.click(screen.getByRole("button",{name}));
 }
 
+it('ne monte les réglages qu’à leur ouverture et conserve leurs brouillons', async () => {
+  window.history.replaceState(null, '', '/app/settings');
+  setup();
+  const general = await screen.findByLabelText('Brouillon général de test') as HTMLInputElement;
+  expect(screen.queryByLabelText('Brouillon mails de test')).toBeNull();
+  expect(screen.queryByLabelText('Brouillon recherche de test')).toBeNull();
+  expect(screen.queryByText('Maintenance de test')).toBeNull();
+  fireEvent.change(general, {target:{value:'À conserver'}});
+  fireEvent.click(screen.getByRole('button',{name:'Mails'}));
+  const mail = await screen.findByLabelText('Brouillon mails de test') as HTMLInputElement;
+  fireEvent.change(mail, {target:{value:'Autre brouillon'}});
+  chooseExtraSetting('Sauvegardes et maintenance');
+  await screen.findByText('Maintenance de test');
+  fireEvent.click(screen.getByRole('button',{name:'Général'}));
+  expect((screen.getByLabelText('Brouillon général de test') as HTMLInputElement).value).toBe('À conserver');
+  fireEvent.click(screen.getByRole('button',{name:'Mails'}));
+  expect((screen.getByLabelText('Brouillon mails de test') as HTMLInputElement).value).toBe('Autre brouillon');
+  expect(screen.queryByLabelText('Brouillon recherche de test')).toBeNull();
+});
+
+it.each(['/app/settings?settings=preparation', '/app/preparation'])('conserve les réglages de réunion non enregistrés depuis %s', async (path) => {
+  window.history.replaceState(null, '', path);
+  const settings: FusionSettings = {enabled:true, proactive_enabled:false, auto_enhancement_enabled:false,
+    mode:'network', onboarding_complete:false, capabilities:{enabled:true,
+      capture:{durable:true,max_upload_mb:50,max_duration_minutes:120,tracks:['mic'],browser_permission_required:true},
+      transcription:{batch_ready:true,live_ready:false,live_operational:true,detail:'Essai'},notes:{staging:true,erp_projection:true}}};
+  const stats: FusionStats = {sources:{total:0,by_type:{},extracted:0,indexed:0,current:0},
+    sessions:{total:0,by_state:{},duration_seconds:0,audio_bytes:0},
+    assistant:{answers:0,stale:0,enhancements:0,p50_seconds:null,p95_seconds:null,tokens:null},
+    engines:{speech:{},generation:{placement:'network',configured:false}},
+    index:{text_passages:0,profiles:[],size_bytes:0},formulas:{}};
+  vi.spyOn(fusionInsights,'readiness').mockReturnValue(new Promise(()=>{}));
+  vi.spyOn(fusionInsights,'settings').mockResolvedValue(settings);
+  vi.spyOn(fusionInsights,'stats').mockResolvedValue(stats);
+  setup();
+  const direct=await screen.findByLabelText('Autoriser la transcription directe en essai') as HTMLInputElement;
+  fireEvent.click(direct);expect(direct.checked).toBe(true);
+  fireEvent.click(screen.getByRole('link',{name:'Mails'}));
+  fireEvent.click(screen.getByRole('link',{name:'Réglages'}));
+  expect((await screen.findByLabelText('Autoriser la transcription directe en essai') as HTMLInputElement).checked).toBe(true);
+  fireEvent.click(screen.getByRole('button',{name:'Apparence'}));
+  chooseExtraSetting('Réunions et transcription');
+  expect((await screen.findByLabelText('Autoriser la transcription directe en essai') as HTMLInputElement).checked).toBe(true);
+  fireEvent.click(screen.getByRole('link',{name:'Mails'}));
+  fireEvent.click(screen.getByRole('link',{name:'Réglages'}));
+  expect((await screen.findByLabelText('Autoriser la transcription directe en essai') as HTMLInputElement).checked).toBe(true);
+});
+
 it("ouvre les rubriques de la fiche en conservant le brouillon et l’URL",()=>{
   window.history.replaceState(null,"","/app/projects/erp-b/cdc");
   setup(ProjectDraft);
@@ -325,7 +506,8 @@ it("conserve les réglages documentaires entre sous-rubriques et protège une sa
   let finish!:(value:DocumentPreferences)=>void;vi.spyOn(documentApi,'savePreferences').mockReturnValue(new Promise(resolve=>{finish=resolve;}));
   const confirm=vi.spyOn(window,'confirm').mockReturnValueOnce(false).mockReturnValueOnce(true);
   setup();expect(read).not.toHaveBeenCalled();chooseExtraSetting("Modèles de documents");
-  await screen.findByLabelText('Modifier les recherches des trames');await waitFor(()=>expect(screen.getByRole('button',{name:'Comparer avec les réglages enregistrés'}).matches(':disabled')).toBe(false));
+  await screen.findByLabelText('Modifier les recherches des trames',{}, {timeout:3000});
+  await waitFor(()=>expect(screen.getByRole('button',{name:'Comparer avec les réglages enregistrés'}).matches(':disabled')).toBe(false));
   fireEvent.change(screen.getAllByLabelText('Libellé')[0],{target:{value:'Brouillon commun'}});
   fireEvent.click(screen.getByRole('button',{name:'Apparence'}));expect(screen.getByRole('region',{name:'Réglages documentaires'})).toBeTruthy();
   fireEvent.click(screen.getByRole('button',{name:'Apparence'}));expect(screen.queryByRole('region',{name:'Réglages documentaires'})).toBeNull();
@@ -338,7 +520,13 @@ it("conserve les réglages documentaires entre sous-rubriques et protège une sa
 });
 
 it("charge le catalogue seulement à l’ouverture de Livrables et conserve le brouillon entre rubriques",async()=>{
-  window.history.replaceState(null,"","/app/settings");const types=vi.spyOn(deliverableApi,"types").mockResolvedValue({items:[],total:0,offset:0,limit:25,can_manage:true});setup();expect(types).not.toHaveBeenCalled();chooseExtraSetting("Modèles de livrables");fireEvent.click(await screen.findByRole("button",{name:"Créer un type de livrable"}));fireEvent.change(screen.getByLabelText("Libellé du type de livrable"),{target:{value:"Brouillon conservé"}});fireEvent.click(screen.getByRole("button",{name:"Apparence"}));chooseExtraSetting("Modèles de livrables");expect((screen.getByLabelText("Libellé du type de livrable") as HTMLInputElement).value).toBe("Brouillon conservé");
+  window.history.replaceState(null,"","/app/settings");
+  const types=vi.spyOn(deliverableApi,"types").mockResolvedValue({items:[],total:0,offset:0,limit:25,can_manage:true});
+  setup();expect(types).not.toHaveBeenCalled();chooseExtraSetting("Modèles de livrables");
+  fireEvent.click(await screen.findByRole("button",{name:"Créer un type de livrable"},{timeout:3000}));
+  fireEvent.change(screen.getByLabelText("Libellé du type de livrable"),{target:{value:"Brouillon conservé"}});
+  fireEvent.click(screen.getByRole("button",{name:"Apparence"}));chooseExtraSetting("Modèles de livrables");
+  expect((screen.getByLabelText("Libellé du type de livrable") as HTMLInputElement).value).toBe("Brouillon conservé");
 });
 
 it("ouvre les référentiels depuis Réglages et charge leur liste à la demande", async () => {
@@ -347,7 +535,7 @@ it("ouvre les référentiels depuis Réglages et charge leur liste à la demande
   const references=vi.spyOn(identityApi,"references").mockResolvedValue({items:[],total:0,offset:0,limit:50});
   setup();expect(references).not.toHaveBeenCalled();
   fireEvent.click(screen.getByRole("button",{name:"Clients et équipe"}));
-  expect(await screen.findByRole("region",{name:"Clients, équipe et catégories"})).toBeTruthy();
+  expect(await screen.findByRole("region",{name:"Clients, équipe et catégories"},{timeout:5000})).toBeTruthy();
   await waitFor(()=>expect(references).toHaveBeenCalledWith("client",expect.objectContaining({offset:0})));
   fireEvent.click(screen.getByRole("button",{name:"Ajouter un client"}));
   fireEvent.change(screen.getByLabelText("Libellé"),{target:{value:"Brouillon conservé"}});
@@ -377,11 +565,11 @@ it("respecte le retour du navigateur après avoir quitté une rubrique projet", 
   expect(screen.getByText("Rubrique projet : reviews")).toBeTruthy();
 });
 
-it("ouvre une vue globale sans choisir ni monter implicitement le premier projet", () => {
+it("ouvre une vue globale sans choisir ni monter implicitement le premier projet", async () => {
   window.history.replaceState(null, "", "/app/meetings");
   const project = vi.fn(ProjectDraft);
   setup(project);
-  expect(screen.getByRole("region", {name: "Réunions globales de test"})).toBeTruthy();
+  expect(await screen.findByRole("region", {name: "Réunions globales de test"})).toBeTruthy();
   expect(project).not.toHaveBeenCalled();
   fireEvent.click(screen.getByRole("link",{name:/^Projets$/}));
   fireEvent.click(screen.getByRole("button",{name:"B-200 · Projet B-200"}));
@@ -420,16 +608,63 @@ it("préserve les états de deux projets distincts et les changements de rubriqu
   expect((screen.getByRole("textbox", {name: "Brouillon erp-b"}) as HTMLInputElement).value).toBe("Brouillon B");
 });
 
-it("désactive le polling de la vue des traitements lorsqu'elle est cachée", () => {
+it("conserve deux brouillons distincts pendant vingt changements de destination", () => {
+  window.history.replaceState(null, "", "/app/projects/erp-a/pilotage");
+  setup();
+  fireEvent.change(screen.getByRole("textbox", {name: "Brouillon erp-a"}), {target: {value: "Texte projet A"}});
+  fireEvent.click(screen.getByRole("link", {name: /^Projets$/}));
+  fireEvent.click(screen.getByRole("button", {name: "B-200 · Projet B-200"}));
+  fireEvent.change(screen.getByRole("textbox", {name: "Brouillon erp-b"}), {target: {value: "Texte projet B"}});
+  for (let i = 0; i < 20; i++) {
+    fireEvent.click(screen.getByRole("link", {name: "Mails"}));
+    fireEvent.click(screen.getByRole("link", {name: /^Projets$/}));
+    const first = i % 2 === 0;
+    fireEvent.click(screen.getByRole("button", {name: first ? "A-100 · Projet A-100" : "B-200 · Projet B-200"}));
+    expect((screen.getByRole("textbox", {name: first ? "Brouillon erp-a" : "Brouillon erp-b"}) as HTMLInputElement).value)
+      .toBe(first ? "Texte projet A" : "Texte projet B");
+  }
+});
+
+it("conserve les vraies saisies CDC de deux projets en changeant de rubrique", () => {
+  const item: CdcItem = {id:"exigence", title:"Titre initial", human_id:"EXI-001", kind:"requirement",
+    source_quote:"Exigence fictive", physical_page:1, modality:"mandatory", priority:"unclassified",
+    confidence:1, estimated_hours:0, knowledge_status:"candidate", evidence:[]};
+  const items = [item];
+  function ProjectReview({projectId}: ProjectWorkspaceProps) {
+    return <section aria-label={`Revue CDC ${projectId}`}><CdcReviewPanel projectId={projectId}
+      items={items} review={null} reviewKind="all" setReviewKind={()=>{}} reviewStatus="all"
+      setReviewStatus={()=>{}} reviewQuery="" setReviewQuery={()=>{}} selected={new Set()}
+      setSelected={()=>{}} refresh={()=>{}} reloadReview={()=>{}} /></section>;
+  }
+  window.history.replaceState(null, "", "/app/projects/erp-a/cdc");
+  setup(ProjectReview);
+  const sidebar = screen.getByRole("complementary", {name:"Menu principal"});
+  const links = within(sidebar).getAllByRole("link").map(link => link.textContent);
+  const title = (project: string) => within(screen.getByRole("region", {name:`Revue CDC ${project}`})).getByLabelText("Titre") as HTMLInputElement;
+  fireEvent.change(title("erp-a"), {target:{value:"Exigence modifiée A"}});
+  fireEvent.click(screen.getByRole("link", {name:"Projets"}));
+  fireEvent.click(screen.getByRole("button", {name:"B-200 · Projet B-200"}));
+  fireEvent.change(title("erp-b"), {target:{value:"Exigence modifiée B"}});
+  for (let i=0; i<4; i++) {
+    fireEvent.click(screen.getByRole("link", {name:"Mails"}));
+    expect(within(sidebar).getAllByRole("link").map(link => link.textContent)).toEqual(links);
+    fireEvent.click(screen.getByRole("link", {name:"Projets"}));
+    const a = i % 2 === 0;
+    fireEvent.click(screen.getByRole("button", {name:a ? "A-100 · Projet A-100" : "B-200 · Projet B-200"}));
+    expect(title(a ? "erp-a" : "erp-b").value).toBe(a ? "Exigence modifiée A" : "Exigence modifiée B");
+    expect(within(sidebar).getAllByRole("link").map(link => link.textContent)).toEqual(links);
+  }
+});
+
+it("désactive le polling de la vue des traitements lorsqu'elle est cachée", async () => {
   window.history.replaceState(null, "", "/app/jobs");
   setup();
-  const jobs = screen.getByRole("region", {name: "Traitements de test"});
+  const jobs = await screen.findByRole("region", {name: "Traitements de test"});
   expect(jobs.getAttribute("data-active")).toBe("true");
   fireEvent.click(screen.getByRole("link", {name: "Mails"}));
   expect(jobs.getAttribute("data-active")).toBe("false");
   expect(jobs.closest("[data-workspace-view]")?.hasAttribute("hidden")).toBe(true);
-  fireEvent.click(screen.getByRole('link',{name:'Réglages'}));
-  fireEvent.click(screen.getByRole("button", {name: "Suivi des analyses"}));
+  window.history.pushState(null,"","/app/jobs");fireEvent.popState(window);
   expect(jobs.getAttribute("data-active")).toBe("true");
 });
 
@@ -466,7 +701,7 @@ it('range les statistiques dans les autres réglages et les sépare de la prépa
   expect(within(options).getByRole('button',{name:'Réunions et transcription'})).toBeTruthy();
 });
 
-it('regroupe les quatre rubriques dans les onglets Réglages en conservant leurs routes',()=>{
+it('réserve les réglages aux paramètres et garde les connexions accessibles',()=>{
   vi.spyOn(fusionSources,'list').mockResolvedValue({items:[],total:0,offset:0,limit:25,has_next:false,labels:[]});
   setup();
   const sidebar=screen.getByRole('complementary',{name:'Menu principal'});
@@ -474,22 +709,87 @@ it('regroupe les quatre rubriques dans les onglets Réglages en conservant leurs
     expect(within(sidebar).queryByRole('link',{name:label})).toBeNull();
   }
   fireEvent.click(within(sidebar).getByRole('link',{name:'Réglages'}));
-  for(const [page,label] of [['sources','Sources'],['knowledge','Informations'],['jobs','Suivi des analyses'],['imports','Connexions & imports']]){
-    const tabs=screen.getByRole('navigation',{name:'Réglages'});
-    fireEvent.click(within(tabs).getByRole('button',{name:label}));
-    expect(window.location.pathname).toBe('/app/'+page);
-    expect(screen.getAllByRole('navigation',{name:'Réglages'})).toHaveLength(1);
-    expect(within(screen.getByRole('navigation',{name:'Réglages'})).getByRole('button',{name:label}).getAttribute('aria-pressed')).toBe('true');
-    expect(within(sidebar).getByRole('link',{name:'Réglages'}).classList.contains('workspace-nav-parent-active')).toBe(true);
-  }
+  const tabs=screen.getByRole('navigation',{name:'Réglages'});
+  for(const label of ['Sources','Informations','Suivi des analyses'])expect(within(tabs).queryByRole('button',{name:label})).toBeNull();
+  fireEvent.click(within(tabs).getByRole('button',{name:'Connexions & imports'}));
+  expect(window.location.pathname).toBe('/app/imports');
+  expect(within(screen.getByRole('navigation',{name:'Réglages'})).getByRole('button',{name:'Connexions & imports'}).getAttribute('aria-pressed')).toBe('true');
   fireEvent.click(within(screen.getByRole('navigation',{name:'Réglages'})).getByRole('button',{name:'Général'}));
   expect(window.location.pathname).toBe('/app/settings');
   expect(screen.getByRole('button',{name:'Général'}).getAttribute('aria-pressed')).toBe('true');
 });
 
-it.each([['sources','Sources'],['knowledge','Informations'],['jobs','Suivi des analyses'],['imports','Connexions & imports']])('repère la rubrique %s ouverte par lien direct', (page,label)=>{
+it.each([['sources','Sources'],['knowledge','Connaissance globale de test'],['jobs','Traitements de test']])('conserve le lien direct vers %s hors des réglages', async(page,label)=>{
   vi.spyOn(fusionSources,'list').mockResolvedValue({items:[],total:0,offset:0,limit:25,has_next:false,labels:[]});
   window.history.replaceState(null,'','/app/'+page);
   setup();
-  expect(within(screen.getByRole('navigation',{name:'Réglages'})).getByRole('button',{name:label}).getAttribute('aria-pressed')).toBe('true');
+  expect(screen.queryByRole('navigation',{name:'Réglages'})).toBeNull();
+  if(page==='sources')expect(await screen.findByRole('heading',{name:label})).toBeTruthy();
+  else expect(await screen.findByRole('region',{name:label})).toBeTruthy();
+});
+it('isole une erreur de rubrique sans masquer la navigation ni les autres brouillons', async()=>{
+  vi.spyOn(console,'error').mockImplementation(()=>{});
+  let fail=true;
+  function ProjectWithFailure(props:ProjectWorkspaceProps){
+    if(props.projectId==='erp-b'&&fail)throw new Error('erreur de recette');
+    return <ProjectDraft {...props}/>;
+  }
+  window.history.replaceState(null,'','/app/projets');
+  setup(ProjectWithFailure);
+  fireEvent.click(screen.getByRole('button',{name:'A-100 · Projet A-100'}));
+  fireEvent.change(screen.getByRole('textbox',{name:'Brouillon erp-a'}),{target:{value:'À conserver'}});
+  fireEvent.click(screen.getByRole('link',{name:'Projets'}));
+  fireEvent.click(screen.getByRole('button',{name:'B-200 · Projet B-200'}));
+  expect(screen.getByText('Cette rubrique ne peut pas être affichée.')).toBeTruthy();
+  expect(screen.getByRole('navigation',{name:'Grandes rubriques'})).toBeTruthy();
+  fail=false;fireEvent.click(screen.getByRole('button',{name:'Réessayer'}));
+  expect(screen.getByRole('textbox',{name:'Brouillon erp-b'})).toBeTruthy();
+  fireEvent.click(screen.getByRole('link',{name:'Projets'}));
+  fireEvent.click(screen.getByRole('button',{name:'A-100 · Projet A-100'}));
+  expect((screen.getByRole('textbox',{name:'Brouillon erp-a'}) as HTMLInputElement).value).toBe('À conserver');
+});
+it('garde les favoris dans Projets sans modifier la barre de navigation',()=>{
+  window.history.replaceState(null,'','/app/projets');setup();
+  const sidebar=screen.getByRole('complementary',{name:'Menu principal'});
+  const labels=within(sidebar).getAllByRole('link').map(link=>link.textContent);
+  fireEvent.click(screen.getByRole('button',{name:'Ajouter A-100 aux favoris'}));
+  expect(within(sidebar).getAllByRole('link').map(link=>link.textContent)).toEqual(labels);
+  expect(within(sidebar).queryByText('Projets favoris')).toBeNull();
+  fireEvent.click(screen.getByText('Projets favoris'));
+  fireEvent.click(within(screen.getByText('Projets favoris').closest('details')!).getByRole('button',{name:/A-100.*Projet A-100/}));
+  expect(window.location.pathname).toContain('/app/projets/erp-a');
+});
+it('ouvre les sources depuis les documents sans perdre le brouillon du projet',async()=>{
+  window.history.replaceState(null,'','/app/projets');setup();
+  fireEvent.click(screen.getByRole('button',{name:'A-100 · Projet A-100'}));
+  fireEvent.change(screen.getByRole('textbox',{name:'Brouillon erp-a'}),{target:{value:'Brouillon préservé'}});
+  fireEvent.click(screen.getByRole('button',{name:'Documents du projet'}));
+  fireEvent.click(screen.getByRole('button',{name:'Sources de tous les projets'}));
+  expect(window.location.pathname).toBe('/app/sources');
+  fireEvent.click(screen.getByRole('link',{name:'Projets'}));
+  fireEvent.click(screen.getByRole('button',{name:'A-100 · Projet A-100'}));
+  expect((screen.getByRole('textbox',{name:'Brouillon erp-a'}) as HTMLInputElement).value).toBe('Brouillon préservé');
+});
+it('ouvre les informations depuis la recherche et les traitements depuis Activité',async()=>{
+  setup();
+  fireEvent.click(screen.getByRole('button',{name:'Rechercher dans Kiara'}));
+  fireEvent.click(screen.getByRole('button',{name:'Toutes les informations'}));
+  expect(window.location.pathname).toBe('/app/knowledge');
+  expect(await screen.findByRole('region',{name:'Connaissance globale de test'})).toBeTruthy();
+  fireEvent.click(screen.getByRole('link',{name:'Activité'}));
+  expect(window.location.pathname).toBe('/app/activite');
+  expect(await screen.findByRole('region',{name:'Traitements de test'})).toBeTruthy();
+});
+it('protège aussi les modifications non enregistrées avant de quitter le portail web',()=>{
+  document.body.dataset.kiaraWebConversations='true';
+  window.history.replaceState(null,'','/kiara/app/settings');
+  try {
+    setup();const dirty=document.createElement('div');dirty.dataset.workspaceDirty='true';document.body.append(dirty);
+    try {
+      const account=screen.getByRole('link',{name:'Compte et appareil'});
+      expect(account.getAttribute('href')).toBe('/kiara/app/conversations#reglages');
+      expect(fireEvent.click(account)).toBe(false);
+      expect(screen.getByText('Enregistrez ou fermez la modification en cours avant de revenir à Conversations.')).toBeTruthy();
+    } finally {dirty.remove();}
+  } finally {delete document.body.dataset.kiaraWebConversations;}
 });

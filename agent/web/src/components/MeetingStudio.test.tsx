@@ -1,3 +1,4 @@
+import {installPublicationLocksForTest} from '../test/publicationLocks';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { act,cleanup, fireEvent, render, screen, waitFor,within } from '@testing-library/react';
 import { MeetingStudio } from './MeetingStudio';
@@ -26,7 +27,7 @@ const row:MeetingSession={id:'sid',title:'Revue mécanique',kind:'note',project_
   tracks:[],total_bytes:0,duration_seconds:0,issues:[],created_at:'2026-10-11',updated_at:'2026-10-11'};
 const capabilities:SessionCapabilities={enabled:true,capture:{durable:true,max_upload_mb:50,max_duration_minutes:120,tracks:['mic','system'],browser_permission_required:true},
   transcription:{batch_ready:false,live_ready:false,detail:'Runtime audio absent'},notes:{staging:true,erp_projection:true}};
-beforeEach(()=>{localStorage.clear();vi.spyOn(meetingSessions,'watchEvents').mockResolvedValue(undefined);vi.spyOn(meetingSessions,'get').mockResolvedValue(row);
+beforeEach(()=>{installPublicationLocksForTest();localStorage.clear();vi.spyOn(meetingSessions,'watchEvents').mockResolvedValue(undefined);vi.spyOn(meetingSessions,'get').mockResolvedValue(row);
   vi.spyOn(meetingSessions,'askHistory').mockResolvedValue({items:[]});vi.spyOn(meetingSessions,'enhancements').mockResolvedValue({items:[]});
   vi.spyOn(meetingSessions,'liveAnswers').mockResolvedValue({items:[]});});
 afterEach(()=>{cleanup();vi.useRealTimers();vi.restoreAllMocks();});
@@ -36,6 +37,18 @@ function setup(value=row,caps=capabilities){vi.mocked(meetingSessions.get).mockR
 
 const retainedAnswer={id:'history-answer',query:'Quelle réserve ?',answer:'Réponse conservée avant modification',scope:'session' as const,
   citations:[],stale:false,status:'answered' as const};
+
+it('explique les deux sources Linux avant leur autorisation',async()=>{
+  document.body.dataset.kiaraLinuxSystemAudio='true';
+  const snapshot={sessionId:'sid',title:'Revue',phase:'ready' as const,tracks:[],seconds:0,totalBytes:0,savedBytes:0,pending:0,error:''};
+  vi.spyOn(meetingCapture,'getSnapshot').mockReturnValue(snapshot);
+  vi.spyOn(meetingCapture,'subscribe').mockImplementation(()=>()=>{});
+  try{
+    setup({...row,kind:'meeting'});
+    expect(await screen.findByText(/Le microphone et tous les sons de la sortie audio par défaut au démarrage seront enregistrés sur deux pistes/)).toBeTruthy();
+    expect(screen.getByRole('button',{name:'Autoriser les sources et démarrer'})).toBeTruthy();
+  }finally{delete document.body.dataset.kiaraLinuxSystemAudio;}
+});
 
 it.each([
   ['starting',false,'Ouverture audio en cours'],
@@ -173,6 +186,38 @@ it('un ancien contrôle d’historique ne remplace pas l’avis qui vient d’ê
   await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'Utile'}));});
   await act(async()=>{release({items:[retainedAnswer]});});
   expect(screen.getByRole('button',{name:'Utile'})).toHaveProperty('ariaPressed','true');
+});
+
+it('suspend le suivi de l’assistant lorsque la fenêtre est masquée et reprend sans perdre les saisies',async()=>{
+  const descriptor=Object.getOwnPropertyDescriptor(document,'hidden');let hidden=false;
+  Object.defineProperty(document,'hidden',{configurable:true,get:()=>hidden});
+  try{
+    await openRetainedConversation();
+    fireEvent.change(screen.getByLabelText('Texte des notes'),{target:{value:'Note humaine à conserver'}});
+    fireEvent.change(screen.getByLabelText('Question à l’assistant'),{target:{value:'Question à conserver'}});
+    let release!:(value:{items:typeof retainedAnswer[]})=>void;
+    vi.mocked(meetingSessions.askHistory)
+      .mockReturnValueOnce(new Promise(resolve=>{release=resolve;}))
+      .mockResolvedValue({items:[{...retainedAnswer,answer:'Réponse actualisée'}]});
+    await act(async()=>{await vi.advanceTimersByTimeAsync(3000);});
+    const calls=vi.mocked(meetingSessions.askHistory).mock.calls;
+    const previousSignal=calls[calls.length-1][3]!;
+    hidden=true;await act(async()=>{document.dispatchEvent(new Event('visibilitychange'));});
+    expect(previousSignal.aborted).toBe(true);
+    const count=vi.mocked(meetingSessions.askHistory).mock.calls.length;
+    await act(async()=>{await vi.advanceTimersByTimeAsync(12000);});
+    expect(meetingSessions.askHistory).toHaveBeenCalledTimes(count);
+    hidden=false;await act(async()=>{document.dispatchEvent(new Event('visibilitychange'));});
+    expect(meetingSessions.askHistory).toHaveBeenCalledTimes(count+1);
+    expect(screen.getByText('Réponse actualisée')).toBeTruthy();
+    await act(async()=>{release({items:[retainedAnswer]});});
+    expect(screen.getByText('Réponse actualisée')).toBeTruthy();
+    expect(screen.getByLabelText('Texte des notes')).toHaveProperty('value','Note humaine à conserver');
+    expect(screen.getByLabelText('Question à l’assistant')).toHaveProperty('value','Question à conserver');
+  }finally{
+    if(descriptor)Object.defineProperty(document,'hidden',descriptor);
+    else delete (document as unknown as {hidden?:boolean}).hidden;
+  }
 });
 
 it('conserve l’avis précédent et la saisie quand son enregistrement échoue',async()=>{
@@ -335,6 +380,26 @@ it('expose Windows et ses périphériques avant le démarrage, avec le navigateu
   expect(audio.closest('.meeting-preparation')).toBeNull();
   expect(screen.getByRole('button',{name:'Enregistrer au microphone (navigateur)'}).closest('details')?.open).toBe(false);
   expect(start).not.toHaveBeenCalled();expect(browser).not.toHaveBeenCalled();
+});
+
+it('suspend le suivi de capture native lorsque la séance est quittée et garde la note au retour',async()=>{
+  const native={installed:true,ready:true,loopback_ready:false,real_test_passed:false,microphone_test_passed:false,devices:[],active:[],session:null};
+  const status=vi.spyOn(meetingSessions,'nativeStatus').mockResolvedValue(native);
+  vi.mocked(meetingSessions.get).mockResolvedValue({...row,kind:'meeting'});
+  const props={sessionId:'sid',rows:[],capabilities:{...capabilities,native_capture:native},onClose:vi.fn(),onOpenProject:vi.fn()};
+  const view=render(<MeetingStudio {...props} active/>);
+  await screen.findByLabelText('Texte des notes');
+  await waitFor(()=>expect(status).toHaveBeenCalledTimes(2));
+  fireEvent.change(screen.getByLabelText('Texte des notes'),{target:{value:'Note de séance à conserver'}});
+  view.rerender(<MeetingStudio {...props} active={false}/>);
+  vi.useFakeTimers();
+  await act(async()=>{await vi.advanceTimersByTimeAsync(11000);});
+  expect(status).toHaveBeenCalledTimes(2);
+  expect(screen.getByLabelText('Texte des notes')).toHaveProperty('value','Note de séance à conserver');
+  view.rerender(<MeetingStudio {...props} active/>);
+  await act(async()=>{});
+  expect(status).toHaveBeenCalledTimes(4);
+  expect(screen.getByLabelText('Texte des notes')).toHaveProperty('value','Note de séance à conserver');
 });
 
 function deferredSnapshot(){
@@ -876,6 +941,33 @@ it('garde uniquement le dernier repère demandé avant le chargement des métado
   expect(play).toHaveBeenCalledOnce();
 });
 
+it('isole une erreur de sauvegarde tardive après changement de séance et retrouve les deux brouillons',async()=>{
+  const b={...row,id:'sid-b',title:'Séance B',note_id:'note-b',note_version_id:'version-b',note:{...row.note!,id:'note-b',version_id:'version-b',content:note('Texte B')}};
+  vi.mocked(meetingSessions.get).mockImplementation(async id=>id==='sid-b'?b:row);
+  let fail!:(reason:Error)=>void;
+  const save=vi.spyOn(meetingSessions,'saveNote').mockReturnValueOnce(new Promise((_resolve,reject)=>{fail=reject;}))
+    .mockResolvedValueOnce({...row,revision:4,note_revision:5,note_version_id:'v5',note:{...row.note!,revision:5,version_id:'v5',content:note('Brouillon A à conserver')}});
+  const props={rows:[],capabilities,onClose:vi.fn(),onOpenProject:vi.fn()};
+  const view=render(<MeetingStudio key="sid" sessionId="sid" {...props}/>);
+  await screen.findByDisplayValue('Réserve : 55 mm à confirmer');
+  fireEvent.change(screen.getByLabelText('Texte des notes'),{target:{value:'Brouillon A à conserver'}});
+  fireEvent.click(screen.getByRole('button',{name:'Enregistrer la note'}));
+  expect(save).toHaveBeenCalledTimes(1);
+  view.rerender(<MeetingStudio key="sid-b" sessionId="sid-b" {...props}/>);
+  await screen.findByDisplayValue('Texte B');
+  fireEvent.change(screen.getByLabelText('Texte des notes'),{target:{value:'Brouillon B à conserver'}});
+  await act(async()=>{fail(new Error('Erreur tardive de la séance A'));});
+  expect(screen.queryByText('Erreur tardive de la séance A')).toBeNull();
+  expect(screen.getByLabelText('Texte des notes')).toHaveProperty('value','Brouillon B à conserver');
+  view.rerender(<MeetingStudio key="sid" sessionId="sid" {...props}/>);
+  await screen.findByDisplayValue('Brouillon A à conserver');
+  fireEvent.click(screen.getByRole('button',{name:'Reprendre l’enregistrement'}));
+  await waitFor(()=>expect(save).toHaveBeenCalledTimes(2));
+  expect(save.mock.calls[1][1].command_id).toBe(save.mock.calls[0][1].command_id);
+  view.rerender(<MeetingStudio key="sid-b" sessionId="sid-b" {...props}/>);
+  await screen.findByDisplayValue('Brouillon B à conserver');
+});
+
 it('sauvegarde la version de note ERP attendue et conserve la saisie arrivée pendant l’enregistrement',async()=>{
   let finish!:(value:MeetingSession)=>void;
   const save=vi.spyOn(meetingSessions,'saveNote').mockReturnValue(new Promise(resolve=>{finish=resolve;}));
@@ -889,6 +981,18 @@ it('sauvegarde la version de note ERP attendue et conserve la saisie arrivée pe
   await screen.findByText('Commande précédente enregistrée. Les nouvelles corrections restent à enregistrer.');
   expect(screen.getByLabelText('Texte des notes')).toHaveProperty('value','Nouvelle correction pendant sauvegarde');
   expect(screen.getByRole('button',{name:'Enregistrer la note'})).toHaveProperty('disabled',false);
+});
+
+it('ne lance pas deux enregistrements de note pendant le même traitement React',async()=>{
+  let finish!:(value:MeetingSession)=>void;
+  const save=vi.spyOn(meetingSessions,'saveNote').mockReturnValue(new Promise(resolve=>{finish=resolve;}));
+  setup();await screen.findByDisplayValue('Réserve : 55 mm à confirmer');
+  fireEvent.change(screen.getByLabelText('Texte des notes'),{target:{value:'Correction à conserver'}});
+  const button=screen.getByRole('button',{name:'Enregistrer la note'});
+  act(()=>{fireEvent.click(button);fireEvent.click(button);});
+  expect(save).toHaveBeenCalledTimes(1);
+  expect(screen.getByLabelText('Texte des notes')).toHaveProperty('value','Correction à conserver');
+  await act(async()=>{finish({...row,revision:4});});
 });
 
 it('reprend un enregistrement réseau interrompu avec la même clé et sans perdre le brouillon',async()=>{

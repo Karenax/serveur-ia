@@ -16,9 +16,9 @@ const BASE = "/v1/thunderbird";
 const EXTENSION = "/api/v1/kiara/thunderbird-extension";
 type Extension = { version: string; managed: boolean; restart_required?: boolean; update_available?: boolean; manual_path?: string };
 
-export function ThunderbirdPanel({ reply, onUpdated, compose = false, extensionOnly = false }: { reply?: ThunderbirdReply; onUpdated?: () => void; compose?: boolean; extensionOnly?: boolean }) {
+export function ThunderbirdPanel({ reply, onUpdated, compose = false, extensionOnly = false, active = true }: { reply?: ThunderbirdReply; onUpdated?: () => void; compose?: boolean; extensionOnly?: boolean; active?:boolean }) {
   if (extensionOnly) return <ThunderbirdExtension />;
-  return <ThunderbirdMail reply={reply} onUpdated={onUpdated} compose={compose} />;
+  return <ThunderbirdMail reply={reply} onUpdated={onUpdated} compose={compose} active={active} />;
 }
 
 function ThunderbirdExtension() {
@@ -59,7 +59,7 @@ function ThunderbirdExtension() {
   </section>;
 }
 
-function ThunderbirdMail({ reply, onUpdated, compose }: { reply?: ThunderbirdReply; onUpdated?: () => void; compose: boolean }) {
+function ThunderbirdMail({ reply, onUpdated, compose, active }: { reply?: ThunderbirdReply; onUpdated?: () => void; compose: boolean; active:boolean }) {
   const [status, setStatus] = useState<Status | null>(null);
   const [folders, setFolders] = useState<Set<string>>(new Set());
   const initialized = useRef(false);
@@ -81,14 +81,15 @@ function ThunderbirdMail({ reply, onUpdated, compose }: { reply?: ThunderbirdRep
     }
   }, [reply?.sourceId]);
   useEffect(() => {
-    let disposed = false, loading = false;
-    const controller = new AbortController();
+    if(!active)return;
+    let disposed=false,loading=false,controller:AbortController|null=null,timer:number|undefined;
+    const stop=()=>{window.clearTimeout(timer);timer=undefined;controller?.abort();controller=null;loading=false;};
     const load = async (quiet=false) => {
       if(disposed || loading || document.hidden)return;
-      loading=true;
+      controller?.abort();const current=new AbortController();controller=current;loading=true;
       try {
-        const value = await request<Status>(`${BASE}/status`,{signal:controller.signal,activity:quiet?false:undefined},20000);
-        if (disposed) return;
+        const value = await request<Status>(`${BASE}/status`,{signal:current.signal,activity:quiet?false:undefined},20000);
+        if (disposed||current.signal.aborted) return;
         setStatus(value);
         if (!initialized.current && value.folders?.length) {
           setFolders(new Set(value.mail_config?.folder_ids ?? value.sync?.folder_ids ?? value.folders.filter(f => /(?:^|\/)INBOX$/i.test(f.path)).map(f => f.id)));
@@ -99,12 +100,13 @@ function ThunderbirdMail({ reply, onUpdated, compose }: { reply?: ThunderbirdRep
             doneJobs.current.add(job.id); updated.current?.();
           }
         }
-      } catch (e) { if (!disposed) setError(String(e)); }
-      finally { loading=false; }
+      } catch (e) { if (!disposed&&!current.signal.aborted) setError(String(e)); }
+      finally {if(controller===current){loading=false;if(!disposed&&!document.hidden)timer=window.setTimeout(()=>void load(true),30000);}}
     };
-    void load(); const timer = window.setInterval(() => void load(true), 30000);
-    return () => { disposed = true; controller.abort(); window.clearInterval(timer); };
-  }, []);
+    const visibility=()=>{if(document.hidden){stop();return;}window.clearTimeout(timer);timer=undefined;void load(true);};
+    document.addEventListener('visibilitychange',visibility);if(!document.hidden)void load();
+    return () => {disposed=true;document.removeEventListener('visibilitychange',visibility);stop();};
+  }, [active]);
   const identities = (status?.accounts || []).flatMap(a => a.identities || []);
   const chosenIdentity = identity || identities[0]?.id || "";
   const synchronize = async () => {

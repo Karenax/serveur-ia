@@ -1,29 +1,36 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {request} from '../lib/http';
 import "../progressive-options.css";
 
 type Recovery = {running:boolean; total:number; processed:number; indexed:number; failed:number; remaining_failed:number; error:string|null};
 const endpoint='/v1/settings/memory/recovery';
-export function MemoryRecovery() {
+export function MemoryRecovery({active=true}:{active?:boolean} = {}) {
   const [state,setState]=useState<Recovery|null>(null),[error,setError]=useState(''),[busy,setBusy]=useState(false);
+  const generation=useRef(0),operation=useRef(false),mounted=useRef(false);
+  useEffect(()=>{mounted.current=true;return()=>{mounted.current=false;};},[]);
   useEffect(()=>{
-    let alive=true,pending=false;
-    const controller=new AbortController();
+    if(!active)return;
+    let alive=true,controller:AbortController|null=null,timer:number|undefined;
+    const stop=()=>{generation.current++;controller?.abort();controller=null;if(timer!==undefined){window.clearInterval(timer);timer=undefined;}};
     const read=async(quiet=false)=>{
-      if(pending||document.hidden)return;
-      pending=true;
-      try{const value=await request<Recovery>(endpoint,{signal:controller.signal,activity:quiet?false:undefined},10000);if(alive){setState(value);setError('');}}
-      catch(e){if(alive)setError(String(e instanceof Error?e.message:e));}
-      finally{pending=false;}
+      if(!alive||operation.current||document.hidden||controller)return;
+      const current=new AbortController();controller=current;const ticket=++generation.current;
+      try{const value=await request<Recovery>(endpoint,{signal:current.signal,activity:quiet?false:undefined},10000);
+        if(alive&&!current.signal.aborted&&ticket===generation.current){setState(value);setError('');}}
+      catch(e){if(alive&&!current.signal.aborted&&ticket===generation.current)setError(String(e instanceof Error?e.message:e));}
+      finally{if(controller===current)controller=null;}
     };
-    void read();const timer=window.setInterval(()=>void read(true),3000);
-    return()=>{alive=false;controller.abort();window.clearInterval(timer);};
-  },[]);
+    const start=(quiet=false)=>{if(!alive||document.hidden||timer!==undefined)return;void read(quiet);timer=window.setInterval(()=>void read(true),3000);};
+    const visibility=()=>{if(document.hidden)stop();else start(true);};
+    document.addEventListener('visibilitychange',visibility);start();
+    return()=>{alive=false;document.removeEventListener('visibilitychange',visibility);stop();};
+  },[active]);
   const retry=async()=>{
-    setBusy(true);setError('');
-    try{setState(await request<Recovery>(endpoint,{method:'POST'},10000));}
-    catch(e){setError(String(e instanceof Error?e.message:e));}
-    finally{setBusy(false);}
+    if(operation.current)return;
+    operation.current=true;generation.current++;setBusy(true);setError('');
+    try{const value=await request<Recovery>(endpoint,{method:'POST'},10000);if(mounted.current)setState(value);}
+    catch(e){if(mounted.current)setError(String(e instanceof Error?e.message:e));}
+    finally{operation.current=false;if(mounted.current)setBusy(false);}
   };
   const retryButton=<button type="button" className="button primary" disabled={busy||!state||state.running||!state.remaining_failed} onClick={()=>void retry()}>{state?.running?'Reprise en cours…':busy?'Démarrage…':'Reprendre les indexations en échec'}</button>;
   return <section className="memory-recovery" aria-label="Reprise des indexations mémoire">

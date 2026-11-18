@@ -21,8 +21,9 @@ hero, une identité marketing, une nouvelle typographie ou la casse anglaise des
   cohérents ; employer les composants existants plutôt qu'une variante voisine.
 - Échelle typographique et espacements réguliers, alignements cohérents, icônes
   connues avec noms accessibles. Les cartes doivent grouper un contenu utile.
-- Tables et formulaires adaptés à la densité réelle, textes longs et listes remplies,
-  ordinateur, téléphone et tablette. Vérifier clair/sombre et zoom.
+- Sur ordinateur, vérifier la densité des tables et formulaires, les textes longs
+  et les listes remplies en 720p, 1080p et 1440p. Vérifier clair/sombre et zoom.
+  Le travail sur l’interface mobile reprend sur demande explicite.
 - Soigner chargement, succès, vide et erreur, sans empêcher une action en cours ni
   perdre un brouillon. Prévoir la récupération des erreurs et le retour utilisateur.
 - Viser les critères WCAG 2.2 AA pertinents : clavier et focus visible/non masqué,

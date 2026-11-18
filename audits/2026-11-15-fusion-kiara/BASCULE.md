@@ -1,5 +1,41 @@
 # Bascule de Kiara et retour arrière
 
+## Livraison Windows et web du 18 novembre 2026
+
+**Kiara 4.0.9** a été activée à 11 h 43, heure de Paris. Le canal classique
+continue de servir la 3.5.63. Le portail ajoute Notes et regroupe les corrections
+de reprise de navigation, de capture audio, de projection des notes et de
+sauvegarde consignées dans le [suivi d’architecture](../2026-11-16-architecture-interface/AVANCEMENT.md).
+
+- **Windows.** Les trois exécutables extraits du NSIS correspondent aux binaires
+  de recette. Le manifeste Ed25519 est vérifié avec la clé du canal existante et
+  les octets téléchargés depuis le lanceur correspondent au SHA-256
+  `a2c85c74c55a8533901a179da6fd11ebce776d9679c4b94a96baf8ecdaae7d2b`.
+  L’installateur est distribué sans Authenticode. La recette du candidat a
+  exécuté WebView2 depuis les binaires extraits et simulé le collage d’une image.
+  L’installation et la rétrogradation natives de ce NSIS restent à qualifier.
+- **Portail.** Les 1 228 tests d’interface ont réussi. Notes a été ouvert dans
+  WebView2 en 1280 × 720, 1920 × 1080 et 2560 × 1440 avec un projet fictif. Le
+  passage du paquet précédent au candidat puis retour a conservé les écritures
+  de recette et les refus hors périmètre.
+- **Production.** Les 11 projets, leurs identifiants et états ont été comparés
+  avant et après redémarrage. L’ERP passe les contrôles SQLite d’intégrité et de
+  clés étrangères et contient les trois nouvelles tables de notes personnelles.
+  `/kiara/` et `/agent/` répondent 200 en HTTPS. Le PID Qwen est resté le même.
+- **Point de reprise.** Les empreintes de la paire chiffrée du 18 novembre à 03 h
+  concordent sur D: et sur le NAS. Le contrôle de cette paire porte sur ses
+  empreintes. Les preuves de la livraison, le sélecteur et l’index précédents,
+  ainsi que le ZIP serveur de référence, sont sous
+  `D:\KRecette\livraison-1794997317710`.
+
+Pour revenir au canal 4.0.8, rétablir le sélecteur `releases.py` et l’index
+conservés sous `retour-production`, puis lancer le redémarrage documenté en
+préservant l’état de Qwen. Les ressources du portail 4.0.8 sont conservées.
+Pour un retour complet du service, utiliser aussi le ZIP serveur de référence
+et les contrôles de la section [Revenir en arrière](#revenir-en-arrière).
+
+## Historique de la fusion
+
 La première mise en service porte sur les écrans et le routage. Conversations conserve les API et les identifiants des fils existants. Le catalogue de recette laisse les projets et leurs objets dans leurs bases propriétaires. Une migration des données, si elle s’avère nécessaire, fera l’objet de sa propre répétition et de son propre point de reprise.
 
 Sur cette machine, utiliser D: pour les compilations, les caches, les fichiers temporaires, les restaurations de recette et la production des preuves. E: sert à conserver les archives et les preuves finalisées. Tant que les accès à E: sont suspendus, utiliser des copies de recette déjà présentes sur D: et y conserver tous les résultats.

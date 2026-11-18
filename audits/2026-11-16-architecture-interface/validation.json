@@ -1,0 +1,86 @@
+{
+  "date": "2026-11-16",
+  "timezone": "Europe/Paris",
+  "commit": "0bf3b3e8234188f020ddb0530ee705437f702146",
+  "scope": "Audit; no application changes or production operations",
+  "vitest": {
+    "passed": 58,
+    "files": 5,
+    "durationSeconds": 19.94,
+    "filesRun": [
+      "WorkspaceShell.test.tsx",
+      "ProjectNavigation.test.tsx",
+      "ConnectionStatus.test.tsx",
+      "ProjectDocumentPersistence.test.tsx",
+      "App.portfolio.test.tsx"
+    ]
+  },
+  "typescript": {
+    "command": "node node_modules/typescript/bin/tsc --noEmit --incremental false",
+    "exitCode": 0
+  },
+  "build": {
+    "vite": "7.3.7",
+    "modules": 172,
+    "jsBytes": 1098886,
+    "jsGzipKilobytes": 307.14,
+    "cssKilobytes": 270.01,
+    "cssGzipKilobytes": 48.41,
+    "warning": "chunk > 500 kB"
+  },
+  "syntax": {
+    "python_syntax": 1080,
+    "javascript_syntax": 101,
+    "powershell_syntax": {
+      "pwsh": 103,
+      "powershell.exe": 103
+    },
+    "passed": true
+  },
+  "uxHeuristics": {
+    "warnings": 50
+  },
+  "browser": {
+    "responses": "synthetic",
+    "production": false,
+    "errors": [],
+    "hiddenPolling": {
+      "durationMs": 4709,
+      "requests": [
+        {
+          "url": "/api/v1/projects/audit-1/cdc/jobs",
+          "time": 1794857031749
+        },
+        {
+          "url": "/api/v1/projects/audit-2/cdc/jobs",
+          "time": 1794857032308
+        },
+        {
+          "url": "/api/v1/projects/audit-1/cdc/jobs",
+          "time": 1794857033742
+        },
+        {
+          "url": "/api/v1/projects/audit-2/cdc/jobs",
+          "time": 1794857034305
+        }
+      ],
+      "mountedProjectViews": 2
+    },
+    "retryRecovered": true,
+    "mobileMenuFocus": "Ouvrir le menu",
+    "quickAccessFocus": "Accès rapide aux rubriques"
+  },
+  "hardware": {
+    "method": "Get-CimInstance Win32_VideoController",
+    "gpus": [
+      {
+        "name": "NVIDIA GeForce RTX 4080",
+        "status": "OK"
+      },
+      {
+        "name": "NVIDIA Quadro P2200",
+        "status": "OK"
+      }
+    ]
+  }
+}

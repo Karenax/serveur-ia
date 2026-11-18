@@ -49,7 +49,7 @@ thinkingCapabilities({});
 
 const contextGauge=wsElement('div',undefined,'context-gauge');
 contextGauge.innerHTML='<span id="context-label">Contexte · connexion requise</span><progress id="context-progress" aria-label="Utilisation du contexte" max="100" value="0"></progress>';
-document.querySelector('.composer-bottom').prepend(contextGauge);
+document.getElementById('composerOptionsMenu').prepend(contextGauge);
 let contextTimer,contextRevision=0,contextPending=false,contextSignature='';
 function contextRefresh(){
  clearTimeout(contextTimer);contextRevision++;

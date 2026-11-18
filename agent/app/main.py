@@ -57,6 +57,7 @@ from backend.app.routers import (  # noqa: E402
     project_documents as mp_documents,
     project_document_jobs as mp_document_jobs,
     project_notes as mp_notes,
+    workspace_notes as mp_workspace_notes,
     project_note_files as mp_note_files,
     project_note_imports as mp_note_imports,
     project_note_network as mp_note_network,
@@ -214,7 +215,9 @@ app.include_router(mp_document_jobs.router)
 app.include_router(mp_note_network.router)
 app.include_router(mp_note_imports.router)
 app.include_router(mp_note_files.router)
+app.include_router(mp_note_files.clipboard_router)
 app.include_router(mp_notes.router)
+app.include_router(mp_workspace_notes.router)
 
 
 @app.get("/health")

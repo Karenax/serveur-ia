@@ -41,17 +41,18 @@ $markdownData = (Join-Path $PSScriptRoot 'markdown.js') + ';.'
 $correctorData = (Join-Path $PSScriptRoot 'corrector.js') + ';.'
 $markdownVendor = (Join-Path $PSScriptRoot 'vendor') + ';vendor'
 $tlsData = @()
-$extensionData = @()
-if ($Relay) {
-    $extension = Join-Path $root 'agent\extensions\thunderbird-agent'
-    foreach ($asset in @('manifest.json','core.js','background.js','options.html','options.js')) {
-        $extensionData += @('--add-data', ((Join-Path $extension $asset) + ';thunderbird-agent'))
-    }
-}
 $rejectedCas = & $python -c 'import pathlib, ssl; print(pathlib.Path(ssl.__file__).with_name("codex-rejected-cas.pem"))'
 if ($LASTEXITCODE -ne 0) { throw 'Vérification du module TLS Python impossible.' }
 if (Test-Path -LiteralPath $rejectedCas -PathType Leaf) { $tlsData = @('--add-data', "$rejectedCas;.") }
-& $python -m PyInstaller --noconfirm --onefile $consoleMode --paths (Join-Path $root 'shared') --collect-all kiara_shared --collect-all webview --collect-all pythonnet --collect-all clr_loader --name $binaryName --icon (Join-Path $PSScriptRoot "fred.ico") --version-file (Join-Path $PSScriptRoot "product-version.txt") --add-data $voiceData --add-data $voiceJsData --add-data $conversationJsData --add-data $workspaceData --add-data $uiCssData --add-data $uiJsData --add-data $projectConversationData --add-data $attachmentsData --add-data $selectionData --add-data $thinkingData --add-data $markdownData --add-data $correctorData --add-data $markdownVendor --add-data ((Join-Path $PSScriptRoot 'chat.html') + ';.') --add-data ((Join-Path $PSScriptRoot 'LICENSE.txt') + ';.') --add-data ((Join-Path $PSScriptRoot 'THIRD-PARTY.txt') + ';.') --add-binary ($WireGuardBinary + ';.') @tlsData @extensionData --distpath $DistributionDirectory --workpath (Join-Path $PSScriptRoot 'build') --specpath $PSScriptRoot (Join-Path $PSScriptRoot 'client.py')
+if ($Relay) {
+    $previousBridge = $env:KIARA_BUILD_WIREGUARD
+    try {
+        $env:KIARA_BUILD_WIREGUARD = (Get-Item -LiteralPath $WireGuardBinary).FullName
+        & $python -m PyInstaller --noconfirm --distpath $DistributionDirectory --workpath (Join-Path $DistributionDirectory 'build') (Join-Path $PSScriptRoot 'kiara-relay.spec')
+    } finally { $env:KIARA_BUILD_WIREGUARD = $previousBridge }
+} else {
+    & $python -m PyInstaller --noconfirm --onefile $consoleMode --paths (Join-Path $root 'shared') --collect-all kiara_shared --collect-all webview --collect-all pythonnet --collect-all clr_loader --name $binaryName --icon (Join-Path $PSScriptRoot "fred.ico") --version-file (Join-Path $PSScriptRoot "product-version.txt") --add-data $voiceData --add-data $voiceJsData --add-data $conversationJsData --add-data $workspaceData --add-data $uiCssData --add-data $uiJsData --add-data $projectConversationData --add-data $attachmentsData --add-data $selectionData --add-data $thinkingData --add-data $markdownData --add-data $correctorData --add-data $markdownVendor --add-data ((Join-Path $PSScriptRoot 'chat.html') + ';.') --add-data ((Join-Path $PSScriptRoot 'LICENSE.txt') + ';.') --add-data ((Join-Path $PSScriptRoot 'THIRD-PARTY.txt') + ';.') --add-binary ($WireGuardBinary + ';.') @tlsData --distpath $DistributionDirectory --workpath (Join-Path $PSScriptRoot 'build') --specpath $PSScriptRoot (Join-Path $PSScriptRoot 'client.py')
+}
 if ($LASTEXITCODE -ne 0) { throw 'La compilation du client a echoue.' }
 & $python (Join-Path $root 'maintenance/check_windows_artifact.py') --artifact (Join-Path $DistributionDirectory ("$binaryName.exe")) --result (Join-Path $DistributionDirectory 'self-test.txt')
 if ($LASTEXITCODE -ne 0) { throw 'Le client construit ne passe pas sa vérification native.' }

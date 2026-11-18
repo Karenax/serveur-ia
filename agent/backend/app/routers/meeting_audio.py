@@ -1,9 +1,13 @@
 """Three explicit phases: transcription, speaker review, LLM synthesis/publication."""
 from app.operational_limits import AUDIO_IMPORT_BYTES
 import hashlib
+import os
 from pathlib import Path
+import re
+import stat
+import tempfile
 
-from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, Response, UploadFile
 from fastapi.responses import FileResponse
 from pydantic import Field
 from sqlalchemy.orm import Session
@@ -63,6 +67,80 @@ def list_recordings(project_id: str, db: Session = Depends(brain_db)):
     return [{k: v for k, v in service.public_recording(row).items() if k not in {"segments", "speaker_names", "summary"}} for row in rows]
 
 
+def _verify_original(path, digest, size=None, *, sync=False):
+    """Never acknowledge an existing path until its contents match the import."""
+    try:
+        root = RAW_DIR.resolve(strict=True)
+        candidate = Path(path).resolve(strict=True)
+        if not candidate.is_relative_to(root):
+            raise ValueError('outside audio storage')
+        with candidate.open('r+b' if sync else 'rb') as stream:
+            info = os.fstat(stream.fileno())
+            if not stat.S_ISREG(info.st_mode) or info.st_size < 1 or info.st_size > MAX_BYTES or (size is not None and info.st_size != size):
+                raise ValueError('different size or non-regular file')
+            actual = hashlib.file_digest(stream, 'sha256').hexdigest()
+            if actual != digest:
+                raise ValueError('different audio')
+            if sync:
+                try:
+                    os.fsync(stream.fileno())
+                except OSError as error:
+                    raise HTTPException(503, 'La copie audio ne peut pas être confirmée sur le stockage ; conservez le fichier local.') from error
+            after = os.fstat(stream.fileno())
+            if (info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns, info.st_ctime_ns) != (
+                    after.st_dev, after.st_ino, after.st_size, after.st_mtime_ns, after.st_ctime_ns):
+                raise ValueError('audio changed while being checked')
+            return {'sha256': actual, 'size': info.st_size}
+    except (OSError, ValueError, TypeError) as error:
+        raise HTTPException(409, 'La copie audio déjà présente est inaccessible ou différente ; aucune copie n’a été remplacée.') from error
+
+
+def _install_original(destination, raw, digest):
+    """Stage a synced copy and publish it without replacing any existing file."""
+    if destination.exists():
+        _verify_original(destination, digest, len(raw), sync=True)
+        return
+    staged = None
+    installed = False
+    try:
+        descriptor, name = tempfile.mkstemp(prefix=f'.{digest[:12]}-', suffix='.pending', dir=RAW_DIR)
+        staged = Path(name)
+        with os.fdopen(descriptor, 'wb') as stream:
+            if stream.write(raw) != len(raw):
+                raise OSError('incomplete audio staging')
+            stream.flush()
+            os.fsync(stream.fileno())
+        _verify_original(staged, digest, len(raw))
+        try:
+            os.link(staged, destination)
+        except FileExistsError:
+            pass  # Another writer won; its file still has to be verified.
+        except OSError:
+            # Some filesystems do not support hard links. Exclusive creation
+            # still prevents replacement; an interrupted partial file is kept
+            # and rejected on a later retry rather than acknowledged.
+            try:
+                with destination.open('xb') as stream:
+                    if stream.write(raw) != len(raw):
+                        raise OSError('incomplete audio publication')
+                    stream.flush()
+                    os.fsync(stream.fileno())
+            except FileExistsError:
+                pass
+        _verify_original(destination, digest, len(raw), sync=True)
+        installed = True
+    except HTTPException:
+        raise
+    except OSError as error:
+        raise HTTPException(503, 'La copie audio n’a pas pu être enregistrée ; réessayez en conservant le fichier local.') from error
+    finally:
+        if installed and staged is not None:
+            try:
+                staged.unlink()
+            except OSError:
+                pass  # A verified destination exists; leave the staged copy for later inspection.
+
+
 def import_audio(project_id, title, date, speakers, filename, mime_type, raw):
     brain_id = linked_project(project_id)
     digest = hashlib.sha256(raw).hexdigest()
@@ -73,11 +151,11 @@ def import_audio(project_id, title, date, speakers, filename, mime_type, raw):
         if source:
             previous = db.query(MeetingRecording).filter_by(source_id=source.id, erp_project_id=project_id, project_id=brain_id).first()
             if previous and previous.erp_project_id == project_id and previous.project_id == brain_id:
+                _verify_original(source.original_uri, digest, len(raw))
                 return service.public_recording(previous)
             raise HTTPException(409, "Cet audio est déjà conservé comme source ; utiliser son enregistrement existant")
         destination = RAW_DIR / f"{digest}{Path(filename).suffix.lower()}"
-        if not destination.exists():
-            destination.write_bytes(raw)
+        _install_original(destination, raw, digest)
         source = Source(project_id=brain_id, source_type="meeting", status="resolved", author="meeting-upload",
                         original_uri=str(destination), sha256=digest, mime_type=mime_type,
                         source_metadata={"filename": filename, "subject": title, "raw_path": str(destination)})
@@ -120,6 +198,17 @@ def get_audio(project_id: str, recording_id: str, db: Session = Depends(brain_db
         raise HTTPException(404, "Fichier audio indisponible dans le stockage local")
     return FileResponse(path, media_type=MIMES.get(Path(row.filename).suffix.lower(), "application/octet-stream"),
                         filename=row.filename, content_disposition_type="inline", headers={"X-Content-Type-Options": "nosniff"})
+
+
+@router.get("/projects/{project_id}/recordings/{recording_id}/audio-integrity")
+def audio_integrity(project_id: str, recording_id: str, response: Response, db: Session = Depends(brain_db)):
+    row = recording(db, project_id, recording_id)
+    source = db.get(Source, row.source_id)
+    if not source or not isinstance(source.sha256, str) or not re.fullmatch(r'[0-9a-f]{64}', source.sha256):
+        raise HTTPException(409, 'La copie audio du serveur ne peut pas être vérifiée.')
+    verified = _verify_original(source.original_uri, source.sha256, sync=True)
+    response.headers['Cache-Control'] = 'no-store'
+    return {'recording_id': row.id, 'source_id': source.id, **verified}
 
 
 @router.post("/projects/{project_id}/recordings/{recording_id}/transcribe", status_code=202)

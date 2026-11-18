@@ -176,6 +176,10 @@ def command(sid: str, command_id: str, db: Session = Depends(get_db)):
     row = db.get(MeetingSessionCommand, command_id)
     if row is None or row.session_id != sid:
         raise HTTPException(404, 'Commande introuvable dans cette séance')
+    if row.operator_id != current_operator().id:
+        # A 403 keeps old clients from treating another operator's command as
+        # absent and discarding their local recovery payload.
+        raise HTTPException(403, 'Reçu réservé à son opérateur')
     return {'id': row.id, 'kind': row.kind, 'status': row.status, 'error': row.error, 'result': row.result}
 
 

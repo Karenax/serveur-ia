@@ -3,7 +3,8 @@ import {act, cleanup, fireEvent, render, screen, waitFor, within} from "@testing
 import {MailApp} from "../App";
 import {api, type PortfolioRow} from "../lib/api";
 
-vi.mock("../hooks/useDurableMailTriage",()=>({useDurableMailTriage:()=>({start:vi.fn(),cancel:vi.fn()})}));
+const triageHook=vi.hoisted(()=>vi.fn(()=>({start:vi.fn(),cancel:vi.fn()})));
+vi.mock("../hooks/useDurableMailTriage",()=>({useDurableMailTriage:triageHook}));
 const project = {id:"erp-a",code:"A0806",title:"Projet A",brain_project_id:"brain-a",brain_code:"A0806"} as PortfolioRow;
 const entries = [1,2].map(n=>({proposal_id:`proposal-${n}`,source_id:`source-${n}`,sender:"client@example.com",subject:`Mail ${n}`,
   received_at:null,excerpt:"Un échange",target_project_id:"divers",target_code:"DIVERS",target_name:"Divers",confidence:.4,reason:"À vérifier"}));
@@ -19,6 +20,65 @@ beforeEach(()=>{
   vi.spyOn(api,"brainSourceDetail").mockImplementation(async(id)=>({id,artifacts:[{kind:"body_text",text:`Corps de ${id}`}]}));
 });
 afterEach(()=>{cleanup();vi.restoreAllMocks();});
+
+it("transmet la visibilité de Mails au suivi sans désactiver les droits",async()=>{
+  const rows=[project];
+  const view=render(<MailApp rows={rows} active/>);
+  await screen.findByRole('heading',{name:'Mail 1'},{timeout:3000});
+  await waitFor(()=>expect(triageHook).toHaveBeenLastCalledWith(expect.objectContaining({enabled:true,active:true})));
+  view.rerender(<MailApp rows={rows} active={false}/>);
+  expect(triageHook).toHaveBeenLastCalledWith(expect.objectContaining({enabled:true,active:false}));
+  view.rerender(<MailApp rows={rows} active/>);
+  expect(triageHook).toHaveBeenLastCalledWith(expect.objectContaining({enabled:true,active:true}));
+});
+
+it("ne recharge pas les mails cachés quand le portefeuille change et conserve la recherche au retour",async()=>{
+  const view=render(<MailApp rows={[project]} active/>);
+  await screen.findByRole('heading',{name:'Mail 1'});
+  const search=screen.getByRole('textbox',{name:'Rechercher dans tous les mails du dossier'}) as HTMLInputElement;
+  fireEvent.change(search,{target:{value:'client fictif'}});
+  await waitFor(()=>expect(api.pendingMailPage).toHaveBeenCalledWith(0,'client fictif','newest'),{timeout:3000});
+  const calls=vi.mocked(api.pendingMailPage).mock.calls.length;
+  view.rerender(<MailApp rows={[{...project,title:'Projet actualisé'}]} active={false}/>);
+  view.rerender(<MailApp rows={[{...project,title:'Projet actualisé encore'}]} active={false}/>);
+  await act(async()=>{await new Promise(resolve=>setTimeout(resolve,350));});
+  expect(api.pendingMailPage).toHaveBeenCalledTimes(calls);
+  expect(search.value).toBe('client fictif');
+  view.rerender(<MailApp rows={[project]} active/>);
+  await waitFor(()=>expect(api.pendingMailPage).toHaveBeenCalledTimes(calls+1));
+  expect(search.value).toBe('client fictif');
+});
+
+it("ignore une réponse de mails arrivée après avoir quitté la rubrique",async()=>{
+  const view=render(<MailApp rows={[project]} active/>);
+  await screen.findByRole('heading',{name:'Mail 1'});
+  let resolveOld!:(value:typeof page)=>void;
+  vi.mocked(api.pendingMailPage).mockImplementationOnce(()=>new Promise(resolve=>{resolveOld=resolve;}));
+  const calls=vi.mocked(api.pendingMailPage).mock.calls.length;
+  view.rerender(<MailApp rows={[{...project,title:'Actualisé'}]} active/>);
+  await waitFor(()=>expect(api.pendingMailPage).toHaveBeenCalledTimes(calls+1));
+  view.rerender(<MailApp rows={[project]} active={false}/>);
+  await act(async()=>{resolveOld({...page,rows:[{...entries[0],subject:'Mail périmé'}]});});
+  expect(screen.getByRole('heading',{name:'Mail 1'})).toBeTruthy();
+  expect(screen.queryByRole('heading',{name:'Mail périmé'})).toBeNull();
+  view.rerender(<MailApp rows={[project]} active/>);
+  await waitFor(()=>expect(api.pendingMailPage).toHaveBeenCalledTimes(calls+2));
+});
+
+it("ne lance pas les lectures de mails si la session répond après le départ",async()=>{
+  let resolveSession!:(value:Awaited<ReturnType<typeof api.session>>)=>void;
+  vi.mocked(api.session).mockImplementationOnce(()=>new Promise(resolve=>{resolveSession=resolve;}));
+  const rows=[project];
+  const view=render(<MailApp rows={rows} active/>);
+  await waitFor(()=>expect(api.session).toHaveBeenCalled());
+  view.rerender(<MailApp rows={rows} active={false}/>);
+  await act(async()=>{resolveSession({operator:{role:'owner',project_ids:null}});});
+  expect(api.pendingMailPage).not.toHaveBeenCalled();
+  expect(api.brainTriageStats).not.toHaveBeenCalled();
+  expect(api.brainProjects).not.toHaveBeenCalled();
+  view.rerender(<MailApp rows={rows} active/>);
+  expect(await screen.findByRole('heading',{name:'Mail 1'})).toBeTruthy();
+});
 
 it("ouvre les mails classés en lecture seule pour un accès limité aux projets",async()=>{
   vi.mocked(api.session).mockResolvedValue({operator:{role:'reader',project_ids:['erp-a']}});

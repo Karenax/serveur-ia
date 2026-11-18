@@ -77,6 +77,22 @@ def role(monkeypatch, value, projects=None):
         monkeypatch.setenv("AGENT_OPERATOR_PROJECT_IDS", json.dumps(projects))
 
 
+def test_audio_integrity_respects_project_scope(context, monkeypatch):
+    permitted, other = context['pids']
+    role(monkeypatch, 'owner')
+    raw = b'audio-fictif-protege'
+    upload = client.post(f'/api/v1/projects/{permitted}/recordings',
+                         data={'title':'Réunion fictive', 'date':'2026-11-18', 'num_speakers':0},
+                         files={'file':('projet.wav',raw,'audio/wav')})
+    assert upload.status_code == 201
+    url = f"/api/v1/projects/{permitted}/recordings/{upload.json()['id']}/audio-integrity"
+    role(monkeypatch, 'reader', [other])
+    assert client.get(url).status_code == 404
+    role(monkeypatch, 'reader', [permitted])
+    response = client.get(url)
+    assert response.status_code == 200 and response.json()['sha256'] == hashlib.sha256(raw).hexdigest()
+
+
 def test_legacy_knowledge_project_link_opens_the_authorized_kiara_project(context, monkeypatch):
     project, other = context["pids"]
     brain = context["bids"][0]
@@ -99,6 +115,9 @@ def test_portal_rollback_preserves_writes_and_project_scopes(context, monkeypatc
         pytest.skip("La répétition requiert les deux bundles de déploiement.")
     previous, candidate = (Path(os.environ[key]).resolve(strict=True) for key in bundle_vars)
     assert previous != candidate
+    # Default retains the historical legacy-to-current exercise. A later
+    # candidate can also be rehearsed against the immediately preceding build.
+    previous_legacy = os.environ.get("KIARA_REHEARSAL_PREVIOUS_LEGACY", "1") == "1"
     markers = ("Redimensionner l’assistant", "Des réponses ancrées dans vos sources")
     routes = [route for route in app.router.routes if getattr(route, "path", None) != "/assets"]
 
@@ -118,7 +137,7 @@ def test_portal_rollback_preserves_writes_and_project_scopes(context, monkeypatc
 
     permitted, excluded = context["pids"]
     role(monkeypatch, "owner", [permitted])
-    before = serve_bundle(previous, legacy=True)
+    before = serve_bundle(previous, legacy=previous_legacy)
     existing_path = "/api/v1/workspace/assistant-threads/" + context["threads"][0]
     assert client.get(existing_path).status_code == 200
 
@@ -132,7 +151,7 @@ def test_portal_rollback_preserves_writes_and_project_scopes(context, monkeypatc
     pilot = created.json()
     path = endpoint + "/" + pilot["id"]
 
-    assert serve_bundle(previous, legacy=True) == before
+    assert serve_bundle(previous, legacy=previous_legacy) == before
     assert client.get(path).json() == pilot
     assert client.get(existing_path).status_code == 200
     role(monkeypatch, "reader", [excluded])

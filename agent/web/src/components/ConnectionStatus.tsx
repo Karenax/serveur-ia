@@ -14,34 +14,44 @@ export function ConnectionStatus({onOpenJobs}:{onOpenJobs?:()=>void}) {
   const [status,setStatus]=useState<Connections|null>(null);
   const [chooseOffline,setChooseOffline]=useState(false);
   useEffect(()=>{
-    let stopped=false, pending=false, refreshAgain=false, failures=0, lastAttempt=-Infinity;
-    const controller=new AbortController();
+    let stopped=false, refreshAgain=false, failures=0, lastAttempt=-Infinity, visible=!document.hidden;
+    let timer:number|undefined, controller:AbortController|null=null;
+    const schedule=(delay=60000)=>{if(!stopped&&!document.hidden&&timer===undefined)timer=window.setTimeout(()=>{timer=undefined;void refresh(true);},delay);};
     const refresh=async(quiet=false,force=false)=>{
-      if(document.hidden || stopped)return;
-      if(pending){if(force)refreshAgain=true;return;}
-      if(!force && Date.now()-lastAttempt<60000)return;
+      if(stopped)return;
+      if(document.hidden){if(force)refreshAgain=true;return;}
+      if(force&&timer!==undefined){window.clearTimeout(timer);timer=undefined;}
+      if(controller){if(force)refreshAgain=true;return;}
+      if(!force && Date.now()-lastAttempt<60000){schedule(60000-(Date.now()-lastAttempt));return;}
       lastAttempt=Date.now();
-      pending=true;
+      const current=new AbortController();controller=current;
       try {
-        const value=await request<Connections>("/api/v1/connections/status",{signal:controller.signal,activity:quiet?false:undefined},20000);
+        const value=await request<Connections>("/api/v1/connections/status",{signal:current.signal,activity:quiet?false:undefined},20000);
         if(!value?.services?.llm || !value.services.embedding || !value.services.memory)throw new Error("Statut incomplet");
-        if(!stopped && !refreshAgain){failures=0;setStatus(value);}
+        if(!stopped && !current.signal.aborted && !refreshAgain){failures=0;setStatus(value);}
       } catch {
-        if(!stopped && !refreshAgain){
+        if(!stopped && !current.signal.aborted && !refreshAgain){
           failures+=1;
           setStatus(previous=>previous && failures<3?previous:{refreshing:false,services:Object.fromEntries(["llm","embedding","memory"].map(key=>[key,{state:"unknown",detail:"État indisponible : le service Projets ne répond pas"}])) as Connections["services"]});
         }
       } finally {
-        pending=false;
-        if(refreshAgain && !stopped){refreshAgain=false;void refresh(true,true);}
+        if(controller===current){
+          controller=null;
+          if(refreshAgain && !stopped&&!document.hidden){refreshAgain=false;void refresh(true,true);}
+          else schedule();
+        }
       }
     };
-    void refresh();
-    const interval=window.setInterval(()=>void refresh(true),60000);
-    const automaticRefresh=()=>void refresh(true),requestedRefresh=()=>void refresh(false,true);
-    document.addEventListener("visibilitychange",automaticRefresh);
+    const stop=()=>{if(timer!==undefined)window.clearTimeout(timer);timer=undefined;controller?.abort();controller=null;};
+    const visibility=()=>{
+      const next=!document.hidden;if(next===visible)return;visible=next;
+      if(!next)stop();else {refreshAgain=false;void refresh(true,true);}
+    };
+    if(visible)void refresh();
+    const requestedRefresh=()=>void refresh(false,true);
+    document.addEventListener("visibilitychange",visibility);
     window.addEventListener("agent:connections-refresh",requestedRefresh);
-    return ()=>{stopped=true;controller.abort();window.clearInterval(interval);document.removeEventListener("visibilitychange",automaticRefresh);window.removeEventListener("agent:connections-refresh",requestedRefresh);};
+    return ()=>{stopped=true;stop();document.removeEventListener("visibilitychange",visibility);window.removeEventListener("agent:connections-refresh",requestedRefresh);};
   },[]);
   const services=Object.values(status?.services || {});
   const mailAvailable=!!onOpenJobs&&mailState!=='unavailable';

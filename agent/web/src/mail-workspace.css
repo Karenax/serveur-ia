@@ -14,6 +14,8 @@
 .maildesk *, .maildesk *::before, .maildesk *::after { box-sizing: border-box; }
 .maildesk button, .maildesk input, .maildesk select { font: inherit; }
 .maildesk button, .maildesk summary { cursor: pointer; }
+/* Libellés de secours masqués visuellement : les déclencheurs restent des icônes seules. */
+.maildesk .sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0; }
 .maildesk button:disabled { cursor: default; opacity: .45; }
 .maildesk input[type="checkbox"] { width: 14px; height: 14px; margin: 0; accent-color: var(--md-accent); flex: none; }
 .maildesk :is(button, a, summary, input, select):focus-visible { outline: 2px solid var(--focus-ring-color); outline-offset: 3px; }
@@ -37,7 +39,7 @@
 .maildesk-secondary { background: var(--md-surface); color: var(--md-ink); border-color: var(--md-line) !important; }
 .maildesk-secondary:hover:not(:disabled) { background: var(--md-tint); }
 .maildesk-tools { position: relative; }
-.maildesk-tools > summary { list-style: none; display: grid; place-items: center; width: 30px; height: 34px; color: var(--md-muted); font-size: 20px; font-weight: 700; border-radius: 8px; }
+.maildesk-tools > summary { list-style: none; display: grid; place-items: center; width: 32px; height: 32px; padding: 0; font-size: 0; color: var(--md-muted); background: transparent; border: 0; border-radius: 8px; }
 .maildesk-tools summary::-webkit-details-marker { display: none; }
 .maildesk-tools > div { position: absolute; right: 0; top: 40px; z-index: 10; display: grid; min-width: 180px; padding: 6px; background: var(--md-surface); border: 1px solid var(--md-line); border-radius: 10px; box-shadow: 0 10px 32px #0002; }
 .maildesk-tools button { text-align: left; padding: 9px; background: none; border: 0; border-radius: 6px; color: var(--md-ink); font-size: 12px; }
@@ -319,7 +321,8 @@ body[data-theme="graphite"] .maildesk-avatar, body[data-theme="graphite"] .maild
 
 /* Keep the daily mail actions visible and open the details on demand. */
 .maildesk-focus .maildesk-toolbar-actions .maildesk-primary span { display:inline; }
-.maildesk-tools > summary { width:auto;padding:9px 12px;border:1px solid var(--md-line);background:var(--md-surface);color:var(--md-ink);font-size:12px;font-weight:600; }
+
+.maildesk-tools > summary:hover { color:var(--md-accent);background:var(--md-tint); }
 .maildesk-tools > div { min-width:230px;max-width:min(320px,85vw); }
 .maildesk-tools > div > label { display:grid;gap:7px;padding:9px;font-size:12px;color:var(--md-muted); }
 .maildesk-tools .maildesk-folder-picker { margin:0; }
@@ -335,6 +338,9 @@ body[data-theme="graphite"] .maildesk-avatar, body[data-theme="graphite"] .maild
 .maildesk-decision-main > .maildesk-primary { min-height:42px;font-size:13px;white-space:normal; }
 .maildesk-change-project,.maildesk-mail-options { margin-top:14px;padding-top:12px;border-top:1px solid var(--md-line); }
 .maildesk-change-project > summary,.maildesk-mail-options > summary,.maildesk-reason > summary { font-size:12px;color:var(--md-ink); }
+.maildesk-mail-options > summary,.maildesk-message-details > summary { display:grid;place-items:center;width:32px;height:32px;min-height:32px;padding:0;box-sizing:border-box;list-style:none;border:0;background:transparent;color:var(--md-muted);white-space:nowrap;font-size:0; }
+.maildesk-mail-options > summary::-webkit-details-marker,.maildesk-message-details > summary::-webkit-details-marker { display:none; }
+.maildesk-mail-options > summary:hover,.maildesk-message-details > summary:hover { color:var(--md-accent);background:var(--md-tint); }
 .maildesk-reason { margin:14px 0 0;font-size:12px; }
 .maildesk-reason ul { margin:8px 0;padding-left:20px;line-height:1.7; }
 .maildesk-secondary-actions { display:flex;flex-wrap:wrap;gap:8px;margin-top:12px; }
@@ -384,7 +390,7 @@ body[data-theme="graphite"] .maildesk-avatar, body[data-theme="graphite"] .maild
 .maildesk-message-meta > strong { min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--md-ink);font-weight:500; }
 .maildesk-message-meta > time { font-size:11px;white-space:nowrap; }
 .maildesk-message-details { margin-left:auto;flex:none; }
-.maildesk-message-details > summary { font-size:11px;white-space:nowrap; }
+.maildesk-message-details > summary { font-size:0;white-space:nowrap; }
 .maildesk-message-details > div { position:absolute;left:0;right:0;top:100%;z-index:5;padding:14px;background:var(--md-surface);border:1px solid var(--md-line);border-radius:8px;box-shadow:0 8px 24px #0002;cursor:default; }
 .maildesk-message-details dl { display:grid;grid-template-columns:65px minmax(0,1fr);gap:7px 10px;margin:0;font-size:12px; }
 .maildesk-message-details dd { margin:0;overflow-wrap:anywhere;color:var(--md-ink); }

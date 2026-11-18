@@ -26,7 +26,7 @@
   navigation.type='button';
   if(platformCapabilities.platform==='windows'){
     navigation.className='secondary voice-button';
-    $('send').before(navigation);
+    (document.getElementById('composerOptionsMenu')||document.querySelector('.composer-bottom')).append(navigation);
   }else document.querySelector('[data-view-button="chat"]').after(navigation);
   uiNavTitles.voice='Vocal';uiPaths.voice='M9 5a3 3 0 0 1 6 0v7a3 3 0 0 1-6 0V5m-3 6v1a6 6 0 0 0 12 0v-1M12 18v4m-4 0h8';
   navigation.onclick=()=>showView('voice');
@@ -782,7 +782,9 @@
         const result=await api('/client/capture',{});
         if(result.cancelled)return;
         if(!/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(result.image||''))throw new Error('Capture impossible. Réessayez.');
-        const raw=atob(result.image.split(',')[1]),bytes=Uint8Array.from(raw,c=>c.charCodeAt(0));
+        const chosen=linux?await window.kiaraSelectLinuxCapture(result.image):result.image;
+        if(!chosen)return;
+        const raw=atob(chosen.split(',')[1]),bytes=Uint8Array.from(raw,c=>c.charCodeAt(0));
         await voiceImageChoose(new File([bytes],'Capture.jpg',{type:'image/jpeg'}),conversation,capture.epoch);
         return;
       }catch(e){if(e.status!==404)throw e;}

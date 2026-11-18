@@ -1,0 +1,121 @@
+/* Libellé de secours pour les déclencheurs à icône seule : lu par les lecteurs d'écran, invisible à l'écran. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Menus d'options et de filtres à icône discrète — Portail React (lot 2).
+   Déclencheur carré 32×32 px, transparent au repos, sans marqueur natif,
+   icône filaire centrée 16×16 px, badge numérique optionnel et popover
+   ancré à droite. Les sélecteurs historiques `discrete-icon-*` restent
+   pris en charge pour ne casser aucun écran déjà livré. */
+
+details.icon-menu-details,
+details.discrete-icon-menu {
+  position: relative;
+  flex: none;
+  font-size: inherit;
+}
+
+summary.icon-menu-summary,
+summary.discrete-icon-summary {
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted, #687380);
+  font-size: 0;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease, border-color .15s ease;
+}
+
+summary.icon-menu-summary::-webkit-details-marker,
+summary.discrete-icon-summary::-webkit-details-marker { display: none; }
+summary.icon-menu-summary::marker,
+summary.discrete-icon-summary::marker { content: ''; }
+
+summary.icon-menu-summary:hover,
+summary.discrete-icon-summary:hover,
+details[open] > summary.icon-menu-summary,
+details[open] > summary.discrete-icon-summary {
+  background: var(--surface-hover, #f2f5f8);
+  border-color: var(--border, #d8dfe5);
+  color: var(--ink, #16202c);
+}
+details[open] > summary.icon-menu-summary,
+details[open] > summary.discrete-icon-summary { color: var(--primary, #b68634); }
+
+summary.icon-menu-summary:focus-visible,
+summary.discrete-icon-summary:focus-visible {
+  outline: 2px solid var(--primary, #b68634);
+  outline-offset: 2px;
+}
+
+summary.icon-menu-summary svg,
+summary.discrete-icon-summary svg { display: block; width: 16px; height: 16px; }
+
+/* Badge numérique : uniquement présenté quand au moins un filtre est actif. */
+.icon-menu-badge,
+.filter-badge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 3px;
+  border-radius: 8px;
+  background: var(--primary, #b68634);
+  color: var(--surface, #fff);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+}
+
+/* Popover aligné à droite, ancré sur le bouton icône. */
+.icon-menu-popover {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 40;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 10px;
+  border: 1px solid var(--border, #d8dfe5);
+  border-radius: 10px;
+  background: var(--surface, #fff);
+  color: var(--ink, #16202c);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, .16);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+@media (max-width: 670px) {
+  .icon-menu-popover {
+    position: static;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    max-height: none;
+    margin-top: 8px;
+    box-shadow: none;
+  }
+}

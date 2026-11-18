@@ -3,14 +3,27 @@ import { act, cleanup, render, screen } from "@testing-library/react";
 import { api, type PortfolioRow } from "./lib/api";
 import { App } from "./App";
 
-vi.mock("./components/WorkspaceShell",()=>({WorkspaceShell:({rows}:{rows:PortfolioRow[]})=><div>{rows.map(row=><span key={row.id}>{row.code}</span>)}</div>}));
+vi.mock("./components/WorkspaceShell",()=>({WorkspaceShell:({rows,error}:{rows:PortfolioRow[];error?:string})=><div><input aria-label="Saisie conservée"/>{error&&<p role="alert">{error}</p>}{rows.map(row=><span key={row.id}>{row.code}</span>)}</div>}));
 const originalHidden=Object.getOwnPropertyDescriptor(document,"hidden");
 afterEach(()=>{
   cleanup();vi.useRealTimers();vi.restoreAllMocks();
   if(originalHidden)Object.defineProperty(document,"hidden",originalHidden);else delete (document as any).hidden;
 });
-const rows=[{id:"a",code:"A-0806"}] as PortfolioRow[];
-const refreshed=[...rows,{id:"b",code:"B-0807"}] as PortfolioRow[];
+const rows=[{id:"a",code:"A-0806",title:"Projet A"}] as PortfolioRow[];
+const refreshed=[...rows,{id:"b",code:"B-0807",title:"Projet B"}] as PortfolioRow[];
+it.each([null,{},[null],[{id:'a',code:'A-0806',title:{malforme:true}}],[rows[0],rows[0]]])('conserve les projets et la saisie si le portefeuille est invalide : %j',async invalid=>{
+  Object.defineProperty(document,'hidden',{configurable:true,value:false});window.history.replaceState(null,'','/app/projects');
+  vi.spyOn(api,'portfolio').mockResolvedValueOnce(rows).mockResolvedValueOnce(invalid as PortfolioRow[]).mockResolvedValueOnce(refreshed);
+  await act(async()=>{render(<App/>);});
+  const input=screen.getByRole('textbox',{name:'Saisie conservée'}) as HTMLInputElement;
+  input.value='Brouillon fictif';
+  await act(async()=>{window.dispatchEvent(new Event('focus'));});
+  expect(screen.getByText('A-0806')).toBeTruthy();expect(input.value).toBe('Brouillon fictif');
+  expect(screen.getByRole('alert').textContent).toContain('Réponse du portefeuille invalide');
+  await act(async()=>{window.dispatchEvent(new Event('focus'));});
+  expect(screen.getByText('B-0807')).toBeTruthy();expect(input.isConnected).toBe(true);expect(input.value).toBe('Brouillon fictif');
+  expect(screen.queryByRole('alert')).toBeNull();
+});
 it.each(["/app/projects","/app/mail"])("met à jour le catalogue visible sur %s quand un projet apparaît côté serveur", async(path)=>{
   vi.useFakeTimers();Object.defineProperty(document,"hidden",{configurable:true,value:false});
   window.history.replaceState(null,"",path);

@@ -16,8 +16,10 @@ description: Auditer une interface réelle avec Playwright MCP pour une nouvelle
    formulaires, boutons et menus, clavier seul, ordre et restauration du focus,
    fermeture des modales et annonces des erreurs. Vérifier chargement, vide, succès
    et erreur avec les fixtures disponibles ; déclarer les états non reproduits.
-4. Capturer les écrans pertinents : typiquement bureau 1440×900, téléphone 390×844,
-   tablette 768×1024, et thèmes supportés. Adapter aux appareils cibles et au zoom.
+4. Vérifier le bureau en 720p (1280 × 720), 1080p (1920 × 1080) et 1440p
+   (2560 × 1440), dans les thèmes pertinents. Ouvrir la vue à la taille cible,
+   attendre la fin du chargement et des transitions, puis capturer la zone visible.
+   Reprendre les essais mobile lorsque Fred les demande explicitement.
    Lire réellement les captures ; l'arbre accessible ne remplace pas l'examen visuel.
 5. Vérifier surcharge de texte, hiérarchie, lisibilité, alignements, débordements,
    contraste, accessibilité et retour des actions. Appliquer `ux-writing-cleaner`,

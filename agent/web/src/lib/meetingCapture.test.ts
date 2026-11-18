@@ -1,6 +1,7 @@
 import { afterEach, expect, it, vi } from 'vitest';
 import { waitFor } from '@testing-library/react';
-import { MeetingCaptureController, type DurableAudioChunk, type DurableChunkStore } from './meetingCapture';
+import { MeetingCaptureController, type CaptureEnvironment, type DurableAudioChunk, type DurableChunkStore } from './meetingCapture';
+import {projectAudioSession} from './projectAudioId';
 import type {BrowserReservation} from './browserCaptureReservation';
 import type { MeetingSession } from './meetingSessions';
 
@@ -15,7 +16,34 @@ class MemoryChunks implements DurableChunkStore {
   list = vi.fn(async(sessionId?:string)=>[...this.items.values()].filter(chunk=>!sessionId||chunk.session_id===sessionId));
   acknowledge = vi.fn(async(id:string)=>{this.items.delete(id);});
 }
-function harness(store = new MemoryChunks(), startFailure?: Error) {
+
+it('ne confond pas les fragments de projet avec les séances à reprendre', async () => {
+  const store=new MemoryChunks();
+  const projectSession=projectAudioSession('personne','projet','95b9c748-cce4-4b51-bc6f-281c163a8af0');
+  const project={id:'projet:0',session_id:projectSession,track:'mic',seq:0,command_id:'commande',blob:new Blob(['projet']),
+    sha256:'0'.repeat(64),start_ms:0,duration_ms:1,created_at:'2026-11-18T00:00:00.000Z'} satisfies DurableAudioChunk;
+  store.items.set(project.id,project);
+  const empty=harness(store);await empty.controller.recover();
+  expect(empty.controller.getSnapshot().phase).toBe('idle');
+  const session={...project,id:'seance:0',session_id:'session-1',blob:new Blob(['séance'])};
+  store.items.set(session.id,session);
+  const withSession=harness(store);await withSession.controller.recover();
+  expect(withSession.controller.getSnapshot()).toMatchObject({sessionId:'session-1',phase:'pending',pending:1});
+  expect(store.items.get(project.id)).toBe(project);
+});
+it('utilise l’inventaire ciblé du studio lorsqu’il est disponible', async () => {
+  class StudioChunks extends MemoryChunks {
+    listStudio = vi.fn(async()=>[...this.items.values()].filter(chunk=>chunk.session_id==='session-1'));
+  }
+  const store=new StudioChunks();
+  const chunk={id:'session-1:mic:0',session_id:'session-1',track:'mic',seq:0,command_id:'commande',blob:new Blob(['séance']),
+    sha256:'0'.repeat(64),start_ms:0,duration_ms:1,created_at:'2026-11-18T00:00:00.000Z'} satisfies DurableAudioChunk;
+  store.items.set(chunk.id,chunk);
+  const result=harness(store);await result.controller.recover();
+  expect(store.listStudio).toHaveBeenCalledOnce();expect(store.list).not.toHaveBeenCalled();
+  expect(result.controller.getSnapshot()).toMatchObject({sessionId:'session-1',phase:'pending',pending:1});
+});
+function harness(store = new MemoryChunks(), startFailure?: Error, webmSupported = true, overrides:Partial<CaptureEnvironment> = {}) {
   let server: MeetingSession = {...row};
   let savedReservation: BrowserReservation | null = null;
   const reservations = {read:vi.fn(()=>savedReservation),write:vi.fn((value:BrowserReservation)=>{savedReservation=structuredClone(value);}),clear:vi.fn(()=>{savedReservation=null;})};
@@ -24,12 +52,12 @@ function harness(store = new MemoryChunks(), startFailure?: Error) {
   const track = {stop:stopTrack,onended:null};
   const stream = {getTracks:()=>[track],getAudioTracks:()=>[track]};
   const devices = {getUserMedia:vi.fn(async()=>stream)} as unknown as MediaDevices;
-  let recorder: FakeRecorder | undefined;
+  let recorder: FakeRecorder | undefined;const recorders:FakeRecorder[]=[];
   class FakeRecorder {
     state = 'inactive'; mimeType='audio/webm'; ondataavailable:((event:BlobEvent)=>void)|null=null;
     onstop:((event:Event)=>void)|null=null; onerror:((event:Event)=>void)|null=null;
-    constructor(){recorder=this;}
-    static isTypeSupported(){return true;}
+    constructor(){recorder=this;recorders.push(this);}
+    static isTypeSupported(){return webmSupported;}
     start(){if(startFailure)throw startFailure;this.state='recording';}
     pause(){this.state='paused';}
     resume(){this.state='recording';}
@@ -54,9 +82,108 @@ function harness(store = new MemoryChunks(), startFailure?: Error) {
       accepted_chunk:{track:name,seq,sha256:String(form.get('sha256')),size_bytes:(form.get('file') as Blob).size}})),
   };
   const controller = new MeetingCaptureController({reservationStore:reservations,store,api:api as never,environment:{devices:()=>devices,
-    recorder:()=>FakeRecorder as unknown as typeof MediaRecorder,lock:async()=>release,hash:async()=> 'a'.repeat(64),now:()=>2000}});
-  return {controller,store,api,devices,reservations,changeRevision:()=>{server={...server,revision:server.revision+1};},release,stopTrack,recorder:()=>recorder!};
+    recorder:()=>FakeRecorder as unknown as typeof MediaRecorder,lock:async()=>release,hash:async()=> 'a'.repeat(64),now:()=>2000,...overrides}});
+  return {controller,store,api,devices,reservations,changeRevision:()=>{server={...server,revision:server.revision+1};},release,stopTrack,recorders,recorder:()=>recorder!};
 }
+
+function linuxHarness() {
+  let lease='';let h!:ReturnType<typeof harness>;
+  const micStop=vi.fn(),systemStop=vi.fn();
+  const micTrack={stop:micStop,onended:null,getSettings:()=>({deviceId:'mic-device'})};
+  const systemTrack={stop:systemStop,onended:null,getSettings:()=>({deviceId:'system-device'})};
+  const mic={getTracks:()=>[micTrack],getAudioTracks:()=>[micTrack]};
+  const system={getTracks:()=>[systemTrack],getAudioTracks:()=>[systemTrack]};
+  const devices={getUserMedia:vi.fn(async()=>mic as unknown as MediaStream)
+    .mockResolvedValueOnce(mic as unknown as MediaStream).mockResolvedValueOnce(system as unknown as MediaStream),
+    enumerateDevices:vi.fn(async()=>[{kind:'audioinput',label:'Kiara_sortie_'+lease.replace(/-/g,''),deviceId:'system-device'}])} as unknown as MediaDevices;
+  const linux={available:()=>true,start:vi.fn(async(id:string)=>{lease=id;
+    expect(h.reservations.read()?.linux_loopback_id).toBe(id);
+    return {lease_id:id,label:'Kiara_sortie_'+id.replace(/-/g,'')};}),
+    stop:vi.fn(async(_id:string)=>{expect(micStop).toHaveBeenCalled();return {closed:true};})};
+  h=harness(new MemoryChunks(),undefined,true,{devices:()=>devices,linuxSystemAudio:linux});
+  return {...h,linux,micStop,systemStop,devices};
+}
+
+it('capture sous Linux les deux pistes et ferme la boucle après les médias',async()=>{
+  const h=linuxHarness();await h.controller.start(row.id,{system:true});
+  expect(h.controller.getSnapshot().phase).toBe('ready');
+  await h.controller.activatePrepared();
+  expect(h.controller.getSnapshot()).toMatchObject({phase:'recording',tracks:['system','mic']});
+  expect(h.recorders).toHaveLength(2);
+  h.recorders[0].emit('audio système');h.recorders[1].emit('microphone');
+  await waitFor(()=>expect(h.store.acknowledge).toHaveBeenCalledTimes(2));
+  const id=h.reservations.read()?.linux_loopback_id;
+  expect(id).toBeTruthy();await h.controller.stop();
+  expect(h.linux.stop).toHaveBeenCalledWith(id);expect(h.systemStop).toHaveBeenCalled();
+  expect(h.linux.stop.mock.invocationCallOrder[0]).toBeLessThan(h.api.browserRelease.mock.invocationCallOrder[0]);
+  expect(h.controller.getSnapshot().phase).toBe('completed');
+  expect(h.reservations.read()).toBeNull();
+});
+
+it('annule une création Linux incertaine avec le même identifiant avant de libérer la réservation',async()=>{
+  const h=linuxHarness();h.linux.start.mockImplementationOnce(async()=>{throw new Error('Réponse locale perdue');});
+  await h.controller.start(row.id,{system:true});
+  await expect(h.controller.activatePrepared()).rejects.toThrow('Réponse locale perdue');
+  const id=h.linux.start.mock.calls[0][0];
+  expect(h.linux.stop).toHaveBeenCalledWith(id);
+  expect(h.api.browserRelease).toHaveBeenCalledTimes(1);
+  expect(h.api.command).not.toHaveBeenCalled();expect(h.reservations.read()).toBeNull();
+});
+
+it('ferme la boucle Linux créée après une demande d’arrêt pendant son ouverture',async()=>{
+  const h=linuxHarness();let release!:(value:{lease_id:string;label:string})=>void;
+  h.linux.start.mockImplementationOnce(()=>new Promise(resolve=>{release=resolve;}));
+  await h.controller.start(row.id,{system:true});const starting=h.controller.activatePrepared();
+  await waitFor(()=>expect(h.linux.start).toHaveBeenCalledOnce());
+  const id=h.linux.start.mock.calls[0][0];const stopping=h.controller.stop();
+  release({lease_id:id,label:'Kiara_sortie_'+id.replace(/-/g,'')});
+  await expect(starting).rejects.toThrow('Démarrage audio annulé');await stopping;
+  expect(h.linux.stop).toHaveBeenCalledWith(id);expect(h.reservations.read()).toBeNull();
+  expect(h.api.command).not.toHaveBeenCalled();expect(h.controller.getSnapshot().phase).toBe('idle');
+});
+
+it('ferme la boucle et le microphone si la source système Linux est ambiguë',async()=>{
+  const h=linuxHarness();
+  vi.mocked(h.devices.enumerateDevices).mockImplementation(async()=>{
+    const label='Kiara_sortie_'+h.reservations.read()!.linux_loopback_id!.replace(/-/g,'');
+    return [{kind:'audioinput',label,deviceId:'first'}, {kind:'audioinput',label,deviceId:'second'}] as MediaDeviceInfo[];
+  });
+  await h.controller.start(row.id,{system:true});
+  await expect(h.controller.activatePrepared()).rejects.toThrow('sortie audio système');
+  expect(h.linux.stop).toHaveBeenCalledOnce();expect(h.micStop).toHaveBeenCalled();
+  expect(h.api.command).not.toHaveBeenCalled();expect(h.reservations.read()).toBeNull();
+});
+
+it('garde une création incertaine si la fermeture Linux échoue, puis permet sa reprise',async()=>{
+  const h=linuxHarness();h.linux.start.mockRejectedValueOnce(new Error('Réponse perdue'));
+  h.linux.stop.mockRejectedValueOnce(new Error('Fermeture non confirmée'));
+  await h.controller.start(row.id,{system:true});
+  await expect(h.controller.activatePrepared()).rejects.toThrow('Réponse perdue');
+  const id=h.reservations.read()?.linux_loopback_id;expect(id).toBeTruthy();
+  expect(h.controller.getSnapshot().phase).toBe('pending');expect(h.api.browserRelease).not.toHaveBeenCalled();
+  await h.controller.retryAndFinalize();
+  expect(h.linux.stop).toHaveBeenLastCalledWith(id);expect(h.reservations.read()).toBeNull();
+  expect(h.api.command).not.toHaveBeenCalled();expect(h.controller.getSnapshot().phase).toBe('idle');
+});
+
+it('garde la réservation et les fragments si la fermeture de la boucle Linux reste incertaine',async()=>{
+  const h=linuxHarness();await h.controller.start(row.id,{system:true});await h.controller.activatePrepared();
+  h.api.chunk.mockRejectedValue(new Error('Réseau absent'));
+  h.recorders[0].emit('audio système');h.recorders[1].emit('microphone');
+  await waitFor(()=>expect(h.store.items.size).toBe(2));
+  h.linux.stop.mockRejectedValueOnce(new Error('Fermeture non confirmée'));
+  await h.controller.stop();
+  expect(h.controller.getSnapshot().phase).toBe('pending');
+  const id=h.reservations.read()?.linux_loopback_id;
+  expect(id).toBeTruthy();expect(h.api.browserRelease).not.toHaveBeenCalled();
+  expect(h.store.items.size).toBe(2);expect(h.api.command.mock.calls.some(call=>call[1]==='finalize')).toBe(false);
+  h.api.chunk.mockImplementation(async(sessionId,track,seq,form)=>({session_id:sessionId,acknowledged:true,replayed:false,revision:row.revision,
+    accepted_chunk:{track,seq,sha256:String(form.get('sha256')),size_bytes:(form.get('file') as Blob).size}}));
+  await h.controller.retryAndFinalize();
+  expect(h.linux.stop).toHaveBeenCalledTimes(2);expect(h.linux.stop).toHaveBeenLastCalledWith(id);
+  expect(h.store.items.size).toBe(0);expect(h.reservations.read()).toBeNull();
+  expect(h.controller.getSnapshot().phase).toBe('completed');
+});
 
 it('sauvegarde le Blob avant le transfert et ne retire que le fragment acquitté',async()=>{
   const h=harness();await h.controller.start(row.id);
@@ -78,6 +205,39 @@ it('conserve la capture quand toutes les vues se désabonnent',async()=>{
   expect(h.recorder().state).toBe('recording');expect(h.stopTrack).not.toHaveBeenCalled();
   h.recorder().emit('audio');await waitFor(()=>expect(h.api.chunk).toHaveBeenCalledTimes(1));
   await h.controller.stop();expect(h.stopTrack).toHaveBeenCalledTimes(1);expect(h.release).toHaveBeenCalledTimes(1);
+});
+
+it('signale une piste sans fragment et ne finalise pas une capture vide',async()=>{
+  const h=harness();await h.controller.start(row.id);
+  await h.controller.stop();
+  expect(h.controller.getSnapshot()).toMatchObject({phase:'error',pending:0});
+  expect(h.controller.getSnapshot().error).toMatch(/Aucun fragment reçu pour microphone/);
+  expect(h.api.command.mock.calls.some(call=>call[1]==='finalize')).toBe(false);
+  expect(h.api.browserRelease).toHaveBeenCalledTimes(1);
+  expect(h.stopTrack).toHaveBeenCalledTimes(1);
+  expect(h.release).toHaveBeenCalledTimes(1);
+});
+
+it('synchronise les fragments PCM WAV de WebKitGTK avant finalisation',async()=>{
+  vi.spyOn(navigator, 'userAgent', 'get').mockReturnValue('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/605.1.15 Safari/605.1.15');
+  const node=()=>({connect:vi.fn(),disconnect:vi.fn()});
+  const processor={...node(),onaudioprocess:null as ((event:AudioProcessingEvent)=>void)|null};
+  class FakeAudioContext {
+    sampleRate=4;destination=node();
+    createMediaStreamSource(){return node();} createScriptProcessor(){return processor;}
+    createGain(){return {...node(),gain:{value:1}};} resume(){return Promise.resolve();} close(){return Promise.resolve();}
+  }
+  vi.stubGlobal('AudioContext',FakeAudioContext);
+  const h=harness(new MemoryChunks(),undefined,false);await h.controller.start(row.id);
+  processor.onaudioprocess?.({inputBuffer:{getChannelData:()=>new Float32Array([0.1,0.2,0.3,0.4,0.5,0.4,0.3,0.2])}} as unknown as AudioProcessingEvent);
+  await waitFor(()=>expect(h.api.chunk).toHaveBeenCalledTimes(1));
+  const form=h.api.chunk.mock.calls[0]![3] as unknown as FormData;
+  const file=form.get('file') as File;
+  expect(file.name).toBe('mic-0.wav');expect(file.type).toBe('audio/wav');expect(file.size).toBe(60);
+  expect(h.store.acknowledge).toHaveBeenCalledTimes(1);
+  await h.controller.stop();
+  expect(h.controller.getSnapshot().phase).toBe('completed');
+  expect(h.api.command.mock.calls.some(call=>call[1]==='finalize')).toBe(true);
 });
 
 it('garde les fragments hors réseau et les reprend avec les mêmes clés avant finalisation',async()=>{
@@ -184,6 +344,8 @@ it('ferme une piste reçue tardivement avant de libérer une demande d’arrêt'
   const stop=h.controller.stop();expect(h.api.browserRelease).not.toHaveBeenCalled();
   resolveMedia(await original({audio:true}));await expect(start).rejects.toThrow('annulé');await stop;
   expect(h.stopTrack).toHaveBeenCalledTimes(1);expect(h.api.command.mock.calls.some(call=>call[1]==='resume')).toBe(false);
+  expect(h.api.command.mock.calls.some(call=>call[1]==='finalize')).toBe(false);
+  expect((await h.api.get()).state).toBe('created');
   expect(h.reservations.read()).toBeNull();
 });
 
@@ -205,6 +367,20 @@ it('attend un clic frais avant le partage système',async()=>{
   expect(h.controller.getSnapshot().phase).toBe('ready');expect(display).not.toHaveBeenCalled();expect(h.devices.getUserMedia).not.toHaveBeenCalled();
   const start=h.controller.activatePrepared();expect(display).toHaveBeenCalledTimes(1);expect(h.devices.getUserMedia).not.toHaveBeenCalled();
   await start;await h.controller.stop();
+});
+
+it('conserve la piste reçue et signale séparément une piste partagée vide',async()=>{
+  const h=harness();const track={stop:vi.fn()};
+  Object.assign(h.devices,{getDisplayMedia:vi.fn(async()=>({getTracks:()=>[track],getAudioTracks:()=>[track]} as unknown as MediaStream))});
+  vi.stubGlobal('MediaStream',class {constructor(private tracks:MediaStreamTrack[]){}getAudioTracks(){return this.tracks;}});
+  await h.controller.start(row.id,{system:true});await h.controller.activatePrepared();
+  h.recorder().emit('fragment microphone');
+  await waitFor(()=>expect(h.api.chunk).toHaveBeenCalledTimes(1));
+  await h.controller.stop();
+  expect(h.api.chunk.mock.calls[0]?.[1]).toBe('mic');
+  expect(h.controller.getSnapshot()).toMatchObject({phase:'error',pending:0});
+  expect(h.controller.getSnapshot().error).toMatch(/Aucun fragment reçu pour audio partagé/);
+  expect(h.api.command.mock.calls.some(call=>call[1]==='finalize')).toBe(false);
 });
 
 it('annule le partage préparé sans média ni publication',async()=>{

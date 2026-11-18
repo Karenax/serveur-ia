@@ -1,13 +1,13 @@
 # Kiara — architecture et versions actuelles
 
-Référence du 16 novembre 2026. Kiara 4.0.8 est le client Windows publié avec le portail privé unifié. Le canal de transition du client classique utilise la 3.5.63. Les prochaines qualifications Linux et Android sont indépendantes de cette publication Windows.
+Référence du 18 novembre 2026. Kiara 4.0.9 est le client Windows publié avec le portail privé unifié. Le canal de transition du client classique utilise la 3.5.63. Les qualifications Linux et Android suivent un calendrier distinct.
 
 ## Versions et responsabilités
 
 | Composant | Version ou contrat | Rôle |
 |---|---|---|
 | Lanceur et client Windows de transition | 3.5.63 | Services Kiara et passage vers Kiara 4 |
-| Client Windows Kiara 4 | 4.0.8 | Application Tauri, téléchargements et mises à jour Windows ; retour 4.0.7 |
+| Client Windows Kiara 4 | 4.0.9 | Application Tauri, téléchargements et mises à jour Windows. Référence de retour 4.0.8. |
 | Linux | 3.5.62, dernière référence documentée | Client Linux historique |
 | Android | 1.0.26, code 27 | Enveloppe Java/WebView et interface partagée |
 | Contrat de conversation | 4 | Conversations, outils et approbations existants |
@@ -43,7 +43,8 @@ documentent ce choix et le rôle de la P2200 pour l’encodage des images.
 - **Recherche.** Qwen local répond avec des citations tirées des sources autorisées. EG2 calcule les embeddings sur la P2200. Les images et l’audio sont recherchés à partir du texte extrait. Les deux anciens runtimes LiteRT ont été retirés.
 - **Mails et réunions.** La liaison Thunderbird collecte les dossiers sélectionnés sur le poste associé. Les imports, le classement manuel, le rejet et le brouillon ont été validés sur le poste Fred. Le classement automatique s’applique à partir d’un score de 75 %. Réunions dans Kiara 4.0.5 a passé la recette de capture, transcription, relecture et publication du compte rendu.
 - **Interface.** Conversations réunit le composeur, l’historique et l’assistant de projet. Les brouillons personnels et de projet et le mode éphémère sont accessibles depuis le même espace. Projets conserve la liste et la fiche à quatre rubriques dans le style Kiara. Le panneau d’assistance historique a été retiré.
-- **Distribution.** La console sert la 4.0.8 avec son manifeste Ed25519 et l’installateur publié sans Authenticode. La 4.0.7 est conservée en retour et les clients classiques passent par la 3.5.63. [Vérifications de publication](audits/2026-11-15-fusion-kiara/BASCULE.md)
+- **Notes.** Le portail réunit les notes privées de l’opérateur et les notes des projets actifs auxquels il a accès. L’éditeur riche permet le collage direct d’images. Les pièces jointes et l’historique des notes de projet relèvent de l’ERP, qui conserve également les versions et images des notes personnelles. [Guide d’utilisation](GUIDE-ASSISTANT-KIARA.md#prendre-des-notes-dans-kiara)
+- **Distribution.** La console sert la 4.0.9 avec son manifeste Ed25519 et son installateur sans Authenticode. La 4.0.8 est conservée pour le retour. Les clients classiques utilisent la 3.5.63. [Vérifications de publication](audits/2026-11-15-fusion-kiara/BASCULE.md#livraison-windows-et-web-du-18-novembre-2026)
 
 Le [plan global](PLAN-GLOBAL-SERVEUR-FRED.md) reprend les vérifications qui restent à faire et le report des imports Sage.
 
@@ -66,7 +67,12 @@ Les sources HTML/CSS/JS Windows restent la base de l’interface. Android fourni
 - Index EG2, chunks et exports : données dérivées, invalidables ou reconstructibles.
 - Sauvegardes chiffrées : récupération et portabilité, avec les procédures de clés existantes.
 
-Les caches et sauvegardes ont donc une fonction propre. Une opération métier possède une implémentation canonique, même lorsqu’elle dispose de plusieurs adaptateurs.
+La console distingue l’archive Projets, la sauvegarde globale, la copie secondaire
+et la dernière restauration vérifiée. Une sauvegarde automatique interrompue
+reprend au prochain horaire configuré. Les retraits de rétention disposent d’un
+journal pour terminer ou reprendre une opération interrompue.
+
+La [matrice des autorités et échanges](maintenance/CONTRATS-DONNEES.md) précise identités, révisions et projections. Les caches et sauvegardes ont donc une fonction propre. Une opération métier possède une implémentation canonique, même lorsqu’elle dispose de plusieurs adaptateurs.
 
 ## Concurrence, saturation et migrations
 
@@ -80,7 +86,7 @@ Le schéma 2 ajoute les index de lecture et le registre de migration. L’absenc
 
 ## Environnements et déploiement
 
-Sept profils sont verrouillés : Strata, EG2 CPU de secours, EG2 CUDA, voix serveur, conversation Windows, Hermes privé et construction Windows. EG2 utilise la P2200 en float32/SDPA, avec choix explicite de carte et repli CPU visible ; `lanceur/eg2-runtime.json` déclare le runtime et les budgets. La vision partage cette carte ; Qwen conserve la RTX 4080 et les deux P100. Le constructeur est dans `toolchain/build-python` ; PyInstaller n’est plus nécessaire dans le runtime Strata. Strata n’hérite plus des bibliothèques de l’outillage Codex.
+Sept profils sont verrouillés : Strata, EG2 CPU de secours, EG2 CUDA, voix serveur, conversation Windows, Hermes privé et construction Windows. EG2 utilise la P2200 en float32/SDPA, avec choix explicite de carte et repli CPU visible ; `lanceur/eg2-runtime.json` déclare le runtime et les budgets. La vision partage cette carte. Sur le poste Fred, l’inventaire Windows du 16 novembre 2026 relève une RTX 4080 et une Quadro P2200 ; les deux P100 appartiennent au profil historique décrit plus haut. Vérifier le moteur et les cartes effectivement utilisés avant toute modification. Le constructeur est dans `toolchain/build-python` ; PyInstaller n’est plus nécessaire dans le runtime Strata. Strata n’hérite plus des bibliothèques de l’outillage Codex.
 
 Le runtime Hermes privé est sélectionné avant toute consultation de l’installation personnelle. Le pointeur déclare ses sources, Python, dépendances et outils. Les répertoires de dépendances partagés conservés lors de la migration restent des prérequis explicites ; retirer l’installation personnelle ne doit pas entraîner la suppression de ces répertoires tant qu’ils sont référencés.
 
@@ -99,3 +105,5 @@ La console expose les mesures d’attente du verrou, de transaction et de snapsh
 Le point d’entrée est `maintenance/verify_project.py`. Il agrège les résultats et écrit les preuves dans un répertoire d’exécution. Les tests UI utilisent tous ce répertoire et ne remplacent plus les captures historiques. Voir [RECONSTRUIRE-FRED.md](RECONSTRUIRE-FRED.md) pour les commandes, puis [la matrice des compatibilités vocales](client-voice/COMPATIBILITE.md).
 
 Les [audits](audits/2026-10-25-global/RAPPORT.md), recherches et dossiers de maintenance datés décrivent les décisions et états passés. Le [suivi des corrections](maintenance/2026-10-26-correctifs-audit-global/AVANCEMENT.md) indique les validations et les limites de cette livraison.
+
+La [matrice des compatibilités](maintenance/COMPATIBILITE.md) indique les responsabilités et les conditions de retrait des anciens clients, routes et formats.

@@ -1,17 +1,28 @@
 # Contexte de reprise — serveur Kiara
 
-Mise à jour du 16 novembre 2026.
+Mise à jour du 18 novembre 2026.
 
-La fusion est en production pour **Windows et le web privé** avec **Kiara 4.0.8**.
+**Kiara 4.0.9** est en production pour **Windows et le web privé** depuis le
+18 novembre 2026 à 11 h 43 (heure de Paris).
 Le lanceur Kiara supervise le service Projets et son catalogue de 11 projets.
 Conversations réunit le composeur, l’historique et l’assistant de projet, avec
 les brouillons et le mode éphémère. Projets propose la fiche à quatre rubriques
 dans le style Kiara. Le superviseur autonome a été retiré du dépôt.
 
-Le canal Windows utilise un manifeste Ed25519. La 4.0.8 a été publiée sans
-Authenticode et la **4.0.7** est conservée pour le retour arrière. La **3.5.63**
-reste la référence pour la transition des clients classiques. Android et Linux
-ont leur propre qualification, après Windows.
+Le canal Windows utilise un manifeste Ed25519 et un installateur sans
+Authenticode. La **4.0.8** est conservée pour le retour. La **3.5.63** reste la
+référence du canal classique. Les paquets Linux et Android ont leur propre
+qualification et suivent un calendrier distinct.
+
+La livraison ajoute **Notes** à l’accueil et à la navigation, avec un carnet
+personnel, les notes des projets actifs et le collage direct d’images. Elle
+regroupe aussi les corrections récentes du portail, des réunions et des
+sauvegardes. Le catalogue de 11 projets et les deux entrées HTTPS ont été vérifiés
+après la bascule. [Livraison du 18 novembre](audits/2026-11-15-fusion-kiara/BASCULE.md#livraison-windows-et-web-du-18-novembre-2026)
+
+Depuis le 18 novembre 2026, les travaux d’interface ciblent le bureau Windows
+et le web privé, avec une recette en 720p, 1080p et 1440p. L’application mobile
+est mise de côté jusqu’à sa reprise explicite. Voir les [consignes UX](maintenance/ux-ui/README.md).
 
 Le dépôt de travail est `D:\Serveur IA`. Utiliser **D:** pour les constructions,
 caches, fichiers temporaires et recettes. **E:** est réservé aux archives et aux

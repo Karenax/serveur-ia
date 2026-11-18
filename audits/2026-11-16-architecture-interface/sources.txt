@@ -1,0 +1,1 @@
+{"python_syntax": 1080, "javascript_syntax": 101, "powershell_syntax": {"pwsh": 103, "powershell.exe": 103}, "passed": true}

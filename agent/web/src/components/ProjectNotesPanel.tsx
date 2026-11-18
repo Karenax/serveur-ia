@@ -5,41 +5,58 @@ import { NoteContentView, NoteRichEditor } from './NoteRichEditor';
 import { NoteAttachments } from './NoteAttachments';
 import { NoteImportPanel } from './NoteImportPanel';
 import { NoteSourcePanel } from './NoteSourcePanel';
-import { blankNote, boundVersionContent, NoteHttpError, noteDraftKey, notesApi, noteUrl, readNoteDraft, sameNote,
+import { blankNote, boundVersionContent, NoteHttpError, noteDraftKey, notesApi, noteUrl, personalNotesScope, readNoteDraft, sameNote,
   validNoteContent, writeNoteDraft, type NoteContent, type NoteDetail, type NoteDraft, type NoteHistory,
-  type NotePage, type NotePending, type NotesList, type NoteVersion } from '../lib/projectNotes';
+  type NotePage, type NotePending, type NotesList, type NotesProject, type NoteVersion } from '../lib/projectNotes';
+import {clearPendingImage, prepareClipboardImage, readPendingImage, rememberPendingImage, type PendingNoteImage} from '../lib/notePasteStore';
 import './project-notes.css';
 import type {MarkdownDraftState} from '../lib/noteMarkdown';
 
 const date=(value:string)=>new Date(value).toLocaleString('fr-FR');
-export function ProjectNotesPanel(props:{projectId:string;active?:boolean}){return <NotesPanel key={props.projectId} {...props}/>;}
-function NotesPanel({projectId,active=true}:{projectId:string;active?:boolean}){
+const newNoteHint='Ajoutez un titre ou collez une image dans la note.';
+type NotesPanelProps={projectId:string;active?:boolean;workspace?:boolean;initialNote?:string;
+  copyProjects?:NotesProject[];onCopied?:(note:NoteDetail)=>void;onNotesChanged?:()=>void};
+export function ProjectNotesPanel(props:NotesPanelProps){return <NotesPanel key={props.projectId} {...props}/>;}
+function NotesPanel({projectId,active=true,workspace=false,initialNote,copyProjects,onCopied,onNotesChanged}:NotesPanelProps){
+  const personal=projectId===personalNotesScope;
   const [page,setPage]=useState<NotesList|null>(null),[query,setQuery]=useState(''),[offset,setOffset]=useState(0);
-  const [selected,setSelected]=useState<string|null>(null),[error,setError]=useState(''),[loading,setLoading]=useState(false),[tick,setTick]=useState(0);
+  const [selected,setSelected]=useState<string|null>(initialNote??null),[error,setError]=useState(''),[loading,setLoading]=useState(false),[tick,setTick]=useState(0);
   const [importing,setImporting]=useState(false),[importVisited,setImportVisited]=useState(false);
+  const panel=useRef<HTMLElement>(null);
+  const [selectionNotice,setSelectionNotice]=useState('');
   useEffect(()=>{if(!active)return;const controller=new AbortController();setLoading(true);setError('');
     const timer=window.setTimeout(()=>notesApi.list(projectId,query,offset,controller.signal).then(value=>{
       if(!controller.signal.aborted){if(value.items.some(n=>n.project_id!==projectId))throw new Error('Liste reçue pour un autre projet');setPage(value);}
     }).catch(e=>{if(!controller.signal.aborted)setError(message(e));}).finally(()=>{if(!controller.signal.aborted)setLoading(false);}),150);
     return()=>{window.clearTimeout(timer);controller.abort();};},[projectId,active,query,offset,tick]);
   const canEdit=!!page?.can_edit&&!error;
-  return <section className="project-notes" aria-label="Notes du projet">
-    <header className="planning-heading"><div><h3>Notes</h3><p>Comptes rendus, décisions et informations du projet.</p></div>
-      {page?.available&&canEdit&&<div className="note-actions"><button type="button" className="button secondary" disabled={!active||loading} onClick={()=>{setImporting(v=>!v);setImportVisited(true);}}>{importing?'Fermer l’import':'Importer une note'}</button>
-        <button type="button" className="button" disabled={!active||loading} onClick={()=>setSelected('new')}>Nouvelle note</button></div>}</header>
+  function selectNote(id:string){
+    if(selected===id)return;
+    if(panel.current?.querySelector('[data-note-volatile="true"]')){
+      setSelectionNotice('Terminez l’enregistrement de cette note avant d’en ouvrir une autre.');return;
+    }
+    setSelectionNotice('');
+    setSelected(id);
+  }
+  return <section ref={panel} className="project-notes" aria-label={personal?'Notes personnelles':'Notes du projet'}>
+    <header className="planning-heading"><div>{!workspace&&<><h3>Notes</h3><p>Comptes rendus, décisions et informations du projet.</p></>}</div>
+      {page?.available&&canEdit&&<div className="note-actions">{!personal&&<button type="button" className="button secondary" disabled={!active||loading} onClick={()=>{setImporting(v=>!v);setImportVisited(true);}}>{importing?'Fermer l’import':'Importer une note'}</button>}
+        <button type="button" className="button" disabled={!active||loading} onClick={()=>selectNote('new')}>Nouvelle note</button></div>}</header>
     {error&&<div role="alert" className="state-panel error"><p>{error}</p><button type="button" className="button secondary" onClick={()=>setTick(n=>n+1)}>Réessayer</button></div>}
+    {selectionNotice&&<p role="status">{selectionNotice}</p>}
     {loading&&<p role="status">Lecture des notes…</p>}
     {page&&!page.available&&<p className="state-panel" role="status">Les notes ne sont pas encore activées sur ce serveur.</p>}
     {page?.available&&page.operator_id&&importVisited&&<div hidden={!importing}><NoteImportPanel key={page.operator_id} projectId={projectId} operatorId={page.operator_id} active={active&&importing} canEdit={canEdit}
-      onImported={id=>{setSelected(id);setImporting(false);setTick(n=>n+1);}}/></div>}
+      onImported={id=>{setSelected(id);setImporting(false);setTick(n=>n+1);onNotesChanged?.();}}/></div>}
     {page?.available&&<div className="note-workspace"><aside className="note-index" aria-label="Liste des notes">
       <label>Rechercher une note<input className="input" maxLength={200} value={query} onChange={e=>{setQuery(e.target.value);setOffset(0);}}/></label>
-      {!loading&&!page.total&&<p>{query?'Aucune note ne correspond.':'Aucune note pour ce projet.'}</p>}
-      <ul>{page.items.map(note=><li key={note.id}><button type="button" className={selected===note.id?'selected':''} aria-pressed={selected===note.id} onClick={()=>setSelected(note.id)}>
-        <strong>{note.title}</strong><span>{note.excerpt||'Note sans texte'}</span><small>Version {note.revision} · {date(note.updated_at)}</small></button></li>)}</ul>
+      {!loading&&!page.total&&<p>{query?'Aucune note ne correspond.':personal?'Aucune note personnelle.':'Aucune note pour ce projet.'}</p>}
+      <ul>{page.items.map(note=><li key={note.id}><button type="button" className={selected===note.id?'selected':''} aria-label={`Ouvrir la note ${note.title}`} aria-pressed={selected===note.id} onClick={()=>selectNote(note.id)}>
+        <strong>{note.title}</strong><span>{note.excerpt.trim()||'Note sans texte'}</span><small>Version {note.revision} · {date(note.updated_at)}</small></button></li>)}</ul>
       <Pagination offset={page.offset} limit={page.limit} total={page.total} disabled={loading} onChange={setOffset}/>
     </aside><div className="note-main">{selected&&page.operator_id?<NoteSession key={`${selected}:${page.operator_id}`} projectId={projectId} noteId={selected}
-      operatorId={page.operator_id} canEdit={canEdit} active={active} onSaved={id=>{setSelected(id);setTick(n=>n+1);}}/>:
+      operatorId={page.operator_id} canEdit={canEdit} active={active} copyProjects={copyProjects} onCopied={onCopied}
+      onSaved={id=>{setSelected(id);setTick(n=>n+1);if(selected==='new')onNotesChanged?.();}}/>:
       <p className="state-panel" hidden={!page.total}>Sélectionnez une note pour la consulter{canEdit?' ou créez-en une.':'.'}</p>}</div></div>}
   </section>;
 }
@@ -53,13 +70,19 @@ function exportDraft(projectId:string,noteId:string,operatorId:string,draft:Note
   const url=URL.createObjectURL(new Blob([raw],{type:'application/json'})),a=document.createElement('a');
   a.href=url;a.download='brouillon-note.json';a.click();window.setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
-function NoteSession({projectId,noteId,operatorId,canEdit,active,onSaved}:{projectId:string;noteId:string;operatorId:string;canEdit:boolean;active:boolean;onSaved:(id:string)=>void}){
+function NoteSession({projectId,noteId,operatorId,canEdit,active,onSaved,copyProjects,onCopied}:{projectId:string;noteId:string;
+  operatorId:string;canEdit:boolean;active:boolean;onSaved:(id:string)=>void;copyProjects?:NotesProject[];onCopied?:(note:NoteDetail)=>void}){
   const [head,setHead]=useState<NoteDetail|null>(null),[draft,setDraft]=useState<NoteDraft|null>(null),[recovery,setRecovery]=useState<NoteDraft|null>(null);
   const [loading,setLoading]=useState(true),[status,setStatus]=useState(''),[error,setError]=useState(''),[storageError,setStorageError]=useState('');
   const [blocked,setBlocked]=useState(false);
   const [markdownDraft,setMarkdownDraft]=useState<MarkdownDraftState>({pending:false,valid:true});
   const [conflict,setConflict]=useState(false),[remote,setRemote]=useState<NoteDetail|null>(null),[busy,setBusy]=useState(false),[history,setHistory]=useState(false);
   const current=useRef<NoteDraft|null>(null),alive=useAlive(),action=useRef<AbortController|null>(null),headRef=useRef<NoteDetail|null>(null),inFlight=useRef(false);
+  const [pendingImage,setPendingImage]=useState<PendingNoteImage>(),[pasteReady,setPasteReady]=useState(false);
+  const [pasteError,setPasteError]=useState(''),[pasteBusy,setPasteBusy]=useState(false);
+  const imageKey=noteDraftKey(projectId,noteId,operatorId);
+  const section=useRef<HTMLElement>(null);
+  const imageLocked=pasteBusy||!!pendingImage;
   const writable=canEdit&&!head?.read_only&&active&&!loading&&!recovery;
   const dirty=!!draft&&(!!draft.pending||!head||!sameNote(draft,head));
   function persist(value:NoteDraft){
@@ -74,22 +97,26 @@ function NoteSession({projectId,noteId,operatorId,canEdit,active,onSaved}:{proje
       if(note)verify(note);headRef.current=note;setHead(note);
       const local=readNoteDraft(projectId,noteId,operatorId),base=makeDraft(projectId,noteId,operatorId,note);
       current.current=base;setDraft(base);setRecovery(local.draft&&(!note||local.draft.pending||!sameNote(local.draft,note))?local.draft:null);
-      setStorageError(local.error);setBlocked(!!local.error);setStatus(note?`Enregistrée · version ${note.revision}`:'Saisissez un titre pour créer la note.');
+      setStorageError(local.error);setBlocked(!!local.error);setStatus(note?`Enregistrée · version ${note.revision}`:newNoteHint);
     }).catch(e=>{if(!controller.signal.aborted)setError(message(e));}).finally(()=>{if(!controller.signal.aborted)setLoading(false);});
     return()=>{controller.abort();action.current?.abort();};},[projectId,noteId,operatorId]);
-  useEffect(()=>{const guard=(e:BeforeUnloadEvent)=>{if(dirty||recovery||storageError||markdownDraft.pending){e.preventDefault();e.returnValue='';}};
-    window.addEventListener('beforeunload',guard);return()=>window.removeEventListener('beforeunload',guard);},[dirty,recovery,storageError,markdownDraft.pending]);
+  useEffect(()=>{let cancelled=false;
+    readPendingImage(imageKey).then(job=>{if(!cancelled){setPendingImage(job);setPasteReady(true);}})
+      .catch(()=>{if(!cancelled)setPasteError('Impossible de lire les images en attente sur cet appareil.');});
+    return()=>{cancelled=true;};},[imageKey]);
+  useEffect(()=>{const guard=(e:BeforeUnloadEvent)=>{if(dirty||recovery||storageError||markdownDraft.pending||pendingImage||pasteBusy){e.preventDefault();e.returnValue='';}};
+    window.addEventListener('beforeunload',guard);return()=>window.removeEventListener('beforeunload',guard);},[dirty,recovery,storageError,markdownDraft.pending,pendingImage,pasteBusy]);
   const executeRef=useRef<()=>void>(()=>{});
-  useEffect(()=>{if(!writable||!dirty||busy||draft?.pending||conflict||storageError||markdownDraft.pending||!head||!draft?.title.trim()||!validNoteContent(draft.content))return;
+  useEffect(()=>{if(!writable||!dirty||busy||pendingImage||draft?.pending||conflict||storageError||markdownDraft.pending||!head||!draft?.title.trim()||!validNoteContent(draft.content))return;
     const timer=window.setTimeout(()=>executeRef.current(),1200);return()=>window.clearTimeout(timer);
-  },[draft,writable,dirty,busy,conflict,storageError,head,markdownDraft.pending]);
+  },[draft,writable,dirty,busy,pendingImage,conflict,storageError,head,markdownDraft.pending]);
   function edit(values:Partial<Pick<NoteDraft,'title'|'content'|'attachment_ids'>>){
     if(!current.current)return false;const next={...current.current,...values,updated_at:new Date().toISOString()};const stored=apply(next);
     if(!conflict)setStatus(inFlight.current?'Enregistrement en cours · nouvelles modifications en attente':'Brouillon local · enregistrement à venir');
     return stored;
   }
   async function execute(restoreId?:string){
-    const value=current.current;if(!value||!canEdit||!active||headRef.current?.read_only||inFlight.current||recovery||markdownDraft.pending)return;
+    const value=current.current;if(!value||!canEdit||!active||headRef.current?.read_only||inFlight.current||pendingImage||recovery||markdownDraft.pending)return;
     const pending:NotePending=value.pending||(restoreId?{kind:'restore',payload:{command_id:crypto.randomUUID(),expected_revision:value.expected_revision,version_id:restoreId}}:
       noteId==='new'?{kind:'create',payload:{command_id:crypto.randomUUID(),title:value.title.trim(),content:value.content}}:
       {kind:'save',payload:{command_id:crypto.randomUUID(),expected_revision:value.expected_revision,title:value.title.trim(),content:value.content,attachment_ids:value.attachment_ids}});
@@ -126,34 +153,97 @@ function NoteSession({projectId,noteId,operatorId,canEdit,active,onSaved}:{proje
     finally{inFlight.current=false;if(alive.current){setBusy(false);action.current=null;}}
   }
   executeRef.current=()=>{void execute();};
+  async function sendImage(job:PendingNoteImage,store:boolean){
+    if(inFlight.current||!active||!canEdit||headRef.current?.read_only)return;
+    const controller=new AbortController();action.current=controller;inFlight.current=true;
+    setBusy(true);setPasteBusy(true);setPasteError('');setStatus('Enregistrement de l’image…');
+    try{
+      if(store){
+        try{await rememberPendingImage(imageKey,job);}
+        catch{
+          const existing=await readPendingImage(imageKey).catch(()=>undefined);
+          if(alive.current&&!controller.signal.aborted&&existing)setPendingImage(existing);
+          throw new Error(existing?'Reprenez le collage déjà en attente.':'Impossible de garder l’image sur cet appareil. Recollez-la pour réessayer.');
+        }
+        if(!alive.current||controller.signal.aborted)return;
+        setPendingImage(job);
+      }
+      const response=await notesApi.paste(projectId,noteId,job.payload,job.file,controller.signal);
+      if(!alive.current||controller.signal.aborted)return;
+      const note=verify(response.note);
+      if(response.command_id!==job.payload.command_id)throw new Error('La réponse ne correspond pas à l’image collée. Réessayez.');
+      const next=makeDraft(projectId,note.id,operatorId,note);
+      if(!persist(next)){setStatus('Image enregistrée sur le serveur. Reprenez le collage pour actualiser la note.');return;}
+      await clearPendingImage(imageKey,job.payload.command_id);
+      if(!alive.current||controller.signal.aborted)return;
+      headRef.current=note;setHead(note);current.current=next;setDraft(next);setRecovery(null);setConflict(false);setRemote(null);
+      setPendingImage(undefined);
+      if(noteId==='new')localStorage.removeItem(imageKey);
+      setStatus(note.revision===response.command_revision?'Image enregistrée.':'Image enregistrée dans l’historique. Une version plus récente est affichée.');
+      onSaved(note.id);
+    }catch(e){
+      if(!alive.current||controller.signal.aborted)return;
+      const stale=e instanceof NoteHttpError&&e.status===409&&e.message.startsWith('La note a changé');
+      setPasteError(stale?'La note a changé. Écartez le collage local, comparez les versions et recollez l’image.':message(e));
+      if(noteId!=='new'&&stale)setConflict(true);
+      setStatus('');
+    }finally{inFlight.current=false;if(alive.current){setBusy(false);setPasteBusy(false);action.current=null;}}
+  }
+  function pasteImage(file:File,insertAt:number){
+    const value=current.current;
+    if(!value||!writable||!pasteReady||blocked||conflict||inFlight.current||pendingImage||value.pending||
+      section.current?.querySelector('.note-attachments[aria-busy="true"]')){
+      setPasteError('Terminez l’enregistrement ou la reprise de la note, puis recollez l’image.');return;
+    }
+    try{
+      if(!validNoteContent(value.content)||value.content.blocks.length>=500||value.attachment_ids.length>=20)
+        throw new Error('La note ne dispose plus de place pour cette image.');
+      const job={file:prepareClipboardImage(file),payload:{command_id:crypto.randomUUID(),title:value.title.trim()||'Note sans titre',
+        content:value.content,expected_revision:value.expected_revision,attachment_ids:value.attachment_ids,insert_at:insertAt}};
+      void sendImage(job,true);
+    }catch(e){setPasteError(message(e));}
+  }
+  async function discardImage(){
+    if(!pendingImage||inFlight.current)return;
+    try{await clearPendingImage(imageKey,pendingImage.payload.command_id);setPendingImage(undefined);setPasteError('');}
+    catch{setPasteError('Impossible de retirer l’image locale. Réessayez.');}
+  }
   async function compare(){const controller=new AbortController();action.current=controller;setBusy(true);setError('');
     try{const note=verify(await notesApi.read(projectId,noteId,controller.signal));if(alive.current&&!controller.signal.aborted)setRemote(note);}
     catch(e){if(alive.current&&!controller.signal.aborted)setError(message(e));}finally{if(alive.current){setBusy(false);action.current=null;}}}
   function recover(){if(!recovery)return;apply(recovery);setRecovery(null);const stale=!!head&&recovery.expected_revision!==head.revision;
     setConflict(stale);setStatus(recovery.pending?'Commande en attente : reprendre son enregistrement.':stale?'Brouillon repris · comparer avec la version enregistrée.':'Brouillon local repris.');}
-  return <section className="note-session" aria-label="Note sélectionnée" data-workspace-dirty={dirty||recovery||storageError||markdownDraft.pending?'true':undefined}>
+  return <section ref={section} className="note-session" aria-label="Note sélectionnée" data-workspace-dirty={dirty||recovery||storageError||markdownDraft.pending||imageLocked?'true':undefined}
+    data-note-volatile={storageError||pasteBusy?'true':undefined}>
     {loading&&<p role="status">Ouverture de la note…</p>}
     {error&&<p role="alert" className="document-warning">{error}</p>}
+    {pasteError&&<p role="alert" className="document-warning">{pasteError}</p>}
+    {pendingImage&&!pasteBusy&&<div className="note-recovery"><p role="status">Une image collée attend d’être enregistrée.</p><div className="note-actions">
+      {canEdit&&<button className="button" type="button" disabled={!active||busy} onClick={()=>void sendImage(pendingImage,false)}>Reprendre le collage</button>}
+      <button className="button secondary" type="button" disabled={busy} onClick={()=>void discardImage()}>Écarter le collage local</button></div></div>}
     {storageError&&<div role="alert" className="document-warning"><p>{storageError}</p>
       <button type="button" className="button secondary sm" onClick={()=>{try{exportDraft(projectId,noteId,operatorId,blocked?null:draft);}catch(e){setError(message(e));}}}>Exporter le brouillon</button>
       <button type="button" className="button secondary sm" onClick={()=>{if(draft&&persist(draft))setBlocked(false);}}>{blocked?'Remplacer le brouillon illisible par la version affichée':'Réessayer la sauvegarde locale'}</button></div>}
     {recovery&&<div role="status" className="note-recovery"><strong>Brouillon retrouvé sur cet appareil</strong><p>{recovery.title||'Note sans titre'} · {date(recovery.updated_at)}</p>
       <div className="note-actions"><button type="button" className="button" onClick={recover}>Reprendre ce brouillon</button>
         <button type="button" className="button secondary" onClick={()=>{try{exportDraft(projectId,noteId,operatorId,recovery);}catch(e){setError(message(e));}}}>Exporter le brouillon</button>
-        <button type="button" className="button secondary" onClick={()=>{if(draft&&persist(draft)){setRecovery(null);setStatus(head?`Enregistrée · version ${head.revision}`:'Saisissez un titre pour créer la note.');}}}>Écarter ce brouillon</button></div></div>}
-    {draft&&!loading&&<><div className="note-title"><label>Titre de la note<input className="input" maxLength={255} value={draft.title} readOnly={!writable||blocked||(busy&&draft.pending?.kind==='restore')} onChange={e=>edit({title:e.target.value})}/></label>
+        <button type="button" className="button secondary" onClick={()=>{if(draft&&persist(draft)){setRecovery(null);setStatus(head?`Enregistrée · version ${head.revision}`:newNoteHint);}}}>Écarter ce brouillon</button></div></div>}
+    {draft&&!loading&&<><div className="note-title"><label>Titre de la note<input className="input" maxLength={255} value={draft.title} readOnly={!writable||blocked||imageLocked||(busy&&draft.pending?.kind==='restore')} onChange={e=>edit({title:e.target.value})}/></label>
       <div role="status" aria-live="polite" className={`note-save-status ${busy?'saving':''}`}>{status}</div>
-      {head&&<small>Dernière version par {head.actor_id||'auteur non renseigné'} · {date(head.updated_at)}</small>}</div>
+      {head&&<small>{projectId===personalNotesScope?'Dernière modification':`Dernière version par ${head.actor_id||'auteur non renseigné'}`} · {date(head.updated_at)}</small>}</div>
       {(!canEdit||head?.read_only)&&<p className="document-help">{head?.read_only?'Document Office en consultation. Son original reste conservé.':'Lecture seule : vous pouvez consulter la note et son historique.'}</p>}
       <NoteRichEditor content={draft.content} projectId={projectId} noteId={noteId} draftId={JSON.stringify([projectId,noteId,operatorId])}
-        onMarkdownDraftState={setMarkdownDraft} disabled={!writable||blocked||(busy&&draft.pending?.kind==='restore')} onChange={content=>edit({content})}/>
+        onMarkdownDraftState={setMarkdownDraft} disabled={!writable||blocked||imageLocked||(busy&&draft.pending?.kind==='restore')}
+        onPasteImage={pasteImage} onChange={content=>edit({content})}/>
       {!validNoteContent(draft.content)&&<p role="alert">Le contenu dépasse les limites de la note. Réduisez le texte ou le nombre de blocs avant l’enregistrement.</p>}
-      <div className="note-actions">{canEdit&&!head?.read_only&&<button type="button" className="button" disabled={!active||busy||!!recovery||blocked||markdownDraft.pending||(!dirty&&!draft.pending)||(!draft.pending&&conflict)} onClick={()=>void execute()}>
+      <div className="note-actions">{canEdit&&!head?.read_only&&<button type="button" className="button" disabled={!active||busy||imageLocked||!!recovery||blocked||markdownDraft.pending||(!dirty&&!draft.pending)||(!draft.pending&&conflict)} onClick={()=>void execute()}>
         {draft.pending?'Reprendre l’enregistrement':noteId==='new'?'Créer la note':'Enregistrer maintenant'}</button>}
         <button type="button" className="button secondary" onClick={()=>{try{exportDraft(projectId,noteId,operatorId,draft);}catch(e){setError(message(e));}}}>Exporter le brouillon</button>
         {head&&<button type="button" className="button secondary" disabled={busy} onClick={()=>setHistory(v=>!v)}>{history?'Fermer l’historique':'Historique de la note'}</button>}
         {head&&(conflict||draft.pending)&&<button type="button" className="button secondary" disabled={busy||!active} onClick={()=>void compare()}>Comparer avec la version enregistrée</button>}
       </div>
+      {projectId===personalNotesScope&&head&&canEdit&&!!copyProjects?.length&&onCopied&&
+        <CopyNote note={head} projects={copyProjects} disabled={!writable||dirty||busy||imageLocked||markdownDraft.pending} onCopied={onCopied}/>}
       {remote&&<section className="note-comparison" aria-label="Version enregistrée à comparer"><h4>{remote.title} · version {remote.revision}</h4>
         <NoteContentView content={remote.content} projectId={projectId} noteId={noteId}/><p>Votre saisie reste affichée au-dessus.</p>
         {canEdit&&conflict&&<button type="button" className="button secondary" disabled={busy||remote.read_only} onClick={()=>{
@@ -162,14 +252,44 @@ function NoteSession({projectId,noteId,operatorId,canEdit,active,onSaved}:{proje
         <button type="button" className="button secondary" disabled={busy||!!draft.pending&&!conflict} onClick={()=>{
           headRef.current=remote;setHead(remote);apply(makeDraft(projectId,noteId,operatorId,remote));setRemote(null);setConflict(false);setError('');setStatus(`Enregistrée · version ${remote.revision}`);
         }}>Remplacer ma saisie par cette version</button></section>}
-      {head&&<NoteAttachments projectId={projectId} noteId={noteId} operatorId={operatorId} revision={head.revision} active={active}
-        canEdit={writable&&!blocked&&!busy&&!conflict&&!draft.pending&&!markdownDraft.pending} selectedIds={draft.attachment_ids}
+      {head&&projectId!==personalNotesScope&&<NoteAttachments projectId={projectId} noteId={noteId} operatorId={operatorId} revision={head.revision} active={active}
+        canEdit={writable&&!blocked&&!busy&&!imageLocked&&!conflict&&!draft.pending&&!markdownDraft.pending} selectedIds={draft.attachment_ids}
         onAttach={id=>{const live=current.current!;if(!live.attachment_ids.includes(id))edit({attachment_ids:[...live.attachment_ids,id]});}}
         onImage={(id,filename)=>{const live=current.current!;edit({content:{...live.content,blocks:[...live.content.blocks,{type:'image',attachment_id:id,caption:filename}]},
           attachment_ids:[...new Set([...live.attachment_ids,id])]});}}/>}
       {head?.source_kind&&<NoteSourcePanel projectId={projectId} noteId={noteId} active={active}/>}
-      {head&&history&&<NoteHistoryPanel key={head.revision} projectId={projectId} noteId={noteId} active={active} canRestore={writable&&!dirty&&!busy&&!conflict&&!draft.pending&&!storageError&&!markdownDraft.pending} onRestore={id=>void execute(id)}/>}</>}
+      {head&&history&&<NoteHistoryPanel key={head.revision} projectId={projectId} noteId={noteId} active={active} canRestore={writable&&!dirty&&!busy&&!imageLocked&&!conflict&&!draft.pending&&!storageError&&!markdownDraft.pending} onRestore={id=>void execute(id)}/>}</>}
   </section>;
+}
+
+function CopyNote({note,projects,disabled,onCopied}:{note:NoteDetail;projects:NotesProject[];disabled:boolean;onCopied:(note:NoteDetail)=>void}){
+  const [target,setTarget]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState('');
+  const request=useRef<AbortController|null>(null);
+  useEffect(()=>()=>request.current?.abort(),[]);
+  async function copy(){
+    if(disabled||!target||request.current)return;
+    const controller=new AbortController();request.current=controller;setBusy(true);setError('');
+    try{
+      const result=await notesApi.copy(note.id,target,note.version_id,controller.signal);
+      if(!controller.signal.aborted){
+        if(result.project_id!==target)throw new Error('Le projet de la note copiée ne correspond pas à la sélection.');
+        onCopied(result);
+      }
+    }catch(e){if(!controller.signal.aborted)setError(message(e));}
+    finally{request.current=null;if(!controller.signal.aborted)setBusy(false);}
+  }
+  return <details className="note-project-picker" data-note-volatile={busy?'true':undefined}>
+    <summary>Copier vers un projet</summary>
+    <form onSubmit={e=>{e.preventDefault();void copy();}}>
+      <label>Projet de destination<select className="input" value={target} disabled={busy} onChange={e=>setTarget(e.target.value)}>
+        <option value="">Choisir un projet</option>{projects.map(project=><option key={project.id} value={project.id}>
+          {project.code?`${project.code} — `:''}{project.title}</option>)}
+      </select></label>
+      <p>Les personnes qui ont accès au projet pourront lire la copie. L’original reste dans Personnel.</p>
+      <button type="submit" className="button" disabled={!target||disabled||busy}>{busy?'Copie en cours…':'Copier la note'}</button>
+      {error&&<p role="alert" className="document-warning">{error}</p>}
+    </form>
+  </details>;
 }
 function NoteHistoryPanel({projectId,noteId,active,canRestore,onRestore}:{projectId:string;noteId:string;active:boolean;canRestore:boolean;onRestore:(id:string)=>void}){
   const [page,setPage]=useState<NotePage<NoteHistory>|null>(null),[offset,setOffset]=useState(0),[version,setVersion]=useState<NoteVersion|null>(null);

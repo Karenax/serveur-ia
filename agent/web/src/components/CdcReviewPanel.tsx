@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { api, type CdcItem, type CdcReview } from "../lib/api";
 import { Badge, EmptyState } from "./Ui";
-import { Glyph, P } from "../os/icons";
+import { Glyph, Icon, P } from "../os/icons";
 const STATUS_LABELS: Record<string, string> = {
   candidate: "Candidat",
   confirmed: "Confirmé",
@@ -35,6 +35,22 @@ const KIND_LABELS: Record<string, string> = {
   interface: "Interface",
   open_point: "Point ouvert",
 };
+// Libellés français affichés dans les éditeurs ; les valeurs techniques restent inchangées.
+const MODALITY_LABELS: Record<string, string> = {
+  mandatory: "Obligatoire",
+  preference: "Souhaité",
+  option: "Optionnel",
+  example: "Exemple",
+  information: "Information",
+  prohibition: "Interdit",
+  assumption: "Hypothèse",
+};
+const PRIORITY_LABELS: Record<string, string> = {
+  p1: "Priorité 1 · haute",
+  p2: "Priorité 2 · moyenne",
+  p3: "Priorité 3 · basse",
+  unclassified: "Non classée",
+};
 
 export function CdcReviewPanel(props: {
   projectId: string;
@@ -51,6 +67,7 @@ export function CdcReviewPanel(props: {
   refresh: () => void;
   reloadReview: () => void;
 }) {
+  const optionPrefix = useId();
   const [busy, setBusy] = useState("");
   const [drafts, setDrafts] = useState<Record<string, Partial<CdcItem>>>({});
   const [focusId, setFocusId] = useState<string | null>(null);
@@ -60,6 +77,7 @@ export function CdcReviewPanel(props: {
   useEffect(()=>{const query=window.matchMedia?.('(min-width:671px)');const resized=()=>setFilterOpen(query?query.matches:window.innerWidth>670);window.addEventListener('resize',resized);query?.addEventListener('change',resized);return()=>{window.removeEventListener('resize',resized);query?.removeEventListener('change',resized);};},[]);
   const [compact, setCompact] = useState(false);
   const reviewRoot = useRef<HTMLDivElement>(null);
+  const listRoot = useRef<HTMLDivElement>(null);
 
   const filtered = useMemo(() => {
     const q = props.reviewQuery.trim().toLowerCase();
@@ -110,6 +128,12 @@ export function CdcReviewPanel(props: {
   }, [focusId]);
 
   const focus = filtered.find((i) => i.id === focusId) ?? null;
+  useEffect(() => {
+    const active = document.activeElement;
+    if (!active || active.getAttribute('role') !== 'row' || !listRoot.current?.contains(active)) return;
+    const index = filtered.findIndex(item => item.id === focusId);
+    if (index >= 0) document.getElementById(`${optionPrefix}-${index}`)?.focus();
+  }, [filtered, focusId, optionPrefix]);
 
   const patch = async (item: CdcItem, body: object) => {
     setBusy(item.id);
@@ -237,6 +261,9 @@ export function CdcReviewPanel(props: {
   const focusStatus = focus ? focus.knowledge_status || "candidate" : "candidate";
   const focusDraft = focus ? draftOf(focus) : {};
   const focusDirty = focus ? Object.keys(focusDraft).length > 0 : false;
+  // Nombre de filtres réellement actifs : alimente le badge du menu discret.
+  const activeFilterCount = (props.reviewKind !== "all" ? 1 : 0)
+    + (props.reviewStatus !== "pending" && props.reviewStatus !== "all" ? 1 : 0);
 
   return (
     <div className="cdc-panel">
@@ -254,10 +281,7 @@ export function CdcReviewPanel(props: {
             onChange={(e) => props.setReviewQuery(e.target.value)}
             style={{ width: 200 }}
           />
-          <label><input type="checkbox" checked={compact} onChange={(e) => setCompact(e.target.checked)} /> Compact</label>
-        </div>
-      </div>
-      <details className="cdc-filter-disclosure" open={filterOpen} onToggle={e=>setFilterOpen(e.currentTarget.open)}><summary>Filtres · {props.reviewKind==='all'?'Tous les types':KIND_LABELS[props.reviewKind]} · {props.reviewStatus==='pending'?'À valider':STATUS_LABELS[props.reviewStatus]||'Tous les statuts'}</summary><div className="cdc-chips" role="group" aria-label="Filtrer par type et statut">
+          <details className="discrete-icon-menu icon-menu-details" open={filterOpen} onToggle={e=>setFilterOpen(e.currentTarget.open)}><summary className="discrete-icon-summary icon-menu-summary" aria-label="Filtres et options d'affichage" title="Filtres et options d'affichage"><Icon name="filter" size={16} />{activeFilterCount > 0 && <span className="filter-badge icon-menu-badge" aria-hidden="true">{activeFilterCount}</span>}</summary><div className="cdc-filter-bar icon-menu-popover"><label className="identity-checkbox"><input type="checkbox" checked={compact} onChange={(e) => setCompact(e.target.checked)} /> Compact</label><div className="cdc-chips" role="group" aria-label="Filtrer par type et statut">
         {Object.keys(KIND_LABELS).filter((k) => counts.byKind[k]).map((k) => (
           <button
             key={k}
@@ -300,7 +324,7 @@ export function CdcReviewPanel(props: {
         >
           Tout voir <b>{total}</b>
         </button>
-      </div></details>
+      </div></div></details></div></div>
 
       {props.selected.size > 0 && (
         <div className="cdc-bulk">
@@ -319,27 +343,38 @@ export function CdcReviewPanel(props: {
       )}
 
       <div ref={reviewRoot} className={`cdc-review-grid${compact ? " compact" : ""}`}>
-        <div className="cdc-item-list cdc-list-virtual" role="listbox" aria-label="Éléments CDC">
-          <div className="cdc-item-columns"><span>ID</span><span>Élément</span><span>Prio</span><span></span></div>
-          {filtered.map((i) => {
+        <div ref={listRoot} className="cdc-item-list cdc-list-virtual" role="grid" aria-label="Éléments CDC"
+          onKeyDown={event=>{
+            const target=event.target as HTMLElement;
+            if((target!==event.currentTarget&&target.getAttribute('role')!=='row')||!filtered.length||!['ArrowDown','ArrowUp','Home','End'].includes(event.key))return;
+            event.preventDefault();
+            const index=filtered.findIndex(item=>item.id===focusId);
+            const next=event.key==='Home'?0:event.key==='End'?filtered.length-1:event.key==='ArrowDown'?Math.min(index+1,filtered.length-1):Math.max(index-1,0);
+            setFocusId(filtered[next].id);setEvSel(0);document.getElementById(`${optionPrefix}-${next}`)?.focus();
+          }}>
+          <div className="cdc-item-columns" role="row"><span role="columnheader">ID</span><span role="columnheader">Élément</span><span role="columnheader">Prio</span><span role="columnheader" aria-label="Sélection"></span></div>
+          {filtered.map((i, index) => {
             const status = i.knowledge_status || "candidate";
             return (
               <div
                 key={i.id}
-                role="option"
+                id={`${optionPrefix}-${index}`}
+                role="row"
+                tabIndex={focus?.id === i.id ? 0 : -1}
+                aria-label={`${i.human_id || 'Exigence'} · ${i.title} · ${STATUS_LABELS[status] || status} · ${index + 1} sur ${filtered.length}`}
                 aria-selected={focus?.id === i.id}
                 className={`cdc-item-row${focus?.id === i.id ? " selected" : ""}`}
-                onClick={() => setFocusId(i.id)}
+                onClick={event => {setFocusId(i.id); event.currentTarget.focus();}}
               >
-                <span><em>{i.human_id || "—"}</em></span>
-                <span>
+                <span role="gridcell"><em>{i.human_id || "—"}</em></span>
+                <span role="gridcell">
                   {mark(i.title, props.reviewQuery)}
                   <small className={`row-status ${status}`}>{STATUS_LABELS[status] || status} · p{i.physical_page}</small>
                 </span>
-                <span>
+                <span role="gridcell">
                   <span className={`cdc-priority ${i.priority}`}>{i.priority === "unclassified" ? "–" : i.priority.toUpperCase()}</span>
                 </span>
-                <span>
+                <span role="gridcell">
                   <input
                     type="checkbox"
                     checked={props.selected.has(i.id)}
@@ -352,7 +387,7 @@ export function CdcReviewPanel(props: {
             );
           })}
           {!filtered.length && (
-            <div className="cdc-empty-filter">Aucun élément avec ces filtres.</div>
+            <div role="row"><span role="gridcell" className="cdc-empty-filter">Aucun élément avec ces filtres.</span></div>
           )}
         </div>
 
@@ -370,6 +405,7 @@ export function CdcReviewPanel(props: {
                     key={idx}
                     type="button"
                     className={evSel === idx ? "selected" : ""}
+                    aria-label={`Sélectionner la preuve ${e.locator} de l’exigence ${focus.human_id || focus.title}`}
                     onClick={() => { setEvSel(idx); void loadEvPages(e.source_id); }}
                   >
                     <span>{e.locator}</span>
@@ -431,7 +467,7 @@ export function CdcReviewPanel(props: {
                     onChange={(e) => setDrafts((s) => ({ ...s, [focus.id]: { ...s[focus.id], modality: e.target.value } }))}
                   >
                     {["mandatory", "preference", "option", "example", "information", "prohibition", "assumption"].map((m) => (
-                      <option key={m} value={m}>{m}</option>
+                      <option key={m} value={m}>{MODALITY_LABELS[m] || m}</option>
                     ))}
                   </select>
                 </label>
@@ -441,7 +477,7 @@ export function CdcReviewPanel(props: {
                     onChange={(e) => setDrafts((s) => ({ ...s, [focus.id]: { ...s[focus.id], priority: e.target.value } }))}
                   >
                     {["p1", "p2", "p3", "unclassified"].map((m) => (
-                      <option key={m} value={m}>{m}</option>
+                      <option key={m} value={m}>{PRIORITY_LABELS[m] || m}</option>
                     ))}
                   </select>
                 </label>

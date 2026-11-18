@@ -44,10 +44,23 @@ def definitions(output, business_python=None, npm_cli=None):
     windows_server_tests = [path.stem for path in sorted((ROOT/'lanceur').glob('test_*.py'))
                             if path.name != 'test_android_updates.py']
     return {
+        # This profile intentionally exercises only desktop sizes. Browser
+        # simulations are useful regression checks, not native OS qualification.
+        'desktop-server': [[business_python, '-m', 'pytest',
+                            'tests/test_workspace.py::test_jobs_keep_global_mail_jobs_out_of_project_scope',
+                            '-p', 'no:cacheprovider']],
+        'desktop-portal': [['node', str(ROOT/'agent/scripts/ux-quality-check.mjs')],
+                           ['node', '--test', str(ROOT/'agent/scripts/ux-quality-check.test.mjs')],
+                           ['node', str(web/'node_modules/typescript/bin/tsc'), '--noEmit', '--incremental', 'false'],
+                           ['node', str(web/'node_modules/vite/bin/vite.js'), 'build', '--outDir', str(output/'desktop-web')]],
+        'desktop-windows-browser': [['node', 'client-qwen/test_ux_recovery_ui.cjs', '--windows-only', '--desktop-audit']],
+        'desktop-linux-browser': [['node', 'client-qwen/test_ux_recovery_ui.cjs', '--linux-only', '--desktop-audit']],
         'business': [[business_python, '-m', 'pytest', 'tests', '-p', 'no:cacheprovider']],
         'business-restore': [[business_python, '-m', 'pytest', 'tests/test_project_note_backup.py',
                               '-p', 'no:cacheprovider']],
-        'business-web': [['node', str(web/'node_modules/typescript/bin/tsc'), '--noEmit', '--incremental', 'false'],
+        'business-web': [['node', str(ROOT/'agent/scripts/ux-quality-check.mjs')],
+                         ['node', '--test', str(ROOT/'agent/scripts/ux-quality-check.test.mjs')],
+                         ['node', str(web/'node_modules/typescript/bin/tsc'), '--noEmit', '--incremental', 'false'],
                          ['node', str(web/'node_modules/vitest/vitest.mjs'), 'run', '--maxWorkers=4'],
                          ['node', str(web/'node_modules/vite/bin/vite.js'), 'build', '--outDir', str(output/'web')]],
         'package-server': [['node', str(web/'node_modules/vite/bin/vite.js'), 'build', '--outDir', str(output/'package-web')],
@@ -80,10 +93,43 @@ def definitions(output, business_python=None, npm_cli=None):
     }
 
 
+DESKTOP_AUDIT_CHECKS = ('desktop-server', 'desktop-portal', 'desktop-windows-browser', 'desktop-linux-browser')
+
+
+def coverage(checks, results):
+    """Describe evidence actually recorded, without promoting it to OS qualification."""
+    recorded = {result['check'] for result in results}
+    categories = {
+        'serveur': {'business', 'business-restore', 'server', 'server-windows', 'desktop-server'},
+        'portail': {'business-web', 'desktop-portal'},
+        'client_windows': {'windows', 'windows-client', 'ui', 'ui-windows', 'desktop-windows-browser'},
+        'client_linux': {'ui', 'desktop-linux-browser'},
+        'android': {'ui', 'android', 'android-lint'},
+    }
+    dimensions = {}
+    for category, members in categories.items():
+        matching = [result for result in results if result['check'] in members]
+        dimensions[category] = {
+            'recorded_checks': sorted({result['check'] for result in matching}),
+            'recorded_commands_passed': all(result['passed'] for result in matching) if matching else None,
+        }
+    return {
+        'recorded_checks': sorted(recorded),
+        'not_recorded_checks': sorted(set(checks) - recorded),
+        'dimensions': dimensions,
+        'passed_applies_to': 'recorded commands only',
+        'native_windows_qualification': 'not established by this report',
+        'native_linux_qualification': 'not established by this report',
+        'desktop_browser_checks': 'Chromium simulations, not Tauri or native system tests',
+    }
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output',type=Path)
     parser.add_argument('--checks',nargs='+')
+    parser.add_argument('--desktop-audit', action='store_true',
+                        help='Run isolated desktop-oriented checks; browser simulations are not native qualification')
     parser.add_argument('--business-python', type=Path, help='Python environment with the project-service dependencies')
     parser.add_argument('--npm-cli', type=Path, help='Path to npm-cli.js when npm.cmd is unavailable')
     parser.add_argument('--reuse-server-log',type=Path,help='Explicitly reuse a completed full server suite; recorded as reused evidence')
@@ -95,7 +141,9 @@ def main():
     output=(args.output or evidence_root/datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S')).resolve()
     output.mkdir(parents=True,exist_ok=True)
     checks=definitions(output,args.business_python,args.npm_cli)
-    selected=args.checks or [name for name in checks if name not in {'server-windows', 'ui-windows', 'windows-client'}]
+    if args.desktop_audit and args.checks:
+        parser.error('--desktop-audit and --checks cannot be combined')
+    selected=list(DESKTOP_AUDIT_CHECKS) if args.desktop_audit else args.checks or [name for name in checks if name not in {'server-windows', 'ui-windows', 'windows-client', *DESKTOP_AUDIT_CHECKS}]
     if set(selected)-set(checks):parser.error('Unknown check: '+','.join(sorted(set(selected)-set(checks))))
     env={**os.environ,'PYTHON_EXE':str(PYTHON),'PYTHONIOENCODING':'utf-8','UI_PROOF_DIRECTORY':str(output/'ui'),
          'GOPATH':str(ROOT/'client-qwen/wireguard-tools/workspace'),'GOCACHE':str(ROOT/'client-qwen/wireguard-tools/cache'),
@@ -117,15 +165,24 @@ def main():
             with log.open('w',encoding='utf-8') as stream:
                 try:
                     cwd = {'business': ROOT/'agent', 'business-restore': ROOT/'agent', 'business-web': ROOT/'agent/web',
+                           'desktop-server': ROOT/'agent', 'desktop-portal': ROOT/'agent/web',
                            'windows-client': ROOT/'client-qwen'}.get(name, ROOT)
                     if name == 'package-server' and number == 1:
                         cwd = ROOT/'agent/web'
                     if name in ('go','go-security') and number == 1:
                         cwd = ROOT/'client-qwen/wireguard-bridge'
                     check_env = env
-                    if name in ('business', 'business-restore', 'transport'):
-                        modules = ('agent', 'shared') if name.startswith('business') else ('lanceur', 'client-qwen', 'shared')
-                        check_env = {**env, 'PYTHONPATH': os.pathsep.join(str(ROOT/module) for module in modules)}
+                    if name.startswith('desktop-'):
+                        temporary = output/'tmp'
+                        temporary.mkdir(exist_ok=True)
+                        check_env = {**env, 'TEMP': str(temporary), 'TMP': str(temporary), 'TMPDIR': str(temporary)}
+                    if name in ('desktop-windows-browser', 'desktop-linux-browser'):
+                        # Do not silently substitute an externally configured Windows
+                        # executable for the requested browser simulation.
+                        check_env = {key: value for key, value in check_env.items() if key != 'KIARA_UX_WINDOWS_EXE'}
+                    if name in ('business', 'business-restore', 'desktop-server', 'transport'):
+                        modules = ('agent', 'shared') if name != 'transport' else ('lanceur', 'client-qwen', 'shared')
+                        check_env = {**check_env, 'PYTHONPATH': os.pathsep.join(str(ROOT/module) for module in modules)}
                     if name == 'windows-client':
                         check_env = {**env, 'PYTHONPATH': str(ROOT/'shared')}
                     if name == 'server-windows':
@@ -140,9 +197,14 @@ def main():
                             'sha256':hashlib.sha256(log.read_bytes()).hexdigest()})
             print(json.dumps(results[-1],ensure_ascii=False),flush=True)
     report={'format':1,'created_at':datetime.now(timezone.utc).isoformat(),
-            'passed':all(value['passed'] for value in results),'results':results}
+            'passed':all(value['passed'] for value in results),'results':results,
+            'coverage':coverage(checks, results)}
     if previous_hash:report['previous_validation_sha256']=previous_hash
     (output/'validation.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
+    for category, summary in report['coverage']['dimensions'].items():
+        status = 'aucun contrôle dédié enregistré' if summary['recorded_commands_passed'] is None else ('commandes enregistrées réussies' if summary['recorded_commands_passed'] else 'échec enregistré')
+        print(f"{category}: {status} ({', '.join(summary['recorded_checks']) or 'aucune commande enregistrée'})")
+    print('Les résultats navigateur ne constituent pas une qualification Tauri native.')
     print('Validation:',output/'validation.json')
     if not report['passed']:raise SystemExit(1)
 

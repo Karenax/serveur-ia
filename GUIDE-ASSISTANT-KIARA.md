@@ -26,6 +26,18 @@ l’historique.
 
 [Architecture et validations de Kiara](ARCHITECTURE-ACTUELLE.md#projets-et-conversations)
 
+## Prendre des notes dans Kiara
+
+Ouvre **Notes** depuis l’accueil ou la navigation principale. **Personnel** affiche
+tes notes privées. Chaque projet actif auquel tu as accès apparaît dès qu’il
+contient une note. Utilise **Nouvelle note de projet** pour créer la première.
+
+L’éditeur conserve les tableaux, les cases à cocher et la couleur du texte.
+Colle une image avec **Ctrl+V** dans le document, y compris dans une note neuve.
+Si l’envoi s’interrompt, rouvre la note sur le même appareil et choisis
+**Reprendre le collage**. Pour partager une note personnelle, utilise **Copier
+vers un projet**. Le projet reçoit une copie et l’original reste privé.
+
 ## Choisir son espace
 
 Sous Windows, ouvrir **Réglages → Mémoire et rappels**, puis choisir

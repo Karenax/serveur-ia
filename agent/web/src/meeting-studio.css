@@ -55,7 +55,9 @@
 @media not all and (min-width:671px){.meeting-studio button,.meeting-studio .note-toolbar button,.meeting-studio .note-block-actions button,.meeting-studio .note-actions button,.meeting-studio .meeting-assistant-pane>nav>button,.meeting-studio select,.meeting-studio .note-toolbar select,.meeting-studio-controls>label>select,.meeting-studio-controls>.meeting-export{min-height:44px}.meeting-studio button{min-width:44px}.meeting-studio .note-toolbar input[type=color]{height:44px;width:44px}.meeting-studio input:not([type=checkbox]):not([type=color]){min-height:44px}.meeting-studio .meeting-system-choice,.meeting-studio .meeting-native-mic,.meeting-studio .meeting-source-picker label:has(input[type=checkbox]){min-height:44px}}
 /* Preparation preserves the secondary commands without occupying a permanent work row. */
 .meeting-preparation{position:relative;min-width:0}
-.meeting-preparation>summary{cursor:pointer;min-height:32px;box-sizing:border-box;padding:5px 8px;border:1px solid var(--border,#dce3ea);border-radius:8px;font-size:12px;background:var(--surface,#fff)}
+.meeting-preparation>summary{cursor:pointer;box-sizing:border-box;width:32px;height:32px;min-height:32px;display:grid;place-items:center;padding:0;list-style:none;border:0;border-radius:8px;background:transparent;color:var(--text,#263342)}
+.meeting-preparation>summary::-webkit-details-marker{display:none}
+.meeting-preparation>summary:hover{background:var(--accent-soft,#eef0f4);color:var(--accent,#00796c)}
 .meeting-automatic-chip{font-size:10px;color:var(--muted,#647184);margin-left:5px;white-space:nowrap}
 .meeting-preparation-close{margin-bottom:8px}
 .meeting-studio-setup{padding:12px;box-sizing:border-box;background:var(--surface,#fff);border:1px solid var(--border,#dce3ea);border-radius:10px}
@@ -73,7 +75,9 @@
 .meeting-studio .meeting-audio-help{font-size:11px;line-height:1.4;margin-top:6px}
 .meeting-audio-diagnostics{margin-top:4px}
 .meeting-browser-setup{flex-basis:100%;width:100%;padding:8px 12px;box-sizing:border-box;border:1px solid var(--border,#dce3ea);border-radius:10px}
-.meeting-browser-setup>summary{cursor:pointer;min-height:32px;display:flex;align-items:center}
+.meeting-browser-setup>summary{cursor:pointer;box-sizing:border-box;width:32px;height:32px;min-height:32px;display:grid;place-items:center;padding:0;list-style:none;border:0;border-radius:8px;background:transparent;color:var(--text,#263342)}
+.meeting-browser-setup>summary::-webkit-details-marker{display:none}
+.meeting-browser-setup>summary:hover{background:var(--accent-soft,#eef0f4);color:var(--accent,#00796c)}
 .meeting-browser-setup>.meeting-studio-controls{padding:4px 0}
 .meeting-browser-setup .meeting-system-choice{flex-basis:100%}
 @media not all and (min-width:671px){.meeting-audio-devices>label,.meeting-audio-microphone{flex-basis:100%;min-width:0}.meeting-audio-devices>.meeting-start{width:100%}}
@@ -111,7 +115,7 @@
 }
 @media not all and (min-width:671px){
   .meeting-preparation{flex-basis:100%;width:100%}
-  .meeting-preparation>summary{min-height:44px}
+  .meeting-preparation>summary{width:40px;height:40px;min-height:40px}
   .meeting-studio-heading>.meeting-native{flex-basis:100%}
   .meeting-studio-title{flex:1;min-width:0}
 }
@@ -207,7 +211,7 @@
 .meeting-studio .meeting-start:hover:not(:disabled){background:color-mix(in srgb,var(--button-primary-bg,var(--meeting-accent)) 90%,var(--text));color:var(--button-primary-text,#fff)}
 .meeting-studio .meeting-studio-heading{margin-bottom:4px;gap:6px 8px}
 .meeting-studio .meeting-studio-heading>.meeting-browser-setup{flex-basis:auto;width:auto;padding:0;border:0;background:transparent}
-.meeting-studio .meeting-browser-setup>summary{padding:5px 8px;border:1px solid var(--border);border-radius:8px;font-size:12px}
+.meeting-studio .meeting-browser-setup>summary{width:32px;height:32px;min-height:32px;padding:0;display:grid;place-items:center;list-style:none;border:0;border-radius:8px}
 .meeting-studio .meeting-browser-setup[open]{flex-basis:100%;width:100%;padding:8px 10px;border:1px solid var(--border)}
 .meeting-studio .meeting-studio-heading>.meeting-native{margin:0;padding:6px 10px}
 .meeting-studio .meeting-native .meeting-audio-help{margin:4px 0 0;font-size:12px}

@@ -101,6 +101,11 @@ def _page(limit, offset):
         raise HTTPException(422, 'Pagination bornée requise')
 
 
+def fold_query(query):
+    return ''.join(char for char in unicodedata.normalize('NFKD', query.strip().casefold())
+                   if not unicodedata.combining(char))
+
+
 def list_notes(db, project_id, *, query='', limit=30, offset=0):
     _project(db, project_id)
     _page(limit, offset)
@@ -108,7 +113,7 @@ def list_notes(db, project_id, *, query='', limit=30, offset=0):
         raise HTTPException(422, 'Recherche limitée à 200 caractères')
     if not _ready(db):
         return {'available': False, 'items': [], 'total': 0, 'limit': limit, 'offset': offset}
-    folded = ''.join(char for char in unicodedata.normalize('NFKD', query.strip().casefold()) if not unicodedata.combining(char))
+    folded = fold_query(query)
     conditions = [ProjectNote.project_id == project_id]
     if folded:
         conditions.append(func.agent_fold(ProjectNote.title + '\n' + ProjectNote.plain_text).contains(folded, autoescape=True))

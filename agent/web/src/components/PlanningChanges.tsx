@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { priorityLabels, taskStatusLabels, workflowLabels, type PlanningDiff } from '../lib/projectPlanning';
 import { Pagination } from './IdentityPickers';
-import { SourceInspector } from './WorkspaceViews';
+import { SourceInspector } from './SourceInspector';
 
 export const planningFieldLabels:Record<string,string>={title:'Intitulé',code:'Code',order:'Position',status:'État',workflow_status:'Workflow',comment:'Commentaire',active:'Actif',
   contractual_date:'Date contractuelle',forecast_date:'Date prévisionnelle',actual_date:'Date réelle',due_date:'Échéance',date_sources:'Sources des dates',

@@ -1,5 +1,5 @@
 import { afterEach, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen, waitFor,within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor,within } from "@testing-library/react";
 import { api, type PortfolioRow } from "../lib/api";
 import { workspaceApi, type DurableTriageJob, type WorkspaceJob, type WorkspaceKnowledge, type WorkspaceMeeting } from "../lib/workspaceApi";
 import { GlobalJobsView, GlobalKnowledgeView, GlobalMeetingsView, SourceInspector } from "./WorkspaceViews";
@@ -103,7 +103,7 @@ it.each([{type:'document',filename:'plan.pdf',locator:{physical_page:7},repere:'
     artifacts:[{id:'a',kind:'document_text',text:'Contenu complet du fichier fictif.'}]});
   render(<GlobalMeetingsView rows={[]} onOpenProject={vi.fn()}/>);
   fireEvent.click(await screen.findByText('Séance de preuve'));
-  await screen.findByRole('textbox',{name:'Titre de la note'});fireEvent.change(screen.getByLabelText('Titre de la note'),{target:{value:'Brouillon à garder'}});
+  await screen.findByRole('textbox',{name:'Titre de la note'},{timeout:5000});fireEvent.change(screen.getByLabelText('Titre de la note'),{target:{value:'Brouillon à garder'}});
   fireEvent.click(screen.getByRole('button',{name:'Notes enrichies'}));
   fireEvent.click(await screen.findByText('Preuve exacte'));fireEvent.click(screen.getByRole('button',{name:'Examiner la source citée'}));
   const dialog=await screen.findByRole('dialog');await within(dialog).findByText('Contenu complet du fichier fictif.');
@@ -373,6 +373,68 @@ it("rend les repères de tableur, audio et version de note consultables", async 
   render(<SourceInspector sourceId="repere" onClose={vi.fn()} evidence={[{source_id: "repere", locator: {sheet: "Chiffrage", range: "A4:C4", start_ms: 5000, end_ms: 10000, note_revision: 2, block_index: 3}}]} />);
   await screen.findByText("Sources localisées");
   expect(screen.getByText("Feuille : Chiffrage · Plage : A4:C4 · Début (ms) : 5000 · Fin (ms) : 10000 · Version de note : 2 · Bloc : 4")).toBeTruthy();
+});
+
+it("actualise les traitements au retour et ignore une ancienne réponse", async () => {
+  let resolveOld!: (value: {items: WorkspaceJob[]; total: number}) => void;
+  const load=vi.spyOn(workspaceApi,"jobs")
+    .mockImplementationOnce(()=>new Promise(resolve=>{resolveOld=resolve;}))
+    .mockResolvedValue({items:[job],total:1});
+  const view=render(<GlobalJobsView rows={rows} onOpenProject={vi.fn()} active/>);
+  await waitFor(()=>expect(load).toHaveBeenCalledTimes(1));
+  const oldSignal=load.mock.calls[0][1] as AbortSignal;
+  view.rerender(<GlobalJobsView rows={rows} onOpenProject={vi.fn()} active={false}/>);
+  expect(oldSignal.aborted).toBe(true);
+  view.rerender(<GlobalJobsView rows={rows} onOpenProject={vi.fn()} active/>);
+  await screen.findByText("4 / 10 mails");
+  expect(load).toHaveBeenCalledTimes(2);
+  await act(async()=>resolveOld({items:[],total:0}));
+  expect(screen.getByText("4 / 10 mails")).toBeTruthy();
+  expect(screen.queryByText("Aucun traitement enregistré")).toBeNull();
+});
+
+it("reprend les traitements au retour de la fenêtre sans perdre le filtre", async () => {
+  const hidden=vi.spyOn(document,"hidden","get").mockReturnValue(false);
+  let resolveOld!: (value: {items: WorkspaceJob[]; total: number}) => void;
+  const load=vi.spyOn(workspaceApi,"jobs")
+    .mockImplementationOnce(()=>new Promise(resolve=>{resolveOld=resolve;}))
+    .mockResolvedValue({items:[job],total:1});
+  render(<GlobalJobsView rows={rows} onOpenProject={vi.fn()} active/>);
+  await waitFor(()=>expect(load).toHaveBeenCalledTimes(1));
+  const oldSignal=load.mock.calls[0][1] as AbortSignal;
+  hidden.mockReturnValue(true);fireEvent(document,new Event("visibilitychange"));
+  expect(oldSignal.aborted).toBe(true);
+  hidden.mockReturnValue(false);fireEvent(document,new Event("visibilitychange"));
+  await screen.findByText("4 / 10 mails");
+  expect(load).toHaveBeenCalledTimes(2);
+  await act(async()=>resolveOld({items:[],total:0}));
+  expect(screen.getByText("4 / 10 mails")).toBeTruthy();
+  fireEvent.change(screen.getByLabelText("Projet"),{target:{value:"erp-a"}});
+  await waitFor(()=>expect(load).toHaveBeenLastCalledWith(expect.objectContaining({project_id:"erp-a"}),expect.any(AbortSignal)));
+  hidden.mockReturnValue(true);fireEvent(document,new Event("visibilitychange"));
+  hidden.mockReturnValue(false);fireEvent(document,new Event("visibilitychange"));
+  await waitFor(()=>expect(load).toHaveBeenLastCalledWith(expect.objectContaining({project_id:"erp-a"}),expect.any(AbortSignal),true));
+  expect((screen.getByLabelText("Projet") as HTMLSelectElement).value).toBe("erp-a");
+});
+
+it("laisse aboutir une lecture de traitements lente avant de reprendre le suivi", async () => {
+  vi.useFakeTimers();
+  try {
+    let finish!: (value: {items: WorkspaceJob[]; total: number}) => void;
+    const load=vi.spyOn(workspaceApi,"jobs")
+      .mockImplementationOnce(()=>new Promise(resolve=>{finish=resolve;}))
+      .mockResolvedValue({items:[job],total:1});
+    render(<GlobalJobsView rows={rows} onOpenProject={vi.fn()} active/>);
+    expect(load).toHaveBeenCalledTimes(1);
+    const signal=load.mock.calls[0][1] as AbortSignal;
+    await act(async()=>{await vi.advanceTimersByTimeAsync(11000);});
+    expect(load).toHaveBeenCalledTimes(1);
+    expect(signal.aborted).toBe(false);
+    await act(async()=>finish({items:[job],total:1}));
+    expect(screen.getByText("4 / 10 mails")).toBeTruthy();
+    await act(async()=>{await vi.advanceTimersByTimeAsync(5000);});
+    expect(load).toHaveBeenCalledTimes(2);
+  } finally {vi.useRealTimers();}
 });
 
 it("affiche les compteurs réels et propose seulement les commandes garanties par le moteur", async () => {

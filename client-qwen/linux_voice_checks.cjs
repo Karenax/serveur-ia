@@ -39,7 +39,7 @@ module.exports=async({page,state,errors,until,sleep,voiceUI})=>{
  assert.equal(await page.locator('#voice-execution option[value="pc"]').isDisabled(),true);
  assert.equal(await page.locator('#conversation-interruptions').isDisabled(),true);
  assert.equal(await page.locator('#voice-gpu-options').isVisible(),false);
- assert.equal(await page.locator('#voice-image-capture').isVisible(),false);
+ assert.equal(await page.locator('#voice-image-capture').isVisible(),true);
  assert(!(await page.locator('#voice-settings-dialog').innerText()).includes('réglages Windows'));
  state.native.max_tools_installed=true;
  await voiceUI.click('#conversation-start');await page.waitForFunction(()=>window.conversationBusy);

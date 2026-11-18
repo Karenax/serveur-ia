@@ -63,8 +63,8 @@ def source_names(component, web_dist=None):
         path=ROOT/name
         if not name or not path.is_file():continue
         if component == 'server' and name == 'agent/scripts/agent_runtime.py':continue
-        is_cargo_lock = component == 'windows' and name == 'client-tauri/Cargo.lock'
-        if not is_cargo_lock and path.suffix.lower() not in SUFFIXES and not (path.suffix=='.txt' and (path.name.startswith('requirements') or path.name=='product-version.txt')):
+        is_windows_input = component == 'windows' and name in {'client-tauri/Cargo.lock', 'client-qwen/kiara-relay.spec'}
+        if not is_windows_input and path.suffix.lower() not in SUFFIXES and not (path.suffix=='.txt' and (path.name.startswith('requirements') or path.name=='product-version.txt')):
             if not (component=='server' and name.startswith('agent/') and path.suffix.lower() in AGENT_SUFFIXES):continue
         if path.name.startswith(('test_','preview_','verify_','validate_')) or any(part in {'tests','__pycache__','node_modules'} for part in path.parts):continue
         if '/src/androidTest/' in name or '/src/debug/' in name:continue

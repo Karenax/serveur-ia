@@ -59,10 +59,16 @@ autre poste ou avec une autre clé.
 
 Pour la livraison Windows, construire le client Tauri et le paquet serveur avec
 le portail compilé. Utiliser la validation de périmètre `windows` pour le
-manifeste de déploiement. La 4.0.8 publiée utilise le manifeste Ed25519 du canal
+manifeste de déploiement. La 4.0.9 publiée utilise le manifeste Ed25519 du canal
 avec un installateur sans Authenticode. Conserver l’installateur et le manifeste
-4.0.7 ainsi que l’index du portail précédent. [Construction Windows](client-tauri/README.md)
+4.0.8 ainsi que l’index du portail précédent. [Construction Windows](client-tauri/README.md)
 [Procédure de bascule et preuves](audits/2026-11-15-fusion-kiara/BASCULE.md)
+
+Construire le relais avec `Build-Client.ps1 -Relay -SkipManifest`. La recette
+PyInstaller utilise `client-qwen/kiara-relay.spec` pour embarquer les ressources de
+récupération et du portail. Extraire le NSIS de distribution et comparer les
+empreintes de `Kiara.exe`, `kiara-relay.exe` et `kiara-agent-capture.exe` aux
+binaires de construction. Vérifier WebView2 en 720p, 1080p et 1440p.
 
 Pour activer le service Projets au démarrage du lanceur, créer `project-service.json` dans
 `KIARA_DATA_DIR` (par défaut, le dossier `lanceur`). Renseigner `data` avec le
@@ -151,13 +157,25 @@ sur `KIARA_EVIDENCE_DIR`, qui peut contenir un ancien chemin.
 
 ```powershell
 $Recette = Join-Path $PWD ('toolchain\test-results\' + (Get-Date -Format 'yyyyMMdd-HHmmss'))
-& '.\Strata-src\.venv\Scripts\python.exe' maintenance/verify_project.py --output $Recette
+& '.\Strata-src\.venv\Scripts\python.exe' maintenance/verify_project.py --desktop-audit --output $Recette
 ```
 
 Il agrège les échecs et produit `validation.json` dans un répertoire d’exécution
 sous `toolchain/test-results`. `--output` permet un emplacement explicite et
 `--checks` un sous-ensemble. Les vérifications OSV et Go consultent les avis publics.
 Les captures UI restent dans ce répertoire et ne remplacent aucune preuve historique.
+
+Pour la vérification ciblée Windows et Linux de l'audit, sans lancer Android ni
+les anciens tests Qt, utiliser `--desktop-audit` et fournir au besoin
+`--business-python` avec un environnement Python contenant les dépendances du
+service Projets. Ce profil comprend un test serveur isolé, les contrôles statiques
+et la compilation du portail, puis deux simulations Chromium de l'interface aux
+tailles de bureau de 720p à WQHD. Le champ `coverage` du rapport énumère les
+groupes non enregistrés ; la réussite concerne les seules commandes exécutées.
+Ces simulations ne remplacent pas les recettes Tauri natives Windows et Linux,
+ni la suite complète du service ou du portail.
+Sans `--desktop-audit` ni sélection `--checks`, le contrôle historique lance un
+ensemble plus large qui comprend Android et des scénarios mobiles.
 
 Les commandes individuelles restent disponibles :
 

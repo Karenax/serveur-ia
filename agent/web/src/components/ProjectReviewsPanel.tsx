@@ -44,7 +44,7 @@ function ReviewsView({projectId,active=true,onSaved,onOpenDocument}:ReviewsProps
     {error&&<ErrorState message={error} retry={()=>setTick(v=>v+1)}/>} {loading&&<LoadingState label="Chargement des revues"/>}
     {page&&!page.total&&!loading&&<p>Aucune revue de lancement. Les comptes rendus restent disponibles dans « Réunions et audio ».</p>}
     {page&&page.total>0&&<><div className="review-list" aria-label="Révisions de la revue">{page.items.map(row=><button type="button" key={row.id}
-      className={`review-card ${selectedId===row.id?'selected':''}`} aria-pressed={selectedId===row.id} disabled={locked||opening||!active}
+      className={`review-card ${selectedId===row.id?'selected':''}`} aria-label={`RLP · Révision ${row.number} — ouvrir le détail`} aria-pressed={selectedId===row.id} disabled={locked||opening||!active}
       onClick={()=>{setSelectedId(row.id);setDetail(null);}}><strong>RLP · Révision {row.number}</strong><span>{row.status==='published'?'Publiée · figée':'Brouillon'}</span>
       <small>{row.meeting_date||'Date à préciser'} · {row.participants} participant(s)</small></button>)}</div>
       <Pagination offset={page.offset} total={page.total} limit={page.limit} onChange={setOffset} disabled={locked||loading||opening}/></>}

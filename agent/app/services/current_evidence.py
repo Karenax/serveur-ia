@@ -9,7 +9,8 @@ def is_current_evidence(source, *, erp_factory=None):
         return False
     if metadata.get("origin_kind") == "erp_note":
         from .note_evidence_bridge import current_source_version
-        return current_source_version(metadata, erp_factory=erp_factory)["eligible"]
+        return current_source_version(metadata, erp_factory=erp_factory,
+                                      brain_project_id=source.project_id)["eligible"]
     return True
 
 

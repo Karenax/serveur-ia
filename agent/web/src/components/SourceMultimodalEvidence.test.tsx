@@ -48,7 +48,7 @@ it.each([
     author:'Recette fictive',metadata:{filename},artifacts:[{id:'artifact-original',kind:'document_text',text:'Original conservé version 2.'},
       {id:'before-correction',kind:'transcription_snapshot',text:'Ancienne transcription conservée.'}]});
   render(<WorkspaceShell rows={rows} reload={async()=>undefined} ProjectPanel={()=>null} MailPanel={()=>null} CreatePanel={()=>null} SagePanel={()=>null}/>);
-  fireEvent.change(screen.getByLabelText('Rechercher une source'),{target:{value:'couple visserie'}});
+  fireEvent.change(await screen.findByLabelText('Rechercher une source'),{target:{value:'couple visserie'}});
   fireEvent.click(screen.getByText(/Périmètre et filtres/));
   fireEvent.click(screen.getByRole('button',{name:'Rechercher dans le contenu des sources'}));
   fireEvent.click(await screen.findByRole('button',{name:`Consulter la source · ${name}`}));

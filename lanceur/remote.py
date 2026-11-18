@@ -629,37 +629,9 @@ def serve_gateway(store, backend, port=GATEWAY_PORT, *, agent_web_origin=None, b
             if self.path=='/v1/workspace':
                 if not self.authorized():return
                 return self.respond(200,store.workspace.snapshot(self.identity))
-            if self.path in ('/v1/client/kiara4/release', '/v1/client/kiara4/download', DESKTOP_RELEASE, DESKTOP_DOWNLOAD):
-                if not self.authorized(): return
-                from releases import DESKTOP_INSTALLER, windows_installer
-                if self.path.endswith('/release'):
-                    try:
-                        release, _ = windows_installer(store.home)
-                        return self.respond(200, release)
-                    except ValueError as error:
-                        return self.respond(503, {'error': {'message': str(error)}})
-                try:
-                    stream = (store.home / 'installateurs' / DESKTOP_INSTALLER).open('rb')
-                except OSError:
-                    return self.respond(503, {'error': {'message': 'Installateur Kiara 4 indisponible.'}})
-                with stream:
-                    try:
-                        release, _ = windows_installer(store.home, stream=stream)
-                    except ValueError as error:
-                        return self.respond(503, {'error': {'message': str(error)}})
-                    self.send_response(200)
-                    self.send_header('Content-Type', 'application/octet-stream')
-                    self.send_header('Content-Length', str(release['bytes']))
-                    self.send_header('Cache-Control', 'no-store')
-                    self.send_header('X-Content-Type-Options', 'nosniff')
-                    self.end_headers()
-                    try:
-                        while chunk := stream.read(256 * 1024):
-                            if not self.access_valid(): return
-                            self.wfile.write(chunk)
-                    except (ConnectionError, TimeoutError):
-                        return
-                return
+            from gateway_desktop_downloads import ROUTES as DESKTOP_ROUTES, handle as desktop_download
+            if self.path in DESKTOP_ROUTES:
+                return desktop_download(self, store)
             if self.path in ('/v1/client/release','/v1/client/download'):
                 if not self.authorized():return
                 from releases import release_binary, status
@@ -727,28 +699,8 @@ def serve_gateway(store, backend, port=GATEWAY_PORT, *, agent_web_origin=None, b
             if self.path in LOW_ROUTES:return low_voice(self,store)
             if self.path=='/v1/embeddings':return embeddings(self,store)
             if self.path == '/v1/cancel':
-                if not self.authorized(): return
-                try:
-                    value = json_body(self, 4096, allow_empty=True)
-                    if not isinstance(value,dict) or set(value)-{'text_transform','voice_conversation'}:raise ValueError('Requête d’annulation invalide.')
-                    direct=bool(value)
-                    if direct and (len(value)!=1 or next(iter(value.values())) is not True):raise ValueError('Annulation directe invalide.')
-                    request=self.headers.get('X-Qwen-Request') or None
-                    if request is not None or direct:store.text_transforms.request_id(request)
-                    # A receipt survives cancellation arriving before submit or during health checks.
-                    if direct:store.text_transforms.cancel(self.identity,request)
-                    with scheduler.condition:
-                        transforms=[item['id'] for item in scheduler.requests if item['owner']==self.identity and (item.get('text_transform') or item.get('voice_conversation')) and (request is None or item['id']==request)]
-                    for target in transforms:store.text_transforms.cancel(self.identity,target)
-                    scheduler.cancel(self.identity,request)
-                    manager=getattr(store.hermes,'conversations',None)
-                    agent_active=request is None and manager is not None and manager.context(self.identity) is not None
-                    if direct or (transforms and not agent_active):return self.respond(200,{'cancelled':True,'request_id':request})
-                except (ValueError,TypeError,OSError) as error:return self.respond(400,{'error':{'message':str(error)}})
-                if store.hermes:
-                    try:return self.respond(200,store.hermes.cancel(self.identity,request))
-                    except ValueError as error:return self.respond(400,{'error':{'message':str(error)}})
-                return self.respond(200, {'cancelled': True})
+                from gateway_cancel import handle as cancel
+                return cancel(self, store, scheduler)
             if self.path not in ('/v1/chat/completions','/v1/context'):
                 return self.respond(404, {'error': {'message': 'Route non disponible.'}})
             if not self.authorized():

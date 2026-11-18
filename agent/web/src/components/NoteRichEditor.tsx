@@ -1,17 +1,12 @@
 import { agentPath } from '../lib/agentRoutes';
-import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ClipboardEvent, type KeyboardEvent } from 'react';
 import { noteUrl, safeNoteLink, validNoteContent, type NoteBlock, type NoteContent, type NoteMark, type NoteRun } from '../lib/projectNotes';
 import {markdownDraftKey,noteToMarkdown,parseNoteMarkdown,readMarkdownDraft,type MarkdownDraft,type MarkdownDraftState} from '../lib/noteMarkdown';
+import {NoteContentView} from './NoteContentView';
 import './note-editor.css';
+export {NoteContentView,renderNoteRuns} from './NoteContentView';
 
 const tags:Record<NoteMark,string>={bold:'strong',italic:'em',underline:'u',strike:'s',code:'code'};
-export function renderNoteRuns(runs:NoteRun[]):ReactNode{return runs.map((run,i)=>{
-  let node:ReactNode=run.text;
-  for(const mark of run.marks)node=mark==='bold'?<strong>{node}</strong>:mark==='italic'?<em>{node}</em>:
-    mark==='underline'?<u>{node}</u>:mark==='strike'?<s>{node}</s>:<code>{node}</code>;
-  if(run.href&&safeNoteLink(run.href))node=<a href={run.href} target="_blank" rel="noopener noreferrer">{node}</a>;
-  return <span key={i} style={run.color&&/^#[0-9a-f]{6}$/i.test(run.color)?{color:run.color}:undefined}>{node}</span>;
-});}
 function paintRuns(element:HTMLElement,runs:NoteRun[]){
   const nodes=runs.map(run=>{
     let node:Node=document.createTextNode(run.text);
@@ -69,22 +64,15 @@ function RunsInput({runs,onChange,label,onFocus,onKeyDown,inputId,disabled=false
       const range=selection.getRangeAt(0);range.deleteContents();const text=document.createTextNode(value);range.insertNode(text);range.setStartAfter(text);range.collapse(true);selection.removeAllRanges();selection.addRange(range);emit();}}
     onDrop={e=>e.preventDefault()}/>;
 }
-export function NoteContentView({content,projectId,noteId,preview=false}:{content:NoteContent;projectId:string;noteId:string;preview?:boolean}){
-  return <div className="note-content-view">{content.blocks.map((b,i)=>b.type==='paragraph'?<p key={i} style={{textAlign:b.align}}>{renderNoteRuns(b.runs)}</p>:
-    b.type==='heading'?<div key={i} role="heading" aria-level={b.level} className={`note-heading level-${b.level}`}>{renderNoteRuns(b.runs)}</div>:
-    b.type==='image'?<figure key={i}>{preview?<p className="note-image-placeholder">Image conservée à l’import : {b.caption||'sans légende'}</p>:<img src={agentPath(`${noteUrl(projectId,noteId)}/attachments/${encodeURIComponent(b.attachment_id)}/image`)} alt={b.caption}/>}<figcaption>{b.caption}</figcaption></figure>:
-    b.type==='table'?<div key={i} className="note-table-scroll"><table><tbody>{b.rows.map((row,r)=><tr key={r}>{row.map((cell,c)=>r===0&&b.header?<th key={c}>{renderNoteRuns(cell)}</th>:<td key={c}>{renderNoteRuns(cell)}</td>)}</tr>)}</tbody></table></div>:
-    <ol key={i} className={`note-list ${b.kind}`}>{b.items.map((item,n)=><li key={n} style={{marginLeft:item.indent*16}}>{b.kind==='checklist'&&<input type="checkbox" checked={item.checked} disabled aria-label={`Case ${n+1}`}/>}<span>{renderNoteRuns(item.runs)}</span></li>)}</ol>)}</div>;
-}
 type NoteEditorProps={content:NoteContent;onChange:(value:NoteContent)=>void|boolean;projectId:string;noteId:string;disabled?:boolean;
-  draftId?:string;onMarkdownDraftState?:(state:MarkdownDraftState)=>void};
+  draftId?:string;onMarkdownDraftState?:(state:MarkdownDraftState)=>void;onPasteImage?:(file:File,insertAt:number)=>void};
 type EditorFocus={id:string;offset:number};
 type EditorSnapshot={content:NoteContent;focus:EditorFocus|null};
 export function NoteRichEditor(props:NoteEditorProps){
   const identity=props.draftId||JSON.stringify([props.projectId,props.noteId]);
   return <RichEditorSession key={identity} {...props} identity={identity}/>;
 }
-function RichEditorSession({content,onChange,projectId,noteId,disabled=false,draftId,onMarkdownDraftState,identity}:NoteEditorProps&{identity:string}){
+function RichEditorSession({content,onChange,projectId,noteId,disabled=false,draftId,onMarkdownDraftState,onPasteImage,identity}:NoteEditorProps&{identity:string}){
   const [focused,setFocused]=useState(0),[focusedItem,setFocusedItem]=useState(0),[link,setLink]=useState(''),[showLink,setShowLink]=useState(false),[notice,setNotice]=useState('');
   const [initial]=useState(()=>draftId||projectId||noteId?readMarkdownDraft(identity):{ok:true as const,value:null});
   const [markdown,setMarkdown]=useState<MarkdownDraft|null>(initial.ok?initial.value:null);
@@ -264,6 +252,22 @@ function RichEditorSession({content,onChange,projectId,noteId,disabled=false,dra
     commit({...latest.current,blocks});savedRange.current=null;
   }
   const b=content.blocks[focused];
+  function pasteImage(event:ClipboardEvent<HTMLDivElement>){
+    if(!onPasteImage||disabled)return;
+    const files=Array.from(event.clipboardData.files??[]).filter(candidate=>candidate.type.startsWith('image/'));
+    if(!files.length)for(const item of Array.from(event.clipboardData.items??[])){
+      if(item.kind==='file'&&item.type.startsWith('image/')){
+        const file=item.getAsFile();if(file)files.push(file);
+      }
+    }
+    if(!files.length)return;
+    event.preventDefault();
+    event.stopPropagation();
+    if(files.length>1){setNotice('Collez une image à la fois.');return;}
+    const field=(event.target as HTMLElement).closest<HTMLElement>('[data-note-input]');
+    const at=field?Number(field.dataset.noteInput?.split(':')[1]):focused;
+    setNotice('');onPasteImage(files[0],Math.min(at+1,content.blocks.length));
+  }
   function styleBlock(value:string){
     if(!b)return;
     if(b.type==='paragraph'||b.type==='heading')change(focused,value==='paragraph'?{type:'paragraph',align:'left',runs:b.runs}:{type:'heading',level:Number(value.slice(1)),runs:b.runs});
@@ -285,7 +289,8 @@ function RichEditorSession({content,onChange,projectId,noteId,disabled=false,dra
       name==='undo'?<path d="m8 5-5 5 5 5M3 10h12a5 5 0 0 1 0 10"/>:
       name==='redo'?<path d="m16 5 5 5-5 5M21 10H9a5 5 0 0 0 0 10"/>:<path d="M12 5v14M5 12h14"/>}</svg>;
   if(markdownMode)return <div className="note-rich-editor note-markdown-editor" data-workspace-dirty={markdownPending?'true':undefined}>
-    <p>Markdown réversible : paragraphes, titres 1–3, listes, gras, italique, code et liens HTTP(S)/mailto sûrs. Tableaux, images et autres mises en forme restent dans l’éditeur riche.</p>
+    <p>Markdown réversible : paragraphes, titres 1–3, listes, gras, italique, code.</p>
+    <p>Liens HTTP(S) et mailto sûrs ; tableaux, images et autres mises en forme restent dans l'éditeur riche.</p>
     {journalError&&<p role="alert">{journalError}</p>}
     {markdown&&<label>Texte Markdown<textarea className="input" style={{width:'100%',minHeight:180,fontFamily:'monospace'}} value={markdown.text} readOnly={disabled}
       onChange={event=>{const next={...markdown,text:event.target.value};setMarkdown(next);setMarkdownPending(true);persistMarkdown(next);}}/></label>}
@@ -313,7 +318,7 @@ function RichEditorSession({content,onChange,projectId,noteId,disabled=false,dra
       <span className="note-toolbar-divider" aria-hidden="true"/>
       {(['bullet','ordered','checklist'] as const).map(kind=><button type="button" key={kind} className="note-tool" aria-label={{bullet:'Liste à puces',ordered:'Liste numérotée',checklist:'Liste à cocher'}[kind]}
         title={{bullet:'Liste à puces',ordered:'Liste numérotée',checklist:'Liste à cocher'}[kind]} aria-pressed={b?.type==='list'&&b.kind===kind} onMouseDown={e=>e.preventDefault()} onClick={()=>list(kind)}>{icon(kind)}</button>)}
-      <details className="note-format-menu"><summary onMouseDown={()=>{savedRange.current=selection();}}>{icon('plus')} Insérer / format <span aria-hidden="true">⌄</span></summary>
+      <details className="note-format-menu"><summary aria-label="Insérer et formater" title="Insérer et formater" onMouseDown={()=>{savedRange.current=selection();}}>{icon('plus')}<span className="sr-only">+ Insérer / format</span></summary>
         <div className="note-format-popover">
           <div className="note-menu-section"><span>Insérer</span><button type="button" disabled={content.blocks.length>=500} onClick={()=>add({type:'paragraph',align:'left',runs:[]})}>Paragraphe</button>
             <button type="button" disabled={content.blocks.length>=500} onClick={()=>add({type:'table',header:true,rows:[[[],[],[]],[[],[],[]],[[],[],[]]]})}>Tableau</button></div>
@@ -343,7 +348,7 @@ function RichEditorSession({content,onChange,projectId,noteId,disabled=false,dra
       <button type="button" className="button secondary sm" disabled={!safeNoteLink(link)} onClick={()=>{format('createLink',link);setShowLink(false);setLink('');}}>Appliquer le lien</button>
       <button type="button" className="button secondary sm" onClick={()=>{format('unlink');setShowLink(false);}}>Retirer le lien</button></div>}
     {notice&&<p className="note-editor-notice" role="status">{notice}</p>}</>}
-    <div className="note-blocks note-document-page" aria-label="Document de la note" onClick={event=>{if(event.target===event.currentTarget){const inputs=root.current?.querySelectorAll<HTMLElement>('.note-runs'),last=inputs?.[inputs.length-1];if(!last)return;last.focus();const range=document.createRange();range.selectNodeContents(last);range.collapse(false);const selected=window.getSelection();selected?.removeAllRanges();selected?.addRange(range);}}}>
+    <div className="note-blocks note-document-page" aria-label="Document de la note" onPasteCapture={pasteImage} onClick={event=>{if(event.target===event.currentTarget){const inputs=root.current?.querySelectorAll<HTMLElement>('.note-runs'),last=inputs?.[inputs.length-1];if(!last)return;last.focus();const range=document.createRange();range.selectNodeContents(last);range.collapse(false);const selected=window.getSelection();selected?.removeAllRanges();selected?.addRange(range);}}} onKeyDown={event=>{if(event.target===event.currentTarget&&(event.key==='Enter'||event.key===' ')){event.preventDefault();const inputs=root.current?.querySelectorAll<HTMLElement>('.note-runs'),last=inputs?.[inputs.length-1];last?.focus();}}}>
       {content.blocks.map((block,i)=><div key={i} className={`note-block ${block.type}${block.type==='heading'?` level-${block.level}`:''}`}>
         {(block.type==='paragraph'||block.type==='heading')&&<div style={block.type==='paragraph'?{textAlign:block.align}:undefined}>
           <RunsInput runs={block.runs} inputId={`p:${i}`} disabled={disabled} label={`Texte du bloc ${i+1}`} onFocus={()=>{setFocused(i);setFocusedItem(0);}}
@@ -358,7 +363,7 @@ function RichEditorSession({content,onChange,projectId,noteId,disabled=false,dra
           const Cell=r===0&&block.header?'th':'td';return <Cell key={c}><RunsInput runs={cell} inputId={`t:${i}:${r}:${c}`} disabled={disabled} label={`Ligne ${r+1}, colonne ${c+1} du bloc ${i+1}`}
             onFocus={()=>setFocused(i)} onKeyDown={e=>tableKey(e,i,r,c)} onChange={runs=>change(i,{...block,rows:block.rows.map((rw,ri)=>ri===r?rw.map((cl,ci)=>ci===c?runs:cl):rw)},`t:${i}:${r}:${c}`)}/></Cell>;
         })}</tr>)}</tbody></table></div>}
-        {block.type==='image'&&<figure onClick={()=>setFocused(i)}><img src={agentPath(`${noteUrl(projectId,noteId)}/attachments/${encodeURIComponent(block.attachment_id)}/image`)} alt={block.caption}/>
+        {block.type==='image'&&<figure onClick={()=>setFocused(i)}><img src={agentPath(`${noteUrl(projectId,noteId)}/attachments/${encodeURIComponent(block.attachment_id)}/image`)} alt={block.caption||'Image dans la note'}/>
           <label>Légende<input className="input" maxLength={1000} value={block.caption} readOnly={disabled} onFocus={()=>setFocused(i)} onChange={e=>change(i,{...block,caption:e.target.value},`image:${i}`)}/></label></figure>}
       </div>)}
       {!content.blocks.length&&!disabled&&<button type="button" className="note-empty-page" onClick={()=>{focus('p:0');commit({...content,blocks:[{type:'paragraph',align:'left',runs:[]}]});}}>Commencez à écrire…</button>}

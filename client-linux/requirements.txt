@@ -1,12 +1,9 @@
-# Runtime Linux et reconnaissance locale ; aucun composant Windows.
-pywebview[pyside6]==6.2.1
-# Dépendance Python pure de pywebview, distribuée uniquement en sources.
-proxy_tools==0.1.0
-PySide6==6.12.0
+# Relais Linux et reconnaissance locale pour le client Tauri.
 keyring==25.7.0
 cryptography==50.0.2
 PyYAML==6.0.3
 psutil==7.2.2
+dbus-next==0.2.3
 sherpa-onnx==1.13.8
 onnxruntime==1.24.4
 numpy==2.2.6

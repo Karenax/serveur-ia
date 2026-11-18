@@ -23,8 +23,12 @@ utilisateur final, pas pour un développeur.
   de récupération. Ne pas sacrifier une fonctionnalité pour l'esthétique.
 - Réutiliser les composants, variables CSS, typographie et conventions existants.
   Éviter décoration gratuite et multiplication artificielle des cartes et boutons.
-- Favoriser navigation stable, actions fréquentes et interactions directes ; conserver
-  la densité fonctionnelle nécessaire sur ordinateur, téléphone et tablette.
+- Favoriser une navigation stable, des actions directes et une densité adaptée à
+  l’écran d’ordinateur. Le périmètre actif est le client Windows et le web privé.
+- Vérifier les écrans concernés en 720p (1280 × 720), 1080p (1920 × 1080) et
+  1440p (2560 × 1440). Prendre les captures à taille d’écran fixe, une fois
+  l’interface stabilisée. Les travaux et recettes mobile sont reportés jusqu’à
+  leur reprise explicite.
 - Vérifier erreurs, états vide/chargement, clavier, focus et accessibilité pertinente
   WCAG 2.2 AA ; ne pas annoncer une conformité complète sans vérification suffisante.
 

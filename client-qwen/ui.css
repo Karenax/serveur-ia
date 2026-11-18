@@ -202,3 +202,66 @@ body[data-project-ephemeral="true"] :is(#ui-draft-status,#ui-draft-retry), body[
   overflow: hidden;
   clip-path: inset(50%);
 }
+
+body[data-kiara-unified-navigation="true"]{--sidebar-width:238px}
+body.sidebar-collapsed[data-kiara-unified-navigation="true"]{--sidebar-width:70px}
+/* Keep the main destinations in the same order and position as the Kiara portal. */
+body[data-kiara-unified-navigation="true"] .sidebar{padding:22px 15px 16px}
+body[data-kiara-unified-navigation="true"] .brand{padding:0 12px 12px;gap:12px}
+body[data-kiara-unified-navigation="true"] .brand .logo{border-radius:8px;width:30px;height:30px}
+body[data-kiara-unified-navigation="true"] .brand strong{font-size:16px;font-weight:700;line-height:1.5;letter-spacing:normal;color:var(--text)}
+body[data-kiara-unified-navigation="true"] .brand small{display:none}
+body[data-kiara-unified-navigation="true"] .sidebar-nav{margin-top:14px;gap:5px;padding:0}
+body[data-kiara-unified-navigation="true"] :is(.sidebar-nav,.sidebar-settings) .nav-button{padding:11px 12px;gap:12px;border-radius:8px;font-size:14px;font-weight:600;line-height:1.5;min-height:43px}
+body[data-kiara-unified-navigation="true"] :is(.sidebar-nav,.sidebar-settings) .nav-button svg{width:18px;height:18px;stroke-width:1.7}
+body[data-kiara-unified-navigation="true"] .sidebar-nav .nav-button.active{background:var(--hover);color:var(--text);font-weight:600}
+body[data-kiara-unified-navigation="true"] .sidebar-settings{margin-top:auto;display:grid;gap:22px;padding-top:18px}
+body[data-kiara-unified-navigation="true"] .unified-sidebar-status{display:flex;align-items:center;gap:7px;padding:0 12px;color:var(--muted);font-size:12px;line-height:1.5}
+body[data-kiara-unified-navigation="true"] .unified-sidebar-status::before{content:"";width:7px;height:7px;flex:none;border-radius:50%;background:var(--green)}
+body.sidebar-collapsed[data-kiara-unified-navigation="true"] .unified-sidebar-status{display:none}
+body[data-kiara-unified-navigation="true"] .conversation-toolbar{padding:12px 32px 0}
+body[data-kiara-unified-navigation="true"] .conversation-toolbar .new-button{border:1px solid var(--line);padding:8px 12px}
+body[data-kiara-unified-navigation="true"] .conversation-history-menu{position:relative}
+body[data-kiara-unified-navigation="true"] .conversation-history-menu>summary{list-style:none;cursor:pointer;border:1px solid var(--line);border-radius:7px;padding:8px 12px}
+body[data-kiara-unified-navigation="true"] .conversation-history-menu>summary::-webkit-details-marker{display:none}
+body[data-kiara-unified-navigation="true"] .conversation-history-menu .history-navigation{position:absolute;top:calc(100% + 6px);left:0;z-index:30;width:min(320px,calc(100vw - 40px));max-height:min(65vh,520px);overflow:auto;padding:10px;background:var(--bg);border:1px solid var(--line);border-radius:9px;box-shadow:var(--shadow)}
+body.sidebar-collapsed[data-kiara-unified-navigation="true"] .conversation-toolbar :is(.nav-text,.history-search,.section-label,#conversation-list){display:revert}
+@media(max-width:850px){body[data-kiara-unified-navigation="true"] .conversation-toolbar{padding-inline:24px;flex-wrap:wrap}}
+@media(min-width:851px){body.sidebar-collapsed[data-kiara-unified-navigation="true"] :is(.sidebar-nav,.sidebar-settings) .nav-button{font-size:0;justify-content:center;padding:11px 0}}
+
+/* Lot 1 — une seule entrée discrète pour les options secondaires. */
+.menu-divider{height:1px;background:var(--line);margin:6px 2px}
+#ui-conversation-menu>summary{display:grid;place-items:center;width:32px;height:32px;padding:0;border:1px solid transparent;border-radius:8px;font-size:18px}
+#ui-conversation-menu>summary:hover{border-color:var(--line)}
+#ui-conversation-menu .model-choice{display:grid;gap:4px;min-width:0;max-width:none;width:min(280px,calc(100vw - 64px));align-items:stretch;padding:4px 6px 8px}
+#ui-conversation-menu .model-choice label{font-size:11px;color:var(--muted)}
+#ui-conversation-menu .model-choice select{width:100%;min-height:34px;font-size:12px}
+#ui-conversation-menu .model-choice #model{font-size:11px;text-align:left;white-space:normal;overflow-wrap:anywhere;max-width:none}
+.discrete-icon-menu,.project-conversation-options{position:relative;flex:0 0 auto}
+.discrete-icon-menu>summary,.project-conversation-options>summary{display:grid;place-items:center;width:32px;height:32px;padding:0;border:1px solid transparent;border-radius:8px;list-style:none;color:var(--muted);font-size:16px;line-height:1;cursor:pointer}
+.discrete-icon-menu>summary::-webkit-details-marker,.project-conversation-options>summary::-webkit-details-marker{display:none}
+.discrete-icon-menu>summary:hover,.project-conversation-options>summary:hover{background:var(--hover);border-color:var(--line);color:var(--text)}
+.discrete-icon-menu>summary svg{width:18px;height:18px}
+.composer-options-body{top:auto;bottom:calc(100% + 10px);left:-4px;right:auto;width:min(320px,calc(100vw - 28px));max-height:min(70vh,560px);overflow:auto;gap:10px;padding:12px}
+.composer-options-body>:is(.context-gauge,.privacy,.ws-pickers,.thinking-control){font-size:11px;color:var(--muted)}
+.composer-options-body .thinking-bar{width:100%}
+.composer-options-body .thinking-segment{flex:1 0 auto}
+.composer-options-body .ws-pickers{display:flex;flex-wrap:wrap;gap:6px}
+.composer-options-body .ws-pickers select{max-width:100%}
+.composer-options-body .composer-options>div{position:static;width:auto;padding:8px 0 0;border:0;box-shadow:none;background:none}
+.composer-options-body .composer-options summary{font-size:11px}
+.composer-options-body .composer-options .controls{gap:6px}
+.composer-options-body button{font-size:11px!important;padding:7px 9px!important}
+.send-row>#voice-start{margin-left:0}
+.send-row>#send{margin-left:auto}
+.send-row>.icon-voice-button{width:32px;height:32px;min-width:32px;min-height:32px;padding:0;border-radius:8px;display:grid;place-items:center}
+.send-row>.icon-voice-button svg{width:17px;height:17px}
+.send-row>.icon-voice-button[aria-pressed=true]{color:var(--danger);border-color:var(--danger)}
+.project-conversation-controls .project-conversation-options .menu-body{top:calc(100% + 6px);right:auto;left:0;width:min(280px,calc(100vw - 32px));gap:8px}
+.project-conversation-controls .project-conversation-options label{font-size:12px;color:var(--muted);white-space:normal}
+.project-conversation-controls .project-conversation-options select{max-width:100%}
+@media(max-width:620px){.composer-options-body{width:min(320px,calc(100vw - 24px))}.send-row>.icon-voice-button{width:36px;height:36px;min-width:36px;min-height:36px}}
+/* Copie de sélection : icône seule, sans texte ni bordure au repos. */
+.selection-copy-label{display:none}
+button.selection-copy-control{width:32px;height:32px;min-width:32px;padding:0;justify-content:center;border:0;background:transparent;font-size:0}
+button.selection-copy-control:hover{background:var(--hover);border-color:transparent}

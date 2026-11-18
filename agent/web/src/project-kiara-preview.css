@@ -1,26 +1,64 @@
 /* Kiara navigation uses the palette from Conversations. */
 .workspace-shell[data-kiara-navigation="true"] {
-  --ink:#242423; --muted:#686862; --accent:#242423; --bg:#fff;
-  --surface:#fff; --surface-muted:#fafaf9; --surface-hover:#f0f0ed;
-  --border:#e7e7e3; --danger:#ad4038; --kiara-sidebar:#f7f7f5;
+  --ink:#242423; --muted:#686862; --accent:#242423; --text:#242423; --bg:#fff;
+  --surface:#fff; --surface-muted:#fafaf9; --surface-hover:#eeeee9;
+  --border:#e7e7e3; --danger:#ad4038; --kiara-sidebar:#f7f7f5; --kiara-success:#327854;
   font-family:"Segoe UI",system-ui,sans-serif;
 }
 .workspace-shell[data-kiara-navigation="true"][data-workspace-theme="dark"] {
-  --ink:#ececeb; --muted:#999994; --accent:#ececeb; --bg:#202021;
-  --surface:#202021; --surface-muted:#262627; --surface-hover:#303032;
-  --border:#383839; --danger:#e4a199; --kiara-sidebar:#19191a;
+  --ink:#ececeb; --muted:#999994; --accent:#ececeb; --text:#ececeb; --bg:#202021;
+  --surface:#202021; --surface-muted:#262627; --surface-hover:#2d2d2e;
+  --border:#383839; --danger:#e4a199; --kiara-sidebar:#19191a; --kiara-success:#8fba9e;
 }
 .workspace-shell[data-kiara-navigation="true"] .workspace-sidebar {
   background:var(--kiara-sidebar);
 }
 .workspace-shell[data-kiara-navigation="true"] .workspace-brand {
+  padding:0 12px 12px;
+  gap:12px;
   font-size:16px;
+  font-weight:700;
+  line-height:1.5;
   letter-spacing:normal;
+  color:var(--text);
 }
 .workspace-shell[data-kiara-navigation="true"] .workspace-brand > span {
   width:30px;
   height:30px;
   border-radius:8px;
+  background:var(--text);
+  color:var(--bg);
+  font-size:16px;
+  font-weight:600;
+}
+.workspace-shell[data-kiara-navigation="true"] .workspace-sidebar nav a {
+  padding:11px 12px;
+  gap:12px;
+  border-radius:8px;
+  font-size:14px;
+  font-weight:600;
+  line-height:1.5;
+  min-height:43px;
+}
+.workspace-shell[data-kiara-navigation="true"] .workspace-sidebar-foot {
+  margin-top:auto;
+  display:grid;
+  gap:22px;
+  padding-top:18px;
+}
+.workspace-shell[data-kiara-navigation="true"] .workspace-local {
+  padding:0 12px;
+  font-size:12px;
+  color:var(--muted);
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+.workspace-shell[data-kiara-navigation="true"] .workspace-local i {
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:var(--kiara-success,#327854);
 }
 .workspace-shell[data-kiara-navigation="true"] .workspace-topbar {
   min-height:58px;
@@ -35,6 +73,33 @@
 @media (min-width:851px) {
   .workspace-shell[data-kiara-navigation="true"] {
     grid-template-columns:238px minmax(0,1fr);
+  }
+  /* Même repli que client-qwen : 70px, icônes seules. */
+  .workspace-shell[data-kiara-navigation="true"].workspace-sidebar-collapsed {
+    grid-template-columns:70px minmax(0,1fr);
+  }
+  .workspace-shell[data-kiara-navigation="true"].workspace-sidebar-collapsed .workspace-sidebar {
+    padding:22px 8px 16px;
+    align-items:stretch;
+  }
+  .workspace-shell[data-kiara-navigation="true"].workspace-sidebar-collapsed .workspace-brand {
+    justify-content:center;
+    padding:0 0 12px;
+    font-size:0;
+  }
+  .workspace-shell[data-kiara-navigation="true"].workspace-sidebar-collapsed .workspace-brand > span {
+    font-size:16px;
+  }
+  .workspace-shell[data-kiara-navigation="true"].workspace-sidebar-collapsed .workspace-sidebar nav a,
+  .workspace-shell[data-kiara-navigation="true"].workspace-sidebar-collapsed .workspace-sidebar-foot nav a {
+    justify-content:center;
+    padding-inline:0;
+    font-size:0;
+  }
+  .workspace-shell[data-kiara-navigation="true"].workspace-sidebar-collapsed .workspace-sidebar nav a > span,
+  .workspace-shell[data-kiara-navigation="true"].workspace-sidebar-collapsed .workspace-sidebar-foot nav a > span,
+  .workspace-shell[data-kiara-navigation="true"].workspace-sidebar-collapsed .workspace-local {
+    display:none;
   }
 }
 
@@ -107,8 +172,20 @@
 }
 @media (max-width:520px) {
   .kiara-project-tabs { display:grid;grid-template-columns:repeat(2,minmax(0,1fr)); }
-  .workspace-shell[data-project-presentation="kiara"] .workspace-portfolio :is(th,td):nth-child(3),
-  .workspace-shell[data-project-presentation="kiara"] .workspace-portfolio :is(th,td):nth-child(4) { display:none; }
+  /* Keep every project field available on a narrow screen without sideways scrolling. */
+  .workspace-shell[data-project-presentation="kiara"] .workspace-portfolio { display:block;min-width:0; }
+  .workspace-shell[data-project-presentation="kiara"] .workspace-portfolio thead { position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap; }
+  .workspace-shell[data-project-presentation="kiara"] .workspace-portfolio tbody { display:block; }
+  .workspace-shell[data-project-presentation="kiara"] .workspace-portfolio tr { display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;padding:14px 16px;border-bottom:1px solid var(--border); }
+  .workspace-shell[data-project-presentation="kiara"] .workspace-portfolio tr:last-child { border-bottom:0; }
+  .workspace-shell[data-project-presentation="kiara"] .workspace-portfolio td { display:block;min-width:0;padding:0;border:0; }
+  .workspace-shell[data-project-presentation="kiara"] .workspace-portfolio td:first-child { width:auto;min-width:0;max-width:none;grid-column:1; }
+  .workspace-shell[data-project-presentation="kiara"] .workspace-portfolio td:first-child>small { margin-left:0; }
+  .workspace-shell[data-project-presentation="kiara"] .workspace-portfolio td:nth-child(2) { grid-column:1; }
+  .workspace-shell[data-project-presentation="kiara"] .workspace-portfolio td:nth-child(3) { grid-column:1; }
+  .workspace-shell[data-project-presentation="kiara"] .workspace-portfolio td:nth-child(4) { grid-column:1;overflow-wrap:anywhere; }
+  .workspace-shell[data-project-presentation="kiara"] .workspace-portfolio td:nth-child(4)::before { content:"Prochaine étape : ";color:var(--muted); }
+  .workspace-shell[data-project-presentation="kiara"] .workspace-portfolio td:nth-child(5) { grid-column:2;grid-row:1 / span 2;align-self:start; }
 }
 
 .workspace-shell[data-project-presentation="kiara"] .workspace-toolbar > input[aria-label="Rechercher un projet"] {

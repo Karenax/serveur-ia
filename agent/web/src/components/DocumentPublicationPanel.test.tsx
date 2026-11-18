@@ -1,5 +1,5 @@
 import { beforeEach,afterEach,it,expect,vi } from 'vitest';
-import { render,screen,fireEvent,waitFor,cleanup } from '@testing-library/react';
+import { act,render,screen,fireEvent,waitFor,cleanup } from '@testing-library/react';
 import { DocumentPublicationPanel } from './DocumentPublicationPanel';
 import { publicationApi,pendingKey,type PublicationRecord,type PublicationCommand,type PublicationPreview } from '../lib/projectDocumentPublications';
 import { documentApi,type DocumentWorkspace } from '../lib/projectDocuments';
@@ -15,7 +15,8 @@ beforeEach(()=>{localStorage.clear();vi.spyOn(documentApi,'workspace').mockResol
   vi.spyOn(publicationApi,'preview').mockResolvedValue(preview);vi.spyOn(publicationApi,'publish').mockResolvedValue(record);
   vi.spyOn(publicationApi,'abandon').mockResolvedValue({...record,state:'abandoned',can_resume:false,can_abandon:false});
 });
-afterEach(()=>{cleanup();vi.restoreAllMocks();vi.clearAllMocks();localStorage.clear();});
+const originalHidden=Object.getOwnPropertyDescriptor(document,'hidden');
+afterEach(()=>{cleanup();vi.useRealTimers();vi.restoreAllMocks();vi.clearAllMocks();localStorage.clear();if(originalHidden)Object.defineProperty(document,'hidden',originalHidden);else Reflect.deleteProperty(document,'hidden');});
 async function chooseLink(){await screen.findByRole('option',{name:/Documents.*D:\/Fictif/});
   fireEvent.change(screen.getByRole('combobox',{name:'Lien de destination'}),{target:{value:'link'}});}
 async function inspect(){await chooseLink();
@@ -68,6 +69,21 @@ it('clôturer une intention exige confirmation et la révision lue, sans supprim
 });
 it('un volet inactif ne lit ni liens ni reçus',()=>{
   render(<DocumentPublicationPanel {...base} active={false}/>);expect(publicationApi.list).not.toHaveBeenCalled();expect(documentApi.workspace).not.toHaveBeenCalled();
+});
+it('suspend les lectures masquées sans effacer une intention après une réponse tardive',async()=>{
+  vi.useFakeTimers();localStorage.setItem(pendingKey('p1','copy'),JSON.stringify(command));
+  let finishOld!:(value:Awaited<ReturnType<typeof publicationApi.list>>)=>void;
+  vi.mocked(publicationApi.list).mockReturnValueOnce(new Promise(resolve=>{finishOld=resolve;}));
+  render(<DocumentPublicationPanel {...base}/>);await act(async()=>{});
+  expect(publicationApi.list).toHaveBeenCalledTimes(1);
+  const first=vi.mocked(publicationApi.list).mock.calls[0][4]!;
+  Object.defineProperty(document,'hidden',{configurable:true,value:true});
+  await act(async()=>{document.dispatchEvent(new Event('visibilitychange'));});expect(first.aborted).toBe(true);
+  await act(async()=>{await vi.advanceTimersByTimeAsync(15000);});expect(publicationApi.list).toHaveBeenCalledTimes(1);
+  Object.defineProperty(document,'hidden',{configurable:true,value:false});
+  await act(async()=>{document.dispatchEvent(new Event('visibilitychange'));});expect(publicationApi.list).toHaveBeenCalledTimes(2);
+  await act(async()=>{finishOld({project_id:'p1',job_id:'j1',job_revision:6,execution_blocked:false,items:[record],total:1,offset:0,limit:20});});
+  expect(JSON.parse(localStorage.getItem(pendingKey('p1','copy'))!)).toEqual(command);
 });
 it('interrompre l’attente conserve la commande et transmet l’annulation',async()=>{
   localStorage.setItem(pendingKey('p1','copy'),JSON.stringify(command));let signal:AbortSignal|undefined;

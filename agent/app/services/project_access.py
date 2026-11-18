@@ -210,6 +210,10 @@ def authorize(method, path, *, query=None, body=None):
         raise HTTPException(403, "Modification des liaisons Brain réservée à l'opérateur propriétaire")
     if operator.project_ids is None:
         return
+    if path == '/api/v1/notes/projects' and method in SAFE_METHODS:
+        return  # The catalogue query applies the operator's scope.
+    if path == '/api/v1/notes/personal' or path.startswith('/api/v1/notes/personal/'):
+        return  # The private notebook checks ownership on every note and image.
     if path == "/api/v1/meeting-sessions" and method == "POST":
         if not isinstance(body, dict) or not body.get("project_id"):
             raise HTTPException(403, "Choisir un projet autorisé pour la séance")

@@ -1,0 +1,50 @@
+import {act, cleanup, renderHook} from '@testing-library/react';
+import {afterEach, expect, it, vi} from 'vitest';
+import {api, type CdcJob} from '../lib/api';
+import {useCdcJobs} from './useCdcJobs';
+afterEach(()=>{cleanup();vi.useRealTimers();vi.restoreAllMocks();});
+it('suspend les lectures en arrière-plan et reprend en conservant les transitions',async()=>{
+  vi.useFakeTimers();let hidden=false;
+  vi.spyOn(document,'hidden','get').mockImplementation(()=>hidden);
+  const updated=vi.fn();
+  const jobs=vi.spyOn(api,'cdcJobs').mockResolvedValue([{id:'job',status:'running'}] as CdcJob[]);
+  const hook=renderHook(({active})=>useCdcJobs('p',updated,active),{initialProps:{active:true}});
+  await act(async()=>{});expect(jobs).toHaveBeenCalledTimes(1);
+  hook.rerender({active:false});await act(async()=>{await vi.advanceTimersByTimeAsync(10000);});expect(jobs).toHaveBeenCalledTimes(1);
+  jobs.mockResolvedValue([{id:'job',status:'completed'}] as CdcJob[]);
+  hook.rerender({active:true});await act(async()=>{});expect(jobs).toHaveBeenCalledTimes(2);expect(updated).toHaveBeenCalledTimes(1);
+  await act(async()=>{await vi.advanceTimersByTimeAsync(10000);});expect(jobs).toHaveBeenCalledTimes(2);
+  hidden=true;act(()=>document.dispatchEvent(new Event('visibilitychange')));
+  await act(async()=>{await vi.advanceTimersByTimeAsync(60000);});expect(jobs).toHaveBeenCalledTimes(2);
+  hidden=false;await act(async()=>{document.dispatchEvent(new Event('visibilitychange'));});expect(jobs).toHaveBeenCalledTimes(3);
+});
+it('ignore les réponses arrivées après avoir quitté la fiche',async()=>{
+  let resolve!: (value:CdcJob[])=>void;
+  vi.spyOn(api,'cdcJobs').mockImplementation(()=>new Promise(r=>{resolve=r;}));
+  const hook=renderHook(({active})=>useCdcJobs('p',vi.fn(),active),{initialProps:{active:true}});
+  hook.rerender({active:false});await act(async()=>resolve([{id:'late',status:'running'}] as CdcJob[]));
+  expect(hook.result.current.jobs).toEqual([]);
+});
+it('accélère le suivi après le lancement et signale la fin du travail',async()=>{
+  vi.useFakeTimers();vi.spyOn(document,'hidden','get').mockReturnValue(false);
+  const updated=vi.fn();
+  const jobs=vi.spyOn(api,'cdcJobs').mockResolvedValue([]);
+  vi.spyOn(api,'analyzeCdc').mockResolvedValue({id:'job',status:'running'} as CdcJob);
+  const hook=renderHook(()=>useCdcJobs('p',updated,true));
+  await act(async()=>{});
+  await act(async()=>{await hook.result.current.enqueue('source');});
+  jobs.mockResolvedValue([{id:'job',status:'completed'}] as CdcJob[]);
+  await act(async()=>{await vi.advanceTimersByTimeAsync(2000);});
+  expect(jobs).toHaveBeenCalledTimes(2);expect(updated).toHaveBeenCalledTimes(1);
+});
+it('relit le serveur au retour si une requête était en cours pendant le masquage',async()=>{
+  vi.useFakeTimers();let hidden=false;vi.spyOn(document,'hidden','get').mockImplementation(()=>hidden);
+  let resolve!: (value:CdcJob[])=>void;
+  const jobs=vi.spyOn(api,'cdcJobs').mockImplementationOnce(()=>new Promise(r=>{resolve=r;})).mockResolvedValue([{id:'fresh',status:'running'}] as CdcJob[]);
+  const hook=renderHook(()=>useCdcJobs('p',vi.fn(),true));
+  hidden=true;act(()=>document.dispatchEvent(new Event('visibilitychange')));
+  hidden=false;act(()=>document.dispatchEvent(new Event('visibilitychange')));
+  await act(async()=>resolve([]));
+  await act(async()=>{await vi.advanceTimersByTimeAsync(0);});
+  expect(jobs).toHaveBeenCalledTimes(2);expect(hook.result.current.jobs[0]?.id).toBe('fresh');
+});

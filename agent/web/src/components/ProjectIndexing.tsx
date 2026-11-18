@@ -4,10 +4,20 @@ type Status={engine:string;model:string;server:string;compute:string;automatic:b
   projects:{project_id:string;code:string;sources:number;indexed:number|null;passages:number|null;pending:number;failed:number;missing:number;without_text:number}[]};
 export function ProjectIndexing({active=true,projectId}:{active?:boolean;projectId?:string}){
   const [status,setStatus]=useState<Status|null>(null),[error,setError]=useState('');
-  useEffect(()=>{if(!active)return;const controller=new AbortController();let pending=false;setStatus(null);
-    const read=async()=>{if(pending)return;pending=true;try{const value=await request<Status>(`/api/v1/workspace/indexing${projectId?`?project_id=${encodeURIComponent(projectId)}`:''}`,{signal:controller.signal,activity:false});
-      if(!controller.signal.aborted){setStatus(value);setError('');}}catch(cause){if(!controller.signal.aborted)setError((cause as Error).message);}finally{pending=false;}};
-    void read();const timer=setInterval(()=>void read(),15000);return()=>{controller.abort();clearInterval(timer);};},[active,projectId]);
+  useEffect(()=>{setStatus(null);setError('');},[projectId]);
+  useEffect(()=>{if(!active)return;let stopped=false,pending=false,controller:AbortController|null=null,timer:ReturnType<typeof setTimeout>|undefined;
+    const stop=()=>{clearTimeout(timer);timer=undefined;controller?.abort();controller=null;pending=false;};
+    const read=async()=>{
+      if(stopped||document.hidden||pending)return;
+      controller?.abort();const current=new AbortController();controller=current;pending=true;
+      try{const value=await request<Status>(`/api/v1/workspace/indexing${projectId?`?project_id=${encodeURIComponent(projectId)}`:''}`,{signal:current.signal,activity:false});
+        if(!current.signal.aborted){setStatus(value);setError('');}}
+      catch(cause){if(!current.signal.aborted)setError((cause as Error).message);}
+      finally{if(controller===current){pending=false;if(!stopped&&!document.hidden)timer=setTimeout(()=>void read(),15000);}}
+    };
+    const visibility=()=>{if(document.hidden){stop();return;}clearTimeout(timer);timer=undefined;void read();};
+    document.addEventListener('visibilitychange',visibility);if(!document.hidden)void read();
+    return()=>{stopped=true;document.removeEventListener('visibilitychange',visibility);stop();};},[active,projectId]);
   return <section className="fusion-multimodal" aria-label="Indexation automatique des projets"><h2>Indexation automatique des projets</h2>
     <p>Quand vous classez un mail ou importez un document dans un projet, Kiara prépare automatiquement son texte pour la recherche avec EG2 sur le serveur configuré. Aucun dossier réseau n’est parcouru.</p>
     <p>Kiara indexe les passages utiles pour les retrouver dans la recherche et les réponses.</p>

@@ -105,7 +105,13 @@ def extract_archive(source, destination, password):
                         or entry.is_dir() or entry.compress_type != ZIP_STORED):
                     raise ValueError('Chemin de sauvegarde Agent invalide.')
                 target = destination.joinpath(*relative.parts)
-                target.parent.mkdir(parents=True, exist_ok=True)
-                with archive.open(entry) as reader, target.open('xb') as output:
+                try:
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    output = target.open('xb')
+                except OSError as error:
+                    if os.name == 'nt' and len(str(target)) >= 248 and error.errno in (2, 3, 36):
+                        raise ValueError('Chemin de restauration trop long. Choisissez un dossier plus proche de la racine du disque, par exemple D:\\Restauration.') from error
+                    raise
+                with output, archive.open(entry) as reader:
                     while block := reader.read(BLOCK):
                         output.write(block)

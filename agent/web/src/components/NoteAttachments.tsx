@@ -36,7 +36,7 @@ export function NoteAttachments({projectId,noteId,operatorId,revision,active,can
     }catch(e){if(alive.current&&gen===generation.current&&!controller.signal.aborted){setError(message(e));setNotice('');}}
     finally{running.current=false;if(alive.current){setBusy(false);action.current=null;}}
   }
-  return <section className="note-attachments" aria-label="Pièces jointes de la note" data-workspace-dirty={journal||busy?'true':undefined}>
+  return <section className="note-attachments" aria-label="Pièces jointes de la note" aria-busy={busy} data-workspace-dirty={journal||busy?'true':undefined}>
     <h4>Pièces jointes</h4>{error&&<p role="alert" className="document-warning">{error}</p>}{notice&&<p role="status">{notice}</p>}
     {journalError&&<p role="alert">{journalError}</p>}
     {journal&&<p className="document-warning" role="status">Copie à reprendre : {journal.filename}. Resélectionnez ce même fichier ; la commande conservée évite un doublon.</p>}

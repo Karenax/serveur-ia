@@ -1,19 +1,29 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod recovery_policy;
+mod recovery_protocol;
+mod recovery_window;
+
 use std::{
     io::{BufRead, BufReader, Read, Write},
-    os::windows::process::CommandExt,
     path::{Path, PathBuf},
     process::{Child, ChildStdin, Command, Stdio},
     sync::{atomic::{AtomicBool, Ordering}, mpsc, Arc, Mutex},
     thread,
     time::{Duration, Instant},
 };
+#[cfg(windows)]
+use std::os::windows::process::CommandExt;
 use tauri::{Url, WebviewUrl, WebviewWindow, WebviewWindowBuilder, WindowEvent};
 
 type RelayInput = Arc<Mutex<Option<ChildStdin>>>;
 
 struct Relay(Child, RelayInput);
+
+enum RelayStart {
+    Ready(Url, String, Relay, mpsc::Receiver<String>),
+    Recovery(recovery_protocol::RecoveryOffer, Relay, mpsc::Receiver<String>),
+}
 
 impl Drop for Relay {
     fn drop(&mut self) {
@@ -31,6 +41,20 @@ impl Drop for Relay {
 }
 
 fn relay_ready(line: &str) -> Result<(Url, String), &'static str> {
+    let line = line.trim_end();
+    match line {
+        "KIARA_RELAY_ORIGIN_BUSY" => return Err("Le port utilisé par les données locales est occupé. Fermez l’application qui l’utilise, puis relancez Kiara."),
+        "KIARA_RELAY_ORIGIN_INVALID" => return Err("Impossible de vérifier le port des données locales. Conservez les fichiers de ce poste et vérifiez la configuration avant de relancer Kiara."),
+        "KIARA_RELAY_ORIGIN_MULTIPLE" => return Err("Des données locales existent à plusieurs emplacements ou ne correspondent pas à la connexion actuelle. Elles sont conservées. Demandez de l’aide avant de les modifier."),
+        "KIARA_RELAY_SETTINGS_UNREADABLE" => return Err("Impossible de lire les réglages locaux. Le fichier original est conservé. Vérifiez votre accès au trousseau ou restaurez une copie valide."),
+        "KIARA_RELAY_RECOVERY_UNAVAILABLE" => return Err("La vérification des données locales est interrompue ou un port nécessaire est occupé. Fermez les autres versions de Kiara puis réessayez. Vos données sont conservées."),
+        "KIARA_RELAY_RECEIVER_UNAVAILABLE" => return Err("La récupération des données locales ne répond pas. Vos données restent sur cet appareil. Relancez Kiara ; si le problème persiste, demandez de l’aide avant de modifier ces données."),
+        "KIARA_RELAY_RECOVERY_CONFLICT" => return Err("Des brouillons différents existent sur plusieurs origines. Ils sont conservés ; la récupération doit être vérifiée avant de continuer."),
+        "KIARA_RELAY_RECOVERY_RESTART" => return Err("Les deux versions sont conservées. Relancez Kiara pour terminer leur vérification."),
+        "KIARA_RELAY_ARCHIVE_UNAVAILABLE" => return Err("Une version conservée est introuvable ou illisible. Les autres versions restent sur cet appareil. Restaurez la copie depuis une sauvegarde avant de réessayer."),
+        "KIARA_RELAY_QT_STORAGE" => return Err("Des données locales d’une ancienne version restent à vérifier. Elles sont conservées sur cet appareil."),
+        _ => (),
+    }
     let (url, identity) = line.strip_prefix("KIARA_RELAY_READY ")
         .and_then(|value| value.split_once(' '))
         .ok_or("Le relais Kiara n’a pas pu ouvrir le profil")?;
@@ -40,22 +64,21 @@ fn relay_ready(line: &str) -> Result<(Url, String), &'static str> {
     Ok((local_url(url)?, identity.to_owned()))
 }
 
-fn start_relay(profile: Option<&Path>, version: &str) -> Result<Option<(Url, String, Relay, mpsc::Receiver<String>)>, &'static str> {
+fn start_relay(profile: Option<&Path>, version: &str) -> Result<Option<RelayStart>, &'static str> {
     let executable = std::env::current_exe().map_err(|_| "Emplacement de Kiara introuvable")?;
-    let binary = executable.with_file_name("kiara-relay.exe");
+    let binary = executable.with_file_name(if cfg!(windows) { "kiara-relay.exe" } else { "kiara-relay" });
     let mut command = Command::new(binary);
     command.arg("--relay-stdio");
     command.env("KIARA_DESKTOP_VERSION", version);
+    #[cfg(windows)]
     command.env("KIARA_DESKTOP_UPDATES", "1");
     if let Some(profile) = profile {
         command.arg(profile);
     }
-    let mut child = command
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::null())
-        .creation_flags(0x08000000)
-        .spawn().map_err(|_| "Impossible de démarrer le relais Kiara")?;
+    command.stdin(Stdio::piped()).stdout(Stdio::piped()).stderr(Stdio::null());
+    #[cfg(windows)]
+    command.creation_flags(0x08000000);
+    let mut child = command.spawn().map_err(|_| "Impossible de démarrer le relais Kiara")?;
     let input = child.stdin.take();
     let mut relay = Relay(child, Arc::new(Mutex::new(input)));
     let output = relay.0.stdout.take().ok_or("Le relais Kiara ne répond pas")?;
@@ -82,8 +105,20 @@ fn start_relay(profile: Option<&Path>, version: &str) -> Result<Option<(Url, Str
     if response.trim_end() == "KIARA_RELAY_CANCELLED" {
         return Ok(None);
     }
+    let response = match response.trim_end() {
+        "KIARA_RELAY_PROFILE_IN_USE" => return Err("Le profil Kiara est déjà ouvert"),
+        "KIARA_RELAY_PROFILE_LOCK_UNAVAILABLE" => return Err("Le profil Kiara ne peut pas être protégé"),
+        "KIARA_RELAY_PROFILE_LOCKED" => receive.recv_timeout(Duration::from_secs(45))
+            .map_err(|_| "Le relais Kiara n’a pas pu ouvrir le profil")?,
+        _ => return Err("Le relais Kiara doit être mis à jour avant de continuer"),
+    };
+    if response.starts_with("KIARA_RELAY_ORIGIN_SCAN ") {
+        let offer = recovery_protocol::parse_recovery_offer(&response)
+            .ok_or("Impossible de vérifier les données locales")?;
+        return Ok(Some(RelayStart::Recovery(offer, relay, receive)));
+    }
     let (url, identity) = relay_ready(response.trim_end())?;
-    Ok(Some((url, identity, relay, receive)))
+    Ok(Some(RelayStart::Ready(url, identity, relay, receive)))
 }
 
 fn local_url(value: &str) -> Result<Url, &'static str> {
@@ -100,6 +135,18 @@ fn local_url(value: &str) -> Result<Url, &'static str> {
         return Err("Adresse locale invalide");
     }
     Ok(url)
+}
+
+fn same_local_navigation(next: &Url, origin: &(String, String, Option<u16>)) -> bool {
+    // WebKitGTK checks blob downloads as navigations. Accept only blobs
+    // created by the same loopback origin as the Kiara page.
+    let target = if next.scheme() == "blob" {
+        Url::parse(next.path()).ok()
+    } else {
+        Some(next.clone())
+    };
+    target.is_some_and(|url| url.scheme() == origin.0
+        && url.host_str() == Some(origin.1.as_str()) && url.port() == origin.2)
 }
 
 const PREPARE_CLOSE: &str = r#"
@@ -140,6 +187,7 @@ fn wait_for_close_save(window: &WebviewWindow) -> bool {
     false
 }
 
+#[cfg(windows)]
 fn confirm_close(window: &WebviewWindow) -> bool {
     #[link(name = "user32")]
     extern "system" {
@@ -153,6 +201,57 @@ fn confirm_close(window: &WebviewWindow) -> bool {
     const YES: i32 = 6;
     // The buffers stay alive while the modal dialog is open on the window thread.
     unsafe { MessageBoxW(owner.0, text.as_ptr(), title.as_ptr(), YES_NO_WARNING_DEFAULT_NO) == YES }
+}
+
+#[cfg(windows)]
+fn windows_startup_message(message: &str, hidden: bool) {
+    #[link(name = "user32")]
+    extern "system" {
+        fn MessageBoxW(owner: *mut std::ffi::c_void, text: *const u16, title: *const u16, flags: u32) -> i32;
+    }
+    let message = match message {
+        "Le profil Kiara est déjà ouvert" => "Kiara est déjà ouvert avec cet accès. Fermez la première fenêtre avant d’en ouvrir une autre.",
+        "Le profil Kiara ne peut pas être protégé" => "Impossible de protéger les données locales. Réessayez après avoir vérifié votre session Windows.",
+        "Le relais Kiara doit être mis à jour avant de continuer" => "Le client Kiara est incomplet. Réinstallez le paquet complet avant de continuer.",
+        other => other,
+    };
+    eprintln!("{message}");
+    if !hidden {
+        let text: Vec<u16> = message.encode_utf16().chain([0]).collect();
+        let title: Vec<u16> = "Kiara".encode_utf16().chain([0]).collect();
+        unsafe { MessageBoxW(std::ptr::null_mut(), text.as_ptr(), title.as_ptr(), 0x30); }
+    }
+}
+
+#[cfg(target_os = "linux")]
+fn confirm_close(_window: &WebviewWindow) -> bool {
+    use gtk::prelude::*;
+    let dialog = gtk::MessageDialog::new(
+        None::<&gtk::Window>, gtk::DialogFlags::MODAL, gtk::MessageType::Warning,
+        gtk::ButtonsType::YesNo,
+        "Des modifications peuvent être en attente. Fermer Kiara quand même ?",
+    );
+    dialog.set_title("Fermer Kiara");
+    dialog.set_default_response(gtk::ResponseType::No);
+    let confirmed = dialog.run() == gtk::ResponseType::Yes;
+    dialog.close();
+    confirmed
+}
+
+#[cfg(target_os = "linux")]
+fn microphone_permission() -> tauri::webview::PermissionResponse {
+    use gtk::prelude::*;
+    use tauri::webview::PermissionResponse;
+    let dialog = gtk::MessageDialog::new(
+        None::<&gtk::Window>, gtk::DialogFlags::MODAL, gtk::MessageType::Question,
+        gtk::ButtonsType::YesNo,
+        "Autoriser Kiara à utiliser le microphone pour cette capture ?",
+    );
+    dialog.set_title("Accès au microphone");
+    dialog.set_default_response(gtk::ResponseType::No);
+    let allowed = dialog.run() == gtk::ResponseType::Yes;
+    dialog.close();
+    if allowed { PermissionResponse::Allow } else { PermissionResponse::Deny }
 }
 
 fn protect_close(window: &WebviewWindow, pending: Arc<AtomicBool>) {
@@ -181,12 +280,14 @@ fn protect_close(window: &WebviewWindow, pending: Arc<AtomicBool>) {
     });
 }
 
+#[cfg(windows)]
 fn relay_reply(input: &RelayInput, reply: u8) {
     if let Some(stream) = input.lock().unwrap().as_mut() {
         let _ = stream.write_all(&[reply]);
     }
 }
 
+#[cfg(windows)]
 fn update_installer(line: &str) -> Option<&Path> {
     let value = line.strip_suffix('\n')?.trim_end_matches('\r');
     let path = Path::new(value.strip_prefix("KIARA_RELAY_UPDATE ")?);
@@ -200,6 +301,7 @@ fn update_installer(line: &str) -> Option<&Path> {
     Some(path)
 }
 
+#[cfg(windows)]
 fn watch_updates(window: &WebviewWindow, pending: Arc<AtomicBool>, input: RelayInput, events: mpsc::Receiver<String>) {
     let window = window.clone();
     thread::spawn(move || {
@@ -238,6 +340,276 @@ fn watch_updates(window: &WebviewWindow, pending: Arc<AtomicBool>, input: RelayI
     });
 }
 
+#[cfg(target_os = "linux")]
+fn linux_data_home() -> Option<PathBuf> {
+    std::env::var_os("XDG_DATA_HOME").map(PathBuf::from).filter(|path| path.is_absolute())
+        .or_else(|| std::env::var_os("HOME").map(PathBuf::from).filter(|path| path.is_absolute()).map(|path| path.join(".local/share")))
+}
+
+#[cfg(target_os = "linux")]
+#[derive(Debug, PartialEq, Eq)]
+enum ProfileLockError { InUse, Unavailable, RelayOutdated }
+
+#[cfg(target_os = "linux")]
+fn lock_linux_profile(base: &Path, profile: Option<&str>) -> Result<std::fs::File, ProfileLockError> {
+    use std::os::unix::fs::OpenOptionsExt;
+    let directory = base.join("kiara");
+    std::fs::create_dir_all(&directory).map_err(|_| ProfileLockError::Unavailable)?;
+    let name = profile.map(|value| format!("tauri-{value}.lock")).unwrap_or_else(|| "tauri-default.lock".into());
+    let file = std::fs::OpenOptions::new().read(true).write(true).create(true).mode(0o600)
+        .open(directory.join(name)).map_err(|_| ProfileLockError::Unavailable)?;
+    match file.try_lock() {
+        Ok(()) => Ok(file),
+        Err(std::fs::TryLockError::WouldBlock) => Err(ProfileLockError::InUse),
+        Err(std::fs::TryLockError::Error(_)) => Err(ProfileLockError::Unavailable),
+    }
+}
+
+#[cfg(target_os = "linux")]
+fn profile_lock_message(error: ProfileLockError, hidden: bool) {
+    let message = match error {
+        ProfileLockError::InUse => "Kiara est déjà ouvert avec cet accès. Fermez la première fenêtre avant d’en ouvrir une autre.",
+        ProfileLockError::Unavailable => "Impossible de protéger les données locales. Vérifiez l’accès au dossier Kiara, puis réessayez.",
+        ProfileLockError::RelayOutdated => "Le client Kiara est incomplet. Réinstallez le paquet Linux complet avant de continuer.",
+    };
+    linux_startup_message(message, hidden);
+}
+
+#[cfg(target_os = "linux")]
+fn linux_startup_message(message: &str, hidden: bool) {
+    use gtk::prelude::*;
+    eprintln!("{message}");
+    if !hidden && gtk::init().is_ok() {
+        let dialog = gtk::MessageDialog::new(None::<&gtk::Window>, gtk::DialogFlags::MODAL,
+            gtk::MessageType::Warning, gtk::ButtonsType::Ok, message);
+        dialog.set_title("Kiara");
+        dialog.run();
+        dialog.close();
+    }
+}
+
+fn recovery_profile_directory(identity: &str) -> Option<PathBuf> {
+    #[cfg(windows)]
+    { std::env::var_os("LOCALAPPDATA").map(PathBuf::from)
+        .map(|base| base.join("QwenClient").join(format!("webview-{identity}"))) }
+    #[cfg(target_os = "linux")]
+    { linux_data_home().map(|base| base.join("kiara").join(format!("tauri-webview-{identity}"))) }
+}
+
+fn recovery_error(message: &str, hidden: bool) {
+    #[cfg(windows)]
+    windows_startup_message(message, hidden);
+    #[cfg(target_os = "linux")]
+    linux_startup_message(message, hidden);
+}
+
+fn open_main_window(app: &tauri::AppHandle, url: Url, directory: Option<PathBuf>, hidden: bool,
+                    updates: Option<(RelayInput, mpsc::Receiver<String>)>) -> tauri::Result<()> {
+    #[cfg(target_os = "linux")]
+    use tauri::Manager;
+    #[cfg(target_os = "linux")]
+    {
+        use tauri::ipc::CapabilityBuilder;
+        app.add_capability(CapabilityBuilder::new("kiara-zoom").local(false)
+            .remote(format!("http://127.0.0.1:{}/*", url.port().unwrap())).window("main")
+            .permission("core:webview:allow-set-webview-zoom"))?;
+    }
+    let (width, height) = app.primary_monitor().ok().flatten()
+        .map(|monitor| initial_window_size(monitor.work_area().size.width,
+                                          monitor.work_area().size.height, monitor.scale_factor()))
+        .unwrap_or((1100.0, 650.0));
+    let origin = (url.scheme().to_owned(), url.host_str().unwrap().to_owned(), url.port());
+    #[allow(unused_mut)]
+    let mut builder = WebviewWindowBuilder::new(app, "main", WebviewUrl::External(url))
+        .title("Kiara").zoom_hotkeys_enabled(true).visible(!hidden)
+        .inner_size(width, height).min_inner_size(width.min(600.0), height.min(450.0))
+        .on_navigation(move |next| same_local_navigation(&next, &origin));
+    if let Some(directory) = directory { builder = builder.data_directory(directory); }
+    #[cfg(target_os = "linux")]
+    {
+        use tauri::webview::{PermissionKind, PermissionResponse};
+        builder = builder.initialization_script(include_str!("linux_zoom_keys.js"));
+        builder = builder.on_permission_request(|_, kind| match kind {
+            PermissionKind::Microphone => microphone_permission(),
+            PermissionKind::Camera => PermissionResponse::Deny,
+            _ => PermissionResponse::Default,
+        });
+    }
+    let window = builder.build()?;
+    if let Some((input, events)) = updates {
+        let pending = Arc::new(AtomicBool::new(false));
+        protect_close(&window, pending.clone());
+        #[cfg(windows)]
+        watch_updates(&window, pending, input, events);
+        #[cfg(target_os = "linux")]
+        let _ = (pending, input, events);
+    }
+    Ok(())
+}
+
+fn run_recovery(context: tauri::Context<tauri::Wry>, offer: recovery_protocol::RecoveryOffer,
+                relay: Relay, events: mpsc::Receiver<String>, hidden: bool) {
+    use tauri::Manager;
+    let identity = offer.identity().to_owned();
+    let Some(directory) = recovery_profile_directory(&identity) else {
+        recovery_error("Impossible de retrouver le dossier du profil Kiara.", hidden);
+        std::process::exit(2);
+    };
+    let input = relay.1.clone();
+    let result = tauri::Builder::default().setup(move |app| {
+        let handle = app.handle().clone();
+        let recovery = recovery_window::build(&handle, &offer, directory.clone(), hidden)?;
+        let cancel_handle = handle.clone();
+        recovery.on_window_event(move |event| {
+            if let WindowEvent::CloseRequested { api, .. } = event {
+                // Hidden transfer windows must not keep a cancelled recovery alive.
+                api.prevent_close();
+                cancel_handle.exit(0);
+            }
+        });
+        thread::spawn(move || {
+            let mut transfer_active = false;
+            let mut review_shown = false;
+            loop {
+                let line = match events.recv() {
+                    Ok(line) => line,
+                    Err(_) => {
+                        let callback = handle.clone();
+                        let _ = handle.run_on_main_thread(move || {
+                            recovery_error("Le relais Kiara ne répond plus.", hidden);
+                            callback.exit(2);
+                        });
+                        return;
+                    }
+                };
+                if line.starts_with("KIARA_RELAY_ORIGIN_TRANSFER ") {
+                    let offer = recovery_protocol::parse_transfer_offer(&line);
+                    if transfer_active || offer.as_ref().map(|value| value.identity()) != Some(identity.as_str()) {
+                        let callback = handle.clone();
+                        let _ = handle.run_on_main_thread(move || { recovery_error("Transfert local invalide.", hidden); callback.exit(2); });
+                        return;
+                    }
+                    let offer = offer.expect("checked transfer offer");
+                    let callback = handle.clone();
+                    let data_directory = directory.clone();
+                    let (done, confirmation) = mpsc::sync_channel(1);
+                    if handle.run_on_main_thread(move || {
+                        let ok = callback.get_webview_window("origin-recovery").is_some()
+                            && callback.get_webview_window("origin-transfer-source").is_none()
+                            && callback.get_webview_window("origin-transfer-destination").is_none()
+                            && recovery_window::build_transfer(&callback, &offer, data_directory).is_ok();
+                        let _ = done.send(ok);
+                    }).is_err() || !matches!(confirmation.recv_timeout(Duration::from_secs(15)), Ok(true)) {
+                        let callback = handle.clone();
+                        let _ = handle.run_on_main_thread(move || { recovery_error("Impossible d’ouvrir les fenêtres de récupération.", hidden); callback.exit(2); });
+                        return;
+                    }
+                    transfer_active = true;
+                    review_shown = false;
+                    continue;
+                }
+                if line.trim_end() == "KIARA_RELAY_ORIGIN_REVIEW" {
+                    if !transfer_active || review_shown {
+                        let callback = handle.clone();
+                        let _ = handle.run_on_main_thread(move || { recovery_error("Comparaison des versions indisponible.", hidden); callback.exit(2); });
+                        return;
+                    }
+                    let callback = handle.clone();
+                    let (done, confirmation) = mpsc::sync_channel(1);
+                    if handle.run_on_main_thread(move || {
+                        let ok = callback.get_webview_window("origin-transfer-destination").map(|window| {
+                            let cancel = callback.clone();
+                            window.on_window_event(move |event| {
+                                if let WindowEvent::CloseRequested { api, .. } = event {
+                                    api.prevent_close();
+                                    cancel.exit(0);
+                                }
+                            });
+                            let shown = window.show().is_ok();
+                            if shown { let _ = window.set_focus(); }
+                            shown
+                        }).unwrap_or(false);
+                        let _ = done.send(ok);
+                    }).is_err() || !matches!(confirmation.recv_timeout(Duration::from_secs(15)), Ok(true)) {
+                        let callback = handle.clone();
+                        let _ = handle.run_on_main_thread(move || { recovery_error("Impossible d’ouvrir la comparaison des versions.", hidden); callback.exit(2); });
+                        return;
+                    }
+                    let acknowledged = input.lock().ok().and_then(|mut guard| {
+                        guard.as_mut().map(|stream| stream.write_all(b"K").and_then(|_| stream.flush()).is_ok())
+                    }).unwrap_or(false);
+                    if !acknowledged {
+                        let callback = handle.clone();
+                        let _ = handle.run_on_main_thread(move || { recovery_error("Le relais ne confirme plus la récupération.", hidden); callback.exit(2); });
+                        return;
+                    }
+                    review_shown = true;
+                    continue;
+                }
+                if line.trim_end() == "KIARA_RELAY_ORIGIN_TRANSFER_DONE" {
+                    if !transfer_active {
+                        let callback = handle.clone();
+                        let _ = handle.run_on_main_thread(move || { recovery_error("Fermeture de récupération invalide.", hidden); callback.exit(2); });
+                        return;
+                    }
+                    let callback = handle.clone();
+                    let (done, confirmation) = mpsc::sync_channel(1);
+                    if handle.run_on_main_thread(move || {
+                        let mut ok = callback.get_webview_window("origin-transfer-destination").is_some();
+                        for label in ["origin-transfer-source", "origin-transfer-destination"] {
+                            if let Some(window) = callback.get_webview_window(label) {
+                                ok &= window.destroy().is_ok();
+                            }
+                        }
+                        let _ = done.send(ok);
+                    }).is_err() || !matches!(confirmation.recv_timeout(Duration::from_secs(15)), Ok(true)) {
+                        let callback = handle.clone();
+                        let _ = handle.run_on_main_thread(move || { recovery_error("Impossible de fermer les fenêtres de récupération.", hidden); callback.exit(2); });
+                        return;
+                    }
+                    let acknowledged = input.lock().ok().and_then(|mut guard| {
+                        guard.as_mut().map(|stream| stream.write_all(b"K").and_then(|_| stream.flush()).is_ok())
+                    }).unwrap_or(false);
+                    if !acknowledged {
+                        let callback = handle.clone();
+                        let _ = handle.run_on_main_thread(move || { recovery_error("Le relais ne confirme plus la récupération.", hidden); callback.exit(2); });
+                        return;
+                    }
+                    transfer_active = false;
+                    continue;
+                }
+                let ready = if transfer_active { Err("Transfert local non terminé") } else {
+                    relay_ready(&line).and_then(|(url, found)| if found == identity { Ok(url) }
+                        else { Err("Identifiant de profil Kiara invalide") })
+                };
+                let callback = handle.clone();
+                let _ = handle.run_on_main_thread(move || {
+                    if callback.get_webview_window("origin-recovery").is_none() { return; }
+                    match ready {
+                        Ok(url) => {
+                            if open_main_window(&callback, url, Some(directory), hidden, Some((input, events))).is_ok() {
+                                let _ = recovery.destroy();
+                            } else {
+                                recovery_error("Impossible d’ouvrir la fenêtre principale de Kiara.", hidden);
+                                callback.exit(2);
+                            }
+                        }
+                        Err(message) => { recovery_error(message, hidden); callback.exit(2); }
+                    }
+                });
+                return;
+            }
+        });
+        Ok(())
+    }).build(context);
+    let exit_code = match result {
+        Ok(app) => app.run_return(|_, _| {}),
+        Err(_) => { recovery_error("Impossible d’ouvrir la vérification des données locales.", hidden); 2 }
+    };
+    drop(relay);
+    std::process::exit(exit_code);
+}
+
 fn main() {
     let context = tauri::generate_context!();
     let args: Vec<_> = std::env::args_os().collect();
@@ -260,11 +632,15 @@ fn main() {
                 _ => { eprintln!("Paramètres Kiara invalides"); std::process::exit(2); }
             };
             match start_relay(profile, &context.package_info().version.to_string()) {
-                Ok(Some((url, identity, child, events))) => {
+                Ok(Some(RelayStart::Ready(url, identity, child, events))) => {
                     updates = Some((child.1.clone(), events));
                     relay = Some(child);
-                    profile_directory = Some(format!("webview-{identity}"));
+                    profile_directory = recovery_profile_directory(&identity);
                     (Ok(url), hidden)
+                }
+                Ok(Some(RelayStart::Recovery(offer, child, events))) => {
+                    run_recovery(context, offer, child, events, hidden);
+                    return;
                 }
                 Ok(None) => return,
                 Err(message) => (Err(message), hidden),
@@ -274,36 +650,36 @@ fn main() {
     let url = match url {
         Ok(url) => url,
         Err(message) => {
-            eprintln!("{message}");
+            #[cfg(target_os = "linux")]
+            if message == "Le profil Kiara est déjà ouvert" {
+                profile_lock_message(ProfileLockError::InUse, hidden);
+            } else if message == "Le profil Kiara ne peut pas être protégé" {
+                profile_lock_message(ProfileLockError::Unavailable, hidden);
+            } else if message == "Le relais Kiara doit être mis à jour avant de continuer" {
+                profile_lock_message(ProfileLockError::RelayOutdated, hidden);
+            } else {
+                linux_startup_message(message, hidden);
+            }
+            #[cfg(windows)]
+            windows_startup_message(message, hidden);
             std::process::exit(2);
         }
     };
-    let origin = (
-        url.scheme().to_owned(),
-        url.host_str().unwrap().to_owned(),
-        url.port(),
-    );
+    #[cfg(target_os = "linux")]
+    let _profile_guard = if profile_directory.is_none() {
+        Some(match linux_data_home().ok_or(ProfileLockError::Unavailable)
+            .and_then(|base| lock_linux_profile(&base, None)) {
+            Ok(guard) => guard,
+            Err(error) => {
+                drop(relay);
+                profile_lock_message(error, hidden);
+                std::process::exit(3);
+            }
+        })
+    } else {None}; // Normal Linux relays hold the same profile lock before loading data.
     let app = tauri::Builder::default()
         .setup(move |app| {
-            let mut builder = WebviewWindowBuilder::new(app, "main", WebviewUrl::External(url.clone()))
-                .title("Kiara")
-                .visible(!hidden)
-                .inner_size(1280.0, 800.0)
-                .min_inner_size(600.0, 450.0)
-                .on_navigation(move |next| {
-                    next.scheme() == origin.0
-                        && next.host_str() == Some(origin.1.as_str())
-                        && next.port() == origin.2
-                });
-            if let (Some(local_app_data), Some(directory)) = (std::env::var_os("LOCALAPPDATA"), profile_directory) {
-                builder = builder.data_directory(PathBuf::from(local_app_data).join("QwenClient").join(directory));
-            }
-            let window = builder.build()?;
-            if let Some((input, events)) = updates {
-                let pending = Arc::new(AtomicBool::new(false));
-                protect_close(&window, pending.clone());
-                watch_updates(&window, pending, input, events);
-            }
+            open_main_window(app.handle(), url, profile_directory, hidden, updates)?;
             Ok(())
         })
         .build(context)
@@ -313,11 +689,42 @@ fn main() {
     std::process::exit(exit_code);
 }
 
+fn initial_window_size(width: u32, height: u32, scale: f64) -> (f64, f64) {
+    let scale = if scale.is_finite() && scale > 0.0 { scale } else { 1.0 };
+    ((f64::from(width) / scale * 0.9).clamp(240.0, 1280.0),
+     (f64::from(height) / scale * 0.9).clamp(200.0, 800.0))
+}
+
 #[cfg(test)]
 mod tests {
-    use super::{local_url, relay_ready, update_installer};
+    use super::{initial_window_size, local_url, relay_ready, same_local_navigation};
+    #[cfg(windows)]
+    use super::update_installer;
 
     #[test]
+    fn window_fits_work_area_from_720p_through_wqhd() {
+        let (width, height) = initial_window_size(1280, 672, 1.0);
+        assert!((width - 1152.0).abs() < 0.01 && (height - 604.8).abs() < 0.01);
+        assert_eq!(initial_window_size(2560, 1400, 1.0), (1280.0, 800.0));
+        let (width, height) = initial_window_size(1280, 672, 1.5);
+        assert!(width * 1.5 < 1280.0 && height * 1.5 < 672.0);
+    }
+
+    #[test]
+    fn navigation_accepts_only_the_local_origin_and_its_blobs() {
+        let origin = ("http".to_string(), "127.0.0.1".to_string(), Some(17843));
+        for value in ["http://127.0.0.1:17843/chat", "blob:http://127.0.0.1:17843/fiction"] {
+            assert!(same_local_navigation(&super::Url::parse(value).unwrap(), &origin), "{value}");
+        }
+        for value in ["http://127.0.0.1:17844/chat", "https://127.0.0.1:17843/chat",
+                      "blob:http://127.0.0.1:17844/fiction", "blob:https://127.0.0.1:17843/fiction",
+                      "blob:http://example.test:17843/fiction", "blob:null/fiction", "file:///tmp/fiction"] {
+            assert!(!same_local_navigation(&super::Url::parse(value).unwrap(), &origin), "{value}");
+        }
+    }
+
+    #[test]
+    #[cfg(windows)]
     fn only_accepts_a_windows_installer_from_the_relay() {
         assert!(update_installer("KIARA_RELAY_UPDATE C:\\Usér Files\\Kiara_4.0.2_x64-setup.exe\r\n").is_some());
         assert!(update_installer("KIARA_RELAY_UPDATE C:\\Kiara_3.5.63_x64-setup.exe\n").is_none());
@@ -325,11 +732,45 @@ mod tests {
     }
 
     #[test]
+    fn recovery_receiver_error_explains_safe_retry_without_assuming_port_conflict() {
+        let message = relay_ready("KIARA_RELAY_RECEIVER_UNAVAILABLE\n").unwrap_err();
+        assert!(message.contains("données restent sur cet appareil"));
+        assert!(message.contains("Relancez Kiara"));
+        assert!(!message.contains("port"));
+        assert!(relay_ready("KIARA_RELAY_RECOVERY_UNAVAILABLE\n").unwrap_err().contains("port"));
+    }
+
+    #[test]
     fn relay_supplies_a_local_origin_and_safe_profile_directory_key() {
         let (url, key) = relay_ready("KIARA_RELAY_READY http://127.0.0.1:45678/chat 0123456789abcdef0123").unwrap();
         assert_eq!(url.port(), Some(45678));
         assert_eq!(key, "0123456789abcdef0123");
+        assert_eq!(relay_ready("KIARA_RELAY_READY http://127.0.0.1:45678/chat 0123456789abcdef0123\r\n").unwrap().1, key);
         assert!(relay_ready("KIARA_RELAY_READY http://127.0.0.1:45678/chat ../another-profile").is_err());
+        assert!(relay_ready("KIARA_RELAY_ORIGIN_BUSY\n").unwrap_err().contains("occupé"));
+        assert!(relay_ready("KIARA_RELAY_ORIGIN_MULTIPLE\n").unwrap_err().contains("conservées"));
+        assert!(relay_ready("KIARA_RELAY_ORIGIN_INVALID\n").unwrap_err().contains("vérifier"));
+        assert!(relay_ready("KIARA_RELAY_SETTINGS_UNREADABLE\n").unwrap_err().contains("original est conservé"));
+        assert!(relay_ready("KIARA_RELAY_ARCHIVE_UNAVAILABLE\n").unwrap_err().contains("sauvegarde"));
+        assert!(relay_ready("KIARA_RELAY_QT_STORAGE\n").unwrap_err().contains("conservées"));
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn linux_profile_lock_excludes_only_the_same_profile_and_releases_on_close() {
+        use super::{lock_linux_profile, ProfileLockError};
+        let root = std::env::temp_dir().join(format!("kiara-profile-lock-{}-{}", std::process::id(),
+            std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));
+        let first = lock_linux_profile(&root, Some("webview-a")).unwrap();
+        assert_eq!(lock_linux_profile(&root, Some("webview-a")).unwrap_err(), ProfileLockError::InUse);
+        let other = lock_linux_profile(&root, Some("webview-b")).unwrap();
+        drop(first);
+        let reopened = lock_linux_profile(&root, Some("webview-a")).unwrap();
+        drop((other,reopened));
+        std::fs::remove_file(root.join("kiara/tauri-webview-a.lock")).unwrap();
+        std::fs::remove_file(root.join("kiara/tauri-webview-b.lock")).unwrap();
+        std::fs::remove_dir(root.join("kiara")).unwrap();
+        std::fs::remove_dir(root).unwrap();
     }
 
     #[test]

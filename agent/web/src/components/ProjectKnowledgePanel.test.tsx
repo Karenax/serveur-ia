@@ -1,12 +1,13 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ProjectKnowledgePanel } from './ProjectKnowledgePanel';
 import { projectKnowledgeApi, type KnowledgeAnalysis } from '../lib/projectKnowledge';
 
 const result:KnowledgeAnalysis={enabled:true,status:'waiting_idle',error:null,cursor:2,total_batches:10,next_due:null,retry_after:null,interval_hours:48,stale:false,
   activity:{active_calls:1,waiting_calls:0,background_active:false},report:{},items:[],total:0,offset:0,limit:20};
+const originalHidden=Object.getOwnPropertyDescriptor(document,'hidden');
 beforeEach(()=>vi.spyOn(projectKnowledgeApi,'read').mockResolvedValue(result));
-afterEach(()=>{cleanup();vi.restoreAllMocks();});
+afterEach(()=>{cleanup();vi.useRealTimers();vi.restoreAllMocks();if(originalHidden)Object.defineProperty(document,'hidden',originalHidden);else Reflect.deleteProperty(document,'hidden');});
 
 it('affiche immédiatement l’attente du modèle et la progression',async()=>{
   render(<ProjectKnowledgePanel projectId="p1"/>);
@@ -38,4 +39,30 @@ it('n’interroge pas un panneau inactif et annule ses lectures au changement de
   view.rerender(<ProjectKnowledgePanel projectId="p2" active/>);
   await waitFor(()=>expect(projectKnowledgeApi.read).toHaveBeenLastCalledWith('p2',0,expect.any(AbortSignal)));
   expect(signal.aborted).toBe(true);
+});
+
+it('suspend le suivi et annule une lecture lorsque la fenêtre est masquée, puis reprend sans appliquer une réponse tardive',async()=>{
+  vi.useFakeTimers();
+  Object.defineProperty(document,'hidden',{configurable:true,value:true});
+  let finishOld!:(value:KnowledgeAnalysis)=>void;
+  vi.mocked(projectKnowledgeApi.read).mockReturnValueOnce(new Promise(resolve=>{finishOld=resolve;})).mockResolvedValue({...result,cursor:7});
+  render(<ProjectKnowledgePanel projectId="p1"/>);
+  await act(async()=>{});
+  expect(projectKnowledgeApi.read).not.toHaveBeenCalled();
+  Object.defineProperty(document,'hidden',{configurable:true,value:false});
+  await act(async()=>{document.dispatchEvent(new Event('visibilitychange'));});
+  expect(projectKnowledgeApi.read).toHaveBeenCalledTimes(1);
+  const first=vi.mocked(projectKnowledgeApi.read).mock.calls[0][2]!;
+  Object.defineProperty(document,'hidden',{configurable:true,value:true});
+  await act(async()=>{document.dispatchEvent(new Event('visibilitychange'));});
+  expect(first.aborted).toBe(true);
+  await act(async()=>{await vi.advanceTimersByTimeAsync(45000);});
+  expect(projectKnowledgeApi.read).toHaveBeenCalledTimes(1);
+  Object.defineProperty(document,'hidden',{configurable:true,value:false});
+  await act(async()=>{document.dispatchEvent(new Event('visibilitychange'));});
+  expect(projectKnowledgeApi.read).toHaveBeenCalledTimes(2);
+  fireEvent.click(screen.getByText('Informations à vérifier'));
+  expect(screen.getByText(/7\/10 lots traités/)).toBeTruthy();
+  await act(async()=>{finishOld({...result,cursor:1});});
+  expect(screen.getByText(/7\/10 lots traités/)).toBeTruthy();
 });

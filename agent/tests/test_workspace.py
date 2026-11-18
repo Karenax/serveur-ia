@@ -180,6 +180,7 @@ def test_jobs_keep_global_mail_jobs_out_of_project_scope(context):
     assert running["total"] == 1 and running["items"][0]["engine"] == "audio"
     global_jobs = client.get(PREFIX + "/jobs").json()["items"]
     assert any(row["id"] == job["id"] and row["project_id"] is None for row in global_jobs)
+    assert any(row["engine"] == "cdc" and row["project_id"] == pids[0] for row in global_jobs)
 
 
 def test_assistant_history_revision_conflict_keeps_saved_messages(context):

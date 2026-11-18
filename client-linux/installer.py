@@ -24,12 +24,14 @@ def main():
     if not manifest_path.is_file():
         raise SystemExit(
             'Ce dossier ne contient pas le paquet Kiara complet (build-manifest.json absent).\n'
-            'Extrayez l’archive Kiara-linux-amd64-…-vocal.tar.gz, puis lancez\n'
+            'Extrayez l’archive Kiara-linux-amd64-…-tauri.tar.gz, puis lancez\n'
             'python3 installer.py depuis le dossier extrait Kiara-linux-amd64.\n'
             'Copier uniquement le dossier client-linux du dépôt ne suffit pas.')
     if not shutil.which('parec'):
         raise SystemExit('Installez pulseaudio-utils pour le microphone, puis relancez cet installateur.')
     manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+    if manifest.get('shell')!='tauri' or not all((root/name).is_file() for name in ('kiara','kiara-relay','start-tauri.sh')):
+        raise SystemExit('Ce paquet ne contient pas le client Tauri complet. Utilisez une archive Kiara Tauri.')
     expected = {'amd64':('x86_64','amd64'), 'arm64':('aarch64','arm64')}
     if platform.machine().lower() not in expected[manifest['architecture']]:
         raise SystemExit('Ce paquet ne correspond pas au processeur de ce PC.')
@@ -38,20 +40,21 @@ def main():
     environment = root/'.venv'
     venv.EnvBuilder(with_pip=True).create(environment)
     try:
-        # proxy_tools is pure Python and published only as a source archive.
         subprocess.run([str(environment/'bin/python'),'-m','pip','install','--only-binary=:all:',
-                        '--no-binary=proxy_tools','-r',str(root/'requirements.txt')], check=True)
+                        '-r',str(root/'requirements.txt')], check=True)
     except subprocess.CalledProcessError:
         raise SystemExit('L’installation des dépendances a échoué. Consultez l’erreur pip ci-dessus, puis relancez python3 installer.py.') from None
     root.joinpath('start.sh').chmod(0o755)
     root.joinpath('client/wireguard-bridge').chmod(0o755)
+    for name in ('kiara', 'kiara-relay', 'start-tauri.sh'):
+        root.joinpath(name).chmod(0o755)
     base = Path(os.environ.get('XDG_DATA_HOME',str(Path.home()/'.local/share')))
     if not base.is_absolute():
         raise SystemExit('XDG_DATA_HOME doit être un chemin absolu.')
     shortcuts = base/'applications'
     shortcuts.mkdir(parents=True, exist_ok=True)
     entry = ('[Desktop Entry]\nType=Application\nName=Kiara\nComment=Accès à votre assistant Kiara\n'
-             'Exec='+desktop_quote(root/'start.sh')+'\nIcon='+str(root/'client/fred-icon.png')+
+             'Exec='+desktop_quote(root/'start-tauri.sh')+'\nIcon='+str(root/'client/fred-icon.png')+
              '\nTerminal=false\nCategories=Office;Network;\nStartupNotify=true\n')
     (shortcuts/'kiara.desktop').write_text(entry,encoding='utf-8')
     print('Kiara est installé. Ouvrez Kiara depuis le menu des applications.')

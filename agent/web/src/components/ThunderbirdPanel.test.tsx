@@ -1,9 +1,26 @@
 import { afterEach, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import * as http from "../lib/http";
 import { ThunderbirdPanel } from "./ThunderbirdPanel";
 
-afterEach(() => { cleanup(); vi.restoreAllMocks(); });
+const originalHidden=Object.getOwnPropertyDescriptor(document,'hidden');
+afterEach(() => {cleanup();vi.useRealTimers();vi.restoreAllMocks();if(originalHidden)Object.defineProperty(document,'hidden',originalHidden);else Reflect.deleteProperty(document,'hidden');});
+
+it("suspend le suivi hors rubrique et au masquage sans perdre le message",async()=>{
+  vi.useFakeTimers();
+  const read=vi.spyOn(http,"request").mockResolvedValue({connected:true,folders:[],accounts:[],jobs:[]});
+  const view=render(<ThunderbirdPanel compose active/>);await act(async()=>{});
+  expect(read).toHaveBeenCalledTimes(1);const first=read.mock.calls[0][1]!.signal as AbortSignal;
+  fireEvent.change(screen.getByLabelText("Message"),{target:{value:"Brouillon de réponse conservé"}});
+  view.rerender(<ThunderbirdPanel compose active={false}/>);expect(first.aborted).toBe(true);
+  await act(async()=>{await vi.advanceTimersByTimeAsync(60000);});expect(read).toHaveBeenCalledTimes(1);
+  view.rerender(<ThunderbirdPanel compose active/>);await act(async()=>{});expect(read).toHaveBeenCalledTimes(2);
+  const second=read.mock.calls[1][1]!.signal as AbortSignal;
+  Object.defineProperty(document,'hidden',{configurable:true,value:true});await act(async()=>{document.dispatchEvent(new Event('visibilitychange'));});
+  expect(second.aborted).toBe(true);await act(async()=>{await vi.advanceTimersByTimeAsync(60000);});expect(read).toHaveBeenCalledTimes(2);
+  Object.defineProperty(document,'hidden',{configurable:true,value:false});await act(async()=>{document.dispatchEvent(new Event('visibilitychange'));});
+  expect(read).toHaveBeenCalledTimes(3);expect((screen.getByLabelText("Message") as HTMLTextAreaElement).value).toBe("Brouillon de réponse conservé");
+});
 
 it("affiche le fichier à installer si Windows refuse la stratégie utilisateur", async () => {
   const manualPath = "C:\\Kiara\\agent-thunderbird-0.3.1.xpi";

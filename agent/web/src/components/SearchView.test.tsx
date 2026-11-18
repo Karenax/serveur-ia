@@ -6,7 +6,7 @@ import { api } from '../lib/api';
 
 vi.mock('../lib/searchApi', () => ({searchEvidence: vi.fn()}));
 vi.mock('../lib/api', () => ({api: {brainProjects: vi.fn()}}));
-vi.mock('./WorkspaceViews', () => ({SourceInspector: ({sourceId, onClose}: {sourceId: string; onClose: () => void}) => <section aria-label="Source consultée">{sourceId}<button onClick={onClose}>Fermer la source</button></section>}));
+vi.mock('./SourceInspector', () => ({SourceInspector: ({sourceId, onClose}: {sourceId: string; onClose: () => void}) => <section aria-label="Source consultée">{sourceId}<button onClick={onClose}>Fermer la source</button></section>}));
 beforeEach(() => {window.history.replaceState({},'', '/app/search');vi.mocked(api.brainProjects).mockResolvedValue([{id: 'p1', code: 'PROJET', name: 'Projet test'}]);});
 afterEach(() => {cleanup(); vi.clearAllMocks();window.history.replaceState({},'', '/');});
 const page: EvidencePage = {items: [{id: 's1', kind: 'source', source_id: 's1', source_type: 'email',

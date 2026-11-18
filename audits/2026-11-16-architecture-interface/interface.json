@@ -1,0 +1,341 @@
+{
+  "fixture": "Current source build, synthetic HTTP responses, no production access",
+  "views": [
+    {
+      "name": "desktop",
+      "width": 1440,
+      "height": 900,
+      "overflow": false,
+      "headings": [
+        "Projets"
+      ],
+      "buttons": [
+        {
+          "name": "AUD-2 · Étude de faisabilité du nouvel atelier",
+          "width": 223.390625,
+          "height": 19.5
+        }
+      ]
+    },
+    {
+      "name": "tablet",
+      "width": 768,
+      "height": 1024,
+      "overflow": false,
+      "headings": [
+        "Projets"
+      ],
+      "buttons": []
+    },
+    {
+      "name": "mobile",
+      "width": 390,
+      "height": 844,
+      "overflow": false,
+      "headings": [
+        "Projets"
+      ],
+      "buttons": []
+    }
+  ],
+  "errors": [],
+  "requests": [
+    {
+      "url": "/api/v1/session",
+      "time": 1794857027075
+    },
+    {
+      "url": "/api/v1/connections/status",
+      "time": 1794857027075
+    },
+    {
+      "url": "/api/v1/workspace/native-capture",
+      "time": 1794857027076
+    },
+    {
+      "url": "/api/v1/session",
+      "time": 1794857027076
+    },
+    {
+      "url": "/api/v1/portfolio",
+      "time": 1794857027077
+    },
+    {
+      "url": "/api/v1/workspace/mail-activity",
+      "time": 1794857027081
+    },
+    {
+      "url": "/api/v1/session",
+      "time": 1794857027555
+    },
+    {
+      "url": "/api/v1/connections/status",
+      "time": 1794857027556
+    },
+    {
+      "url": "/api/v1/workspace/native-capture",
+      "time": 1794857027557
+    },
+    {
+      "url": "/api/v1/session",
+      "time": 1794857027558
+    },
+    {
+      "url": "/api/v1/portfolio",
+      "time": 1794857027558
+    },
+    {
+      "url": "/api/v1/workspace/mail-activity",
+      "time": 1794857027567
+    },
+    {
+      "url": "/api/v1/session",
+      "time": 1794857027989
+    },
+    {
+      "url": "/api/v1/connections/status",
+      "time": 1794857027989
+    },
+    {
+      "url": "/api/v1/workspace/native-capture",
+      "time": 1794857027990
+    },
+    {
+      "url": "/api/v1/session",
+      "time": 1794857027991
+    },
+    {
+      "url": "/api/v1/portfolio",
+      "time": 1794857027991
+    },
+    {
+      "url": "/api/v1/workspace/mail-activity",
+      "time": 1794857028002
+    },
+    {
+      "url": "/api/v1/session",
+      "time": 1794857028469
+    },
+    {
+      "url": "/api/v1/connections/status",
+      "time": 1794857028469
+    },
+    {
+      "url": "/api/v1/workspace/native-capture",
+      "time": 1794857028470
+    },
+    {
+      "url": "/api/v1/session",
+      "time": 1794857028470
+    },
+    {
+      "url": "/api/v1/portfolio",
+      "time": 1794857028471
+    },
+    {
+      "url": "/api/v1/workspace/mail-activity",
+      "time": 1794857028479
+    },
+    {
+      "url": "/api/v1/session",
+      "time": 1794857028539
+    },
+    {
+      "url": "/api/v1/connections/status",
+      "time": 1794857028540
+    },
+    {
+      "url": "/api/v1/workspace/native-capture",
+      "time": 1794857028540
+    },
+    {
+      "url": "/api/v1/session",
+      "time": 1794857028541
+    },
+    {
+      "url": "/api/v1/portfolio",
+      "time": 1794857028541
+    },
+    {
+      "url": "/api/v1/workspace/mail-activity",
+      "time": 1794857028554
+    },
+    {
+      "url": "/api/v1/session",
+      "time": 1794857028976
+    },
+    {
+      "url": "/api/v1/connections/status",
+      "time": 1794857028976
+    },
+    {
+      "url": "/api/v1/workspace/native-capture",
+      "time": 1794857028976
+    },
+    {
+      "url": "/api/v1/session",
+      "time": 1794857028977
+    },
+    {
+      "url": "/api/v1/portfolio",
+      "time": 1794857028977
+    },
+    {
+      "url": "/api/v1/workspace/mail-activity",
+      "time": 1794857028990
+    },
+    {
+      "url": "/api/v1/brain/projects",
+      "time": 1794857029286
+    },
+    {
+      "url": "/api/v1/projects/audit-1",
+      "time": 1794857029735
+    },
+    {
+      "url": "/api/v1/projects/audit-1/cdc/items",
+      "time": 1794857029735
+    },
+    {
+      "url": "/api/v1/projects/audit-1/cdc/sources",
+      "time": 1794857029736
+    },
+    {
+      "url": "/api/v1/projects/audit-1/meetings",
+      "time": 1794857029736
+    },
+    {
+      "url": "/api/v1/ai/status",
+      "time": 1794857029737
+    },
+    {
+      "url": "/api/v1/projects/audit-1/cdc/jobs",
+      "time": 1794857029737
+    },
+    {
+      "url": "/api/v1/projects/audit-2",
+      "time": 1794857030301
+    },
+    {
+      "url": "/api/v1/projects/audit-2/cdc/items",
+      "time": 1794857030301
+    },
+    {
+      "url": "/api/v1/projects/audit-2/cdc/sources",
+      "time": 1794857030302
+    },
+    {
+      "url": "/api/v1/projects/audit-2/meetings",
+      "time": 1794857030303
+    },
+    {
+      "url": "/api/v1/projects/audit-2/cdc/jobs",
+      "time": 1794857030303
+    },
+    {
+      "url": "/api/v1/ai/status",
+      "time": 1794857030303
+    },
+    {
+      "url": "/api/v1/projects/audit-1/cdc/jobs",
+      "time": 1794857031749
+    },
+    {
+      "url": "/api/v1/projects/audit-2/cdc/jobs",
+      "time": 1794857032308
+    },
+    {
+      "url": "/api/v1/projects/audit-1/cdc/jobs",
+      "time": 1794857033742
+    },
+    {
+      "url": "/api/v1/workspace/native-capture",
+      "time": 1794857033979
+    },
+    {
+      "url": "/api/v1/projects/audit-2/cdc/jobs",
+      "time": 1794857034305
+    },
+    {
+      "url": "/api/v1/session",
+      "time": 1794857035607
+    },
+    {
+      "url": "/api/v1/connections/status",
+      "time": 1794857035607
+    },
+    {
+      "url": "/api/v1/workspace/native-capture",
+      "time": 1794857035608
+    },
+    {
+      "url": "/api/v1/session",
+      "time": 1794857035609
+    },
+    {
+      "url": "/api/v1/portfolio",
+      "time": 1794857035609
+    },
+    {
+      "url": "/api/v1/workspace/mail-activity",
+      "time": 1794857035622
+    },
+    {
+      "url": "/api/v1/portfolio",
+      "time": 1794857035736
+    },
+    {
+      "url": "/api/v1/session",
+      "time": 1794857035820
+    },
+    {
+      "url": "/api/v1/connections/status",
+      "time": 1794857035821
+    },
+    {
+      "url": "/api/v1/workspace/native-capture",
+      "time": 1794857035822
+    },
+    {
+      "url": "/api/v1/session",
+      "time": 1794857035822
+    },
+    {
+      "url": "/api/v1/portfolio",
+      "time": 1794857035823
+    },
+    {
+      "url": "/api/v1/workspace/mail-activity",
+      "time": 1794857035826
+    }
+  ],
+  "mobileMenuFocus": "Ouvrir le menu",
+  "quickAccessFocus": "Accès rapide aux rubriques",
+  "emptyFilter": "Projets\n＋ Nouveau projet\nActifs\nTous\nArchivés\nEn retard\nÀ examiner\nProjet / client\tÉtat\tAvancement\tProchaine étape\t\nFavori\nAucun projet dans cette vue\n\nChangez le filtre ou créez un projet.",
+  "keyboardSearchRoute": true,
+  "hiddenPolling": {
+    "durationMs": 4709,
+    "requests": [
+      {
+        "url": "/api/v1/projects/audit-1/cdc/jobs",
+        "time": 1794857031749
+      },
+      {
+        "url": "/api/v1/projects/audit-2/cdc/jobs",
+        "time": 1794857032308
+      },
+      {
+        "url": "/api/v1/projects/audit-1/cdc/jobs",
+        "time": 1794857033742
+      },
+      {
+        "url": "/api/v1/projects/audit-2/cdc/jobs",
+        "time": 1794857034305
+      }
+    ],
+    "mountedProjectViews": 2
+  },
+  "errorText": "Impossible de charger cette vue\n\nService Projets indisponible — simulation audit\n\nRéessayer\n\nLe portefeuille est indisponible. Les autres rubriques restent accessibles ; utilisez Réessayer pour recharger les projets.",
+  "retryRecovered": true,
+  "emptyText": "Projets\n＋ Nouveau projet\nActifs\nTous\nArchivés\nEn retard\nÀ examiner\nProjet / client\tÉtat\tAvancement\tProchaine étape\t\nFavori\nAucun projet dans cette vue\n\nChangez le filtre ou créez un projet."
+}

@@ -9,7 +9,7 @@ const baseline=process.argv.includes('--baseline'),automaticReasoning=process.ar
 const script=name=>{let source=baseline&&name==='conversation.js'?execFileSync('git',['show','0354e91:client-qwen/conversation.js'],{cwd:root,encoding:'utf8'}):read(name);if(preRestoreLow&&name==='conversation.js')source=source.replace("if(native.quality!=='max')return classicLowSplitSpeech(final);",'').replace("if(native.quality!=='max')return classicLowSpeak(text,token);",'').replace("if(quality.value==='low')return classicLowRefresh();",'').replace("options.hidden=quality.value==='low';",'');if(!baseline&&name==='conversation.js')source=source.replace('setInterval(refresh,200);refresh();','window.__qaVoice=()=>({listening:!responding()&&!native.capture_paused,ignoredSpeech,pendingTurns,firstSpeechQueued,speechBuffer,speechRunning,listenAfter});setInterval(refresh,200);refresh();');return '<script nonce="qa">'+source.replaceAll('</script','<\\/script')+'</script>';};
 const renderHtml=()=>android?fs.readFileSync(path.join(root,'../client-android/app/src/main/assets/android-chat.html'),'utf8').replace('__CONFIG__',JSON.stringify({...config,platform:'android'})).replaceAll('__NONCE__','qa').replace('setInterval(refresh,200);refresh();','window.__qaVoice=()=>({listening:!responding()&&!native.capture_paused,ignoredSpeech,pendingTurns,speechRunning});setInterval(refresh,200);refresh();').replace('</head>',`<script nonce="qa">window.AndroidClient={conversationStatus(){return this.request()},conversationAction(body){return this.request(body)},request(body){const xhr=new XMLHttpRequest();xhr.open(body?'POST':'GET','/client/conversation',false);xhr.setRequestHeader('Authorization','Bearer ${config.key}');xhr.setRequestHeader('Content-Type','application/json');xhr.send(body||null);return xhr.responseText;},notificationReady(){},voiceStatus(){return JSON.stringify({phase:'idle',installed:true})},voiceAction(){return '{}'}};</script></head>`):read('chat.html').replace('__UI_CSS__',read('ui.css')).replace('__CONFIG__',JSON.stringify(config)).replaceAll('__NONCE__','qa')
   .replace('</head>',()=>script('vendor/markdown-it.min.js')+script('markdown.js')+'</head>')
-  .replace('</body>',()=>read('workspace.html')+['ui.js','attachments.js','corrector.js','selection.js','thinking.js','voice.js','conversation.js',...(linux?['linux_features.js']:[])].map(script).join('')+'</body>');
+  .replace('</body>',()=>read('workspace.html')+['ui.js','attachments.js','corrector.js','selection.js','thinking.js','voice.js','conversation.js',...(linux?['linux_features.js']:[])].map(script).join('')+'</body>').replaceAll('__NONCE__','qa');
 const html=renderHtml();
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 const webEvents=process.argv.includes('--web-events');
@@ -35,7 +35,7 @@ async function main(){
   const later=(work,ms)=>{const timer=setTimeout(()=>{state.timers.delete(timer);work();},ms);state.timers.add(timer);};
   const server=http.createServer(async(req,res)=>{
     let raw='';for await(const chunk of req)raw+=chunk;const body=JSON.parse(raw||'{}');
-    if(req.url==='/'){res.writeHead(200,{'Content-Type':'text/html; charset=utf-8'});return res.end(process.argv.includes('--preview')?renderHtml():html);}
+    if(req.url==='/'){res.writeHead(200,{'Content-Type':'text/html; charset=utf-8',...(process.argv.includes('--capture-test')?{'Content-Security-Policy':"default-src 'none'; script-src 'nonce-qa'; style-src 'nonce-qa'; connect-src 'self'; img-src data:; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"}:{})});return res.end(process.argv.includes('--preview')?renderHtml():html);}
     state.calls.push({path:req.url,body,requestId:req.headers['x-qwen-request']});
     if(req.headers.authorization!=='Bearer '+config.key)return json(res,{error:{message:'Unauthorized'}},401);
     if(process.argv.includes('--preview')&&req.url==='/__fixture'){
@@ -88,6 +88,7 @@ async function main(){
     if(req.url==='/client/voice/max/install-cancel'){state.installation={...state.installation,phase:'cancelled',message:'Installation Max arrêtée. Vous pouvez la relancer.'};return json(res,state.installation);}
     if(req.url==='/client/voice/max')return json(res,process.argv.includes('--max-unavailable')?{pc:{installed:false,available:false,message:'Mode Max non installé'},server:{installed:true,available:false,message:'Mode Max trop lent sur cet appareil. Low est conseillé.'}}:{pc:{installed:true,available:true,latency_ms:1200,message:'Mode Max prêt'},server:{installed:true,available:true,latency_ms:600,message:'Mode Max prêt'}});
     if(req.url==='/client/draft')return json(res,{draft:null});
+    if(req.url==='/client/capture'&&state.captureTestImage)return json(res,{cancelled:false,image:state.captureTestImage});
     if(req.url==='/client/integrations')return json(res,{apps:[]});
     if(req.url==='/client/voice')return json(res,{phase:'idle',installed:false});
     if(req.url==='/client/conversation'){
@@ -145,9 +146,10 @@ async function main(){
     console.log('Isolated voice fixture: http://127.0.0.1:'+server.address().port);
     await new Promise(()=>{});
   }
-  let page,snapshot;
+  let page,snapshot,errors=[];
   try{
-    page=await browser.newPage({viewport:android?{width:390,height:844}:{width:1440,height:1000}});const errors=[];page.on('pageerror',error=>errors.push(error.message));
+    page=await browser.newPage({viewport:android?{width:390,height:844}:{width:1440,height:1000}});page.on('pageerror',error=>errors.push(process.argv.includes('--capture-test')?error.stack:error.message));
+    if(process.argv.includes('--capture-test'))page.setDefaultTimeout(5000);
     await page.addInitScript(()=>{
       window.__audio={started:0,ended:0,stopped:0,gain:1,analysed:0};
       window.AudioContext=class{
@@ -162,11 +164,22 @@ async function main(){
     });
     const voiceUI={};
     async function revealVoiceControl(selector){
-      if(!await page.locator('#voice-settings-dialog').count())return;
-      const inside=await page.evaluate(sel=>!!document.querySelector(sel)?.closest('#voice-settings-dialog'),selector);
-      const opened=await page.locator('#voice-settings-dialog').evaluate(el=>el.open);
-      if(inside&&!opened)await page.locator('#voice-settings-toggle').click();
-      if(!inside&&opened)await page.locator('#voice-settings-close').click();
+      if(await page.locator('#voice-settings-dialog').count()){
+        const inside=await page.evaluate(sel=>!!document.querySelector(sel)?.closest('#voice-settings-dialog'),selector);
+        const opened=await page.locator('#voice-settings-dialog').evaluate(el=>el.open);
+        if(inside&&!opened)await page.locator('#voice-settings-toggle').click();
+        if(!inside&&opened)await page.locator('#voice-settings-close').click();
+      }
+      // Les commandes de rédaction, le sélecteur de projet et le correcteur sont
+      // logés dans le menu discret #ui-composer-options-menu : ouvrir chaque
+      // <details> fermé ancêtre avant de cliquer sur la commande ciblée.
+      await page.evaluate(sel=>{
+        const target=document.querySelector(sel);
+        if(!target)return;
+        for(let menu=target.closest('details');menu;menu=menu.parentElement?.closest('details')){
+          if(!menu.open)menu.open=true;
+        }
+      },selector);
     }
     for(const name of ['click','selectOption','check','uncheck','focus','fill'])voiceUI[name]=async(selector,...args)=>{
       await revealVoiceControl(selector);
@@ -174,6 +187,8 @@ async function main(){
       return page.locator(selector)[name](...args);
     };
     await page.goto('http://127.0.0.1:'+server.address().port);await page.waitForFunction(()=>!document.getElementById('conversation-start')?.disabled);
+    if(linux&&process.argv.includes('--capture-test'))return await require('./linux_capture_checks.cjs')({page,state,errors,until,voiceUI});
+    if(!linux&&!android&&process.argv.includes('--capture-test'))return await require('./windows_capture_checks.cjs')({page,state,errors,until,voiceUI});
     if(linux)return await require('./linux_voice_checks.cjs')({page,state,errors,until,sleep,voiceUI});
     if(process.argv.includes('--realtime-loop'))return await require('./voice_realtime_checks.cjs')({page,state,errors,until,sleep,event,voiceUI});
     if(process.argv.includes('--assistant-integration'))return await require('./assistant_ui_checks.cjs')({page,state,android,errors});
@@ -576,7 +591,7 @@ async function main(){
     if(!baseline)assert.equal(await page.inputValue('#voice-volume'),'35','Volume survives reload');
     if(maxVoice){assert.equal(await page.inputValue('#voice-quality'),'max');assert(state.calls.some(call=>call.path==='/client/voice/max/speech'));assert(!state.calls.some(call=>call.path==='/v1/voice/speech'),'Max must use its own speech engine');}
     console.log(JSON.stringify({passed:true,source:baseline?'0354e91':'working-tree',reasoning:'oral none, written preference preserved',checks:['direct Qwen + delayed sync preserves session and complete text','all three PCM frames finish without automatic cancellation','second ASR turn waits for history sync and submits exactly once','same conversation with unique turn IDs','real new speech during calculation cancels original turn','speech playback barge-in cancels correct audio and scheduled sources','hangup returns controls','local requests bypass Hermes; oral reasoning disabled','short first sentence is spoken before LLM completion','hangup failure keeps completed text and offers retry','network probe failure preserves reply and microphone','offline utterance resumes exactly once after reconnection','audio transport failure preserves full text and microphone','revoked access still closes microphone','keyboard mute/unmute preserves playback and session','muted recognition never interrupts or submits','failed mute never reports microphone closed','interruptions disabled by default','noise and late transcripts neither cancel nor submit while disabled','listening resumes after playback','interruption setting survives reload both ways','first natural clause spoken before model finishes','reasoning hidden during voice and restored unchanged after hangup','speech after playback remains queued during history save'],chats:state.chats.length,acks:state.acks,simulation:'native ASR and PCM timing; no hardware microphone or server models'},null,2));
-  }catch(error){console.error(JSON.stringify({passed:false,source:baseline?'0354e91':'working-tree',snapshot,current:await page.evaluate(()=>({active:window.conversationBusy,busy,button:document.getElementById('conversation-start').textContent,disabled:document.getElementById('conversation-start').disabled,status:document.getElementById('conversation-status').textContent,voice:window.__qaVoice?.()})),recent:state.calls.slice(-12),native:state.native,stops:state.stops,cancels:state.cancels,voiceCancels:state.voiceCancels},null,2));throw error;}
+  }catch(error){console.error(JSON.stringify({passed:false,source:baseline?'0354e91':'working-tree',errors,snapshot,current:await page.evaluate(()=>({active:window.conversationBusy,busy:typeof busy==='undefined'?null:busy,button:document.getElementById('conversation-start')?.textContent,disabled:document.getElementById('conversation-start')?.disabled,status:document.getElementById('conversation-status')?.textContent,voice:window.__qaVoice?.()})),recent:state.calls.slice(-12),native:state.native,stops:state.stops,cancels:state.cancels,voiceCancels:state.voiceCancels},null,2));throw error;}
   finally{for(const timer of state.timers)clearTimeout(timer);await browser.close();server.closeAllConnections?.();await new Promise(resolve=>server.close(resolve));}
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});

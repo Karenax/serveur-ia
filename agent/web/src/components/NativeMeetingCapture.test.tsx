@@ -79,6 +79,51 @@ const devices:NativeCaptureStatus['devices']=[
 ];
 beforeEach(()=>{localStorage.clear();vi.spyOn(meetingSessions,'get').mockResolvedValue(row);vi.spyOn(meetingSessions,'nativeStatus').mockResolvedValue(native);});
 afterEach(()=>{cleanup();vi.restoreAllMocks();});
+
+it('suspend le suivi de la séance masquée sans perdre le choix de capture ni envoyer de commande',async()=>{
+  vi.useFakeTimers();
+  const command=vi.spyOn(meetingSessions,'native');
+  const props={session:row,capabilities:native,onChanged:vi.fn(),browserBusy:false};
+  const view=render(<NativeMeetingCapture {...props} active/>);
+  try{
+    await act(async()=>{});
+    expect(meetingSessions.nativeStatus).toHaveBeenCalledTimes(2);
+    fireEvent.change(screen.getByLabelText('Source audio de la réunion'),{target:{value:'mic'}});
+    view.rerender(<NativeMeetingCapture {...props} active={false}/>);
+    await act(async()=>{await vi.advanceTimersByTimeAsync(15000);});
+    expect(meetingSessions.nativeStatus).toHaveBeenCalledTimes(2);
+    expect(screen.getByLabelText('Source audio de la réunion')).toHaveProperty('value','mic');
+    expect(command).not.toHaveBeenCalled();
+    view.rerender(<NativeMeetingCapture {...props} active/>);
+    await act(async()=>{});
+    expect(meetingSessions.nativeStatus).toHaveBeenCalledTimes(4);
+    expect(screen.getByLabelText('Source audio de la réunion')).toHaveProperty('value','mic');
+  }finally{view.unmount();vi.useRealTimers();}
+});
+
+it('suspend le suivi global quand le document est masqué et ignore une réponse devenue ancienne',async()=>{
+  vi.useFakeTimers();let hidden=false;
+  vi.spyOn(document,'hidden','get').mockImplementation(()=>hidden);
+  const pending=deferred<NativeCaptureStatus>();
+  vi.mocked(meetingSessions.nativeStatus).mockResolvedValueOnce(owned(owner)).mockReturnValueOnce(pending.promise)
+    .mockResolvedValue(owned({...owner,state:'paused'}));
+  const command=vi.spyOn(meetingSessions,'native');
+  const view=render(<NativeCaptureBar onOpen={vi.fn()}/>);
+  try{
+    await act(async()=>{});
+    await act(async()=>{await vi.advanceTimersByTimeAsync(5000);});
+    const signal=vi.mocked(meetingSessions.nativeStatus).mock.calls[1][1]!;
+    hidden=true;act(()=>document.dispatchEvent(new Event('visibilitychange')));
+    expect(signal.aborted).toBe(true);
+    await act(async()=>{await vi.advanceTimersByTimeAsync(15000);});
+    expect(meetingSessions.nativeStatus).toHaveBeenCalledTimes(2);
+    hidden=false;await act(async()=>{document.dispatchEvent(new Event('visibilitychange'));});
+    expect(meetingSessions.nativeStatus).toHaveBeenCalledTimes(3);
+    await act(async()=>{pending.resolve(owned({...owner,state:'interrupted',process_alive:false}));});
+    expect(screen.getByText(/Capture Windows · En pause/)).toBeTruthy();
+    expect(command).not.toHaveBeenCalled();
+  }finally{view.unmount();vi.useRealTimers();}
+});
 it('démarre seulement la sortie Windows par défaut et exige un choix explicite pour le microphone',async()=>{
   const start=vi.spyOn(meetingSessions,'native').mockResolvedValue({...row,state:'recording'});
   render(<NativeMeetingCapture session={row} capabilities={native} onChanged={vi.fn()} browserBusy={false}/>);

@@ -3,7 +3,7 @@ import { agentPath } from '../lib/agentRoutes';
 import {citationSourceUrl,noteVersionIdentity,stagedNoteVersionIdentity,type CitationTarget} from '../lib/citationLinks';
 import {boundVersionContent,notesApi,validNoteContent,type NoteContent} from '../lib/projectNotes';
 import {meetingSessions} from '../lib/meetingSessions';
-import {NoteContentView} from './NoteRichEditor';
+import {NoteContentView} from './NoteContentView';
 import './project-notes.css';
 
 type Target={kind:'erp';projectId:string;noteId:string;versionId:string;url:string}|{kind:'staging';sessionId:string;versionId:string;url:string};

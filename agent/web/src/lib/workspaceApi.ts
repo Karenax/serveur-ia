@@ -57,8 +57,8 @@ export const workspaceApi = {
   knowledgeProjects: (signal?: AbortSignal) => request<{id:string;code:string;name:string}[]>("/api/v1/brain/projects",{signal}),
   createKnowledgeProject: (code:string,name:string) => request<{id:string;code:string;name:string}>(
     "/v1/projects",{method:"POST",body:JSON.stringify({code,name})}),
-  meetings: (filters: WorkspaceFilter = {}, signal?: AbortSignal,quiet=false) => request<WorkspacePage<WorkspaceMeeting>>(pageUrl("meetings", filters), {signal,activity:quiet?false:undefined}),
-  jobs: (filters: WorkspaceFilter = {}, signal?: AbortSignal,quiet=false) => request<WorkspacePage<WorkspaceJob>>(pageUrl("jobs", filters), {signal,activity:quiet?false:undefined}),
+  meetings: (filters: WorkspaceFilter = {}, signal?: AbortSignal,quiet=false) => request<WorkspacePage<WorkspaceMeeting>>(pageUrl("meetings", filters), {signal,activity:quiet?false:undefined}, 30000),
+  jobs: (filters: WorkspaceFilter = {}, signal?: AbortSignal,quiet=false) => request<WorkspacePage<WorkspaceJob>>(pageUrl("jobs", filters), {signal,activity:quiet?false:undefined}, 30000),
   proposals: (filters: WorkspaceFilter = {}, signal?: AbortSignal) => request<WorkspacePage<WorkspaceKnowledge>>(pageUrl("proposals", filters), {signal}),
   knowledge: (filters: WorkspaceFilter = {}, signal?: AbortSignal) => request<WorkspacePage<WorkspaceKnowledge>>(pageUrl("knowledge", filters), {signal}),
   changeKnowledge: (projectId: string, id: string, action: 'invalidate' | 'restore' | 'confirm') => request<{id:string;status:string}>(
@@ -71,8 +71,8 @@ export const workspaceApi = {
     return request<unknown>(url, {method: "POST"});
   },
   triageJobs: (signal?: AbortSignal) => request<WorkspacePage<DurableTriageJob>>("/api/v1/workspace/triage-jobs?limit=1&offset=0", {signal}),
-  latestTriage: (signal?: AbortSignal,quiet=false) => request<{job: DurableTriageJob | null}>("/api/v1/workspace/triage-jobs/latest", {signal,activity:quiet?false:undefined}),
-  triageJob: (id: string, signal?: AbortSignal,quiet=false) => request<DurableTriageJob>(`/api/v1/workspace/triage-jobs/${encodeURIComponent(id)}`, {signal,activity:quiet?false:undefined}),
+  latestTriage: (signal?: AbortSignal,quiet=false) => request<{job: DurableTriageJob | null}>("/api/v1/workspace/triage-jobs/latest", {signal,activity:quiet?false:undefined},30000),
+  triageJob: (id: string, signal?: AbortSignal,quiet=false) => request<DurableTriageJob>(`/api/v1/workspace/triage-jobs/${encodeURIComponent(id)}`, {signal,activity:quiet?false:undefined},30000),
   startTriage: (force = false) => request<DurableTriageJob>("/api/v1/workspace/triage-jobs", {method: "POST", body: JSON.stringify({force})}),
   cancelTriage: (id: string) => request<DurableTriageJob>(`/api/v1/workspace/triage-jobs/${encodeURIComponent(id)}/cancel`, {method: "POST"}),
 };

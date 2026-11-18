@@ -41,6 +41,9 @@
 .document-version-list small {display:block;margin-top:5px;}
 .document-version-list p {white-space:pre-wrap;overflow-wrap:anywhere;}
 .document-setting {margin:14px 0;}
+.document-setting .document-field-grid>label:not(.document-confirm){display:grid;gap:6px;min-width:0;align-content:start}
+.document-setting .document-field-grid>label:not(.document-confirm)>.input{width:100%;min-width:0}
+.document-setting .document-field-grid>label>textarea{resize:vertical;min-height:38px}
 @media(max-width:600px){.document-version-list>li {flex-direction:column;}}
 .document-batch{margin-top:24px;border:1px solid var(--border);border-radius:14px;padding:18px;background:var(--surface);min-width:0}
 .document-worker{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:7px;white-space:normal}

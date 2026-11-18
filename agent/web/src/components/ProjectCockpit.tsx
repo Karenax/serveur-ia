@@ -7,6 +7,7 @@ import { TaskEditor, message } from './PlanningTasksPanel';
 import { MilestoneEditor } from './PlanningMilestonesPanel';
 import { Pagination } from './IdentityPickers';
 import { ErrorState, LoadingState } from './Ui';
+import { Icon } from '../os/icons';
 import './project-cockpit.css';
 import { ProjectKnowledgePanel } from './ProjectKnowledgePanel';
 
@@ -71,7 +72,7 @@ function Cockpit({projectId,active=true,revision,onSaved,onOpenDeliverable,onOpe
     <CockpitAlerts projectId={projectId} active={active} tick={tick} revision={revision} graphRevision={graph.data?.revision} locked={locked} onSelect={inspectAlert} onRefresh={refresh}/>
     <ProjectKnowledgePanel key={projectId} projectId={projectId} active={active}/>
     <div className="cockpit-controls"><label>Rechercher dans le projet<input className="input" value={search} maxLength={200} placeholder="Échéance, tâche, document…" onChange={e=>setSearch(e.target.value)}/></label>
-    <details className="cockpit-display-options"><summary>Options d’affichage</summary><div className="cockpit-controls">
+    <details className="discrete-icon-menu icon-menu-details"><summary className="discrete-icon-summary icon-menu-summary" aria-label="Options d’affichage" title="Options d’affichage"><Icon name="sliders" size={16} /><span className="sr-only">Options d’affichage</span></summary><div className="cockpit-controls cockpit-filter-menu icon-menu-popover">
       <label>Afficher<select className="input" value={layer} onChange={e=>setLayer(e.target.value as typeof layer)}><option value="all">Tâches et livrables</option><option value="tasks">Tâches</option><option value="documents">Livrables</option></select></label>
       <label className="identity-checkbox"><input type="checkbox" checked={past} onChange={e=>setPast(e.target.checked)}/>Inclure les jalons passés</label>
       <label className="identity-checkbox"><input type="checkbox" checked={compact} onChange={e=>setCompact(e.target.checked)}/>Vue compacte</label>

@@ -1,37 +1,94 @@
 import { agentLocation, agentPath, conversationsHref, projectConversationHref } from '../lib/agentRoutes';
 import {useQueryState} from '../hooks/useQueryState';
-import { useCallback, useEffect, useRef, useState, type ComponentType } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState, type ComponentType, type ReactNode } from "react";
+import {retryableLazy} from '../lib/retryableLazy';
 import { api, type PortfolioRow, type SearchHit } from "../lib/api";
 import { parseWorkspaceRoute, projectTabs, routeKey, workspacePath, type ProjectTab, type WorkspaceRoute } from "../lib/workspaceNavigation";
 import { Glyph, P } from "../os/icons";
-import { AiSettingsForm, MailSettingsForm, MemorySettingsForm } from "./SettingsForms";
-import { OperationsPanel } from "./OperationsPanel";
 import { ThunderbirdPanel } from "./ThunderbirdPanel";
 import { ActionDashboard } from "./ActionDashboard";
-import { GlobalMeetingsView, GlobalJobsView, GlobalKnowledgeView, SourceInspector,type MeetingCreationRequest } from "./WorkspaceViews";
+import type {MeetingCreationRequest} from "./WorkspaceViews";
+import {SourceInspector} from "./SourceInspector";
 import { Badge, EmptyState, ErrorState, LoadingState } from "./Ui";
 import { ProjectFolder } from "./ProjectFolder";
+import { WorkspaceViewBoundary } from "./WorkspaceViewBoundary";
 import { useWorkspaceWheel } from "../hooks/useWorkspaceWheel";
-import { ProjectReferenceSettings } from "./ProjectReferenceSettings";
-import { DeliverableSettings } from "./DeliverableSettings";
-import { DocumentSettings } from "./DocumentSettings";
 import { ConnectionStatus } from "./ConnectionStatus";
 import { SearchView } from "./SearchView";
-import { MeetingCaptureBar } from "./MeetingStudio";
-import { SourcesLibrary } from "./SourcesLibrary";
-import { FusionInsights } from "./FusionInsights";
+import { MeetingCaptureBar } from "./MeetingCaptureBar";
+
 import { NativeCaptureBar } from "./NativeMeetingCapture";
 import type {WorkspaceCitation} from "../lib/workspaceApi";
 import { withActivity } from "../lib/asyncActivity";
 import "../project-kiara-preview.css";
 import {MEETING_WORKSPACE_EVENT} from '../lib/meetingWorkspace';
+const NotesWorkspace = retryableLazy(
+  () => import('./NotesWorkspace').then(module=>({default:module.NotesWorkspace})),
+  () => import('./NotesWorkspace?kiara-retry=1').then(module=>({default:(module as unknown as typeof import('./NotesWorkspace')).NotesWorkspace})));
+const SourcesLibrary = retryableLazy(
+  () => import('./SourcesLibrary').then(module=>({default:module.SourcesLibrary})),
+  () => import('./SourcesLibrary?kiara-retry=1').then(module=>({default:(module as unknown as typeof import('./SourcesLibrary')).SourcesLibrary})));
 
-export type ProjectWorkspaceProps = {projectId:string; initialTab:ProjectTab | "import"; row?:PortfolioRow; reloadRows:()=>Promise<void>; back:()=>void; onTabChange?:(tab:ProjectTab | "import")=>boolean|void;};
+// These views share one module; reuse the recovered address in later views.
+let recoveredWorkspaceViews = false;
+const loadWorkspaceViews = ():Promise<typeof import('./WorkspaceViews')> => recoveredWorkspaceViews
+  ? import('./WorkspaceViews?kiara-retry=1') as unknown as Promise<typeof import('./WorkspaceViews')>
+  : import('./WorkspaceViews');
+const retryWorkspaceViews = async ():Promise<typeof import('./WorkspaceViews')> => {
+  const module = await import('./WorkspaceViews?kiara-retry=1') as unknown as typeof import('./WorkspaceViews');
+  recoveredWorkspaceViews = true;
+  return module;
+};
+const GlobalMeetingsView = retryableLazy(() => loadWorkspaceViews().then(module=>({default:module.GlobalMeetingsView})), () => retryWorkspaceViews().then(module=>({default:module.GlobalMeetingsView})));
+const GlobalKnowledgeView = retryableLazy(() => loadWorkspaceViews().then(module=>({default:module.GlobalKnowledgeView})), () => retryWorkspaceViews().then(module=>({default:module.GlobalKnowledgeView})));
+const GlobalJobsView = retryableLazy(() => loadWorkspaceViews().then(module=>({default:module.GlobalJobsView})), () => retryWorkspaceViews().then(module=>({default:module.GlobalJobsView})));
+
+const ProjectReferenceSettings = retryableLazy(
+  () => import('./ProjectReferenceSettings').then(module=>({default:module.ProjectReferenceSettings})),
+  () => import('./ProjectReferenceSettings?kiara-retry=1').then(module=>({default:(module as unknown as typeof import('./ProjectReferenceSettings')).ProjectReferenceSettings})));
+const DeliverableSettings = retryableLazy(
+  () => import('./DeliverableSettings').then(module=>({default:module.DeliverableSettings})),
+  () => import('./DeliverableSettings?kiara-retry=1').then(module=>({default:(module as unknown as typeof import('./DeliverableSettings')).DeliverableSettings})));
+const DocumentSettings = retryableLazy(
+  () => import('./DocumentSettings').then(module=>({default:module.DocumentSettings})),
+  () => import('./DocumentSettings?kiara-retry=1').then(module=>({default:(module as unknown as typeof import('./DocumentSettings')).DocumentSettings})));
+let recoveredFusionInsights = false;
+const loadFusionInsights = ():Promise<typeof import('./FusionInsights')> => recoveredFusionInsights
+  ? import('./FusionInsights?kiara-retry=1') as unknown as Promise<typeof import('./FusionInsights')>
+  : import('./FusionInsights');
+const retryFusionInsights = async ():Promise<typeof import('./FusionInsights')> => {
+  const module = await import('./FusionInsights?kiara-retry=1') as unknown as typeof import('./FusionInsights');
+  recoveredFusionInsights = true;
+  return module;
+};
+const FusionInsights = retryableLazy(() => loadFusionInsights().then(module=>({default:module.FusionInsights})), () => retryFusionInsights().then(module=>({default:module.FusionInsights})));
+
+let recoveredSettings = false;
+const loadSettings = ():Promise<typeof import('./SettingsForms')> => recoveredSettings
+  ? import('./SettingsForms?kiara-retry=1') as unknown as Promise<typeof import('./SettingsForms')>
+  : import('./SettingsForms');
+const retrySettings = async ():Promise<typeof import('./SettingsForms')> => {
+  const module = await import('./SettingsForms?kiara-retry=1') as unknown as typeof import('./SettingsForms');
+  recoveredSettings = true;
+  return module;
+};
+const AiSettingsForm = retryableLazy(() => loadSettings().then(module=>({default:module.AiSettingsForm})), () => retrySettings().then(module=>({default:module.AiSettingsForm})));
+const MailSettingsForm = retryableLazy(() => loadSettings().then(module=>({default:module.MailSettingsForm})), () => retrySettings().then(module=>({default:module.MailSettingsForm})));
+const MemorySettingsForm = retryableLazy(() => loadSettings().then(module=>({default:module.MemorySettingsForm})), () => retrySettings().then(module=>({default:module.MemorySettingsForm})));
+const OperationsPanel = retryableLazy(
+  () => import('./OperationsPanel').then(module=>({default:module.OperationsPanel})),
+  () => import('./OperationsPanel?kiara-retry=1').then(module=>({default:(module as unknown as typeof import('./OperationsPanel')).OperationsPanel})));
+function DeferredSetting({children}:{children:ReactNode}) {
+  return <WorkspaceViewBoundary><Suspense fallback={<LoadingState label="Chargement des réglages"/>}>{children}</Suspense></WorkspaceViewBoundary>;
+}
+
+export type ProjectWorkspaceProps = {active?:boolean; projectId:string; initialTab:ProjectTab | "import"; row?:PortfolioRow; reloadRows:()=>Promise<void>; back:()=>void; onTabChange?:(tab:ProjectTab | "import")=>boolean|void; registerCache?:(id:string,canRelease:()=>boolean)=>()=>void;};
 export type ProjectCreateProps = {reload:()=>Promise<void> | void;close:()=>void;onCreated?:(id:string)=>Promise<void>};
 export type MailPanelProps = {rows?:PortfolioRow[]; active?:boolean; reloadProjects?:()=>Promise<void>};
 type Props = {canCreateProject?:boolean; portfolioLoading?:boolean; portfolioUnavailable?:boolean; rows:PortfolioRow[]; reload:()=>Promise<void>; error?:string; ProjectPanel:ComponentType<ProjectWorkspaceProps>; MailPanel:ComponentType<MailPanelProps>; CreatePanel:ComponentType<ProjectCreateProps>; SagePanel:ComponentType};
 const navigation = [
   {page:"home", label:"Accueil", icon:P.grid}, {page:"projects", label:"Projets", icon:P.folder},
+  {page:"notes", label:"Notes", icon:P.note},
   {page:"mail", label:"Mails", icon:["M3 5h18v14H3zM3 5l9 7 9-7"]},
   {page:"meetings", label:"Réunions", icon:["M4 10v4M8 5v14M12 8v8M16 3v18M20 9v6"]},
   {page:"activity", label:"Activité", icon:["M3 12h4l3-6 4 12 3-6h4"]},
@@ -42,12 +99,14 @@ const navigation = [
 const commandDestinations = [...navigation, {page:"search" as const, label:"Recherche", icon:P.search}, {page:"preparation" as const,label:"Préparer les réunions",icon:P.sync}];
 const pageLabels:Record<string,string> = {...Object.fromEntries(commandDestinations.map(n=>[n.page,n.label])), imports:"Connexions & imports",stats:"Statistiques",preparation:"Réunions et transcription",settings:"Réglages",create:"Nouveau projet",project:"Projet"};
 const settingsPages:WorkspaceRoute['page'][] = ["sources","knowledge","jobs","imports"];
-const settingsAreaPages:WorkspaceRoute['page'][] = ["settings","stats","preparation",...settingsPages];
-const mainSettings = [["ai","Général"],["mail","Mails"],["references","Clients et équipe"],["appearance","Apparence"],["sources","Sources"],["knowledge","Informations"],["jobs","Suivi des analyses"],["imports","Connexions & imports"]];
+const settingsAreaPages:WorkspaceRoute['page'][] = ["settings","stats","preparation","imports"];
+const mainSettings = [["ai","Général"],["mail","Mails"],["references","Clients et équipe"],["appearance","Apparence"],["imports","Connexions & imports"]];
 const extraSettings = [["stats","Statistiques"],["preparation","Réunions et transcription"],["memory","Recherche dans les documents"],["deliverables","Modèles de livrables"],["documents","Modèles de documents"],["operations","Sauvegardes et maintenance"]];
 const sparkle = ["m12 3 3 6 6 3-6 3-3 6-3-6-6-3 6-3z"];
 const bell = ["M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"];
 const settingsIcon = ["M4 6h16M4 12h16M4 18h16",'<circle cx="8" cy="6" r="2" fill="currentColor"/>','<circle cx="16" cy="12" r="2" fill="currentColor"/>','<circle cx="10" cy="18" r="2" fill="currentColor"/>'];
+const moreIcon = ["M12 5h.01", "M12 12h.01", "M12 19h.01"];
+const MAX_CACHED_PROJECTS = 6;
 function preference(key:string, fallback:string) { try {return localStorage.getItem(key) || fallback;} catch {return fallback;} }
 function savePreference(key:string,value:string) { try {localStorage.setItem(key,value);} catch {/* preference stays in this session */} }
 function readWorkspaceRoute(windows:boolean):WorkspaceRoute {
@@ -65,7 +124,55 @@ export function WorkspaceShell({rows,reload,error,canCreateProject=true,portfoli
   const [route,setRoute] = useState(()=>readWorkspaceRoute(windows));
   const showProjectPresentation = route.page === "projects" || route.page === "project";
   const [visited,setVisited] = useState<WorkspaceRoute[]>(()=>[route]);
+  const routeRef = useRef(route);
+  const cacheChecks = useRef(new Map<string,()=>boolean>());
+  const cacheOrder = useRef(new Map<string,number>(route.page==='project'&&route.projectId?[[route.projectId,1]]:[]));
+  const cacheClock = useRef(1);
+  const [cacheGeneration,setCacheGeneration] = useState(0);
+  const registerCache = useCallback((id:string,canRelease:()=>boolean)=>{
+    cacheChecks.current.set(id,canRelease);setCacheGeneration(value=>value+1);
+    return()=>{if(cacheChecks.current.get(id)===canRelease)cacheChecks.current.delete(id);};
+  },[]);
+  useEffect(()=>{
+    if(visited.filter(view=>view.page==='project').length<=MAX_CACHED_PROJECTS)return;
+    setVisited(previous=>{
+      let excess=previous.filter(view=>view.page==='project').length-MAX_CACHED_PROJECTS;
+      if(excess<=0)return previous;
+      const candidates=previous.filter(view=>view.page==='project'&&view.projectId&&routeKey(view)!==routeKey(routeRef.current))
+        .sort((a,b)=>(cacheOrder.current.get(a.projectId!)||0)-(cacheOrder.current.get(b.projectId!)||0));
+      const remove=new Set<string>();
+      for(const view of candidates){
+        if(excess<=0)break;
+        const id=view.projectId!,check=cacheChecks.current.get(id);
+        // Unknown views stay mounted. A project opts in only while it can be recreated without losing local state.
+        let releasable=false;
+        try {releasable=check?.()===true;} catch {/* An uncertain view must remain mounted. */}
+        if(releasable){remove.add(routeKey(view));excess--;}
+      }
+      return remove.size?previous.filter(view=>!remove.has(routeKey(view))):previous;
+    });
+  },[visited,route,cacheGeneration]);
+  useEffect(()=>{
+    const retained=new Set(visited.filter(view=>view.page==='project').map(view=>view.projectId));
+    if(routeRef.current.page==='project')retained.add(routeRef.current.projectId);
+    for(const id of cacheOrder.current.keys())if(!retained.has(id))cacheOrder.current.delete(id);
+  },[visited]);
   const [mobileMenu,setMobileMenu] = useState(false);
+  const [sidebarCollapsed,setSidebarCollapsed] = useState(()=>preference("fred-sidebar-collapsed","false")==="true");
+  const toggleSidebar = useCallback(()=>{
+    setSidebarCollapsed(previous=>{
+      const next=!previous;
+      savePreference("fred-sidebar-collapsed",String(next));
+      return next;
+    });
+  },[]);
+  useEffect(()=>{
+    const sync=(event:StorageEvent)=>{
+      if(event.key==="fred-sidebar-collapsed")setSidebarCollapsed(event.newValue==="true");
+    };
+    window.addEventListener("storage",sync);
+    return()=>window.removeEventListener("storage",sync);
+  },[]);
   const [navigationViewport,setNavigationViewport] = useState(navigationBreakpoints);
   const fusionWorkspace = route.page==='sources'||route.page==='meetings';
   const narrow = navigationViewport.standardNarrow;
@@ -122,12 +229,17 @@ export function WorkspaceShell({rows,reload,error,canCreateProject=true,portfoli
   const [integrationsTab,setIntegrationsTab] = useQueryState<string>("connection","sage","/app/imports");
   const [settingsTab,setSettingsTab] = useQueryState<string>("settings",route.page==="stats"?"stats":route.page==="preparation"?"preparation":"ai","/app/settings");
   const [settingsOptionsOpen,setSettingsOptionsOpen] = useState(false);
+  const [settingsStarted,setSettingsStarted] = useState<Set<string>>(()=>new Set());
   const [referencesStarted,setReferencesStarted] = useState(false);
   const [deliverablesStarted,setDeliverablesStarted] = useState(false);
   const [deliverablesBusy,setDeliverablesBusy] = useState(false);
   const [documentsStarted,setDocumentsStarted] = useState(false);
   const [documentsBusy,setDocumentsBusy] = useState(false);
   useEffect(()=>{if(settingsTab==="documents")setDocumentsStarted(true);},[settingsTab]);
+  useEffect(()=>{setSettingsStarted(previous=>{
+    if(previous.has(settingsTab))return previous;
+    return new Set(previous).add(settingsTab);
+  });},[settingsTab]);
   useEffect(()=>{if(route.page==='stats'||route.page==='preparation')setSettingsTab(route.page);},[route.page]);
   const changeSettingsTab=(id:string)=>{if(settingsTab==="documents"&&document.querySelector('[aria-label="Réglages documentaires"][data-workspace-dirty="true"]')&&!window.confirm("Changer de rubrique en conservant les réglages documentaires non enregistrés ?"))return;setSettingsTab(id);setSettingsOptionsOpen(false);};
   useEffect(()=>{if(settingsTab==="references")setReferencesStarted(true);},[settingsTab]);
@@ -142,6 +254,8 @@ export function WorkspaceShell({rows,reload,error,canCreateProject=true,portfoli
 
   const projectListQuery = useRef(route.page === 'projects' ? window.location.search : '');
   const applyRoute = useCallback((next:WorkspaceRoute)=>{
+    routeRef.current=next;
+    if(next.page==='project'&&next.projectId)cacheOrder.current.set(next.projectId,++cacheClock.current);
     setRoute(next); setVisited(previous=>{
       const existing=previous.findIndex(r=>routeKey(r)===routeKey(next));
       return existing<0?[...previous,next]:previous.map((r,i)=>i===existing?next:r);
@@ -167,7 +281,7 @@ export function WorkspaceShell({rows,reload,error,canCreateProject=true,portfoli
     return true;
   },[applyRoute,canLeaveCurrentView]);
   const guardConversationLink = (event: React.MouseEvent<HTMLAnchorElement>)=>{
-    if(!windows||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
+    if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
     if(document.querySelector('[data-workspace-dirty="true"]')){
       setNotice("Enregistrez ou fermez la modification en cours avant de revenir à Conversations.");
       event.preventDefault();
@@ -230,9 +344,14 @@ export function WorkspaceShell({rows,reload,error,canCreateProject=true,portfoli
   useEffect(()=>{savePreference("agent-ui-density",density);},[density]);
   useEffect(()=>{savePreference("agent-project-favorites",JSON.stringify(favorites));},[favorites]);
   useEffect(()=>{
-    const keyboard=(e:KeyboardEvent)=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="k"){e.preventDefault();navigate({page:"search"});}if(e.key==="Escape")setMobileMenu(false);};
+    const keyboard=(e:KeyboardEvent)=>{
+      if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="k"){e.preventDefault();navigate({page:"search"});}
+      const target=e.target as HTMLElement|null;
+      if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="b"&&!["INPUT","TEXTAREA","SELECT"].includes(target?.tagName||"")&&!target?.isContentEditable){e.preventDefault();toggleSidebar();}
+      if(e.key==="Escape")setMobileMenu(false);
+    };
     window.addEventListener("keydown",keyboard);return()=>window.removeEventListener("keydown",keyboard);
-  },[navigate]);
+  },[navigate,toggleSidebar]);
   useEffect(()=>{
     const dialog=commandDialog.current;if(!dialog)return;
     if(commandOpen){dialog.showModal?.();commandInput.current?.focus();}else if(dialog.open)dialog.close();
@@ -276,18 +395,22 @@ export function WorkspaceShell({rows,reload,error,canCreateProject=true,portfoli
     navigate(portalEntry);
   };
   const breadcrumb=<nav className="workspace-breadcrumb" aria-label="Fil d’Ariane"><a href={workspacePath(portalEntry)} onClick={openPortalEntry}>{windows?"Projets":"Espace de travail"}</a><Glyph d={P.chevR} size={12}/><span>{route.page==="project"?`${current?.code||"Projet"} · ${current?.client_name||"Client à renseigner"}`:pageLabels[route.page]}</span></nav>;
-  return <div ref={shellRef} className={`workspace-shell ${density==="compact"?"workspace-compact":""}`} data-workspace-theme={theme} data-kiara-navigation="true" data-project-presentation={showProjectPresentation ? "kiara" : undefined} data-fusion-workspace={fusionWorkspace?route.page:undefined} data-meeting-studio={studioHere?'true':undefined}>
+  return <div ref={shellRef} className={`workspace-shell ${density==="compact"?"workspace-compact":""} ${sidebarCollapsed?"workspace-sidebar-collapsed":""}`} data-workspace-theme={theme} data-kiara-navigation="true" data-sidebar-collapsed={sidebarCollapsed?"true":"false"} data-project-presentation={showProjectPresentation ? "kiara" : undefined} data-fusion-workspace={fusionWorkspace?route.page:undefined} data-meeting-studio={studioHere?'true':undefined}>
     <a className="workspace-skip" href="#workspace-main">Aller au contenu</a>
     {mobileMenu&&<button className="workspace-menu-backdrop" type="button" aria-label="Fermer le menu" onClick={()=>setMobileMenu(false)}/>}
     <aside className={`workspace-sidebar ${mobileMenu?"is-open":""}`} aria-label="Menu principal" aria-hidden={narrow&&!mobileMenu?true:undefined} inert={narrow&&!mobileMenu}>
       <a className="workspace-brand" href={workspacePath(portalEntry)} onClick={openPortalEntry}><span aria-hidden="true">K</span>Kiara</a>
-      <nav aria-label="Grandes rubriques">{conversationsPath&&<a href={conversationsPath} onClick={guardConversationLink}><Glyph d={P.chevL}/><span>Conversations</span></a>}{navigation.filter(n=>n.page!=="home"&&!settingsPages.includes(n.page)).map(n=><div className="workspace-nav-group" key={n.page}><a href={workspacePath({page:n.page})} aria-current={route.page===n.page||(n.page==="projects"&&route.page==="project")?"page":undefined} className={n.page==="projects"&&route.page==="project"?"workspace-nav-parent-active":undefined} onClick={e=>{if(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault();navigate({page:n.page});}}><Glyph d={n.icon}/><span>{n.label}</span></a>
+      <nav aria-label="Grandes rubriques">{conversationsPath&&<a href={conversationsPath} onClick={guardConversationLink}><Glyph d="M3 4h18v12H8l-5 4V4"/><span>Conversations</span></a>}{navigation.filter(n=>n.page!=="home"&&!settingsPages.includes(n.page)).map(n=><div className="workspace-nav-group" key={n.page}><a href={workspacePath({page:n.page})} aria-current={route.page===n.page||(n.page==="projects"&&route.page==="project")?"page":undefined} className={n.page==="projects"&&route.page==="project"?"workspace-nav-parent-active":undefined} onClick={e=>{if(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault();navigate({page:n.page});}}><Glyph d={n.icon}/><span>{n.label}</span></a>
       </div>)}</nav>
-      {!!favorites.length&&<details className="workspace-favorites"><summary>Projets favoris</summary>{favorites.filter(id=>rows.some(r=>r.id===id)).slice(0,8).map(id=>{const r=rows.find(p=>p.id===id)!;return <button key={id} type="button" onClick={()=>openProject(id)}><ProjectFolder code={r.code}/><span>{r.code}<small>{r.title}</small></span></button>;})}</details>}
       <div className="workspace-sidebar-foot"><nav><a href={agentPath("/app/settings")} aria-current={route.page==="settings"?"page":undefined} className={settingsAreaPages.includes(route.page)?"workspace-nav-parent-active":undefined} onClick={e=>{if(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault();navigate({page:"settings"});}}><Glyph d={settingsIcon}/><span>Réglages</span></a></nav><span className="workspace-local"><i/>{document.body.dataset.kiaraDesktop==='true' ? 'Serveur Kiara' : 'Espace de travail'}</span></div>
     </aside>
     <div className="workspace-body" inert={narrow&&mobileMenu}><header className="workspace-topbar">
-      <button ref={mobileToggle} type="button" className="workspace-icon-button workspace-mobile-toggle" aria-label="Ouvrir le menu" aria-expanded={mobileMenu} onClick={()=>setMobileMenu(v=>!v)}><Glyph d={P.list}/></button>
+      <button ref={mobileToggle} type="button" className="workspace-icon-button workspace-mobile-toggle"
+        aria-label={narrow?(mobileMenu?"Fermer le menu":"Ouvrir le menu"):"Afficher ou masquer la navigation"}
+        aria-expanded={narrow?mobileMenu:!sidebarCollapsed}
+        onClick={()=>narrow?setMobileMenu(v=>!v):toggleSidebar()}>
+        <Glyph d={narrow?P.list:["M3 4h18v16H3V4m5 0v16"]}/>
+      </button>
       <button type="button" className="workspace-search-trigger" aria-label="Rechercher dans Kiara" title="Recherche globale · Ctrl K" onClick={()=>navigate({page:"search"})}><Glyph d={P.search}/><span>Rechercher…</span></button>
       <button type="button" className="workspace-icon-button" aria-label="Accès rapide aux rubriques" title="Accès rapide aux rubriques" onClick={()=>setCommandOpen(true)}><Glyph d={P.grid}/></button>
       <ConnectionStatus onOpenJobs={()=>navigate({page:"jobs"})}/>
@@ -303,24 +426,26 @@ export function WorkspaceShell({rows,reload,error,canCreateProject=true,portfoli
       {microphones.map(id=><div className="workspace-notice" role="status" key={id}>● Microphone actif · {rows.find(r=>r.id===id)?.code || "Réunion"} <button type="button" className="workspace-text-button" onClick={()=>{if(openProject(id,"reviews"))window.dispatchEvent(new CustomEvent("agent-show-recording",{detail:{projectId:id}}));}}>Revenir à l’enregistrement</button> <button type="button" className="button secondary" onClick={()=>window.dispatchEvent(new CustomEvent("agent-stop-recording",{detail:{projectId:id}}))}>Arrêter l’enregistrement</button></div>)}
       {settingsAreaPages.includes(route.page)&&<>
         {['settings','stats','preparation'].includes(route.page)&&<div className="workspace-page-header"><h1>Réglages</h1></div>}
-        <div className="workspace-settings-navigation"><nav className="workspace-tabs" aria-label="Réglages">{mainSettings.map(([id,label])=><button type="button" key={id} aria-pressed={(settingsPages.includes(route.page)?route.page:settingsTab)===id} disabled={deliverablesBusy||documentsBusy} onClick={()=>openSettingsTab(id)}>{label}</button>)}</nav>
-          <div className="workspace-options"><button type="button" className="button secondary" aria-expanded={settingsOptionsOpen} aria-controls="workspace-extra-settings" disabled={deliverablesBusy||documentsBusy} onClick={()=>setSettingsOptionsOpen(v=>!v)}>Autres réglages{!settingsPages.includes(route.page)&&extraSettings.find(([id])=>id===settingsTab)&&` · ${extraSettings.find(([id])=>id===settingsTab)![1]}`}</button><div id="workspace-extra-settings" className="workspace-options-panel" hidden={!settingsOptionsOpen} role="group" aria-label="Réglages supplémentaires">{extraSettings.map(([id,label])=><button type="button" key={id} aria-pressed={!settingsPages.includes(route.page)&&settingsTab===id} disabled={deliverablesBusy||documentsBusy} onClick={()=>openSettingsTab(id)}>{label}</button>)}</div></div>
+        <div className="workspace-settings-navigation"><nav className="workspace-tabs" aria-label="Réglages">{mainSettings.map(([id,label])=><button type="button" key={id} aria-pressed={(settingsPages.includes(route.page)?route.page:settingsTab)===id} disabled={deliverablesBusy||documentsBusy} onClick={()=>openSettingsTab(id)}>{label}</button>)}{conversationsPath&&<a className="button secondary" href={`${conversationsPath}#reglages`} onClick={guardConversationLink}>Compte et appareil</a>}</nav>
+          <div className="workspace-options"><button type="button" className="workspace-icon-button" aria-label="Autres réglages" title="Autres réglages" aria-expanded={settingsOptionsOpen} aria-controls="workspace-extra-settings" disabled={deliverablesBusy||documentsBusy} onClick={()=>setSettingsOptionsOpen(v=>!v)}><Glyph d={moreIcon}/></button><div id="workspace-extra-settings" className="workspace-options-panel" hidden={!settingsOptionsOpen} role="group" aria-label="Réglages supplémentaires">{extraSettings.map(([id,label])=><button type="button" key={id} aria-pressed={!settingsPages.includes(route.page)&&settingsTab===id} disabled={deliverablesBusy||documentsBusy} onClick={()=>openSettingsTab(id)}>{label}</button>)}</div></div>
         </div>
       </>}
       {visited.map(view=>{
         const visible=routeKey(view)===routeKey(route), key=routeKey(view);
         if ((view.page==='home'||view.page==='projects')&&(portfolioLoading||portfolioUnavailable)) return <div key={key} hidden={!visible} className="workspace-cached-view">{portfolioLoading?<LoadingState label="Chargement des projets"/>:<p>Le portefeuille est indisponible. Les autres rubriques restent accessibles ; utilisez Réessayer pour recharger les projets.</p>}</div>;
         return <div key={key} hidden={!visible} className="workspace-cached-view" data-workspace-view={key}>
-          {view.page==="home"&&<><div className="workspace-page-header"><h1>Accueil</h1><button type="button" className="button primary" onClick={()=>navigate({page:"projects"})}><Glyph d={P.folder}/>Ouvrir les projets</button></div><section className="workspace-section"><div className="workspace-section-heading"><h2>À traiter</h2></div><ActionDashboard onOpen={openProject}/></section><details className="workspace-overview-options"><summary>Chiffres des projets</summary><div className="workspace-stat-grid"><button onClick={()=>navigate({page:"projects"})} type="button"><span>Projets en cours</span><strong>{rows.filter(r=>r.status==="active").length}</strong></button><button onClick={()=>{setProjectFilter("review");navigate({page:"projects"});}} type="button"><span>Exigences à vérifier</span><strong>{rows.reduce((n,r)=>n+(r.unconfirmed||0),0)}</strong></button><button onClick={()=>navigate({page:"projects"})} type="button"><span>Heures restantes</span><strong>{Math.round(rows.filter(r=>r.status==="active").reduce((n,r)=>n+r.raf,0))} <small>h</small></strong></button></div></details><section className="workspace-section"><div className="workspace-section-heading"><h2>Projets en cours</h2><button className="workspace-text-button" type="button" onClick={()=>navigate({page:"projects"})}>Tous les projets →</button></div>{portfolio(true)}</section></>}
-          {view.page==="projects"&&<><div className="workspace-page-header"><h1>Projets</h1>{canCreateProject&&<button className="button primary" type="button" onClick={()=>navigate({page:"create"})}>＋ Nouveau projet</button>}</div><div className="workspace-toolbar"><input className="input" aria-label="Rechercher un projet" placeholder="Code, titre ou client…" value={projectQuery} onChange={e=>setProjectQuery(e.target.value)}/><select className="input" aria-label="État des projets" value={projectFilter} onChange={e=>setProjectFilter(e.target.value)}><option value="active">Actifs</option><option value="all">Tous</option><option value="closed">Archivés</option><option value="late">En retard</option><option value="review">À examiner</option></select></div>{portfolio()}{filtered.length>0&&<p className="kiara-project-count" role="status">{filtered.length} {filtered.length===1?"projet":"projets"}</p>}</>}
-          {view.page==="project"&&<ProjectPanel projectId={view.projectId!} initialTab={view.tab||"pilotage"} row={rows.find(r=>r.id===view.projectId)} reloadRows={reload} back={()=>navigate({page:"projects"})} onTabChange={tab=>tab==="import"?navigate({page:"imports"}):openProject(view.projectId!,tab)}/>}
+          <WorkspaceViewBoundary>
+          {view.page==="home"&&<><div className="workspace-page-header"><h1>Accueil</h1><div className="workspace-toolbar"><button type="button" className="button secondary" onClick={()=>navigate({page:"notes"})}><Glyph d={P.note}/>Notes</button><button type="button" className="button primary" onClick={()=>navigate({page:"projects"})}><Glyph d={P.folder}/>Ouvrir les projets</button></div></div><section className="workspace-section"><div className="workspace-section-heading"><h2>À traiter</h2></div><ActionDashboard onOpen={openProject}/></section><details className="workspace-overview-options"><summary>Chiffres des projets</summary><div className="workspace-stat-grid"><button onClick={()=>navigate({page:"projects"})} type="button" aria-label="Voir les projets en cours"><span>Projets en cours</span><strong>{rows.filter(r=>r.status==="active").length}</strong></button><button onClick={()=>{setProjectFilter("review");navigate({page:"projects"});}} type="button" aria-label="Voir les exigences à vérifier"><span>Exigences à vérifier</span><strong>{rows.reduce((n,r)=>n+(r.unconfirmed||0),0)}</strong></button><button onClick={()=>navigate({page:"projects"})} type="button" aria-label="Voir les heures restantes"><span>Heures restantes</span><strong>{Math.round(rows.filter(r=>r.status==="active").reduce((n,r)=>n+r.raf,0))} <small>h</small></strong></button></div></details><section className="workspace-section"><div className="workspace-section-heading"><h2>Projets en cours</h2><button className="workspace-text-button" type="button" onClick={()=>navigate({page:"projects"})}>Tous les projets →</button></div>{portfolio(true)}</section></>}
+          {view.page==="projects"&&<><div className="workspace-page-header"><h1>Projets</h1>{canCreateProject&&<button className="button primary" type="button" onClick={()=>navigate({page:"create"})}>＋ Nouveau projet</button>}</div>{!!favorites.length&&<details className="workspace-favorites"><summary>Projets favoris</summary>{favorites.filter(id=>rows.some(r=>r.id===id)).slice(0,8).map(id=>{const r=rows.find(p=>p.id===id)!;return <button key={id} type="button" aria-label={`Ouvrir le projet ${r.code} — ${r.title}`} onClick={()=>openProject(id)}><ProjectFolder code={r.code}/><span>{r.code}<small>{r.title}</small></span></button>;})}</details>}<div className="workspace-toolbar"><input className="input" aria-label="Rechercher un projet" placeholder="Code, titre ou client…" value={projectQuery} onChange={e=>setProjectQuery(e.target.value)}/><select className="input" aria-label="État des projets" value={projectFilter} onChange={e=>setProjectFilter(e.target.value)}><option value="active">Actifs</option><option value="all">Tous</option><option value="closed">Archivés</option><option value="late">En retard</option><option value="review">À examiner</option></select></div>{portfolio()}{filtered.length>0&&<p className="kiara-project-count" role="status">{filtered.length} {filtered.length===1?"projet":"projets"}</p>}</>}
+          {view.page==="notes"&&<WorkspaceViewBoundary><Suspense fallback={<LoadingState label="Chargement des notes"/>}><NotesWorkspace active={visible}/></Suspense></WorkspaceViewBoundary>}
+          {view.page==="project"&&<><ProjectPanel active={visible} projectId={view.projectId!} initialTab={view.tab||"pilotage"} row={rows.find(r=>r.id===view.projectId)} reloadRows={reload} registerCache={registerCache} back={()=>navigate({page:"projects"})} onTabChange={tab=>tab==="import"?navigate({page:"imports"}):openProject(view.projectId!,tab)}/>{visible&&view.tab==="documents"&&<nav className="workspace-related-links" aria-label="Ressources transversales"><button type="button" className="workspace-text-button" onClick={()=>navigate({page:"sources"})}>Sources de tous les projets</button><button type="button" className="workspace-text-button" onClick={()=>navigate({page:"knowledge"})}>Informations de tous les projets</button></nav>}</>}
           {view.page==="mail"&&<><div className="workspace-page-header"><h1>Mails</h1></div><MailPanel rows={rows} active={visible} reloadProjects={reload}/></>}
-          {view.page==="meetings"&&<GlobalMeetingsView rows={rows} onOpenProject={openProject} active={visible} initialProjectId={visible?route.projectId:view.projectId} creationRequest={requestedCreation} onStudioOpenChange={setStudioOpen} studioNavigation={breadcrumb}/>}
-          {view.page==="sources"&&<SourcesLibrary rows={rows} active={visible} onOpenSource={(sourceId,title,evidence)=>setSource({sourceId,title,evidence})} onOpenProject={openProject} onCreateMeeting={createMeeting}/>}
+          {view.page==="meetings"&&<Suspense fallback={<LoadingState label="Chargement des réunions"/>}><GlobalMeetingsView rows={rows} onOpenProject={openProject} active={visible} initialProjectId={visible?route.projectId:view.projectId} creationRequest={requestedCreation} onStudioOpenChange={setStudioOpen} studioNavigation={breadcrumb}/></Suspense>}
+          {view.page==="sources"&&<Suspense fallback={<LoadingState label="Chargement des sources"/>}><SourcesLibrary rows={rows} active={visible} onOpenSource={(sourceId,title,evidence)=>setSource({sourceId,title,evidence})} onOpenProject={openProject} onCreateMeeting={createMeeting}/></Suspense>}
           
           
-          {view.page==="knowledge"&&<GlobalKnowledgeView rows={rows} onOpenProject={openProject} active={visible}/>}
-          {view.page==="search"&&<SearchView rows={rows} onOpenProject={openProject} active={visible}/>}
+          {view.page==="knowledge"&&<Suspense fallback={<LoadingState label="Chargement des informations"/>}><GlobalKnowledgeView rows={rows} onOpenProject={openProject} active={visible}/></Suspense>}
+          {view.page==="search"&&<><SearchView rows={rows} onOpenProject={openProject} active={visible}/><nav className="workspace-related-links" aria-label="Explorer les ressources"><button type="button" className="workspace-text-button" onClick={()=>navigate({page:"sources"})}>Toutes les sources</button><button type="button" className="workspace-text-button" onClick={()=>navigate({page:"knowledge"})}>Toutes les informations</button></nav></>}
           {view.page==="activity"&&<>
             <div className="workspace-page-header"><h1>Activité</h1>
               {!windows&&document.body.dataset.kiaraDesktop==='true'&&<a className="button secondary" href="/chat#notifications">Notifications</a>}
@@ -329,19 +454,20 @@ export function WorkspaceShell({rows,reload,error,canCreateProject=true,portfoli
               <div className="workspace-section-heading"><h2>À traiter</h2></div>
               {visible&&<ActionDashboard onOpen={openProject}/>}
             </section>
-            <GlobalJobsView rows={rows} onOpenProject={openProject} active={visible} embedded/>
+            <WorkspaceViewBoundary><Suspense fallback={<LoadingState label="Chargement des traitements"/>}><GlobalJobsView rows={rows} onOpenProject={openProject} active={visible} embedded/></Suspense></WorkspaceViewBoundary>
           </>}
-          {view.page==="jobs"&&<GlobalJobsView rows={rows} onOpenProject={openProject} active={visible}/>}
+          {view.page==="jobs"&&<Suspense fallback={<LoadingState label="Chargement des traitements"/>}><GlobalJobsView rows={rows} onOpenProject={openProject} active={visible}/></Suspense>}
           {view.page==="create"&&!canCreateProject&&<ErrorState message="Vous ne disposez pas de l’autorisation de créer un projet."/>}
           {view.page==="create"&&canCreateProject&&<><div className="workspace-page-header"><div><h1>Nouveau projet</h1><p>Créer un projet ou reprendre un dossier technique existant.</p></div><button className="button secondary" onClick={()=>navigate({page:"projects"})}>Retour au portefeuille</button></div><CreatePanel reload={reload} close={()=>navigate({page:"projects"})} onCreated={projectCreated}/></>}
-          {view.page==="imports"&&<><div className="workspace-page-header"><div><h1>Connexions & imports</h1><p>Sage, Thunderbird et dossiers réseau.</p></div></div><nav className="workspace-tabs" aria-label="Connexions">{[["sage","Import Sage"],["thunderbird","Thunderbird"],["network","Dossiers réseau"],["archives","Archives JSON"]].map(([id,label])=><button type="button" key={id} aria-pressed={integrationsTab===id} onClick={()=>setIntegrationsTab(id)}>{label}</button>)}</nav><section hidden={integrationsTab!=="archives"} className="card"><h2>Reprendre une archive de projet</h2><p>Importer une sauvegarde JSON dans le portefeuille.</p><button type="button" className="button secondary" disabled={importing} onClick={()=>importFile.current?.click()}><Glyph d={P.download}/>Importer une archive JSON</button><input ref={importFile} type="file" accept="application/json,.json" hidden onChange={e=>{const f=e.target.files?.[0];if(f)void importArchive(f);}}/></section><div hidden={integrationsTab!=="sage"}><SagePanel/></div><div hidden={integrationsTab!=="thunderbird"}><ThunderbirdPanel/></div><div hidden={integrationsTab!=="network"}><EmptyState title="Les dossiers sont associés à chaque projet" detail="Choisissez explicitement un projet pour ouvrir ses Documents et gérer ses liens réseau."/>{rows.map(r=><button className="button secondary" key={r.id} type="button" onClick={()=>openProject(r.id,"documents")}>{r.code} · Documents</button>)}</div></>}
+          {view.page==="imports"&&<><div className="workspace-page-header"><div><h1>Connexions & imports</h1><p>Sage, Thunderbird et dossiers réseau.</p></div></div><nav className="workspace-tabs" aria-label="Connexions">{[["sage","Import Sage"],["thunderbird","Thunderbird"],["network","Dossiers réseau"],["archives","Archives JSON"]].map(([id,label])=><button type="button" key={id} aria-pressed={integrationsTab===id} onClick={()=>setIntegrationsTab(id)}>{label}</button>)}</nav><section hidden={integrationsTab!=="archives"} className="card"><h2>Reprendre une archive de projet</h2><p>Importer une sauvegarde JSON dans le portefeuille.</p><button type="button" className="button secondary" disabled={importing} onClick={()=>importFile.current?.click()}><Glyph d={P.download}/>Importer une archive JSON</button><input ref={importFile} type="file" accept="application/json,.json" hidden aria-label="Importer une archive JSON" onChange={e=>{const f=e.target.files?.[0];if(f)void importArchive(f);}}/></section><div hidden={integrationsTab!=="sage"}><SagePanel/></div><div hidden={integrationsTab!=="thunderbird"}><ThunderbirdPanel active={visible&&integrationsTab==="thunderbird"}/></div><div hidden={integrationsTab!=="network"}><EmptyState title="Les dossiers sont associés à chaque projet" detail="Choisissez explicitement un projet pour ouvrir ses Documents et gérer ses liens réseau."/>{rows.map(r=><button className="button secondary" key={r.id} type="button" onClick={()=>openProject(r.id,"documents")}>{r.code} · Documents</button>)}</div></>}
           {["settings","stats","preparation"].includes(view.page)&&<>
-            <div hidden={settingsTab!=="stats"}>{settingsTab==="stats"&&<FusionInsights rows={rows} active={visible} initialTab="stats"/>}</div><div hidden={settingsTab!=="preparation"}>{settingsTab==="preparation"&&<FusionInsights rows={rows} active={visible} initialTab="preparation"/>}</div><div hidden={settingsTab!=="ai"}><AiSettingsForm/></div><div hidden={settingsTab!=="mail"}><MailSettingsForm/></div><div hidden={settingsTab!=="memory"}><MemorySettingsForm/></div><div hidden={settingsTab!=="references"}>{referencesStarted&&<ProjectReferenceSettings/>}</div><div hidden={settingsTab!=="deliverables"}>{deliverablesStarted&&<DeliverableSettings active={visible&&settingsTab==="deliverables"} onBusy={setDeliverablesBusy}/>}</div><div hidden={settingsTab!=="documents"}>{documentsStarted&&<DocumentSettings active={visible&&settingsTab==="documents"} onBusy={setDocumentsBusy}/>}</div><div hidden={settingsTab!=="operations"}><OperationsPanel/></div><section hidden={settingsTab!=="appearance"} className="card"><h2>Apparence</h2><div className="workspace-toolbar">{windows?<a className="button secondary" href="/chat#apparence" onClick={guardConversationLink}>Thème de Kiara</a>:<label>Thème<select className="input" value={theme} onChange={e=>setTheme(e.target.value)}><option value="light">Clair</option><option value="dark">Sombre</option></select></label>}<label>Densité<select className="input" value={density} onChange={e=>setDensity(e.target.value)}><option value="comfortable">Confortable</option><option value="compact">Compacte</option></select></label></div><p>Préférences enregistrées dans ce navigateur.</p></section></>}
+            <div hidden={settingsTab!=="stats"}>{settingsStarted.has("stats")&&<DeferredSetting><FusionInsights rows={rows} active={visible&&settingsTab==="stats"} initialTab="stats"/></DeferredSetting>}</div><div hidden={settingsTab!=="preparation"}>{settingsStarted.has("preparation")&&<DeferredSetting><FusionInsights rows={rows} active={visible&&settingsTab==="preparation"} initialTab="preparation"/></DeferredSetting>}</div><div hidden={settingsTab!=="ai"}>{settingsStarted.has("ai")&&<DeferredSetting><AiSettingsForm/></DeferredSetting>}</div><div hidden={settingsTab!=="mail"}>{settingsStarted.has("mail")&&<DeferredSetting><MailSettingsForm active={visible&&settingsTab==="mail"}/></DeferredSetting>}</div><div hidden={settingsTab!=="memory"}>{settingsStarted.has("memory")&&<DeferredSetting><MemorySettingsForm active={visible&&settingsTab==="memory"}/></DeferredSetting>}</div><div hidden={settingsTab!=="references"}>{referencesStarted&&<DeferredSetting><ProjectReferenceSettings/></DeferredSetting>}</div><div hidden={settingsTab!=="deliverables"}>{deliverablesStarted&&<DeferredSetting><DeliverableSettings active={visible&&settingsTab==="deliverables"} onBusy={setDeliverablesBusy}/></DeferredSetting>}</div><div hidden={settingsTab!=="documents"}>{documentsStarted&&<DeferredSetting><DocumentSettings active={visible&&settingsTab==="documents"} onBusy={setDocumentsBusy}/></DeferredSetting>}</div><div hidden={settingsTab!=="operations"}>{settingsStarted.has("operations")&&<DeferredSetting><OperationsPanel/></DeferredSetting>}</div><section hidden={settingsTab!=="appearance"} className="card"><h2>Apparence</h2><div className="workspace-toolbar">{windows?<a className="button secondary" href="/chat#apparence" onClick={guardConversationLink}>Thème de Kiara</a>:<label>Thème<select className="input" value={theme} onChange={e=>setTheme(e.target.value)}><option value="light">Clair</option><option value="dark">Sombre</option></select></label>}<label>Densité<select className="input" value={density} onChange={e=>setDensity(e.target.value)}><option value="comfortable">Confortable</option><option value="compact">Compacte</option></select></label></div><p>Préférences enregistrées dans ce navigateur.</p></section></>}
+          </WorkspaceViewBoundary>
         </div>;
       })}
     </main>
     </div></div>
-    <dialog ref={commandDialog} className="workspace-command" aria-label="Recherche et navigation" onCancel={()=>setCommandOpen(false)} onClose={()=>setCommandOpen(false)}><div className="workspace-section-heading"><h2>Rechercher dans Kiara</h2><button type="button" className="workspace-icon-button" aria-label="Fermer la recherche" onClick={()=>setCommandOpen(false)}>×</button></div><input ref={commandInput} className="input" aria-label="Recherche globale" placeholder="Projet, rubrique, exigence, tâche…" value={command} onChange={e=>setCommand(e.target.value)}/><div className="workspace-command-results">{commandDestinations.filter(n=>(!windows||n.page!=="home")&&n.label.toLowerCase().includes(command.toLowerCase())).map(n=><button type="button" key={n.page} onClick={()=>selectCommand({page:n.page})}><Glyph d={n.icon}/>{n.label}<small>Rubrique</small></button>)}{rows.filter(r=>`${r.code} ${r.title}`.toLowerCase().includes(command.toLowerCase())).slice(0,8).map(r=><button type="button" key={r.id} onClick={()=>selectCommand({page:"project",projectId:r.id,tab:"pilotage"})}><ProjectFolder code={r.code}/>{r.code} · {r.title}<small>Projet</small></button>)}{searching&&<p role="status">Recherche dans les éléments du projet…</p>}{searchError&&<ErrorState message={searchError}/>} {hits.slice(0,20).map((h,i)=><button type="button" key={`${h.type}:${i}`} onClick={()=>{setCommandOpen(false);openProject(h.project_id,h.tab);}}><Glyph d={P.search}/>{h.label}<small>{h.type}</small></button>)}</div><p className="workspace-muted">Échap pour fermer · la recherche métier respecte le projet affiché.</p></dialog>
+    <dialog ref={commandDialog} className="workspace-command" aria-label="Accès rapide" onCancel={()=>setCommandOpen(false)} onClose={()=>setCommandOpen(false)}><div className="workspace-section-heading"><h2>Accès rapide</h2><button type="button" className="workspace-icon-button" aria-label="Fermer l’accès rapide" onClick={()=>setCommandOpen(false)}>×</button></div><input ref={commandInput} className="input" aria-label="Chercher une rubrique, un projet ou un élément" placeholder="Projet, rubrique, exigence, tâche…" value={command} onChange={e=>setCommand(e.target.value)}/><div className="workspace-command-results">{commandDestinations.filter(n=>(!windows||n.page!=="home")&&n.label.toLowerCase().includes(command.toLowerCase())).map(n=><button type="button" key={n.page} aria-label={`Ouvrir la rubrique ${n.label}`} onClick={()=>selectCommand({page:n.page})}><Glyph d={n.icon}/>{n.label}<small>Rubrique</small></button>)}{rows.filter(r=>`${r.code} ${r.title}`.toLowerCase().includes(command.toLowerCase())).slice(0,8).map(r=><button type="button" key={r.id} aria-label={`Ouvrir le projet ${r.code} — ${r.title}`} onClick={()=>selectCommand({page:"project",projectId:r.id,tab:"pilotage"})}><ProjectFolder code={r.code}/>{r.code} · {r.title}<small>Projet</small></button>)}{searching&&<p role="status">Recherche dans les éléments du projet…</p>}{searchError&&<ErrorState message={searchError}/>} {hits.slice(0,20).map((h,i)=><button type="button" key={`${h.type}:${i}`} aria-label={`Ouvrir le résultat ${h.label}`} onClick={()=>{setCommandOpen(false);openProject(h.project_id,h.tab);}}><Glyph d={P.search}/>{h.label}<small>{h.type}</small></button>)}</div><p className="workspace-muted">Échap pour fermer · la recherche métier respecte le projet affiché.</p></dialog>
     {source&&<SourceInspector sourceId={source.sourceId} title={source.title} evidence={source.evidence} onClose={()=>setSource(null)}/>}
   </div>;
 }

@@ -8,11 +8,16 @@ import {fileURLToPath} from 'node:url';
 
 const web=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const output=path.resolve(process.argv[2]||path.join(web,'../../toolchain/maintenance-ui-evidence'));
+const backupDesktopOnly=process.argv.includes('--backup-desktop-only');
 await fs.mkdir(output,{recursive:true});
 const events=[],errors=[],checks=[],secret='Fixture recovery phrase 2026';
 const config={enabled:false,time:'03:00',frequency:'daily',weekday:0,destination:'D:\\Fixture Backups',secondary_destination:'',retention:{daily:7,weekly:4,monthly:6},secret_configured:true};
 let devices=[{id:'fixturephone',name:'Téléphone de test',device_kind:'phone',device_owner:'Client de test',device_version:'',reported_version:'1.0.0',reported_kind:'phone',last_activity_epoch:1780000000,last_transport:'https',has_android_profile:true,suspended:false,revoked:false}];
 let catalog=[{id:'a'.repeat(24),file:'D:\\Fixture Backups\\test.fredbackup',created_at:'2026-10-10T03:00:00+02:00',timestamp:1791594000,kind:'manual',size:8192,verified:true,sha256:'a'.repeat(64),summary:{counts:{conversations:2,projects:1,documents:1,jobs:1},included:['Conversations','Espaces de travail','Réglages'],excluded:['Modèles GGUF']},secondary:{status:'copied'}}];
+let restoreProof=null;
+let projectBackup={state:'none'};
+let reconcileWarning='';
+let retentionWarning='';
 let job={id:'fixture-job',state:'idle',message:''},maintenance={state:'idle',active:false,message:''},backupReads=0,restoreReads=0,storedDocuments=1,rejectRestoreOnce=false;
 const settings={context:8192,workers:15,prefill:256,vram_reserve:512,history_enabled:true,history_slots:2,history_every:16384,mtp_enabled:true,spec:3,spec_min_p:0.5,layer_split:24,expert_cache:'auto',short_read:0,min_free_ram_gib:6,gpus:'0,1',host:'127.0.0.1',port:8080,api_key:'',model_name:'fixture',cors_origins:'',trusted_origins:'',pack:'fixture',native:'fixture',tokenizer:'fixture',expert_profile:'fixture'};
 const remote=()=>({clients:devices,enabled:false,client_compiled:true,gateway_available:true,connection:{message:'Serveur synthétique',public_host:'fixture.invalid',listen_port:51820,compiled:true,firewall:{state:'ready',port:51820,message:'Fixture'}}});
@@ -25,7 +30,8 @@ function route(url,method,data){
   if(url==='/api/operations')return result({startup:false,autoload:false,restart:false});
   if(url==='/api/releases')return result({server_version:'fixture',release:{version:'fixture'},verified:true});
   if(url==='/api/workspace')return result({owners:[],jobs:[],events:[],used_bytes:128,global_bytes:104857600,web_enabled:false,web_key_configured:false});
-  if(url==='/api/backups'){if(job.state==='running'&&++backupReads>=3){job={...job,state:'succeeded',message:'Archive chiffrée et vérifiée.'};catalog.unshift({...catalog[0],id:'b'.repeat(24),kind:'automatic'});}return result({config,catalog,job,next_run:'2026-10-11T03:00:00+02:00',last_success:'2026-10-10T03:00:00+02:00',last_error:''});}
+  if(url==='/api/client-storage')return result({root:'D:\\Fixture Clients',transaction_database:'D:\\Fixture workspace.sqlite',clients:{},last_sync:0,error:'',mode:'synchronized_files',automatic:true});
+  if(url==='/api/backups'){if(job.state==='running'&&++backupReads>=3){job={...job,state:'succeeded',message:'Archive chiffrée et vérifiée.'};catalog.unshift({...catalog[0],id:'b'.repeat(24),kind:'automatic'});}return result({config,catalog,job,next_run:'2026-10-11T03:00:00+02:00',last_success:'2026-10-10T03:00:00+02:00',last_error:'',reconcile_warning:reconcileWarning,retention_warning:retentionWarning,last_restore_verification:restoreProof,project_backup:projectBackup});}
   if(url==='/api/maintenance'){if(maintenance.active&&++restoreReads>=3)maintenance={state:'completed',active:false,message:'Restauration vérifiée.',job:{state:'succeeded'}};return result(maintenance);}
   if(url==='/api/inventory')return result({storage:{history_count:2,projects:1,documents:1,jobs:1,workspace_bytes:1024},files:[{name:'workspace.sqlite',exists:true,size:1024,included:true}],decisions:['Les données locales des clients ne sont pas incluses.']});
   if(url.startsWith('/api/remote/profile/'))return result(JSON.stringify({fixture:true,client_id:url.split('/').at(-1)}),200,{'Content-Type':'application/json','Content-Disposition':'attachment; filename="Fixture.fred-android"'});
@@ -74,7 +80,53 @@ async function check(name,work){await work();checks.push({name,passed:true});}
 try{
  await cdp('Runtime.enable');await cdp('Page.enable');await cdp('Browser.setDownloadBehavior',{behavior:'allow',downloadPath:path.join(output,'downloads')});await cdp('Emulation.setDeviceMetricsOverride',{width:1440,height:1000,deviceScaleFactor:1,mobile:false});await cdp('Page.navigate',{url:base+'/#backup'});
  await until(`document.getElementById('backup-archive-count')?.textContent==='1'`,'Chargement du catalogue');
- await check('Navigation, catalogue et rendu sans erreur',async()=>{assert.equal(await evaluate(`document.getElementById('backup').hidden`),false);assert.equal(await evaluate(`document.querySelectorAll('.backup-archive').length`),1);await shot('01-sauvegardes-desktop');});
+ await check('Navigation, catalogue et rendu sans erreur',async()=>{assert.equal(await evaluate(`document.getElementById('backup').hidden`),false);assert.equal(await evaluate(`document.querySelectorAll('.backup-archive').length`),1);assert.doesNotMatch(await evaluate(`document.body.innerText`),/Route de fixture inconnue/);await shot('01-sauvegardes-desktop');});
+ await check('Le catalogue ne garantit pas l’accès actuel aux archives',async()=>{
+  assert((await evaluate(`document.querySelector('#backup-archive-count').parentElement.textContent`)).includes('ARCHIVES AU CATALOGUE'));
+  assert((await evaluate(`document.getElementById('backup').textContent`)).includes('l’accès et l’intégrité actuels des fichiers ne sont pas contrôlés à chaque affichage'));
+  assert((await evaluate(`document.getElementById('backup-latest-coverage').textContent`)).includes('selon le catalogue'));
+ });
+ await check('Avertissement de découverte incomplète affiché et effacé',async()=>{
+  reconcileWarning='Certaines archives n’ont pas pu être examinées au démarrage.';
+  await click('#backup .section-title button');await until(`!document.getElementById('backup-catalogue-warning').hidden`,'Avertissement visible');
+  assert.equal(await evaluate(`document.getElementById('backup-catalogue-warning').textContent`),reconcileWarning);
+  reconcileWarning='';await click('#backup .section-title button');await until(`document.getElementById('backup-catalogue-warning').hidden`,'Avertissement effacé');
+ });
+ await check('Avertissement de nettoyage à reprendre affiché et effacé',async()=>{
+  retentionWarning='Un nettoyage de sauvegardes reste à reprendre.';
+  await click('#backup .section-title button');await until(`!document.getElementById('backup-retention-warning').hidden`,'Nettoyage à reprendre');
+  assert.equal(await evaluate(`document.getElementById('backup-retention-warning').textContent`),retentionWarning);
+  retentionWarning='';await click('#backup .section-title button');await until(`document.getElementById('backup-retention-warning').hidden`,'Nettoyage repris');
+ });
+ await check('Périmètre et seconde copie de la dernière archive vérifiée',async()=>{
+  assert((await evaluate(`document.getElementById('backup-latest-coverage').textContent`)).includes('aucune archive associée des Projets'));
+  assert((await evaluate(`document.getElementById('backup-latest-coverage').textContent`)).includes('Copie secondaire vérifiée lors de sa création'));
+  catalog[0].agent={file:'D:\\Fixture Backups\\test.kiara-agent',sha256:'b'.repeat(64)};catalog[0].secondary.status='error';
+  await click('#backup .section-title button');await until(`document.getElementById('backup-latest-coverage').textContent.includes('Copie secondaire en échec')`,'État de copie');
+  assert((await evaluate(`document.getElementById('backup-latest-coverage').textContent`)).includes('archive associée des Projets'));
+  delete catalog[0].agent;catalog[0].secondary.status='copied';await click('#backup .section-title button');
+  await until(`document.getElementById('backup-latest-coverage').textContent.includes('Copie secondaire vérifiée')`,'État initial');
+ });
+ await check('Preuve de restauration distinguée de la vérification',async()=>{
+  assert((await evaluate(`document.getElementById('backup-restore-evidence').textContent`)).includes('Aucune preuve'));
+  restoreProof={scope:'paired',verified_at:'2026-10-11T03:00:00+02:00',archive_created_at:'2026-10-10T03:00:00+02:00'};
+  await click('#backup .section-title button');await until(`document.getElementById('backup-restore-evidence').textContent.includes('Dernier essai de restauration isolée')`,'Preuve disponible');
+  restoreProof=null;await click('#backup .section-title button');await until(`document.getElementById('backup-restore-evidence').textContent.includes('Aucune preuve')`,'Preuve absente');
+ });
+ await check('Sauvegarde autonome des Projets distincte de la paire',async()=>{
+  assert((await evaluate(`document.getElementById('backup-project-status').textContent`)).includes('Aucune sauvegarde autonome'));
+  projectBackup={state:'recorded',status:'verification_failed',created_at:'2026-10-10T03:00:00+02:00'};
+  await click('#backup .section-title button');await until(`document.getElementById('backup-project-status').textContent.includes('dernière vérification en échec')`,'Sauvegarde Projets');
+  projectBackup={state:'none'};await click('#backup .section-title button');await until(`document.getElementById('backup-project-status').textContent.includes('Aucune sauvegarde autonome')`,'État Projets initial');
+ });
+ if(backupDesktopOnly)await check('Console aux résolutions Windows et Linux demandées',async()=>{
+  for(const [width,height] of [[1280,720],[1920,1080],[2560,1440]]){
+   await cdp('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false});
+   assert.equal(await evaluate(`document.documentElement.scrollWidth<=innerWidth`),true);
+   assert((await evaluate(`document.getElementById('backup-latest-coverage').textContent`)).includes('Copie secondaire vérifiée'));
+   await shot('sauvegardes-'+width+'x'+height);
+  }
+ });
  await check('Brouillon de programmation conservé pendant les actualisations',async()=>{await fill('#backup-destination','D:\\Nouveau dossier de test');await sleep(2800);assert.equal(await evaluate(`document.getElementById('backup-destination').value`),'D:\\Nouveau dossier de test');});
  await check('Configuration hebdomadaire, conservation et secret effacé',async()=>{await fill('#backup-frequency','weekly');await fill('#backup-weekday','4');await fill('#backup-secret',secret);await evaluate(`document.getElementById('backup-enabled').checked=true`);await submit('#backup-config');await until(`document.getElementById('backup-secret').value===''`,'Sauvegarde configuration');assert.equal(config.frequency,'weekly');assert.equal(config.weekday,4);assert(config.enabled);});
  await check('Sauvegarde asynchrone suivie et archive vérifiée',async()=>{await click('#backup-create-now');await until(`document.querySelectorAll('.backup-archive').length===2`,'Nouvelle archive');assert.equal(job.state,'succeeded');});
@@ -82,6 +134,7 @@ try{
  await check('Aperçu vérifié et effets affichés',async()=>{await fill('#backup-verify-secret',secret);await submit('#backup-verify-form');await until(`!document.getElementById('backup-confirm-restore').hidden`,'Aperçu restauration');assert((await evaluate(`document.getElementById('backup-preview-content').textContent`)).includes('Conversations'));await shot('02-restauration-apercu');});
  await check('Confirmation périmée : erreur visible, nouvelle vérification et restauration',async()=>{rejectRestoreOnce=true;await click('#backup-confirm-restore');await until(`document.getElementById('backup-confirm-restore').hidden&&document.getElementById('backup-preview-status').textContent.includes('Vérifiez')`,'Confirmation refusée');assert.equal(maintenance.active,false);assert.equal(await evaluate(`document.getElementById('backup-preview').open`),true);await submit('#backup-verify-form');await until(`!document.getElementById('backup-confirm-restore').hidden`,'Nouvelle vérification');await click('#backup-confirm-restore');await until(`document.getElementById('backup-progress').textContent.includes('Restauration vérifiée')`,'Restauration terminée');assert.equal(maintenance.state,'completed');});
  await check('Inventaire du périmètre lisible',async()=>{await evaluate(`document.getElementById('backup-inventory').open=true`);await until(`document.getElementById('backup-inventory-body').textContent.includes('workspace.sqlite')`,'Inventaire');});
+ if(!backupDesktopOnly){
  await click('#tab-devices');await until(`!document.getElementById('devices').hidden`,'Vue appareils');
  await check('Création d’un accès Android distinct',async()=>{await evaluate(`document.getElementById('devices-create').open=true`);await fill('#device-create-name','Tablette de test');await fill('#device-create-owner','Paul');await fill('#device-create-kind','tablet');await submit('#devices-create-form');await until(`document.querySelector('[data-device-id="createdfixture"]')`,'Appareil créé');assert.equal(devices.find(d=>d.id==='createdfixture').device_kind,'tablet');});
  await check('Profil privé téléchargé avec token dans l’en-tête',async()=>{await click('[data-device-id="createdfixture"] [data-action="profile"]');await until(`document.querySelector('[data-device-id="createdfixture"] [data-action="profile"]')?.disabled===false`,'Téléchargement');assert(events.some(e=>e.path==='/api/remote/profile/createdfixture'&&e.hasAuthorization));assert(!events.some(e=>e.path.includes('fixture-token')));});
@@ -91,6 +144,7 @@ try{
  await check('Révocation définitive puis archive avec données conservées',async()=>{await evaluate(`(()=>{const e=[...document.querySelectorAll('[data-device-id="replacementfixture"] details')].find(x=>x.querySelector('summary')?.textContent==='Révoquer définitivement');e.open=true;e.querySelector('button').click();})()`);await until(`document.querySelector('[data-device-id="replacementfixture"] .client-badge').textContent==='Révoqué'`,'Révocation');await evaluate(`(()=>{const e=[...document.querySelectorAll('[data-device-id="replacementfixture"] details')].find(x=>x.querySelector('summary')?.textContent==='Archiver l’appareil');e.open=true;e.querySelector('button').click();})()`);await until(`!document.querySelector('[data-device-id="replacementfixture"]')`,'Archivage');assert.equal(storedDocuments,1);});
  await shot('03-appareils-desktop');
  await check('Téléphone : panneaux et dialogue sans débordement horizontal',async()=>{await cdp('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});await until(`document.querySelector('.console-sidebar').getBoundingClientRect().right<=0`,'Navigation mobile masquée');await sleep(4500);await shot('04-appareils-telephone');assert.equal(await evaluate(`document.documentElement.scrollWidth<=innerWidth`),true);await evaluate(`openTopic('backup')`);await shot('05-sauvegardes-telephone');assert.equal(await evaluate(`document.documentElement.scrollWidth<=innerWidth`),true);await click('.backup-archive button');await shot('06-restauration-telephone');assert.equal(await evaluate(`document.documentElement.scrollWidth<=innerWidth`),true);});
+ }
  assert.deepEqual(errors,[]);checks.push({name:'Aucune exception JavaScript',passed:true});
  const report={fixture:true,liveDataUsed:false,date:new Date().toISOString(),checks,errors,requests:events,retainedDocuments:storedDocuments};await fs.writeFile(path.join(output,'maintenance-ui.json'),JSON.stringify(report,null,2));console.log(JSON.stringify({passed:checks.length,failed:0,evidence:output}));
 }catch(error){console.error(error.stack);throw error;}finally{try{await Promise.race([cdp('Browser.close'),sleep(2000)]);}catch{}ws.close();server.close();if(chrome.exitCode===null)chrome.kill();}

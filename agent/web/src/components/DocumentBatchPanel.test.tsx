@@ -31,6 +31,23 @@ afterEach(()=>{cleanup();vi.restoreAllMocks();vi.clearAllMocks();vi.useRealTimer
 async function add(){fireEvent.click(screen.getByRole('button',{name:'Ajouter la trame vérifiée au lot'}));await screen.findByText('1 / 8 trame(s) sélectionnée(s)');}
 async function open(){fireEvent.click(await screen.findByRole('button',{name:/2 \/ 2 fichier.*Échec/}));return screen.findByRole('region',{name:'Suivi du lot sélectionné'});}
 
+it('suspend le suivi du lot au masquage, ignore la réponse tardive et conserve la sélection',async()=>{
+  let hidden=false;vi.spyOn(document,'hidden','get').mockImplementation(()=>hidden);
+  let resolveOld!:(value:DocumentJobs)=>void;
+  vi.mocked(documentJobApi.list).mockReturnValueOnce(new Promise(done=>{resolveOld=done;}));
+  render(<DocumentBatchPanel {...base}/>);await waitFor(()=>expect(documentJobApi.list).toHaveBeenCalledTimes(1));
+  await add();
+  const oldSignal=vi.mocked(documentJobApi.list).mock.calls[0][2]!;
+  hidden=true;act(()=>document.dispatchEvent(new Event('visibilitychange')));expect(oldSignal.aborted).toBe(true);
+  vi.useFakeTimers();await act(async()=>{await vi.advanceTimersByTimeAsync(30_000);});
+  expect(documentJobApi.list).toHaveBeenCalledTimes(1);
+  hidden=false;await act(async()=>{document.dispatchEvent(new Event('visibilitychange'));});
+  expect(documentJobApi.list).toHaveBeenCalledTimes(2);
+  await act(async()=>resolveOld({...jobs,worker:{...jobs.worker,state:'disabled',can_submit:false}}));
+  expect(screen.getByText('Traitement disponible')).toBeTruthy();
+  expect(screen.getByText('1 / 8 trame(s) sélectionnée(s)')).toBeTruthy();
+});
+
 it('capture l’aperçu relu et la révision du formulaire sans remplacer les choix saisis',async()=>{
   const value=structuredClone(choice),view=render(<DocumentBatchPanel {...base} choice={value}/>);await add();
   value.overrides.description='Modification ultérieure';view.rerender(<DocumentBatchPanel {...base} choice={value} reviewed={false}/>);

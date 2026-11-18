@@ -8,6 +8,7 @@ import {navigateTabs} from '../lib/uiTabs';
 import type {WorkspaceCitation} from '../lib/workspaceApi';
 import {citationLocatorText} from '../lib/citationLinks';
 import {AsyncDownloadLink} from './AsyncDownloadLink';
+import { Icon } from '../os/icons';
 import {agentPath} from '../lib/agentRoutes';
 const fail=(error:unknown)=>error instanceof Error?error.message:String(error);
 const date=(value:string)=>{const parsed=new Date(value);return Number.isNaN(parsed.getTime())?value:parsed.toLocaleDateString('fr-FR');};
@@ -23,6 +24,7 @@ export function SourcesLibrary({rows,active=true,onOpenSource,onOpenProject,onCr
   const [page,setPage]=useState<SourcePage|null>(null),[project,setProject]=useQueryState<string>('project','',sourcesPath),[query,setQuery]=useQueryState<string>('q','',sourcesPath),[kind,setKind]=useQueryState<string>('kind','all',sourcesPath);
   const [label,setLabel]=useQueryState<string>('label','',sourcesPath),[status,setStatus]=useQueryState<string>('status','all',sourcesPath),[sort,setSort]=useQueryState<NonNullable<SourceFilters['sort']>>('sort','date_desc',sourcesPath);
   const [fileFormat,setFileFormat]=useQueryState<NonNullable<SourceFilters['file_format']>>('format','all',sourcesPath);
+  const perimeterLabel=`Périmètre et filtres${kind!=='all'?` · ${KINDS[kind]||kind}`:''}${fileFormat!=='all'?` · ${fileFormat==='unknown'?'Format non reconnu':FILE_FORMATS[fileFormat!]}`:''}${status!=='all'?` · ${status==='resolved'?'Sources rattachées':'À rattacher'}`:''}${label?` · ${label}`:''}`;
   const [offset,setOffset]=useQueryState<number>('offset',0,sourcesPath),[tick,setTick]=useState(0),[loading,setLoading]=useState(false),[error,setError]=useState('');
   const [indexing,setIndexing]=useQueryState<boolean>('indexing',false,sourcesPath);
   const [view,setView]=useQueryState<'list'|'grid'|'graph'>('view','list',sourcesPath),[graph,setGraph]=useState<SourceGraph|null>(null);
@@ -149,26 +151,16 @@ export function SourcesLibrary({rows,active=true,onOpenSource,onOpenProject,onCr
       <div className="fusion-search-row"><label className="fusion-search"><span className="fusion-sr-only">Rechercher une source</span><input type="search" disabled={!!busy} maxLength={2000} placeholder="Rechercher dans les sources" value={query} onChange={event=>filtered(()=>setQuery(event.target.value))}/></label>
         <button type="button" className="fusion-primary" onClick={()=>setImports(value=>!value)} aria-expanded={imports}>{imports?'Fermer l’import':'Ajouter une source'}</button>
         <button type="button" aria-label="Actualiser les sources" disabled={!!busy} onClick={()=>setTick(value=>value+1)}>↻</button>
-      </div>
+      <details className="fusion-library-advanced discrete-icon-menu icon-menu-details" onKeyDown={event=>{if(event.key==='Escape'){event.stopPropagation();event.currentTarget.open=false;event.currentTarget.querySelector('summary')?.focus();}}}>
+        <summary className="discrete-icon-summary icon-menu-summary" aria-label="Filtres et options des sources" title="Filtres et options des sources"><Icon name="filter" size={16} />{perimeterLabel}</summary>
+      <div className="fusion-library-toolbar icon-menu-popover">
+        <p>Documents, notes et réunions de vos projets, avec leurs versions et leurs preuves. Le projet visible gouverne les imports et la préparation d’une séance.</p>
       <div className="fusion-label-filter-row" aria-label="Labels des sources">
         <button type="button" disabled={!!busy} onClick={()=>editLabels()}>Ajouter un label</button>
         <button type="button" aria-pressed={!label} onClick={()=>filtered(()=>setLabel(''))}>Tous les labels</button>
         {visiblePage?.labels.map(value=><button type="button" key={value} aria-pressed={label===value} onClick={()=>filtered(()=>setLabel(label===value?'':value))}>{value}</button>)}
       </div>
-      </>}
-    <div className="fusion-library-summary">
-      {view==='graph'&&<><button type="button" className="fusion-primary" onClick={()=>setImports(value=>!value)} aria-expanded={imports}>{imports?'Fermer l’import':'Ajouter une source'}</button>
-        <button type="button" aria-label="Actualiser les sources" disabled={!!busy} onClick={()=>setTick(value=>value+1)}>↻</button></>}
-      {view!=='graph'&&<><span className="fusion-source-total">{visiblePage?`${visiblePage.total} source${visiblePage.total===1?'':'s'}`:'Lecture du périmètre…'}</span>
         <div className="fusion-format-shortcuts" aria-label="Formats des sources">{(['pdf','png','txt','xlsx'] as const).map(value=><button type="button" key={value} aria-pressed={fileFormat===value} onClick={()=>filtered(()=>setFileFormat(fileFormat===value?'all':value))}>{FILE_FORMATS[value]}</button>)}</div>
-        <label className="fusion-sort"><span className="fusion-sr-only">Trier</span><select value={sort} onChange={event=>filtered(()=>setSort(event.target.value as NonNullable<SourceFilters['sort']>))}><option value="date_desc">Imports récents</option><option value="date_asc">Imports anciens</option><option value="title_asc">Nom A–Z</option><option value="title_desc">Nom Z–A</option></select></label>
-        <button type="button" aria-label="Afficher la liste" aria-pressed={view==='list'} onClick={()=>setView('list')}>☷</button>
-        <button type="button" aria-label="Afficher la grille" aria-pressed={view==='grid'} onClick={()=>setView('grid')}>▦</button>
-      </>}
-      <details className="fusion-library-advanced" onKeyDown={event=>{if(event.key==='Escape'){event.stopPropagation();event.currentTarget.open=false;event.currentTarget.querySelector('summary')?.focus();}}}><summary>Périmètre et filtres{kind!=='all'?` · ${KINDS[kind]||kind}`:''}{fileFormat!=='all'?` · ${fileFormat==='unknown'?'Format non reconnu':FILE_FORMATS[fileFormat!]}`:''}{status!=='all'?` · ${status==='resolved'?'Sources rattachées':'À rattacher'}`:''}{label?` · ${label}`:''}</summary>
-      <div className="fusion-library-toolbar">
-        <p>Documents, notes et réunions de vos projets, avec leurs versions et leurs preuves. Le projet visible gouverne les imports et la préparation d’une séance.</p>
-      {view!=='graph'&&<>
         <label>Type de source<select value={kind} onChange={event=>filtered(()=>setKind(event.target.value))}><option value="all">Tous</option>{Object.entries(KINDS).map(([key,value])=><option key={key} value={key}>{value}</option>)}</select></label>
         <label>Format<select value={fileFormat} onChange={event=>filtered(()=>setFileFormat(event.target.value as NonNullable<SourceFilters['file_format']>))}><option value="all">Tous</option>{Object.entries(FILE_FORMATS).map(([key,value])=><option key={key} value={key}>{value}</option>)}<option value="unknown">Sans format de fichier reconnu</option></select></label>
         <label>Label<select value={label} onChange={event=>filtered(()=>setLabel(event.target.value))}><option value="">Tous</option>{visiblePage?.labels.map(value=><option key={value} value={value}>{value}</option>)}</select></label>
@@ -185,8 +177,22 @@ export function SourcesLibrary({rows,active=true,onOpenSource,onOpenProject,onCr
           } catch(failure) {if(current())setError(fail(failure));}
           finally {if(current())setSemanticPendingScope(null);}
         })}>{semanticPendingScope===semanticScopeKey?'Recherche en cours…':'Rechercher dans le contenu des sources'}</button>
-        {semanticPendingScope===semanticScopeKey&&<p role="status">Recherche dans le périmètre choisi…</p>}</>}
+        {semanticPendingScope===semanticScopeKey&&<p role="status">Recherche dans le périmètre choisi…</p>}
       </div></details>
+      </div>
+      </>}
+    <div className="fusion-library-summary">
+      {view==='graph'&&<><button type="button" className="fusion-primary" onClick={()=>setImports(value=>!value)} aria-expanded={imports}>{imports?'Fermer l’import':'Ajouter une source'}</button>
+        <button type="button" aria-label="Actualiser les sources" disabled={!!busy} onClick={()=>setTick(value=>value+1)}>↻</button>
+        <details className="fusion-library-advanced discrete-icon-menu icon-menu-details">
+          <summary className="discrete-icon-summary icon-menu-summary" aria-label="Périmètre des sources" title="Périmètre des sources"><Icon name="filter" size={16} /><span className="fusion-sr-only">{perimeterLabel}</span></summary>
+          <div className="fusion-library-toolbar icon-menu-popover"><p>Documents, notes et réunions de vos projets, avec leurs versions et leurs preuves. Le projet visible gouverne les imports et la préparation d’une séance.</p></div>
+        </details></>}
+      {view!=='graph'&&<><span className="fusion-source-total">{visiblePage?`${visiblePage.total} source${visiblePage.total===1?'':'s'}`:'Lecture du périmètre…'}</span>
+        <label className="fusion-sort"><span className="fusion-sr-only">Trier</span><select value={sort} onChange={event=>filtered(()=>setSort(event.target.value as NonNullable<SourceFilters['sort']>))}><option value="date_desc">Imports récents</option><option value="date_asc">Imports anciens</option><option value="title_asc">Nom A–Z</option><option value="title_desc">Nom Z–A</option></select></label>
+        <button type="button" aria-label="Afficher la liste" aria-pressed={view==='list'} onClick={()=>setView('list')}>☷</button>
+        <button type="button" aria-label="Afficher la grille" aria-pressed={view==='grid'} onClick={()=>setView('grid')}>▦</button>
+      </>}
     </div>
     {imports&&<section className="fusion-import-panel" aria-label="Ajouter des sources">
       <h2>Importer dans {rows.find(row=>row.id===project)?.code||'un projet'}</h2>

@@ -1,0 +1,71 @@
+{
+  "commit": "0bf3b3e8234188f020ddb0530ee705437f702146",
+  "trackedFiles": 7086,
+  "metrics": {
+    "lanceur/": {
+      "files": 122,
+      "lines": 18117
+    },
+    "agent/app/": {
+      "files": 123,
+      "lines": 20706
+    },
+    "agent/backend/app/": {
+      "files": 137,
+      "lines": 23841
+    },
+    "agent/web/src/": {
+      "files": 148,
+      "lines": 21972
+    },
+    "client-qwen/": {
+      "files": 44,
+      "lines": 7389
+    },
+    "shared/": {
+      "files": 17,
+      "lines": 1644
+    },
+    "client-tauri/src/": {
+      "files": 1,
+      "lines": 350
+    }
+  },
+  "large": [
+    {
+      "file": "agent/web/src/App.tsx",
+      "lines": 1715,
+      "bytes": 87245,
+      "stateHooks": 107,
+      "effects": 15
+    },
+    {
+      "file": "agent/web/src/components/WorkspaceShell.tsx",
+      "lines": 348,
+      "bytes": 38992,
+      "stateHooks": 25,
+      "effects": 20
+    },
+    {
+      "file": "agent/web/src/components/MeetingStudio.tsx",
+      "lines": 871,
+      "bytes": 80315,
+      "stateHooks": 41,
+      "effects": 13
+    },
+    {
+      "file": "lanceur/remote.py",
+      "lines": 1169,
+      "bytes": 77165,
+      "stateHooks": 0,
+      "effects": 0
+    },
+    {
+      "file": "lanceur/workspace.py",
+      "lines": 877,
+      "bytes": 64990,
+      "stateHooks": 0,
+      "effects": 0
+    }
+  ]
+}

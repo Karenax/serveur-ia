@@ -1,19 +1,24 @@
 import { agentPath } from '../lib/agentRoutes';
 import {useQueryState} from '../hooks/useQueryState';
-import {MessageContent} from './MessageContent';
 import {MemoryRecovery} from './MemoryRecovery';
 import {AsyncDownloadLink} from './AsyncDownloadLink';
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import {retryableLazy} from '../lib/retryableLazy';
+import {WorkspaceViewBoundary} from './WorkspaceViewBoundary';
 import { api, type PortfolioRow } from "../lib/api";
-import { workspaceApi, type WorkspaceCitation, type WorkspaceJob, type WorkspaceKnowledge, type WorkspacePage, type WorkspaceSource } from "../lib/workspaceApi";
+import { workspaceApi, type WorkspaceCitation, type WorkspaceJob, type WorkspaceKnowledge, type WorkspacePage } from "../lib/workspaceApi";
 import { useDebouncedValue } from "../hooks/useDebouncedValue";
 import { Glyph, P } from "../os/icons";
-import { MeetingStudio } from './MeetingStudio';
 import { meetingSessions, sessionExportUrl, type MeetingSession, type SessionCapabilities, type SessionCitation } from '../lib/meetingSessions';
 import "../workspace-views.css";
-import {citationSourceUrl,citationReaderUrl,citationAudioUrl,citationLocatorText,isNoteVersionUrl} from '../lib/citationLinks';
-import {NoteVersionPreview} from './NoteVersionPreview';
 import {fusionInsights} from '../lib/fusionInsights';
+import {Modal} from './WorkspaceModal';
+import {SourceInspector} from './SourceInspector';
+import {dateLabel, errorMessage} from './workspaceViewUtils';
+export {SourceInspector} from './SourceInspector';
+const MeetingStudio = retryableLazy(
+  () => import('./MeetingStudio').then(module => ({default: module.MeetingStudio})),
+  () => import('./MeetingStudio?kiara-retry=1').then(module => ({default:(module as unknown as typeof import('./MeetingStudio')).MeetingStudio})));
 
 export type WorkspaceViewProps = {rows: PortfolioRow[]; onOpenProject: (id: string, tab: string) => void; active?: boolean};
 export type MeetingCreationRequest = {key:number;projectId?:string};
@@ -25,12 +30,6 @@ const STATUS: Record<string, string> = {
   transcribed: "Texte à relire", reviewed: "Texte validé", synthesizing: "Synthèse", consolidating: "Consolidation", draft: "Brouillon", publishing: "Publication",
 };
 const KIND: Record<string, string> = {fact: "Fait", action: "Action", risk: "Risque", decision: "Décision", requirement: "Exigence", constraint: "Contrainte", open_point: "Point ouvert", milestone: "Échéance", summary: "Compte rendu"};
-const errorMessage = (error: unknown) => error instanceof Error ? error.message : String(error);
-const dateLabel = (value?: string | null) => {
-  if (!value) return "Date non précisée";
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? value : new Intl.DateTimeFormat("fr-FR", {day: "numeric", month: "short", year: "numeric"}).format(date);
-};
 
 function StateLabel({status}: {status: string}) {
   return <span className={`workspace-state workspace-state--${["failed", "interrupted", "running", "pending", "validated", "published", "completed"].includes(status) ? status : "neutral"}`}>{STATUS[status] || status || "À préparer"}</span>;
@@ -54,23 +53,35 @@ function useWorkspacePage<T>(loader: (signal: AbortSignal,quiet?:boolean) => Pro
   const [revision, setRevision] = useState(0);
   const previousLoader = useRef<typeof loader | null>(null);
   const automaticRefresh = useRef(false);
+  const currentRequest = useRef<AbortController | null>(null);
+  const wasPolling = useRef(polling);
   useEffect(() => {
+    if (polling && document.hidden) return;
     const controller = new AbortController();
+    currentRequest.current = controller;
     let live = true;
     const quiet=previousLoader.current===loader&&automaticRefresh.current;
     automaticRefresh.current=false;
     if (previousLoader.current !== loader) setLoading(true);
     previousLoader.current = loader;
     setError("");
-    void (quiet?loader(controller.signal,true):loader(controller.signal)).then(data => {if (live) setPage(data);}).catch(cause => {
+    void (quiet?loader(controller.signal,true):loader(controller.signal)).then(data => {if (live && !controller.signal.aborted) setPage(data);}).catch(cause => {
       if (live && !controller.signal.aborted) setError(errorMessage(cause));
-    }).finally(() => {if (live) setLoading(false);});
-    return () => {live = false; controller.abort();};
+    }).finally(() => {
+      if(currentRequest.current===controller)currentRequest.current=null;
+      if (live && !controller.signal.aborted) setLoading(false);
+    });
+    return () => {live = false; controller.abort();if(currentRequest.current===controller)currentRequest.current=null;};
   }, [loader, revision]);
   useEffect(() => {
-    if (!polling) return;
-    const timer = window.setInterval(() => {if (!document.hidden){automaticRefresh.current=true;setRevision(value => value + 1);}}, 5000);
-    return () => window.clearInterval(timer);
+    const previous=wasPolling.current;wasPolling.current=polling;
+    if (!polling) {if(previous)currentRequest.current?.abort();return;}
+    const refresh=()=>{automaticRefresh.current=true;setRevision(value=>value+1);};
+    const visibility=()=>{if(document.hidden)currentRequest.current?.abort();else refresh();};
+    if (!previous && !document.hidden) refresh();
+    document.addEventListener('visibilitychange',visibility);
+    const timer = window.setInterval(() => {if (!document.hidden && !currentRequest.current)refresh();}, 5000);
+    return () => {window.clearInterval(timer);document.removeEventListener('visibilitychange',visibility);};
   }, [polling]);
   return {page, loading, error, reload: () => {automaticRefresh.current=false;setRevision(value => value + 1);}};
 }
@@ -89,83 +100,6 @@ function Pagination({offset, total, loading, setOffset}: {offset: number; total:
     <button type="button" disabled={loading || !offset} onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}><Glyph d={P.chevL} />Précédents</button>
     <button type="button" disabled={loading || offset + PAGE_SIZE >= total} onClick={() => setOffset(offset + PAGE_SIZE)}>Suivants<Glyph d={P.chevR} /></button>
   </nav>;
-}
-
-function Modal({title, children, onClose, dirty = false, busy = false}: {title: string; children: ReactNode; onClose: () => void; dirty?: boolean; busy?: boolean}) {
-  const panel = useRef<HTMLDivElement>(null);
-  const close = useCallback(() => {
-    if (busy) return;
-    if (!dirty || window.confirm("Les corrections ne sont pas enregistrées. Fermer ce brouillon ?")) onClose();
-  }, [busy, dirty, onClose]);
-  useEffect(() => {
-    const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    panel.current?.focus();
-    return () => {if (previous?.isConnected) previous.focus();};
-  }, []);
-  useEffect(() => {
-    if (!dirty) return;
-    const guard = (event: BeforeUnloadEvent) => {event.preventDefault(); event.returnValue = "";};
-    window.addEventListener("beforeunload", guard);
-    return () => window.removeEventListener("beforeunload", guard);
-  }, [dirty]);
-  return <div className="workspace-modal-backdrop">
-    <div ref={panel} tabIndex={-1} role="dialog" aria-modal="true" aria-label={title} className="workspace-modal" data-workspace-dirty={dirty ? "true" : undefined}
-      onKeyDown={event => {
-        if (event.key === "Escape") {event.stopPropagation(); close();}
-        if (event.key !== "Tab") return;
-        const fields = Array.from(panel.current?.querySelectorAll<HTMLElement>("button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex='0']") || []);
-        if (!fields.length) {event.preventDefault(); return;}
-        const first = fields[0], last = fields[fields.length - 1];
-        if (event.shiftKey && (document.activeElement === first || document.activeElement === panel.current)) {event.preventDefault(); last.focus();}
-        if (!event.shiftKey && (document.activeElement === last || document.activeElement === panel.current)) {event.preventDefault(); first.focus();}
-      }}>
-      <header className="workspace-modal-heading"><h2>{title}</h2><button type="button" aria-label="Fermer" disabled={busy} onClick={close}>×</button></header>
-      {children}
-    </div>
-  </div>;
-}
-
-export function SourceInspector({sourceId, evidence = [], title = "Source et preuve", onClose}: {
-  sourceId: string; evidence?: WorkspaceCitation[]; title?: string; onClose: () => void;
-}) {
-  const [source, setSource] = useState<WorkspaceSource | null>(null);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [retry, setRetry] = useState(0);
-  useEffect(() => {
-    const controller = new AbortController();
-    let live = true;
-    setSource(null); setError(""); setLoading(true);
-    void workspaceApi.source(sourceId, controller.signal).then(value => {if (live) setSource(value);}).catch(cause => {
-      if (live && !controller.signal.aborted) setError(errorMessage(cause));
-    }).finally(() => {if (live) setLoading(false);});
-    return () => {live = false; controller.abort();};
-  }, [sourceId, retry]);
-  const citations = evidence.filter(item => item.source_id === sourceId);
-  return <Modal title={title} onClose={onClose}>
-    <div className="workspace-source-content">
-      {citations.map((citation, index) => <section className="workspace-proof" key={index} aria-label={`Preuve ${index + 1}`}>
-        <strong>{citation.title || "Extrait cité"}</strong>
-        {citation.excerpt && <blockquote>{citation.excerpt}</blockquote>}
-        {citationSourceUrl(citation)&&<a href={agentPath(citationReaderUrl(citation)!)} target="_blank" rel="noreferrer">{isNoteVersionUrl(citationSourceUrl(citation))?'Ouvrir la version citée':'Consulter la source citée'}</a>}
-        <NoteVersionPreview citation={citation}/>
-        {citation.locator && <p className="workspace-meta">{citationLocatorText(citation.locator,' : ')}</p>}
-        {citationAudioUrl(citation) && <audio controls preload="metadata" src={agentPath(citationAudioUrl(citation)!)}>Lecture audio indisponible.</audio>}
-      </section>)}
-      {loading && <p role="status">Chargement de la source…</p>}
-      {error && <div role="alert"><p>{error}</p><button type="button" onClick={() => setRetry(value => value + 1)}>Réessayer</button></div>}
-      {source && <>
-        <div className="workspace-source-heading"><h3>{source.metadata.subject || source.metadata.filename || "Source originale"}</h3>
-          <p className="workspace-meta">{source.author || "Auteur non précisé"} · {dateLabel(source.received_at)} · {source.type}</p>
-          <AsyncDownloadLink href={source.metadata.note_version_id?`/api/v1/workspace/sources/${encodeURIComponent(source.id)}/original`:`/v1/sources/${encodeURIComponent(source.id)}/raw`} target="_blank" rel="noreferrer">{source.metadata.note_version_id?'Télécharger la version actuelle de note':'Télécharger l’original'} <Glyph d={P.download} size={16} /></AsyncDownloadLink>
-        </div>
-        {(source.body_html || source.artifacts.length) ? (source.body_html ? [{id:"original-mail",kind:"body_text",text:source.body_html}] : source.artifacts).map(artifact => <section key={artifact.id} className="workspace-source-text">
-          <h4>{({body_text: "Texte du message", transcription: "Transcription", transcription_snapshot: "Transcription avant correction (historique)", ocr: "Texte du document", document_page: "Texte du document", sheet_row: "Ligne du tableur", document_text: "Texte du document", web_page: "Texte de la page web", media: "Fichier image ou audio"} as Record<string, string>)[artifact.kind] || "Contenu extrait"}</h4>
-          {source.type === "email" || artifact.kind === "body_text" ? <MessageContent text={artifact.text || "Aucun texte disponible pour cette version."} inlineImages={source.inline_images}/> : <pre>{artifact.text || "Aucun texte disponible pour cette version."}</pre>}
-        </section>) : <p>Cette source ne contient pas de texte extrait. Consultez le fichier original.</p>}
-      </>}
-    </div>
-  </Modal>;
 }
 
 export function GlobalMeetingsView({rows, onOpenProject, active=true,initialProjectId,creationRequest,studioNavigation,onStudioOpenChange}: WorkspaceViewProps&{
@@ -267,11 +201,12 @@ export function GlobalMeetingsView({rows, onOpenProject, active=true,initialProj
   const state = useWorkspacePage(loader,active);
   const meeting = state.page.items.find(item => item.id === selected);
   const prepared=sessions.filter(session=>!state.page.items.some(item=>item.session_id===session.id));
-  if (studio && capabilities?.enabled) return <><MeetingStudio key={studio} sessionId={studio} rows={rows} capabilities={capabilities}
+  const closeStudio=()=>{setStudio(null);setSourceProof(null); setSessionTick(value => value + 1); state.reload();};
+  if (studio && capabilities?.enabled) return <><WorkspaceViewBoundary onLeave={closeStudio} leaveLabel="Retour aux réunions"><Suspense fallback={<p role="status">Chargement de la réunion…</p>}><MeetingStudio key={studio} sessionId={studio} rows={rows} capabilities={capabilities}
     active={active} navigation={studioNavigation}
     sessionList={sessions} onSelectSession={setStudio} onNewSession={()=>{setStudio(null);setKind('note');setCreating(true);setCreateProject(project);createCommand.current=null;}}
-    onClose={() => {setStudio(null);setSourceProof(null); setSessionTick(value => value + 1); state.reload();}}
-    onChanged={() => {setSessionTick(value => value + 1); state.reload();}} onOpenProject={onOpenProject} onOpenSource={setSourceProof}/>
+    onClose={closeStudio}
+    onChanged={() => {setSessionTick(value => value + 1); state.reload();}} onOpenProject={onOpenProject} onOpenSource={setSourceProof}/></Suspense></WorkspaceViewBoundary>
     {sourceProof?.source_id&&<SourceInspector sourceId={sourceProof.source_id} evidence={[{...sourceProof,source_id:sourceProof.source_id,excerpt:sourceProof.excerpt||sourceProof.quote}]}
       onClose={()=>setSourceProof(null)}/>}</>;
   return <section className="workspace-view workspace-meetings" aria-label="Réunions">
@@ -302,7 +237,7 @@ export function GlobalMeetingsView({rows, onOpenProject, active=true,initialProj
     </form>}
     {capabilities && sessions.length > 0 && <section className="meeting-session-library" aria-label="Séances préparées">
       <h2>Séances · {sessionTotal}</h2>{!capabilities.enabled&&<p>Les séances restent récupérables. Réactivez l’espace de séance dans Préparation pour les modifier.</p>}
-      <div className="meeting-session-grid">{prepared.map(session => <article key={session.id}><button type="button" className="meeting-session-card" disabled={!capabilities.enabled} onClick={() => setStudio(session.id)}>
+      <div className="meeting-session-grid">{prepared.map(session => <article key={session.id}><button type="button" className="meeting-session-card" aria-label={`Ouvrir la séance ${session.title}`} disabled={!capabilities.enabled} onClick={() => setStudio(session.id)}>
         <span>{session.date} · {session.project_id ? rows.find(row => row.id === session.project_id)?.code || 'Projet' : 'À rattacher'}</span>
         <strong>{session.title}</strong><span>{STATUS[session.state] || ({created:'À préparer',recording:'Enregistrement',paused:'En pause',finalizing:'Consolidation',completed:'Audio conservé'} as Record<string,string>)[session.state] || session.state}</span>
         <small>{Math.round(session.total_bytes / 1024)} Ko conservés · {session.note_id ? 'Note du projet' : 'Notes de séance'}</small></button>

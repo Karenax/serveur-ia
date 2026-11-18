@@ -6,6 +6,12 @@ Playwright MCP est configuré au niveau utilisateur et peut servir aux autres pr
 
 ## Fonctionnement courant
 
+Depuis le 18 novembre 2026, le client Windows et le web privé sont les surfaces
+de travail actives. Les recettes visuelles de bureau utilisent 1280 × 720,
+1920 × 1080 et 2560 × 1440. Faire les captures à la taille cible après stabilisation
+de l’interface et cadrer l’écran visible. Le travail sur mobile et sa qualification
+sont reportés jusqu’à une demande explicite de reprise.
+
 `AGENTS.md` charge les règles permanentes du dépôt. Les sept skills de
 `.agents/skills/` sont découvrables automatiquement ; ne lire que ceux adaptés à la
 tâche. Les cinq skills locaux complètent `frontend-design` d'Anthropic et

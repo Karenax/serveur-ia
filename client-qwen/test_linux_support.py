@@ -1,6 +1,7 @@
 """Linux adaptation: encrypted storage, bounded import and the real loopback UI."""
 import base64
 import json
+import io
 import os
 from pathlib import Path
 import struct
@@ -9,11 +10,15 @@ import threading
 import unittest
 import urllib.error
 import urllib.request
-from unittest.mock import patch
+from types import SimpleNamespace
+from unittest.mock import Mock, patch
 
 from cryptography.fernet import Fernet
 import client
 import linux_support
+import portal_origin_state
+import portal_recovery_stdio
+import relay_control_stream
 
 
 def profile():
@@ -29,6 +34,206 @@ class LinuxSupportTests(unittest.TestCase):
         self.directory=tempfile.TemporaryDirectory();self.addCleanup(self.directory.cleanup)
         environment=patch.dict(os.environ,{'XDG_DATA_HOME':self.directory.name})
         environment.start();self.addCleanup(environment.stop)
+
+    def test_receiver_timeout_reports_specific_error_and_releases_profile(self):
+        from portal_migration_job import MigrationReceiverUnavailable
+        (Path(self.directory.name)/'profile.enc').write_bytes(b'profil fictif');guard=Mock()
+        with patch.object(client.sys,'platform','linux'), \
+             patch.object(client.sys,'stdin',SimpleNamespace(buffer=io.BytesIO())), \
+             patch.dict(os.environ,{'KIARA_TEST_RECOVERY_FULL':'1'}), \
+             patch.object(linux_support,'data_home',return_value=Path(self.directory.name)), \
+             patch.object(client,'read_profile',return_value=profile()), \
+             patch.object(client,'settings_path',return_value=Path(self.directory.name)/('a'*20+'.enc')), \
+             patch.object(linux_support,'lock_desktop_profile',return_value=guard), \
+             patch.object(relay_control_stream,'RelayControlStream'), \
+             patch.object(portal_recovery_stdio,'resolve_port_full',side_effect=MigrationReceiverUnavailable('fictif')), \
+             patch.object(client,'open_local_relay') as relay,patch('builtins.print') as printed:
+            client.relay_stdio(version='4.0.9')
+        relay.assert_not_called();guard.close.assert_called_once()
+        self.assertEqual(printed.call_args_list[-1].args,('KIARA_RELAY_RECEIVER_UNAVAILABLE',))
+
+    def test_initial_window_leaves_room_on_720p_desktop(self):
+        with patch.object(client.sys, 'platform', 'linux'):
+            geometry = client.window_geometry()
+        self.assertLessEqual(geometry['width'], 1280)
+        self.assertLessEqual(geometry['height'], 672)
+        self.assertLessEqual(geometry['min_size'][0], geometry['width'])
+        self.assertLessEqual(geometry['min_size'][1], geometry['height'])
+
+    def test_tauri_reuses_the_existing_linux_profile_without_windows_updater(self):
+        (Path(self.directory.name) / 'profile.enc').write_bytes(b'profil fictif')
+        (Path(self.directory.name) / ('a'*20+'.enc')).write_bytes(b'reglages fictifs existants')
+        remote = SimpleNamespace(desktop_update=None, close=Mock())
+        server = SimpleNamespace(server_port=48001, serve_forever=Mock(), shutdown=Mock(), server_close=Mock())
+        stdin = SimpleNamespace(buffer=io.BytesIO(b''))
+        guard = Mock()
+        with patch.object(client.sys, 'platform', 'linux'), \
+             patch.object(client.sys, 'stdin', stdin), \
+             patch.dict(os.environ, {'KIARA_DESKTOP_UPDATES': '1'}), \
+             patch.object(linux_support, 'data_home', return_value=Path(self.directory.name)), \
+             patch.object(linux_support, 'lock_desktop_profile', return_value=guard) as lock_profile, \
+             patch.object(client, 'read_profile', return_value=profile()) as read, \
+             patch.object(client, 'open_local_relay', return_value=(remote, server)) as open_relay, \
+             patch.object(client, 'settings_path', return_value=Path(self.directory.name)/('a'*20+'.enc')), \
+             patch.object(portal_origin_state, 'read_origin', return_value=17844), \
+             patch('builtins.print') as printed:
+            client.relay_stdio(version='4.0.9')
+        read.assert_called_once_with()
+        lock_profile.assert_called_once_with(profile())
+        open_relay.assert_called_once_with(profile(), managed=False, required_port=17844)
+        self.assertFalse(remote.managed_relay)
+        self.assertIsNone(remote.desktop_update)
+        self.assertEqual(printed.call_args_list, [unittest.mock.call('KIARA_RELAY_PROFILE_LOCKED', flush=True),
+                         unittest.mock.call('KIARA_RELAY_READY http://127.0.0.1:48001/chat '+('a'*20), flush=True)])
+        remote.close.assert_called_once()
+        server.server_close.assert_called_once()
+        guard.close.assert_called_once()
+
+    def test_locked_profile_is_rejected_before_loading_history_or_opening_a_server(self):
+        (Path(self.directory.name) / 'profile.enc').write_bytes(b'profil fictif')
+        with patch.object(client.sys, 'platform', 'linux'), \
+             patch.object(linux_support, 'data_home', return_value=Path(self.directory.name)), \
+             patch.object(client, 'read_profile', return_value=profile()), \
+             patch.object(linux_support, 'lock_desktop_profile', side_effect=linux_support.ProfileAlreadyOpen('busy')), \
+             patch.object(client, 'open_local_relay') as open_relay, \
+             patch('builtins.print') as printed:
+            client.relay_stdio(version='4.0.9')
+        open_relay.assert_not_called()
+        printed.assert_called_once_with('KIARA_RELAY_PROFILE_IN_USE', flush=True)
+
+    def test_unavailable_lock_is_reported_without_opening_a_server(self):
+        (Path(self.directory.name) / 'profile.enc').write_bytes(b'profil fictif')
+        with patch.object(client.sys, 'platform', 'linux'), \
+             patch.object(linux_support, 'data_home', return_value=Path(self.directory.name)), \
+             patch.object(client, 'read_profile', return_value=profile()), \
+             patch.object(linux_support, 'lock_desktop_profile', side_effect=linux_support.ProfileLockError('unavailable')), \
+             patch.object(client, 'open_local_relay') as open_relay, \
+             patch('builtins.print') as printed:
+            client.relay_stdio(version='4.0.9')
+        open_relay.assert_not_called()
+        printed.assert_called_once_with('KIARA_RELAY_PROFILE_LOCK_UNAVAILABLE', flush=True)
+
+    def test_relay_releases_profile_if_server_initialization_fails(self):
+        (Path(self.directory.name) / 'profile.enc').write_bytes(b'profil fictif')
+        guard = Mock()
+        with patch.object(client.sys, 'platform', 'linux'), \
+             patch.object(linux_support, 'data_home', return_value=Path(self.directory.name)), \
+             patch.object(client, 'read_profile', return_value=profile()), \
+             patch.object(portal_origin_state, 'fresh_tauri_storage_absent', return_value=False), \
+             patch.object(portal_origin_state, 'read_origin', return_value=17844), \
+             patch.object(linux_support, 'lock_desktop_profile', return_value=guard), \
+             patch.object(client, 'open_local_relay', side_effect=ValueError('error')), \
+             patch('builtins.print'):
+            with self.assertRaises(ValueError):client.relay_stdio(version='4.0.9')
+        guard.close.assert_called_once()
+
+    def test_recorded_port_is_used_and_invalid_state_never_opens_server(self):
+        (Path(self.directory.name) / 'profile.enc').write_bytes(b'profil fictif')
+        guard = Mock()
+        remote = SimpleNamespace(desktop_update=None, close=Mock())
+        server = SimpleNamespace(server_port=17844, serve_forever=Mock(), shutdown=Mock(), server_close=Mock())
+        stdin = SimpleNamespace(buffer=io.BytesIO(b''))
+        with patch.object(client.sys, 'platform', 'linux'), \
+             patch.object(client.sys, 'stdin', stdin), \
+             patch.object(linux_support, 'data_home', return_value=Path(self.directory.name)), \
+             patch.object(client, 'read_profile', return_value=profile()), \
+             patch.object(linux_support, 'lock_desktop_profile', return_value=guard), \
+             patch.object(client, 'settings_path', return_value=Path(self.directory.name)/('a'*20+'.enc')), \
+             patch.object(portal_origin_state, 'read_origin', return_value=17844) as read_origin, \
+             patch.object(client, 'open_local_relay', return_value=(remote,server)) as open_relay, \
+             patch('builtins.print'):
+            client.relay_stdio(version='4.0.9')
+        read_origin.assert_called_once_with(Path(self.directory.name)/(('a'*20)+'.tauri-origin.json'))
+        open_relay.assert_called_once_with(profile(), managed=False, required_port=17844)
+        guard.close.assert_called_once()
+
+        guard = Mock()
+        with patch.object(client.sys, 'platform', 'linux'), \
+             patch.object(linux_support, 'data_home', return_value=Path(self.directory.name)), \
+             patch.object(client, 'read_profile', return_value=profile()), \
+             patch.object(linux_support, 'lock_desktop_profile', return_value=guard), \
+             patch.object(client, 'settings_path', return_value=Path(self.directory.name)/('a'*20+'.enc')), \
+             patch.object(portal_origin_state, 'read_origin', side_effect=portal_origin_state.OriginStateError('invalid')), \
+             patch.object(client, 'open_local_relay') as open_relay, \
+             patch('builtins.print') as printed:
+            client.relay_stdio(version='4.0.9')
+        open_relay.assert_not_called()
+        self.assertEqual(printed.call_args_list[-1].args, ('KIARA_RELAY_ORIGIN_INVALID',))
+        guard.close.assert_called_once()
+
+    def test_occupied_recorded_port_is_reported_without_fallback(self):
+        (Path(self.directory.name) / 'profile.enc').write_bytes(b'profil fictif')
+        guard = Mock()
+        with patch.object(client.sys, 'platform', 'linux'), \
+             patch.object(linux_support, 'data_home', return_value=Path(self.directory.name)), \
+             patch.object(client, 'read_profile', return_value=profile()), \
+             patch.object(linux_support, 'lock_desktop_profile', return_value=guard), \
+             patch.object(client, 'settings_path', return_value=Path(self.directory.name)/('a'*20+'.enc')), \
+             patch.object(portal_origin_state, 'read_origin', return_value=17844), \
+             patch.object(client, 'open_local_relay', side_effect=client.LocalOriginPortUnavailable('busy')) as open_relay, \
+             patch('builtins.print') as printed:
+            client.relay_stdio(version='4.0.9')
+        open_relay.assert_called_once_with(profile(), managed=False, required_port=17844)
+        self.assertEqual(printed.call_args_list[-1].args, ('KIARA_RELAY_ORIGIN_BUSY',))
+        guard.close.assert_called_once()
+
+    def test_unreadable_settings_are_reported_and_profile_is_released(self):
+        (Path(self.directory.name) / 'profile.enc').write_bytes(b'profil fictif')
+        (Path(self.directory.name) / ('a'*20+'.enc')).write_bytes(b'reglages fictifs illisibles')
+        guard = Mock()
+        with patch.object(client.sys, 'platform', 'linux'), \
+             patch.object(linux_support, 'data_home', return_value=Path(self.directory.name)), \
+             patch.object(client, 'read_profile', return_value=profile()), \
+             patch.object(linux_support, 'lock_desktop_profile', return_value=guard), \
+             patch.object(client, 'settings_path', return_value=Path(self.directory.name)/('a'*20+'.enc')), \
+             patch.object(portal_origin_state, 'read_origin', return_value=17844), \
+             patch.object(client, 'open_local_relay', side_effect=client.LocalSettingsUnreadable('illisible')), \
+             patch('builtins.print') as printed:
+            client.relay_stdio(version='4.0.9')
+        self.assertEqual(printed.call_args_list, [unittest.mock.call('KIARA_RELAY_PROFILE_LOCKED', flush=True),
+                         unittest.mock.call('KIARA_RELAY_SETTINGS_UNREADABLE', flush=True)])
+        guard.close.assert_called_once()
+
+    def test_opt_in_recovery_keeps_control_stream_until_relay_stops(self):
+        (Path(self.directory.name) / 'profile.enc').write_bytes(b'profil fictif')
+        guard=Mock();control=Mock()
+        remote=SimpleNamespace(desktop_update=None,close=Mock())
+        server=SimpleNamespace(server_port=17844,serve_forever=Mock(),shutdown=Mock(),server_close=Mock())
+        with patch.object(client.sys,'platform','linux'), \
+             patch.object(client.sys,'stdin',SimpleNamespace(buffer=io.BytesIO())), \
+             patch.dict(os.environ,{'KIARA_TEST_RECOVERY':'1'}), \
+             patch.object(linux_support,'data_home',return_value=Path(self.directory.name)), \
+             patch.object(client,'read_profile',return_value=profile()), \
+             patch.object(client,'settings_path',return_value=Path(self.directory.name)/('a'*20+'.enc')), \
+             patch.object(linux_support,'lock_desktop_profile',return_value=guard), \
+             patch.object(relay_control_stream,'RelayControlStream',return_value=control), \
+             patch.object(portal_recovery_stdio,'recovery_assets',return_value={}), \
+             patch.object(portal_recovery_stdio,'resolve_port',return_value=17844) as resolve, \
+             patch.object(client,'open_local_relay',return_value=(remote,server)) as open_relay, \
+             patch('builtins.print'):
+            client.relay_stdio(version='4.0.9')
+        resolve.assert_called_once_with(profile(),control,client.sys.stdout,{})
+        open_relay.assert_called_once_with(profile(),managed=False,required_port=17844)
+        control.read.assert_called_once_with(1);guard.close.assert_called_once()
+
+    def test_opt_in_recovery_refuses_unknown_qt_storage_before_server(self):
+        (Path(self.directory.name) / 'profile.enc').write_bytes(b'profil fictif')
+        guard=Mock()
+        with patch.object(client.sys,'platform','linux'), \
+             patch.object(client.sys,'stdin',SimpleNamespace(buffer=io.BytesIO())), \
+             patch.dict(os.environ,{'KIARA_TEST_RECOVERY':'1'}), \
+             patch.object(linux_support,'data_home',return_value=Path(self.directory.name)), \
+             patch.object(client,'read_profile',return_value=profile()), \
+             patch.object(client,'settings_path',return_value=Path(self.directory.name)/('a'*20+'.enc')), \
+             patch.object(linux_support,'lock_desktop_profile',return_value=guard), \
+             patch.object(relay_control_stream,'RelayControlStream'), \
+             patch.object(portal_recovery_stdio,'recovery_assets',return_value={}), \
+             patch.object(portal_recovery_stdio,'resolve_port',side_effect=portal_recovery_stdio.QtLegacyStoragePresent()), \
+             patch.object(client,'open_local_relay') as open_relay,patch('builtins.print') as printed:
+            client.relay_stdio(version='4.0.9')
+        open_relay.assert_not_called()
+        self.assertEqual(printed.call_args_list[-1].args,('KIARA_RELAY_QT_STORAGE',))
+        guard.close.assert_called_once()
 
     def test_import_reads_footer_without_executing_and_rejects_truncation(self):
         path=Path(self.directory.name)/'personal.exe'

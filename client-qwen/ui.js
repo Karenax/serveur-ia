@@ -5,10 +5,12 @@ function uiLoadedModel(name,code=''){
   const text=name?'Modèle : '+name:['model_unloaded','no_models'].includes(code)?'Aucun modèle disponible':'Modèle : connexion requise';if(label.textContent!==text)label.textContent=text;
   label.title=label.textContent;
 }
-const uiPaths={notifications:'M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4',chat:'M3 4h18v12H8l-5 4V4',projects:'M3 7V5h6l2 2h10v13H3V7',settings:'M4 6h16M4 12h16M4 18h16M8 3v6m8 0v6m-6 0v6',new:'M15 4l5 5M4 20l4-1L21 6l-3-3L5 16l-1 4',sidebar:'M3 4h18v16H3V4m5 0v16',project:'M3 7V5h6l2 2h10v13H3V7',writing:'M4 20l4-1L21 6l-3-3L5 16l-1 4',code:'M8 6l-6 6 6 6m8-12 6 6-6 6m-3-14-2 16',analysis:'M4 20h16M7 16v-5m5 5V4m5 12V8',research:'M15 15l6 6M17 9a8 8 0 1 1-16 0 8 8 0 0 1 16 0',general:'M12 3v18M3 12h18M5.6 5.6l12.8 12.8m0-12.8L5.6 18.4'};
-function uiIcon(name){const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('fill','none');svg.setAttribute('stroke','currentColor');svg.setAttribute('stroke-width','1.5');svg.setAttribute('stroke-linecap','round');svg.setAttribute('stroke-linejoin','round');svg.setAttribute('aria-hidden','true');svg.classList.add('icon');const path=document.createElementNS(svg.namespaceURI,'path');path.setAttribute('d',uiPaths[name]||uiPaths.general);svg.append(path);return svg;}
+// Les tracés sont partagés avec WorkspaceShell.tsx (Glyph, stroke-width 1.7, 18px).
+const uiPaths={notifications:'M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4',chat:'M3 4h18v12H8l-5 4V4',projects:'M3 6V4h7l2 3h9v13H3z',settings:'M4 6h16M4 12h16M4 18h16|<circle cx="8" cy="6" r="2" fill="currentColor"/>|<circle cx="16" cy="12" r="2" fill="currentColor"/>|<circle cx="10" cy="18" r="2" fill="currentColor"/>',new:'M15 4l5 5M4 20l4-1L21 6l-3-3L5 16l-1 4',sidebar:'M3 4h18v16H3V4m5 0v16',project:'M3 6V4h7l2 3h9v13H3z',writing:'M4 20l4-1L21 6l-3-3L5 16l-1 4',code:'M8 6l-6 6 6 6m8-12 6 6-6 6m-3-14-2 16',analysis:'M4 20h16M7 16v-5m5 5V4m5 12V8',research:'M15 15l6 6M17 9a8 8 0 1 1-16 0 8 8 0 0 1 16 0',general:'M12 3v18M3 12h18M5.6 5.6l12.8 12.8m0-12.8L5.6 18.4'};
+function uiIcon(name){const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('fill','none');svg.setAttribute('stroke','currentColor');svg.setAttribute('stroke-width','1.7');svg.setAttribute('stroke-linecap','round');svg.setAttribute('stroke-linejoin','round');svg.setAttribute('aria-hidden','true');svg.classList.add('icon');for(const shape of (uiPaths[name]||uiPaths.general).split('|')){if(shape.startsWith('<')){svg.insertAdjacentHTML('beforeend',shape);continue;}const path=document.createElementNS(svg.namespaceURI,'path');path.setAttribute('d',shape);svg.append(path);}return svg;}
 const uiNavTitles={notifications:'Notifications',chat:'Conversations',projects:'Projets',settings:'Réglages'};
 const uiNavigationLabels=new WeakMap();
+let uiUnifiedStatusLabel=null;
 uiNavTitles.assistant='Mémoire et rappels';uiPaths.assistant='M4 4h7v16H4V4m9 0h7v16h-7V4M7 8h1m8 0h1M7 12h1m8 0h1';
 async function uiOpenProjectWorkspace(path){
   if(busy)throw new Error('Attendez la fin de la réponse.');
@@ -31,57 +33,95 @@ if(platformCapabilities.platform!=='android'){
   const projectButton=document.querySelector('[data-view-button="projects"]');
   const nav=document.querySelector('#client-navigation');
   const notifications=nav.querySelector('[data-view-button="notifications"]');
+  let unifiedNavigation = false;
+  // Une fenêtre Windows ayant déjà affiché la barre Kiara doit la retrouver au boot,
+  // sans attendre la réponse réseau. Un contexte vierge reste en mode classique.
+  try {
+    unifiedNavigation = localStorage.getItem('fred-unified-navigation') === 'true' || document.body.dataset.kiaraUnifiedNavigation === 'true';
+  } catch {}
+  const brandTitle = document.querySelector('.brand strong');
+  const settingsButton = document.querySelector('[data-view-button="settings"]');
+  const openLocalSettings = settingsButton.onclick;
+  settingsButton.onclick = () => unifiedNavigation ? wsTry(()=>uiOpenProjectWorkspace('/app/settings')) : openLocalSettings();
   const openLocalProjects = projectButton.onclick;
   projectButton.onclick = () => {
-    if(ws.data?.project_catalogue?.interface==='projects-v1' && ws.data.project_catalogue.state==='ready') {
+    if(unifiedNavigation || (ws.data?.project_catalogue?.interface==='projects-v1' && ws.data.project_catalogue.state==='ready')) {
       return wsTry(()=>uiOpenProjectWorkspace('/app/projets'));
     }
     return openLocalProjects();
   };
   const entries = [
+    ['Notes', '/app/notes', 'M6 3h12v18H6zM9 8h6M9 12h6M9 16h4'],
     ['Mails', '/app/mails', 'M3 5h18v14H3zM3 5l9 7 9-7'],
-    ['Réunions', '/app/reunions', 'M4 9v6M8 5v14M12 3v18M16 6v12M20 9v6'],
+    ['Réunions', '/app/reunions', 'M4 10v4M8 5v14M12 8v8M16 3v18M20 9v6'],
     ['Activité', '/app/activite', 'M3 12h4l3-6 4 12 3-6h4']
   ];
   let links = [];
+  let unifiedDomApplied = false;
+  const applyUnifiedDom = () => {
+    if (unifiedDomApplied) return;
+    unifiedDomApplied = true;
+    document.body.dataset.kiaraUnifiedNavigation = 'true';
+    brandTitle.textContent = 'Kiara';
+    const toolbar = wsElement('div', undefined, 'conversation-toolbar');
+    const history = wsElement('details', undefined, 'conversation-history-menu');
+    const summary = wsElement('summary', 'Historique');
+    history.append(summary, wsHistoryNavigation);
+    history.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && history.open) { event.preventDefault(); event.stopPropagation(); history.open = false; summary.focus(); }
+    });
+    history.addEventListener('click', event => {
+      if (event.target.closest('.conversation-item')) history.open = false;
+    });
+    document.addEventListener('click', event => { if (!history.contains(event.target)) history.open = false; });
+    toolbar.append($('new'), history);
+    document.querySelector('.chat-view').prepend(toolbar);
+    document.querySelector('[data-view="access"]').append(document.querySelector('.sidebar-bottom'));
+    const locationLabel = wsElement('span', platformCapabilities.platform === 'windows' ? 'Serveur Kiara' : 'Espace de travail', 'unified-sidebar-status');
+    uiUnifiedStatusLabel = locationLabel;
+    settingsButton.after(locationLabel);
+    links = entries.map(([label,path,icon]) => {
+      uiPaths[label] = icon;
+      const button = wsElement('button',null,'nav-button');
+      button.type = 'button';
+      button.append(uiIcon(label),wsElement('span',label,'nav-text'));
+      button.onclick = () => wsTry(() => uiOpenProjectWorkspace(path));
+      return button;
+    });
+    projectButton.after(...links);
+    if (platformCapabilities.platform === 'windows' && notifications.parentNode === nav) {
+      notifications.classList.add('notifications-shortcut');
+      $('connection').before(notifications);
+    }
+  };
+  const enableUnifiedNavigation = () => {
+    unifiedNavigation = true;
+    try { localStorage.setItem('fred-unified-navigation', 'true'); } catch {}
+    applyUnifiedDom();
+  };
   const drawProjects = wsDrawProjects;
   wsDrawProjects = function(){
     drawProjects();
     const catalogue = ws.data?.project_catalogue;
-    const enabled = catalogue?.state === 'ready' && catalogue.navigation === 'kiara-v1';
+    // Dès que le catalogue annonce la navigation Kiara, même indisponible, on bascule.
+    if (catalogue?.navigation === 'kiara-v1') enableUnifiedNavigation();
     openPortfolio.hidden = catalogue?.interface === 'projects-v1' && catalogue.state === 'ready';
-    if (platformCapabilities.platform === 'windows') {
-      if (enabled && notifications.parentNode === nav) {
-        notifications.classList.add('notifications-shortcut');
-        $('connection').before(notifications);
-      } else if (!enabled && notifications.parentNode !== nav) {
-        notifications.classList.remove('notifications-shortcut');
-        nav.append(notifications);
-      }
-    }
-    if (enabled && !links.length) {
-      links = entries.map(([label,path,icon]) => {
-        uiPaths[label] = icon;
-        const button = wsElement('button',null,'nav-button');
-        button.type = 'button';
-        button.append(uiIcon(label),wsElement('span',label,'nav-text'));
-        button.onclick = () => wsTry(() => uiOpenProjectWorkspace(path));
-        return button;
-      });
-      projectButton.after(...links);
-    }
-    for (const button of links) button.hidden = !enabled;
   };
+  if (unifiedNavigation) {
+    try { localStorage.setItem('fred-unified-navigation', 'true'); } catch {}
+    queueMicrotask(applyUnifiedDom);
+  }
 }
 if (platformCapabilities.platform !== 'windows' && location.hash === '#notifications') {
   void clientReady.then(() => showView('notifications'));
 }
-if (platformCapabilities.platform === 'windows') {
+if (platformCapabilities.platform === 'windows' || platformCapabilities.platform === 'web') {
   const openChatDestination = () => {
     if (location.hash === '#notifications') {
       showView('notifications');
       return;
     }
+    if (location.hash === '#reglages') { showView('settings'); return; }
     if (location.hash !== '#apparence') return;
     showView('settings');
     $('ui-theme').focus();
@@ -92,6 +132,7 @@ if (platformCapabilities.platform === 'windows') {
 function uiDecorateNavigation(){for(const button of document.querySelectorAll('[data-view-button]')){button.removeAttribute('aria-selected');if(button.classList.contains('active'))button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');}for(const b of document.querySelectorAll('.nav-button')){const name=b.dataset.viewButton;if(!uiNavTitles[name])continue;const unchangedSignature=JSON.stringify([name,uiNavTitles[name],b.dataset.unreadCount||0,b.dataset.unread==='true'||b.textContent.includes('résultats disponibles')]);if(uiNavigationLabels.get(b)===unchangedSignature&&b.querySelector('.nav-text'))continue;uiNavigationLabels.set(b,unchangedSignature);if(name==='notifications'){const count=Number(b.dataset.unreadCount||0);b.replaceChildren(uiIcon(name),wsElement('span',uiNavTitles[name],'nav-text'));if(count)b.append(wsElement('span',String(count),'fred-nav-count'));b.title='Notifications'+(count?' · '+count+' non lues':'');continue;}b.replaceChildren(uiIcon(name),wsElement('span',uiNavTitles[name],'nav-text'));b.title=uiNavTitles[name];}}
 $('new').prepend(uiIcon('new'));$('ui-sidebar-toggle').append(uiIcon('sidebar'));
 document.querySelector('.sidebar-settings').append(document.querySelector('[data-view-button="settings"]'));
+if(uiUnifiedStatusLabel)document.querySelector('.sidebar-settings').append(uiUnifiedStatusLabel);
 $('workspace-heading').after($('undo-delete'));
 document.querySelector('[data-view="access"] .settings-card:last-child').append(document.querySelector('.sidebar-tools'));
 wsSettingsNav.classList.add('settings-subnav');
@@ -102,7 +143,9 @@ const uiSidebarClose=wsElement('button','Fermer la navigation','sidebar-close se
 function uiSidebarModal(){return matchMedia('(max-width:850px)').matches&&document.body.classList.contains('sidebar-open');}
 function uiSyncSidebar(){const mobile=matchMedia('(max-width:850px)').matches,open=uiSidebarModal();uiSidebar.inert=mobile&&!open;uiMain.inert=open;uiSidebar.setAttribute('aria-modal',String(open));if(open)uiSidebar.setAttribute('role','dialog');else{uiSidebar.removeAttribute('role');uiSidebar.removeAttribute('aria-modal');}$('ui-sidebar-toggle').setAttribute('aria-expanded',String(mobile?open:!document.body.classList.contains('sidebar-collapsed')));}
 function uiCloseSidebar(restoreFocus=true){const wasOpen=uiSidebarModal();document.body.classList.remove('sidebar-open');uiSyncSidebar();if(wasOpen&&restoreFocus)$('ui-sidebar-toggle').focus();}
-function uiToggleSidebar(){if(uiSidebarModal()){uiCloseSidebar();return;}document.body.classList.toggle(matchMedia('(max-width:850px)').matches?'sidebar-open':'sidebar-collapsed');uiSyncSidebar();if(uiSidebarModal())uiSidebarClose.focus();}
+function uiPersistSidebarState(){try{localStorage.setItem('fred-sidebar-collapsed',String(document.body.classList.contains('sidebar-collapsed')));}catch{}}
+try{if(localStorage.getItem('fred-sidebar-collapsed')==='true')document.body.classList.add('sidebar-collapsed');}catch{}
+function uiToggleSidebar(){if(uiSidebarModal()){uiCloseSidebar();return;}document.body.classList.toggle(matchMedia('(max-width:850px)').matches?'sidebar-open':'sidebar-collapsed');uiPersistSidebarState();uiSyncSidebar();if(uiSidebarModal())uiSidebarClose.focus();}
 uiSidebar.addEventListener('keydown',e=>{if(e.key!=='Tab'||!uiSidebarModal())return;const items=[...uiSidebar.querySelectorAll('button,input,select,summary,a[href],[tabindex="0"]')].filter(n=>!n.disabled&&n.getClientRects().length),first=items[0],last=items.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}});
 uiSidebarClose.onclick=()=>uiCloseSidebar();$('ui-sidebar-toggle').onclick=uiToggleSidebar;document.querySelector('.sidebar-backdrop').onclick=()=>uiCloseSidebar();matchMedia('(max-width:850px)').addEventListener('change',()=>{const hiddenFocus=uiSidebar.contains(document.activeElement);document.body.classList.remove('sidebar-open');uiSyncSidebar();if(hiddenFocus&&uiSidebar.inert)$('ui-sidebar-toggle').focus();});uiSyncSidebar();
 const uiThemeCard=wsElement('div',undefined,'settings-card');uiThemeCard.append(wsElement('h3','Apparence'));const uiThemeRow=wsElement('div',undefined,'theme-row');const uiThemeLabel=wsElement('label','Thème de l’interface');uiThemeLabel.htmlFor='ui-theme';const uiThemeSelect=wsElement('select');uiThemeSelect.id='ui-theme';uiThemeSelect.append(new Option('Clair','light'),new Option('Sombre','dark'),new Option('Comme Windows','system'));uiThemeRow.append(uiThemeLabel,uiThemeSelect);uiThemeCard.append(uiThemeRow);document.querySelector('[data-view="access"]').prepend(uiThemeCard);
@@ -193,15 +236,26 @@ function uiApplyPreferences(values){
   uiSetReading(values.font||uiFontSelect.value,values.text_size||uiSizeSelect.value);
   if(!busy){uiThinkingLoad(values);}
   if(typeof values.corrector_text==='string'&&$('corrector-text')&&!correctorDirty&&document.activeElement!==$('corrector-text'))$('corrector-text').value=values.corrector_text;
-  if(typeof values.sidebar_collapsed==='boolean'){document.body.classList.toggle('sidebar-collapsed',values.sidebar_collapsed);uiSyncSidebar();}
+  if(typeof values.sidebar_collapsed==='boolean'){
+    // The portal and Conversations share this local choice. A stale server
+    // preference must not undo a change made in the portal between pages.
+    let localChoice=null;try{localChoice=localStorage.getItem('fred-sidebar-collapsed');}catch{}
+    const collapsed=localChoice==='true'?true:localChoice==='false'?false:values.sidebar_collapsed;
+    document.body.classList.toggle('sidebar-collapsed',collapsed);uiPersistSidebarState();uiSyncSidebar();
+  }
 }
 uiThemeSelect.addEventListener('change',()=>uiPersistPreferences().catch(e=>error(e)));
 $('ui-sidebar-toggle').addEventListener('click',()=>uiPersistPreferences().catch(e=>error(e)));
 
-const uiSendRow=document.querySelector('.send-row');uiSendRow.prepend(pickers);
+const uiSendRow=document.querySelector('.send-row');
+// Les réglages secondaires du composeur vivent dans un unique menu discret :
+// ne restent en façade que la pièce jointe, le menu, la dictée et l'envoi.
+const uiComposerMenu=$('composerOptionsMenu')||document.querySelector('.composer-options-body');
+uiComposerMenu.prepend(pickers);
 const uiDocumentControls=wsElement('div',undefined,'ws-pickers');uiDocumentControls.id='ui-document-controls';uiDocumentControls.hidden=true;uiDocumentControls.append($('ws-chat-document').parentElement,$('ws-publish'),$('ws-panel'));document.querySelector('.composer').insertBefore(uiDocumentControls,document.querySelector('.composer-bottom'));
 const uiChatSelections=wsChatSelections;wsChatSelections=function(){uiChatSelections();uiDocumentControls.hidden=!wsCurrent()?.project_id;};wsChatSelections();
-uiSendRow.insertBefore($('thinking'),uiSendRow.querySelector('.hint'));
+// La réflexion figure déjà dans le menu d'options du composeur (chat.html).
+
 const uiSourceButton=wsElement('button','Sources','context-details');uiSourceButton.type='button';uiSourceButton.hidden=true;pickers.append(uiSourceButton);const uiOriginalSources=workspaceShowSources;workspaceShowSources=function(sources){ws.lastSources=sources;uiSourceButton.hidden=!sources.length;uiSourceButton.textContent='Sources · '+sources.length;};uiSourceButton.onclick=()=>uiOriginalSources(ws.lastSources||[]);
 let uiConversation=null;
 const uiRender=render;render=function(){uiComposerSync();uiRender();document.querySelector('.chat-view').classList.toggle('is-empty',!messages.length);if(uiConversation!==currentId){uiSourceButton.hidden=true;$('ws-side').hidden=true;uiConversation=currentId;}uiDecorateNavigation();};

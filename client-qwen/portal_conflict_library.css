@@ -1,0 +1,21 @@
+.kiara-conflict-banner {display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding:10px 32px;
+  color:var(--text); background:var(--panel); border-bottom:1px solid var(--line); font-size:13px;}
+.kiara-conflict-dialog {box-sizing:border-box; width:min(1100px, calc(100vw - 48px)); max-width:none;
+  max-height:calc(100vh - 48px); overflow:auto; padding:24px; border:1px solid var(--line); border-radius:10px;
+  color:var(--text); background:var(--bg); box-shadow:var(--shadow);}
+.kiara-conflict-heading {display:flex; align-items:center; justify-content:space-between; gap:16px;}
+.kiara-conflict-heading h2 {font-size:20px; margin:0;}
+.kiara-conflict-dialog p {line-height:1.5; margin:12px 0;}
+.kiara-conflict-label {display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:16px 0;}
+.kiara-conflict-label select {max-width:min(100%, 480px); min-height:36px; padding:6px 10px;
+  border:1px solid var(--muted); border-radius:6px; color:var(--text); background:var(--bg); font:inherit;}
+.kiara-conflict-versions {display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap:16px;}
+.kiara-conflict-version h3 {font-size:14px; margin:0 0 8px;}
+.kiara-conflict-version audio {display:block; width:100%; max-width:100%;}
+.kiara-audio-download {display:inline-block; margin:10px 0 0; padding:5px 0; color:var(--text);}
+.kiara-conflict-version textarea {box-sizing:border-box; width:100%; min-height:220px; resize:vertical;
+  padding:10px; border:1px solid var(--muted); border-radius:6px; background:var(--bg); color:var(--text);
+  font:inherit; line-height:1.5;}
+.kiara-conflict-version details {margin-top:8px;}
+.kiara-conflict-version summary {cursor:pointer; padding:4px 0;}
+.kiara-conflict-dialog :focus-visible {outline:3px solid #447ada; outline-offset:2px;}

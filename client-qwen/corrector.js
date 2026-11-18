@@ -7,7 +7,7 @@ const correctorNav=wsElement('button','Correcteur','nav-button');correctorNav.da
 correctorNav.type='button';
 if(platformCapabilities.platform==='windows'){
   correctorNav.className='secondary voice-button';
-  $('send').before(correctorNav);
+  (document.getElementById('composerOptionsMenu')||document.querySelector('.composer-bottom')).append(correctorNav);
 }else document.querySelector('#client-navigation').insertBefore(correctorNav,document.querySelector('[data-view-button="assistant"]')||document.querySelector('[data-view-button="notifications"]'));
 uiDecorateNavigation();
 let correctorRunning=false,correctorDirty=false,correctorDraftTimer=null,correctorAnswer={content:''},correctorSelectedId,correctorChatId=null;

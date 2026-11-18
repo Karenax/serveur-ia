@@ -9,6 +9,25 @@ export type MailActivitySnapshot = {source:string;transfer:Step;analysis:Step;in
 type Entry = {text:string;time:string};
 const labels:Record<string,string> = {running:"En cours",queued:"En attente",offline:"Déconnecté",failed:"À reprendre",idle:"Au repos"};
 export type MailActivityState = "checking" | "offline" | "running" | "failed" | "queued" | "idle" | "unavailable";
+
+function isMailActivitySnapshot(value:unknown): value is MailActivitySnapshot {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const snapshot=value as Record<string,unknown>;
+  const step=(item:unknown) => {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) return false;
+    const row=item as Record<string,unknown>;
+    const count=(number:unknown)=>number===null||(typeof number==='number'&&Number.isFinite(number));
+    return typeof row.state==='string' && typeof row.detail==='string' && count(row.processed) && count(row.total);
+  };
+  return typeof snapshot.source==='string' && typeof snapshot.checked_at==='string'
+    && step(snapshot.transfer) && step(snapshot.analysis) && step(snapshot.indexing)
+    && Array.isArray(snapshot.events) && snapshot.events.every((event:unknown)=>{
+      if(!event || typeof event!=='object' || Array.isArray(event))return false;
+      const row=event as Record<string,unknown>;
+      return typeof row.key==='string' && typeof row.state==='string' && typeof row.text==='string';
+    });
+}
+
 export function MailActivity({onOpen,onStateChange}:{onOpen:()=>void;onStateChange?:(state:MailActivityState)=>void}) {
   const [value,setValue]=useState<MailActivitySnapshot|null>(null);
   const [error,setError]=useState(false);
@@ -17,20 +36,24 @@ export function MailActivity({onOpen,onStateChange}:{onOpen:()=>void;onStateChan
   const previous=useRef(new Map<string,string>());
   const disconnected=useRef(false);
   useEffect(()=>{
-    let live=true,loading=false,failures=0,lastAttempt=-Infinity;
-    const controller=new AbortController();
-    const load=async(quiet=false)=>{
-      if(loading||document.hidden||!live||Date.now()-lastAttempt<30000)return;
+    let live=true,failures=0,lastAttempt=-Infinity,visible=!document.hidden;
+    let timer:number|undefined,controller:AbortController|null=null;
+    const schedule=(delay=30000)=>{if(live&&!document.hidden&&timer===undefined)timer=window.setTimeout(()=>{timer=undefined;void load(true);},delay);};
+    const load=async(quiet=false,force=false)=>{
+      if(!live||document.hidden||controller)return;
+      if(force&&timer!==undefined){window.clearTimeout(timer);timer=undefined;}
+      if(!force&&Date.now()-lastAttempt<30000){schedule(30000-(Date.now()-lastAttempt));return;}
       lastAttempt=Date.now();
-      loading=true;
+      const current=new AbortController();controller=current;
       try {
-        const session=await api.session();
-        if(!live)return;
+        const session=await api.session(current.signal,20000);
+        if(!live||current.signal.aborted)return;
         const limited=Array.isArray(session.operator.project_ids);
         setRestricted(limited);
         if(limited)return;
-        const result=await request<MailActivitySnapshot>("/api/v1/workspace/mail-activity",{signal:controller.signal,activity:quiet?false:undefined},20000);
-        if(!live)return;
+        const result=await request<unknown>("/api/v1/workspace/mail-activity",{signal:current.signal,activity:quiet?false:undefined},20000);
+        if(!live||current.signal.aborted)return;
+        if(!isMailActivitySnapshot(result))throw new Error('État des mails incomplet');
         failures=0;setValue(result);setError(false);
         const changed=result.events.filter(event=>previous.current.get(event.key)!==`${event.state}:${event.text}`);
         previous.current=new Map(result.events.map(event=>[event.key,`${event.state}:${event.text}`]));
@@ -38,17 +61,19 @@ export function MailActivity({onOpen,onStateChange}:{onOpen:()=>void;onStateChan
         if(disconnected.current)updates.unshift({text:"Connexion au serveur rétablie",time:result.checked_at});
         disconnected.current=false;
         if(updates.length)setLog(old=>[...updates,...old].slice(0,4));
-      }catch{if(live){
+      }catch{if(live&&!current.signal.aborted){
         failures+=1;
         if(failures<3)return;
         setError(true);
         if(!disconnected.current)setLog(old=>[{text:"Serveur indisponible · nouvelle tentative",time:new Date().toISOString()},...old].slice(0,4));
         disconnected.current=true;
-      }}finally{loading=false;}
+      }}finally{if(controller===current){controller=null;schedule();}}
     };
-    void load();const timer=window.setInterval(()=>void load(true),30000);
-    const resume=()=>void load(true);window.addEventListener("focus",resume);document.addEventListener("visibilitychange",resume);
-    return()=>{live=false;controller.abort();window.clearInterval(timer);window.removeEventListener("focus",resume);document.removeEventListener("visibilitychange",resume);};
+    const stop=()=>{if(timer!==undefined)window.clearTimeout(timer);timer=undefined;controller?.abort();controller=null;};
+    const visibility=()=>{const next=!document.hidden;if(next===visible)return;visible=next;if(!next)stop();else void load(true,true);};
+    const resume=()=>void load(true);
+    if(visible)void load();window.addEventListener("focus",resume);document.addEventListener("visibilitychange",visibility);
+    return()=>{live=false;stop();window.removeEventListener("focus",resume);document.removeEventListener("visibilitychange",visibility);};
   },[]);
   const steps=value?[value.transfer,value.analysis,value.indexing]:[];
   const busy=!error&&steps.some(step=>step.state==="running");

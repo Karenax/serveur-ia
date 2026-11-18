@@ -18,6 +18,10 @@ et [livraison et limites](38_FORESIGHT_DELIVERY.md).
 
 Références actuelles : [contexte](../PROJECT_CONTEXT.md), [exploitation](../README_BACKEND.md), [corrections et preuves](19_AUDIT_REMEDIATION.md). Les sections de conception ci-dessous doivent être lues avec cet état.
 
+La [carte d'autorité vérifiée](../../audits/2026-11-16-architecture-interface/AUTORITE-DONNEES.md)
+précise les identifiants, révisions, projections et limites de suppression pour
+les projets, notes, séances et brouillons examinés.
+
 ## Entités principales
 
 Les listes ci-dessous décrivent le vocabulaire métier et les champs attendus.
@@ -47,6 +51,15 @@ Champs minimaux :
 - e-mails ;
 - rôles par projet ;
 - aliases.
+
+### Notes personnelles
+
+L’onglet Personnel utilise `personal_notes`, `personal_note_versions` et
+`personal_note_images` dans l’ERP. Le propriétaire est l’opérateur authentifié.
+Les versions et les images privées sont incluses dans les instantanés SQLite.
+La copie vers un projet crée une note et des pièces jointes distinctes dans le
+projet destinataire. Les requêtes confirment le droit d’écriture sur ce projet.
+Le collage d’images conserve une commande locale jusqu’à réception du résultat.
 
 ### Source
 Une unité de preuve reçue par le système.

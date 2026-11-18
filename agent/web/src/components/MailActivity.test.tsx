@@ -76,6 +76,57 @@ it("limite les lectures et tolère deux erreurs avant de signaler une déconnexi
   expect(screen.getAllByText("Synchro : 12 / 80 mails")).toHaveLength(1);
 });
 
+it("conserve le dernier état valide lorsqu’une réponse est incomplète puis reprend",async()=>{
+  vi.useFakeTimers();
+  vi.mocked(request).mockResolvedValueOnce(data()).mockResolvedValueOnce({events:[]}).mockResolvedValue(data());
+  render(<MailActivity onOpen={()=>{}}/>);
+  await act(async()=>{});
+  expect(screen.getByRole("progressbar",{name:"Traitement des mails en cours"})).toBeTruthy();
+  await act(async()=>{await vi.advanceTimersByTimeAsync(30000);});
+  expect(screen.getByRole("progressbar",{name:"Traitement des mails en cours"})).toBeTruthy();
+  expect(screen.queryByText("État indisponible · reconnexion…")).toBeNull();
+  await act(async()=>{await vi.advanceTimersByTimeAsync(30000);});
+  expect(request).toHaveBeenCalledTimes(3);
+  expect(screen.getByRole("progressbar",{name:"Traitement des mails en cours"})).toBeTruthy();
+});
+
+it("suspend l'activité masquée, ignore la réponse tardive et reprend au retour",async()=>{
+  vi.useFakeTimers();
+  const hidden=vi.spyOn(document,'hidden','get').mockReturnValue(false);
+  let finish!:(value:unknown)=>void;
+  const latest=data();latest.transfer.processed=42;latest.transfer.detail='42 mails en cours';
+  vi.mocked(request).mockResolvedValueOnce(data()).mockImplementationOnce(()=>new Promise(resolve=>{finish=resolve;})).mockResolvedValue(latest);
+  render(<MailActivity onOpen={()=>{}}/>);await act(async()=>{});
+  await act(async()=>{await vi.advanceTimersByTimeAsync(30000);});
+  const signal=vi.mocked(request).mock.calls[1][1]!.signal as AbortSignal;
+  hidden.mockReturnValue(true);act(()=>document.dispatchEvent(new Event('visibilitychange')));
+  expect(signal.aborted).toBe(true);
+  const stale=data();stale.transfer.state='failed';stale.transfer.detail='Ancienne erreur';
+  await act(async()=>{finish(stale);await vi.advanceTimersByTimeAsync(60000);});
+  expect(request).toHaveBeenCalledTimes(2);
+  expect(screen.queryByText('Ancienne erreur')).toBeNull();
+  expect((screen.getByRole('progressbar',{name:'Traitement des mails en cours'}) as HTMLProgressElement).value).toBe(12);
+  hidden.mockReturnValue(false);act(()=>document.dispatchEvent(new Event('visibilitychange')));await act(async()=>{});
+  expect(request).toHaveBeenCalledTimes(3);
+  expect((screen.getByRole('progressbar',{name:'Traitement des mails en cours'}) as HTMLProgressElement).value).toBe(42);
+});
+
+it("ne lit pas l'activité après une session reçue pendant le masquage",async()=>{
+  const hidden=vi.spyOn(document,'hidden','get').mockReturnValue(false);
+  let finish!:(value:Awaited<ReturnType<typeof api.session>>)=>void;
+  vi.mocked(api.session).mockImplementationOnce(()=>new Promise(resolve=>{finish=resolve;}))
+    .mockResolvedValue({operator:{role:'owner',project_ids:null}});
+  vi.mocked(request).mockResolvedValue(data());render(<MailActivity onOpen={()=>{}}/>);
+  const signal=vi.mocked(api.session).mock.calls[0][0]!;
+  hidden.mockReturnValue(true);act(()=>document.dispatchEvent(new Event('visibilitychange')));
+  expect(signal.aborted).toBe(true);
+  await act(async()=>{finish({operator:{role:'owner',project_ids:null}});});
+  expect(request).not.toHaveBeenCalled();
+  hidden.mockReturnValue(false);act(()=>document.dispatchEvent(new Event('visibilitychange')));
+  expect(await screen.findByRole('progressbar',{name:'Traitement des mails en cours'})).toBeTruthy();
+  expect(request).toHaveBeenCalledTimes(1);
+});
+
 it("garde un échec visible quand les détails sont repliés",async()=>{
   const value=data();value.transfer.state="idle";value.analysis.state="failed";value.analysis.detail="Le serveur IA a refusé ce mail";
   vi.mocked(request).mockResolvedValue(value);render(<MailActivity onOpen={()=>{}}/>);

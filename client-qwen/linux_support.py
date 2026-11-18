@@ -4,6 +4,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import stat
 import struct
 
 
@@ -54,6 +55,37 @@ def protect(value, decrypt=False):
 def settings_path(profile):
     identity = hashlib.sha256((profile['url']+profile['token']).encode()).hexdigest()[:20]
     return data_home()/(identity+'.enc')
+
+
+class ProfileLockError(RuntimeError):
+    """The current desktop profile cannot be opened safely."""
+
+
+class ProfileAlreadyOpen(ProfileLockError):
+    pass
+
+
+def lock_desktop_profile(profile):
+    """Keep the lock file open until the relay and web engine have stopped."""
+    import fcntl
+    fd = None
+    try:
+        path = data_home()/('tauri-webview-'+settings_path(profile).stem+'.lock')
+        flags = os.O_RDWR | os.O_CREAT | getattr(os, 'O_CLOEXEC', 0) | getattr(os, 'O_NOFOLLOW', 0)
+        fd = os.open(path, flags, 0o600)
+        if not stat.S_ISREG(os.fstat(fd).st_mode):
+            raise OSError('Fichier de verrou invalide.')
+        fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        stream = os.fdopen(fd, 'r+b')
+        fd = None
+        return stream
+    except BlockingIOError as error:
+        raise ProfileAlreadyOpen('Kiara est déjà ouvert avec cet accès. Fermez la première fenêtre avant d’en ouvrir une autre.') from error
+    except (OSError, ValueError) as error:
+        raise ProfileLockError('Impossible de protéger les données locales. Vérifiez l’accès au dossier Kiara, puis réessayez.') from error
+    finally:
+        if fd is not None:
+            os.close(fd)
 
 
 def import_profile(path):

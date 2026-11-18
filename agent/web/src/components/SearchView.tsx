@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import {useQueryObject} from '../hooks/useQueryState';
 import { api, type PortfolioRow } from '../lib/api';
 import { searchEvidence, type SearchFilters, type EvidencePage } from '../lib/searchApi';
-import { SourceInspector } from './WorkspaceViews';
+import { SourceInspector } from './SourceInspector';
 import { ErrorState } from './Ui';
 import '../search.css';
 
