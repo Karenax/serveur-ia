@@ -1,13 +1,13 @@
 # Kiara — architecture et versions actuelles
 
-Référence du 18 novembre 2026. Kiara 4.0.10 est le client Windows publié avec le portail privé unifié. Le canal de transition du client classique utilise la 3.5.63. Les qualifications Linux et Android suivent un calendrier distinct.
+Référence du 18 novembre 2026. Kiara 4.0.11 est le client Windows publié avec le portail privé unifié. Le canal de transition du client classique utilise la 3.5.63. Les qualifications Linux et Android suivent un calendrier distinct.
 
 ## Versions et responsabilités
 
 | Composant | Version ou contrat | Rôle |
 |---|---|---|
 | Lanceur et client Windows de transition | 3.5.63 | Services Kiara et passage vers Kiara 4 |
-| Client Windows Kiara 4 | 4.0.10 | Application Tauri, téléchargements et mises à jour Windows. Référence de retour 4.0.9. |
+| Client Windows Kiara 4 | 4.0.11 | Application Tauri, téléchargements et mises à jour Windows. Référence de retour 4.0.10. |
 | Linux | 3.5.62, dernière référence documentée | Client Linux historique |
 | Android | 1.0.26, code 27 | Enveloppe Java/WebView et interface partagée |
 | Contrat de conversation | 4 | Conversations, outils et approbations existants |
@@ -45,7 +45,8 @@ documentent ce choix et le rôle de la P2200 pour l’encodage des images.
 - **Interface.** Conversations réunit le composeur, l’historique et l’assistant de projet. Les brouillons personnels et de projet et le mode éphémère sont accessibles depuis le même espace. Projets conserve la liste et la fiche à quatre rubriques dans le style Kiara. Le panneau d’assistance historique a été retiré.
 - **Notes.** Le portail réunit les notes privées de l’opérateur et les notes des projets actifs auxquels il a accès. L’éditeur riche permet le collage direct d’images. Les pièces jointes et l’historique des notes de projet relèvent de l’ERP, qui conserve également les versions et images des notes personnelles. [Guide d’utilisation](GUIDE-ASSISTANT-KIARA.md#prendre-des-notes-dans-kiara)
 - **Vocal.** La conversation vocale et la dictée sont disponibles dans le composeur Windows. Le web privé indique où ouvrir le client Windows pour utiliser le microphone.
-- **Distribution.** La console sert la 4.0.10 avec son manifeste Ed25519 et son installateur sans Authenticode. La 4.0.9 est conservée pour le retour. Les clients classiques utilisent la 3.5.63. [Vérifications de publication](audits/2026-11-15-fusion-kiara/BASCULE.md#correctif-dinterface-4010)
+- **Réglages.** Le portail expose les rubriques serveur, projets et appareil. Sous Windows, Conversations ouvre les réglages de l’appareil en local. Les mises à jour utilisent le relais du client et le canal signé. [Audit des réglages](audits/2026-11-15-fusion-kiara/BASCULE.md#audit-des-réglages-de-kiara-4011)
+- **Distribution.** La console sert la 4.0.11 avec son manifeste Ed25519 et son installateur sans Authenticode. La 4.0.10 est conservée pour le retour. Les clients classiques utilisent la 3.5.63.
 
 Le [plan global](PLAN-GLOBAL-SERVEUR-FRED.md) reprend les vérifications qui restent à faire et le report des imports Sage.
 

@@ -46,6 +46,49 @@ document.querySelector('.workspace').append(wsSettings);
 const wsSettingsButton=wsElement('button','Réglages','nav-button');wsSettingsButton.dataset.viewButton='settings';document.querySelector('#client-navigation').append(wsSettingsButton);
 const wsShowViewOnce=showView;showView=function(name){const selected=name==='settings'?'access':name;wsShowViewOnce(selected);wsSettings.hidden=!wsSettingsSections.includes(selected);wsSettingsButton.classList.toggle('active',!wsSettings.hidden);if(!wsSettings.hidden)$('workspace-heading').textContent='Réglages · '+({access:'Mon accès',connection:'Connexion',updates:'Mises à jour',api:'API locale',assistant:'Mémoire et rappels'})[selected];};
 wsSettingsButton.onclick=()=>showView('settings');
+if(platformCapabilities.platform==='windows'){
+  const views={'mises-a-jour':'updates','connexion':'connection','api-locale':'api','memoire':'assistant'};
+  function openDeviceSetting(section){
+    if(Object.hasOwn(views,section)){
+      const view=views[section];
+      showView(view);
+      const pane=wsSettings.querySelector(`[data-view="${view}"]`);
+      const heading=pane?.hidden?null:pane?.querySelector('h2');
+      if(heading){heading.tabIndex=-1;heading.focus();}
+    }else if(section==='vocal'){
+      showView('voice');
+      const trigger=$('voice-settings-toggle');
+      if(trigger?.getClientRects().length)trigger.click();
+    }else if(section==='dictee'){
+      showView('chat');
+      const dictation=$('voice-dictation-settings');
+      if(dictation&&!dictation.closest('[data-view]').hidden){
+        $('ui-composer-options-menu').open=true;
+        dictation.open=true;dictation.querySelector('summary').focus();
+      }
+    }else if(section==='notifications'){
+      showView('notifications');
+      const preferences=$('fred-inbox-preferences').closest('details');
+      if(!preferences.closest('[data-view]').hidden){preferences.open=true;preferences.querySelector('summary').focus();}
+    }
+  }
+  const openDeviceHash=()=>{
+    if(location.hash.startsWith('#reglages-'))openDeviceSetting(location.hash.slice('#reglages-'.length));
+  };
+  window.addEventListener('hashchange',openDeviceHash);
+  window.addEventListener('DOMContentLoaded',()=>{
+    // L’accès à l’appareil reste local, même quand le portail est inaccessible.
+    wsSettingsButton.onclick=()=>showView('settings');
+    for(const [id,label] of [['vocal','Vocal'],['dictee','Dictée'],['notifications','Notifications']]){
+      const button=wsElement('button',label,'secondary');button.type='button';
+      button.onclick=event=>{event.stopPropagation();openDeviceSetting(id);};
+      wsSettingsNav.append(button);
+    }
+    const portal=wsButton('Réglages du portail',()=>uiOpenProjectWorkspace('/app/settings'));
+    wsSettingsNav.append(portal);
+    openDeviceHash();
+  },{once:true});
+}
 const originalDrawLibrary=drawLibrary;drawLibrary=function(){originalDrawLibrary();wsChatSelections();};
 const wsFillProjectOnce=wsFillProject;wsFillProject=function(){wsFillProjectOnce();ws.projectRevision=ws.data?.projects.find(p=>p.id===ws.project)?.revision;};
 function wsChatSelections(){if(!ws.data)return;const c=wsCurrent();wsOptions($('ws-chat-project'),ws.data.projects.filter(p=>!p.archived||p.id===c?.project_id),'Sans projet');$('ws-chat-project').value=c?.project_id||'';const p=ws.data.projects.find(p=>p.id===c?.project_id);wsOptions($('ws-chat-document'),p?.documents||[],'Tous les documents');$('ws-chat-document').value=c?.document_id||'';const managed=wsIsAgentProject(c?.project_id);$('ws-chat-project').disabled=conversationLocked();$('ws-chat-document').disabled=conversationLocked()||managed;$('ws-publish').disabled=conversationLocked()||(managed&&(!p?.can_edit||p.archived));$('ws-panel').hidden=!c?.document_id;}

@@ -1,5 +1,32 @@
 # Bascule de Kiara et retour arrière
 
+## Audit des réglages de Kiara 4.0.11
+
+La passe a comparé les réglages du client Serveur IA historique, la 4.0.10
+distribuée et le portail qui l’accompagne. Les actions du poste reprennent les
+écrans et les contrôles de signature existants du client Windows.
+
+| Priorité | Constat | Correction et vérification |
+| --- | --- | --- |
+| P1 | Les mises à jour se trouvaient derrière « Compte et appareil », puis dans un second écran. | **Réglages → Mises à jour** figure dans la page du portail Windows. Un client 4.0.10 ouvre ses onglets locaux. Un client 4.0.11 ouvre directement l’onglet Mises à jour. |
+| P1 | Depuis Conversations, le bouton Réglages dépendait de l’ouverture du portail. Une coupure pouvait empêcher d’atteindre les réglages de connexion. | Conversations ouvre les réglages locaux. Le bouton **Réglages du portail** revient aux réglages serveur en ligne. Accès local et message d’erreur de vérification rejoués hors connexion. |
+| P1 | Statistiques, transcription, recherche documentaire, modèles de livrables et de documents et maintenance dépendaient du menu « … ». | Les 11 rubriques sont visibles à l’ouverture. Les parcours de navigation, le chargement différé, la reprise après erreur et la protection des modifications en cours sont couverts par les tests du portail. |
+| P2 | Les réglages audio et de notifications se trouvaient dans des pages différentes. Dans le web privé, les préférences de lecture étaient accessibles depuis Conversations. | Les accès Windows à la connexion, à l’API et aux intégrations, à la mémoire, au vocal, à la dictée et aux préférences de notification figurent dans Réglages. Le navigateur donne accès à Mon accès et Lecture des conversations. |
+
+La navigation a été rejouée dans WebView2 à 1280 × 720, 1920 × 1080 et
+2560 × 1440 avec les binaires extraits de l’installateur 4.0.11. La recette a
+utilisé des données fictives et simulé la disponibilité et le lancement de la
+mise à jour. Le parcours de secours emploie les ressources du relais 4.0.10.
+Les 85 tests ciblés du portail, les 18 tests de transport Windows exécutés et
+la suite de navigation et de récupération Windows ont réussi.
+
+La bascule du 18 novembre à 13 h 57 a vérifié l’installateur signé, les deux
+entrées HTTPS, les 11 projets et le processus Qwen. Le téléchargement donne
+le SHA-256 `de65111d87c68e5cb108d9d0502e0c7139f51055d814948fc5a2c6343f283102`.
+Les captures, la preuve de bascule et les références de retour sont sous
+`D:\KRecette\reglages-410`. Le script `publier.ps1 -Retour` remet le canal et
+l’index du portail 4.0.10 en préservant l’état de Qwen.
+
 ## Correctif d’interface 4.0.10
 
 La comparaison de la 4.0.9 avec la 4.0.8 a porté sur Conversations, Vocal,

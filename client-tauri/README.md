@@ -1,8 +1,8 @@
 # Client Windows Kiara 4
 
-La version publiée est **4.0.10**. Elle utilise le manifeste Ed25519 du canal
-Kiara et un installateur sans Authenticode. La version **4.0.9** reste disponible
-pour le retour arrière. [Bascule et preuves](../audits/2026-11-15-fusion-kiara/BASCULE.md#correctif-dinterface-4010)
+La version publiée est **4.0.11**. Elle utilise le manifeste Ed25519 du canal
+Kiara et un installateur sans Authenticode. La version **4.0.10** reste disponible
+pour le retour arrière. [Bascule et preuves](../audits/2026-11-15-fusion-kiara/BASCULE.md#audit-des-réglages-de-kiara-4011)
 
 Dans le client classique 3.5.62, ouvrir **Mises à jour** et installer la
 3.5.63. Dans cette dernière, cliquer sur **Passer à Kiara 4**. Le client
@@ -10,8 +10,9 @@ vérifie l’installateur, l’exécute pour le compte Windows courant et ouvre
 Kiara 4 avec l’accès existant. Le relais conserve le profil chiffré par
 DPAPI et retrouve les réglages, l’historique et les brouillons de l’appareil.
 
-Depuis le portail Windows unifié, ouvrir **Réglages → Compte et appareil →
-Mises à jour**. Une fois sur Kiara 4.0.2 ou ultérieure, choisir
+Dans Kiara sur Windows, ouvrir **Réglages → Mises à jour**. En 4.0.10,
+le raccourci du portail ouvre les réglages de l’appareil. Y choisir l’onglet
+**Mises à jour**. Une fois sur Kiara 4.0.2 ou ultérieure, choisir
 **Vérifier les mises à jour** et **Mettre à jour le client**. Kiara vérifie le
 paquet du serveur, enregistre les changements en cours et redémarre après
 l’installation pour le compte Windows courant. Une 4.0.0 ou 4.0.1 déjà installée

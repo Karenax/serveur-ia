@@ -42,7 +42,7 @@
     draft=prompt.value;dictating=true;window.voiceBusy=true;if(typeof buttons==='function')buttons();if(typeof drawLibrary==='function')drawLibrary();await act('start');
   };
   cancel.onclick=()=>act('cancel');
-  const settings=document.createElement('details');settings.className='composer-options';
+  const settings=document.createElement('details');settings.className='composer-options';settings.id='voice-dictation-settings';
   const label=document.createElement('summary');label.textContent='Réglages de la dictée';
   const description=document.createElement('p');description.textContent='Reconnaissance locale en français. Microphone fermé à la fin de la dictée. Aucun envoi automatique.';
   const reinstall=document.createElement('button');reinstall.type='button';reinstall.className='secondary';reinstall.textContent='Installer / réparer';

@@ -187,11 +187,27 @@ it("reprend le thème des Conversations et renvoie vers son réglage sous Window
     const {container}=setup();
     expect(container.querySelector(".workspace-shell")?.getAttribute("data-workspace-theme")).toBe("dark");
     expect(screen.getByRole("link",{name:"Thème de Kiara"}).getAttribute("href")).toBe("/chat#apparence");
-    expect(screen.getByRole("link",{name:"Compte et appareil"}).getAttribute("href")).toBe("/chat#reglages");
+    expect(screen.getByRole("link",{name:"Mon accès"}).getAttribute("href")).toBe("/chat#reglages");
+    expect(screen.getByRole("link",{name:"Mises à jour"}).getAttribute("href")).toBe("/chat#reglages");
     expect(localStorage.getItem("agent-ui-theme")).toBe("light");
   } finally {
     delete document.body.dataset.kiaraDesktop;
     delete document.body.dataset.kiaraWindows;
+  }
+});
+
+it('affiche les réglages Windows et ouvre chaque destination prise en charge par le relais',()=>{
+  window.history.replaceState(null,'','/app/settings');
+  Object.assign(document.body.dataset,{kiaraDesktop:'true',kiaraWindows:'true',kiaraDeviceSettings:'true'});
+  try {
+    setup();
+    const device=within(screen.getByRole('group',{name:'Appareil Windows'}));
+    expect(device.getAllByRole('link').map(link=>link.getAttribute('href'))).toEqual([
+      '/chat#reglages','/chat#reglages-mises-a-jour','/chat#reglages-connexion','/chat#reglages-api-locale',
+      '/chat#reglages-memoire','/chat#reglages-vocal','/chat#reglages-dictee','/chat#reglages-notifications',
+    ]);
+  } finally {
+    for(const name of ['kiaraDesktop','kiaraWindows','kiaraDeviceSettings'])delete document.body.dataset[name];
   }
 });
 
@@ -432,8 +448,7 @@ it('accorde le menu au seuil CSS lorsque la largeur entière diffère de la larg
   expect(sidebar.hasAttribute('inert')).toBe(true);
   expect(document.activeElement).toBe(screen.getByRole('button',{name:'Ouvrir le menu'}));
 });
-function chooseExtraSetting(name:string) {
-  fireEvent.click(screen.getByRole("button",{name:/^Autres réglages/}));
+function chooseSetting(name:string) {
   fireEvent.click(screen.getByRole("button",{name}));
 }
 
@@ -448,7 +463,7 @@ it('ne monte les réglages qu’à leur ouverture et conserve leurs brouillons',
   fireEvent.click(screen.getByRole('button',{name:'Mails'}));
   const mail = await screen.findByLabelText('Brouillon mails de test') as HTMLInputElement;
   fireEvent.change(mail, {target:{value:'Autre brouillon'}});
-  chooseExtraSetting('Sauvegardes et maintenance');
+  chooseSetting('Sauvegardes et maintenance');
   await screen.findByText('Maintenance de test');
   fireEvent.click(screen.getByRole('button',{name:'Général'}));
   expect((screen.getByLabelText('Brouillon général de test') as HTMLInputElement).value).toBe('À conserver');
@@ -478,7 +493,7 @@ it.each(['/app/settings?settings=preparation', '/app/preparation'])('conserve le
   fireEvent.click(screen.getByRole('link',{name:'Réglages'}));
   expect((await screen.findByLabelText('Autoriser la transcription directe en essai') as HTMLInputElement).checked).toBe(true);
   fireEvent.click(screen.getByRole('button',{name:'Apparence'}));
-  chooseExtraSetting('Réunions et transcription');
+  chooseSetting('Réunions et transcription');
   expect((await screen.findByLabelText('Autoriser la transcription directe en essai') as HTMLInputElement).checked).toBe(true);
   fireEvent.click(screen.getByRole('link',{name:'Mails'}));
   fireEvent.click(screen.getByRole('link',{name:'Réglages'}));
@@ -505,13 +520,13 @@ it("conserve les réglages documentaires entre sous-rubriques et protège une sa
   const read=vi.spyOn(documentApi,'preferences').mockResolvedValue(preferences);
   let finish!:(value:DocumentPreferences)=>void;vi.spyOn(documentApi,'savePreferences').mockReturnValue(new Promise(resolve=>{finish=resolve;}));
   const confirm=vi.spyOn(window,'confirm').mockReturnValueOnce(false).mockReturnValueOnce(true);
-  setup();expect(read).not.toHaveBeenCalled();chooseExtraSetting("Modèles de documents");
+  setup();expect(read).not.toHaveBeenCalled();chooseSetting("Modèles de documents");
   await screen.findByLabelText('Modifier les recherches des trames',{}, {timeout:3000});
   await waitFor(()=>expect(screen.getByRole('button',{name:'Comparer avec les réglages enregistrés'}).matches(':disabled')).toBe(false));
   fireEvent.change(screen.getAllByLabelText('Libellé')[0],{target:{value:'Brouillon commun'}});
   fireEvent.click(screen.getByRole('button',{name:'Apparence'}));expect(screen.getByRole('region',{name:'Réglages documentaires'})).toBeTruthy();
   fireEvent.click(screen.getByRole('button',{name:'Apparence'}));expect(screen.queryByRole('region',{name:'Réglages documentaires'})).toBeNull();
-  chooseExtraSetting("Modèles de documents");expect((screen.getAllByLabelText('Libellé')[0] as HTMLInputElement).value).toBe('Brouillon commun');
+  chooseSetting("Modèles de documents");expect((screen.getAllByLabelText('Libellé')[0] as HTMLInputElement).value).toBe('Brouillon commun');
   expect(read).toHaveBeenCalledTimes(1);expect(confirm).toHaveBeenCalledTimes(2);
   fireEvent.click(screen.getByRole('button',{name:'Enregistrer les réglages'}));fireEvent.click(screen.getByRole('link',{name:'Mails'}));
   expect(window.location.pathname).toBe('/app/settings');expect(screen.getByText(/Réglages documentaires en cours/)).toBeTruthy();
@@ -522,10 +537,10 @@ it("conserve les réglages documentaires entre sous-rubriques et protège une sa
 it("charge le catalogue seulement à l’ouverture de Livrables et conserve le brouillon entre rubriques",async()=>{
   window.history.replaceState(null,"","/app/settings");
   const types=vi.spyOn(deliverableApi,"types").mockResolvedValue({items:[],total:0,offset:0,limit:25,can_manage:true});
-  setup();expect(types).not.toHaveBeenCalled();chooseExtraSetting("Modèles de livrables");
+  setup();expect(types).not.toHaveBeenCalled();chooseSetting("Modèles de livrables");
   fireEvent.click(await screen.findByRole("button",{name:"Créer un type de livrable"},{timeout:3000}));
   fireEvent.change(screen.getByLabelText("Libellé du type de livrable"),{target:{value:"Brouillon conservé"}});
-  fireEvent.click(screen.getByRole("button",{name:"Apparence"}));chooseExtraSetting("Modèles de livrables");
+  fireEvent.click(screen.getByRole("button",{name:"Apparence"}));chooseSetting("Modèles de livrables");
   expect((screen.getByLabelText("Libellé du type de livrable") as HTMLInputElement).value).toBe("Brouillon conservé");
 });
 
@@ -691,14 +706,12 @@ it("ouvre le composeur commun dans le relais de bureau", () => {
     delete document.body.dataset.kiaraProjectConversation;
   }
 });
-it('range les statistiques dans les autres réglages et les sépare de la préparation',async()=>{
+it('rend visibles les statistiques et les réglages de transcription',async()=>{
   setup();
   expect(screen.queryByRole('link',{name:'Statistiques'})).toBeNull();
   fireEvent.click(screen.getByRole('link',{name:'Réglages'}));
-  fireEvent.click(screen.getByRole('button',{name:'Autres réglages'}));
-  const options=screen.getByRole('group',{name:'Réglages supplémentaires'});
-  expect(within(options).getByRole('button',{name:'Statistiques'})).toBeTruthy();
-  expect(within(options).getByRole('button',{name:'Réunions et transcription'})).toBeTruthy();
+  expect(within(screen.getByRole('group',{name:'Projets'})).getByRole('button',{name:'Statistiques'})).toBeTruthy();
+  expect(within(screen.getByRole('group',{name:'Portail et serveur'})).getByRole('button',{name:'Réunions et transcription'})).toBeTruthy();
 });
 
 it('réserve les réglages aux paramètres et garde les connexions accessibles',()=>{
@@ -786,7 +799,9 @@ it('protège aussi les modifications non enregistrées avant de quitter le porta
   try {
     setup();const dirty=document.createElement('div');dirty.dataset.workspaceDirty='true';document.body.append(dirty);
     try {
-      const account=screen.getByRole('link',{name:'Compte et appareil'});
+      const account=screen.getByRole('link',{name:'Mon accès'});
+      expect(screen.queryByRole('link',{name:'Mises à jour'})).toBeNull();
+      expect(screen.getByRole('link',{name:'Lecture des conversations'}).getAttribute('href')).toBe('/kiara/app/conversations#apparence');
       expect(account.getAttribute('href')).toBe('/kiara/app/conversations#reglages');
       expect(fireEvent.click(account)).toBe(false);
       expect(screen.getByText('Enregistrez ou fermez la modification en cours avant de revenir à Conversations.')).toBeTruthy();

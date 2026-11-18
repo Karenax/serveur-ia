@@ -100,12 +100,14 @@ const commandDestinations = [...navigation, {page:"search" as const, label:"Rech
 const pageLabels:Record<string,string> = {...Object.fromEntries(commandDestinations.map(n=>[n.page,n.label])), imports:"Connexions & imports",stats:"Statistiques",preparation:"Réunions et transcription",settings:"Réglages",create:"Nouveau projet",project:"Projet"};
 const settingsPages:WorkspaceRoute['page'][] = ["sources","knowledge","jobs","imports"];
 const settingsAreaPages:WorkspaceRoute['page'][] = ["settings","stats","preparation","imports"];
-const mainSettings = [["ai","Général"],["mail","Mails"],["references","Clients et équipe"],["appearance","Apparence"],["imports","Connexions & imports"]];
-const extraSettings = [["stats","Statistiques"],["preparation","Réunions et transcription"],["memory","Recherche dans les documents"],["deliverables","Modèles de livrables"],["documents","Modèles de documents"],["operations","Sauvegardes et maintenance"]];
+const settingsGroups = [
+  { label:"Portail et serveur", items:[["ai","Général"],["appearance","Apparence"],["mail","Mails"],["imports","Connexions & imports"],["preparation","Réunions et transcription"],["memory","Recherche dans les documents"],["operations","Sauvegardes et maintenance"]] },
+  { label:"Projets", items:[["references","Clients et équipe"],["deliverables","Modèles de livrables"],["documents","Modèles de documents"],["stats","Statistiques"]] },
+];
+const deviceSettings = [["mises-a-jour","Mises à jour"],["connexion","Connexion au serveur"],["api-locale","API locale et intégrations"],["memoire","Mémoire et rappels"],["vocal","Vocal"],["dictee","Dictée"],["notifications","Notifications"]];
 const sparkle = ["m12 3 3 6 6 3-6 3-3 6-3-6-6-3 6-3z"];
 const bell = ["M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"];
 const settingsIcon = ["M4 6h16M4 12h16M4 18h16",'<circle cx="8" cy="6" r="2" fill="currentColor"/>','<circle cx="16" cy="12" r="2" fill="currentColor"/>','<circle cx="10" cy="18" r="2" fill="currentColor"/>'];
-const moreIcon = ["M12 5h.01", "M12 12h.01", "M12 19h.01"];
 const MAX_CACHED_PROJECTS = 6;
 function preference(key:string, fallback:string) { try {return localStorage.getItem(key) || fallback;} catch {return fallback;} }
 function savePreference(key:string,value:string) { try {localStorage.setItem(key,value);} catch {/* preference stays in this session */} }
@@ -228,7 +230,6 @@ export function WorkspaceShell({rows,reload,error,canCreateProject=true,portfoli
   const [projectFilter,setProjectFilter] = useQueryState<string>("status","active",workspacePath({page:"projects"}));
   const [integrationsTab,setIntegrationsTab] = useQueryState<string>("connection","sage","/app/imports");
   const [settingsTab,setSettingsTab] = useQueryState<string>("settings",route.page==="stats"?"stats":route.page==="preparation"?"preparation":"ai","/app/settings");
-  const [settingsOptionsOpen,setSettingsOptionsOpen] = useState(false);
   const [settingsStarted,setSettingsStarted] = useState<Set<string>>(()=>new Set());
   const [referencesStarted,setReferencesStarted] = useState(false);
   const [deliverablesStarted,setDeliverablesStarted] = useState(false);
@@ -241,7 +242,7 @@ export function WorkspaceShell({rows,reload,error,canCreateProject=true,portfoli
     return new Set(previous).add(settingsTab);
   });},[settingsTab]);
   useEffect(()=>{if(route.page==='stats'||route.page==='preparation')setSettingsTab(route.page);},[route.page]);
-  const changeSettingsTab=(id:string)=>{if(settingsTab==="documents"&&document.querySelector('[aria-label="Réglages documentaires"][data-workspace-dirty="true"]')&&!window.confirm("Changer de rubrique en conservant les réglages documentaires non enregistrés ?"))return;setSettingsTab(id);setSettingsOptionsOpen(false);};
+  const changeSettingsTab=(id:string)=>{if(settingsTab==="documents"&&document.querySelector('[aria-label="Réglages documentaires"][data-workspace-dirty="true"]')&&!window.confirm("Changer de rubrique en conservant les réglages documentaires non enregistrés ?"))return;setSettingsTab(id);};
   useEffect(()=>{if(settingsTab==="references")setReferencesStarted(true);},[settingsTab]);
   useEffect(()=>{if(settingsTab==="deliverables")setDeliverablesStarted(true);},[settingsTab]);
   const [microphones,setMicrophones] = useState<string[]>([]);
@@ -370,6 +371,7 @@ export function WorkspaceShell({rows,reload,error,canCreateProject=true,portfoli
   }, [route.page, current?.code]);
   const favorite=(id:string)=>setFavorites(ids=>ids.includes(id)?ids.filter(v=>v!==id):[...ids,id]);
   const conversationsPath = conversationsHref();
+  const directDeviceSettings = windows && document.body.dataset.kiaraDeviceSettings === 'true';
   const projectAssistantPath = !windows || current ? projectConversationHref(current?.id) : null;
   const importArchive=async(file:File)=>{
     if(importing)return;setImporting(true);setNotice("");
@@ -426,9 +428,14 @@ export function WorkspaceShell({rows,reload,error,canCreateProject=true,portfoli
       {microphones.map(id=><div className="workspace-notice" role="status" key={id}>● Microphone actif · {rows.find(r=>r.id===id)?.code || "Réunion"} <button type="button" className="workspace-text-button" onClick={()=>{if(openProject(id,"reviews"))window.dispatchEvent(new CustomEvent("agent-show-recording",{detail:{projectId:id}}));}}>Revenir à l’enregistrement</button> <button type="button" className="button secondary" onClick={()=>window.dispatchEvent(new CustomEvent("agent-stop-recording",{detail:{projectId:id}}))}>Arrêter l’enregistrement</button></div>)}
       {settingsAreaPages.includes(route.page)&&<>
         {['settings','stats','preparation'].includes(route.page)&&<div className="workspace-page-header"><h1>Réglages</h1></div>}
-        <div className="workspace-settings-navigation"><nav className="workspace-tabs" aria-label="Réglages">{mainSettings.map(([id,label])=><button type="button" key={id} aria-pressed={(settingsPages.includes(route.page)?route.page:settingsTab)===id} disabled={deliverablesBusy||documentsBusy} onClick={()=>openSettingsTab(id)}>{label}</button>)}{conversationsPath&&<a className="button secondary" href={`${conversationsPath}#reglages`} onClick={guardConversationLink}>Compte et appareil</a>}</nav>
-          <div className="workspace-options"><button type="button" className="workspace-icon-button" aria-label="Autres réglages" title="Autres réglages" aria-expanded={settingsOptionsOpen} aria-controls="workspace-extra-settings" disabled={deliverablesBusy||documentsBusy} onClick={()=>setSettingsOptionsOpen(v=>!v)}><Glyph d={moreIcon}/></button><div id="workspace-extra-settings" className="workspace-options-panel" hidden={!settingsOptionsOpen} role="group" aria-label="Réglages supplémentaires">{extraSettings.map(([id,label])=><button type="button" key={id} aria-pressed={!settingsPages.includes(route.page)&&settingsTab===id} disabled={deliverablesBusy||documentsBusy} onClick={()=>openSettingsTab(id)}>{label}</button>)}</div></div>
-        </div>
+        <nav className="workspace-settings-navigation" aria-label="Réglages">
+          {settingsGroups.map(group=><div className="workspace-settings-group" key={group.label} role="group" aria-label={group.label}><h2>{group.label}</h2><div className="workspace-tabs">{group.items.map(([id,label])=><button type="button" key={id} aria-pressed={(settingsPages.includes(route.page)?route.page:settingsTab)===id} disabled={deliverablesBusy||documentsBusy} onClick={()=>openSettingsTab(id)}>{label}</button>)}</div></div>)}
+          {conversationsPath&&<div className="workspace-settings-group" role="group" aria-label={windows?'Appareil Windows':'Compte'}><h2>{windows?'Appareil Windows':'Compte'}</h2><div className="workspace-tabs">
+            <a className="button secondary" href={`${conversationsPath}#reglages`} onClick={guardConversationLink}>Mon accès</a>
+            {!windows&&<a className="button secondary" href={`${conversationsPath}#apparence`} onClick={guardConversationLink}>Lecture des conversations</a>}
+            {(directDeviceSettings?deviceSettings:windows?deviceSettings.slice(0,1):[]).map(([id,label])=><a className="button secondary" key={id} href={`${conversationsPath}${directDeviceSettings?`#reglages-${id}`:'#reglages'}`} onClick={guardConversationLink}>{label}</a>)}
+          </div>{windows&&!directDeviceSettings&&<p>Dans les réglages de l’appareil, choisissez l’onglet Mises à jour.</p>}</div>}
+        </nav>
       </>}
       {visited.map(view=>{
         const visible=routeKey(view)===routeKey(route), key=routeKey(view);

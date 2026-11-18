@@ -59,10 +59,10 @@ autre poste ou avec une autre clé.
 
 Pour la livraison Windows, construire le client Tauri et le paquet serveur avec
 le portail compilé. Utiliser la validation de périmètre `windows` pour le
-manifeste de déploiement. La 4.0.10 publiée utilise le manifeste Ed25519 du canal
+manifeste de déploiement. La 4.0.11 publiée utilise le manifeste Ed25519 du canal
 avec un installateur sans Authenticode. Conserver l’installateur et le manifeste
-4.0.9. Le retour du correctif Conversations utilise aussi l’archive des sources
-4.0.9 servies par le web privé. [Construction Windows](client-tauri/README.md)
+4.0.10 ainsi que l’index du portail conservé lors de la bascule.
+[Construction Windows](client-tauri/README.md)
 [Procédure de bascule et preuves](audits/2026-11-15-fusion-kiara/BASCULE.md)
 
 Construire le relais avec `Build-Client.ps1 -Relay -SkipManifest`. La recette

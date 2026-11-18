@@ -578,7 +578,7 @@ def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
                         if len(html) > 1024 * 1024 or b'<body>' not in html:
                             raise ValueError('Page Projets invalide.')
                         capture = b' data-kiara-capture="true"' if desktop_capture else b''
-                        windows = b' data-kiara-windows="true"' if sys.platform == 'win32' else b''
+                        windows = b' data-kiara-windows="true" data-kiara-device-settings="true"' if sys.platform == 'win32' else b''
                         linux_audio = b' data-kiara-linux-system-audio="true"' if linux_system_audio else b''
                         html = html.replace(b'<body>', b'<body data-kiara-desktop="true" data-kiara-project-conversation="true"' + windows + capture + linux_audio + b'>', 1)
                     self.send_response(response.status if hasattr(response, 'status') else response.code)

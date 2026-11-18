@@ -437,6 +437,10 @@ async function check(browser,platform){
    assert.equal(await page.locator('#prompt').inputValue(),draft);
    await page.route('**/app/settings',route=>route.fulfill({body:'Réglages Kiara de recette'}));
    await sidebar();await page.locator('[data-view-button="settings"]').click();
+   const localSettings=page.getByRole('navigation',{name:'Réglages du client'});
+   await localSettings.getByRole('button',{name:'Mises à jour',exact:true}).click();
+   await page.getByRole('button',{name:'Vérifier les mises à jour'}).waitFor();
+   await localSettings.getByRole('button',{name:'Réglages du portail'}).click();
    await page.waitForURL('**/app/settings');
    assert.equal(state.preferences.conversation_drafts[conversationId],draft);
    await page.goto(new URL('/chat#reglages',chatUrl).href);await ready();
