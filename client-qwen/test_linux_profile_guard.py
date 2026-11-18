@@ -1,11 +1,10 @@
-"""Qt and Tauri must lock a profile before loading local services."""
+"""Linux starts through Tauri and locks its desktop profile."""
 import os
 from pathlib import Path
 import stat
-import sys
 import tempfile
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 import client
 import linux_support
@@ -15,21 +14,16 @@ def profile(token='fiction'):
     return {'url':'https://example.test', 'token':token}
 
 
-class QtGuardTests(unittest.TestCase):
-    def test_qt_rejects_in_use_profile_before_opening_the_relay(self):
-        root = Mock()
+class LinuxEntryTests(unittest.TestCase):
+    def test_legacy_entry_exits_before_reading_profile_or_opening_relay(self):
         with patch.object(client.sys, 'argv', ['client']), \
              patch.object(client.sys, 'platform', 'linux'), \
-             patch.dict(sys.modules, {'webview':Mock()}), \
-             patch.object(client, 'read_profile', return_value=profile()), \
-             patch.object(linux_support, 'lock_desktop_profile', side_effect=linux_support.ProfileAlreadyOpen('Profil déjà ouvert.')), \
-             patch.object(client, 'open_local_relay') as relay, \
-             patch.object(client.tk, 'Tk', return_value=root), \
-             patch.object(client.messagebox, 'showerror') as error:
-            client.main()
+             patch.object(client, 'read_profile') as read, \
+             patch.object(client, 'open_local_relay') as relay:
+            with self.assertRaisesRegex(SystemExit, 'client Tauri'):
+                client.main()
+        read.assert_not_called()
         relay.assert_not_called()
-        error.assert_called_once_with(client.APP_NAME, 'Profil déjà ouvert.', parent=root)
-        root.destroy.assert_called_once()
 
 
 @unittest.skipUnless(os.name == 'posix', 'Verrou Linux : vérifié dans la distribution de recette.')

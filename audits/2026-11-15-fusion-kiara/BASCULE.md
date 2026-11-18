@@ -14,6 +14,9 @@ sauvegarde consignées dans le [suivi d’architecture](../2026-11-16-architectu
   L’installateur est distribué sans Authenticode. La recette du candidat a
   exécuté WebView2 depuis les binaires extraits et simulé le collage d’une image.
   L’installation et la rétrogradation natives de ce NSIS restent à qualifier.
+- **Suites Windows.** Le client compte 309 tests réussis et 24 ignorés. Le
+  lanceur compte 672 tests réussis et un ignoré. Les tests du démarrage et du
+  contrôle de taille des requêtes ont été alignés sur le comportement livré.
 - **Portail.** Les 1 228 tests d’interface ont réussi. Notes a été ouvert dans
   WebView2 en 1280 × 720, 1920 × 1080 et 2560 × 1440 avec un projet fictif. Le
   passage du paquet précédent au candidat puis retour a conservé les écritures

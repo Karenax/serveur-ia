@@ -94,9 +94,12 @@ class RecoveryBrokerTests(unittest.TestCase):
         self.assertEqual(self.post(self.a, '/recovery/read')[2], b'draft')
 
     def test_bounded_input_and_invalid_paths_are_rejected(self):
-        self.assertEqual(self.post(self.b, '/recovery/stage', b'x'*65)[0], 413)
+        # The broker rejects the declared size before reading the body. Sending
+        # unread bytes here can reset the connection instead of returning 413 on Windows.
+        oversized = {**self.headers(self.b), 'Content-Length': '65'}
+        self.assertEqual(request(self.b, 'POST', '/recovery/stage', headers=oversized)[0], 413)
         self.assertEqual(self.post(self.b, '/recovery/stage', b'')[0], 400)
-        self.assertEqual(self.post(self.b, '/other', b'x')[0], 404)
+        self.assertEqual(self.post(self.b, '/other')[0], 404)
         self.assertEqual(self.post(self.a, '/recovery/read')[0], 404)
         self.assertEqual(self.post(self.b, '/recovery/receipt', b'not-an-identifier')[0], 400)
 
