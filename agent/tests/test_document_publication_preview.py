@@ -10,6 +10,9 @@ from backend.app.models import NetworkLink
 from backend.app.project_document_job_models import DocumentJobArtifact, DocumentJob
 from backend.app.project_document_publication_schemas import DocumentPublicationPreview, DocumentPublicationCommand
 from backend.app.services import document_publications as publication, document_jobs as jobs
+from backend.app.services import project_documents
+from backend.app.project_document_schemas import DocumentPreview
+from backend.app.project_document_job_schemas import DocumentBatchSubmit, DocumentBatchItem
 from backend.app.services.document_file_access import FilePolicy
 from backend.app.services.migration_guard import capture_baseline
 from tests.test_project_document_jobs import queue as queue_fixture, install, enqueue
@@ -64,6 +67,47 @@ def test_read_roots_do_not_enable_writes(prepared, monkeypatch):
     monkeypatch.delenv('AGENT_DOCUMENT_WRITE_ROOTS')
     assert publication.configured_write_policy().roots == ()
     failure(409, lambda:review(prepared))
+
+
+def test_update_requires_the_exact_source_version_used_to_prepare_copy(queue, monkeypatch):
+    from tests.test_document_publication_commands import publish
+    install(queue)
+    monkeypatch.setenv('AGENT_DOCUMENT_WRITE_ROOTS', json.dumps([str(queue[2])]))
+    target = queue[2] / 'AIRB26LTH0205-A-Demande de CE.docx'
+    original = (queue[2] / 'ce.docx').read_bytes()
+    target.write_bytes(original)
+    with queue[1]() as db:
+        db.add(NetworkLink(project_id='project', code='demande_ce', libelle='Demande de CE'))
+        db.commit()
+        choice = DocumentPreview(document_id='ce_request', link_id='link', relative_path=target.name)
+        report = project_documents.preview(db, 'project', choice)
+        item = DocumentBatchItem(**choice.model_dump(), expected_source_sha256=report['source_sha256'],
+            expected_link_sha256=report['link_sha256'], expected_values_sha256=report['values_sha256'],
+            expected_identity_revision=report['field_values']['identity_revision'],
+            expected_planning_revision=report['field_values']['planning_revision'])
+        job = jobs.submit(db, 'project', DocumentBatchSubmit(command_id='refresh-ce', items=[item]))
+        db.commit()
+    jobs.run_one(queue[1], 'project', job['id'], storage_root=queue[3])
+    with queue[1]() as db:
+        generated = jobs.detail(db, 'project', job['id'])['items'][0]
+        suggestion = generated['publication_suggestion']
+        assert suggestion == {'link_id': 'link', 'relative_directory': '', 'replace_existing': True}
+    chosen = queue, generated['artifact_id'], DocumentPublicationPreview(**suggestion)
+    target.write_bytes(b'Edited after copy was prepared')
+    blocked = review(chosen)
+    assert not blocked['can_publish'] and 'source_changed' in blocked['blockers']
+    target.write_bytes(original)
+    reviewed = review(chosen)
+    if not reviewed['can_publish']:  # Non-Windows cannot replace an existing original.
+        assert reviewed['blockers'] == ['replacement_not_supported']
+        return
+    result = publish(chosen, DocumentPublicationCommand(**suggestion, command_id='publish-ce',
+        expected_revision=reviewed['job_revision'], expected_preview_sha256=reviewed['preview_sha256'],
+        reviewed=True, link_to_project=True))
+    assert (target.parent / result['backup']).read_bytes() == original
+    with queue[1]() as db:
+        links = list(db.scalars(select(NetworkLink).filter_by(project_id='project', code='demande_ce')))
+        assert len(links) == 1 and links[0].chemin == str(target)
 
 
 def test_scope_precedes_write_configuration_and_every_filesystem_probe(prepared, monkeypatch):

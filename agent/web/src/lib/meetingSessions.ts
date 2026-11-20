@@ -31,7 +31,7 @@ export type MeetingSession = {
   published_meeting_id?: string | null; published_note_version_id?: string | null; calendar_context?: Record<string, unknown> | null;
   native_capture?:NativeCaptureItem|null;native_recovery?:NativeCaptureRecovery[];browser_capture?:BrowserCaptureOwner|null;
   tracks: SessionTrack[]; chunks?: SessionChunk[]; total_bytes: number; duration_seconds: number;
-  segments?: LiveTranscriptSegment[]; transcript_provisional?: boolean;transcript_processing_complete?:boolean;event_cursor?:number;
+  segments?: LiveTranscriptSegment[]; transcript_provisional?: boolean;transcript_processing_complete?:boolean;event_cursor?:number;live_transcription_enabled?:boolean;
   transcription_admission?:{policy:string;suspended:boolean;reason?:string|null;admitted_chunks:number;retained_chunks:number;
     retained_batch_only_chunks:number;recoverable_direct_chunks?:number;last_transition_at_utc?:string|null};
   transcription_batch?:SessionBatchStatus|null;

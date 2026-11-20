@@ -12,7 +12,7 @@ from ..db import get_db
 from ..meeting_session_schemas import Closed
 from ..services import fusion_insights as insights, meeting_sessions as sessions
 from ..services.settings_service import get_section, save_section
-from backend.app.services.project_operator import require_reference_write
+from backend.app.services.project_operator import can_manage_references, current_operator, require_reference_write
 
 router = APIRouter(prefix='/api/v1/workspace', tags=['fusion-insights'])
 _configuration_lock = RLock()
@@ -33,6 +33,34 @@ class Backfill(Closed):
     after_id: str = Field(default='', max_length=36)
 
 
+class PersonalControls(Closed):
+    live_transcription_enabled: bool
+    proactive_enabled: bool
+    auto_enhancement_enabled: bool
+    mode: Literal['network', 'local']
+
+
+@router.get('/fusion-settings/personal')
+def personal_settings(db: Session = Depends(get_db)):
+    from ..services import meeting_preferences
+    return meeting_preferences.preferences(db, current_operator().id)
+
+
+@router.put('/fusion-settings/personal')
+def save_personal_settings(body: PersonalControls, db: Session = Depends(get_db)):
+    from ..services import meeting_preferences
+    values = body.model_dump()
+    meeting_preferences.save(db, current_operator().id, values)
+    if sessions.feature_enabled(db) and os.environ.get('AGENT_TESTING') != '1':
+        if body.live_transcription_enabled:
+            from ..services.live_speech import start_worker
+            start_worker()
+        if body.proactive_enabled or body.auto_enhancement_enabled:
+            from ..services.session_proactive import start_worker
+            start_worker()
+    return values
+
+
 def controls(db):
     value = get_section(db, 'foresight')
     from ..services.speech_acceleration import describe
@@ -40,12 +68,12 @@ def controls(db):
     return {**{k: value.get(k, default) for k, default in {'proactive_enabled': False, 'auto_enhancement_enabled': False, 'mode': 'network', 'onboarding_complete': False}.items()},
             'live_transcription_enabled': value.get('live_transcription_enabled') is True,
             'live_speech_device': acceleration['selected'] or 'cpu', 'speech_acceleration': acceleration,
-            'enabled': sessions.feature_enabled(db), 'capabilities': sessions.capabilities(db)}
+            'enabled': sessions.feature_enabled(db), 'capabilities': sessions.capabilities(db),
+            'can_edit': can_manage_references(current_operator())}
 
 
 @router.get('/fusion-settings')
 def settings(db: Session = Depends(get_db)):
-    require_reference_write()
     return controls(db)
 
 
@@ -100,7 +128,7 @@ def _configure(body, db):
         db.commit()
     try:
         from ..services.live_speech import start_worker as start_speech, stop_worker as stop_speech
-        if body.enabled and body.live_transcription_enabled and os.environ.get('AGENT_TESTING') != '1':
+        if sessions.live_transcription_enabled(db) and os.environ.get('AGENT_TESTING') != '1':
             start_speech()
         else:
             stop_speech()

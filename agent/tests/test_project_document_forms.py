@@ -254,7 +254,7 @@ def test_global_preferences_authorization_precedes_schema_access(store, role, sc
     _, factory, ids, _ = store
     monkeypatch.setattr(forms, '_available', lambda *args, **kwargs: pytest.fail('unauthorized schema read'))
     with factory() as db, operator_context(Operator('limited', role, frozenset({ids[0]}) if scope else None)):
-        for call in (lambda: forms.search_preferences(db), lambda: forms.search_history(db),
+        for call in (lambda: forms.search_history(db),
                      lambda: forms.save_search_preferences(db, expected_revision=0, items=[]),
                      lambda: forms.restore_search_preferences(db, expected_revision=0, version_id='unknown')):
             assert_error(403, call)

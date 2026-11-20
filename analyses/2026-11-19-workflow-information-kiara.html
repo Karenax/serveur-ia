@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comment Kiara traite l’information — LLM et embeddings</title>
+<style>
+
+:root {
+  color-scheme: light dark;
+  --page: #f2f4f8;
+  --surface: #fff;
+  --ink: #17223b;
+  --muted: #50607c;
+  --line: #d8dfeb;
+  --diagram: #f7f8fb;
+  --accent: #2648aa;
+  --hero: #141f42;
+  --hero-ink: #f8faff;
+  --hero-muted: #c8d5f4;
+  --llm: #6d348a;
+  --llm-soft: #f2eafa;
+  --eg2: #07634c;
+  --eg2-soft: #e5f4ed;
+  --data: #274b9b;
+  --data-soft: #e9effd;
+  --gate: #844b09;
+  --gate-soft: #fff2db;
+  --shadow: 0 16px 40px #1c31630e;
+  --sans: "Segoe UI", system-ui, sans-serif;
+  --serif: Georgia, Cambria, serif;
+}
+* { box-sizing: border-box; }
+html { scroll-padding-top: 22px; }
+body { margin: 0; background: var(--page); color: var(--ink); font: 16px/1.67 var(--sans); }
+a { color: var(--accent); text-underline-offset: .19em; }
+a:hover { text-decoration-thickness: 2px; }
+a:focus-visible, summary:focus-visible, .table-wrap:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+.skip { position: absolute; top: 10px; left: 10px; transform: translateY(-170%); padding: 9px 14px; background: var(--surface); z-index: 3; }
+.skip:focus { transform: none; }
+.masthead {
+  color: var(--hero-ink);
+  background:
+    radial-gradient(ellipse at 93% 12%, #3d5ba65c, transparent 48%),
+    linear-gradient(119deg, #151d39 35%, var(--hero));
+  border-bottom: 1px solid #4763a4;
+}
+.hero-inner {
+  max-width: 1376px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(265px, .75fr);
+  gap: 50px;
+  align-items: end;
+  padding: 46px 32px 45px;
+}
+.meta { margin: 0 0 13px; color: var(--hero-muted); font-size: .86rem; font-weight: 650; }
+h1, h2 { font-family: var(--serif); letter-spacing: -.035em; line-height: 1.08; }
+h1 { margin: 0; font-size: clamp(2.4rem, 5.3vw, 4.6rem); font-weight: 550; max-width: 18ch; }
+.hero-lead { max-width: 62ch; margin: 15px 0 0; color: var(--hero-muted); font-size: 1.03rem; }
+.hero-engines { margin: 0 0 2px; display: grid; gap: 9px; }
+.hero-engines > div {
+  display: grid;
+  grid-template-columns: 4px 1fr;
+  column-gap: 14px;
+  padding: 10px 13px;
+  border-radius: 9px;
+  background: #ffffff0c;
+  border: 1px solid #b7c8ff38;
+}
+.hero-engines > div::before { content: ""; grid-row: span 2; border-radius: 5px; background: #d6a3ef; }
+.hero-engines > div:last-child::before { background: #75dab3; }
+.hero-engines dt { margin: 0; font-size: .98rem; color: var(--hero-ink); }
+.hero-engines dd { margin: 0; color: var(--hero-muted); font-size: .89rem; }
+.layout {
+  max-width: 1376px;
+  margin: 0 auto;
+  padding: 31px 32px 52px;
+  display: grid;
+  grid-template-columns: 186px minmax(0, 1fr);
+  gap: 27px;
+  align-items: start;
+}
+nav { position: sticky; top: 20px; padding: 13px 0; }
+nav h2 { margin: 0 0 12px 9px; font: 700 .84rem/1.2 var(--sans); color: var(--muted); }
+nav ul { margin: 0; padding: 0; list-style: none; }
+nav li { margin: 0; }
+nav a {
+  display: block;
+  padding: 7px 9px;
+  border-left: 2px solid transparent;
+  color: var(--muted);
+  font-size: .88rem;
+  line-height: 1.32;
+  text-decoration: none;
+}
+nav a:hover, nav a:focus-visible { background: var(--data-soft); color: var(--accent); border-color: var(--accent); }
+main { min-width: 0; }
+main > section {
+  margin: 0 0 23px;
+  padding: clamp(19px, 3vw, 36px);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 17px;
+  box-shadow: var(--shadow);
+}
+main > section:target { border-color: var(--accent); }
+h2 { margin: 0 0 .63em; font-size: clamp(1.65rem, 3.2vw, 2.3rem); font-weight: 550; }
+h3 { margin: 1.45em 0 .22em; font: 700 1.06rem/1.35 var(--sans); }
+p, ul, ol { margin: .53em 0 .9em; }
+p:last-child, li:last-child { margin-bottom: 0; }
+li { margin: .34em 0; }
+.lead { font-size: 1.06rem; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; margin: 18px 0; }
+.card { border-top: 3px solid var(--data); border-radius: 6px 6px 10px 10px; padding: 11px 15px 14px; background: var(--diagram); }
+.card h3 { margin: 0 0 .3em; }
+.card p { font-size: .94rem; }
+.card.engine-llm { border-color: var(--llm); }
+.card.engine-eg2 { border-color: var(--eg2); }
+.diagram {
+  margin: 18px 0 22px;
+  padding: clamp(12px, 1.8vw, 21px);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--diagram);
+  color: var(--muted);
+}
+.diagram > figcaption { margin: 0 0 13px; color: var(--ink); font-weight: 700; }
+.diagram-note { margin: 12px 0 0; font-size: .88rem; line-height: 1.48; }
+.nodes {
+  --columns: 3;
+  display: grid;
+  grid-template-columns: repeat(var(--columns), minmax(0, 1fr));
+  gap: 23px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.nodes.two { --columns: 2; }
+.nodes.four { --columns: 4; }
+.node {
+  position: relative;
+  padding: 11px 12px;
+  min-width: 0;
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--surface);
+  color: var(--ink);
+}
+.node > strong { display: block; font-size: .95rem; line-height: 1.22; }
+.node > span { display: block; margin-top: 5px; color: var(--muted); font-size: .83rem; line-height: 1.4; }
+.node.kind-llm { background: var(--llm-soft); border-color: transparent; color: var(--llm); }
+.node.kind-eg2 { background: var(--eg2-soft); border-color: transparent; color: var(--eg2); }
+.node.kind-data { background: var(--data-soft); border-color: transparent; color: var(--data); }
+.node.kind-gate { background: var(--gate-soft); border-color: transparent; color: var(--gate); }
+.nodes.arrows > :not(:last-child)::after {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 3px);
+  transform: translateY(-57%);
+  content: "→";
+  color: var(--muted);
+  font-weight: 650;
+}
+.nodes.forked { position: relative; margin-top: 10px; }
+.nodes.forked::before {
+  content: "";
+  position: absolute;
+  top: -9px;
+  left: calc((100% - 46px) / 6);
+  right: calc((100% - 46px) / 6);
+  border-top: 1px solid var(--muted);
+}
+.nodes.two.forked::before { left: calc((100% - 23px) / 4); right: calc((100% - 23px) / 4); }
+.nodes.forked > li::before {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  height: 9px;
+  border-left: 1px solid var(--muted);
+}
+.split-label {
+  margin: 0;
+  padding: 7px 0;
+  text-align: center;
+  font-size: .81rem;
+  line-height: 1.35;
+  font-weight: 700;
+}
+.split-label::before { content: "↓"; margin-right: 6px; font-size: 1rem; }
+.lane { display: grid; grid-template-columns: 108px minmax(0, 1fr); align-items: center; gap: 11px; }
+.lane + .lane { margin-top: 10px; }
+.lane > strong { font-size: .86rem; color: var(--ink); }
+.dots { display: flex; gap: 11px 16px; flex-wrap: wrap; padding: 0; margin: 0; list-style: none; }
+.dots li { display: flex; align-items: center; gap: 6px; margin: 0; font-size: .81rem; }
+.dots li::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: currentColor; }
+.dots .key-llm { color: var(--llm); }
+.dots .key-eg2 { color: var(--eg2); }
+.dots .key-data { color: var(--data); }
+.legend-note { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 7px 14px; margin-top: 12px; }
+.chart { display: grid; grid-template-columns: minmax(0, 1fr) max-content; gap: 16px 25px; align-items: center; }
+.bars { list-style: none; padding: 0; margin: 0; }
+.bars li { display: grid; grid-template-columns: 142px minmax(0, 1fr) 38px; align-items: center; gap: 9px; margin: 5px 0 9px; }
+.bar-name { color: var(--ink); font-size: .85rem; font-weight: 600; }
+.bar-track { height: 15px; border-radius: 50px; background: var(--line); }
+.bar-fill { display: block; width: var(--lot-width); min-width: 2px; height: 100%; border-radius: 50px; background: var(--llm); }
+.bars li:first-child .bar-fill { opacity: .46; }
+.bar-value { text-align: right; color: var(--ink); font-size: .91rem; font-variant-numeric: tabular-nums; }
+.chart-caption { display: grid; gap: 1px; border-left: 1px solid var(--line); padding-left: 16px; }
+.chart-caption strong { color: var(--llm); font: 700 2rem/1.02 var(--sans); }
+.chart-caption span { font-size: .81rem; }
+.callout { padding: 12px 16px; background: var(--data-soft); border-left: 3px solid var(--data); border-radius: 0 8px 8px 0; margin: 18px 0; }
+.callout p { margin: 0; }
+.table-wrap { overflow-x: auto; margin: 16px 0; border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; min-width: 670px; text-align: left; font-size: .92rem; line-height: 1.5; }
+caption { text-align: left; padding: 8px 13px; color: var(--muted); font-size: .83rem; }
+th, td { padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+thead th { background: var(--hero); color: var(--hero-ink); }
+tbody th { font-weight: 650; }
+tbody tr:nth-child(even) { background: var(--diagram); }
+tbody tr:last-child > * { border-bottom: 0; }
+table .row-topic, table .row-model { width: 24%; }
+.tag { display: inline-block; background: var(--data-soft); color: var(--data); padding: 1px 6px; border-radius: 4px; font-size: .78rem; font-weight: 700; }
+.tag.llm { background: var(--llm-soft); color: var(--llm); }
+.tag.eg2 { background: var(--eg2-soft); color: var(--eg2); }
+dl { margin: 14px 0; }
+dt { font-weight: 700; margin-top: .7em; }
+dd { margin: 0 0 .6em; color: var(--muted); }
+.sources { padding-top: 8px; border-top: 1px solid var(--line); color: var(--muted); font-size: .83rem; line-height: 1.51; }
+.sources a, code { overflow-wrap: anywhere; }
+code { color: var(--data); font: .89em Consolas, monospace; }
+details { border: 1px solid var(--line); border-radius: 7px; padding: 10px 12px; margin: 10px 0; background: var(--diagram); }
+summary { cursor: pointer; font-weight: 650; }
+details[open] summary { margin-bottom: .4em; }
+@media (max-width: 985px) {
+  .layout { grid-template-columns: minmax(0, 1fr); gap: 15px; }
+  nav { position: static; border-bottom: 1px solid var(--line); padding: 0 0 13px; }
+  nav ul { display: flex; flex-wrap: wrap; gap: 1px 7px; }
+  .hero-inner { gap: 24px; }
+}
+@media (max-width: 690px) {
+  .hero-inner, .grid, .chart { grid-template-columns: 1fr; }
+  .hero-inner, .layout { padding-left: 15px; padding-right: 15px; }
+  .hero-inner { padding-top: 29px; padding-bottom: 27px; }
+  .hero-engines { grid-template-columns: 1fr 1fr; }
+  .lane { grid-template-columns: 1fr; gap: 4px; }
+  .nodes { grid-template-columns: 1fr; gap: 17px; }
+  .nodes.arrows > :not(:last-child)::after { content: "↓"; top: calc(100% - 1px); left: 16px; transform: none; }
+  .nodes.forked { margin-top: 2px; gap: 8px; }
+  .nodes.forked::before, .nodes.forked > li::before { display: none; }
+  .chart-caption { border: 0; padding: 0; }
+  .bars li { grid-template-columns: 105px minmax(0, 1fr) 32px; gap: 7px; }
+}
+@media (max-width: 390px) {
+  .hero-engines { grid-template-columns: 1fr; }
+  main > section { padding: 14px; }
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page: #111827; --surface: #1c2538; --ink: #eef2fb; --muted: #b8c6db;
+    --line: #3b4861; --diagram: #171f32; --accent: #b6cbff;
+    --llm: #e9b8fe; --llm-soft: #392743;
+    --eg2: #8be1c2; --eg2-soft: #1b3838;
+    --data: #adcbff; --data-soft: #263756;
+    --gate: #ffcf86; --gate-soft: #4c3829;
+    --shadow: none;
+  }
+}
+@media print {
+  @page { margin: 13mm; }
+  :root {
+    color-scheme: light;
+    --surface: #fff; --ink: #17223b; --muted: #50607c; --line: #d8dfeb;
+    --diagram: #f7f8fb; --accent: #2648aa;
+    --llm: #6d348a; --llm-soft: #f2eafa; --eg2: #07634c; --eg2-soft: #e5f4ed;
+    --data: #274b9b; --data-soft: #e9effd; --gate: #844b09; --gate-soft: #fff2db;
+  }
+  body { background: #fff; font-size: 10.5pt; print-color-adjust: exact; }
+  .masthead { background: #fff; color: var(--ink); }
+  .hero-inner, .layout { display: block; padding: 0; }
+  .masthead { padding-bottom: 10pt; }
+  .masthead .meta, .hero-lead { color: var(--muted); }
+  h1 { font-size: 29pt; max-width: none; }
+  nav, .skip, .hero-engines { display: none; }
+  main > section { padding: 10pt 0; margin-bottom: 4pt; border: 0; box-shadow: none; }
+  h2, h3 { break-after: avoid; }
+  .diagram, .grid, .callout, tr { break-inside: avoid; }
+  .table-wrap { overflow: visible; }
+  table { min-width: 0; font-size: 8.5pt; }
+  thead { display: table-header-group; }
+}
+
+</style>
+</head>
+<body>
+<a class="skip" href="#contenu">Aller au rapport</a>
+<header class="masthead">
+  <div class="hero-inner">
+    <div>
+      <p class="meta">Rapport de fonctionnement · Configuration relevée le 19 novembre 2026</p>
+      <h1>Comment Kiara traite l’information</h1>
+      <p class="hero-lead">Des sources aux réponses, les schémas montrent où passent les données et ce qui déclenche chaque appel.</p>
+    </div>
+    <dl class="hero-engines">
+      <div><dt>Qwen · LLM</dt><dd>Classer, extraire, comparer, rédiger</dd></div>
+      <div><dt>EmbeddingGemma 2 · EG2</dt><dd>Indexer et retrouver des passages</dd></div>
+    </dl>
+  </div>
+</header>
+<div class="layout">
+<nav aria-label="Sommaire du rapport">
+  <h2>Sommaire</h2>
+  <ul>
+    <li><a href="#vue">Vue d’ensemble</a></li>
+    <li><a href="#sources-entree">Entrée des sources</a></li>
+    <li><a href="#validation">De la source à l’information retenue</a></li>
+    <li><a href="#index">Embeddings et recherche</a></li>
+    <li><a href="#reponses">Conversations et assistants</a></li>
+    <li><a href="#analyses">Analyses de projet</a></li>
+    <li><a href="#appels">Tableau des appels</a></li>
+    <li><a href="#exploitation">Charge, erreurs et visibilité</a></li>
+    <li><a href="#glossaire">Glossaire</a></li>
+  </ul>
+</nav>
+<main id="contenu">
+<section id="vue" aria-labelledby="titre-vue">
+  <h2 id="titre-vue">Le circuit de l’information</h2>
+  <figure class="diagram" aria-labelledby="fig-circuit">
+    <figcaption id="fig-circuit">De l’entrée des sources à leur utilisation</figcaption>
+    <ol class="nodes arrows" aria-label="Entrée et conservation">
+      <li class="node"><strong>Mails, documents, notes, réunions</strong><span>Sources reçues ou produites dans Kiara</span></li>
+      <li class="node"><strong>Extraction et rattachement</strong><span>Lecture des fichiers, règles métier, aide de Qwen pour le tri des mails</span></li>
+      <li class="node kind-data"><strong>ERP et Brain</strong><span>Originaux référencés, versions, données et décisions du projet</span></li>
+    </ol>
+    <p class="split-label">À partir des données conservées</p>
+    <ul class="nodes forked" aria-label="Trois usages des données de projet">
+      <li class="node kind-data"><strong>Consulter</strong><span>Lire les informations retenues et les dates du planning</span></li>
+      <li class="node kind-eg2"><strong>Rechercher · EG2</strong><span>Indexer le texte puis retrouver un passage par son sens</span></li>
+      <li class="node kind-llm"><strong>Analyser ou répondre · Qwen</strong><span>Produire une synthèse, un bilan ou une réponse avec des sources</span></li>
+    </ul>
+    <div class="legend-note">
+      <ul class="dots" aria-label="Légende des schémas">
+        <li class="key-data">Données conservées</li><li class="key-eg2">Embeddings EG2</li><li class="key-llm">Génération Qwen</li>
+      </ul>
+    </div>
+  </figure>
+  <div class="grid">
+    <article class="card engine-llm"><h3>Qwen produit du texte ou des résultats structurés</h3><p>Le serveur interrogé exécute <strong>Qwen</strong> sur Strata. Le modèle observé répond sous le nom <code>qwen3.8-flash-next-iq4-xs</code>. Le service Projets utilise l’alias <code>fred-qwen</code> via la passerelle interne.</p></article>
+    <article class="card engine-eg2"><h3>EG2 transforme le texte en vecteurs</h3><p><strong>EmbeddingGemma 2</strong> tourne dans un service séparé. La console le signalait prêt sur la <strong>Quadro P2200</strong>, en <code>float32</code>, avec des vecteurs de <strong>768 dimensions</strong>. Kiara compare les vecteurs pour retrouver des passages proches par le sens.</p></article>
+  </div>
+  <p>Les sources et les décisions sont enregistrées côté serveur. L’<strong>ERP</strong> garde notamment les projets, exigences, jalons et versions de notes. <strong>Brain</strong> garde les sources, propositions, informations retenues et liens vers les preuves. <strong>Workspace</strong> gère notamment les espaces privés, conversations et souvenirs. Les index sont des copies de recherche que Kiara peut reconstruire à partir des données de référence.</p>
+  <p class="sources">Références techniques. <a href="../ARCHITECTURE-ACTUELLE.md">Architecture et autorités des données</a> · <a href="../agent/app/services/settings_service.py">Réglages effectifs du service Projets</a> · <a href="../lanceur/app.py">État du serveur et du moteur</a> · <a href="../lanceur/embeddings.py">Service EG2</a></p>
+</section>
+
+<section id="sources-entree" aria-labelledby="titre-entree">
+  <h2 id="titre-entree">Comment les sources entrent dans Kiara</h2>
+  <h3>Mails Thunderbird et imports de fichiers EML</h3>
+  <figure class="diagram" aria-labelledby="fig-mail">
+    <figcaption id="fig-mail">Un mail peut solliciter Qwen à deux moments</figcaption>
+    <ol class="nodes arrows" aria-label="Préparation d’un mail et proposition de classement">
+      <li class="node kind-data"><strong>Mail importé</strong><span>Original, texte et pièces jointes</span></li>
+      <li class="node kind-llm"><strong>Qwen propose le projet</strong><span>Indices de classement et résumé</span></li>
+      <li class="node kind-gate"><strong>Kiara vérifie les indices</strong><span>Seuil de 75 % et règles de classement</span></li>
+    </ol>
+    <p class="split-label">Décision de classement</p>
+    <ul class="nodes two forked" aria-label="Deux issues du classement">
+      <li class="node kind-data"><strong>Projet suffisamment fiable</strong><span>Rattachement automatique si les règles le permettent</span></li>
+      <li class="node"><strong>Projet incertain</strong><span>Le mail attend un choix ou une confirmation</span></li>
+    </ul>
+    <p class="split-label">Une fois le mail rattaché</p>
+    <ol class="nodes arrows" aria-label="Enrichissement et indexation">
+      <li class="node kind-llm"><strong>Qwen extrait les éléments utiles</strong><span>Actions, faits, décisions et jalons, selon le parcours</span></li>
+      <li class="node kind-data"><strong>Brain garde les liens de preuve</strong><span>Proposition ou information retenue</span></li>
+      <li class="node kind-eg2"><strong>EG2 indexe la source</strong><span>Calcul des vecteurs manquants du texte disponible</span></li>
+    </ol>
+  </figure>
+  <p>La liaison Thunderbird envoie les messages des dossiers sélectionnés. Kiara peut aussi importer des fichiers EML et surveiller un dossier selon le mode configuré. À cette étape, le code lit le format du message, sépare le sujet, les participants, le corps et les pièces jointes, puis contrôle les doublons. Le message est conservé comme source, avec ses métadonnées. Ces opérations utilisent des règles et des lecteurs de fichiers.</p>
+  <p>Pour un mail à classer, Kiara combine des indices tels qu’un code projet dans l’objet, des alias ou des contacts connus avec, si le LLM est disponible, une suggestion de projet et un résumé. Le modèle reçoit notamment l’objet, les participants, une liste des projets candidats et jusqu’à 6 000 caractères du corps. Kiara arbitre ensuite avec ses règles. Le seuil de classement automatique relevé est de <strong>75 %</strong>. Un message ambigu reste à examiner, avec <em>Divers</em> comme destination proposée quand le système ne trouve pas de projet fiable. Un mail déjà analysé est généralement ignoré au passage suivant, sauf réanalyse forcée.</p>
+  <p>Une fois le mail rattaché, l’enrichissement peut lancer un <strong>second appel LLM</strong> pour en extraire les faits, actions, décisions, risques, engagements ou jalons. Le texte du mail fait l’objet de cet appel. Les textes tirés des pièces jointes suivent aussi le circuit d’indexation, avec leur propre repère de source. La tâche d’extraction et la tâche d’indexation ont des états distincts. Si l’indexation échoue, le classement du mail est déjà enregistré.</p>
+  <p class="sources">Références techniques. <a href="../agent/app/services/mail_ingest.py">Import et dédoublonnage des mails</a> · <a href="../agent/app/services/triage.py">Classement et rattachement</a> · <a href="../agent/app/services/ai_client.py">Appel de classement et d’extraction</a> · <a href="../agent/app/services/mail_enrichment.py">Tâche d’enrichissement</a> · <a href="../agent/app/services/mail_attachment_extraction.py">Extraction des pièces jointes</a></p>
+
+  <h3>Documents, pages web et sources choisies</h3>
+  <p>Une source importée dans la bibliothèque conserve son original, son rattachement et ses versions. Kiara extrait le texte lisible des formats pris en charge, par exemple le texte d’une page PDF ou les cellules d’un tableur. Il garde des repères tels que la page, la feuille ou le passage. Une page scannée sans texte peut passer par la reconnaissance de caractères locale <abbr title="Reconnaissance optique de caractères">OCR</abbr>. L’analyse du cahier des charges se déclenche séparément.</p>
+  <p>Une page web ou un fichier obtenu via un connecteur entre dans ce même circuit d’import, selon l’action choisie. La récupération externe de l’original et l’envoi d’un contexte à un modèle sont deux opérations distinctes. Les résultats de recherche conservent la référence de l’original et sa version courante.</p>
+  <p class="sources">Références techniques. <a href="../agent/app/routers/source_library.py">Imports et connecteurs de la bibliothèque</a> · <a href="../agent/app/services/source_library.py">Versions et préparation des sources</a> · <a href="../agent/app/services/library_extraction.py">Extraction locale par format</a> · <a href="../agent/app/services/library_ocr.py">Reconnaissance de caractères</a></p>
+
+  <h3>Notes et réunions</h3>
+  <p><strong>Notes.</strong> La frappe, l’enregistrement et l’historique d’une note sont des opérations de l’éditeur et de l’ERP. Le texte de la version courante d’une note de projet peut servir de source de recherche lorsque le projet ERP est relié à Brain. La passerelle de notes transmet cette version en arrière-plan et rend les projections précédentes obsolètes. L’indexation peut alors demander des embeddings pour les passages modifiés. Les notes personnelles restent dans leur périmètre privé.</p>
+  <p><strong>Réunions.</strong> La transcription transforme l’audio en texte avec un moteur de parole, notamment Whisper selon le parcours. C’est un calcul distinct de Qwen et de l’index sémantique des textes. Le LLM intervient pour une synthèse demandée, des propositions d’enrichissement activées ou une réponse de l’assistant de réunion. La synthèse peut traiter plusieurs parties de la transcription, puis produire une consolidation. La relecture et la publication choisie par l’utilisateur peuvent fournir de nouvelles preuves et informations de projet à indexer.</p>
+  <figure class="diagram" aria-labelledby="fig-documents">
+    <figcaption id="fig-documents">Comment les documents, notes et réunions alimentent la recherche</figcaption>
+    <div class="lane">
+      <strong>Document</strong>
+      <ol class="nodes arrows" aria-label="Indexation d’un document importé">
+        <li class="node kind-data"><strong>Original conservé</strong><span>Fichier, projet et version</span></li>
+        <li class="node"><strong>Texte et repères</strong><span>Extraction de texte ou OCR si nécessaire</span></li>
+        <li class="node kind-eg2"><strong>Indexation EG2</strong><span>Passages de la source accessibles à la recherche</span></li>
+      </ol>
+    </div>
+    <div class="lane">
+      <strong>Note</strong>
+      <ol class="nodes arrows" aria-label="Indexation d’une note de projet">
+        <li class="node kind-data"><strong>Note enregistrée</strong><span>Version courante dans l’ERP</span></li>
+        <li class="node kind-data"><strong>Source Brain si projet relié</strong><span>L’ancienne projection devient obsolète</span></li>
+        <li class="node kind-eg2"><strong>Indexation EG2</strong><span>Seuls les vecteurs manquants sont calculés</span></li>
+      </ol>
+    </div>
+    <div class="lane">
+      <strong>Réunion</strong>
+      <ol class="nodes arrows" aria-label="De l’enregistrement à la publication d’une réunion">
+        <li class="node"><strong>Audio → transcription</strong><span>Moteur de reconnaissance de la parole</span></li>
+        <li class="node kind-llm"><strong>Qwen selon l’action</strong><span>Synthèse, enrichissement ou réponse</span></li>
+        <li class="node kind-data"><strong>Publication après relecture</strong><span>Preuves de projet disponibles pour l’indexation</span></li>
+      </ol>
+    </div>
+  </figure>
+  <p class="sources">Références techniques. <a href="../agent/app/services/note_evidence_bridge.py">Projection des versions de notes de projet</a> · <a href="../agent/app/services/meeting_audio.py">Transcription, synthèse et publication</a> · <a href="../agent/app/services/session_enhancements.py">Propositions d’enrichissement</a> · <a href="../agent/app/services/meeting_notes_publication.py">Publication des notes de réunion</a></p>
+</section>
+
+<section id="validation" aria-labelledby="titre-validation">
+  <h2 id="titre-validation">Ce que Kiara retient et comment il le justifie</h2>
+  <p>Un même passage peut apparaître sous plusieurs formes le long du parcours. Par exemple, un mail est une source. « La réception est prévue le 20 octobre » en est une information extraite. Une suggestion de jalon qui s’appuie sur ce mail est encore un résultat d’analyse à examiner. La date officielle du planning relève de l’ERP.</p>
+  <figure class="diagram" aria-labelledby="fig-validation">
+    <figcaption id="fig-validation">La preuve accompagne l’information à chaque étape</figcaption>
+    <ol class="nodes four arrows" aria-label="Étapes entre une source brute et une information retenue">
+      <li class="node kind-data"><strong>Source</strong><span>Le mail et le passage d’origine</span></li>
+      <li class="node kind-llm"><strong>Proposition</strong><span>Une date est extraite et reliée à son passage</span></li>
+      <li class="node kind-gate"><strong>Décision</strong><span>Confirmation humaine ou règle de rétention par défaut</span></li>
+      <li class="node kind-data"><strong>Information retenue</strong><span>Le fait, sa provenance et son mode de validation sont conservés</span></li>
+    </ol>
+  </figure>
+  <dl>
+    <dt>Source et extrait</dt><dd>Le mail original, le document ou la transcription et le passage repéré qui permet de revenir à la preuve.</dd>
+    <dt>Proposition</dt><dd>Un rattachement ou une information soumis à une règle d’acceptation ou à la décision d’un opérateur. Kiara enregistre la provenance et la décision.</dd>
+    <dt>Information retenue</dt><dd>Une information active dans Brain. Le statut « validée » peut désigner une confirmation humaine ou une information retenue par défaut à partir d’une source résolue du même projet. Le mode de validation permet de faire la différence.</dd>
+    <dt>Résultat dérivé</dt><dd>Un extrait indexé, un vecteur, une synthèse, une réponse ou une évaluation de l’IA. Son intérêt dépend de ses sources et de leur actualité.</dd>
+  </dl>
+  <p>La règle de rétention par défaut exclut les propositions de rattachement à un projet. Elle peut accepter un élément provenant d’une source déjà rattachée, en conservant la trace de l’acceptation automatique. Une information déclassée exige une décision humaine de rétablissement. Lors d’un reclassement, Kiara invalide les connaissances concernées dans l’ancien projet et rend leurs anciennes projections obsolètes. Les lecteurs revérifient le projet, la version et la validité de la source avant de la ressortir.</p>
+  <p class="sources">Références techniques. <a href="../agent/docs/03_KNOWLEDGE_LEVELS.md">Niveaux de connaissance</a> · <a href="../agent/app/services/knowledge_defaults.py">Validation par défaut et déclassement</a> · <a href="../agent/app/services/knowledge_context.py">Provenance et qualification en lecture</a> · <a href="../agent/app/services/projections.py">Suivi et révision des projections</a></p>
+</section>
+
+<section id="index" aria-labelledby="titre-index">
+  <h2 id="titre-index">Embeddings, index et recherche</h2>
+  <figure class="diagram" aria-labelledby="fig-index">
+    <figcaption id="fig-index">Le même encodeur sert à préparer l’index et à interroger ses passages</figcaption>
+    <div class="lane">
+      <strong>Indexation</strong>
+      <ol class="nodes arrows" aria-label="Construction de l’index">
+        <li class="node kind-data"><strong>Texte de la source</strong><span>Découpé en passages repérables</span></li>
+        <li class="node kind-eg2"><strong>EG2 encode les passages</strong><span>Les vecteurs déjà connus sont réutilisés</span></li>
+        <li class="node kind-data"><strong>Index</strong><span>Texte, vecteur et référence de la source</span></li>
+      </ol>
+    </div>
+    <div class="lane">
+      <strong>Recherche</strong>
+      <ol class="nodes arrows" aria-label="Recherche dans l’index">
+        <li class="node"><strong>Question ou mots saisis</strong><span>Avec les filtres de projet et de source</span></li>
+        <li class="node kind-eg2"><strong>EG2 encode la requête</strong><span>Un vecteur à comparer à ceux de l’index</span></li>
+        <li class="node kind-data"><strong>Passages classés</strong><span>Similarité, mots exacts, versions et droits vérifiés</span></li>
+      </ol>
+    </div>
+  </figure>
+  <h3>Indexer une source</h3>
+  <p>Après l’enregistrement de la source, une tâche prépare sa projection de recherche. Brain découpe le texte en passages, en conservant de petits chevauchements pour retrouver les phrases près d’une coupure. Le code utilise une fenêtre de 160 mots avec un chevauchement de 32 mots sur les longs paragraphes, puis plafonne les passages denses à 1 536 caractères. Chaque passage conserve son texte, son ordre, son projet, la référence de sa source et le profil EG2 utilisé.</p>
+  <p>Kiara envoie uniquement les passages dont le vecteur manque. Le cache des passages identiques réutilise les vecteurs déjà calculés pour le même profil. La provenance reste celle de la nouvelle source. Le nombre de requêtes d’indexation dépend donc des passages nouveaux et de la taille des lots, plutôt que du nombre de fichiers. Dans les paramètres Brain relevés, la taille du lot est de <strong>8 textes</strong>. L’API de la passerelle accepte jusqu’à 32 textes par appel et l’encodeur contrôle la limite de 8 192 jetons par entrée, préfixe compris.</p>
+  <h3>Retrouver un passage ou une information</h3>
+  <p>En recherche sémantique, Kiara calcule un vecteur pour la question, compare ce vecteur aux vecteurs déjà stockés et remonte les passages proches. En recherche hybride, il combine ce signal avec les mots et les références exactes. Cela permet par exemple de rechercher à la fois « réception en atelier » et un numéro de pièce. Les droits sur les projets et l’état courant des sources sont contrôlés lors du classement des résultats.</p>
+  <p>Les informations retenues sont lues dans la base Brain. Le filtre consacré à ces informations peut donc fonctionner avec la recherche textuelle. Si EG2 est indisponible, la recherche hybride conserve la recherche par mots et références et signale le mode dégradé. L’écran de résultats affiche les passages classés directement par le code.</p>
+  <div class="callout">
+    <p><strong>Deux index utilisent le même moteur.</strong> Brain indexe les passages des sources de projet. Workspace conserve son index des documents et souvenirs accessibles à Conversations. Ils ont des compteurs distincts. Le relevé de Brain contenait 20 322 passages associés à 1 070 sources sur 11 projets. Ce chiffre mesure les lignes présentes dans l’index. La recherche applique ensuite les filtres de version et de droits.</p>
+  </div>
+  <p class="sources">Références techniques. <a href="../agent/app/services/eg2_memory.py">Index de Brain et réutilisation des vecteurs</a> · <a href="../lanceur/knowledge.py">Index de Workspace</a> · <a href="../agent/app/services/embedding_channel.py">Appels, lots, profil et reprises</a> · <a href="../agent/app/services/unified_search.py">Recherche hybride</a> · <a href="../lanceur/gateway_embeddings.py">File EG2 et API</a></p>
+</section>
+
+<section id="reponses" aria-labelledby="titre-reponses">
+  <h2 id="titre-reponses">Comment une réponse cite les informations</h2>
+  <figure class="diagram" aria-labelledby="fig-reponse">
+    <figcaption id="fig-reponse">Une question sourcée combine rappel et génération</figcaption>
+    <ol class="nodes four arrows" aria-label="Parcours d’une question sourcée">
+      <li class="node"><strong>Question</strong><span>Le projet ou le périmètre détermine les sources accessibles</span></li>
+      <li class="node kind-eg2"><strong>Rappel des preuves</strong><span>Information SQL et, si demandé, passages retrouvés par EG2</span></li>
+      <li class="node kind-llm"><strong>Qwen rédige</strong><span>Il reçoit la question, le contexte et les références</span></li>
+      <li class="node kind-data"><strong>Réponse et citations</strong><span>Les références permettent de revenir aux justificatifs</span></li>
+    </ol>
+  </figure>
+  <p>Une recherche renvoie des passages. Une question à l’assistant ajoute une génération à partir de la question, de l’historique utile et des extraits autorisés. Une citation correspond à une information ou à un passage sélectionné. L’historique aide à interpréter la question en cours.</p>
+  <div class="grid">
+    <article class="card"><h3>Assistant de projet</h3><p>Le rappel peut utiliser les informations SQL et les jalons officiels, puis les preuves EG2 si elles sont demandées. Les références de type <code>[V]</code> distinguent les informations retenues des passages ou propositions de type <code>[P]</code>. Une recherche portant sur plusieurs projets autorisés peut effectuer un rappel par projet avant de composer la réponse.</p></article>
+    <article class="card"><h3>Conversations et Hermes</h3><p>Une conversation ordinaire passe par le modèle sélectionné. Hermes, lorsqu’il est utilisé, peut lire ou rechercher des documents avec les outils autorisés, puis rappeler le modèle pour exploiter les résultats. Le nombre d’appels d’un tour dépend alors des outils utilisés et de la recherche nécessaire. Une conversation générale peut aussi se dérouler sans recherche documentaire.</p></article>
+  </div>
+  <p>L’assistant de réunion utilise un périmètre choisi parmi la séance, le projet, des sources sélectionnées ou les projets autorisés selon le parcours. Il vérifie la fraîcheur des références. Ce parcours peut restituer une réponse identique déjà enregistrée. En l’absence de citation exploitable, il peut répondre que le contexte est insuffisant avant d’appeler le LLM.</p>
+  <p>Les conversations enregistrées et leurs brouillons ont leur propre historique. Le mode éphémère de l’assistant de projet garde l’échange en mémoire pour la session. Côté Windows, <strong>Vocal</strong> peut ajouter une génération Qwen entre reconnaissance et synthèse de la parole. Le <strong>Correcteur</strong> fait un appel de transformation du texte demandé. Ces générations suivent leur propre parcours, en dehors de l’analyse périodique des projets.</p>
+  <p>Le flux normal du service Projets utilise la passerelle locale et les deux moteurs du serveur. Une sélection explicite d’un fournisseur externe de Conversations ou l’usage d’un outil de recherche web autorisé change la destination des données de ce parcours. Les réglages du service Projets et le fournisseur sélectionné dans Conversations sont à considérer séparément.</p>
+  <p class="sources">Références techniques. <a href="../agent/app/routers/core.py">Rappel, construction du contexte et réponse de projet</a> · <a href="../agent/app/services/scoped_assistant.py">Assistant de réunion, citations et fraîcheur</a> · <a href="../lanceur/remote.py">Routage des conversations et accès des modèles</a> · <a href="../lanceur/hermes_tools.py">Outils et citations de l’assistant Hermes</a> · <a href="../client-qwen/project-conversation.js">Historique et mode éphémère du projet</a> · <a href="../lanceur/text_transform.py">Transformation de texte</a></p>
+</section>
+
+<section id="analyses" aria-labelledby="titre-analyses">
+  <h2 id="titre-analyses">Les analyses de projet qui font travailler le LLM</h2>
+  <h3>Extraire des exigences d’un cahier des charges</h3>
+  <p>Une analyse de <abbr title="Cahier des charges">CDC</abbr> envoie des lots de pages au LLM pour proposer des fonctions, contraintes et exigences structurées. Kiara vérifie que la citation est bien présente sur la page et la révision indiquées. L’équipe peut relire les éléments obtenus. Extraire une exigence d’un document et juger si cette exigence est satisfaite correspondent à deux analyses différentes.</p>
+  <h3>Rechercher des dates de jalons</h3>
+  <p>La recherche de jalons examine les textes disponibles du projet et peut envoyer au LLM de nouveaux extraits. Elle rapproche les dates explicites des jalons concernés et produit des propositions contractuelles, prévisionnelles ou réelles. Les passages déjà traités sont repérés par leur empreinte et par la configuration de l’analyse. L’écriture d’une date officielle suit le workflow du planning.</p>
+  <h3>Évaluer les preuves face aux exigences</h3>
+  <p>Le bilan <strong>Informations à vérifier</strong> confronte les connaissances actives du projet aux fonctions, contraintes et exigences du CDC. Le LLM propose par lot des constats, dates et points importants. Kiara vérifie que le passage cité existe et rattache les constats à leur preuve. Les résultats contradictoires peuvent être marqués <em>À vérifier</em>. La fonction remplit le bilan de consultation. Les opérations métier sur les validations et les dates restent dans leurs écrans respectifs.</p>
+  <figure class="diagram" aria-labelledby="fig-delta">
+    <figcaption id="fig-delta">À l’échéance du contrôle, Kiara compare les entrées au dernier bilan</figcaption>
+    <ul class="nodes" aria-label="Résultats possibles de la comparaison">
+      <li class="node kind-data"><strong>Entrées identiques</strong><span>Le bilan existant reste valable · 0 appel</span></li>
+      <li class="node kind-llm"><strong>Entrées modifiées</strong><span>Qwen traite les nouveautés et les exigences touchées</span></li>
+      <li class="node kind-gate"><strong>Référence indisponible</strong><span>Un premier bilan complet peut être nécessaire</span></li>
+    </ul>
+  </figure>
+  <p>Le passage périodique vérifie les données et la configuration de génération à l’échéance de 48 heures. Si celles-ci coïncident avec le dernier bilan, Kiara le réutilise et ne lance aucun appel. Avec un bilan de référence exploitable, il conserve les constats valides et prépare des lots pour les informations nouvelles ou modifiées. Une exigence modifiée ou privée d’une preuve est réexaminée avec les éléments concernés. Un premier bilan, ou un ancien rapport modifié dont la référence exacte reste irrécupérable, peut nécessiter un passage complet.</p>
+  <figure class="diagram" aria-labelledby="fig-volume">
+    <figcaption id="fig-volume">Outillage M&amp;B · Lots planifiés pour le LLM</figcaption>
+    <div class="chart">
+      <ul class="bars">
+        <li><span class="bar-name">Analyse complète</span><span class="bar-track" aria-hidden="true"><span class="bar-fill" style="--lot-width:100%"></span></span><strong class="bar-value">286</strong></li>
+        <li><span class="bar-name">Analyse des ajouts</span><span class="bar-track" aria-hidden="true"><span class="bar-fill" style="--lot-width:3.846%"></span></span><strong class="bar-value">11</strong></li>
+      </ul>
+      <div class="chart-caption"><strong>−96 %</strong><span>de lots planifiés</span></div>
+    </div>
+    <p class="diagram-note">Les 17 informations nouvelles tiennent dans un seul bloc à comparer aux 11 groupes d’exigences.</p>
+  </figure>
+  <div class="callout">
+    <p>Kiara a retrouvé en production le bilan précédent de 1 333 informations. Les nouveautés provenaient de sept mails et les premiers lots du nouveau plan ont été traités. Le graphique compare le travail prévu. Les reprises et le temps GPU dépendent du déroulement de l’analyse.</p>
+  </div>
+  <p class="sources">Références techniques. <a href="../agent/backend/app/services/cdc_generation.py">Lots de pages et contrôle des citations du CDC</a> · <a href="../agent/backend/app/services/milestone_scan.py">Recherche de jalons par passages</a> · <a href="../agent/backend/app/services/project_knowledge_analysis.py">Bilan, comparaison des versions et reprise</a> · <a href="../agent/web/src/components/ProjectKnowledgePanel.tsx">Affichage du bilan</a></p>
+</section>
+
+<section id="appels" aria-labelledby="titre-appels">
+  <h2 id="titre-appels">Tableau des appels</h2>
+  <p>Les volumes ci-dessous décrivent le parcours habituel. Une requête HTTP peut contenir plusieurs passages. Une reprise peut faire plusieurs tentatives sur un même lot.</p>
+  <p>Dans les échanges techniques, le service Projets envoie les générations à <code>/v1/chat/completions</code> et les calculs vectoriels à <code>/v1/embeddings</code>. Les deux routes ont des files distinctes. Les intégrations compatibles peuvent également utiliser la route de génération <code>/v1/responses</code>.</p>
+  <div class="table-wrap" tabindex="0" role="region" aria-label="Tableau des appels aux moteurs">
+  <table>
+    <caption>Déclencheurs, moteur sollicité et résultat ou volume attendu</caption>
+    <thead><tr><th class="row-topic" scope="col">Action</th><th class="row-model" scope="col">Moteur sollicité</th><th scope="col">Résultat et volume typique</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Importer un mail ou lire un fichier</th><td>Lecteur de format</td><td>Enregistrement de l’original et extraction du texte par le code. Le classement et l’indexation sont des étapes ultérieures.</td></tr>
+      <tr><th scope="row">Classer un mail</th><td><span class="tag llm">LLM si disponible</span></td><td>Une requête habituelle par nouveau mail à analyser. Le modèle propose des indices, les règles appliquent le classement si les conditions sont réunies.</td></tr>
+      <tr><th scope="row">Enrichir un mail classé</th><td><span class="tag llm">LLM selon le parcours</span></td><td>Une autre requête habituelle pour proposer des éléments de connaissance. Des règles d’extraction existent aussi.</td></tr>
+      <tr><th scope="row">Enregistrer une note</th><td>Éditeur et ERP</td><td>L’enregistrement est une écriture de données. La version d’une note de projet éligible peut déclencher ensuite une indexation.</td></tr>
+      <tr><th scope="row">Indexer une source</th><td><span class="tag eg2">Embeddings</span></td><td>Un appel par lot de passages manquants. Les passages identiques avec des vecteurs compatibles peuvent être réutilisés.</td></tr>
+      <tr><th scope="row">Rechercher des sources</th><td><span class="tag eg2">Embeddings selon le mode</span></td><td>Un vecteur de requête en recherche hybride lorsque l’index contient des passages compatibles. Les mots et références exactes sont comparés par le code.</td></tr>
+      <tr><th scope="row">Poser une question sourcée</th><td><span class="tag eg2">Embeddings si rappel sémantique</span> <span class="tag llm">LLM pour répondre</span></td><td>Rappel des extraits, puis génération. Un parcours avec outils ou plusieurs périmètres peut ajouter des appels.</td></tr>
+      <tr><th scope="row">Transcrire une réunion</th><td>Moteur de parole</td><td>Conversion de l’audio en texte. La synthèse, la question à l’assistant et l’indexation du texte ont leurs déclencheurs propres.</td></tr>
+      <tr><th scope="row">Résumer une réunion ou proposer un ajout</th><td><span class="tag llm">LLM</span></td><td>Un ou plusieurs appels selon la longueur, la consolidation et les options de la séance.</td></tr>
+      <tr><th scope="row">Analyser un CDC ou chercher des jalons</th><td><span class="tag llm">LLM par lots</span></td><td>Pages de CDC ou extraits à examiner. La fonction conserve les repères et soumet les propositions aux contrôles métier.</td></tr>
+      <tr><th scope="row">Actualiser le bilan d’exigences</th><td><span class="tag llm">LLM sur les lots nécessaires</span></td><td>Zéro appel si le bilan correspond toujours aux entrées. Sinon, analyse différentielle ou passage complet si la référence manque.</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="exploitation" aria-labelledby="titre-exploitation">
+  <h2 id="titre-exploitation">Charge du serveur, erreurs et suivi</h2>
+  <figure class="diagram" aria-labelledby="fig-file">
+    <figcaption id="fig-file">Une conversation arrive pendant une analyse automatique</figcaption>
+    <ol class="nodes arrows" aria-label="Ordre de passage dans la file de génération">
+      <li class="node kind-gate"><strong>Lot en cours</strong><span>Il se termine normalement</span></li>
+      <li class="node kind-llm"><strong>Conversation en attente</strong><span>Elle obtient la prochaine place disponible</span></li>
+      <li class="node"><strong>Lots de fond suivants</strong><span>Ils reprennent si le budget horaire le permet</span></li>
+    </ol>
+    <p class="diagram-note">Le service EG2 utilise une file séparée pour les calculs d’embeddings.</p>
+  </figure>
+  <p><strong>File de génération.</strong> Les conversations prennent la priorité sur les traitements de fond qui attendent dans la passerelle. Le lot qui tourne peut se terminer. Les analyses de connaissances alternent entre projets éligibles par lot. Après <strong>15 minutes cumulées</strong> de traitement de ces analyses sur une heure glissante, la passerelle reporte les nouveaux lots et indique un délai de reprise. Ce budget concerne l’analyse périodique des projets. La passerelle le mesure pendant son fonctionnement et repart avec une fenêtre vide à son redémarrage.</p>
+  <p><strong>File d’embeddings.</strong> Le canal EG2 possède ses propres mécanismes d’attente. La passerelle accepte une requête EG2 à la fois sur son API, avec une file bornée. Le canal Brain reprend les réponses transitoires de surcharge ou d’indisponibilité dans son budget de temps. Une recherche sémantique peut donc solliciter EG2 alors que la file du LLM est vide.</p>
+  <p><strong>Échec ou changement pendant le calcul.</strong> Kiara conserve les lots d’analyse terminés et le bilan publié. Un lot en erreur peut être repris. Si des données ont changé pendant le calcul, le résultat devenu périmé est écarté et le plan est recalculé. Les index de recherche vérifient de nouveau la source après une opération lente, pour éviter de rendre une version qui vient d’être remplacée.</p>
+  <div class="table-wrap" tabindex="0" role="region" aria-label="Où suivre les traitements">
+  <table>
+    <caption>Repères pour comprendre un pic de charge</caption>
+    <thead><tr><th class="row-topic" scope="col">Où regarder</th><th scope="col">Information disponible</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Vue d’ensemble du projet</th><td><strong>Informations à vérifier</strong> affiche l’état de l’analyse, les lots traités et le dernier bilan. C’est le premier endroit où regarder pour un bilan périodique.</td></tr>
+      <tr><th scope="row">Mails et suivi des traitements</th><td>État du classement, de l’enrichissement et de l’indexation. Un mail peut être classé tout en attendant sa projection de recherche.</td></tr>
+      <tr><th scope="row">Bibliothèque des sources</th><td>État de l’extraction, versions, disponibilité du texte et état d’indexation.</td></tr>
+      <tr><th scope="row">Console serveur</th><td>État de Qwen, état d’EG2 et file de génération. Le journal de la passerelle contient l’heure du lancement et l’origine authentifiée. Un identifiant « service Projets » peut regrouper plusieurs tâches. Il faut le rapprocher de leurs états pour identifier celle qui a travaillé.</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="sources">Références techniques. <a href="../lanceur/scheduler.py">Ordre, durée et budget de génération</a> · <a href="../agent/app/services/inference_scheduler.py">Priorités du service Projets</a> · <a href="../lanceur/remote.py">Journalisation de la passerelle</a> · <a href="../agent/app/services/llm_usage.py">Suivi des jetons lorsqu’ils sont remontés</a> · <a href="../agent/app/services/embedding_channel.py">Attente et reprises EG2</a></p>
+</section>
+
+<section id="glossaire" aria-labelledby="titre-glossaire">
+  <h2 id="titre-glossaire">Glossaire</h2>
+  <dl>
+    <dt>LLM</dt><dd>Modèle de langage génératif, ici Qwen dans le parcours local. Il produit du texte ou des résultats structurés.</dd>
+    <dt>Embedding</dt><dd>Représentation numérique d’un texte. La proximité entre vecteurs aide à retrouver des passages qui parlent de la même chose. Un score de proximité mesure la pertinence possible d’un résultat de recherche.</dd>
+    <dt>Passage</dt><dd>Fragment du texte d’une source conservé avec un repère pour le retrouver et le citer.</dd>
+    <dt>Projection</dt><dd>Copie dérivée d’une source ou d’une information pour un usage spécialisé, par exemple la recherche.</dd>
+    <dt>Provenance</dt><dd>Lien entre une information et son origine, avec notamment le projet, la source, la version et, quand il est disponible, le repère dans l’original.</dd>
+    <dt>Lot</dt><dd>Ensemble de textes ou de comparaisons envoyé dans une même requête à un moteur.</dd>
+  </dl>
+  <details open>
+    <summary>Portée des vérifications</summary>
+    <p>Le rapport décrit les parcours présents dans le code, les réglages relevés et le traitement différentiel observé le 19 novembre 2026. Le relevé de production a consulté les états des moteurs et les métadonnées en lecture seule. Les liens techniques pointent vers les sources du dépôt sur ce poste.</p>
+  </details>
+</section>
+</main>
+</div>
+</body>
+</html>

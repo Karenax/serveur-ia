@@ -26,11 +26,35 @@ l’historique.
 
 [Architecture et validations de Kiara](ARCHITECTURE-ACTUELLE.md#projets-et-conversations)
 
+## Retrouver les réglages
+
+Ouvre **Réglages** depuis le menu de Kiara. Sous **Voix et dictée**, choisis
+**Conversation vocale** ou **Dictée**. Kiara Windows ouvre le panneau dédié de
+cet appareil. Tu peux aussi ouvrir les réglages de dictée depuis les options du
+composeur. En cas de panne du portail, ouvre les réglages depuis Conversations
+pour accéder à la connexion et aux commandes locales.
+
+La cloche ouvre les notifications reçues. Pour modifier les alertes, ouvre
+**Réglages → Notifications** ou choisis **Régler les notifications** dans la
+boîte. Les traitements sont dans **Activité → Analyses**. **Accès rapide**
+retrouve une rubrique, un projet ou un réglage par son nom.
+
+Pour choisir les dossiers Thunderbird ou la fréquence, ouvre
+**Réglages → Mails et Thunderbird**. Cette rubrique donne aussi accès à
+l’installation de la liaison. Pour retrouver un compte rendu, ouvre **Réunions**
+et filtre par projet.
+
 ## Prendre des notes dans Kiara
 
-Ouvre **Notes** depuis l’accueil ou la navigation principale. **Personnel** affiche
-tes notes privées. Chaque projet actif auquel tu as accès apparaît dès qu’il
-contient une note. Utilise **Nouvelle note de projet** pour créer la première.
+Ouvre **Notes**, choisis un carnet puis **Nouvelle note**. **Personnel** affiche
+tes notes privées. Les projets auxquels tu as accès apparaissent dès qu’ils
+contiennent une note. Pour écrire dans un projet qui n’a pas encore de carnet,
+choisis **Choisir un autre projet…**. Depuis une fiche projet, utilise
+**Ouvrir le carnet du projet**.
+
+Le bouton d’enregistrement et son état sont à côté du titre. **Actions de la note**
+donne accès à l’historique, à l’export du brouillon et à la copie vers un projet.
+Dans une réunion, **Notes de séance** désigne la note associée à cette séance.
 
 L’éditeur conserve les tableaux, les cases à cocher et la couleur du texte.
 Colle une image avec **Ctrl+V** dans le document, y compris dans une note neuve.
@@ -40,7 +64,7 @@ vers un projet**. Le projet reçoit une copie et l’original reste privé.
 
 ## Choisir son espace
 
-Sous Windows, ouvrir **Réglages → Mémoire et rappels**, puis choisir
+Ouvrir **Mémoire et rappels** dans les options du composeur, puis choisir
 **Personnel** ou un projet. Les souvenirs,
 rappels et commandes concernent cet espace. Pour une demande dans le chat ou en
 parlant, choisir le projet de la conversation avant l’envoi. Les données de deux
@@ -97,7 +121,7 @@ application forcée à l’arrêt, retrouver les événements à la prochaine co
 
 ## Reprendre un projet
 
-Choisir un projet dans **Réglages → Mémoire et rappels**. **Faire le point** retrouve ses
+Choisir un projet dans **Mémoire et rappels** depuis les options du composeur. **Faire le point** retrouve ses
 décisions confirmées, souvenirs, documents et discussions récentes.
 Vérifier les sources et distinguer une décision confirmée d’une proposition.
 

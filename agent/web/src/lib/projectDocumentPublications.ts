@@ -2,7 +2,7 @@ import { request } from './http';
 import type { DocumentPage } from './projectDocuments';
 
 export type PublicationChoice={link_id:string;relative_directory:string;replace_existing:boolean};
-export type PublicationCommand=Omit<PublicationChoice,'replace_existing'>&{replace_existing?:boolean;command_id:string;expected_revision:number;expected_preview_sha256:string;reviewed:true};
+export type PublicationCommand=Omit<PublicationChoice,'replace_existing'>&{replace_existing?:boolean;command_id:string;expected_revision:number;expected_preview_sha256:string;reviewed:true;link_to_project?:boolean};
 export type FileReceipt={identity:string;sha256:string;size_bytes:number};
 export type PublicationPreview={project_id:string;job_id:string;job_revision:number;artifact_id:string;filename:string;
   destination:string;directory:string;directory_identity:string;preview_sha256:string;occupied:boolean;
@@ -49,17 +49,20 @@ export const publicationStateLabel=(state:PublicationState)=>({requested:'À vé
   backup_saved:'Original sauvegardé',succeeded:'Publication enregistrée',abandoned:'Commande clôturée'}[state]);
 export const publicationBlockerLabel=(code:string)=>({read_only:'Consultation uniquement.',execution_blocked:'Historique suspendu après import ou restauration.',
   job_active:'Terminez ou interrompez le lot avant la publication.',destination_occupied:'Un fichier existe : choisissez explicitement son remplacement pour conserver une sauvegarde.',
-  replacement_target_missing:'Aucun original à remplacer : désactivez ce choix.',replacement_not_supported:'Le remplacement est disponible avec les handles natifs Windows.'}[code]||code);
+  replacement_target_missing:'Aucun original à remplacer : désactivez ce choix.',replacement_not_supported:'Le remplacement nécessite un serveur Windows.',
+  source_changed:'Le fichier existant a changé depuis la préparation. Refaites l’aperçu et préparez une nouvelle copie.'}[code]||code);
 export const pendingKey=(pid:string,aid:string)=>'agent.publication.v2:'+JSON.stringify([pid,aid]);
 export function readPending(pid:string,aid:string):PublicationCommand|null{
   const raw=localStorage.getItem(pendingKey(pid,aid));if(!raw)return null;
   const value=JSON.parse(raw) as PublicationCommand;
-  const keys=['command_id','expected_revision','expected_preview_sha256','link_id','relative_directory','replace_existing','reviewed'];
-  const actual=value?Object.keys(value).sort().join('|'):'';
-  if(!value||![keys.sort().join('|'),keys.filter(key=>key!=='replace_existing').sort().join('|')].includes(actual)||!Number.isSafeInteger(value.expected_revision)||value.expected_revision<1||
+  const required=['command_id','expected_revision','expected_preview_sha256','link_id','relative_directory','reviewed'];
+  const keys=value?Object.keys(value):[];
+  if(!value||!required.every(key=>keys.includes(key))||keys.some(key=>!required.includes(key)&&key!=='replace_existing'&&key!=='link_to_project')||
+    !Number.isSafeInteger(value.expected_revision)||value.expected_revision<1||
     typeof value.command_id!=='string'||typeof value.expected_preview_sha256!=='string'||
     !/^[a-zA-Z0-9_-]{1,36}$/.test(value.command_id)||!/^[a-f0-9]{64}$/.test(value.expected_preview_sha256)||
     typeof value.link_id!=='string'||!value.link_id||value.link_id.length>36||typeof value.relative_directory!=='string'||value.relative_directory.length>2048||
-    'replace_existing' in value&&typeof value.replace_existing!=='boolean'||value.reviewed!==true)throw new Error('Commande locale illisible : consultez les reçus avant de préparer une nouvelle publication.');
+    'replace_existing' in value&&typeof value.replace_existing!=='boolean'||
+    'link_to_project' in value&&typeof value.link_to_project!=='boolean'||value.reviewed!==true)throw new Error('Commande locale illisible : consultez les reçus avant de préparer une nouvelle publication.');
   return value;
 }

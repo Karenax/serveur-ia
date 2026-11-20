@@ -6,6 +6,7 @@ This copy operation returns bounded bytes and changes no project/file data.
 import hashlib
 import json
 from pathlib import Path
+from string import Formatter
 
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
@@ -13,9 +14,11 @@ from sqlalchemy.orm import Session
 from ..models import NetworkLink
 from .deliverable_files import _filename
 from .document_file_access import acquire_file, configured_policy
+from .document_discovery import discover_many
 from .document_package_prepare import prepare_package
 from .document_package_preview import preview_package
 from .document_project_values import project_values
+from .document_search_rules import SearchRule
 from .document_template_catalogue import catalogue, document_spec
 from .project_identity import _project
 from .project_operator import current_operator
@@ -60,6 +63,32 @@ def workspace(db, project_id, *, offset=0, limit=100):
             'links': {'items': links, 'total': total, 'offset': offset, 'limit': limit},
             'file_access': status, 'can_prepare_copy': current_operator().role != 'reader',
             'publication': 'explicit_separate_command', 'batch_available': batch_available}
+
+
+def discover_folder(db, project_id, link_id):
+    preferences = effective_preferences(db, project_id)
+    values = project_values(db, project_id)['values']
+    rules, output_names, fields = [], {}, {}
+    for item in preferences['items']:
+        if not item['active']:
+            continue
+        document_id = item['document_id']
+        rules.append(SearchRule(document_id, tuple(item['relative_paths']), tuple(item['filename_patterns']),
+                                tuple(item['excluded_tokens']), item['preferred_version']))
+        spec = document_spec(document_id)
+        fields[document_id] = sorted({field for _, field in (*spec['cells'], *spec['bookmarks'])
+                                      if not values[field].strip()})
+        keys = [key for _, key, _, _ in Formatter().parse(spec['output_name']) if key]
+        output_names[document_id] = None
+        if all(values[key].strip() for key in keys):
+            try:
+                output_names[document_id] = _filename(spec['output_name'].format_map(values))
+            except HTTPException:
+                pass  # The document preview explains invalid output names.
+    if not rules:
+        raise HTTPException(409, 'Aucune recherche de trame active dans les réglages documentaires')
+    result = discover_many(db, project_id, link_id=link_id, rules=rules, output_names=output_names)
+    return {**result, 'items': [{**row, 'missing_fields': fields[row['document_id']]} for row in result['items']]}
 
 
 def _read(db, project_id, payload, *, prepare=False):

@@ -64,14 +64,8 @@ class HTTPProtection:
                 path = scope['path']
                 if not path.startswith(('/assets/', '/static/')):
                     headers['Cache-Control'] = 'private, no-store'
-                # Legacy Jinja/fallback HTML still has inline handlers. Keep
-                # those working, with the same framing/base/object protections;
-                # the React application can prohibit all inline script.
-                legacy = path.startswith('/ui') or not self._react_available()
                 docs = path in {'/docs', '/redoc', '/docs/oauth2-redirect'}
-                scripts = "'self' 'unsafe-inline'" if legacy else "'self'"
-                if docs:
-                    scripts = "'self' 'unsafe-inline' https://cdn.jsdelivr.net"
+                scripts = "'self' 'unsafe-inline' https://cdn.jsdelivr.net" if docs else "'self'"
                 frames = "'self' blob: data:"
                 # srcdoc mail frames inherit the parent's policy: their own
                 # stricter CSP blocks remote images until explicit opt-in.
@@ -90,8 +84,3 @@ class HTTPProtection:
                 raise
             if not rejected:
                 await JSONResponse({'detail': 'Requête trop volumineuse'}, status_code=413)(scope, receive, send)
-
-    @staticmethod
-    def _react_available():
-        from pathlib import Path
-        return (Path(__file__).resolve().parents[1] / 'web/dist/index.html').is_file()

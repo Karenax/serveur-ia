@@ -60,12 +60,17 @@ export function App() {
   const [error, setError] = useState("");
   const loadGeneration = useRef(0);
   const [canCreateProject, setCanCreateProject] = useState(false);
+  const [readOnly, setReadOnly] = useState(false);
+  const [canManageSharedSettings,setCanManageSharedSettings] = useState(false);
   useEffect(() => {
     let active = true;
     const refreshPermissions = () => {
       void api.session().then(({operator}) => {
-        if (active) setCanCreateProject(operator.role !== 'reader' && operator.project_ids === null);
-      }).catch(() => { if (active) setCanCreateProject(false); });
+        if (!active) return;
+        setReadOnly(operator.role === 'reader');
+        setCanManageSharedSettings(operator.role === 'owner' && operator.project_ids === null);
+        setCanCreateProject(operator.role !== 'reader' && operator.project_ids === null);
+      }).catch(() => { if (active) {setCanCreateProject(false);setCanManageSharedSettings(false);} });
     };
     refreshPermissions();
     window.addEventListener('focus', refreshPermissions);
@@ -97,6 +102,6 @@ export function App() {
     return()=>{loadGeneration.current++;window.clearInterval(timer);window.removeEventListener("focus",refreshVisible);document.removeEventListener("visibilitychange",refreshVisible);};
   }, [load]);
 
-  return <WorkspaceShell canCreateProject={canCreateProject} rows={rows ?? []} portfolioLoading={!rows && !error} portfolioUnavailable={!rows && !!error} reload={load} error={error} ProjectPanel={ProjectPanel}
+  return <WorkspaceShell canCreateProject={canCreateProject} readOnly={readOnly} canManageSharedSettings={canManageSharedSettings} rows={rows ?? []} portfolioLoading={!rows && !error} portfolioUnavailable={!rows && !!error} reload={load} error={error} ProjectPanel={ProjectPanel}
     MailPanel={MailPanel} CreatePanel={CreatePanel} SagePanel={ImportsPanel} />;
 }

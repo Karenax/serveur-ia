@@ -437,11 +437,26 @@ it("laisse aboutir une lecture de traitements lente avant de reprendre le suivi"
   } finally {vi.useRealTimers();}
 });
 
+it("attend le retour dans Activité avant de relire les traitements après une annulation", async () => {
+  const load = vi.spyOn(workspaceApi, 'jobs').mockResolvedValue({items:[job], total:1});
+  let complete!: (value: WorkspaceJob) => void;
+  vi.spyOn(workspaceApi, 'jobAction').mockImplementation(() => new Promise(resolve => {complete = resolve;}));
+  const onOpenProject = vi.fn();
+  const view = render(<GlobalJobsView rows={rows} onOpenProject={onOpenProject}/>);
+  await screen.findByText('4 / 10 mails');
+  fireEvent.click(screen.getByRole('button', {name:'Annuler'}));
+  view.rerender(<GlobalJobsView rows={rows} onOpenProject={onOpenProject} active={false}/>);
+  await act(async () => complete(job));
+  expect(load).toHaveBeenCalledTimes(1);
+  view.rerender(<GlobalJobsView rows={rows} onOpenProject={onOpenProject}/>);
+  await waitFor(() => expect(load).toHaveBeenCalledTimes(2));
+});
+
 it("affiche les compteurs réels et propose seulement les commandes garanties par le moteur", async () => {
   vi.spyOn(workspaceApi, "jobs").mockResolvedValue({items: [job], total: 1});
   const action = vi.spyOn(workspaceApi, "jobAction").mockResolvedValue(job);
   const open = vi.fn();
-  render(<GlobalJobsView rows={rows} onOpenProject={open} active={false} />);
+  render(<GlobalJobsView rows={rows} onOpenProject={open} />);
   await screen.findByText("4 / 10 mails");
   expect(screen.getByRole("progressbar").getAttribute("value")).toBe("40");
   expect(screen.queryByRole("button", {name: "Reprendre"})).toBeNull();
@@ -454,7 +469,7 @@ it("affiche les compteurs réels et propose seulement les commandes garanties pa
 it("lance une ré-analyse globale explicite même quand la vue est filtrée par projet", async () => {
   vi.spyOn(workspaceApi, "jobs").mockResolvedValue({items: [], total: 0});
   const start = vi.spyOn(workspaceApi, "startTriage").mockResolvedValue(triageJob);
-  render(<GlobalJobsView rows={rows} onOpenProject={vi.fn()} active={false} />);
+  render(<GlobalJobsView rows={rows} onOpenProject={vi.fn()} />);
   await screen.findByText("Aucun traitement enregistré");
   fireEvent.change(screen.getByLabelText("Projet"), {target: {value: "erp-a"}});
   fireEvent.click(screen.getByLabelText("Ré-analyser les mails à classer ayant déjà une proposition"));

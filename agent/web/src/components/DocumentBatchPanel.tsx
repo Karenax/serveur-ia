@@ -5,6 +5,7 @@ import { documentJobApi, documentJobLabel, documentEventLabel, type BatchCommand
 import { Pagination } from './IdentityPickers';
 import { useAlive, message } from './PlanningTasksPanel';
 import { DocumentPublicationPanel } from './DocumentPublicationPanel';
+import type { PublicationChoice } from '../lib/projectDocumentPublications';
 
 type Selection={item:BatchItem;label:string;filename:string};
 type Props={projectId:string;active:boolean;canEdit:boolean;disabled:boolean;choice:DocumentChoice|null;
@@ -17,7 +18,7 @@ export function DocumentBatchPanel({projectId,active,canEdit,disabled,choice,pre
   const [journal,setJournal]=useState(false),[eventOffset,setEventOffset]=useState(0),[attemptOffset,setAttemptOffset]=useState(0);
   const [events,setEvents]=useState<DocumentPage<DocumentEvent>|null>(null),[attempts,setAttempts]=useState<DocumentPage<DocumentAttempt>|null>(null);
   const [download,setDownload]=useState<{url:string;name:string;sha256:string}|null>(null);
-  const [publication,setPublication]=useState<{artifactId:string;label:string}|null>(null),[publicationBusy,setPublicationBusy]=useState(false),[publicationDirty,setPublicationDirty]=useState(false);
+  const [publication,setPublication]=useState<{artifactId:string;label:string;suggestion?:PublicationChoice|null}|null>(null),[publicationBusy,setPublicationBusy]=useState(false),[publicationDirty,setPublicationDirty]=useState(false);
   const publicationChanged=useCallback(()=>setTick(value=>value+1),[]);
   useEffect(()=>{onBusy(!!busy||publicationBusy);},[busy,publicationBusy,onBusy]);
   const action=useRef<AbortController|null>(null),alive=useAlive();
@@ -136,10 +137,10 @@ export function DocumentBatchPanel({projectId,active,canEdit,disabled,choice,pre
         {item.artifact_id&&<div className="document-actions"><button type="button" className="button secondary sm" disabled={unavailable} onClick={()=>void file(item.artifact_id!)}>Préparer le téléchargement · {label(item.document_id)}</button>
           <button type="button" className="button secondary sm" disabled={unavailable} onClick={()=>{
             if(publicationDirty&&publication?.artifactId!==item.artifact_id&&!window.confirm('Changer de copie ? La commande mémorisée reste conservée.'))return;
-            setPublication({artifactId:item.artifact_id!,label:label(item.document_id)});
+            setPublication({artifactId:item.artifact_id!,label:label(item.document_id),suggestion:item.publication_suggestion});
           }}>{canEdit&&!detail.execution_blocked?'Publier ou consulter les reçus':'Consulter les publications'} · {label(item.document_id)}</button></div>}</li>)}</ul>
       {publication&&<DocumentPublicationPanel key={publication.artifactId} projectId={projectId} jobId={detail.id} artifactId={publication.artifactId}
-        label={publication.label} revision={detail.revision} active={active} canEdit={canEdit} executionBlocked={detail.execution_blocked}
+        label={publication.label} suggestion={publication.suggestion} revision={detail.revision} active={active} canEdit={canEdit} executionBlocked={detail.execution_blocked}
         jobActive={['queued','running'].includes(detail.status)} disabled={disabled||!!busy} onBusy={setPublicationBusy} onDirty={setPublicationDirty} onChanged={publicationChanged}/>}
       <div className="document-actions">{canEdit&&detail.can_cancel&&<button type="button" className="button secondary" disabled={unavailable||!!readError} onClick={()=>void command('cancel')}>Arrêter ce lot</button>}
         {canEdit&&detail.can_retry&&<button type="button" className="button primary" disabled={unavailable||!jobs?.worker.can_submit||!!readError} onClick={()=>void command('retry')}>Reprendre les fichiers non réussis</button>}

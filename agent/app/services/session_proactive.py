@@ -45,10 +45,10 @@ def question_progress(db, row):
     """Read durable progress without launching, retrying or timing out inference."""
     from ..meeting_session_models import LiveTranscriptSegment, MeetingSessionEvent
     from . import meeting_sessions as sessions
-    from .settings_service import get_section
+    from .meeting_preferences import preferences
 
     sessions.get_session(db, row.id)
-    enabled = bool(get_section(db, 'foresight').get('proactive_enabled', False))
+    enabled = sessions.feature_enabled(db) and preferences(db, row.operator_id)['proactive_enabled']
     result = {'state': 'idle' if enabled else 'disabled', 'elapsed_seconds': 0.0,
               'delayed': False, 'enabled': enabled, 'attempt_id': None}
     attempt = db.scalar(select(MeetingSessionEvent).where(
@@ -108,12 +108,14 @@ def _admission_delay(attempt):
 
 def _observe(db, row):
     from . import meeting_sessions as sessions, scoped_assistant as assistant
+    from .meeting_preferences import preferences
     # SQLite's writer lock makes observations/reservations atomic across workers.
     db.execute(text('UPDATE meeting_sessions SET revision=revision WHERE 0'))
     db.refresh(row)
     sessions.get_session(db, row.id, write=True)
     stamp, note, segments = assistant.session_snapshot(db, row)
-    if row.state not in {'created', 'recording', 'paused', 'completed'} or row.pending_command_id:
+    if (row.state not in {'created', 'recording', 'paused', 'completed'} or row.pending_command_id
+            or not preferences(db, row.operator_id)['auto_enhancement_enabled']):
         db.rollback()
         return None
     if not note and not any(segment.text.strip() for segment in segments):
@@ -146,8 +148,8 @@ def _observe(db, row):
 def automatic_status(db, row):
     from ..meeting_session_models import MeetingSessionEvent
     from . import meeting_sessions as sessions, scoped_assistant as assistant
-    from .settings_service import get_section
-    enabled = sessions.feature_enabled(db) and bool(get_section(db, 'foresight').get('auto_enhancement_enabled', False))
+    from .meeting_preferences import preferences
+    enabled = sessions.feature_enabled(db) and preferences(db, row.operator_id)['auto_enhancement_enabled']
     stamp, note, _ = assistant.session_snapshot(db, row)
     value = {'enabled': enabled, 'state': 'disabled', 'detail': 'Enrichissement automatique désactivé.',
              'error': None, 'note_version_id': note.get('version_id') if note else None,
@@ -210,14 +212,17 @@ def _tick():
     from ..db import SessionLocal
     from ..meeting_session_models import MeetingSession, LiveTranscriptSegment, MeetingSessionEvent
     from . import meeting_sessions as sessions, scoped_assistant as assistant, session_enhancements as enhancements
-    from .settings_service import get_section
+    from .meeting_preferences import any_enabled, enabled_for_session, preferences
     from .inference_scheduler import wait_policy
     with SessionLocal() as db:
-        options = get_section(db, 'foresight')
-        if not sessions.feature_enabled(db) or not (options.get('proactive_enabled', False) or options.get('auto_enhancement_enabled', False)):
+        questions_enabled = any_enabled(db, 'proactive_enabled')
+        enhancements_enabled = any_enabled(db, 'auto_enhancement_enabled')
+        if not sessions.feature_enabled(db) or not (questions_enabled or enhancements_enabled):
             return
         rows = []
-        for row in db.scalars(select(MeetingSession).where(MeetingSession.state.in_(['created', 'recording', 'paused', 'completed']))
+        for row in db.scalars(select(MeetingSession).where(MeetingSession.state.in_(['created', 'recording', 'paused', 'completed']),
+                              (MeetingSession.state.in_(['recording', 'paused']) & enabled_for_session(db, 'proactive_enabled'))
+                              | enabled_for_session(db, 'auto_enhancement_enabled'))
                               .order_by(MeetingSession.updated_at.desc()).limit(20)):
             try:
                 sessions.get_session(db, row.id, write=True)
@@ -225,7 +230,7 @@ def _tick():
             except Exception:
                 continue
         # Consider questions across the whole bounded batch before any enrichment.
-        if options.get('proactive_enabled', False):
+        if questions_enabled:
             for row in rows:
                 if row.state not in {'recording', 'paused'}:
                     continue
@@ -239,7 +244,8 @@ def _tick():
                     except HTTPException:
                         db.rollback()
                         break
-                    if row.state not in {'recording', 'paused'} or row.pending_command_id:
+                    if (row.state not in {'recording', 'paused'} or row.pending_command_id
+                            or not preferences(db, row.operator_id)['proactive_enabled']):
                         db.rollback()
                         break
                     db.refresh(question)
@@ -273,7 +279,7 @@ def _tick():
                         _record_outcome(db, row, 'assistant.proactive-error', {'question_token': token, 'error': str(exc)[:1000]})
                         LOG.warning('Proactive question failed: %s', exc)
                     return
-        if options.get('auto_enhancement_enabled', False):
+        if enhancements_enabled:
             for row in rows:
                 try:
                     reserved = _observe(db, row)

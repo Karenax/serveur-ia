@@ -1,0 +1,89 @@
+.kiara-help {
+  box-sizing: border-box;
+  width: min(740px, calc(100% - 32px));
+  max-height: calc(100dvh - 40px);
+  margin: auto;
+  padding: 0;
+  border: 1px solid var(--border, var(--line, GrayText));
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface, var(--bg, Canvas));
+  color: var(--text, CanvasText);
+  font: 15px/1.55 "Segoe UI", system-ui, sans-serif;
+}
+
+.kiara-help[open] { display: flex; flex-direction: column; }
+.kiara-help::backdrop { background: #11182080; }
+
+.kiara-help-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border, var(--line, GrayText));
+  background: var(--surface-muted, var(--panel, Canvas));
+}
+
+.kiara-help-header h2 { margin: 0; font-size: 19px; font-weight: 650; }
+.kiara-help-header label:not([hidden]) { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.kiara-help-header select, .kiara-help-header button {
+  box-sizing: border-box;
+  min-height: 36px;
+  padding: 4px 8px;
+  border: 1px solid var(--border, var(--line, GrayText));
+  border-radius: 7px;
+  background: var(--surface, var(--bg, Canvas));
+  color: inherit;
+  font: inherit;
+}
+
+.kiara-help-header select { min-width: 0; max-width: 100%; }
+.kiara-help-header button { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; cursor: pointer; }
+.kiara-help-header button:hover { background: var(--surface-hover, var(--hover, ButtonFace)); }
+.kiara-help :focus-visible { outline: 2px solid var(--accent, Highlight); outline-offset: 2px; }
+
+.kiara-help-content {
+  min-height: 0;
+  padding: 22px 24px 28px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  overflow-wrap: anywhere;
+}
+
+.kiara-help-content:focus-visible { outline-offset: -3px; }
+.kiara-help-content article { max-width: 68ch; }
+.kiara-help-content h3 { margin: 0 0 12px; font-size: 24px; line-height: 1.25; }
+.kiara-help-content h4 { margin: 18px 0 6px; font-size: 16px; }
+.kiara-help-content p, .kiara-help-content ol, .kiara-help-content ul { margin: 0 0 10px; }
+.kiara-help-content ol, .kiara-help-content ul { padding-inline-start: 1.5em; }
+.kiara-help-content li + li { margin-top: 5px; }
+.kiara-help-content :last-child { margin-bottom: 0; }
+
+.device-recovery-header .kiara-help-trigger {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  margin-inline-start: auto;
+  cursor: pointer;
+}
+
+.kiara-guide {
+  color-scheme: light dark;
+  max-width: 74ch;
+  margin: 0 auto;
+  padding: 24px;
+  background: Canvas;
+  color: CanvasText;
+  font: 16px/1.6 "Segoe UI", system-ui, sans-serif;
+}
+
+.kiara-guide nav { display: flex; gap: 8px 18px; flex-wrap: wrap; }
+.kiara-guide article { border-top: 1px solid GrayText; padding: 8px 0; }
+.kiara-guide :target { scroll-margin-top: 20px; }
+
+@media (max-width: 480px) {
+  .kiara-help-header, .kiara-help-content { padding-inline: 16px; }
+}

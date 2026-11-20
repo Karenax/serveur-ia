@@ -145,9 +145,11 @@ def _citation(db, item, ordinal):
             **{key: item[key] for key in ('source_version', 'profile_key', 'engine', 'modality') if key in item}}
 
 
-def _effective_cfg(db, cfg):
+def _effective_cfg(db, cfg, *, local=None):
     options = get_section(db, "foresight")
-    if options.get("mode") == "local":
+    if local is None:
+        local = options.get("mode") == "local"
+    if local:
         from urllib.parse import urlsplit
         endpoint = options.get("local_generation_endpoint") or cfg.get("fallback_base_url") or "http://127.0.0.1:1234"
         parsed = urlsplit(endpoint)
@@ -171,7 +173,8 @@ async def prepare(db, row, *, query, scope="session", source_ids=(), history=())
         raise HTTPException(409, "Activer le moteur de génération dans Réglages")
     citations = []
     warnings = []
-    local = get_section(db, 'foresight').get('mode') == 'local'
+    from .meeting_preferences import preferences
+    local = preferences(db, row.operator_id)['mode'] == 'local'
     if scope in {"project", "global"} and not local:
         if scope == "project" and not row.brain_project_id:
             raise HTTPException(409, "Attribuer un projet pour ce périmètre")
@@ -335,7 +338,7 @@ async def prepare(db, row, *, query, scope="session", source_ids=(), history=())
                 raise HTTPException(409, 'Une information a disparu pendant la préparation ; relancer la question')
             citation['knowledge_project_id'] = knowledge.project_id
     conversation = conversation_context(row, scope, source_ids)
-    return _effective_cfg(db, cfg), messages, {"scope": scope, "conversation": conversation,
+    return _effective_cfg(db, cfg, local=local), messages, {"scope": scope, "conversation": conversation,
                                             "conversation_key": conversation_key(conversation),
                                             "revision": row.revision, "session_stamp": stamp,
                                             "citations": citations, "warnings": warnings}

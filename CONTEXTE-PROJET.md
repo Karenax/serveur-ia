@@ -1,17 +1,18 @@
 # Contexte de reprise — serveur Kiara
 
-Mise à jour du 18 novembre 2026.
+Mise à jour du 20 novembre 2026.
 
-**Kiara 4.0.11** est en production pour **Windows et le web privé**. Les mises à
-jour et les réglages du poste sont de nouveau accessibles depuis Réglages.
-[Audit des réglages](audits/2026-11-15-fusion-kiara/BASCULE.md#audit-des-réglages-de-kiara-4011)
+**Kiara 4.0.22** a été vérifiée en production le 20 novembre pour **Windows et
+le web privé**. Dans Documents, la recherche groupée couvre huit types actifs.
+La 4.0.21 est le point de retour documenté.
+[Bascule 4.0.22](audits/2026-11-15-fusion-kiara/BASCULE.md#livraison-kiara-4022)
 Le lanceur Kiara supervise le service Projets et son catalogue de 11 projets.
 Conversations réunit le composeur, l’historique et l’assistant de projet, avec
 les brouillons et le mode éphémère. Projets propose la fiche à quatre rubriques
 dans le style Kiara. Le superviseur autonome a été retiré du dépôt.
 
 Le canal Windows utilise un manifeste Ed25519 et un installateur sans
-Authenticode. La **4.0.10** est conservée pour le retour. La **3.5.63** reste la
+Authenticode. La **3.5.63** reste la
 référence du canal classique. Les paquets Linux et Android ont leur propre
 qualification et suivent un calendrier distinct.
 
@@ -22,8 +23,15 @@ sauvegardes. Le catalogue de 11 projets et les deux entrées HTTPS ont été vé
 après la bascule. [Livraison du 18 novembre](audits/2026-11-15-fusion-kiara/BASCULE.md#livraison-windows-et-web-du-18-novembre-2026)
 
 Depuis le 18 novembre 2026, les travaux d’interface ciblent le bureau Windows
-et le web privé, avec une recette en 720p, 1080p et 1440p. L’application mobile
-est mise de côté jusqu’à sa reprise explicite. Voir les [consignes UX](maintenance/ux-ui/README.md).
+et le web privé. L’audit couvre aussi le client Tauri Linux et son candidat de
+recette. Les essais bureau se font en 720p, 1080p et WQHD. Android est mis de
+côté jusqu’à sa reprise explicite. Voir les [consignes UX](maintenance/ux-ui/README.md)
+et le [suivi de l’audit](audits/2026-11-16-architecture-interface/AVANCEMENT.md).
+L’[audit de cohérence](audits/2026-11-18-coherence-interface/RAPPORT.md) documente
+les réglages, la navigation et les notes.
+
+L’[analyse du circuit de l’information](analyses/2026-11-19-workflow-information-kiara.html)
+décrit l’entrée des sources, leur indexation par EG2 et leur utilisation par Qwen.
 
 Le dépôt de travail est `D:\Serveur IA`. Utiliser **D:** pour les constructions,
 caches, fichiers temporaires et recettes. **E:** est réservé aux archives et aux
@@ -31,123 +39,4 @@ preuves conservées. Tant que les accès à E: sont suspendus, conserver aussi
 les nouvelles preuves sur D:. Voir [l’architecture](ARCHITECTURE-ACTUELLE.md#projets-et-conversations)
 et [la publication avec retour arrière](audits/2026-11-15-fusion-kiara/BASCULE.md).
 
-Les sections qui suivent conservent les états précédents avec leurs versions,
-leurs chemins et leurs conditions de recette.
-
-## État historique du 4 novembre 2026
-
-Versions de cette livraison : **serveur/Windows 3.5.60**, **APK Android 1.0.25/code 26**.
-Les quatre EXE personnels actifs ont été reconditionnés et testés ; signature et
-téléchargement authentifié sont vérifiés. Données, clés, réglages, sauvegardes et
-processus Qwen sont conservés. Voir la
-[publication Windows](maintenance/2026-11-04-connexion-client/README.md).
-
-Le moteur de production est Strata **0.1.56 CUDA 12.9**, RTX 4080 principale,
-deux P100 pour les experts et DFlash2 ; le serveur Python corrigé 0.1.43.1 et
-l’encodeur P2200 sont conservés. Le
-[profil du 3 novembre](maintenance/2026-11-03-rtx4080/default-mode/README.md)
-décrit les réglages. Les sauvegardes quotidiennes à 03 h ont une seconde copie
-sur le NAS, vérifiée lors de cette publication.
-
-Les tâches, révisions automatiques de documents et synthèses programmées ont
-été retirées. Souvenirs, notes, rappels et bilan **Faire le point** restent
-disponibles. Les sources Android ont aussi évolué depuis l’APK du 26 octobre ;
-ces changements ne sont pas encore livrés dans cet APK. Linux conserve son
-archive précédente et ses limites de qualification matérielle.
-L’[architecture actuelle](ARCHITECTURE-ACTUELLE.md) fait référence pour les
-versions et responsabilités ; les sections suivantes conservent la chronologie.
-
-## Historique au 25 octobre 2026
-
-L’[assistant étendu](maintenance/2026-10-25-assistant-integration/README.md) est
-intégré et publié en **serveur/Windows 3.5.52, Android 1.0.23/code 24** : mémoire
-canonique gérée en écrit/oral, notes/tâches vocales, rappels calendaires sans modèle,
-bilans de projet et images associées au tour oral. La mémoire native Hermes est
-désactivée sans suppression des anciens fichiers. « Bonjour Kiara » est un essai
-local facultatif limité à l’application visible ; le relevé Android hors application
-est périodique, non exact et désactivé initialement. Qwen chargé, clés, accès,
-données et programmation des sauvegardes ont été conservés. Les tests matériels
-micro/caméra/veille/batterie et les longues latences restent à qualifier ; consulter
-le rapport avant de présenter ces limites comme résolues. Les paragraphes datés
-ci-dessous décrivent les interventions antérieures.
-
-Le [guide d’utilisation commun](GUIDE-ASSISTANT-KIARA.md) décrit les parcours
-Windows/Android et leurs réglages facultatifs. Les exigences encore partielles
-et les essais physiques non réalisés restent dans le
-[suivi I0–I8](PLAN-INTEGRATION-ASSISTANT-KIARA.md#suivi-de-la-première-intégration).
-
-L’interface **API et réseau → Qwen sur le réseau local** affiche maintenant ces paramètres et permet de les copier, d’activer ou de couper l’accès avec validation administrateur Windows. Le statut vient de la redirection, du pare-feu et de l’écoute réels. Mise en service de la console effectuée en conservant les processus Qwen, clés, données, sauvegardes et réglages Phonon. Douze tests ciblés, trois tests de sécurité et le parcours navigateur simulé passent. La validation Windows du test natif de coupure a été annulée : l’accès reste activé, sans nouvelle tentative d’élévation. Voir [le rapport et ses limites](maintenance/2026-10-22-api-qwen-lan/README.md).
-
-Le 22 octobre, à la demande de l’utilisateur, [Phonon remplace Pocket TTS pour la synthèse vocale serveur](maintenance/2026-10-22-phonon/README.md) : ptts 0.4.1, phonon-40m-fr q8 et voix fournie default, quatre threads CPU, modèle local épinglé et vérifié. Kiara a été redémarré sans redémarrer Qwen ; données, clés, réglages et sauvegardes conservés. Synthèse française réelle, annulation, reprise et dialogue Qwen via une passerelle authentifiée temporaire validés. Première tranche TTS 93 ms dans le test natif et 109 ms via HTTP sur une autre phrase, hors génération Qwen. Aucun nouveau client requis. Le jeton Hugging Face utilisé pour le téléchargement doit être révoqué car partagé dans le chat ; la synthèse fonctionne hors ligne. Qualité auditive et interruption avec un microphone humain non évaluées.
-
-Le 22 octobre, à la demande explicite de l’utilisateur, [l’API native Qwen est ouverte sur le réseau local sans authentification](maintenance/2026-10-22-api-qwen-lan/README.md) : adresse OpenAI `http://192.168.1.41:8080/v1`, modèle `qwen3.8-flash-next-iq4-xs`. Redirection Windows persistante de `192.168.1.41:8080` vers `127.0.0.1:8080`, pare-feu limité à `192.168.1.0/24`. Qwen/Fred n’ont pas été redémarrés. Catalogue et vraie réponse streaming sans clé validés depuis le serveur via son adresse LAN ; aucun autre appareil testé. Les transports Kiara restent identiques. Script de retrait administrateur dans le rapport.
-
-Windows/serveur **3.5.34** étend la [correction des noms à OpenCode 2](maintenance/2026-10-21-opencode-noms/README.md) : libellés lisibles dans la configuration et le message d’ajout, actualisation des modèles Kiara déjà ajoutés, identifiants de requête et options conservés. Le client distant doit mettre Kiara à jour, fermer OpenCode, refaire Ajouter à OpenCode 2 puis le rouvrir. Test natif avec OpenCode 2.0.32 ; livraison signée, Qwen et données conservés. Android reste en 1.0.13/code 14.
-
-Windows/serveur **3.5.33** corrige [l’ajout des modèles à Hermes sur le PC client](maintenance/2026-10-21-hermes-client/README.md) : identifiants affichés lisibles via une API locale dédiée, modèles indisponibles et embeddings exclus du catalogue de conversation, anciennes entrées remplacées au nouvel ajout. Le message précise l’activation des interrupteurs dans Hermes. Distribution signée et clients personnels actualisés ; Qwen, données, clés et sauvegardes conservés. Le poste distant doit mettre Kiara à jour, refaire l’ajout puis activer les modèles souhaités dans Hermes. Android reste en 1.0.13/code 14.
-
-À la demande de l’utilisateur, [EmbeddingGemma 2 est exposé aux clients distants](maintenance/2026-10-21-api-embeddings/README.md) : POST /v1/embeddings et découverte dans /v1/models, authentification existante, formats float/base64 et 768 dimensions. Windows 3.5.32 et Android 1.0.13/code 14 proposent les paramètres dans Réglages > API locale ; Android dispose maintenant du partage de l’adresse et de la clé locales. Qwen reste chargé sans redémarrage. Voir les preuves de publication et les limites Android dans le rapport associé.
-
-Le 21 octobre, l’utilisateur a autorisé l’application des correctifs de l’audit et désigné `\\DS218\home\Sauvegarde\Serveur IA` pour la seconde copie chiffrée. Les protections Windows, les dépendances, le runtime privé Hermes de Kiara et les livraisons Windows 3.5.31 / Android 1.0.12 (code 13) sont décrits avec leurs preuves dans le [rapport des corrections](maintenance/2026-10-21-correctifs-audit/RAPPORT-CORRECTIONS.md). La sauvegarde NAS a été restaurée dans un environnement isolé ; les clés de signature existantes ont aussi leur archive chiffrée séparée. Les outils hôte Hermes restent désactivés. Le runtime Hermes personnel reste inchangé. Voir ce rapport pour le résultat des validations et de la mise en service, ainsi que l’erratum A09 de l’audit.
-
-Le 19 octobre, le [nouveau paquet moteur Strata 0.1.45.3 a été comparé à 0.1.43.1](recherche/strata-0.2.0-beta-20261019/RESULTATS.md), avec les mêmes poids IQ4_XS, deux P100 et le serveur Python actuel corrigé. Série finale enchaînée : texte 34,1 → 35,1 tok/s (+2,9 %), code 39,0 → 39,7 (+1,8 %). Lecture de 1,5K / 6K / 23,6K tokens : +2,7 % / +6,5 % / +7,2 % de débit. Outil booléen, image sur P2200 et alternance de trois conversations d’environ 2,1K tokens vérifiés ; restauration en 1,08 s avec 99,67 % du prompt réutilisé. L’utilisateur a explicitement demandé de poursuivre sans arrêt à 80 °C : le seuil initial a été supprimé, la télémétrie et les protections RAM conservées. Après ces tests, la production avait été remise sur 0.1.43.1. **À la demande suivante de l’utilisateur, le moteur 0.1.45.3 est maintenant actif et enregistré par défaut**, avec chargement automatique et reprise activés. Le serveur Python 0.1.43.1 corrigé, les poids et l’encodeur P2200 sont conservés. Voir [la mise en service et sa preuve](maintenance/2026-10-19-strata-0.1.45.3/README.md). Les limites de validation et l’exigence de pilote déclarée par le manifeste restent documentées dans le rapport ; le pilote est inchangé.
-
-**Activation des correctifs du 16 octobre :** [redémarrage Strata pour charger les derniers correctifs](maintenance/2026-10-16-activation-outils-mixtes/README.md), demandé explicitement après la préparation sans interruption. Les correctifs booléens, XML/JSON mixtes et champs obligatoires sont désormais chargés. Les 367 tests précédents couvrent les cas fautifs ; après relance, deux appels d'outils sur le vrai modèle et trois conversations alternées/restaurées passent. Le cache reste à **20 emplacements / 30 Gio**, réserve RAM 6 Gio. La console n'a pas été redémarrée ; accès et paramètres persistants sont identiques avant/après. Modèle prêt, vision, Hermes, passerelle et WireGuard disponibles. L'effort de réflexion n'a pas été changé : l'utilisateur va comparer medium et low dans OpenCode. Les patchs tiers doivent être conservés dans l'ordre booléens puis formats mixtes lors d'une mise à jour.
-
-Dernière intervention : [arguments booléens des outils Strata/OpenCode corrigés](maintenance/2026-10-16-outils-booleens/README.md). Le parseur normalise `True`/`False` en booléens uniquement selon le schéma attendu, sans modifier les champs texte ; XML, JSON et streaming couverts. 355 tests et deux appels d'outils réels réussis. À la demande de l'utilisateur, le cache passe à **20 conversations sauvegardées**, toujours sous **30 Gio / 30 720 Mio** avec réserve RAM 6 Gio. Ces options sont actives et persistantes dans les deux profils. Trois conversations alternées et restaurées vérifiées après redémarrage. Le modèle est chargé ; Hermes, WireGuard et passerelle disponibles. Le patch Python tiers est conservé pour les mises à jour futures ; binaire CUDA inchangé. Les quatre emplacements cités dans la première mesure ci-dessous décrivent l'état antérieur à cette intervention.
-
-Le 16 octobre, le [cache de plusieurs conversations Strata a été activé et mesuré](maintenance/2026-10-16-diagnostic-opencode/activation/README.md), à la demande de l'utilisateur : plafond **30 Gio / 30 720 Mio**, quatre emplacements, réserve RAM 6 Gio. Les profils de base et de lancement conservent ces options ; les autres réglages restent identiques. Deux essais réels de trois conversations alternées passent : à 32–33 k tokens, lectures initiales de 95–137 s, retours après alternance de 1,17–2,05 s, plus de 99,9 % des tokens réutilisés. Cache occupé 5,66 Gio en fin d'essai. Ce n'est pas un nouveau chronométrage de l'audit OpenCode complet. Le modèle est chargé et les services sont disponibles. La détection du moteur par la protection RAM au chargement accepte désormais le redirecteur Python Windows, avec identité et ascendance vérifiées ; huit tests passent. Une réduction ponctuelle des pages pendant le chargement est documentée dans les preuves. L'ancien budget de cache à zéro cité plus bas décrit l'état antérieur.
-
-Console serveur : [progression du chargement](maintenance/2026-10-15-progression/README.md) ajoutée le 15 octobre. Indicateur global fichiers/GPU/RAM/validation, pourcentage mesuré de la copie RAM, Go, couches et temps écoulé ; étapes indéterminées quand le moteur ne fournit pas de compteur. Ressources statiques actives après rechargement de la page, sans redémarrer de service. Affichage et états vérifiés en navigateur à 1440/390 px sans nouvelle inférence.
-
-Correctif serveur du 15 octobre : [API locale Hermes/OpenCode 2](maintenance/2026-10-15-api-locale/README.md). Le catalogue fonctionnait mais les requêtes standard étaient rejetées faute de `conversation_id` Kiara ; OpenCode envoyait également `store: false`, auparavant refusé. Les applications tierces disposent maintenant d’une route de complétion conservant leurs outils et leur modèle autorisé. API locale automatiquement active avec le client Kiara ouvert ; aucun nouveau binaire requis. Requêtes réelles Qwen en HTTPS/WireGuard, GPT-6 Luna, aller-retour d’outil, Hermes natif et OpenCode 2.0.29 vérifiés depuis le serveur avec configurations temporaires. Les processus Qwen/vision, clés, données et sauvegardes ont été préservés. Les flux des fournisseurs partagés sont assemblés par appel avant émission SSE ; Qwen conserve son flux progressif. Le poste client distant n’a pas été piloté.
-
-Dernière livraison : **Windows/serveur 3.5.30**, [audit et correction de la conversation vocale](audits/2026-10-14-conversation/README.md). La voix passe désormais directement par Qwen local, en streaming par phrases, sans Hermes ni réflexion ; le chat écrit garde Hermes. Corrections du transport d’annulation, de la capture AEC sans sortie active, du découpage des phrases et de la reprise après raccrochage. Le nouvel EXE personnel est disponible ; le client distant 3.5.28 doit être mis à jour. La publication conserve les processus Qwen/P2200, les clés, les données et les sauvegardes. Réception réelle de trames microphone et moteurs Qwen/TTS vérifiés ; qualité ASR et interruption avec la voix humaine dans la pièce restent à mesurer.
-
-État réseau et moteurs recoupé le 13 octobre : [vérification du contexte](maintenance/2026-10-13-contexte/verification.json). La [publication du 14 octobre](maintenance/2026-10-14-opencode/production-corrections.json) confirme Windows/serveur 3.5.29, Qwen toujours chargé avec les mêmes processus, Hermes disponible, données, clés et programmation des sauvegardes conservées. Les connexions réelles WireGuard sur `.41` et HTTPS passent avec cinq modèles accessibles.
-
-Dernière intervention du 14 octobre : [essai de vision réussi](maintenance/2026-10-14-vision/README.md). Qwen a été redémarré pour activer les images ; `images=true`, compréhension vérifiée directement et via un compte Hermes temporaire, catalogue HTTPS actualisé. Le modèle texte reste sur les deux P100, l'encodeur est sur la P2200. Le pic RAM du rechargement à froid a été contenu par une réduction ponctuelle de l'ensemble de travail du seul moteur ; le superviseur prévoit désormais cette intervention une fois au démarrage si nécessaire, avec sa protection RAM conservée. Le modèle est prêt et environ 54 Gio de RAM sont disponibles après les essais. Les clés, accès, réglages et sauvegardes ont été recoupés après ce redémarrage.
-
-## Travaux livrés
-
-L’utilisateur a demandé une revue approfondie du projet, puis toutes les corrections et améliorations identifiées. L’audit de référence examine le commit `ffe85204729db298ac83848e727e2b9aa10f5548`. Les corrections sont développées sur `codex/audit-corrections-20261012` : export des conversations de projet, limites de l’historique Hermes et export de récupération, stockage/quota/rétention Hermes, identité des tours MCP/inférence, anciennes images, quota différentiel des mémoires et syntaxe PowerShell.
-
-L’audit a été livré en Windows/serveur 3.5.28 et Android 1.0.11/code 12. Le rapport final de correction, les tests et la preuve de mise en service se trouvent dans [audits/2026-10-12](audits/2026-10-12/). Le correctif Windows/serveur **3.5.29** du 14 octobre est désormais publié ; Android reste en **1.0.11/code 12**.
-
-Le 14 octobre, l’ajout OpenCode 2 a été corrigé après le signalement « fournisseur présent mais aucun modèle ». OpenCode 2 masque par défaut les modèles personnalisés sans date de publication ; Kiara active maintenant uniquement le modèle ajouté dans les préférences du sélecteur Desktop. Si OpenCode est ouvert, Kiara demande de le fermer et de refaire l’ajout pour ne pas écraser son cache. La configuration JSONC prioritaire est également choisie lorsque JSON et JSONC coexistent. Sur le client : mettre Kiara à jour en **3.5.29**, fermer OpenCode, refaire **Ajouter à OpenCode 2**, puis rouvrir OpenCode. Le nouvel EXE, les préférences, la règle du sélecteur et une requête OpenCode ont été vérifiés avec **2.0.22 et 2.0.29**, en environnement temporaire ; 28 tests Python et cinq suites d’interface passent. Voir [la validation et les limites](maintenance/2026-10-14-opencode/README.md). Le poste client distant reste à actualiser par son utilisateur.
-
-Le 13 octobre, la connexion WireGuard sur le réseau local a été réparée : les anciens profils indiquaient `192.168.1.40`, tandis que l’adresse du serveur est `192.168.1.41`, désormais configurée en IP fixe dans Windows. La préparation des EXE et le téléchargement des profils Android actualisent désormais les routes locales, sans changer les clés. L’EXE personnel disponible dans la console a été régénéré. Pour un client déjà installé, utiliser `192.168.1.41:51820` dans les réglages WireGuard ou récupérer l’EXE corrigé. WireGuard et HTTPS ont été vérifiés avec le client réel ; 40 tests passent. Preuves : [audits/2026-10-13-wireguard](audits/2026-10-13-wireguard/).
-
-La consigne finale du 13 octobre conserve **192.168.1.41** : l’utilisateur adapte la redirection de port de la box à `.41`. Ne pas remettre les profils sur `.40`, occupée par un appareil Espressif. La tentative précédente de retour à `.40` a été rejetée par la détection de conflit de Windows puis annulée. Le script de configuration fixe a été relancé en administrateur et a réussi à **12 h 51 (Europe/Paris)** : `.41`, masque `/24`, passerelle et DNS `192.168.1.1`, DHCP IPv4 désactivé et configuration persistante. Preuves : [maintenance/2026-10-13-ip-fixe/verification.json](maintenance/2026-10-13-ip-fixe/verification.json). Les profils, WireGuard, HTTPS Cloudflare, les processus Qwen chargés et les clés ont été vérifiés après application.
-
-## Fonctionnement documenté en octobre 2026
-
-- Réseau du PC : IP fixe persistante `192.168.1.41/24`, DHCP IPv4 désactivé, passerelle et DNS `192.168.1.1`. Les profils WireGuard utilisent `192.168.1.41:51820` sur le LAN. L’utilisateur adapte la redirection UDP 51820 de la box à `.41` ; cette règle n’a pas été vérifiée depuis un réseau extérieur.
-- Chat Strata direct avec le modèle local : [http://127.0.0.1:8080/](http://127.0.0.1:8080/), également accessible par **Ouvrir le chat** dans la console Kiara. Console : [http://127.0.0.1:8765/](http://127.0.0.1:8765/). Ces deux interfaces écoutent uniquement sur le PC serveur, en loopback.
-- Passerelle Kiara `127.0.0.1:8766`, accessible aux clients via WireGuard UDP 51820 ou [HTTPS Cloudflare](https://ia.karenax.net). Les connexions WireGuard sur le LAN et HTTPS ont été validées après passage en IP fixe.
-- Qwen/Strata sur les deux Tesla P100 ; modèle API `qwen3.8-flash-next-iq4-xs`, chargé, contexte 262 144 tokens, `images=true`. Encodeur visuel séparé sur la Quadro P2200, projecteur BF16 vérifié, plafond 1 024 tokens d'image. L'encodeur officiel se repliait sur CPU avec le pilote 528.89 : une compilation locale CUDA 12.4 ciblant `61-real` est utilisée, sans changement du moteur texte ni du pilote. Voir [les mesures et le retour arrière](maintenance/2026-10-14-vision/README.md). Le modèle chargé doit être préservé pendant une mise à jour de la console.
-- Table ngram/PLE sur le SSD Kingston `C:`, fichier `C:/Temp/Strata-ngram-recherche/iq4-xs-ple-iq4_nl.gguf`, lecture directe. Les experts du modèle sont sur le HDD `D:` ; leur rechargement à froid a pris environ 50 minutes le 14 octobre. La copie en RAM garde temporairement des pages partagées et peut créer un pic bien supérieur à la consommation de l'encodeur d'images. Le superviseur ne réduit l'ensemble de travail du moteur qu'une fois pendant un démarrage sous pression mémoire, jamais périodiquement pendant les conversations.
-- Flash-Next IQ4_XS utilise le moteur Strata officiel **0.1.45.3** dans `dependances/strata-0.1.45.3/engine-cuda12`, avec le serveur Python 0.1.43.1 corrigé conservé dans `dependances/strata-0.1.43.1/source`, dont l’empreinte du moteur actif correspond à la preuve de déploiement. Profil : préfill 2048, 15 workers, MTP 3 / seuil 0,5, split 24, cache historique 8/160000, `STRATA_SPLIT_MTP_BATCH=1`, PLE direct, cache de conversations plafonné à 30 720 Mio / 20 emplacements depuis le 16 octobre (réserve RAM 6 Gio). Le délai de chargement du serveur est 3600 s pour la lecture à froid des experts. Les réglages courants, par défaut et derniers valides sont identiques. Chargement automatique et reprise automatique sont activés. Voir [la mise en service](maintenance/2026-10-19-strata-0.1.45.3/README.md) et son `production.json` ; sauvegarde précédente dans `avant/`, moteurs 0.1.43.1 et `strata-build-p100` conservés. La prélecture expérimentale n’est pas intégrée au démarrage automatique.
-- Conversations écrites et tâches rédactionnelles confiées à Hermes ; Qwen local et modèles du profil natif actif autorisés par la console. La conversation vocale Windows 3.5.30 et les trois actions du correcteur passent directement par Qwen. Les tours vocaux n’exécutent pas les outils Hermes ni de recherche web.
-- Hermes possède sa racine `lanceur/hermes-fred`, ses profils par accès et ses sessions par conversation. API native `127.0.0.1:8643`, adaptateur privé `127.0.0.1:8768`. Outils documentaires, mémoire, calcul et outils web natifs limités au compte/projet/tour autorisé ; outils hôte libres désactivés.
-- SQLite constitue l’autorité. Les dossiers `lanceur/donnees-clients` sont des copies privées actualisées par propriétaire et vérifiées périodiquement. EG2 fonctionne sur CPU avec périmètres de mémoire séparés.
-- Windows : dictée Whisper Small et conversation vocale complète. Android : dictée manuelle Small, téléphone/tablette, téléchargement automatique des mises à jour et confirmation native d’installation.
-- Sauvegardes chiffrées quotidiennes à 03 h, conservation 7/4/6, destination serveur. Aucune destination NAS configurée. Comptes, clés, historiques, profils et programmation doivent être préservés.
-
-## Décisions conservées et travail ultérieur
-
-Les lots 0 à 4, 6 et 8 sont livrés ; le lot 7 couvre dictée Windows/Android et conversation Windows. La refonte complète du tableau de bord (lot 5), conversation Android, extensions des lots 9/10, OCR et réveil Android arrêté restent à développer sur demande. L’audit ne constitue pas une autorisation d’activer des outils système libres ou de nouveaux services externes.
-
-Le partage des fournisseurs existants suit `hermes-models.json`. Les secrets restent hors Git et les connexions personnelles Hermes restent dans leur magasin natif. Ne pas régénérer les clés de signature Windows/Android ni celles de WireGuard pendant une reconstruction.
-
-## Références
-
-- [Audit initial](audits/2026-10-12/RAPPORT-AUDIT.md) et [validation des corrections](audits/2026-10-12/VALIDATION-CORRECTIONS.md).
-- [Audit vocal Windows et livraison 3.5.30](audits/2026-10-14-conversation/README.md).
-- [Réparation WireGuard](audits/2026-10-13-wireguard/VALIDATION.md), [IP fixe](maintenance/2026-10-13-ip-fixe/README.md) et [vérification actuelle](maintenance/2026-10-13-contexte/verification.json).
-- [Strata 0.1.45.3 en production](maintenance/2026-10-19-strata-0.1.45.3/README.md).
-- [Correctif OpenCode 2 et livraison Windows 3.5.29](maintenance/2026-10-14-opencode/README.md).
-- [Vision Qwen/Hermes sur P2200 et pic RAM au chargement](maintenance/2026-10-14-vision/README.md).
-- [Reconstruction et tests](RECONSTRUIRE-FRED.md), [références des moteurs](dependances/README.md), [index des archives](ARCHIVES-ET-PREUVES.md).
-- [Plan global](PLAN-GLOBAL-SERVEUR-FRED.md), [guide Hermes](lanceur/HERMES-FRED.md), [sauvegardes/appareils](lanceur/SAUVEGARDES-APPAREILS.md), [EG2](lanceur/MEMOIRE-EG2.md), [Android](client-android/README.md).
-- [Historique des décisions et livraisons](HISTORIQUE-PROJET-AVANT-AUDIT-20261012.md). Les longues étapes historiques ont été conservées dans ce fichier.
+Les versions et décisions antérieures figurent dans l’historique [d’octobre et novembre 2026](HISTORIQUE-PROJET-OCTOBRE-NOVEMBRE-2026.md).

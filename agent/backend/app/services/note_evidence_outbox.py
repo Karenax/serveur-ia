@@ -2,7 +2,7 @@
 from uuid import NAMESPACE_URL, uuid5
 
 from fastapi import HTTPException
-from sqlalchemy import inspect, select
+from sqlalchemy import func, inspect, select
 from sqlalchemy.schema import CreateTable
 
 from ..note_evidence_models import NoteEvidenceOutbox
@@ -53,7 +53,8 @@ def backfill(db, *, limit=100, after_id=''):
         raise HTTPException(422, 'Lot de migration ou curseur invalide')
     if not inspect(db.connection()).has_table('note_evidence_outbox'):
         raise HTTPException(409, 'Installer la projection Notes protégée avant migration')
-    heads = list(db.scalars(select(ProjectNote).where(ProjectNote.id > after_id)
+    heads = list(db.scalars(select(ProjectNote).join(NoteVersion, NoteVersion.id == ProjectNote.current_version_id)
+                           .where(ProjectNote.id > after_id, func.json_extract(NoteVersion.snapshot, '$.operation') != 'delete')
                            .order_by(ProjectNote.id).limit(limit)))
     for head in heads:
         enqueue_note_version(db, head.current_version_id)

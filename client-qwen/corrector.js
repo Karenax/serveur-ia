@@ -5,7 +5,7 @@ document.querySelector('.workspace').append(correctorPane);
 uiPaths.corrector='M4 20l4-1L21 6l-3-3L5 16l-1 4M9 8l2 2 4-4M4 3h5';uiNavTitles.corrector='Correcteur';
 const correctorNav=wsElement('button','Correcteur','nav-button');correctorNav.dataset.viewButton='corrector';correctorNav.onclick=()=>showView('corrector');
 correctorNav.type='button';
-if(platformCapabilities.platform==='windows'){
+if(['windows','web'].includes(platformCapabilities.platform)){
   correctorNav.className='secondary voice-button';
   $('send').before(correctorNav);
 }else document.querySelector('#client-navigation').insertBefore(correctorNav,document.querySelector('[data-view-button="assistant"]')||document.querySelector('[data-view-button="notifications"]'));
@@ -19,38 +19,38 @@ const correctorModes={
   professional:{label:'Reformuler professionnel'},
   friendly:{label:'Reformuler amical'}
 };
-const correctorButtonsOnce=buttons;buttons=function(){correctorButtonsOnce();for(const id of ['corrector-correct','corrector-pro','corrector-friendly'])$(id).disabled=busy||historySyncPending||!connected;$('corrector-text').readOnly=correctorRunning;$('corrector-cancel').hidden=!correctorRunning;$('corrector-reuse').disabled=correctorRunning||!correctorAnswer.content;$('corrector-copy').disabled=!correctorAnswer.content;};
-function correctorLoad(c){
+const correctorButtonsOnce=buttons;buttons=function(){correctorButtonsOnce();const draftsPending=window.kiaraComposerDraftsReady?.()===false;for(const id of ['corrector-correct','corrector-pro','corrector-friendly'])$(id).disabled=busy||historySyncPending||!connected||draftsPending;$('corrector-text').readOnly=correctorRunning||draftsPending;$('corrector-cancel').hidden=!correctorRunning;$('corrector-reuse').disabled=correctorRunning||draftsPending||!correctorAnswer.content;$('corrector-copy').disabled=!correctorAnswer.content;};
+function correctorLoad(c,preserveDraft=false){
   correctorSelectedId=c.id;correctorAnswer=c.messages.findLast(m=>m.role==='assistant')||{content:''};
-  $('corrector-text').value=c.messages.find(m=>m.role==='user').content.replace(/^(Corriger|Reformuler professionnel|Reformuler amical) :\n\n/,'');
-  correctorDirty=true;renderMarkdown($('corrector-result'),correctorAnswer.content);correctorResultDisplay();
+  if(window.kiaraComposerDraftsReady?.()!==false&&(!preserveDraft||window.kiaraCorrectorDraftExists?.()===false)){$('corrector-text').value=c.messages.find(m=>m.role==='user').content.replace(/^(Corriger|Reformuler professionnel|Reformuler amical) :\n\n/,'');correctorDirty=!preserveDraft;}
+  renderMarkdown($('corrector-result'),correctorAnswer.content);correctorResultDisplay();
   $('corrector-status').textContent=correctorAnswer.interrupted?'Résultat partiel conservé. Vous pouvez relancer la correction.':'Résultat enregistré.';buttons();
 }
 window.correctorOpen=c=>{if(conversationLocked())return;save();if(!isCorrection(library.find(c=>c.id===currentId)))correctorChatId=currentId;currentId=c.id;messages=c.messages;correctorLoad(c);render();showView('corrector');drawLibrary();error('');};
-const correctorShowOnce=showView;showView=function(name){
+onViewChange({before(name){
   const current=library.find(c=>c.id===currentId);
   if(name==='corrector'&&!isCorrection(current))correctorChatId=currentId;
   if(name==='chat'&&isCorrection(current)){
-    if(conversationLocked()){error('Attendez la fin de l’action en cours pour ouvrir une conversation.');return;}
+    if(conversationLocked()){error('Attendez la fin de l’action en cours pour ouvrir une conversation.');return false;}
     let chat=library.find(c=>c.id===correctorChatId&&!isCorrection(c))||library.find(c=>!isCorrection(c)&&!c.archived)||library.find(c=>!isCorrection(c));
-    if(!chat&&library.length>=200){error('Exportez puis supprimez un texte pour créer une conversation.');return;}
+    if(!chat&&library.length>=200){error('Exportez puis supprimez un texte pour créer une conversation.');return false;}
     save();if(!chat){chat={id:crypto.randomUUID(),title:'Nouvelle conversation',messages:[]};library.unshift(chat);}currentId=chat.id;messages=chat.messages;chatAttachments=[];attachmentRender();render();save();
   }
-  correctorShowOnce(name);
+},after(name){
   if(name==='corrector'){$('workspace-heading').textContent='Correcteur de français';drawLibrary();}
-};
+}});
 const correctorNewOnce=$('new').onclick;$('new').onclick=()=>{
   if(historyView!=='corrector')return correctorNewOnce();if(conversationLocked())return;
   correctorSelectedId=null;correctorAnswer={content:''};$('corrector-text').value='';correctorDirty=true;
   renderMarkdown($('corrector-result'),'');correctorResultDisplay();$('corrector-status').textContent='Saisissez le texte à corriger ou à reformuler.';drawLibrary();buttons();uiPersistPreferences().catch(e=>error(e));uiCloseSidebar(false);$('corrector-text').focus();
 };
-window.historyBootstrapView=()=>{if(isCorrection(library.find(c=>c.id===currentId))){if(library.some(c=>!isCorrection(c))||library.length<200)showView('chat');else{correctorLoad(library.find(c=>c.id===currentId));showView('corrector');}}};
+window.historyBootstrapView=()=>{if(!historyReady||window.kiaraComposerDraftsReady?.()===false)return;if(isCorrection(library.find(c=>c.id===currentId))){if(library.some(c=>!isCorrection(c))||library.length<200)showView('chat');else{correctorLoad(library.find(c=>c.id===currentId),true);showView('corrector');}}};
 $('corrector-text').oninput=()=>{correctorDirty=true;clearTimeout(correctorDraftTimer);correctorDraftTimer=setTimeout(()=>uiPersistPreferences().catch(e=>error(e)),500);};
 $('corrector-copy').onclick=async()=>{try{await copyText(correctorAnswer.content);$('corrector-status').textContent='Texte copié.';}catch{error('Copie impossible. Sélectionnez le texte du résultat.');}};
 $('corrector-reuse').onclick=()=>{$('corrector-text').value=correctorAnswer.content.slice(0,100000);correctorDirty=true;uiPersistPreferences().catch(e=>error(e));$('corrector-text').focus();};
 $('corrector-cancel').onclick=()=>{$('cancel').click();};
 async function correctorRun(mode){
-  if(busy||historySyncPending||!connected)return;const source=$('corrector-text').value.trim();if(!source){$('corrector-status').textContent='Saisissez le texte à retravailler.';$('corrector-text').focus();return;}
+  if(busy||historySyncPending||!connected||window.kiaraComposerDraftsReady?.()===false)return;const source=$('corrector-text').value.trim();if(!source){$('corrector-status').textContent='Saisissez le texte à retravailler.';$('corrector-text').focus();return;}
   if(library.length>=200){error('Exportez puis supprimez une conversation pour enregistrer ce résultat.');return;}
   try{await uiPersistPreferences();}catch(e){error(e);return;}
   save();const instruction=correctorModes[mode];currentId=crypto.randomUUID();correctorSelectedId=currentId;correctorAnswer={role:'assistant',content:'',reasoning_content:''};

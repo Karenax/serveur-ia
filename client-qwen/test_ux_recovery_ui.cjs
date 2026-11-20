@@ -10,6 +10,9 @@ const desktopAudit=process.argv.includes('--desktop-audit');
 const linuxOnly=process.argv.includes('--linux-only');
 const windowsOnly=Boolean(windowsShell)||process.argv.includes('--windows-only')||linuxOnly;
 const python=process.env.PYTHON_EXE||path.join(__dirname,'../toolchain/eg2-python/Scripts/python.exe');
+const modernWindows=execFileSync(python,['-B','-c',
+ "import sys; from pathlib import Path; sys.path.insert(0,sys.argv[1]); from kiara_shared.conversation_shell import modern_chat; root=Path(sys.argv[2]); print(modern_chat(sys.stdin.read(), (root / 'kiara-shell.html').read_text(encoding='utf-8')),end='')",
+ path.join(__dirname,'../shared'),__dirname],{input:windows,encoding:'utf8',maxBuffer:6e6,env:{...process.env,PYTHONIOENCODING:'utf-8'}});
 const android=windowsOnly?null:execFileSync(python,['-c',"import importlib.util,sys; from pathlib import Path; s=importlib.util.spec_from_file_location('assets',sys.argv[1]); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); print(m.prepare(Path(sys.argv[2])),end='')",path.join(__dirname,'../client-android/scripts/Prepare-Assets.py'),__dirname],{encoding:'utf8',maxBuffer:6e6,env:{...process.env,PYTHONIOENCODING:'utf-8'}});
 async function checkWindowsOriginal(page){
  const url=page.url();
@@ -38,7 +41,11 @@ async function check(browser,platform){
  const json=(res,value,status=200)=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8'});res.end(JSON.stringify(value));};
  const server=http.createServer(async(req,res)=>{
   let raw='';for await(const chunk of req)raw+=chunk;const body=JSON.parse(raw||'{}');
-  if(req.url==='/'||req.url==='/chat'){res.writeHead(200,{'Content-Type':'text/html; charset=utf-8'});return res.end(html);}
+  if(req.url==='/'||req.url==='/chat'){
+   res.writeHead(200,{'Content-Type':'text/html; charset=utf-8'});
+   return res.end((desktopAudit || state.modernNavigation) && platform!=='android'
+    ? (platform==='linux'?modernWindows.replace('</body>',()=>script('linux_features.js')+'</body>'):modernWindows).replace('__CONFIG__',JSON.stringify(config)).replaceAll('__NONCE__','ux') : html);
+  }
   if(state.projectConversation){
    if(platform==='android'&&req.headers.authorization!=='Bearer '+config.key)return json(res,{error:{message:'Fixture auth required'}},401);
    const threadPath='/api/v1/workspace/assistant-threads';
@@ -76,8 +83,17 @@ async function check(browser,platform){
    }
   }
   if(req.headers.authorization!=='Bearer '+config.key)return json(res,{error:{message:'Fixture auth required'}},401);
-  if(req.url==='/client/state')return json(res,{version:'fixture',preferences:state.preferences,profile_required:false,profile:{name:'Accès fictif'},update:{message:'À jour'},endpoint:'https://example.test',internet_endpoint:'example.test',local_api:'http://127.0.0.1/v1',key:config.key,connection:{connected:true,transport:'https',model:config.model,endpoint:'https://example.test'}});
-  if(req.url==='/client/history'&&req.method==='GET')return json(res,{history:state.history,revision:state.revision});
+  if(req.url==='/client/state'){
+   if(state.stateGate)await state.stateGate;
+   if(state.failState)return json(res,{error:{message:'Réglages fictifs indisponibles'}},503);
+   const preferences=state.preferencesOverride===undefined?state.preferences:state.preferencesOverride;
+   return json(res,{version:'fixture',preferences,profile_required:false,profile:{name:'Accès fictif'},update:{message:'À jour'},endpoint:'https://example.test',internet_endpoint:'example.test',local_api:'http://127.0.0.1/v1',key:config.key,connection:{connected:true,transport:'https',model:config.model,endpoint:'https://example.test'}});
+  }
+  if(req.url==='/client/history'&&req.method==='GET'){
+   if(state.historyGate)await state.historyGate;
+   if(state.failHistory)return json(res,{error:{message:'Lecture fictive indisponible'}},503);
+   return json(res,{history:state.historyOverride===undefined?state.history:state.historyOverride,revision:state.revision});
+  }
   if(req.url==='/client/history/sync'){state.history=state.history||body.initial;return json(res,{history:state.history,revision:state.revision,message:'Synchronisé'});}
   if(req.url==='/client/history'){
    if(body.revision!==state.revision)return json(res,{error:{message:'Conflit fictif de révision'}},409);
@@ -95,7 +111,10 @@ async function check(browser,platform){
   if(req.url==='/v1/models')return json(res,{data:[{id:config.model,name:'Modèle fictif',available:true,capabilities:{thinking:false,context_length:4096}}]});
   if(req.url==='/v1/status')return json(res,{protocol:4,agent_protocol:4,command_nonce_version:2,server_time_ms:Date.now()});
   if(req.url==='/v1/context')return json(res,{tokens:5,capacity:4096,estimated:true});
-  if(req.url==='/v1/workspace')return json(res,state.managed?{projects:state.managed==='ready'?[managed]:[],jobs:[],project_catalogue:{provider:'agent',state:state.managed,can_create:state.managed==='ready',...(state.modernNavigation?{interface:'projects-v1',navigation:'kiara-v1'}:{})}}:{projects:[project],jobs:[]});
+  if(req.url==='/v1/workspace'){
+   if(state.workspaceGate)await state.workspaceGate;
+   return json(res,state.managed?{projects:state.managed==='ready'?[managed]:[],jobs:[],project_catalogue:{provider:'agent',state:state.managed,can_create:state.managed==='ready',...(state.modernNavigation?{interface:'projects-v1',navigation:'kiara-v1'}:{})}}:{projects:[project],jobs:[]});
+  }
   if(req.url==='/v1/notifications'||req.url==='/v1/notifications/action'){
    const visible=state.transcription===true;
    const item={id:'e'.repeat(32),sequence:1,type:'transcription_ready',title:'Transcription disponible',created:1700000000,target:{kind:'agent_project',project:managed.id}};
@@ -129,7 +148,11 @@ async function check(browser,platform){
   await new Promise(resolve=>probe.close(resolve));
   state.managed='ready';
   state.projectConversation=true;
-  if(desktopAudit)state.modernNavigation=true;
+  let resumeWorkspace;
+  if(desktopAudit){
+   state.modernNavigation=true;
+   state.workspaceGate=new Promise(resolve=>{resumeWorkspace=resolve;});
+  }
   const shell=spawn(windowsShell,['--local-url','http://127.0.0.1:'+server.address().port+'/chat','--hidden'],{
    env:{...process.env,WEBVIEW2_USER_DATA_FOLDER:profile,WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS:'--remote-debugging-port='+debugPort},windowsHide:true
   });
@@ -146,12 +169,20 @@ async function check(browser,platform){
     context.setDefaultTimeout(10000);
     const page=context.pages()[0]||await context.waitForEvent('page',{timeout:5000});
     if(desktopAudit){
-      await page.waitForFunction(()=>document.body.dataset.kiaraUnifiedNavigation==='true');
+      await page.getByRole('button',{name:'Activité',exact:true}).waitFor();
       assert.deepEqual(await page.locator('#client-navigation .nav-button:visible').allTextContents(),['Conversations','Projets','Notes','Mails','Réunions','Activité']);
+      const toolbar=page.locator('.conversation-toolbar');
+      const assistant=toolbar.getByRole('button',{name:'Assistant de projet',exact:true});
+      assert(await assistant.isDisabled());
+      const beforeCatalogue=await toolbar.boundingBox();
+      resumeWorkspace();
+      await page.waitForFunction(()=>!document.getElementById('project-conversation-toggle').disabled);
+      assert.deepEqual(await toolbar.boundingBox(),beforeCatalogue);
       if(process.env.UI_PROOF_DIRECTORY)fs.mkdirSync(process.env.UI_PROOF_DIRECTORY,{recursive:true});
       for(const [width,height] of [[1280,720],[1920,1080],[2560,1440]]){
         await page.setViewportSize({width,height});
         await page.getByLabel('Modèle de cette conversation').waitFor({state:'visible'});
+        assert.equal((await page.locator('.sidebar').boundingBox()).width,216);
         const vocal=page.getByRole('button',{name:'Vocal',exact:true});
         await vocal.click({trial:true});
         if(process.env.UI_PROOF_DIRECTORY)await page.screenshot({path:path.join(process.env.UI_PROOF_DIRECTORY,`webview2-${width}x${height}.png`)});
@@ -160,6 +191,15 @@ async function check(browser,platform){
         const start=await page.locator('#conversation-start').boundingBox();
         assert(start && start.y>=0 && start.y+start.height<=height,'Vocal must start without scrolling');
         if(process.env.UI_PROOF_DIRECTORY)await page.screenshot({path:path.join(process.env.UI_PROOF_DIRECTORY,`vocal-webview2-${width}x${height}.png`)});
+        await page.getByRole('button',{name:'Conversations',exact:true}).click();
+        for(const [section,title] of [['vocal','Conversation vocale'],['dictee','Dictée'],['notifications','Notifications']]){
+          await page.evaluate(section=>{location.hash='#reglages-'+section;},section);
+          const panel=page.locator('.device-preferences');
+          await panel.getByRole('heading',{name:title,exact:true}).waitFor();
+          assert.equal(await page.locator('.settings-subnav').isVisible(),false);
+          assert(await page.locator('#device-settings-back').isVisible());
+          if(process.env.UI_PROOF_DIRECTORY)await page.screenshot({path:path.join(process.env.UI_PROOF_DIRECTORY,section+'-reglages-'+width+'x'+height+'.png')});
+        }
         await page.getByRole('button',{name:'Conversations',exact:true}).click();
       }
     }
@@ -174,6 +214,7 @@ async function check(browser,platform){
     console.log(JSON.stringify({platform:'windows-webview2',passed:true,checks:['source preview','original bytes','ephemeral exchange remains open']}));
    }finally{await webview.close();}
   }finally{
+   resumeWorkspace?.();
    shell.kill();
    server.closeAllConnections();
    await new Promise(resolve=>server.close(resolve));
@@ -223,6 +264,70 @@ async function check(browser,platform){
   await page.locator('#ws-chat-project').selectOption('');await page.waitForFunction(()=>!conversationActionPending&&document.getElementById('ui-document-controls').hidden===true);await ready();
   assert.equal(await page.locator('#ui-document-controls').isVisible(),false);
   const first=await page.evaluate(()=>currentId);await page.locator('#prompt').fill('Brouillon de la conversation A');await draftSaved();
+  if(platform!=='android'){
+   let release;state.stateGate=new Promise(resolve=>{release=resolve;});
+   try{
+    await page.reload({waitUntil:'domcontentloaded'});
+    await page.waitForFunction(()=>historyReady&&!uiDraftsLoaded);
+    assert.equal(await page.locator('#prompt').evaluate(node=>node.readOnly),true,'La saisie attend la récupération des brouillons.');
+    assert.equal(await page.locator('#send').isDisabled(),true,'L’envoi attend la récupération des brouillons.');
+    assert.equal(await page.getByRole('button',{name:'Assistant de projet',exact:true,includeHidden:true}).isDisabled(),true);
+    await page.locator('#prompt').focus();await page.keyboard.type('texte prématuré');
+    assert.equal(await page.locator('#prompt').inputValue(),'');
+   }finally{state.stateGate=null;release();}
+   await page.waitForFunction(()=>uiDraftsLoaded);await ready();
+   assert.equal(await page.locator('#prompt').inputValue(),'Brouillon de la conversation A');
+   state.historyGate=new Promise(resolve=>{release=resolve;});
+   try{
+    await page.reload({waitUntil:'domcontentloaded'});
+    await page.waitForFunction(()=>uiDraftsLoaded&&!historyReady);
+    assert.equal(await page.locator('#prompt').evaluate(node=>node.readOnly),true,'La saisie attend aussi la récupération de la conversation.');
+    assert.equal(await page.locator('#send').isDisabled(),true);
+   }finally{state.historyGate=null;release();}
+   await ready();assert.equal(await page.locator('#prompt').inputValue(),'Brouillon de la conversation A');
+   state.failHistory=true;
+   try{
+    await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>historyBlocked&&uiDraftsLoaded);
+    assert.equal(await page.locator('#prompt').evaluate(node=>node.readOnly),true,'La saisie reste bloquée si l’historique est illisible.');
+    assert.equal(await page.locator('#send').isDisabled(),true);
+   }finally{state.failHistory=false;}
+   await page.reload();await ready();assert.equal(await page.locator('#prompt').inputValue(),'Brouillon de la conversation A');
+   state.preferences.corrector_text='Correction fictive à préserver';
+   state.preferencesOverride={conversation_drafts:'données invalides'};
+   try{
+    const response=page.waitForResponse(result=>result.url().endsWith('/client/state'));
+    await page.reload({waitUntil:'domcontentloaded'});await response;
+    await page.waitForFunction(()=>document.getElementById('error').textContent.includes('Brouillons locaux invalides'));
+    assert.equal(await page.evaluate(()=>uiDraftsLoaded),false);
+    assert.equal(await page.locator('#prompt').evaluate(node=>node.readOnly),true);
+    assert.equal(await page.locator('#corrector-text').evaluate(node=>node.readOnly),true,'Le correcteur attend lui aussi ses données locales.');
+    assert.equal(state.preferences.conversation_drafts[first],'Brouillon de la conversation A');
+   }finally{state.preferencesOverride=undefined;}
+   await page.waitForFunction(()=>uiDraftsLoaded);await ready();
+   assert.equal(await page.locator('#prompt').inputValue(),'Brouillon de la conversation A');
+   assert.equal(await page.locator('#corrector-text').inputValue(),'Correction fictive à préserver');
+   state.failState=true;
+   try{
+    await page.reload({waitUntil:'domcontentloaded'});
+    await page.waitForFunction(()=>document.getElementById('error').textContent.includes('Réglages fictifs indisponibles'));
+    assert.equal(await page.evaluate(()=>uiDraftsLoaded),false);
+    assert.equal(await page.locator('#prompt').evaluate(node=>node.readOnly),true);
+    assert.equal(await page.locator('#corrector-text').evaluate(node=>node.readOnly),true);
+   }finally{state.failState=false;}
+   await page.waitForFunction(()=>uiDraftsLoaded);await ready();
+   assert.equal(await page.locator('#prompt').inputValue(),'Brouillon de la conversation A');
+   assert.equal(await page.locator('#corrector-text').inputValue(),'Correction fictive à préserver');
+   state.historyGate=new Promise(resolve=>{release=resolve;});
+   try{
+    await page.reload({waitUntil:'domcontentloaded'});
+    await page.waitForFunction(()=>!historyReady&&!uiDraftsLoaded);
+    await page.evaluate(()=>uiPersistPreferences());
+    assert.equal(state.preferences.corrector_text,'Correction fictive à préserver','Un enregistrement précoce conserve le texte du correcteur.');
+   }finally{state.historyGate=null;release();}
+   await ready();
+   assert.equal(await page.locator('#prompt').inputValue(),'Brouillon de la conversation A','Le brouillon est restauré après un enregistrement précoce des réglages.');
+   assert.equal(await page.locator('#corrector-text').inputValue(),'Correction fictive à préserver');
+  }
   await page.locator('#new').click();await ready();assert.equal(await page.locator('#prompt').inputValue(),'');
   const second=await page.evaluate(()=>currentId);assert.notEqual(first,second);await page.locator('#prompt').fill('Brouillon de la conversation B');await draftSaved();
   await page.locator('[data-conversation-id="'+first+'"]').click();await ready();assert.equal(await page.locator('#prompt').inputValue(),'Brouillon de la conversation A');
@@ -384,6 +489,7 @@ async function check(browser,platform){
   }
   if(platform==='windows'||platform==='linux'){
    state.modernNavigation=true;
+   await page.reload();await ready();
    managed.archived=false;
    await page.evaluate(async()=>{showView('projects');await wsRefresh();});
    assert.equal(await page.locator('#ws-open-portfolio').isVisible(),false);
@@ -437,14 +543,25 @@ async function check(browser,platform){
    assert.equal(await page.locator('#prompt').inputValue(),draft);
    await page.route('**/app/settings',route=>route.fulfill({body:'Réglages Kiara de recette'}));
    await sidebar();await page.locator('[data-view-button="settings"]').click();
-   const localSettings=page.getByRole('navigation',{name:'Réglages du client'});
-   await localSettings.getByRole('button',{name:'Mises à jour',exact:true}).click();
-   await page.getByRole('button',{name:'Vérifier les mises à jour'}).waitFor();
-   await localSettings.getByRole('button',{name:'Réglages du portail'}).click();
    await page.waitForURL('**/app/settings');
+   await page.goto(chatUrl);await ready();
+   state.failProjectSession=true;
+   try {
+    await sidebar();await page.locator('[data-view-button="settings"]').click();
+    await page.locator('[data-view="access"]:not([hidden])').waitFor();
+    assert(await page.locator('.settings-subnav').isVisible());
+    await page.getByText('Le service Projets est indisponible.',{exact:false}).waitFor();
+   }finally{state.failProjectSession=false;}
    assert.equal(state.preferences.conversation_drafts[conversationId],draft);
    await page.goto(new URL('/chat#reglages',chatUrl).href);await ready();
    await page.locator('[data-view="access"]:not([hidden])').waitFor();
+   for(const [slug,title] of [['vocal','Conversation vocale'],['dictee','Dictée'],['notifications','Notifications']]){
+     await page.goto(new URL('/chat#reglages-'+slug,chatUrl).href);
+     await page.locator('.device-preferences').getByRole('heading',{name:title,exact:true}).waitFor();
+     assert.equal(await page.locator('.settings-subnav').isVisible(),false);
+     assert(await page.locator('#device-settings-back').isVisible());
+     assert.equal(await page.locator('[data-view="chat"]').isVisible(),false);
+   }
    await page.goto(chatUrl);await ready();assert.equal(await page.locator('#prompt').inputValue(),draft);
    const overviewPath='/app/projets/'+managed.id+'/vue-ensemble';
    await page.route('**'+overviewPath,route=>route.fulfill({body:'Vue d’ensemble du projet de recette'}));
@@ -499,10 +616,53 @@ async function check(browser,platform){
    await page.goto(new URL('/chat#apparence',page.url()).href);
    const theme=page.getByLabel('Thème de l’interface');
    await theme.waitFor();
-   assert(await theme.evaluate(node=>node===document.activeElement));
+   assert(await page.locator('.device-preferences > h2').evaluate(node=>node===document.activeElement));
    await theme.selectOption('dark');
    await page.waitForFunction(()=>document.documentElement.dataset.theme==='dark'&&!uiPreferencesPending);
    assert.equal(state.preferences.theme,'dark');
+  }
+  if(platform==='windows'||platform==='linux'){
+   await page.close();
+   const corrections=Array.from({length:200},(_,index)=>({id:'fiction-'+index,title:'Correcteur · correction '+index,
+    messages:[{role:'user',content:'Corriger :\n\nTexte ancien '+index},{role:'assistant',content:'Résultat ancien '+index}]}));
+   state.historyOverride=state.history={conversations:corrections,currentId:corrections[0].id};
+   state.preferences.corrector_text='Brouillon du correcteur à conserver';
+   let release;state.historyGate=new Promise(resolve=>{release=resolve;});
+   const recovered=await context.newPage();recovered.on('pageerror',e=>errors.push(e.message));
+   try{
+    await recovered.goto('http://127.0.0.1:'+server.address().port,{waitUntil:'domcontentloaded'});
+    await recovered.waitForFunction(()=>!historyReady&&!uiDraftsLoaded);
+    await recovered.evaluate(()=>uiPersistPreferences());
+    assert.equal(state.preferences.corrector_text,'Brouillon du correcteur à conserver');
+   }finally{state.historyGate=null;release();}
+   await recovered.waitForFunction(()=>historyReady&&uiDraftsLoaded);
+   assert.equal(await recovered.evaluate(()=>library.length),200,'La recette utilise un historique de 200 corrections.');
+   assert.equal(await recovered.locator('#corrector-text').inputValue(),'Brouillon du correcteur à conserver','Une correction historique ne doit pas remplacer un brouillon pendant le démarrage.');
+   await recovered.evaluate(()=>uiPersistPreferences());
+   assert.equal(state.preferences.corrector_text,'Brouillon du correcteur à conserver');
+   await recovered.close();
+   delete state.preferences.corrector_text;
+   const withoutDraft=await context.newPage();withoutDraft.on('pageerror',e=>errors.push(e.message));
+   await withoutDraft.goto('http://127.0.0.1:'+server.address().port,{waitUntil:'domcontentloaded'});
+   await withoutDraft.waitForFunction(()=>historyReady&&uiDraftsLoaded&&historyView==='corrector');
+   assert.equal(await withoutDraft.locator('#corrector-text').inputValue(),'Texte ancien 0','Sans brouillon enregistré, la correction historique reste consultable.');
+   await withoutDraft.close();
+   state.preferences.corrector_text='Brouillon du correcteur à conserver';
+   const chat={id:'chat-fictif',title:'Conversation fictive',messages:[]};
+   state.historyOverride=state.history={conversations:[corrections[0],chat],currentId:corrections[0].id};
+   state.preferences.conversation_drafts={[chat.id]:'Brouillon de conversation conservé'};
+   state.stateGate=new Promise(resolve=>{release=resolve;});
+   const delayed=await context.newPage();delayed.on('pageerror',e=>errors.push(e.message));
+   try{
+    await delayed.goto('http://127.0.0.1:'+server.address().port,{waitUntil:'domcontentloaded'});
+    await delayed.waitForFunction(()=>historyReady&&!uiDraftsLoaded);
+    assert.equal(await delayed.evaluate(()=>currentId),'fiction-0');
+    assert.equal(await delayed.locator('#prompt').evaluate(node=>node.readOnly),true);
+   }finally{state.stateGate=null;release();}
+   await delayed.waitForFunction(()=>historyReady&&uiDraftsLoaded&&currentId==='chat-fictif');
+   assert.equal(await delayed.locator('#prompt').inputValue(),'Brouillon de conversation conservé');
+   assert.equal(await delayed.locator('#corrector-text').inputValue(),'Brouillon du correcteur à conserver');
+   await delayed.close();
   }
   assert.deepEqual(errors,[]);console.log(JSON.stringify({platform,passed:true,scenarios:['per-conversation drafts and reload','failed persistence blocks silent reload','cleared draft stays cleared','instructions unload warning','memory edit survives refresh','delete cancel/error/success','named source dialog',...(desktopAudit?['desktop 720p through WQHD']:['drawer focus at 390 and 768','right-aligned send']),'one main landmark','project history and ephemeral privacy',...(platform!=='android'?['single project entry opens the current portfolio','shared appearance link']:[])]}));
  }finally{await context.close();await new Promise(r=>server.close(r));}

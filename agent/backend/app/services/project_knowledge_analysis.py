@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import threading
+from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 
 from app.services import llm_activity
@@ -19,6 +20,8 @@ _thread = None
 _processing = threading.Lock()
 STATES = {"satisfied", "partial", "not_satisfied", "unclear"}
 ANALYSIS_TIMEOUT_SECONDS = 110
+BASELINE_VERSION = 1
+RESULT_KINDS = ("findings", "dates", "highlights")
 
 
 def response_format(dates, target_count):
@@ -54,6 +57,61 @@ def enabled():
 
 def fingerprint(value):
     return hashlib.sha256(json.dumps(value, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
+
+
+def analysis_inputs(data):
+    return {key: data[key] for key in ("brain_project_id", "knowledge", "targets", "config_key") if key in data}
+
+
+def baseline(data):
+    return {"version": BASELINE_VERSION, "brain_project_id": data["brain_project_id"], "config_key": data["config_key"],
+            **{key: {item["id"]: fingerprint(item) for item in data[key]} for key in ("knowledge", "targets")}}
+
+
+def recover_legacy_baseline(job, data):
+    report = job.report or {}
+    if ("_baseline" in report or not job.completed_at or not data["brain_project_id"]
+            or len(data["knowledge"]) <= report.get("knowledge_count", len(data["knowledge"]))):
+        return False
+    from app.db import SessionLocal as Brain
+    from app.models import KnowledgeItem
+    with Brain() as brain:
+        added = {item_id for (item_id,) in brain.query(KnowledgeItem.id).filter(
+            KnowledgeItem.project_id == data["brain_project_id"], KnowledgeItem.created_at > job.completed_at)}
+    previous = {**data, "knowledge": [item for item in data["knowledge"] if item["id"] not in added]}
+    # An older report stored a digest of the whole input. Only recover its item
+    # fingerprints when that exact input can be reconstructed.
+    if fingerprint(previous) != report.get("fingerprint"):
+        return False
+    job.report = {**report, "_baseline": baseline(previous)}
+    return True
+
+
+def prepare(job, data):
+    previous = (job.report or {}).get("_baseline") or {}
+    job.snapshot = {**data, "plan_version": BASELINE_VERSION}
+    job.working = {key: [] for key in RESULT_KINDS}
+    job.cursor = 0
+    if any(previous.get(key) != value for key, value in (("version", BASELINE_VERSION),
+           ("brain_project_id", data["brain_project_id"]), ("config_key", data["config_key"]))):
+        return
+    current = baseline(data)
+    unchanged = {key: {item_id for item_id, digest in current[key].items() if previous[key].get(item_id) == digest}
+                 for key in ("knowledge", "targets")}
+    report = job.report
+    # A lost passage may have displaced another valid proof in its original lot.
+    # Recheck the requirements it supported against all the remaining evidence.
+    affected = {target["id"] for target in report.get("findings", [])
+                if any(proof["knowledge_id"] not in unchanged["knowledge"] for proof in target.get("proofs", []))}
+    unchanged["targets"].difference_update(affected)
+    job.snapshot = {**job.snapshot, "delta": {key: [item["id"] for item in data[key] if item["id"] not in unchanged[key]]
+                                             for key in ("knowledge", "targets")}}
+    job.working = {
+        "findings": [proof for target in report.get("findings", []) if target["id"] in unchanged["targets"]
+                     for proof in target.get("proofs", []) if proof["knowledge_id"] in unchanged["knowledge"]],
+        **{key: [proof for proof in report.get(key, []) if proof["knowledge_id"] in unchanged["knowledge"]]
+           for key in ("dates", "highlights")},
+    }
 
 
 def snapshot(db, project_id):
@@ -92,7 +150,7 @@ def snapshot(db, project_id):
     return {"brain_project_id": link.brain_project_id if link else None, "knowledge": knowledge, "targets": targets}
 
 
-def batches(data):
+def batches(data, *, include_dates=True):
     """Cover all retained text and all targets, without silently clipping scope."""
     chunks, chunk, size = [], [], 0
     for item in data["knowledge"]:
@@ -107,7 +165,21 @@ def batches(data):
     if chunk:
         chunks.append(chunk)
     groups = [data["targets"][i:i + 12] for i in range(0, len(data["targets"]), 12)] or [[]]
-    return [(chunk, group, index == 0) for chunk in chunks for index, group in enumerate(groups)]
+    return [(chunk, group, include_dates and index == 0) for chunk in chunks for index, group in enumerate(groups)]
+
+
+def pending_batches(data):
+    if "delta" not in data:
+        return batches(data)
+    changed_knowledge = set(data["delta"]["knowledge"])
+    changed_targets = set(data["delta"]["targets"])
+    additions = [item for item in data["knowledge"] if item["id"] in changed_knowledge]
+    previous = [item for item in data["knowledge"] if item["id"] not in changed_knowledge]
+    targets = [item for item in data["targets"] if item["id"] in changed_targets]
+    work = batches({"knowledge": additions, "targets": data["targets"]})
+    if targets:
+        work.extend(batches({"knowledge": previous, "targets": targets}, include_dates=False))
+    return work
 
 
 def analyse(cfg, knowledge, targets, dates):
@@ -195,9 +267,13 @@ def supported(result, knowledge, targets, dates):
 
 def finish(job, cfg):
     working = job.working
+    by_target = defaultdict(list)
+    for proof in working.get("findings", []):
+        by_target[proof["target_id"]].append(proof)
+    inputs = analysis_inputs(job.snapshot)
     findings = []
     for target in job.snapshot["targets"]:
-        proofs = [row for row in working.get("findings", []) if row["target_id"] == target["id"]]
+        proofs = by_target[target["id"]]
         states = {row["state"] for row in proofs}
         # Contradictory or incomplete evidence never becomes a positive assertion.
         state = next(iter(states)) if len(states) == 1 else "unclear" if states else "unknown"
@@ -206,14 +282,21 @@ def finish(job, cfg):
                          else proofs[0]["reason"] if proofs else "Aucune preuve pertinente retrouvée dans les connaissances retenues."})
     job.completed_at = now()
     job.next_due = job.completed_at + timedelta(hours=interval_hours())
-    job.report = {"completed_at": job.completed_at.isoformat() + "Z", "fingerprint": fingerprint(job.snapshot),
-                  "data_fingerprint": fingerprint({key: value for key, value in job.snapshot.items() if key != "config_key"}),
+    job.report = {"completed_at": job.completed_at.isoformat() + "Z", "fingerprint": fingerprint(inputs),
+                  "data_fingerprint": fingerprint({key: value for key, value in inputs.items() if key != "config_key"}),
+                  "_baseline": baseline(inputs),
                   "knowledge_count": len(job.snapshot["knowledge"]), "model": cfg.get("model"),
                   "findings": findings, "dates": working.get("dates", []), "highlights": working.get("highlights", []),
                   "counts": {state: sum(row["state"] == state for row in findings) for state in (*sorted(STATES), "unknown")}}
     job.status, job.error, job.retry_after = "completed", None, None
     job.updated_at = job.completed_at
     job.snapshot, job.working, job.cursor = {}, {}, 0
+
+
+def configured_snapshot(db, project_id, cfg):
+    data = snapshot(db, project_id)
+    data["config_key"] = fingerprint({key: cfg.get(key) for key in ("provider", "base_url", "model")})
+    return data
 
 
 def process_next(should_stop=lambda: False, idle_seconds=30):
@@ -246,24 +329,46 @@ def _step(should_stop, idle_seconds):
         db.commit()
         if not eligible:
             return False
-        # Complete the current project before claiming the next one.
-        job = sorted(eligible, key=lambda x: (not bool(x.snapshot), x.completed_at or datetime.min, x.project_id))[0]
+        # Give each eligible project one batch before returning to it.
+        job = min(eligible, key=lambda x: (x.updated_at, x.project_id))
         cfg = brain_ai_settings()
+        data = configured_snapshot(db, job.project_id, cfg)
+        data_key = fingerprint(data)
+        if (job.report or {}).get("fingerprint") == data_key and job.completed_at:
+            # Upgrade even an older unchanged report without invoking the model.
+            if "_baseline" not in job.report:
+                job.report = {**job.report, "_baseline": baseline(data)}
+            job.status, job.error, job.retry_after = "completed", None, None
+            job.snapshot, job.working, job.cursor = {}, {}, 0
+            job.updated_at = now()
+            job.next_due = job.updated_at + timedelta(hours=interval_hours())
+            db.commit()
+            return True
         if not cfg.get("enabled") or cfg.get("provider") == "none":
             job.status = "waiting_model"
+            job.updated_at = now()
             db.commit()
             return False
         with llm_activity.idle(idle_seconds) as available:
             if not available:
                 job.status = "waiting_idle"
+                job.updated_at = now()
                 db.commit()
                 return False
-            data = snapshot(db, job.project_id)
-            config_key = fingerprint({key: cfg.get(key) for key in ("provider", "base_url", "model")})
-            data["config_key"] = config_key
-            if fingerprint(data) != fingerprint(job.snapshot):
-                job.snapshot, job.working, job.cursor = data, {"findings": [], "dates": [], "highlights": []}, 0
-            work = batches(data)
+            previous_plan = job.snapshot or {}
+            changed = data_key != fingerprint(analysis_inputs(previous_plan))
+            recovered = (changed or "plan_version" not in previous_plan) and recover_legacy_baseline(job, data)
+            if changed or recovered:
+                prior_working, prior_cursor = job.working, job.cursor
+                prepare(job, data)
+                if recovered and not changed and prior_cursor:
+                    remaining = len(pending_batches(previous_plan)) - prior_cursor
+                    if 0 < remaining < len(pending_batches(job.snapshot)):
+                        job.snapshot = {**previous_plan, "plan_version": BASELINE_VERSION}
+                        job.working, job.cursor = prior_working, prior_cursor
+            elif "plan_version" not in previous_plan:
+                job.snapshot = {**previous_plan, "plan_version": BASELINE_VERSION}
+            work = pending_batches(job.snapshot)
             if not work:
                 finish(job, cfg)
                 db.commit()
@@ -275,12 +380,11 @@ def _step(should_stop, idle_seconds):
                 result = supported(analyse(cfg, knowledge, targets, dates), knowledge, targets, dates)
                 if should_stop():
                     return False
-                fresh = snapshot(db, job.project_id)
                 fresh_cfg = brain_ai_settings()
-                fresh["config_key"] = fingerprint({key: fresh_cfg.get(key) for key in ("provider", "base_url", "model")})
+                fresh = configured_snapshot(db, job.project_id, fresh_cfg)
                 db.expire_all()
                 project = db.get(Project, job.project_id)
-                if not project or project.status != "active" or not fresh_cfg.get("enabled") or fingerprint(fresh) != fingerprint(data):
+                if not project or project.status != "active" or not fresh_cfg.get("enabled") or fingerprint(fresh) != data_key:
                     job.snapshot, job.working, job.cursor, job.status = {}, {}, 0, "queued"
                     db.commit()
                     return True
@@ -294,8 +398,10 @@ def _step(should_stop, idle_seconds):
                     finish(job, cfg)
                 db.commit()
                 return True
-            except llm_activity.Deferred:
+            except llm_activity.Deferred as exc:
                 job.status = "waiting_idle"
+                if exc.retry_after_seconds:
+                    job.retry_after = now() + timedelta(seconds=exc.retry_after_seconds)
                 db.commit()
                 return False
             except Exception as exc:
@@ -317,16 +423,17 @@ def describe(db, project_id, offset=0, limit=20):
     operator = require_project_access(project_id)
     job = db.get(ProjectKnowledgeAnalysis, project_id)
     report = dict(job.report or {}) if job else {}
+    report.pop("_baseline", None)
     current = snapshot(db, project_id)
     # Config changes are irrelevant to documentary freshness.
-    old = {k: v for k, v in (job.snapshot or {}).items() if k != "config_key"} if job and job.snapshot else None
+    old = job.snapshot if job and job.snapshot else None
     stale = bool(report) and report.get("data_fingerprint") != fingerprint(current)
     rows = report.pop("findings", [])
     for key in ("dates", "highlights"):
         report[key + "_total"] = len(report.get(key, []))
         report[key] = report.get(key, [])[:50]
     return {"enabled": enabled(), "status": job.status if job else "queued", "error": job.error if job else None,
-            "cursor": job.cursor if job else 0, "total_batches": len(batches(old)) if old else 0,
+            "cursor": job.cursor if job else 0, "total_batches": len(pending_batches(old)) if old else 0,
             "next_due": job.next_due.isoformat() + "Z" if job and job.next_due else None,
             "retry_after": job.retry_after.isoformat() + "Z" if job and job.retry_after else None,
             "interval_hours": interval_hours(), "activity": llm_activity.status(), "stale": stale,

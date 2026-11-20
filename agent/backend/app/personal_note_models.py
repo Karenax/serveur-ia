@@ -5,6 +5,7 @@ from sqlalchemy import CheckConstraint, ForeignKey, Index, JSON, LargeBinary, St
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .db import Base
+from .project_note_schemas import NOTE_ATTACHMENT_BUDGET
 
 
 class PersonalNote(Base):
@@ -39,7 +40,7 @@ class PersonalNoteVersion(Base):
 
 class PersonalNoteImage(Base):
     __tablename__ = 'personal_note_images'
-    __table_args__ = (CheckConstraint('size_bytes BETWEEN 1 AND 5242880'),)
+    __table_args__ = (CheckConstraint(f'size_bytes BETWEEN 1 AND {NOTE_ATTACHMENT_BUDGET}'),)
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
     note_id: Mapped[str] = mapped_column(ForeignKey('personal_notes.id'), index=True)

@@ -516,7 +516,8 @@ def _process_chunk(chunk_id: str):
             db.expire_all()
             chunk = db.get(MeetingAudioChunk, chunk_id)
             session = db.get(MeetingSession, chunk.session_id)
-            if (generation != _stop_generation or _stop.is_set() or not live_transcription_enabled(db)
+            if (generation != _stop_generation or _stop.is_set()
+                    or not live_transcription_enabled(db, operator_id=session.operator_id)
                     or session.state == 'cancelled'):
                 raise InterruptedError("Transcription directe interrompue ; audio conservé")
             context_revised = _revise_context(db, chunk, prepared, result)

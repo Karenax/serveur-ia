@@ -1,0 +1,26 @@
+<aside class="sidebar" aria-label="Navigation principale">
+  <div class="brand"><div class="logo" aria-hidden="true">K</div><div><strong>Kiara</strong></div></div>
+  <nav id="client-navigation" class="sidebar-nav" aria-label="Fonctions du client">
+    <button type="button" class="nav-button active" data-view-button="chat" aria-current="page">Conversations</button>
+    <button type="button" class="nav-button" data-view-button="projects">Projets</button>
+    <button type="button" class="nav-button" data-workspace-link="notes">Notes</button>
+    <button type="button" class="nav-button" data-workspace-link="mail">Mails</button>
+    <button type="button" class="nav-button" data-workspace-link="meetings">Réunions</button>
+    <button type="button" class="nav-button" data-workspace-link="activity">Activité</button>
+  </nav>
+  <div class="sidebar-settings">
+    <button type="button" class="nav-button" data-view-button="settings">Réglages</button>
+    <span class="unified-sidebar-status">{location}</span>
+  </div>
+</aside>
+<template id="local-settings-navigation">{local_settings}</template>
+<!-- conversation-toolbar -->
+<div class="conversation-toolbar">
+  {new_button}
+  <details class="conversation-history-menu"><summary>Historique</summary>
+    <div class="history-navigation">{history}<div id="ws-sidebar-projects"></div></div>
+  </details>
+  <div class="project-conversation-switch">
+    <button id="project-conversation-toggle" class="secondary" type="button" aria-pressed="false" disabled>Assistant de projet</button>
+  </div>
+</div>

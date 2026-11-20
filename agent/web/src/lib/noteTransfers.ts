@@ -1,4 +1,4 @@
-import { noteRequest, noteUrl, type NoteContent, type NoteDetail, type NoteAttachment } from './projectNotes';
+import { NOTE_ATTACHMENT_BUDGET, noteRequest, noteUrl, type NoteContent, type NoteDetail, type NoteAttachment } from './projectNotes';
 
 export type NoteSource={kind:'upload'|'project_link';link_id:string|null;relative_path:string};
 export type SourceFile={relative_path:string;size_bytes:number;sha256:string;kind?:string};
@@ -64,7 +64,7 @@ function read<T>(key:string,validate:(v:unknown)=>v is T):{value:T|null;error:st
 export const readUploadJournal=(pid:string,nid:string,actor:string)=>read<UploadJournal>(uploadJournalKey(pid,nid,actor),
   (v):v is UploadJournal=>object(v)&&exact(v,['format','project_id','note_id','operator_id','command_id','filename','size_bytes','sha256'])&&v.format===1&&v.project_id===pid&&v.note_id===nid&&v.operator_id===actor&&
     isTransferId(v.command_id)&&typeof v.filename==='string'&&v.filename.length>0&&v.filename.length<=255&&!/[\\/\x00-\x1f]/.test(v.filename)&&
-    Number.isSafeInteger(v.size_bytes)&&(v.size_bytes as number)>=1&&(v.size_bytes as number)<=5*1024*1024&&digest(v.sha256));
+    Number.isSafeInteger(v.size_bytes)&&(v.size_bytes as number)>=1&&(v.size_bytes as number)<=NOTE_ATTACHMENT_BUDGET&&digest(v.sha256));
 export const readImportJournal=(pid:string,actor:string)=>read<ImportJournal>(importJournalKey(pid,actor),
   (v):v is ImportJournal=>object(v)&&exact(v,['format','project_id','operator_id','command','inventory'])&&v.format===1&&v.project_id===pid&&v.operator_id===actor&&validCommand(v.command)&&validInventory(v.inventory)&&
     (v.command.source.kind==='project_link'?v.inventory.length===0:v.inventory.length>=1));

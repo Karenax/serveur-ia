@@ -212,7 +212,7 @@ def _proxy(handler, store, path, query, identity, access_valid, *, browser, brow
                 return handler.respond(503, {'detail': 'L’espace de travail Kiara est indisponible.'})
             page = page.replace(b'="/assets/', b'="' + browser_prefix.encode('ascii') + b'/assets/')
             if getattr(handler, 'browser_conversation', None):
-                page = page.replace(b'<body', b'<body data-kiara-web-conversations="true"', 1)
+                page = page.replace(b'<body', b'<body data-kiara-web-conversations="true" data-kiara-notification-settings="true"', 1)
         if not authorized():
             return handler.respond(403, {'error': {'message': 'Accès désactivé.'}})
         handler.send_response(response.status)

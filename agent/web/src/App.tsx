@@ -11,6 +11,7 @@ import { type TriageProgress } from "./lib/mailTriage";
 import { useDurableMailTriage } from "./hooks/useDurableMailTriage";
 import { useDebouncedValue } from "./hooks/useDebouncedValue";
 import { useCdcJobs } from "./hooks/useCdcJobs";
+import { useProjectData } from "./hooks/useProjectData";
 import { CdcJobsPanel } from "./components/CdcJobsPanel";
 import { CdcSourceUpload } from "./components/CdcSourceUpload";
 import {SourceInspector} from "./components/SourceInspector";
@@ -1296,10 +1297,10 @@ function ReviewsPanel({ projectId, meetings, refresh, active, onOpenDocument }: 
   const [visited, setVisited] = useState(!!initialMeetingId);
   useEffect(()=>{const showRecording=(event:Event)=>{if((event as CustomEvent<{projectId?:string}>).detail?.projectId!==projectId)return;setView('meetings');setVisited(true);};window.addEventListener('agent-show-recording',showRecording);return()=>window.removeEventListener('agent-show-recording',showRecording);},[projectId]);
   return <div>
-    <p><a className="button primary" href={meetingWorkspaceHref(projectId)} onClick={event=>{if(requestMeetingWorkspace(projectId))event.preventDefault();}}>Ouvrir le Studio des réunions et notes</a></p>
+    <p><a className="button primary" href={meetingWorkspaceHref(projectId)} onClick={event=>{if(requestMeetingWorkspace(projectId))event.preventDefault();}}>Ouvrir les séances du projet</a></p>
     <div className="mp-subtabs" role="tablist" aria-label="Réunions et revues">
       <button type="button" role="tab" aria-selected={view==='rlp'} className={`mp-subtab ${view==='rlp'?'active':''}`} onClick={()=>setView('rlp')}>Revue de lancement</button>
-      <button type="button" role="tab" aria-selected={view==='meetings'} className={`mp-subtab ${view==='meetings'?'active':''}`} onClick={()=>{setView('meetings');setVisited(true);}}>Réunions et audio</button>
+      <button type="button" role="tab" aria-selected={view==='meetings'} className={`mp-subtab ${view==='meetings'?'active':''}`} onClick={()=>{setView('meetings');setVisited(true);}}>Comptes rendus et audio</button>
     </div>
     <div hidden={view!=='rlp'}><ProjectReviewsPanel projectId={projectId} active={active&&view==='rlp'} onSaved={refresh} onOpenDocument={onOpenDocument}/></div>
     {visited&&<div hidden={view!=='meetings'}><LegacyMeetingsPanel projectId={projectId} meetings={meetings} refresh={refresh} initialMeetingId={initialMeetingId} active={active&&view==='meetings'}/></div>}
@@ -1595,46 +1596,6 @@ export function SagePanel() {
       {status && !status.batch && <EmptyState title="Jamais importé" detail="Enregistrez le dossier des exports, puis lancez l’import." />}
     </div>
   );
-}
-
-function useProjectData(projectId: string, reloadRows: () => Promise<void> | void) {
-  const [detail, setDetail] = useState<ProjectDetail | null>(null);
-  const [items, setItems] = useState<CdcItem[]>([]);
-  const [sources, setSources] = useState<CdcSource[]>([]);
-  const [meetings, setMeetings] = useState<Meeting[]>([]);
-  const [error, setError] = useState("");
-  const generation = useRef(0);
-  const refresh = async () => {
-    const request = ++generation.current;
-    try {
-      setError("");
-      const [project, cdcItems, cdcSources, reviews] = await Promise.all([
-        api.detail(projectId), api.cdcItems(projectId), api.cdcSources(projectId), api.meetings(projectId),
-      ]);
-      if (request !== generation.current) return false;
-      const objectRows = (value: unknown) => Array.isArray(value) && value.every(row => row !== null && typeof row === 'object' && !Array.isArray(row));
-      if (!project || typeof project !== 'object' || project.id !== projectId ||
-          !objectRows(project.tasks) || !objectRows(project.milestones) || !objectRows(project.deliverables) ||
-          !objectRows(cdcItems) || !objectRows(cdcSources) || !objectRows(reviews) ||
-          project.tasks.some(task => typeof task.id !== 'string' || typeof task.title !== 'string' ||
-            typeof task.status !== 'string' || (task.due_date != null && typeof task.due_date !== 'string'))) {
-        throw new Error('Réponse du projet invalide. Les données et saisies affichées sont conservées.');
-      }
-      setDetail(project); setItems(cdcItems); setSources(cdcSources); setMeetings(reviews);
-      await reloadRows();
-      return true;
-    } catch (e: unknown) {
-      if (request === generation.current) setError(e instanceof Error ? e.message : String(e));
-      return false;
-    }
-  };
-  useEffect(() => {
-    setDetail(null); setItems([]); setSources([]); setMeetings([]);
-    void refresh();
-    return () => {generation.current += 1;};
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projectId]);
-  return { detail, items, sources, meetings, error, refresh };
 }
 
 export function ProjectWindow(props: {

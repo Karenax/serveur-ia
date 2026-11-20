@@ -9,9 +9,12 @@ DocumentId = Literal['offer_lt_simple', 'tdao', 'tdsp', 'manufacturing_specifica
     'user_manual', 'ce_request', 'customer_satisfaction_product', 'customer_satisfaction_fixed_price']
 
 
-class DocumentDiscover(DomainInput):
-    document_id: DocumentId
+class DocumentFolderDiscover(DomainInput):
     link_id: str = Field(min_length=1, max_length=36)
+
+
+class DocumentDiscover(DocumentFolderDiscover):
+    document_id: DocumentId
 
 
 class DocumentPreview(DocumentDiscover):

@@ -15,6 +15,7 @@ from app.services.deliverable_manifest import freeze
 from app.db_support import utc_iso
 
 from ..models import NetworkLink
+from ..personal_document_models import PersonalDocumentSearchVersion
 from ..project_document_form_schemas import DocumentDraftSave
 from ..project_document_models import (
     DOCUMENT_FORM_TABLES, DocumentDraftVersion, DocumentSearchState,
@@ -27,7 +28,7 @@ from .document_project_values import project_values
 from .document_template_catalogue import catalogue, document_spec
 from .project_document_migration import validate_document_schema
 from .project_identity import _project
-from .project_operator import require_reference_write
+from .project_operator import can_manage_references, current_operator, require_reference_write
 
 
 def _conflict(message='Le formulaire a changé ; rechargez sa version avant de réessayer'):
@@ -98,13 +99,85 @@ def _preferences(db):
 
 
 def search_preferences(db):
-    require_reference_write()
-    return _preferences(db)
+    return {**_preferences(db), 'can_edit': can_manage_references(current_operator())}
 
 
 def effective_preferences(db, project_id):
     _project(db, project_id)
-    return _preferences(db)
+    row = _personal_head(db)
+    if row is None:
+        return _preferences(db)
+    return {**_personal_preferences(row), 'available': _available(db)}
+
+
+_PERSONAL_FORMAT = 'agent-personal-document-search-preferences'
+
+
+def _personal_versions(actor):
+    return select(PersonalDocumentSearchVersion).where(PersonalDocumentSearchVersion.actor_id == actor)
+
+
+def _personal_installed(db):
+    return inspect(db.connection()).has_table(PersonalDocumentSearchVersion.__tablename__)
+
+
+def _personal_value(row):
+    value = _snapshot(row, format_name=_PERSONAL_FORMAT)
+    if value.get('catalogue_sha256') != freeze(catalogue())[1]:
+        _conflict('Catalogue documentaire modifié ; réconciliation explicite requise')
+    return value
+
+
+def _personal_head(db):
+    if not _personal_installed(db):
+        return None
+    return db.scalar(_personal_versions(_actor(current_operator())).order_by(
+        PersonalDocumentSearchVersion.revision.desc()).limit(1))
+
+
+def _personal_preferences(row):
+    return {'available': True, 'revision': row.revision,
+            'version_id': row.id, 'items': _items(_personal_value(row)['items'])}
+
+
+def personal_search_preferences(db):
+    available = _personal_installed(db)
+    row = _personal_head(db) if available else None
+    return {**(_personal_preferences(row) if row else {
+        'available': available, 'revision': 0, 'version_id': None, 'items': _preferences(db)['items']
+    }), 'can_edit': True}
+
+
+def save_personal_search_preferences(db, *, expected_revision, items, restored_from=None):
+    actor = _actor(current_operator())
+    _revision(expected_revision)
+    values = _items(items)
+    if not _personal_installed(db):
+        _conflict('Installation des réglages personnels requise')
+    # Reserve the SQLite writer before comparing the per-owner revision.
+    db.execute(text('UPDATE personal_document_search_versions SET revision=revision WHERE 0'))
+    db.expire_all()
+    head = _personal_head(db)
+    if (head.revision if head else 0) != expected_revision:
+        _conflict()
+    revision = expected_revision + 1
+    snapshot, digest = freeze({'format': _PERSONAL_FORMAT, 'version': 1, 'actor_id': actor,
+                              'revision': revision, 'catalogue_sha256': freeze(catalogue())[1],
+                              'items': values, 'restored_from': restored_from})
+    row = PersonalDocumentSearchVersion(revision=revision, snapshot=snapshot, sha256=digest, actor_id=actor)
+    db.add(row)
+    db.flush()
+    return {'available': True, 'can_edit': True, 'revision': revision, 'version_id': row.id, 'items': values}
+
+
+def restore_personal_search_preferences(db, *, expected_revision, version_id):
+    if not _personal_installed(db):
+        _conflict('Installation des réglages personnels requise')
+    row = db.scalar(_personal_versions(_actor(current_operator())).where(PersonalDocumentSearchVersion.id == version_id))
+    if row is None:
+        raise HTTPException(404, 'Version de préférences introuvable')
+    return save_personal_search_preferences(db, expected_revision=expected_revision,
+        items=_personal_value(row)['items'], restored_from=version_id)
 
 
 def save_search_preferences(db, *, expected_revision, items, restored_from=None):
@@ -287,6 +360,18 @@ def search_history_page(db, *, offset=0, limit=50):
                       .offset(offset).limit(limit)) if available else []
     return {'items': [{'id': row.id, 'revision': row.revision, 'sha256': row.sha256,
              'created_at': utc_iso(row.created_at), 'value': _snapshot(row, format_name='agent-document-search-preferences')}
+            for row in rows], 'total': total, 'offset': offset, 'limit': limit}
+
+
+def personal_search_history_page(db, *, offset=0, limit=50):
+    _pagination(offset, limit)
+    query = _personal_versions(_actor(current_operator()))
+    available = _personal_installed(db)
+    total = db.scalar(select(func.count()).select_from(query.subquery())) if available else 0
+    rows = db.scalars(query.order_by(PersonalDocumentSearchVersion.revision.desc())
+                      .offset(offset).limit(limit)) if available else []
+    return {'items': [{'id': row.id, 'revision': row.revision, 'sha256': row.sha256,
+            'created_at': utc_iso(row.created_at), 'value': _snapshot(row, format_name=_PERSONAL_FORMAT)}
             for row in rows], 'total': total, 'offset': offset, 'limit': limit}
 
 

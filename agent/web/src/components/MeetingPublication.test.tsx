@@ -12,7 +12,7 @@ const session:MeetingSession={id:'sid',title:'Revue',kind:'note',project_id:'erp
 beforeEach(()=>{installPublicationLocksForTest();localStorage.clear();});afterEach(()=>{cleanup();vi.restoreAllMocks();});
 it('lie le compte rendu publié au projet et à son identifiant dans une URL rechargeable',()=>{
   render(<MeetingNotePublication session={{...session,published_meeting_id:'report'}} dirty={false} unfinished={false} onPublished={vi.fn()} onOpenProject={vi.fn()}/>);
-  expect(screen.getByRole('link',{name:'Ouvrir le compte rendu'}).getAttribute('href')).toBe('/app/projects/erp/reviews?meeting=report');
+  expect(screen.getByRole('link',{name:'Ouvrir le compte rendu'}).getAttribute('href')).toBe('/app/projets/erp/reunions?meeting=report');
 });
 it('garde la version des notes publiée même si la note courante a changé',async()=>{
   const load=vi.spyOn(notesApi,'version').mockResolvedValue({id:'published-version',project_id:'erp',note_id:'note',revision:2,title:'Notes publiées',actor_id:'human',created_at:'2026-10-11T15:30:00Z',operation:'save',

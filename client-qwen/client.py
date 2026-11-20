@@ -24,9 +24,11 @@ from tkinter import filedialog, messagebox, simpledialog
 import urllib.error
 import urllib.request
 from uuid import UUID
-from urllib.parse import urlsplit
+from urllib.parse import parse_qs, urlsplit
 import time
 from updater import VERSION, AGENT_PROTOCOL
+from kiara_shared.conversation_shell import (DEVICE_SETTINGS, chat_contextual_help, device_settings,
+                                             modern_chat, notification_settings)
 from kiara_shared.releases import version as validate_version
 from product import APP_NAME, LOCAL_API_PORT, LOCAL_API_LAST_PORT
 import history_store
@@ -450,6 +452,7 @@ def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
     drafts=DraftStore(settings_path(remote.profile),protect)
     histories=HistorySync(remote,settings_path(remote.profile).with_suffix('.history.dpapi'),protect)
     agent_cookie = secrets.token_urlsafe(32)
+    device_cookie = secrets.token_urlsafe(32)
     helper = Path(sys.executable).with_name('kiara-agent-capture.exe')
     desktop_capture = None
     if managed and sys.platform == 'win32' and getattr(sys, 'frozen', False) and helper.is_file():
@@ -497,16 +500,19 @@ def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
                     or path.startswith(prefixes)
                     or re.fullmatch(r'/v1/resolution/[A-Za-z0-9_-]{1,36}/confirm', path) is not None)
 
-        def agent_authorized(self):
+        def local_session(self, name, expected):
             if not self.local_request():
                 return False
             try:
                 cookie = SimpleCookie()
                 cookie.load(self.headers.get('Cookie', ''))
-                value = cookie.get('kiara_agent')
-                return bool(value and hmac.compare_digest(value.value, agent_cookie))
+                value = cookie.get(name)
+                return bool(value and hmac.compare_digest(value.value, expected))
             except CookieError:
                 return False
+
+        def agent_authorized(self):
+            return self.local_session('kiara_agent', agent_cookie)
 
         def agent_proxy(self):
             bridge = self.path.startswith(THUNDERBIRD_PREFIX)
@@ -578,7 +584,8 @@ def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
                         if len(html) > 1024 * 1024 or b'<body>' not in html:
                             raise ValueError('Page Projets invalide.')
                         capture = b' data-kiara-capture="true"' if desktop_capture else b''
-                        windows = b' data-kiara-windows="true" data-kiara-device-settings="true"' if sys.platform == 'win32' else b''
+                        windows = (b' data-kiara-windows="true" data-kiara-device-settings="true"'
+                                   b' data-kiara-inline-settings="true"' + (b' data-kiara-notification-settings="true" data-kiara-native-settings="true"' if managed else b'')) if sys.platform == 'win32' else b''
                         linux_audio = b' data-kiara-linux-system-audio="true"' if linux_system_audio else b''
                         html = html.replace(b'<body>', b'<body data-kiara-desktop="true" data-kiara-project-conversation="true"' + windows + capture + linux_audio + b'>', 1)
                     self.send_response(response.status if hasattr(response, 'status') else response.code)
@@ -681,6 +688,25 @@ def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
             self.end_headers()
             self.wfile.write(data)
 
+        def device_session(self):
+            if not managed or sys.platform != 'win32':
+                return self.reply(404, {'detail': 'Réglages de cet appareil indisponibles.'})
+            if not self.authorized():
+                return
+            try:
+                if json_body(self, 4096) != {}:
+                    raise ValueError()
+            except (TypeError, ValueError):
+                return self.reply(400, {'error': {'message': 'Demande invalide.'}})
+            data = b'{"url":"/device-recovery"}'
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json; charset=utf-8')
+            self.send_header('Content-Length', str(len(data)))
+            self.send_header('Set-Cookie', f'kiara_device={device_cookie}; Path=/device-recovery; HttpOnly; SameSite=Strict')
+            self.send_header('Cache-Control', 'no-store')
+            self.end_headers()
+            self.wfile.write(data)
+
         def agent_open_path(self):
             origin = f'http://{self.headers.get("Host", "")}'
             if not self.agent_authorized() or self.headers.get('Origin') != origin:
@@ -714,23 +740,40 @@ def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
                 return self.reply(422, {'detail': 'Ce fichier ou dossier est inaccessible sur ce poste.'})
             return self.reply(200, {'opened': True})
 
-        def chat(self):
+        def chat(self, settings_panel=False, notifications=False, *, section=None, recovery=False):
             if not self.local_request():
                 return self.reply(403, {'error': {'message': 'Le chat est accessible sur localhost uniquement.'}})
             nonce = secrets.token_urlsafe(24)
             config = json.dumps({'key':key, 'model':remote.model, 'version':remote.version, 'storage':hashlib.sha256(key.encode()).hexdigest()[:20], 'platform':'linux' if sys.platform.startswith('linux') else 'windows'}, ensure_ascii=False).replace('<', '\\u003c')
             template = Path(getattr(sys, '_MEIPASS', Path(__file__).parent)) / 'chat.html'
-            scripts=('ui.js','attachments.js','corrector.js','selection.js','thinking.js','voice.js','conversation.js','project-conversation.js')+ (('linux_features.js',) if sys.platform.startswith('linux') else ()) + ('portal_conflict_archive.js','portal_conflict_review.js','portal_conflict_library.js','portal_origin_recovery.js','portal_audio_conflict_archive.js','portal_audio_conflict_library.js')
-            presentation = ''.join('<script nonce="__NONCE__">'+(template.parent/name).read_text(encoding='utf-8')+'</script>' for name in scripts)
-            markdown=''.join('<script nonce="__NONCE__">'+path.read_text(encoding='utf-8').replace('</script','<\\/script')+'</script>' for path in (template.parent/'vendor/markdown-it.min.js',template.parent/'markdown.js'))
-            css = ''.join((template.parent/name).read_text(encoding='utf-8') for name in ('ui.css','portal_conflict_library.css'))
-            content = template.read_text(encoding='utf-8').replace('</head>',markdown+'</head>').replace('</body>',(template.parent/'workspace.html').read_text(encoding='utf-8')+presentation+'</body>').replace('__UI_CSS__',css).replace('__CONFIG__', config).replace('__NONCE__', nonce).encode()
+            def read_asset(name):
+                return (template.parent / name).read_text(encoding='utf-8')
+            if section:
+                content = device_settings(read_asset, nonce, section, key=key, recovery=recovery)
+            elif notifications:
+                content = notification_settings(read_asset, nonce, key=key)
+            else:
+                scripts=('ui.js','attachments.js','corrector.js','selection.js','thinking.js','voice.js','conversation.js','project-conversation.js')+ (('linux_features.js',) if sys.platform.startswith('linux') else ()) + ('portal_conflict_archive.js','portal_conflict_review.js','portal_conflict_library.js','portal_origin_recovery.js','portal_audio_conflict_archive.js','portal_audio_conflict_library.js')
+                presentation = ''.join('<script nonce="__NONCE__">'+(template.parent/name).read_text(encoding='utf-8')+'</script>' for name in scripts)
+                markdown=''.join('<script nonce="__NONCE__">'+path.read_text(encoding='utf-8').replace('</script','<\\/script')+'</script>' for path in (template.parent/'vendor/markdown-it.min.js',template.parent/'markdown.js'))
+                css = ''.join((template.parent/name).read_text(encoding='utf-8') for name in ('ui.css','portal_conflict_library.css'))
+                chat = template.read_text(encoding='utf-8')
+                if (sys.platform == 'win32' and managed) or sys.platform.startswith('linux'):
+                    chat = modern_chat(chat, (template.parent / 'kiara-shell.html').read_text(encoding='utf-8'),
+                                       settings_panel=settings_panel,
+                                       native_settings=sys.platform == 'win32' and managed and not settings_panel)
+                    if not settings_panel:
+                        chat = chat_contextual_help(chat, read_asset)
+                elif settings_panel:
+                    chat = chat.replace('<body>', '<body data-kiara-settings-panel="true">', 1)
+                content = chat.replace('</head>',markdown+'</head>').replace('</body>',(template.parent/'workspace.html').read_text(encoding='utf-8')+presentation+'</body>').replace('__UI_CSS__',css).replace('__CONFIG__', config).replace('__NONCE__', nonce).encode()
             self.send_response(200)
             self.send_header('Content-Type', 'text/html; charset=utf-8')
             self.send_header('Content-Length', str(len(content)))
             self.send_header('Cache-Control', 'no-store')
             self.send_header('X-Content-Type-Options', 'nosniff')
-            self.send_header('Content-Security-Policy', f"default-src 'none'; script-src 'nonce-{nonce}'; style-src 'nonce-{nonce}'; connect-src 'self'; img-src data:; media-src blob:; frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
+            ancestors = "'self'" if settings_panel else "'none'"
+            self.send_header('Content-Security-Policy', f"default-src 'none'; script-src 'nonce-{nonce}'; style-src 'nonce-{nonce}'; connect-src 'self'; img-src data:; media-src blob:; frame-ancestors {ancestors}; base-uri 'none'; form-action 'self'")
             self.end_headers()
             self.wfile.write(content)
 
@@ -754,8 +797,44 @@ def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
             if self.path in ('/', '/chat'):
                 try:
                     return self.chat()
-                except (FileNotFoundError, UnicodeError):
+                except (OSError, ValueError):
                     return self.reply(503, {'error': {'message': 'Impossible de charger l’interface. Réinstallez le paquet complet de Kiara.'}})
+            target = urlsplit(self.path)
+            if target.path in ('/device-settings', '/device-recovery'):
+                recovery = target.path == '/device-recovery'
+                try:
+                    query = parse_qs(target.query, strict_parsing=True, max_num_fields=1)
+                except ValueError:
+                    query = {'invalid': []}
+                sections = query.get('section', [])
+                section = sections[0] if len(sections) == 1 else 'connexion' if recovery and not query else None
+                notifications = section == 'notifications' and not recovery
+                if (query and section is None) or (section is not None and section not in DEVICE_SETTINGS and not notifications):
+                    return self.reply(404, {'detail': 'Rubrique de réglages inconnue.'})
+                access = self.local_session('kiara_device', device_cookie) if recovery else self.agent_authorized()
+                if sys.platform != 'win32' or not access or (section is not None and not managed):
+                    return self.reply(403, {'detail': 'Accès aux réglages Kiara refusé.'})
+                try:
+                    return self.chat(not recovery, notifications, section=None if notifications else section, recovery=recovery)
+                except (OSError, ValueError):
+                    return self.reply(503, {'error': {'message': 'Impossible de charger les réglages de Kiara.'}})
+            if self.path in ('/client/device-state', '/client/device-state?section=vocal'):
+                if not self.authorized():
+                    return
+                if not managed or sys.platform != 'win32':
+                    return self.reply(404, {'detail': 'Réglages de cet appareil indisponibles.'})
+                voice_preferences, failure = {}, None
+                if self.path.endswith('?section=vocal'):
+                    try:
+                        voice_preferences = {name: value for name, value in read_preferences_for_display(remote.profile).items()
+                                             if name.startswith('voice_')}
+                    except LocalSettingsUnreadable:
+                        failure = 'Les réglages du vocal ne peuvent pas être lus. Le fichier local est conservé.'
+                remote.refresh_diagnostic()
+                return self.reply(200, {'endpoint': remote.endpoint, 'internet_endpoint': remote.profile['wireguard']['endpoint'],
+                                        'connection': remote.state(), 'update': remote.update_state,
+                                        'local_api': f'http://127.0.0.1:{self.server.server_port}/v1',
+                                        'voice_preferences': voice_preferences, 'voice_preferences_error': failure})
             if self.path == '/client/voice':
                 if not self.authorized():return
                 return self.reply(200,voice.status())
@@ -764,9 +843,13 @@ def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
                 return self.reply(200,{'apps':app_integrations.detect()})
             if self.path == '/client/state':
                 if not self.authorized():return
+                try:
+                    preferences = read_preferences_for_display(remote.profile)
+                except LocalSettingsUnreadable:
+                    return self.reply(503, {'error': {'message': 'Les brouillons et réglages locaux ne peuvent pas être lus. Le fichier est conservé ; réessayez après vérification.'}})
                 histories.schedule()
                 remote.refresh_diagnostic()
-                return self.reply(200,{'version':remote.version,'logged_in':True,'username':'Accès personnel','endpoint':remote.endpoint,'internet_endpoint':remote.profile['wireguard']['endpoint'],'connection':remote.state(),'history':histories.status(),'preferences':client_settings(remote.profile).get('preferences',{}),'update':remote.update_state,'desktop_managed':managed,'kiara4_migration':sys.platform=='win32' and not managed and bool(getattr(sys,'frozen',False)),'local_api':f'http://127.0.0.1:{self.server.server_port}/v1','key':key})
+                return self.reply(200,{'version':remote.version,'logged_in':True,'username':'Accès personnel','endpoint':remote.endpoint,'internet_endpoint':remote.profile['wireguard']['endpoint'],'connection':remote.state(),'history':histories.status(),'preferences':preferences,'update':remote.update_state,'desktop_managed':managed,'kiara4_migration':sys.platform=='win32' and not managed and bool(getattr(sys,'frozen',False)),'local_api':f'http://127.0.0.1:{self.server.server_port}/v1','key':key})
             if self.path == '/client/history':
                 if not self.authorized():return
                 try:return self.reply(200,histories.read())
@@ -790,6 +873,21 @@ def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
             self.forward()
 
         def do_POST(self):
+            if self.path == '/client/device-session':
+                return self.device_session()
+            if self.path == '/client/device-reconnect':
+                if not self.authorized():
+                    return
+                if not managed or sys.platform != 'win32':
+                    return self.reply(404, {'detail': 'Réglages de cet appareil indisponibles.'})
+                try:
+                    if json_body(self, 4096) != {}:
+                        raise ValueError()
+                except (TypeError, ValueError):
+                    return self.reply(400, {'error': {'message': 'Demande invalide.'}})
+                remote.next_probe = 0
+                threading.Thread(target=remote.check, daemon=True).start()
+                return self.reply(202, {'checking': True})
             if self.path in ('/client/project-session', '/client/agent/session'):
                 return self.agent_session()
             if self.path == '/api/v1/open-path':
@@ -1194,6 +1292,27 @@ def validate_conversation_drafts(value):
         raise ValueError('Brouillons des conversations trop volumineux ou invalides.')
 
 
+def validated_preferences(settings):
+    """Reject malformed saved drafts before displaying or updating settings."""
+    preferences = settings.get('preferences', {})
+    try:
+        if not isinstance(preferences, dict):
+            raise ValueError('Préférences invalides')
+        if 'conversation_drafts' in preferences:
+            validate_conversation_drafts(preferences['conversation_drafts'])
+        if 'corrector_text' in preferences and (not isinstance(preferences['corrector_text'], str)
+                                                 or len(preferences['corrector_text']) > 100000):
+            raise ValueError('Brouillon du correcteur invalide')
+    except (ValueError, TypeError, UnicodeError) as error:
+        raise LocalSettingsUnreadable('Réglages locaux illisibles. Le fichier original est conservé.') from error
+    return preferences
+
+
+def read_preferences_for_display(profile):
+    """Do not display unreadable saved drafts as a new empty workspace."""
+    return validated_preferences(read_settings_for_update(profile))
+
+
 def save_preferences(profile,values):
     allowed={'theme':('light','dark','system'),'font':('system','humanist','serif','mono'),
              'voice_quality':('low','max'),'voice_execution':('auto','pc','server'),'voice_animation_style':('waves','orb','constellation'),'voice_visual_version':(2,),
@@ -1211,14 +1330,15 @@ def save_preferences(profile,values):
     path=settings_path(profile)
     with locked(path):
         settings=read_settings_for_update(profile)
+        previous=validated_preferences(settings)
         if 'conversation_drafts' in values:
-            drafts={**settings.get('preferences',{}).get('conversation_drafts',{})}
+            drafts={**previous.get('conversation_drafts',{})}
             for key,text in values['conversation_drafts'].items():
                 if text:drafts[key]=text
                 else:drafts.pop(key,None)
             validate_conversation_drafts(drafts)
             values={**values,'conversation_drafts':drafts}
-        settings['preferences']={**settings.get('preferences',{}),**values}
+        settings['preferences']={**previous,**values}
         settings['preferences'].pop('maximum',None)
         history_store.atomic(path,protect(json.dumps(settings)))
     return {'saved':True}

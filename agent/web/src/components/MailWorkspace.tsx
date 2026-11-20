@@ -92,7 +92,6 @@ function readableText(text: string) {
 
 export function MailWorkspace(props: Props) {
   const [thunderbirdOpen, setThunderbirdOpen] = useState(false);
-  const [thunderbirdSetup, setThunderbirdSetup] = useState(false);
   const [thunderbirdAvailable, setThunderbirdAvailable] = useState(false);
   const [canReply, setCanReply] = useState(false);
   useEffect(() => {
@@ -540,14 +539,14 @@ export function MailWorkspace(props: Props) {
         {!props.scoped && !props.readOnly && <button type="button" className="maildesk-primary" aria-label={props.triaging ? "Analyse des mails en cours" : "Analyser les nouveaux mails"} disabled={props.triaging || locked} onClick={() => {if(tools.current)tools.current.open=false;props.onRunTriage(false);}}>
           <Glyph d={SPARK} size={16} /><span>{props.triaging ? "Analyse en cours…" : "Analyser les nouveaux"}</span></button>
         }
-        <details ref={tools} className="maildesk-tools"><summary aria-label="Options des mails" title="Options des mails"><Glyph d={MORE} size={16}/><span className="sr-only">Options des mails</span>Options</summary><div>
+        <details data-dismiss-outside ref={tools} className="maildesk-tools"><summary aria-label="Options des mails" title="Options des mails"><Glyph d={MORE} size={16}/><span className="sr-only">Options des mails</span>Options</summary><div>
           {!props.readOnly && (!props.scoped || emlProjects.length > 0) && <button type="button" disabled={locked} onClick={showEmlImport}>Importer des mails EML</button>}
           {!props.scoped && !props.readOnly && <>
           <button type="button" disabled={syncing} onClick={() => void scan()}>{syncing ? "Synchronisation…" : "Synchroniser les mails"}</button>
           <button type="button" onClick={() => { setReply(undefined); setThunderbirdOpen(true); if(tools.current)tools.current.open=false; }}>Nouveau message</button>
           <button type="button" disabled={props.triaging || locked} onClick={() => {if(tools.current)tools.current.open=false;props.onRunTriage(true);}}>Tout ré-analyser</button>
           </>}
-          {thunderbirdAvailable && <button type="button" onClick={() => {setThunderbirdSetup(true); if(tools.current)tools.current.open=false;}}>Extension Thunderbird</button>}
+          {thunderbirdAvailable && <a href={agentPath("/app/settings?settings=mail")}>Réglages Thunderbird</a>}
           <button type="button" onClick={() => void refresh()}>Actualiser la boîte</button>
         <label>Dossier<select className="maildesk-folder-picker" aria-label="Dossier de mails" value={folder} onChange={event=>{changeFolder(event.target.value);if(tools.current)tools.current.open=false;}}>
           {!(props.scoped && props.readOnly) && <option value="pending">À classer</option>}<option value="classified">Mails classés</option>{!props.readOnly && <option value="rejected">Mails rejetés</option>}{!props.scoped && <option value="divers">Divers</option>}
@@ -570,7 +569,6 @@ export function MailWorkspace(props: Props) {
       <button type="submit" className="maildesk-primary" disabled={!emlProject || !emlFiles.length || locked}>Importer</button>
       <button type="button" className="maildesk-secondary" disabled={sourceBusy} onClick={() => setEmlOpen(false)}>Fermer</button>
     </form>}
-    {thunderbirdSetup && <div className="maildesk-compose"><button type="button" className="maildesk-secondary" onClick={()=>setThunderbirdSetup(false)}>Fermer les réglages Thunderbird</button><ThunderbirdPanel extensionOnly /></div>}
       {thunderbirdOpen && <div className="maildesk-compose"><button type="button" className="maildesk-secondary" onClick={()=>setThunderbirdOpen(false)}>Fermer le message</button><ThunderbirdPanel key={reply?.sourceId || "new"} compose active={props.active !== false} reply={reply} onUpdated={() => { void refresh(); }} /></div>}
     {showAnalysis && <section className="maildesk-analysis-progress" aria-label="Progression de l’analyse des mails">
       <div className="maildesk-analysis-summary">
@@ -646,7 +644,7 @@ export function MailWorkspace(props: Props) {
                   {!!targetEvidence?.length && <ul>{targetEvidence.map(evidence=><li key={evidence.key}>{evidence.label}</li>)}</ul>}
                   {active.pending.discard_suggestion?.probability!=null && <div className="maildesk-discard-estimate"><p>Suggestion de suppression : {focusPercent(active.pending.discard_suggestion.probability)}</p><p>{active.pending.discard_suggestion.reason}</p><small>Estimation issue des mails déjà classés ou supprimés de Kiara ; elle reste à vérifier.</small></div>}
                 </details>}
-                {!props.scoped && <details className="maildesk-mail-options"><summary aria-label="Options du mail" title="Options du mail"><Glyph d={MORE} size={16}/><span className="sr-only">Actions secondaires du mail</span>Options du mail</summary><div className="maildesk-secondary-actions">
+                {!props.scoped && <details data-dismiss-outside className="maildesk-mail-options"><summary aria-label="Options du mail" title="Options du mail"><Glyph d={MORE} size={16}/><span className="sr-only">Actions secondaires du mail</span>Options du mail</summary><div className="maildesk-secondary-actions">
                   <button type="button" className="maildesk-secondary" aria-label="Classer dans Divers" disabled={locked || !diversProject} onClick={()=>void validateCurrent(diversProject!.id)}>Classer dans Divers</button>
                   <button type="button" className="maildesk-reject" disabled={locked} onClick={()=>void discard([active.id])}>Supprimer ce mail de Kiara</button>
                 </div><p>La suppression retire le contenu de ce mail de Kiara et l’exclut des analyses.</p></details>}
@@ -672,7 +670,7 @@ export function MailWorkspace(props: Props) {
                 <div className="maildesk-message-meta">
                   <strong title={detail?.sender || active.sender}>{senderName(detail?.sender || active.sender) || "Expéditeur non renseigné"}</strong>
                   <time title={fullDate(detail?.received_at || active.date)}>{shortDate(detail?.received_at || active.date)}</time>
-                  <details key={active.id} className="maildesk-message-details"><summary aria-label="Détails du mail" title="Détails du mail"><Glyph d={INFO} size={16}/><span className="sr-only">En-têtes et pièces jointes</span>Détails du mail</summary><div>
+                  <details data-dismiss-outside key={active.id} className="maildesk-message-details"><summary aria-label="Détails du mail" title="Détails du mail"><Glyph d={INFO} size={16}/><span className="sr-only">En-têtes et pièces jointes</span>Détails du mail</summary><div>
                     <dl><dt>De</dt><dd>{detail?.sender || active.sender || "Expéditeur non renseigné"}</dd>
                       <dt>{detail?.recipients ? "À" : "Destinataires"}</dt><dd>{(detail?.recipients?.to || detail?.participants || []).join(", ") || (detailLoading ? "Chargement…" : "Non renseignés")}</dd>
                       {!!detail?.recipients?.cc.length && <><dt>Copie</dt><dd>{detail.recipients.cc.join(", ")}</dd></>}

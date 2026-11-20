@@ -5,7 +5,7 @@ import warnings
 
 from PIL import Image, UnidentifiedImageError
 
-MAX_BYTES = 5 * 1024 * 1024
+from ..project_note_schemas import NOTE_ATTACHMENT_BUDGET as MAX_BYTES
 MAX_PIXELS = 16_000_000
 IMAGE_TYPES = {'.png': ('PNG', 'image/png'), '.jpg': ('JPEG', 'image/jpeg'),
                '.jpeg': ('JPEG', 'image/jpeg'), '.webp': ('WEBP', 'image/webp')}
@@ -32,7 +32,7 @@ def image(data, expected_format):
 
 def content_type(filename, data):
     if not isinstance(data, bytes) or not 0 < len(data) <= MAX_BYTES:
-        raise ValueError('Pièce binaire non vide de 5 Mio maximum requise')
+        raise ValueError('Pièce binaire non vide compatible avec le quota de la note requise')
     extension = PurePosixPath(filename).suffix.casefold()
     if extension in IMAGE_TYPES:
         image_format, mime = IMAGE_TYPES[extension]

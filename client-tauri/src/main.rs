@@ -612,6 +612,16 @@ fn run_recovery(context: tauri::Context<tauri::Wry>, offer: recovery_protocol::R
 
 fn main() {
     let context = tauri::generate_context!();
+    #[cfg(target_os = "linux")]
+    {
+        // Keep the version marker in the executable for cross-platform packaging.
+        let marker = std::hint::black_box(concat!("KIARA_TAURI_VERSION=", env!("KIARA_LINUX_BUILD_VERSION"), "\0"));
+        let version = marker.strip_prefix("KIARA_TAURI_VERSION=").and_then(|value| value.strip_suffix('\0'));
+        if version != Some(context.package_info().version.to_string().as_str()) {
+            eprintln!("La version du binaire Kiara ne correspond pas à sa configuration Tauri.");
+            std::process::exit(2);
+        }
+    }
     let args: Vec<_> = std::env::args_os().collect();
     let mut relay = None;
     let mut updates = None;

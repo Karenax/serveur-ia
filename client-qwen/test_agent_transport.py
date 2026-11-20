@@ -54,7 +54,7 @@ class AgentTransportTests(unittest.TestCase):
                                  'address': '10.77.0.2/32', 'endpoint': 'example.test:51820'}}
         self.remote = client.Remote(profile, Opener())
         with patch.object(client, 'settings_path', return_value=Path(self.folder.name) / 'settings.json'):
-            self.server = client.serve_local(self.remote, 'local-key', 0)
+            self.server = client.serve_local(self.remote, 'local-key', 0, managed=sys.platform == 'win32')
         self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
         self.thread.start()
         self.port = self.server.server_address[1]
@@ -109,11 +109,35 @@ class AgentTransportTests(unittest.TestCase):
         self.assertEqual(status, 200)
         cookie = headers['Set-Cookie'].split(';', 1)[0]
         self.assertIn('HttpOnly', headers['Set-Cookie'])
+        status, _, chat = self.call('GET', '/chat')
+        self.assertEqual(status, 200)
+        self.assertEqual(b'<body data-kiara-unified-navigation="true"' in chat, sys.platform == 'win32' or sys.platform.startswith('linux'))
+        self.assertIn(b'class="conversation-toolbar"', chat)
+        sidebar = chat.split(b'<aside class="sidebar"', 1)[1].split(b'</aside>', 1)[0]
+        self.assertNotIn(b'id="conversation-list"', sidebar)
+        self.assertNotIn(b'data-view-button="connection"', sidebar)
         status, _, html = self.call('GET', '/app', headers={'Cookie': cookie})
         self.assertEqual(status, 200)
         self.assertIn(b'data-kiara-desktop="true"', html)
         self.assertEqual(b'data-kiara-windows="true"' in html, sys.platform == 'win32')
         self.assertEqual(b'data-kiara-linux-system-audio="true"' in html, sys.platform.startswith('linux'))
+        self.assertEqual(b'data-kiara-inline-settings="true"' in html, sys.platform == 'win32')
+        self.assertEqual(self.call('GET', '/device-settings')[0], 403)
+        self.assertEqual(self.call('GET', '/device-settings', headers={
+            'Cookie': cookie, 'Origin': 'https://example.com'})[0], 403)
+        status, headers, panel = self.call('GET', '/device-settings', headers={'Cookie': cookie})
+        self.assertEqual(status, 200 if sys.platform == 'win32' else 403)
+        if status == 200:
+            self.assertIn("frame-ancestors 'self'", headers['Content-Security-Policy'])
+            self.assertIn(b'data-kiara-settings-panel="true">', panel)
+            notifications = '/device-settings?section=notifications'
+            self.assertEqual(self.call('GET', notifications)[0], 403)
+            status, headers, lightweight = self.call('GET', notifications, headers={'Cookie': cookie})
+            self.assertEqual(status, 200)
+            self.assertIn("frame-ancestors 'self'", headers['Content-Security-Policy'])
+            self.assertIn(b'/chat#notifications', lightweight)
+            self.assertNotIn(b'id="composer"', lightweight)
+            self.assertLess(len(lightweight), len(panel) // 10)
         path = '/api/v1/projects?limit=5'
         self.assertEqual(self.call('PATCH', path, 'abc', {'Cookie': cookie, 'Origin': 'https://example.com'})[0], 403)
         status, _, _ = self.call('PATCH', path, 'abc', {
@@ -121,6 +145,7 @@ class AgentTransportTests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertEqual(self.calls[-1][0], 'PATCH')
         self.assertTrue(self.calls[-1][1].endswith('/v1/business' + path))
+
         self.assertEqual(self.calls[-1][2:], ('text/plain', b'abc'))
         resolution = '/v1/resolution/source-recette/confirm'
         self.assertEqual(self.call('POST', resolution, '{}')[0], 403)
@@ -129,6 +154,53 @@ class AgentTransportTests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertTrue(self.calls[-1][1].endswith('/v1/business' + resolution))
 
+    @unittest.skipUnless(sys.platform == 'win32', 'Réglages locaux réservés à Kiara pour Windows')
+    def test_native_settings_are_scoped_and_recovery_works_without_projects(self):
+        auth = {'Content-Type': 'application/json', 'Authorization': 'Bearer local-key'}
+        result = self.call('POST', '/client/project-session', '{}', auth)
+        self.assertEqual(result[0], 200)
+        agent = result[1]['Set-Cookie'].split(';', 1)[0]
+        for section in client.DEVICE_SETTINGS:
+            route = '/device-settings?section=' + section
+            status, headers, markup = self.call('GET', route, headers={'Cookie': agent})
+            self.assertEqual(status, 200)
+            self.assertIn("frame-ancestors 'self'", headers['Content-Security-Policy'])
+            self.assertNotIn(b'id="composer"', markup)
+            self.assertNotIn(b'<nav', markup)
+            self.assertNotIn(b'<dialog', markup)
+        self.assertEqual(self.call('GET', '/device-settings?section=inconnue', headers={'Cookie': agent})[0], 404)
+        self.assertEqual(self.call('GET', '/device-recovery', headers={'Cookie': agent})[0], 403)
+        with patch.object(self.remote, 'open', side_effect=OSError('Appareil hors connexion')) as unavailable:
+            self.assertEqual(self.call('POST', '/client/project-session', '{}', auth)[0], 503)
+            count = unavailable.call_count
+            self.assertEqual(self.call('POST', '/client/device-session', '{}')[0], 401)
+            self.assertEqual(self.call('POST', '/client/device-session', '{}',
+                                       {**auth, 'Origin': 'https://example.test'})[0], 403)
+            status, headers, _ = self.call('POST', '/client/device-session', '{}', auth)
+            self.assertEqual(status, 200)
+            device = headers['Set-Cookie'].split(';', 1)[0]
+            self.assertIn('Path=/device-recovery', headers['Set-Cookie'])
+            self.assertEqual(self.call('GET', '/app', headers={'Cookie': device})[0], 403)
+            self.assertEqual(self.call('GET', '/device-recovery',
+                                       headers={'Cookie': device, 'Origin': 'https://example.test'})[0], 403)
+            status, headers, markup = self.call('GET', '/device-recovery?section=mises-a-jour', headers={'Cookie': device})
+            self.assertEqual(status, 200)
+            self.assertIn("frame-ancestors 'none'", headers['Content-Security-Policy'])
+            self.assertIn(b'id="update-check"', markup)
+            self.assertEqual(unavailable.call_count, count)
+
+        # Both writes go through the actual encrypted local settings store on the fixture profile.
+        with patch.object(client, 'settings_path', return_value=Path(self.folder.name) / 'device-fixture.dpapi'):
+            self.assertEqual(self.call('POST', '/client/preferences', '{"theme":"dark","corrector_text":"Recette"}', auth)[0], 200)
+            self.assertEqual(self.call('POST', '/client/preferences', '{"voice_volume":42,"voice_quality":"max"}', auth)[0], 200)
+            state = json.loads(self.call('GET', '/client/device-state?section=vocal', headers=auth)[2])
+            self.assertEqual(state['voice_preferences'], {'voice_volume': 42, 'voice_quality': 'max'})
+            self.assertNotIn('Recette', json.dumps(state))
+            self.assertEqual(self.call('POST', '/client/endpoint', '{"endpoint":"example.test:51821"}', auth)[0], 200)
+            saved = client.read_settings_for_update(self.remote.profile)
+            self.assertEqual(saved['endpoint'], 'example.test:51821')
+            self.assertEqual(saved['preferences']['corrector_text'], 'Recette')
+
     def test_desktop_version_is_visible_through_authenticated_state(self):
         self.remote.version = '3.5.63'
         self.assertEqual(self.call('GET', '/client/state')[0], 401)
@@ -136,6 +208,46 @@ class AgentTransportTests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertEqual(json.loads(body)['version'], '3.5.63')
         self.assertEqual(self.call('GET', '/api/v1/projects')[0], 403)
+
+    def test_state_refuses_unreadable_or_invalid_local_drafts_and_recovers(self):
+        settings = Path(self.folder.name)/'settings-local.json'
+        headers = {'Authorization': 'Bearer local-key'}
+        original = {'preferences': {'conversation_drafts': {'conversation-fictive': 'Brouillon conservé'},
+                                    'corrector_text': 'Correction conservée'}}
+        encoded = json.dumps(original, ensure_ascii=False).encode('utf-8')
+        with patch.object(client, 'settings_path', return_value=settings), \
+             patch.object(client, 'protect', side_effect=lambda value, decrypt=False: value if isinstance(value, bytes) else value.encode('utf-8')):
+            settings.write_bytes(encoded)
+            status, _, body = self.call('GET', '/client/state', headers=headers)
+            self.assertEqual(status, 200)
+            self.assertEqual(json.loads(body)['preferences'], original['preferences'])
+            invalid = [b'{fichier-corrompu',
+                       json.dumps({'preferences': []}).encode(),
+                       json.dumps({'preferences': {'conversation_drafts': 'invalide'}}).encode(),
+                       json.dumps({'preferences': {'corrector_text': None}}).encode()]
+            for damaged in invalid:
+                settings.write_bytes(damaged)
+                status, _, body = self.call('GET', '/client/state', headers=headers)
+                self.assertEqual(status, 503, body)
+                self.assertNotIn(damaged, body)
+                self.assertEqual(settings.read_bytes(), damaged)
+                post_headers = {**headers, 'Content-Type': 'application/json'}
+                status, _, body = self.call('POST', '/client/preferences',
+                                            json.dumps({'theme': 'dark', 'corrector_text': 'nouveau texte'}),
+                                            post_headers)
+                self.assertEqual(status, 400, body)
+                self.assertEqual(settings.read_bytes(), damaged)
+            settings.write_bytes(encoded)
+            status, _, body = self.call('GET', '/client/state', headers=headers)
+            self.assertEqual(status, 200)
+            self.assertEqual(json.loads(body)['preferences'], original['preferences'])
+            self.assertEqual(settings.read_bytes(), encoded)
+            status, _, body = self.call('POST', '/client/preferences', json.dumps({'theme': 'dark'}),
+                                        {**headers, 'Content-Type': 'application/json'})
+            self.assertEqual(status, 200, body)
+            saved = json.loads(settings.read_bytes())['preferences']
+            self.assertEqual(saved['corrector_text'], original['preferences']['corrector_text'])
+            self.assertEqual(saved['conversation_drafts'], original['preferences']['conversation_drafts'])
 
     def test_chat_contains_read_only_local_recovery_library_under_its_csp(self):
         status, headers, body = self.call('GET', '/chat')
@@ -151,6 +263,7 @@ class AgentTransportTests(unittest.TestCase):
         self.assertIn("script-src 'nonce-", headers['Content-Security-Policy'])
         self.assertIn("style-src 'nonce-", headers['Content-Security-Policy'])
         self.assertIn('media-src blob:', headers['Content-Security-Policy'])
+        self.assertIn("frame-ancestors 'none'", headers['Content-Security-Policy'])
         self.assertNotIn("'unsafe-inline'", headers['Content-Security-Policy'])
 
     def test_unreadable_settings_are_preserved_by_local_api(self):

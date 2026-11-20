@@ -118,3 +118,49 @@ def test_private_boundaries_and_copy_with_image(client, store, monkeypatch):
         project.status = 'archived'
         db.commit()
     assert session.get(catalogue).json()['projects'] == []
+
+
+def test_all_notes_colours_permissions_and_replayable_deletion(client, monkeypatch):
+    session, (first, second) = client
+    roots = ['/api/v1/notes/personal', f'/api/v1/projects/{first}/notes', f'/api/v1/projects/{second}/notes']
+    notes = []
+    for root, title, background in zip(roots, ['Privée', 'Premier projet', 'Autre projet'], ['pink', 'blue', 'green']):
+        result = session.post(root, json={'command_id': core.command(), 'title': title,
+                                         'content': {'blocks': [], 'background': background}})
+        assert result.status_code == 201, result.text
+        notes.append(result.json()['note'])
+    all_url = '/api/v1/notes/all'
+    params = [('projects', first), ('projects', second)]
+    assert {row['background'] for row in session.get(all_url, params=params).json()['items']} == {'pink', 'blue', 'green'}
+    assert session.get(all_url, params={'query': 'privee'}).json()['items'][0]['title'] == 'Privée'
+    monkeypatch.setenv('AGENT_OPERATOR_ROLE', 'editor')
+    monkeypatch.setenv('AGENT_OPERATOR_PROJECT_IDS', json.dumps([first]))
+    assert session.get(all_url, params=params).json()['total'] == 2
+    foreign = f"{roots[2]}/{notes[2]['id']}"
+    assert session.request('DELETE', foreign, json={'command_id': core.command(), 'expected_revision': 1}).status_code == 404
+    for root, note in zip(roots[:2], notes[:2]):
+        path = f"{root}/{note['id']}"
+        delete = {'command_id': core.command(), 'expected_revision': 1}
+        assert session.request('DELETE', path, json={**delete, 'expected_revision': 2}).status_code == 409
+        assert session.request('DELETE', path, json=delete).json() == {'deleted': True}
+        assert session.request('DELETE', path, json=delete).json() == {'deleted': True}
+        assert session.get(path).status_code == 404
+        assert session.get(root).json()['total'] == 0
+    assert session.get(all_url, params=params).json()['total'] == 0
+    assert session.get('/api/v1/notes/projects').json()['projects'][0]['has_notes'] is False
+
+
+def test_private_clipboard_image_over_five_mib_keeps_background(client):
+    session, _ = client
+    stream = BytesIO()
+    Image.new('RGB', (1500, 1500), 'blue').save(stream, format='PNG', compress_level=0)
+    data = stream.getvalue()
+    assert len(data) > 5 * 1024 * 1024
+    root = '/api/v1/notes/personal'
+    result = paste(session, root, {'command_id': core.command(), 'title': 'Grande image', 'expected_revision': 0,
+                                   'content': {'blocks': [], 'background': 'yellow'}, 'insert_at': 0}, data)
+    assert result.status_code == 201, result.text
+    note = result.json()['note']
+    assert note['content']['background'] == 'yellow'
+    attachment = note['attachment_ids'][0]
+    assert session.get(f"{root}/{note['id']}/attachments/{attachment}/image").content == data

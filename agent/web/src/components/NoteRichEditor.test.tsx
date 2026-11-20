@@ -69,7 +69,19 @@ it('changes list style in place and exposes secondary actions without controls b
   fireEvent.click(screen.getByText(/Insérer \/ format/));
   expect(screen.getByRole('button',{name:'Ajouter un élément'})).toBeTruthy();
   fireEvent.click(screen.getByRole('button',{name:'Ajouter un élément'}));
+  expect(document.querySelector('details.note-format-menu')?.hasAttribute('open')).toBe(false);
   expect(value().blocks[0]).toMatchObject({items:[{}, {runs:[],checked:false,indent:0}]});
+});
+
+it('supprime une ligne à cocher vide au clavier et conserve les lignes voisines',()=>{
+  render(<Editor initial={{version:1,blocks:[{type:'list',kind:'checklist',items:[
+    {runs:[],checked:true,indent:0},{runs:[run('À conserver')],checked:false,indent:0},
+  ]}]}}/>);
+  const empty=screen.getByRole('textbox',{name:'Élément 1 du bloc 1'});
+  caret(empty);fireEvent.keyDown(empty,{key:'Delete'});
+  expect(value().blocks[0]).toMatchObject({items:[{runs:[run('À conserver')],checked:false}]});
+  expect(screen.getAllByRole('checkbox')).toHaveLength(1);
+  expect(screen.getByLabelText('Couleur du texte').closest('[role="toolbar"]')).toBeTruthy();
 });
 
 it('tabs across a table and adds a row while preserving headers, links and images',()=>{

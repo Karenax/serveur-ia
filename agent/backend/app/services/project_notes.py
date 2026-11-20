@@ -15,7 +15,7 @@ from sqlalchemy.dialects.sqlite import insert
 from app.db_support import utc_iso
 from app.services.deliverable_manifest import freeze
 from ..project_note_models import ProjectNote, NoteVersion, NoteAttachment, NoteSourceImport
-from ..project_note_schemas import ImageBlock, NoteContent, NoteCreate, NoteSave, NoteRestore, content_text
+from ..project_note_schemas import ImageBlock, NoteContent, NoteCreate, NoteDelete, NoteSave, NoteRestore, content_text
 from ..project_identity_models import now, uid
 from .project_identity import _project
 from .project_note_schema import validate_note_schema
@@ -50,9 +50,12 @@ def _actor():
     return value
 
 
-def _head(db, project_id, note_id):
+def _head(db, project_id, note_id, *, include_deleted=False):
     head = db.get(ProjectNote, note_id)
     if head is None or head.project_id != project_id:
+        raise HTTPException(404, 'Note introuvable')
+    if not include_deleted and db.scalar(select(func.json_extract(NoteVersion.snapshot, '$.operation'))
+                                          .where(NoteVersion.id == head.current_version_id)) == 'delete':
         raise HTTPException(404, 'Note introuvable')
     return head
 
@@ -114,15 +117,16 @@ def list_notes(db, project_id, *, query='', limit=30, offset=0):
     if not _ready(db):
         return {'available': False, 'items': [], 'total': 0, 'limit': limit, 'offset': offset}
     folded = fold_query(query)
-    conditions = [ProjectNote.project_id == project_id]
+    current = ProjectNote.current_version_id == NoteVersion.id
+    conditions = [ProjectNote.project_id == project_id, func.json_extract(NoteVersion.snapshot, '$.operation') != 'delete']
     if folded:
         conditions.append(func.agent_fold(ProjectNote.title + '\n' + ProjectNote.plain_text).contains(folded, autoescape=True))
-    total = db.scalar(select(func.count()).select_from(ProjectNote).where(*conditions))
+    total = db.scalar(select(func.count()).select_from(ProjectNote).join(NoteVersion, current).where(*conditions))
     items = []
-    for head in db.scalars(select(ProjectNote).where(*conditions).order_by(ProjectNote.updated_at.desc(), ProjectNote.id).limit(limit).offset(offset)):
+    for head in db.scalars(select(ProjectNote).join(NoteVersion, current).where(*conditions).order_by(ProjectNote.updated_at.desc(), ProjectNote.id).limit(limit).offset(offset)):
         value = _detail(db, head)
         items.append({key: value[key] for key in ('id', 'project_id', 'title', 'revision', 'version_id', 'updated_at', 'actor_id')}
-                     | {'excerpt': value['plain_text'][:240]})
+                     | {'excerpt': value['plain_text'][:240], 'background': value['content'].get('background')})
     operator = current_operator()
     return {'available': True, 'items': items, 'total': total, 'limit': limit, 'offset': offset,
             'can_edit': operator.role != 'reader', 'operator_id': operator.id}
@@ -225,6 +229,8 @@ def _append(db, project_id, note_id, *, title, content, attachment_ids, revision
         if result.rowcount != 1:
             _error()
     db.expire_all()
+    if operation == 'delete':
+        return {'deleted': True}
     from .note_evidence_outbox import enqueue_note_version
     enqueue_note_version(db, version_id)
     return _response(db, db.get(NoteVersion, version_id), replayed=False)
@@ -262,6 +268,30 @@ def save_note(db, project_id, note_id, payload: NoteSave):
     return _append(db, project_id, note_id, title=payload.title, content=payload.content,
                    attachment_ids=payload.attachment_ids, revision=head.revision+1, command_id=payload.command_id,
                    command_digest=digest, actor=actor, operation='save', head=head)
+
+
+def delete_note(db, project_id, note_id, payload: NoteDelete):
+    _project(db, project_id, write=True)
+    _ready(db, write=True)
+    _lock(db)
+    actor = _actor()
+    head = _head(db, project_id, note_id, include_deleted=True)
+    digest = _command_digest(project_id, note_id, 'delete', payload, actor)
+    version = db.get(NoteVersion, head.current_version_id)
+    value = _value(version)
+    if value['operation'] == 'delete':
+        if version.command_id == payload.command_id and version.command_sha256 == digest and not version.execution_blocked:
+            return {'deleted': True}
+        raise HTTPException(404, 'Note introuvable')
+    if head.revision != payload.expected_revision:
+        _error()
+    if db.scalar(select(NoteSourceImport.id).where(NoteSourceImport.project_id == project_id,
+                                                  NoteSourceImport.command_id == payload.command_id)):
+        _error('Commande déjà utilisée')
+    content, attachments = _bound_content(version, value)
+    return _append(db, project_id, note_id, title=head.title, content=content, attachment_ids=attachments,
+                   revision=head.revision+1, command_id=payload.command_id, command_digest=digest,
+                   actor=actor, operation='delete', head=head)
 
 
 def restore_note(db, project_id, note_id, payload: NoteRestore):

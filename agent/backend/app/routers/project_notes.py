@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from ..db import get_db
-from ..project_note_schemas import NoteCreate, NoteSave, NoteRestore
+from ..project_note_schemas import NoteCreate, NoteDelete, NoteSave, NoteRestore
 from ..services import project_notes as service
 
 router = APIRouter(prefix='/api/v1/projects/{project_id}/notes', tags=['project-notes'])
@@ -42,6 +42,11 @@ def detail(project_id: str, note_id: str, db: Session = Depends(get_db)):
 @router.put('/{note_id}')
 def save(project_id: str, note_id: str, payload: NoteSave, db: Session = Depends(get_db)):
     return _command(db, service.save_note, project_id, note_id, payload)
+
+
+@router.delete('/{note_id}')
+def delete(project_id: str, note_id: str, payload: NoteDelete, db: Session = Depends(get_db)):
+    return _command(db, service.delete_note, project_id, note_id, payload)
 
 
 @router.get('/{note_id}/history')

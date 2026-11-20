@@ -1,0 +1,2652 @@
+{
+  "date": "2026-11-18",
+  "environnement": "Sources du dépôt de travail, données synthétiques. Coordonnées CSS [x, y, largeur, hauteur] dans la fenêtre, échelle 1.",
+  "controles": {
+    "vocalTree": "- link \"Aller au contenu\":\n  - /url: \"#fred-main\"\n- complementary \"Navigation principale\":\n  - text: K\n  - strong: Kiara\n  - navigation \"Fonctions du client\":\n    - button \"Conversations\"\n    - button \"Projets\"\n    - button \"Notes\"\n    - button \"Mails\"\n    - button \"Réunions\"\n    - button \"Activité\"\n  - button \"Réglages\"\n  - text: Serveur Kiara\n- main \"Vocal\":\n  - button \"Afficher ou masquer la navigation\" [expanded]\n  - heading \"Vocal\" [level=1]\n  - 'status \"Modèle : Modèle de démonstration\"'\n  - button \"Notifications\"\n  - button \"Connecté au serveur IA · Afficher le diagnostic de connexion\": ● Connecté au serveur IA ⌄\n  - region \"Vocal\":\n    - heading \"Vocal\" [level=2]\n    - paragraph: Conversation\n    - button \"Nouvelle conversation\"\n    - button \"Historique\"\n    - group: ···\n    - button \"Réglages\" [expanded]\n    - text: Low · voix sur le serveur Votre micro\n    - meter \"Niveau de votre microphone\"\n    - text: Voix de Kiara\n    - meter \"Niveau de la voix de Kiara\"\n    - status: Prêt à discuter\n    - status\n    - button \"Installer le vocal\"\n    - checkbox \"Interrompre Kiara en parlant\"\n    - text: Interrompre Kiara en parlant\n    - paragraph: Kiara termine sa réponse avant de vous écouter.\n    - button \"Choisir une image\"\n    - button \"Choisir une capture\"\n    - status\n    - status\n    - group: Échanges écrits\n- dialog \"Réglages du vocal\":\n  - banner:\n    - heading \"Réglages du vocal\" [level=3]\n    - button \"Fermer les réglages du vocal\": Fermer\n  - complementary \"Réglages du vocal\":\n    - group \"Qualité\":\n      - text: Qualité Qualité vocale\n      - combobox \"Qualité vocale\":\n        - option \"Low · Léger\" [selected]\n        - option \"Max · Vocal avancé\"\n      - paragraph: Moteur léger sur le PC, voix sur le serveur.\n    - group \"Microphone\":\n      - text: Microphone\n      - paragraph: Microphone choisi dans les réglages Windows.\n    - group \"Voix de Kiara\":\n      - text: Voix de Kiara Volume\n      - status: 100 %\n      - slider \"Volume\": \"100\"\n      - paragraph: La voix française utilise la sortie audio de Windows.\n    - group \"Affichage\":\n      - text: Affichage Animation\n      - combobox \"Animation\":\n        - option \"Ondes vocales 3D\" [selected]\n        - option \"Orbe\"\n        - option \"Constellation\"\n      - checkbox \"Activer les mouvements\" [checked]\n      - text: Activer les mouvements\n      - paragraph: Les mouvements réduits de votre appareil sont respectés.\n    - group: Informations vocales\n    - status\n    - group \"Activation vocale · essai\":\n      - text: Activation vocale · essai\n      - checkbox \"Attendre « Bonjour Kiara » sur cet appareil\"\n      - text: Attendre « Bonjour Kiara » sur cet appareil\n      - paragraph: Laissez Kiara ouverte. La détection est locale et garde le microphone actif jusqu’à l’appel ou à l’arrêt. La reconnaissance reste à vérifier avec votre voix.",
+    "dictationTree": "- link \"Aller au contenu\":\n  - /url: \"#fred-main\"\n- complementary \"Navigation principale\":\n  - text: K\n  - strong: Kiara\n  - navigation \"Fonctions du client\":\n    - button \"Conversations\"\n    - button \"Projets\"\n    - button \"Notes\"\n    - button \"Mails\"\n    - button \"Réunions\"\n    - button \"Activité\"\n  - button \"Réglages\"\n  - text: Serveur Kiara\n- main \"Conversations\":\n  - button \"Afficher ou masquer la navigation\" [expanded]\n  - heading \"Conversations\" [level=1]\n  - 'status \"Modèle : Modèle de démonstration\"'\n  - button \"Notifications\"\n  - button \"Connecté au serveur IA · Afficher le diagnostic de connexion\": ● Connecté au serveur IA ⌄\n  - button \"Assistant de projet\"\n  - button \"Nouvelle conversation\"\n  - group: Historique\n  - textbox \"Nom de la conversation\": Conversation\n  - group: ···\n  - text: Modèle de cette conversation\n  - combobox \"Modèle de cette conversation\":\n    - option \"Modèle de démonstration\" [selected]\n  - status: Contexte · 4 096 tokens\n  - region \"Conversation\":\n    - text: VOTRE ESPACE POUR AVANCER\n    - heading \"Qu’allons-nous préparer ?\" [level=2]\n    - paragraph: Une idée, un document, une question. Commencez simplement, votre assistant s’occupe de la suite.\n    - button \"Préparer un projet\"\n    - button \"Rédiger un texte\"\n    - button \"Explorer un sujet\"\n    - button \"Travailler sur du code\"\n  - textbox \"Votre message\":\n    - /placeholder: Posez une question ou décrivez ce que vous voulez faire…\n  - button \"Joindre un document\" [disabled]: +\n  - status: TXT, Markdown, PDF texte, Word · 2 Mo · Images indisponibles sur ce modèle\n  - group:\n    - text: Contexte · connexion requise\n    - progressbar \"Utilisation du contexte\"\n    - text: Projet\n    - combobox \"Projet de la discussion\":\n      - option \"Sans projet\" [selected]\n      - option \"Réaménagement de l’atelier\"\n    - group: ⚙Options de réponse\n    - group:\n      - text: ⚙Réglages de la dictée\n      - paragraph: Modèle français · français · taille indiquée à l’installation. Microphone fermé à la fin de la dictée. Aucun envoi automatique. Chaque dictée dure au maximum deux minutes.\n      - button \"Installer / réparer\"\n      - button \"Désinstaller le modèle\"\n  - button \"Correcteur\"\n  - button \"Installer la dictée\"\n  - button \"Vocal\"\n  - button \"Envoyer le message\": ↑\n  - group \"Réflexion\":\n    - text: Réflexion\n    - paragraph: Réflexion automatique selon le modèle · aucun niveau réglable.\n  - status: Synchronisé\n  - status\n  - status: Dictée locale · français",
+    "webAppearanceClick": "http://127.0.0.1:49993/kiara/app/settings",
+    "webAfterReload": [
+      "Général"
+    ],
+    "winAppearanceClick": "http://127.0.0.1:49993/app/settings?settings=appearance",
+    "winAfterReload": [
+      "Apparence"
+    ],
+    "carnetClavier": "AT-27",
+    "noteSaved": true,
+    "projectNew": "Nouvelle note · ES-09",
+    "retry": true,
+    "loading": true,
+    "quickDialog": "- dialog \"Accès rapide\":\n  - heading \"Accès rapide\" [level=2]\n  - button \"Fermer l’accès rapide\": ×\n  - text: Ouvrir une rubrique, un projet ou un élément\n  - textbox \"Ouvrir une rubrique, un projet ou un élément\":\n    - /placeholder: Ex. Réunions, code projet, tâche\n  - region \"Rubriques\":\n    - heading \"Rubriques\" [level=3]\n    - button \"Ouvrir la rubrique Projets\": Projets\n    - button \"Ouvrir la rubrique Notes\": Notes\n    - button \"Ouvrir la rubrique Mails\": Mails\n    - button \"Ouvrir la rubrique Réunions\": Réunions\n    - button \"Ouvrir la rubrique Activité\": Activité\n    - button \"Ouvrir la rubrique Sources\": Sources\n    - button \"Ouvrir la rubrique Informations\": Informations\n    - button \"Ouvrir la rubrique Suivi des analyses\": Suivi des analyses\n    - button \"Ouvrir la rubrique Recherche\": Recherche\n    - button \"Ouvrir la rubrique Préparer les réunions\": Préparer les réunions\n  - region \"Projets\":\n    - heading \"Projets\" [level=3]\n    - button \"Ouvrir le projet AT-27 — Réaménagement de l’atelier\": AT-27 · Réaménagement de l’atelier\n    - button \"Ouvrir le projet ES-09 — Banc de contrôle\": ES-09 · Banc de contrôle\n  - paragraph: Échap pour fermer · les éléments sont filtrés selon les accès et le projet affiché.",
+    "quickEscape": "Accès rapide",
+    "ctrlK": "http://127.0.0.1:49993/app/search",
+    "unsavedAI": {
+      "prompts": 0,
+      "model": "Modele-demo"
+    },
+    "reducedSidebar": "- complementary \"Menu principal\":\n  - link \"Kiara\":\n    - /url: /app/projets\n  - navigation \"Grandes rubriques\":\n    - link:\n      - /url: /chat\n    - link:\n      - /url: /app/projets\n    - link:\n      - /url: /app/notes\n    - link:\n      - /url: /app/mail\n    - link:\n      - /url: /app/meetings\n    - link:\n      - /url: /app/activite\n  - navigation:\n    - link:\n      - /url: /app/settings"
+  },
+  "contraste_note_selectionnee": {
+    "background": "rgb(231, 242, 251)",
+    "strong": {
+      "text": "rgb(236, 236, 235)",
+      "size": "14px",
+      "ratio": 1.0409390953082114
+    },
+    "span": {
+      "text": "rgb(236, 236, 235)",
+      "size": "13px",
+      "ratio": 1.0409390953082114
+    },
+    "small": {
+      "text": "rgb(153, 153, 148)",
+      "size": "12px",
+      "ratio": 2.519785832316309
+    }
+  },
+  "retour_vocal": {
+    "dialog": false,
+    "focus": "voice-settings-toggle",
+    "pane": "Vocal"
+  },
+  "dictee_depuis_reglages_locaux": {
+    "hash": "#reglages",
+    "heading": "Conversations",
+    "focus": "Réglages de la dictée"
+  },
+  "navigation_conversations_web": "- navigation \"Fonctions du client\":\n  - button \"Conversations\"\n  - button \"Vocal\"\n  - button \"Projets\"\n  - button \"Notes\"\n  - button \"Mails\"\n  - button \"Réunions\"\n  - button \"Activité\"\n  - button \"Correcteur\"\n  - button \"Mémoire et rappels\"\n  - button \"Notifications\"",
+  "acces_rapide_dictee": "- dialog \"Accès rapide\":\n  - heading \"Accès rapide\" [level=2]\n  - button \"Fermer l’accès rapide\": ×\n  - text: Ouvrir une rubrique, un projet ou un élément\n  - textbox \"Ouvrir une rubrique, un projet ou un élément\":\n    - /placeholder: Ex. Réunions, code projet, tâche\n    - text: Dictée\n  - paragraph: Échap pour fermer · les éléments sont filtrés selon les accès et le projet affiché.",
+  "console": [
+    {
+      "name": "Navigation, catalogue et rendu sans erreur",
+      "passed": true
+    },
+    {
+      "name": "Le catalogue ne garantit pas l’accès actuel aux archives",
+      "passed": true
+    },
+    {
+      "name": "Avertissement de découverte incomplète affiché et effacé",
+      "passed": true
+    },
+    {
+      "name": "Avertissement de nettoyage à reprendre affiché et effacé",
+      "passed": true
+    },
+    {
+      "name": "Périmètre et seconde copie de la dernière archive vérifiée",
+      "passed": true
+    },
+    {
+      "name": "Preuve de restauration distinguée de la vérification",
+      "passed": true
+    },
+    {
+      "name": "Sauvegarde autonome des Projets distincte de la paire",
+      "passed": true
+    },
+    {
+      "name": "Console aux résolutions Windows et Linux demandées",
+      "passed": true
+    },
+    {
+      "name": "Brouillon de programmation conservé pendant les actualisations",
+      "passed": true
+    },
+    {
+      "name": "Configuration hebdomadaire, conservation et secret effacé",
+      "passed": true
+    },
+    {
+      "name": "Sauvegarde asynchrone suivie et archive vérifiée",
+      "passed": true
+    },
+    {
+      "name": "Phrase incorrecte refusée, aucune restauration proposée",
+      "passed": true
+    },
+    {
+      "name": "Aperçu vérifié et effets affichés",
+      "passed": true
+    },
+    {
+      "name": "Confirmation périmée : erreur visible, nouvelle vérification et restauration",
+      "passed": true
+    },
+    {
+      "name": "Inventaire du périmètre lisible",
+      "passed": true
+    },
+    {
+      "name": "Aucune exception JavaScript",
+      "passed": true
+    }
+  ],
+  "vues": [
+    {
+      "name": "reglages-windows",
+      "path": "/app/settings",
+      "viewport": [
+        1280,
+        720
+      ],
+      "settingsCount": 19,
+      "active": [
+        "Réglages",
+        "Général"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          238,
+          58,
+          1042,
+          873
+        ],
+        ".workspace-settings-navigation": [
+          270,
+          186,
+          978,
+          282
+        ],
+        ".workspace-settings-form": [
+          270,
+          490,
+          860,
+          377
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1042,
+          58
+        ]
+      },
+      "scrollWidth": 1280,
+      "contenu": "Projets\nRéglages\nRéglages\nPortail et serveur\nGénéral\nApparence\nMails\nConnexions & imports\nRéunions et transcription\nRecherche dans les documents\nSauvegardes et maintenance\nProjets\nClients et équipe\nModèles de livrables\nModèles de documents\nStatistiques\nAppareil Windows\nMon accès\nMises à jour\nConnexion au serveur\nAPI locale et intégrations\nMémoire et rappels\nVocal\nDictée\nNotifications\n\nChoisissez le service qui rédige les réponses et les comptes rendus. Enregistrez les réglages avant de tester la connexion.\n\nActiver l’assistant IA\nService IA\nDésactivé\nOllama sur un ordinateur\nLM Studio ou API compatible OpenAI\nModèle\nConnexion et clé d’accès\nSecours local si le serveur ne répond pas\nEnregistrer\nTester"
+    },
+    {
+      "name": "vocal",
+      "path": "/chat#reglages-vocal",
+      "viewport": [
+        1280,
+        720
+      ],
+      "settingsCount": 0,
+      "active": [],
+      "boxes": {
+        "#voice-settings-toggle": [
+          1170,
+          86,
+          72,
+          36
+        ]
+      },
+      "scrollWidth": 1280,
+      "contenu": "Aller au contenu\nK\nKiara\nConversations\nProjets\nNotes\nMails\nRéunions\nActivité\nRéglages\nServeur Kiara\nVocal\nModèle : Modèle de démonstration\nNotifications\n● Connecté au serveur IA ⌄\nVocal\n\nConversation\n\nNouvelle conversation\nHistorique\n···\nRéglages\nLow · voix sur le serveur\nVotre micro\nVoix de Kiara\nPrêt à discuter\nInstaller le vocal\nInterrompre Kiara en parlant\n\nKiara termine sa réponse avant de vous écouter.\n\nChoisir une image\nChoisir une capture\n\nÉchanges écrits\nRéglages du vocal\nFermer\nQualité\nQualité vocale\nLow · Léger\nMax · Vocal avancé\n\nMoteur léger sur le PC, voix sur le serveur.\n\nMicrophone\n\nMicrophone choisi dans les réglages Windows.\n\nVoix de Kiara\nVolume \n100 %\n\nLa voix française utilise la sortie audio de Windows.\n\nAffichage\nAnimation\nOndes vocales 3D\nOrbe\nConstellation\nActiver les mouvements\n\nLes mouvements réduits de votre appareil sont respectés.\n\nInformations vocales\n\nActivation vocale · essai\nAttendre « Bonjour Kiara » sur cet appareil\n\nLaissez Kiara ouverte. La détection est locale et garde le microphone actif jusqu’à l’appel ou à l’arrêt. La reconnaissance reste à vérifier avec votre voix."
+    },
+    {
+      "name": "dictee",
+      "path": "/chat#reglages-dictee",
+      "viewport": [
+        1280,
+        720
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Conversations"
+      ],
+      "boxes": {
+        "#voice-dictation-settings": [
+          397,
+          409,
+          294,
+          152
+        ]
+      },
+      "scrollWidth": 1280,
+      "contenu": "✳\nVOTRE ESPACE POUR AVANCER\nQu’allons-nous préparer ?\n\nUne idée, un document, une question.\nCommencez simplement, votre assistant s’occupe de la suite.\n\nPréparer un projet\nRédiger un texte\nExplorer un sujet\nTravailler sur du code"
+    },
+    {
+      "name": "preferences-notifications",
+      "path": "/chat#reglages-notifications",
+      "viewport": [
+        1280,
+        720
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Notifications"
+      ],
+      "boxes": {
+        "[data-view=\"notifications\"]": [
+          238,
+          58,
+          1042,
+          662
+        ],
+        "#fred-inbox-preferences": [
+          262,
+          347,
+          994,
+          230
+        ]
+      },
+      "scrollWidth": 1280,
+      "contenu": "Aller au contenu\nK\nKiara\nConversations\nProjets\nNotes\nMails\nRéunions\nActivité\nRéglages\nServeur Kiara\nNotifications\nModèle : Modèle de démonstration\nNotifications\n● Connecté au serveur IA ⌄\nNotifications\n\nVos résultats et alertes sont conservés sur le serveur. Ils sont retrouvés à la reconnexion.\n\nActualiser\nTout marquer lu\n\nNotifications synchronisées avec le serveur.\n\nAucune notification pour le moment.\n\nPréférences de notification\n Document prêt pour la recherche\n Transcription disponible\n Alertes discrètes\nLe contenu privé des documents et conversations est masqué dans les alertes.\nEnregistrer les préférences\n\nLes alertes Android nécessitent votre autorisation. Une application complètement arrêtée récupère les événements à sa prochaine ouverture."
+    },
+    {
+      "name": "appareil",
+      "path": "/chat#reglages",
+      "viewport": [
+        1280,
+        720
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Réglages",
+        "Mon accès personnel"
+      ],
+      "boxes": {
+        "[data-view=\"settings\"]": [
+          238,
+          58,
+          1042,
+          662
+        ]
+      },
+      "scrollWidth": 1280,
+      "contenu": "Aller au contenu\nK\nKiara\nConversations\nProjets\nNotes\nMails\nRéunions\nActivité\nRéglages\nServeur Kiara\nRéglages · Mon accès\nModèle : Modèle de démonstration\nNotifications\n● Connecté au serveur IA ⌄\nRéglages\nMon accès personnel\nConnexion au serveur\nMises à jour\nAPI locale\nMémoire et rappels\nVocal\nDictée\nNotifications\nRéglages du portail\nApparence\nThème de l’interface\nClair\nSombre\nComme Windows\nPolice des conversations\nModerne · Segoe UI\nClassique · Arial\nLecture · Georgia\nTechnique · Consolas\nTaille du texte\nCompact · 14 px\nStandard · 15 px\nGrand · 17 px\nTrès grand · 19 px\n\nUne réponse claire, agréable à lire.\n\nLes changements s’appliquent immédiatement aux conversations et au correcteur.\nAppliqué : Moderne · Segoe UI · Standard · 15 px\nMon accès personnel\n\nVotre application possède une clé d’accès dédiée.\n\nAccès personnel\nConnexion automatique\n\nOuvrez votre application : elle se connecte au serveur avec votre accès personnel. Aucun identifiant ni mot de passe à saisir.\n\nCet EXE est votre clé d’accès. Le serveur peut le suspendre, limiter sa validité ou le révoquer. Transmettez-le uniquement à son destinataire.\nVos conversations\n\nToutes vos conversations sont enregistrées sur le serveur, même sans projet. Une copie locale chiffrée conserve vos changements pendant une coupure et les synchronise à la reconnexion.\n\nLes boutons Importer et Exporter ci-dessous permettent de transférer vos conversations. Les fichiers exportés ne sont pas chiffrés.\nExporter l’historique\nImporter\nK\nAccès personnel\nAccès serveur Kiara recette"
+    },
+    {
+      "name": "retour-portail",
+      "path": "/app/settings",
+      "viewport": [
+        1280,
+        720
+      ],
+      "settingsCount": 19,
+      "active": [
+        "Réglages",
+        "Général"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          238,
+          58,
+          1042,
+          796
+        ],
+        ".workspace-settings-navigation": [
+          270,
+          186,
+          978,
+          282
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1042,
+          58
+        ]
+      },
+      "scrollWidth": 1280,
+      "contenu": "Projets\nRéglages\nRéglages\nPortail et serveur\nGénéral\nApparence\nMails\nConnexions & imports\nRéunions et transcription\nRecherche dans les documents\nSauvegardes et maintenance\nProjets\nClients et équipe\nModèles de livrables\nModèles de documents\nStatistiques\nAppareil Windows\nMon accès\nMises à jour\nConnexion au serveur\nAPI locale et intégrations\nMémoire et rappels\nVocal\nDictée\nNotifications\nChargement des réglages…"
+    },
+    {
+      "name": "boite-notifications",
+      "path": "/chat#notifications",
+      "viewport": [
+        1280,
+        720
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Notifications"
+      ],
+      "boxes": {
+        "[data-view=\"notifications\"]": [
+          238,
+          58,
+          1042,
+          662
+        ],
+        "#fred-inbox-preferences": [
+          262,
+          347,
+          994,
+          230
+        ]
+      },
+      "scrollWidth": 1280,
+      "contenu": "Aller au contenu\nK\nKiara\nConversations\nProjets\nNotes\nMails\nRéunions\nActivité\nRéglages\nServeur Kiara\nNotifications\nModèle : Modèle de démonstration\nNotifications\n● Connecté au serveur IA ⌄\nNotifications\n\nVos résultats et alertes sont conservés sur le serveur. Ils sont retrouvés à la reconnexion.\n\nActualiser\nTout marquer lu\n\nNotifications synchronisées avec le serveur.\n\nAucune notification pour le moment.\n\nPréférences de notification"
+    },
+    {
+      "name": "notes-liste",
+      "path": "/app/notes",
+      "viewport": [
+        1280,
+        720
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Notes"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          238,
+          58,
+          1042,
+          651
+        ],
+        ".notes-page-header": [
+          270,
+          121,
+          978,
+          40
+        ],
+        ".notes-tabs": [
+          270,
+          189,
+          978,
+          48
+        ],
+        ".planning-heading": [
+          270,
+          277,
+          978,
+          38
+        ],
+        ".note-index": [
+          270,
+          315,
+          280,
+          207
+        ],
+        ".note-main": [
+          570,
+          315,
+          678,
+          314
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1042,
+          58
+        ]
+      },
+      "scrollWidth": 1280,
+      "contenu": "Projets\nNotes\nNotes\nNouvelle note de projet\nPersonnel\nAT-27\nNouvelle note\nRechercher une note\nPréparer la revue de jeudi\nRelire le plan avant la réunion.\nVersion 2 · 17/11/2026 14:45:00\n\nSélectionnez une note pour la consulter ou créez-en une."
+    },
+    {
+      "name": "notes-edition",
+      "path": "/app/notes",
+      "viewport": [
+        1280,
+        720
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Notes"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          238,
+          58,
+          1042,
+          1016
+        ],
+        ".notes-page-header": [
+          270,
+          121,
+          978,
+          40
+        ],
+        ".notes-tabs": [
+          270,
+          189,
+          978,
+          48
+        ],
+        ".planning-heading": [
+          270,
+          277,
+          978,
+          38
+        ],
+        ".note-index": [
+          270,
+          315,
+          280,
+          207
+        ],
+        ".note-main": [
+          570,
+          315,
+          678,
+          679
+        ],
+        ".note-title": [
+          570,
+          315,
+          678,
+          140
+        ],
+        ".note-document-toolbar": [
+          571,
+          471,
+          676,
+          49
+        ],
+        ".note-document-page": [
+          571,
+          520,
+          676,
+          380
+        ],
+        ".note-runs": [
+          601,
+          545,
+          616,
+          27
+        ],
+        ".note-session>.note-actions": [
+          570,
+          917,
+          678,
+          40
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1042,
+          58
+        ]
+      },
+      "scrollWidth": 1280,
+      "contenu": "Projets\nNotes\nNotes\nNouvelle note de projet\nPersonnel\nAT-27\nNouvelle note\nRechercher une note\nPréparer la revue de jeudi\nRelire le plan avant la réunion.\nVersion 2 · 17/11/2026 14:45:00\nTitre de la note\nEnregistrée · version 2\nDernière modification · 17/11/2026 14:45:00\nParagraphe\nTitre 1\nTitre 2\nTitre 3\nB\nI\n+ Insérer / format\nMD\nRelire le plan avant la réunion.\nEnregistrer maintenant\nExporter le brouillon\nHistorique de la note\nCopier vers un projet"
+    },
+    {
+      "name": "reglages-web",
+      "path": "/kiara/app/settings",
+      "viewport": [
+        1280,
+        720
+      ],
+      "settingsCount": 13,
+      "active": [
+        "Réglages",
+        "Général"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          238,
+          58,
+          1042,
+          873
+        ],
+        ".workspace-settings-navigation": [
+          270,
+          186,
+          978,
+          282
+        ],
+        ".workspace-settings-form": [
+          270,
+          490,
+          860,
+          377
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1042,
+          58
+        ]
+      },
+      "scrollWidth": 1280,
+      "contenu": "Espace de travail\nRéglages\nRéglages\nPortail et serveur\nGénéral\nApparence\nMails\nConnexions & imports\nRéunions et transcription\nRecherche dans les documents\nSauvegardes et maintenance\nProjets\nClients et équipe\nModèles de livrables\nModèles de documents\nStatistiques\nCompte\nMon accès\nLecture des conversations\n\nChoisissez le service qui rédige les réponses et les comptes rendus. Enregistrez les réglages avant de tester la connexion.\n\nActiver l’assistant IA\nService IA\nDésactivé\nOllama sur un ordinateur\nLM Studio ou API compatible OpenAI\nModèle\nConnexion et clé d’accès\nSecours local si le serveur ne répond pas\nEnregistrer\nTester"
+    },
+    {
+      "name": "apparence-web",
+      "path": "/kiara/app/settings",
+      "viewport": [
+        1280,
+        720
+      ],
+      "settingsCount": 13,
+      "active": [
+        "Réglages",
+        "Apparence"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          238,
+          58,
+          1042,
+          703
+        ],
+        ".workspace-settings-navigation": [
+          270,
+          186,
+          978,
+          282
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1042,
+          58
+        ]
+      },
+      "scrollWidth": 1280,
+      "contenu": "Espace de travail\nRéglages\nRéglages\nPortail et serveur\nGénéral\nApparence\nMails\nConnexions & imports\nRéunions et transcription\nRecherche dans les documents\nSauvegardes et maintenance\nProjets\nClients et équipe\nModèles de livrables\nModèles de documents\nStatistiques\nCompte\nMon accès\nLecture des conversations\nApparence\nThème\nClair\nSombre\nDensité\nConfortable\nCompacte\n\nPréférences enregistrées dans ce navigateur."
+    },
+    {
+      "name": "reglages-windows",
+      "path": "/app/settings",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 19,
+      "active": [
+        "Réglages",
+        "Général"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          279,
+          58,
+          1600,
+          822
+        ],
+        ".workspace-settings-navigation": [
+          311,
+          186,
+          1536,
+          231
+        ],
+        ".workspace-settings-form": [
+          311,
+          439,
+          860,
+          377
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Projets\nRéglages\nRéglages\nPortail et serveur\nGénéral\nApparence\nMails\nConnexions & imports\nRéunions et transcription\nRecherche dans les documents\nSauvegardes et maintenance\nProjets\nClients et équipe\nModèles de livrables\nModèles de documents\nStatistiques\nAppareil Windows\nMon accès\nMises à jour\nConnexion au serveur\nAPI locale et intégrations\nMémoire et rappels\nVocal\nDictée\nNotifications\n\nChoisissez le service qui rédige les réponses et les comptes rendus. Enregistrez les réglages avant de tester la connexion.\n\nActiver l’assistant IA\nService IA\nDésactivé\nOllama sur un ordinateur\nLM Studio ou API compatible OpenAI\nModèle\nConnexion et clé d’accès\nSecours local si le serveur ne répond pas\nEnregistrer\nTester"
+    },
+    {
+      "name": "vocal",
+      "path": "/chat#reglages-vocal",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 0,
+      "active": [],
+      "boxes": {
+        "#voice-settings-toggle": [
+          1800,
+          86,
+          72,
+          36
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Aller au contenu\nK\nKiara\nConversations\nProjets\nNotes\nMails\nRéunions\nActivité\nRéglages\nServeur Kiara\nVocal\nModèle : Modèle de démonstration\nNotifications\n● Connecté au serveur IA ⌄\nVocal\n\nConversation\n\nNouvelle conversation\nHistorique\n···\nRéglages\nLow · voix sur le serveur\nVotre micro\nVoix de Kiara\nPrêt à discuter\nInstaller le vocal\nInterrompre Kiara en parlant\n\nKiara termine sa réponse avant de vous écouter.\n\nChoisir une image\nChoisir une capture\n\nÉchanges écrits\nRéglages du vocal\nFermer\nQualité\nQualité vocale\nLow · Léger\nMax · Vocal avancé\n\nMoteur léger sur le PC, voix sur le serveur.\n\nMicrophone\n\nMicrophone choisi dans les réglages Windows.\n\nVoix de Kiara\nVolume \n100 %\n\nLa voix française utilise la sortie audio de Windows.\n\nAffichage\nAnimation\nOndes vocales 3D\nOrbe\nConstellation\nActiver les mouvements\n\nLes mouvements réduits de votre appareil sont respectés.\n\nInformations vocales\n\nActivation vocale · essai\nAttendre « Bonjour Kiara » sur cet appareil\n\nLaissez Kiara ouverte. La détection est locale et garde le microphone actif jusqu’à l’appel ou à l’arrêt. La reconnaissance reste à vérifier avec votre voix."
+    },
+    {
+      "name": "dictee",
+      "path": "/chat#reglages-dictee",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Conversations"
+      ],
+      "boxes": {
+        "#voice-dictation-settings": [
+          526,
+          769,
+          294,
+          152
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "✳\nVOTRE ESPACE POUR AVANCER\nQu’allons-nous préparer ?\n\nUne idée, un document, une question.\nCommencez simplement, votre assistant s’occupe de la suite.\n\nPréparer un projet\nRédiger un texte\nExplorer un sujet\nTravailler sur du code"
+    },
+    {
+      "name": "preferences-notifications",
+      "path": "/chat#reglages-notifications",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Notifications"
+      ],
+      "boxes": {
+        "[data-view=\"notifications\"]": [
+          238,
+          58,
+          1682,
+          1022
+        ],
+        "#fred-inbox-preferences": [
+          379,
+          359,
+          1400,
+          230
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Aller au contenu\nK\nKiara\nConversations\nProjets\nNotes\nMails\nRéunions\nActivité\nRéglages\nServeur Kiara\nNotifications\nModèle : Modèle de démonstration\nNotifications\n● Connecté au serveur IA ⌄\nNotifications\n\nVos résultats et alertes sont conservés sur le serveur. Ils sont retrouvés à la reconnexion.\n\nActualiser\nTout marquer lu\n\nNotifications synchronisées avec le serveur.\n\nAucune notification pour le moment.\n\nPréférences de notification\n Document prêt pour la recherche\n Transcription disponible\n Alertes discrètes\nLe contenu privé des documents et conversations est masqué dans les alertes.\nEnregistrer les préférences\n\nLes alertes Android nécessitent votre autorisation. Une application complètement arrêtée récupère les événements à sa prochaine ouverture."
+    },
+    {
+      "name": "appareil",
+      "path": "/chat#reglages",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Réglages",
+        "Mon accès personnel"
+      ],
+      "boxes": {
+        "[data-view=\"settings\"]": [
+          238,
+          58,
+          1682,
+          1022
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Aller au contenu\nK\nKiara\nConversations\nProjets\nNotes\nMails\nRéunions\nActivité\nRéglages\nServeur Kiara\nRéglages · Mon accès\nModèle : Modèle de démonstration\nNotifications\n● Connecté au serveur IA ⌄\nRéglages\nMon accès personnel\nConnexion au serveur\nMises à jour\nAPI locale\nMémoire et rappels\nVocal\nDictée\nNotifications\nRéglages du portail\nApparence\nThème de l’interface\nClair\nSombre\nComme Windows\nPolice des conversations\nModerne · Segoe UI\nClassique · Arial\nLecture · Georgia\nTechnique · Consolas\nTaille du texte\nCompact · 14 px\nStandard · 15 px\nGrand · 17 px\nTrès grand · 19 px\n\nUne réponse claire, agréable à lire.\n\nLes changements s’appliquent immédiatement aux conversations et au correcteur.\nAppliqué : Moderne · Segoe UI · Standard · 15 px\nMon accès personnel\n\nVotre application possède une clé d’accès dédiée.\n\nAccès personnel\nConnexion automatique\n\nOuvrez votre application : elle se connecte au serveur avec votre accès personnel. Aucun identifiant ni mot de passe à saisir.\n\nCet EXE est votre clé d’accès. Le serveur peut le suspendre, limiter sa validité ou le révoquer. Transmettez-le uniquement à son destinataire.\nVos conversations\n\nToutes vos conversations sont enregistrées sur le serveur, même sans projet. Une copie locale chiffrée conserve vos changements pendant une coupure et les synchronise à la reconnexion.\n\nLes boutons Importer et Exporter ci-dessous permettent de transférer vos conversations. Les fichiers exportés ne sont pas chiffrés.\nExporter l’historique\nImporter\nK\nAccès personnel\nAccès serveur Kiara recette"
+    },
+    {
+      "name": "retour-portail",
+      "path": "/app/settings",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 19,
+      "active": [
+        "Réglages",
+        "Général"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          279,
+          58,
+          1600,
+          745
+        ],
+        ".workspace-settings-navigation": [
+          311,
+          186,
+          1536,
+          231
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Projets\nRéglages\nRéglages\nPortail et serveur\nGénéral\nApparence\nMails\nConnexions & imports\nRéunions et transcription\nRecherche dans les documents\nSauvegardes et maintenance\nProjets\nClients et équipe\nModèles de livrables\nModèles de documents\nStatistiques\nAppareil Windows\nMon accès\nMises à jour\nConnexion au serveur\nAPI locale et intégrations\nMémoire et rappels\nVocal\nDictée\nNotifications\nChargement des réglages…"
+    },
+    {
+      "name": "boite-notifications",
+      "path": "/chat#notifications",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Notifications"
+      ],
+      "boxes": {
+        "[data-view=\"notifications\"]": [
+          238,
+          58,
+          1682,
+          1022
+        ],
+        "#fred-inbox-preferences": [
+          379,
+          359,
+          1400,
+          230
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Aller au contenu\nK\nKiara\nConversations\nProjets\nNotes\nMails\nRéunions\nActivité\nRéglages\nServeur Kiara\nNotifications\nModèle : Modèle de démonstration\nNotifications\n● Connecté au serveur IA ⌄\nNotifications\n\nVos résultats et alertes sont conservés sur le serveur. Ils sont retrouvés à la reconnexion.\n\nActualiser\nTout marquer lu\n\nNotifications synchronisées avec le serveur.\n\nAucune notification pour le moment.\n\nPréférences de notification"
+    },
+    {
+      "name": "notes-liste",
+      "path": "/app/notes",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Notes"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          279,
+          58,
+          1600,
+          651
+        ],
+        ".notes-page-header": [
+          311,
+          121,
+          1536,
+          40
+        ],
+        ".notes-tabs": [
+          311,
+          189,
+          1536,
+          48
+        ],
+        ".planning-heading": [
+          311,
+          277,
+          1536,
+          38
+        ],
+        ".note-index": [
+          311,
+          315,
+          280,
+          207
+        ],
+        ".note-main": [
+          611,
+          315,
+          1236,
+          314
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Projets\nNotes\nNotes\nNouvelle note de projet\nPersonnel\nAT-27\nNouvelle note\nRechercher une note\nPréparer la revue de jeudi\nRelire le plan avant la réunion.\nVersion 2 · 17/11/2026 14:45:00\n\nSélectionnez une note pour la consulter ou créez-en une."
+    },
+    {
+      "name": "notes-edition",
+      "path": "/app/notes",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Notes"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          279,
+          58,
+          1600,
+          1016
+        ],
+        ".notes-page-header": [
+          311,
+          121,
+          1536,
+          40
+        ],
+        ".notes-tabs": [
+          311,
+          189,
+          1536,
+          48
+        ],
+        ".planning-heading": [
+          311,
+          277,
+          1536,
+          38
+        ],
+        ".note-index": [
+          311,
+          315,
+          280,
+          207
+        ],
+        ".note-main": [
+          611,
+          315,
+          1236,
+          679
+        ],
+        ".note-title": [
+          611,
+          315,
+          1236,
+          140
+        ],
+        ".note-document-toolbar": [
+          612,
+          471,
+          1234,
+          49
+        ],
+        ".note-document-page": [
+          612,
+          520,
+          1234,
+          380
+        ],
+        ".note-runs": [
+          642,
+          545,
+          1174,
+          27
+        ],
+        ".note-session>.note-actions": [
+          611,
+          917,
+          1236,
+          40
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Projets\nNotes\nNotes\nNouvelle note de projet\nPersonnel\nAT-27\nNouvelle note\nRechercher une note\nPréparer la revue de jeudi\nRelire le plan avant la réunion.\nVersion 2 · 17/11/2026 14:45:00\nTitre de la note\nEnregistrée · version 2\nDernière modification · 17/11/2026 14:45:00\nParagraphe\nTitre 1\nTitre 2\nTitre 3\nB\nI\n+ Insérer / format\nMD\nRelire le plan avant la réunion.\nEnregistrer maintenant\nExporter le brouillon\nHistorique de la note\nCopier vers un projet"
+    },
+    {
+      "name": "notes-filtre",
+      "path": "/app/notes",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Notes"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          279,
+          58,
+          1600,
+          456
+        ],
+        ".notes-page-header": [
+          311,
+          121,
+          1536,
+          40
+        ],
+        ".notes-tabs": [
+          311,
+          189,
+          1536,
+          48
+        ],
+        ".planning-heading": [
+          311,
+          277,
+          1536,
+          38
+        ],
+        ".note-index": [
+          311,
+          315,
+          280,
+          119
+        ],
+        ".note-main": [
+          611,
+          315,
+          1236,
+          0
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Projets\nNotes\nNotes\nNouvelle note de projet\nPersonnel\nAT-27\nNouvelle note\nRechercher une note\n\nAucune note ne correspond."
+    },
+    {
+      "name": "notes-erreur",
+      "path": "/app/notes",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Notes"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          279,
+          58,
+          1600,
+          599
+        ],
+        ".notes-page-header": [
+          311,
+          121,
+          1536,
+          40
+        ],
+        ".notes-tabs": [
+          311,
+          189,
+          1536,
+          48
+        ],
+        ".planning-heading": [
+          311,
+          277,
+          1536,
+          0
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Projets\nNotes\nNotes\nNouvelle note de projet\nPersonnel\nAT-27\n\nImpossible de charger les notes de démonstration.\n\nRéessayer"
+    },
+    {
+      "name": "notes-vide",
+      "path": "/app/notes",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Notes"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          279,
+          58,
+          1600,
+          456
+        ],
+        ".notes-page-header": [
+          311,
+          121,
+          1536,
+          40
+        ],
+        ".notes-tabs": [
+          311,
+          189,
+          1536,
+          48
+        ],
+        ".planning-heading": [
+          311,
+          277,
+          1536,
+          38
+        ],
+        ".note-index": [
+          311,
+          315,
+          280,
+          119
+        ],
+        ".note-main": [
+          611,
+          315,
+          1236,
+          0
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Projets\nNotes\nNotes\nNouvelle note de projet\nPersonnel\nAT-27\nNouvelle note\nRechercher une note\n\nAucune note personnelle."
+    },
+    {
+      "name": "reglages-web",
+      "path": "/kiara/app/settings",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 13,
+      "active": [
+        "Réglages",
+        "Général"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          279,
+          58,
+          1600,
+          822
+        ],
+        ".workspace-settings-navigation": [
+          311,
+          186,
+          1536,
+          231
+        ],
+        ".workspace-settings-form": [
+          311,
+          439,
+          860,
+          377
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Espace de travail\nRéglages\nRéglages\nPortail et serveur\nGénéral\nApparence\nMails\nConnexions & imports\nRéunions et transcription\nRecherche dans les documents\nSauvegardes et maintenance\nProjets\nClients et équipe\nModèles de livrables\nModèles de documents\nStatistiques\nCompte\nMon accès\nLecture des conversations\n\nChoisissez le service qui rédige les réponses et les comptes rendus. Enregistrez les réglages avant de tester la connexion.\n\nActiver l’assistant IA\nService IA\nDésactivé\nOllama sur un ordinateur\nLM Studio ou API compatible OpenAI\nModèle\nConnexion et clé d’accès\nSecours local si le serveur ne répond pas\nEnregistrer\nTester"
+    },
+    {
+      "name": "apparence-web",
+      "path": "/kiara/app/settings",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 13,
+      "active": [
+        "Réglages",
+        "Apparence"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          279,
+          58,
+          1600,
+          652
+        ],
+        ".workspace-settings-navigation": [
+          311,
+          186,
+          1536,
+          231
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Espace de travail\nRéglages\nRéglages\nPortail et serveur\nGénéral\nApparence\nMails\nConnexions & imports\nRéunions et transcription\nRecherche dans les documents\nSauvegardes et maintenance\nProjets\nClients et équipe\nModèles de livrables\nModèles de documents\nStatistiques\nCompte\nMon accès\nLecture des conversations\nApparence\nThème\nClair\nSombre\nDensité\nConfortable\nCompacte\n\nPréférences enregistrées dans ce navigateur."
+    },
+    {
+      "name": "accueil",
+      "path": "/kiara/app/",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 0,
+      "active": [],
+      "boxes": {
+        ".workspace-main": [
+          279,
+          58,
+          1600,
+          727
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Espace de travail\nAccueil\nAccueil\nNotes\nOuvrir les projets\nÀ traiter\n\n0 mail(s) à classer · échéances des 14 prochains jours\n\nAucune action prioritaire sur les projets actifs.\n\nChiffres des projets\nProjets en cours\nTous les projets →\nProjet / client\tÉtat\tAvancement\tReste à faire\tProchaine étape\t\nFavori\n\n\n27\nAT-27 · Réaménagement de l’atelier\nAtelier de démonstration\n\tEN COURS\t40 %\n\t24 h\tRevue des plans\n2026-12-08\n\t\n\n\n09\nES-09 · Banc de contrôle\nAtelier de démonstration\n\tEN COURS\t40 %\n\t24 h\tRevue des plans\n2026-12-08\n\t"
+    },
+    {
+      "name": "projets",
+      "path": "/app/projets",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Projets"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          469,
+          58,
+          1220,
+          448
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Projets\n＋ Nouveau projet\nActifs\nTous\nArchivés\nEn retard\nÀ examiner\nProjet / client\tÉtat\tAvancement\tProchaine étape\t\nFavori\n\n\nRéaménagement de l’atelier\nAT-27 · Atelier de démonstration\n\tEn cours\t40 %\tRevue des plans\n2026-12-08\n\t\n\n\nBanc de contrôle\nES-09 · Atelier de démonstration\n\tEn cours\t40 %\tRevue des plans\n2026-12-08\n\t\n\n2 projets"
+    },
+    {
+      "name": "fiche",
+      "path": "/app/projets/atelier/vue-ensemble",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Projets",
+        "Vue d’ensemble"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          469,
+          58,
+          1220,
+          630
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "← Tous les projets\nRéaménagement de l’atelier\n\nAT-27 · Atelier de démonstrationEn cours\n\nOptions du projet\nVue d’ensemble\nPilotage\nDocuments\nRéunions\nÀ traiter\n\nAucune tâche planifiée à traiter.\n\nSituation\nAvancement\n40 %\nÉchéance\n2026-12-08\nClient\nAtelier de démonstration\nDocuments\n\nConsulter les documents du projet.\n\nVoir les documents\nProchaine réunion\n\nAucune réunion à venir.\n\nVoir les réunions\nSuivi détaillé du projet"
+    },
+    {
+      "name": "pilotage",
+      "path": "/app/projets/atelier/pilotage",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Projets"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          469,
+          58,
+          1220,
+          394
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "← Tous les projets\nRéaménagement de l’atelier\n\nAT-27 · Atelier de démonstrationEn cours\n\nOptions du projet\nVue d’ensemble\nPilotage\nDocuments\nRéunions\nPlanning\nCahier des charges\nAtelier\nÉchéances 0\nTâches 0\nOutils du planning\nÉchéances du projet\nRechercher un jalon\nInclure les jalons archivés\nRecharger la liste\nNouveau jalon spécifique\nCréer le jalon\n\nAucun jalon ne correspond à ces filtres.\n\nÉcart : réalisation ou prévision moins engagement contractuel. Un écart positif indique un retard.\nJALON / ORDRE\tCONTRACTUELLE\tPRÉVISIONNELLE\tRÉELLE\tÉCART\tÉTAPE\tACTIONS\nJalons du projet\n\nEngagement contractuel, dernière prévision et réalisation constatée. Chaque date garde sa source et son historique.\n\nRechercher les dates\n\nL’agent recherche automatiquement toutes les 5 minutes dans les sources du projet et ses liens réseau. Les dates proposées attendent votre validation.\n\nDates proposées 0\n\nAucune date à valider. L’agent conserve les champs vides lorsqu’il ne trouve pas de preuve suffisamment explicite."
+    },
+    {
+      "name": "documents",
+      "path": "/app/projets/atelier/documents",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Projets",
+        "Documents"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          469,
+          58,
+          1220,
+          766
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "← Tous les projets\nRéaménagement de l’atelier\n\nAT-27 · Atelier de démonstrationEn cours\n\nOptions du projet\nVue d’ensemble\nPilotage\nDocuments\nRéunions\nDocuments du projet\nInformations\nÀ remettre\nFichiers et dossiers\nNotes\nPréparer un document\nDocuments à remettre\nAjouter depuis les modèles\nNouveau livrable\nRechercher un livrable\nStatut documentaire\nTous\nBrouillon\nÀ vérifier\nValidé\nÀ réviser\nArchivé\n\nAucun livrable ne correspond à ces filtres.\n\nSources de tous les projets\nInformations de tous les projets"
+    },
+    {
+      "name": "revues",
+      "path": "/app/projets/atelier/reunions",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Projets",
+        "Réunions"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          469,
+          58,
+          1220,
+          472
+        ],
+        ".planning-heading": [
+          511,
+          388,
+          1136,
+          52
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "← Tous les projets\nRéaménagement de l’atelier\n\nAT-27 · Atelier de démonstrationEn cours\n\nOptions du projet\nVue d’ensemble\nPilotage\nDocuments\nRéunions\n\nOuvrir le Studio des réunions et notes\n\nRevue de lancement\nRéunions et audio\nRevue de lancement de projet\n\nPréparer les engagements, vérifier les sources puis publier une révision figée.\n\nAucune revue de lancement. Les comptes rendus restent disponibles dans « Réunions et audio »."
+    },
+    {
+      "name": "creation",
+      "path": "/app/create",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 0,
+      "active": [],
+      "boxes": {
+        ".workspace-main": [
+          279,
+          58,
+          1600,
+          386
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Projets\nNouveau projet\nNouveau projet\n\nCréer un projet ou reprendre un dossier technique existant.\n\nRetour au portefeuille\nDepuis dossier réseau\nManuel\nDossier réseau du projet\n🔍 Scanner"
+    },
+    {
+      "name": "mails",
+      "path": "/app/mails",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Mails"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          238,
+          58,
+          1682,
+          532
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Mails\n0 mail sur 0\nAnalyser les nouveaux\nOptions des mails\nOptions\nProjets\nGlissez le mail sur une vignette\nAT-27\nRéaménagement de l’atelier\nES-09\nBanc de contrôle\nDIVERS\nÀ réexaminer plus tard\nSupprimer de Kiara\nSupprime la copie importée dans Kiara\nSynchronisation automatique\nAucun mail dans ce dossier"
+    },
+    {
+      "name": "reunions",
+      "path": "/app/reunions",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Réunions"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          279,
+          58,
+          1600,
+          503
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Projets\nRéunions\nRéunions\nNouvelle séance\nProjet\nTous les projets\nAT-27 — Réaménagement de l’atelier\nES-09 — Banc de contrôle\nRechercher une réunion\nComptes rendus · 0\nAucun compte rendu pour ce périmètre\n\nModifiez les filtres ou ouvrez un projet pour poursuivre."
+    },
+    {
+      "name": "activite",
+      "path": "/app/activite",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Activité"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          279,
+          58,
+          1600,
+          876
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Activité\nÀ traiter\n\n0 mail(s) à classer · échéances des 14 prochains jours\n\nAucune action prioritaire sur les projets actifs.\n\nInformations indexées\nAucune indexation en échec\nOptions de reprise\nSuivi des analyses\n\nMails, documents et réunions en cours de traitement.\n\nActualiser\nAnalyse globale des mails\n\nLe classement traite tous les mails admissibles, indépendamment du filtre projet de cette vue.\n\nRé-analyser les mails à classer ayant déjà une proposition\nAnalyser les mails\nProjet\nTous les projets\nAT-27 — Réaménagement de l’atelier\nES-09 — Banc de contrôle\n\nMise à jour automatique\n\nAucun traitement enregistré\n\nModifiez les filtres ou ouvrez un projet pour poursuivre."
+    },
+    {
+      "name": "recherche",
+      "path": "/app/search",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 0,
+      "active": [],
+      "boxes": {
+        ".workspace-main": [
+          279,
+          58,
+          1600,
+          491
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Projets\nRecherche\nRecherche\n\nRetrouvez un passage, un mail ou une connaissance avec vos mots ou une référence exacte.\n\nRechercher dans Kiara\nProjet\nTous les projets autorisés\nAT-27 · Réaménagement de l’atelier\nType\nToutes les sources et connaissances\nMails\nDocuments\nRéunions\nAppels\nConnaissances retenues\nDepuis le\nJusqu’au\nRechercher\nToutes les sources\nToutes les informations"
+    },
+    {
+      "name": "sources",
+      "path": "/app/sources",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 0,
+      "active": [],
+      "boxes": {
+        ".workspace-main": [
+          279,
+          58,
+          1600,
+          646
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Projets\nSources\nSources\nProjet\nTous les projets accessibles\nAT-27 — Réaménagement de l’atelier\nES-09 — Banc de contrôle (connaissance à relier)\nNouvelle séance\nListe des fichiers\nVue des relations\nAfficher l’état de l’indexation\nRechercher une source\nAjouter une source\n↻\nPérimètre et filtres\n0 sources\nTrier\nImports récents\nImports anciens\nNom A–Z\nNom Z–A\n☷\n▦\nAucune source pour ce périmètre\n\nModifiez les filtres ou ajoutez une source au projet choisi.\n\n0 source\nPrécédentes\nSuivantes"
+    },
+    {
+      "name": "informations",
+      "path": "/app/knowledge",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 0,
+      "active": [],
+      "boxes": {
+        ".workspace-main": [
+          279,
+          58,
+          1600,
+          625
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Projets\nInformations\nInformations\n\nInformations des mails, documents et réunions, avec leurs sources.\n\nActualiser\nInformations retenues\nDéclassées\nÀ vérifier\nProjets de connaissance\nProjet\nTous les projets\nAT-27 — Réaménagement de l’atelier\nES-09 — Banc de contrôle (informations non liées)\nRechercher une information\nÀ réexaminer seulement\n\nLes informations des sources rattachées sont retenues par défaut. Déclassez une information si elle est erronée ou inapplicable.\n\nAucune information retenue pour ce périmètre\n\nModifiez les filtres ou ouvrez un projet pour poursuivre."
+    },
+    {
+      "name": "analyses",
+      "path": "/app/jobs",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 0,
+      "active": [],
+      "boxes": {
+        ".workspace-main": [
+          279,
+          58,
+          1600,
+          718
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Projets\nSuivi des analyses\nInformations indexées\nAucune indexation en échec\nOptions de reprise\nSuivi des analyses\n\nMails, documents et réunions en cours de traitement.\n\nActualiser\nAnalyse globale des mails\n\nLe classement traite tous les mails admissibles, indépendamment du filtre projet de cette vue.\n\nRé-analyser les mails à classer ayant déjà une proposition\nAnalyser les mails\nProjet\nTous les projets\nAT-27 — Réaménagement de l’atelier\nES-09 — Banc de contrôle\n\nMise à jour automatique\n\nAucun traitement enregistré\n\nModifiez les filtres ou ouvrez un projet pour poursuivre."
+    },
+    {
+      "name": "imports",
+      "path": "/app/imports",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 19,
+      "active": [
+        "Connexions & imports"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          279,
+          58,
+          1600,
+          680
+        ],
+        ".workspace-settings-navigation": [
+          311,
+          121,
+          1536,
+          231
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Projets\nConnexions & imports\nPortail et serveur\nGénéral\nApparence\nMails\nConnexions & imports\nRéunions et transcription\nRecherche dans les documents\nSauvegardes et maintenance\nProjets\nClients et équipe\nModèles de livrables\nModèles de documents\nStatistiques\nAppareil Windows\nMon accès\nMises à jour\nConnexion au serveur\nAPI locale et intégrations\nMémoire et rappels\nVocal\nDictée\nNotifications\nConnexions & imports\n\nSage, Thunderbird et dossiers réseau.\n\nImport Sage\nThunderbird\nDossiers réseau\nArchives JSON\nExports Sage (CSV `;` — dossiers Achats, Pointages)\nEnregistrer\nLancer l’import\nJamais importé\n\nEnregistrez le dossier des exports, puis lancez l’import."
+    },
+    {
+      "name": "conversations",
+      "path": "/chat",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Conversations"
+      ],
+      "boxes": {
+        "#voice-dictation-settings": [
+          526,
+          933,
+          294,
+          20
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "✳\nVOTRE ESPACE POUR AVANCER\nQu’allons-nous préparer ?\n\nUne idée, un document, une question.\nCommencez simplement, votre assistant s’occupe de la suite.\n\nPréparer un projet\nRédiger un texte\nExplorer un sujet\nTravailler sur du code"
+    },
+    {
+      "name": "conversations-web",
+      "path": "/kiara/app/conversations",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Conversations"
+      ],
+      "boxes": {},
+      "scrollWidth": 1920,
+      "contenu": "✳\nVOTRE ESPACE POUR AVANCER\nQu’allons-nous préparer ?\n\nUne idée, un document, une question.\nCommencez simplement, votre assistant s’occupe de la suite.\n\nPréparer un projet\nRédiger un texte\nExplorer un sujet\nTravailler sur du code"
+    },
+    {
+      "name": "lecture-web",
+      "path": "/kiara/app/conversations#apparence",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Réglages",
+        "Mon accès personnel"
+      ],
+      "boxes": {
+        "[data-view=\"settings\"]": [
+          238,
+          58,
+          1682,
+          1022
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Aller au contenu\nK\nKiara\nConversations\nVocal\nProjets\nNotes\nMails\nRéunions\nActivité\nCorrecteur\nMémoire et rappels\nNotifications\nRéglages\nEspace de travail\nRéglages · Mon accès\nModèle : Modèle de démonstration\n● Connecté au serveur IA ⌄\nRéglages\nMon accès personnel\nApparence\nThème de l’interface\nClair\nSombre\nComme le système\nPolice des conversations\nModerne · Segoe UI\nClassique · Arial\nLecture · Georgia\nTechnique · Consolas\nTaille du texte\nCompact · 14 px\nStandard · 15 px\nGrand · 17 px\nTrès grand · 19 px\n\nUne réponse claire, agréable à lire.\n\nLes changements s’appliquent immédiatement aux conversations et au correcteur.\nAppliqué : Moderne · Segoe UI · Standard · 15 px\nMon accès personnel\nSe déconnecter\nVos conversations\n\nL’historique personnel est enregistré sur le serveur. Les brouillons enregistrés restent dans ce navigateur.\n\nExporter l’historique\nImporter\nK\nAccès personnel\nAccès serveur Kiara"
+    },
+    {
+      "name": "web-compte",
+      "path": "/kiara/app/conversations#reglages",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Réglages",
+        "Mon accès personnel"
+      ],
+      "boxes": {
+        "[data-view=\"settings\"]": [
+          238,
+          58,
+          1682,
+          1022
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Aller au contenu\nK\nKiara\nConversations\nVocal\nProjets\nNotes\nMails\nRéunions\nActivité\nCorrecteur\nMémoire et rappels\nNotifications\nRéglages\nEspace de travail\nRéglages · Mon accès\nModèle : Modèle de démonstration\n● Connecté au serveur IA ⌄\nRéglages\nMon accès personnel\nApparence\nThème de l’interface\nClair\nSombre\nComme le système\nPolice des conversations\nModerne · Segoe UI\nClassique · Arial\nLecture · Georgia\nTechnique · Consolas\nTaille du texte\nCompact · 14 px\nStandard · 15 px\nGrand · 17 px\nTrès grand · 19 px\n\nUne réponse claire, agréable à lire.\n\nLes changements s’appliquent immédiatement aux conversations et au correcteur.\nAppliqué : Moderne · Segoe UI · Standard · 15 px\nMon accès personnel\nSe déconnecter\nVos conversations\n\nL’historique personnel est enregistré sur le serveur. Les brouillons enregistrés restent dans ce navigateur.\n\nExporter l’historique\nImporter\nK\nAccès personnel\nAccès serveur Kiara"
+    },
+    {
+      "name": "r-mails",
+      "path": "/app/settings?settings=mail",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 19,
+      "active": [
+        "Réglages",
+        "Mails"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          279,
+          58,
+          1600,
+          950
+        ],
+        ".workspace-settings-navigation": [
+          311,
+          186,
+          1536,
+          231
+        ],
+        ".workspace-settings-form": [
+          311,
+          439,
+          860,
+          505
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Projets\nRéglages\nRéglages\nPortail et serveur\nGénéral\nApparence\nMails\nConnexions & imports\nRéunions et transcription\nRecherche dans les documents\nSauvegardes et maintenance\nProjets\nClients et équipe\nModèles de livrables\nModèles de documents\nStatistiques\nAppareil Windows\nMon accès\nMises à jour\nConnexion au serveur\nAPI locale et intégrations\nMémoire et rappels\nVocal\nDictée\nNotifications\nSource des mails\nThunderbird\nDossier de fichiers EML\n\nThunderbird fermé ou liaison indisponible\n\nThunderbird doit être ouvert pour synchroniser. Les mails déjà importés restent disponibles dans Kiara.\n\nChoisir les dossiers · 0 sélectionné(s)\nSynchronisation automatique\nOptions de synchronisation et de classement\nEnregistrer\nSynchroniser maintenant\nAnalyser un dossier EML ponctuellement"
+    },
+    {
+      "name": "r-references",
+      "path": "/app/settings?settings=references",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 19,
+      "active": [
+        "Réglages",
+        "Clients et équipe"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          279,
+          58,
+          1600,
+          1013
+        ],
+        ".workspace-settings-navigation": [
+          311,
+          186,
+          1536,
+          231
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Projets\nRéglages\nRéglages\nPortail et serveur\nGénéral\nApparence\nMails\nConnexions & imports\nRéunions et transcription\nRecherche dans les documents\nSauvegardes et maintenance\nProjets\nClients et équipe\nModèles de livrables\nModèles de documents\nStatistiques\nAppareil Windows\nMon accès\nMises à jour\nConnexion au serveur\nAPI locale et intégrations\nMémoire et rappels\nVocal\nDictée\nNotifications\nClients, équipe et catégories\n\nLes listes communes utilisées dans les projets : clients, personnes, agences et catégories.\n\nConsultation seule. Seul le propriétaire peut modifier ces listes.\n\nListe\nClients\nAgences\nBusiness units\nFamilles\nTypologies\nPersonnes\nRechercher dans la liste\nInclure les éléments archivés"
+    },
+    {
+      "name": "r-livrables",
+      "path": "/app/settings?settings=deliverables",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 19,
+      "active": [
+        "Réglages",
+        "Modèles de livrables"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          279,
+          58,
+          1600,
+          968
+        ],
+        ".workspace-settings-navigation": [
+          311,
+          186,
+          1536,
+          231
+        ],
+        ".planning-heading": [
+          311,
+          511,
+          1536,
+          52
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Projets\nRéglages\nRéglages\nPortail et serveur\nGénéral\nApparence\nMails\nConnexions & imports\nRéunions et transcription\nRecherche dans les documents\nSauvegardes et maintenance\nProjets\nClients et équipe\nModèles de livrables\nModèles de documents\nStatistiques\nAppareil Windows\nMon accès\nMises à jour\nConnexion au serveur\nAPI locale et intégrations\nMémoire et rappels\nVocal\nDictée\nNotifications\nCatalogue et versions\nComposition par typologie\nCatalogue des livrables\n\nTypes, versions et contrôles opérationnels. La sélection dans chaque projet reste explicite.\n\nRechercher un type de livrable\nInclure les types archivés\nRecharger le catalogue\nTYPE\tDERNIÈRE PUBLICATION\tÉTAT\tACTION\n\nAucun type dans cette recherche."
+    },
+    {
+      "name": "r-documents",
+      "path": "/app/settings?settings=documents",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 19,
+      "active": [
+        "Réglages",
+        "Modèles de documents"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          279,
+          58,
+          1600,
+          759
+        ],
+        ".workspace-settings-navigation": [
+          311,
+          186,
+          1536,
+          231
+        ],
+        ".planning-heading": [
+          311,
+          455,
+          1536,
+          76
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Projets\nRéglages\nRéglages\nPortail et serveur\nGénéral\nApparence\nMails\nConnexions & imports\nRéunions et transcription\nRecherche dans les documents\nSauvegardes et maintenance\nProjets\nClients et équipe\nModèles de livrables\nModèles de documents\nStatistiques\nAppareil Windows\nMon accès\nMises à jour\nConnexion au serveur\nAPI locale et intégrations\nMémoire et rappels\nVocal\nDictée\nNotifications\nTrames et recherches documentaires\n\nDéfinir les noms, dossiers et indices recherchés pour les huit trames du projet. Chaque sauvegarde conserve la version précédente.\n\nVersion enregistrée : 1\n\nCritères communs aux projets\n\nUn critère par ligne. Les mots d’un nom sont tous requis ; les lignes proposent des alternatives. Les dossiers sont relatifs au lien choisi dans le projet.\n\nEnregistrer les réglages\nComparer avec les réglages enregistrés\nHistorique des réglages"
+    },
+    {
+      "name": "r-stats",
+      "path": "/app/settings?settings=stats",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 19,
+      "active": [
+        "Réglages",
+        "Statistiques"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          279,
+          58,
+          1600,
+          1225
+        ],
+        ".workspace-settings-navigation": [
+          311,
+          186,
+          1536,
+          231
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Projets\nRéglages\nRéglages\nPortail et serveur\nGénéral\nApparence\nMails\nConnexions & imports\nRéunions et transcription\nRecherche dans les documents\nSauvegardes et maintenance\nProjets\nClients et équipe\nModèles de livrables\nModèles de documents\nStatistiques\nAppareil Windows\nMon accès\nMises à jour\nConnexion au serveur\nAPI locale et intégrations\nMémoire et rappels\nVocal\nDictée\nNotifications\nStatistiques\n\nActivité enregistrée et état réel des moteurs.\n\nActualiser\nProjet mesuré\nTous les projets accessibles\nAT-27 — Réaménagement de l’atelier\nES-09 — Banc de contrôle\nSources conservées\n0\n\n0 dans le rappel courant\n\nSources indexées\n0\n\n0 avec texte extrait\n\nSéances\n0\n\nAudio conservé\n0 min\n\n0 Mo\n\nRéponses de l’assistant\n0\n\n0 réponse(s) devenue(s) obsolète(s)\n\nRéponses jugées utiles\nIndisponible\n\nL’utilité nécessite un avis explicite ; aucun score déduit du nombre de réponses\n\nPropositions de notes\n0\n\nPropositions distinctes de vos notes enregistrées\n\nTemps de réponse médian\nIndisponible\n\nP95 indisponible\n\nPassages recherchables\n0\n\n0 Mo\n\nTokens mesurés\nIndisponible\n\nAucune économie calculée sans mesure et référence\n\nMoteurs\nTranscription\n\nNon qualifié\nGénération\n\nPlacement non vérifié\n\nNon configurée\nDéfinition des mesures"
+    },
+    {
+      "name": "r-reunions",
+      "path": "/app/settings?settings=preparation",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 19,
+      "active": [
+        "Réglages",
+        "Réunions et transcription"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          279,
+          58,
+          1600,
+          1767
+        ],
+        ".workspace-settings-navigation": [
+          311,
+          186,
+          1536,
+          231
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Projets\nRéglages\nRéglages\nPortail et serveur\nGénéral\nApparence\nMails\nConnexions & imports\nRéunions et transcription\nRecherche dans les documents\nSauvegardes et maintenance\nProjets\nClients et équipe\nModèles de livrables\nModèles de documents\nStatistiques\nAppareil Windows\nMon accès\nMises à jour\nConnexion au serveur\nAPI locale et intégrations\nMémoire et rappels\nVocal\nDictée\nNotifications\nPréparer les réunions\n\nConfigurer la capture, les moteurs et le fonctionnement sur ce PC.\n\nActualiser\n1. Conserver la séance\n\nSauvegarde progressive des fragments disponible.\n\nLe navigateur demande les pistes audio au démarrage. Leur présence est contrôlée pendant la capture.\n\n2. Transcrire les voix\n\nTranscription des fichiers indisponible. Direct en essai, qualité et latence non qualifiées.\n\nInstallation du moteur direct : non renseignée. Activation enregistrée : désactivée. Moteur direct : état non renseigné.\n\n3. Retrouver les documents\n\n0 passages texte indexés.\n\nImportez un document choisi dans Sources puis contrôlez son état d’extraction et d’indexation.\n\n4. Répondre et enrichir les notes\n\nLa génération doit être vérifiée sur une question réelle.\n\nLes propositions conservent leurs sources ; leur acceptation enregistre une nouvelle version de note.\n\nDisponibilité des moteurs\n\nDiagnostic de la configuration enregistrée. Vérifier les modèles n’ouvre pas le microphone et ne lance pas de réponse.\n\nCapture\n\nConservation progressive disponible\n\nNon vérifié · Non vérifié\n\nTranscription\n\nFichiers : Non vérifié · Direct : Non vérifié\n\nDirect installé : Non vérifié · Chargé : Non vérifié\n\nLa disponibilité en essai ne qualifie pas la qualité ou la latence.\n\nRecherche dans les sources\n\nIndex EG2\n\nRecherche dans le texte, y compris le texte reconnu et les transcriptions indexées.\n\nGénération\n\nNon configurée · Placement non vérifié\n\nModèle non configuré\n\nInstallé : Non vérifié · Chargé : Non vérifié\n\nInventaire non vérifié.\n\nAucune réponse réelle testée pour cette configuration.\n\nMémoire disponible : Indisponible · Disque disponible : Indisponible.\n\nÉtat de démonstration\n\nVérifier les modèlesTester une réponse\n\nLe test envoie seulement « Réponds uniquement OK » au modèle sélectionné, sans document ni note. Le serveur peut charger ce modèle à la demande ; ce n’est pas un test de qualité métier.\n\nActiver l’espace de séance\nAutoriser la transcription directe en essai\n\nCe réglage distinct autorise le traitement des fragments enregistrés. Il ne démarre pas le microphone. Le texte direct reste provisoire et doit être relu ; activer l’essai ne qualifie ni sa qualité ni sa latence.\n\nProposer des réponses aux questions entendues automatiquement\nProposer des enrichissements des notes automatiquement\n\nL’enrichissement attend au moins huit secondes de stabilité de la dernière note et des segments enregistrés. Vos modifications non enregistrées ne participent pas à l’analyse. Chaque ajout proposé attend votre acceptation.\n\nExécution des nouveaux traitements\nServeur du réseau\nEntièrement sur ce PC\n\nLe mode choisi conserve l’ancien fonds documentaire. Les états ci-dessus indiquent ce qui est disponible ; le mode local doit fonctionner sans réseau pour chaque moteur.\n\nEnregistrer les régl"
+    },
+    {
+      "name": "r-recherche",
+      "path": "/app/settings?settings=memory",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 19,
+      "active": [
+        "Réglages",
+        "Recherche dans les documents"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          279,
+          58,
+          1600,
+          951
+        ],
+        ".workspace-settings-navigation": [
+          311,
+          186,
+          1536,
+          231
+        ],
+        ".workspace-settings-form": [
+          311,
+          439,
+          860,
+          506
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Projets\nRéglages\nRéglages\nPortail et serveur\nGénéral\nApparence\nMails\nConnexions & imports\nRéunions et transcription\nRecherche dans les documents\nSauvegardes et maintenance\nProjets\nClients et équipe\nModèles de livrables\nModèles de documents\nStatistiques\nAppareil Windows\nMon accès\nMises à jour\nConnexion au serveur\nAPI locale et intégrations\nMémoire et rappels\nVocal\nDictée\nNotifications\nRecherche dans les documents\n\nLa recherche retrouve les passages utiles des sources du projet. L’assistant IA peut ensuite rédiger une réponse avec ses citations.\n\nNombre de passages non vérifié\n\nConnexion au service de recherche\nEnregistrer\nTester la recherche\nRéglages avancés et diagnostic\nInformations indexées\nAucune indexation en échec\nOptions de reprise"
+    },
+    {
+      "name": "r-sauvegardes",
+      "path": "/app/settings?settings=operations",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 19,
+      "active": [
+        "Réglages",
+        "Sauvegardes et maintenance"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          279,
+          58,
+          1600,
+          772
+        ],
+        ".workspace-settings-navigation": [
+          311,
+          186,
+          1536,
+          231
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Projets\nRéglages\nRéglages\nPortail et serveur\nGénéral\nApparence\nMails\nConnexions & imports\nRéunions et transcription\nRecherche dans les documents\nSauvegardes et maintenance\nProjets\nClients et équipe\nModèles de livrables\nModèles de documents\nStatistiques\nAppareil Windows\nMon accès\nMises à jour\nConnexion au serveur\nAPI locale et intégrations\nMémoire et rappels\nVocal\nDictée\nNotifications\nSauvegardes et maintenance\n\nDernière sauvegarde du service Projets : Aucune enregistrée\n\nVérification à effectuer\n\nVérifier la dernière sauvegarde\n\nCette sauvegarde couvre le service Projets. Pour les sauvegardes chiffrées de Kiara et leur copie secondaire, ouvrez la console du serveur. Les brouillons non synchronisés restent sur leur appareil. La vérification ne remplace pas un essai de restauration.\n\nEspace disque et sauvegardes de migration\nActualiser l’état"
+    },
+    {
+      "name": "r-apparence",
+      "path": "/app/settings?settings=appearance",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 19,
+      "active": [
+        "Réglages",
+        "Apparence"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          279,
+          58,
+          1600,
+          652
+        ],
+        ".workspace-settings-navigation": [
+          311,
+          186,
+          1536,
+          231
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Projets\nRéglages\nRéglages\nPortail et serveur\nGénéral\nApparence\nMails\nConnexions & imports\nRéunions et transcription\nRecherche dans les documents\nSauvegardes et maintenance\nProjets\nClients et équipe\nModèles de livrables\nModèles de documents\nStatistiques\nAppareil Windows\nMon accès\nMises à jour\nConnexion au serveur\nAPI locale et intégrations\nMémoire et rappels\nVocal\nDictée\nNotifications\nApparence\nThème de Kiara\nDensité\nConfortable\nCompacte\n\nPréférences enregistrées dans ce navigateur."
+    },
+    {
+      "name": "acces-rapide",
+      "path": "/app/settings?settings=appearance",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 19,
+      "active": [
+        "Réglages",
+        "Apparence"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          279,
+          58,
+          1600,
+          652
+        ],
+        ".workspace-settings-navigation": [
+          311,
+          186,
+          1536,
+          231
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Projets\nRéglages\nRéglages\nPortail et serveur\nGénéral\nApparence\nMails\nConnexions & imports\nRéunions et transcription\nRecherche dans les documents\nSauvegardes et maintenance\nProjets\nClients et équipe\nModèles de livrables\nModèles de documents\nStatistiques\nAppareil Windows\nMon accès\nMises à jour\nConnexion au serveur\nAPI locale et intégrations\nMémoire et rappels\nVocal\nDictée\nNotifications\nApparence\nThème de Kiara\nDensité\nConfortable\nCompacte\n\nPréférences enregistrées dans ce navigateur."
+    },
+    {
+      "name": "navigation-reduite",
+      "path": "/app/settings",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 19,
+      "active": [
+        "",
+        "Général"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          195,
+          58,
+          1600,
+          822
+        ],
+        ".workspace-settings-navigation": [
+          227,
+          186,
+          1536,
+          231
+        ],
+        ".workspace-settings-form": [
+          227,
+          439,
+          860,
+          377
+        ],
+        ".workspace-topbar": [
+          70,
+          0,
+          1850,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Projets\nRéglages\nRéglages\nPortail et serveur\nGénéral\nApparence\nMails\nConnexions & imports\nRéunions et transcription\nRecherche dans les documents\nSauvegardes et maintenance\nProjets\nClients et équipe\nModèles de livrables\nModèles de documents\nStatistiques\nAppareil Windows\nMon accès\nMises à jour\nConnexion au serveur\nAPI locale et intégrations\nMémoire et rappels\nVocal\nDictée\nNotifications\n\nChoisissez le service qui rédige les réponses et les comptes rendus. Enregistrez les réglages avant de tester la connexion.\n\nActiver l’assistant IA\nService IA\nDésactivé\nOllama sur un ordinateur\nLM Studio ou API compatible OpenAI\nModèle\nConnexion et clé d’accès\nSecours local si le serveur ne répond pas\nEnregistrer\nTester"
+    },
+    {
+      "name": "notes-sombre",
+      "path": "/kiara/app/notes",
+      "viewport": [
+        1920,
+        1080
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Notes"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          279,
+          58,
+          1600,
+          1016
+        ],
+        ".notes-page-header": [
+          311,
+          121,
+          1536,
+          40
+        ],
+        ".notes-tabs": [
+          311,
+          189,
+          1536,
+          48
+        ],
+        ".planning-heading": [
+          311,
+          277,
+          1536,
+          38
+        ],
+        ".note-index": [
+          311,
+          315,
+          280,
+          207
+        ],
+        ".note-main": [
+          611,
+          315,
+          1236,
+          679
+        ],
+        ".note-title": [
+          611,
+          315,
+          1236,
+          140
+        ],
+        ".note-document-toolbar": [
+          612,
+          471,
+          1234,
+          49
+        ],
+        ".note-document-page": [
+          612,
+          520,
+          1234,
+          380
+        ],
+        ".note-runs": [
+          642,
+          545,
+          1174,
+          27
+        ],
+        ".note-session>.note-actions": [
+          611,
+          917,
+          1236,
+          40
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          1682,
+          58
+        ]
+      },
+      "scrollWidth": 1920,
+      "contenu": "Espace de travail\nNotes\nNotes\nNouvelle note de projet\nPersonnel\nAT-27\nNouvelle note\nRechercher une note\nPréparer la revue de jeudi\nRelire le plan avant la réunion.\nVersion 2 · 17/11/2026 14:45:00\nTitre de la note\nEnregistrée · version 2\nDernière modification · 17/11/2026 14:45:00\nParagraphe\nTitre 1\nTitre 2\nTitre 3\nB\nI\n+ Insérer / format\nMD\nRelire le plan avant la réunion.\nEnregistrer maintenant\nExporter le brouillon\nHistorique de la note\nCopier vers un projet"
+    },
+    {
+      "name": "reglages-windows",
+      "path": "/app/settings",
+      "viewport": [
+        2560,
+        1440
+      ],
+      "settingsCount": 19,
+      "active": [
+        "Réglages",
+        "Général"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          599,
+          58,
+          1600,
+          822
+        ],
+        ".workspace-settings-navigation": [
+          631,
+          186,
+          1536,
+          231
+        ],
+        ".workspace-settings-form": [
+          631,
+          439,
+          860,
+          377
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          2322,
+          58
+        ]
+      },
+      "scrollWidth": 2560,
+      "contenu": "Projets\nRéglages\nRéglages\nPortail et serveur\nGénéral\nApparence\nMails\nConnexions & imports\nRéunions et transcription\nRecherche dans les documents\nSauvegardes et maintenance\nProjets\nClients et équipe\nModèles de livrables\nModèles de documents\nStatistiques\nAppareil Windows\nMon accès\nMises à jour\nConnexion au serveur\nAPI locale et intégrations\nMémoire et rappels\nVocal\nDictée\nNotifications\n\nChoisissez le service qui rédige les réponses et les comptes rendus. Enregistrez les réglages avant de tester la connexion.\n\nActiver l’assistant IA\nService IA\nDésactivé\nOllama sur un ordinateur\nLM Studio ou API compatible OpenAI\nModèle\nConnexion et clé d’accès\nSecours local si le serveur ne répond pas\nEnregistrer\nTester"
+    },
+    {
+      "name": "vocal",
+      "path": "/chat#reglages-vocal",
+      "viewport": [
+        2560,
+        1440
+      ],
+      "settingsCount": 0,
+      "active": [],
+      "boxes": {
+        "#voice-settings-toggle": [
+          2440,
+          86,
+          72,
+          36
+        ]
+      },
+      "scrollWidth": 2560,
+      "contenu": "Aller au contenu\nK\nKiara\nConversations\nProjets\nNotes\nMails\nRéunions\nActivité\nRéglages\nServeur Kiara\nVocal\nModèle : Modèle de démonstration\nNotifications\n● Connecté au serveur IA ⌄\nVocal\n\nConversation\n\nNouvelle conversation\nHistorique\n···\nRéglages\nLow · voix sur le serveur\nVotre micro\nVoix de Kiara\nPrêt à discuter\nInstaller le vocal\nInterrompre Kiara en parlant\n\nKiara termine sa réponse avant de vous écouter.\n\nChoisir une image\nChoisir une capture\n\nÉchanges écrits\nRéglages du vocal\nFermer\nQualité\nQualité vocale\nLow · Léger\nMax · Vocal avancé\n\nMoteur léger sur le PC, voix sur le serveur.\n\nMicrophone\n\nMicrophone choisi dans les réglages Windows.\n\nVoix de Kiara\nVolume \n100 %\n\nLa voix française utilise la sortie audio de Windows.\n\nAffichage\nAnimation\nOndes vocales 3D\nOrbe\nConstellation\nActiver les mouvements\n\nLes mouvements réduits de votre appareil sont respectés.\n\nInformations vocales\n\nActivation vocale · essai\nAttendre « Bonjour Kiara » sur cet appareil\n\nLaissez Kiara ouverte. La détection est locale et garde le microphone actif jusqu’à l’appel ou à l’arrêt. La reconnaissance reste à vérifier avec votre voix."
+    },
+    {
+      "name": "dictee",
+      "path": "/chat#reglages-dictee",
+      "viewport": [
+        2560,
+        1440
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Conversations"
+      ],
+      "boxes": {
+        "#voice-dictation-settings": [
+          846,
+          1129,
+          294,
+          152
+        ]
+      },
+      "scrollWidth": 2560,
+      "contenu": "✳\nVOTRE ESPACE POUR AVANCER\nQu’allons-nous préparer ?\n\nUne idée, un document, une question.\nCommencez simplement, votre assistant s’occupe de la suite.\n\nPréparer un projet\nRédiger un texte\nExplorer un sujet\nTravailler sur du code"
+    },
+    {
+      "name": "preferences-notifications",
+      "path": "/chat#reglages-notifications",
+      "viewport": [
+        2560,
+        1440
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Notifications"
+      ],
+      "boxes": {
+        "[data-view=\"notifications\"]": [
+          238,
+          58,
+          2322,
+          1382
+        ],
+        "#fred-inbox-preferences": [
+          699,
+          359,
+          1400,
+          230
+        ]
+      },
+      "scrollWidth": 2560,
+      "contenu": "Aller au contenu\nK\nKiara\nConversations\nProjets\nNotes\nMails\nRéunions\nActivité\nRéglages\nServeur Kiara\nNotifications\nModèle : Modèle de démonstration\nNotifications\n● Connecté au serveur IA ⌄\nNotifications\n\nVos résultats et alertes sont conservés sur le serveur. Ils sont retrouvés à la reconnexion.\n\nActualiser\nTout marquer lu\n\nNotifications synchronisées avec le serveur.\n\nAucune notification pour le moment.\n\nPréférences de notification\n Document prêt pour la recherche\n Transcription disponible\n Alertes discrètes\nLe contenu privé des documents et conversations est masqué dans les alertes.\nEnregistrer les préférences\n\nLes alertes Android nécessitent votre autorisation. Une application complètement arrêtée récupère les événements à sa prochaine ouverture."
+    },
+    {
+      "name": "appareil",
+      "path": "/chat#reglages",
+      "viewport": [
+        2560,
+        1440
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Réglages",
+        "Mon accès personnel"
+      ],
+      "boxes": {
+        "[data-view=\"settings\"]": [
+          238,
+          58,
+          2322,
+          1382
+        ]
+      },
+      "scrollWidth": 2560,
+      "contenu": "Aller au contenu\nK\nKiara\nConversations\nProjets\nNotes\nMails\nRéunions\nActivité\nRéglages\nServeur Kiara\nRéglages · Mon accès\nModèle : Modèle de démonstration\nNotifications\n● Connecté au serveur IA ⌄\nRéglages\nMon accès personnel\nConnexion au serveur\nMises à jour\nAPI locale\nMémoire et rappels\nVocal\nDictée\nNotifications\nRéglages du portail\nApparence\nThème de l’interface\nClair\nSombre\nComme Windows\nPolice des conversations\nModerne · Segoe UI\nClassique · Arial\nLecture · Georgia\nTechnique · Consolas\nTaille du texte\nCompact · 14 px\nStandard · 15 px\nGrand · 17 px\nTrès grand · 19 px\n\nUne réponse claire, agréable à lire.\n\nLes changements s’appliquent immédiatement aux conversations et au correcteur.\nAppliqué : Moderne · Segoe UI · Standard · 15 px\nMon accès personnel\n\nVotre application possède une clé d’accès dédiée.\n\nAccès personnel\nConnexion automatique\n\nOuvrez votre application : elle se connecte au serveur avec votre accès personnel. Aucun identifiant ni mot de passe à saisir.\n\nCet EXE est votre clé d’accès. Le serveur peut le suspendre, limiter sa validité ou le révoquer. Transmettez-le uniquement à son destinataire.\nVos conversations\n\nToutes vos conversations sont enregistrées sur le serveur, même sans projet. Une copie locale chiffrée conserve vos changements pendant une coupure et les synchronise à la reconnexion.\n\nLes boutons Importer et Exporter ci-dessous permettent de transférer vos conversations. Les fichiers exportés ne sont pas chiffrés.\nExporter l’historique\nImporter\nK\nAccès personnel\nAccès serveur Kiara recette"
+    },
+    {
+      "name": "retour-portail",
+      "path": "/app/settings",
+      "viewport": [
+        2560,
+        1440
+      ],
+      "settingsCount": 19,
+      "active": [
+        "Réglages",
+        "Général"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          599,
+          58,
+          1600,
+          745
+        ],
+        ".workspace-settings-navigation": [
+          631,
+          186,
+          1536,
+          231
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          2322,
+          58
+        ]
+      },
+      "scrollWidth": 2560,
+      "contenu": "Projets\nRéglages\nRéglages\nPortail et serveur\nGénéral\nApparence\nMails\nConnexions & imports\nRéunions et transcription\nRecherche dans les documents\nSauvegardes et maintenance\nProjets\nClients et équipe\nModèles de livrables\nModèles de documents\nStatistiques\nAppareil Windows\nMon accès\nMises à jour\nConnexion au serveur\nAPI locale et intégrations\nMémoire et rappels\nVocal\nDictée\nNotifications\nChargement des réglages…"
+    },
+    {
+      "name": "boite-notifications",
+      "path": "/chat#notifications",
+      "viewport": [
+        2560,
+        1440
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Notifications"
+      ],
+      "boxes": {
+        "[data-view=\"notifications\"]": [
+          238,
+          58,
+          2322,
+          1382
+        ],
+        "#fred-inbox-preferences": [
+          699,
+          359,
+          1400,
+          230
+        ]
+      },
+      "scrollWidth": 2560,
+      "contenu": "Aller au contenu\nK\nKiara\nConversations\nProjets\nNotes\nMails\nRéunions\nActivité\nRéglages\nServeur Kiara\nNotifications\nModèle : Modèle de démonstration\nNotifications\n● Connecté au serveur IA ⌄\nNotifications\n\nVos résultats et alertes sont conservés sur le serveur. Ils sont retrouvés à la reconnexion.\n\nActualiser\nTout marquer lu\n\nNotifications synchronisées avec le serveur.\n\nAucune notification pour le moment.\n\nPréférences de notification"
+    },
+    {
+      "name": "notes-liste",
+      "path": "/app/notes",
+      "viewport": [
+        2560,
+        1440
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Notes"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          599,
+          58,
+          1600,
+          651
+        ],
+        ".notes-page-header": [
+          631,
+          121,
+          1536,
+          40
+        ],
+        ".notes-tabs": [
+          631,
+          189,
+          1536,
+          48
+        ],
+        ".planning-heading": [
+          631,
+          277,
+          1536,
+          38
+        ],
+        ".note-index": [
+          631,
+          315,
+          280,
+          207
+        ],
+        ".note-main": [
+          931,
+          315,
+          1236,
+          314
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          2322,
+          58
+        ]
+      },
+      "scrollWidth": 2560,
+      "contenu": "Projets\nNotes\nNotes\nNouvelle note de projet\nPersonnel\nAT-27\nNouvelle note\nRechercher une note\nPréparer la revue de jeudi\nRelire le plan avant la réunion.\nVersion 2 · 17/11/2026 14:45:00\n\nSélectionnez une note pour la consulter ou créez-en une."
+    },
+    {
+      "name": "notes-edition",
+      "path": "/app/notes",
+      "viewport": [
+        2560,
+        1440
+      ],
+      "settingsCount": 0,
+      "active": [
+        "Notes"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          599,
+          58,
+          1600,
+          1016
+        ],
+        ".notes-page-header": [
+          631,
+          121,
+          1536,
+          40
+        ],
+        ".notes-tabs": [
+          631,
+          189,
+          1536,
+          48
+        ],
+        ".planning-heading": [
+          631,
+          277,
+          1536,
+          38
+        ],
+        ".note-index": [
+          631,
+          315,
+          280,
+          207
+        ],
+        ".note-main": [
+          931,
+          315,
+          1236,
+          679
+        ],
+        ".note-title": [
+          931,
+          315,
+          1236,
+          140
+        ],
+        ".note-document-toolbar": [
+          932,
+          471,
+          1234,
+          49
+        ],
+        ".note-document-page": [
+          932,
+          520,
+          1234,
+          380
+        ],
+        ".note-runs": [
+          962,
+          545,
+          1174,
+          27
+        ],
+        ".note-session>.note-actions": [
+          931,
+          917,
+          1236,
+          40
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          2322,
+          58
+        ]
+      },
+      "scrollWidth": 2560,
+      "contenu": "Projets\nNotes\nNotes\nNouvelle note de projet\nPersonnel\nAT-27\nNouvelle note\nRechercher une note\nPréparer la revue de jeudi\nRelire le plan avant la réunion.\nVersion 2 · 17/11/2026 14:45:00\nTitre de la note\nEnregistrée · version 2\nDernière modification · 17/11/2026 14:45:00\nParagraphe\nTitre 1\nTitre 2\nTitre 3\nB\nI\n+ Insérer / format\nMD\nRelire le plan avant la réunion.\nEnregistrer maintenant\nExporter le brouillon\nHistorique de la note\nCopier vers un projet"
+    },
+    {
+      "name": "reglages-web",
+      "path": "/kiara/app/settings",
+      "viewport": [
+        2560,
+        1440
+      ],
+      "settingsCount": 13,
+      "active": [
+        "Réglages",
+        "Général"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          599,
+          58,
+          1600,
+          822
+        ],
+        ".workspace-settings-navigation": [
+          631,
+          186,
+          1536,
+          231
+        ],
+        ".workspace-settings-form": [
+          631,
+          439,
+          860,
+          377
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          2322,
+          58
+        ]
+      },
+      "scrollWidth": 2560,
+      "contenu": "Espace de travail\nRéglages\nRéglages\nPortail et serveur\nGénéral\nApparence\nMails\nConnexions & imports\nRéunions et transcription\nRecherche dans les documents\nSauvegardes et maintenance\nProjets\nClients et équipe\nModèles de livrables\nModèles de documents\nStatistiques\nCompte\nMon accès\nLecture des conversations\n\nChoisissez le service qui rédige les réponses et les comptes rendus. Enregistrez les réglages avant de tester la connexion.\n\nActiver l’assistant IA\nService IA\nDésactivé\nOllama sur un ordinateur\nLM Studio ou API compatible OpenAI\nModèle\nConnexion et clé d’accès\nSecours local si le serveur ne répond pas\nEnregistrer\nTester"
+    },
+    {
+      "name": "apparence-web",
+      "path": "/kiara/app/settings",
+      "viewport": [
+        2560,
+        1440
+      ],
+      "settingsCount": 13,
+      "active": [
+        "Réglages",
+        "Apparence"
+      ],
+      "boxes": {
+        ".workspace-main": [
+          599,
+          58,
+          1600,
+          652
+        ],
+        ".workspace-settings-navigation": [
+          631,
+          186,
+          1536,
+          231
+        ],
+        ".workspace-topbar": [
+          238,
+          0,
+          2322,
+          58
+        ]
+      },
+      "scrollWidth": 2560,
+      "contenu": "Espace de travail\nRéglages\nRéglages\nPortail et serveur\nGénéral\nApparence\nMails\nConnexions & imports\nRéunions et transcription\nRecherche dans les documents\nSauvegardes et maintenance\nProjets\nClients et équipe\nModèles de livrables\nModèles de documents\nStatistiques\nCompte\nMon accès\nLecture des conversations\nApparence\nThème\nClair\nSombre\nDensité\nConfortable\nCompacte\n\nPréférences enregistrées dans ce navigateur."
+    }
+  ],
+  "vues_complementaires": {
+    "pilotage": {
+      "text": "← Tous les projets\nRéaménagement de l’atelier\n\nAT-27 · Atelier de démonstrationEn cours\n\nOptions du projet\nVue d’ensemble\nPilotage\nDocuments\nRéunions\nPlanning\nCahier des charges\nAtelier\nÉchéances 0\nTâches 0\nOutils du planning\nÉchéances du projet\nRechercher un jalon\nInclure les jalons archivés\nRecharger la liste\nNouveau jalon spécifique\nCréer le jalon\n\nAucun jalon ne correspond à ces filtres.\n\nÉcart : réalisation ou prévision moins engagement contractuel. Un écart positif indique un retard.\nJALON / ORDRE\tCONTRACTUELLE\tPRÉVISIONNELLE\tRÉELLE\tÉCART\tÉTAPE\tACTIONS\nJalons du projet\n\nEngagement contractuel, dernière prévision et réalisation constatée. Chaque date garde sa source et son historique.\n\nRechercher les dates\n\nL’agent recherche automatiquement toutes les 5 minutes dans les sources du projet et ses liens réseau. Les dates proposées attendent votre validation.\n\nDates proposées 0\n\nAucune date à valider. L’agent conserve les champs vides lorsqu’il ne trouve pas de preuve suffisamment explicite.",
+      "api": [
+        "/api/v1/projects/atelier/cdc/items",
+        "/api/v1/projects/atelier/cdc/sources",
+        "/api/v1/projects/atelier/meetings",
+        "/api/v1/ai/status",
+        "/api/v1/projects/atelier/cdc/jobs"
+      ]
+    },
+    "imports": {
+      "text": "Projets\nConnexions & imports\nPortail et serveur\nGénéral\nApparence\nMails\nConnexions & imports\nRéunions et transcription\nRecherche dans les documents\nSauvegardes et maintenance\nProjets\nClients et équipe\nModèles de livrables\nModèles de documents\nStatistiques\nAppareil Windows\nMon accès\nMises à jour\nConnexion au serveur\nAPI locale et intégrations\nMémoire et rappels\nVocal\nDictée\nNotifications\nConnexions & imports\n\nSage, Thunderbird et dossiers réseau.\n\nImport Sage\nThunderbird\nDossiers réseau\nArchives JSON\nExports Sage (CSV `;` — dossiers Achats, Pointages)\nEnregistrer\nLancer l’import\nJamais importé\n\nEnregistrez le dossier des exports, puis lancez l’import.",
+      "api": []
+    },
+    "documents": {
+      "text": "← Tous les projets\nRéaménagement de l’atelier\n\nAT-27 · Atelier de démonstrationEn cours\n\nOptions du projet\nVue d’ensemble\nPilotage\nDocuments\nRéunions\nDocuments du projet\nInformations\nÀ remettre\nFichiers et dossiers\nNotes\nPréparer un document\nDocuments à remettre\nAjouter depuis les modèles\nNouveau livrable\nRechercher un livrable\nStatut documentaire\nTous\nBrouillon\nÀ vérifier\nValidé\nÀ réviser\nArchivé\n\nAucun livrable ne correspond à ces filtres.\n\nSources de tous les projets\nInformations de tous les projets",
+      "api": [
+        "/api/v1/projects/atelier/cdc/items",
+        "/api/v1/projects/atelier/cdc/sources",
+        "/api/v1/projects/atelier/meetings",
+        "/api/v1/ai/status",
+        "/api/v1/projects/atelier/cdc/jobs",
+        "/api/v1/project-people"
+      ]
+    },
+    "r-references": {
+      "text": "Projets\nRéglages\nRéglages\nPortail et serveur\nGénéral\nApparence\nMails\nConnexions & imports\nRéunions et transcription\nRecherche dans les documents\nSauvegardes et maintenance\nProjets\nClients et équipe\nModèles de livrables\nModèles de documents\nStatistiques\nAppareil Windows\nMon accès\nMises à jour\nConnexion au serveur\nAPI locale et intégrations\nMémoire et rappels\nVocal\nDictée\nNotifications\nClients, équipe et catégories\n\nLes listes communes utilisées dans les projets : clients, personnes, agences et catégories.\n\nConsultation seule. Seul le propriétaire peut modifier ces listes.\n\nListe\nClients\nAgences\nBusiness units\nFamilles\nTypologies\nPersonnes\nRechercher dans la liste\nInclure les éléments archivés",
+      "api": []
+    },
+    "r-livrables": {
+      "text": "Projets\nRéglages\nRéglages\nPortail et serveur\nGénéral\nApparence\nMails\nConnexions & imports\nRéunions et transcription\nRecherche dans les documents\nSauvegardes et maintenance\nProjets\nClients et équipe\nModèles de livrables\nModèles de documents\nStatistiques\nAppareil Windows\nMon accès\nMises à jour\nConnexion au serveur\nAPI locale et intégrations\nMémoire et rappels\nVocal\nDictée\nNotifications\nCatalogue et versions\nComposition par typologie\nCatalogue des livrables\n\nTypes, versions et contrôles opérationnels. La sélection dans chaque projet reste explicite.\n\nRechercher un type de livrable\nInclure les types archivés\nRecharger le catalogue\nTYPE\tDERNIÈRE PUBLICATION\tÉTAT\tACTION\n\nAucun type dans cette recherche.",
+      "api": []
+    },
+    "notes-sombre": {
+      "text": "Espace de travail\nNotes\nNotes\nNouvelle note de projet\nPersonnel\nAT-27\nNouvelle note\nRechercher une note\nPréparer la revue de jeudi\nRelire le plan avant la réunion.\nVersion 2 · 17/11/2026 14:45:00\nTitre de la note\nEnregistrée · version 2\nDernière modification · 17/11/2026 14:45:00\nParagraphe\nTitre 1\nTitre 2\nTitre 3\nB\nI\n+ Insérer / format\nMD\nRelire le plan avant la réunion.\nEnregistrer maintenant\nExporter le brouillon\nHistorique de la note\nCopier vers un projet",
+      "api": []
+    },
+    "nouvelle-reunion": {
+      "text": "Projets\nRéunions\nRéunions\nNouvelle séance\nProjet\nTous les projets\nAT-27 — Réaménagement de l’atelier\nES-09 — Banc de contrôle\nRechercher une réunion\nNouvelle séance\n\nLes réunions sont désactivées sur ce PC. Activez l’espace de séance pour préparer l’audio et les notes.\n\nActiver les réunions\n\nCette activation n’ouvre aucun microphone. Les réglages de transcription et d’assistance restent ceux que vous avez choisis.\n\nVoir tous les réglages des réunions\nTitre de la séance\nProjet de la nouvelle séance\nÀ rattacher après la réunion\nAT-27 — Réaménagement de l’atelier\nES-09 — Banc de contrôle\nPréparation\nEnregistrer une réunion\nPrendre des notes\nImporter un audio\nOuvrir la séance\nFermer\nComptes rendus · 0\nAucun compte rendu pour ce périmètre\n\nModifiez les filtres ou ouvrez un projet pour poursuivre.",
+      "api": []
+    }
+  },
+  "autres_ecrans": {
+    "appareil-connexion": {
+      "main": "Aller au contenu\nK\nKiara\nConversations\nProjets\nNotes\nMails\nRéunions\nActivité\nRéglages\nServeur Kiara\nRéglages · Connexion\nModèle : Modèle de démonstration\nNotifications\n● Connecté au serveur IA ⌄\nRéglages\nMon accès personnel\nConnexion au serveur\nMises à jour\nAPI locale\nMémoire et rappels\nVocal\nDictée\nNotifications\nRéglages du portail\nConnexion au serveur\n\nChoisissez WireGuard ou HTTPS Cloudflare pour accéder au même serveur.\n\nMode de connexion\nWireGuard · VPN\nHTTPS · Cloudflare\nHTTPS utilise ia.karenax.net. Cloudflare peut techniquement lire les données qui transitent.\nAdresse du serveur\nEn mode WireGuard, Automatique choisit l’adresse prévue dans votre EXE.\nAppliquer la connexion\nAutomatique\nCopier les paramètres\nColler les paramètres\nParamètres de connexion à copier ou coller\nUtiliser ces paramètres\nAprès collage, cliquez sur « Utiliser ces paramètres », puis sur « Appliquer la connexion ».\n\nÉtat de la connexion\n\nServeur IA accessible.\nAdresse utilisée : https://exemple.invalid (manuelle)\nAdresse Internet : exemple.invalid\n\nRéessayer la connexion\n\nChaque personne ou PC utilisé simultanément doit posséder son propre EXE généré sur le serveur. Deux copies du même EXE utilisent la même clé et peuvent interrompre leurs connexions.",
+      "title": [
+        "Réglages · Connexion",
+        "Réglages",
+        "Connexion au serveur"
+      ]
+    },
+    "appareil-mises-a-jour": {
+      "main": "Aller au contenu\nK\nKiara\nConversations\nProjets\nNotes\nMails\nRéunions\nActivité\nRéglages\nServeur Kiara\nRéglages · Mises à jour\nModèle : Modèle de démonstration\nNotifications\n● Connecté au serveur IA ⌄\nRéglages\nMon accès personnel\nConnexion au serveur\nMises à jour\nAPI locale\nMémoire et rappels\nVocal\nDictée\nNotifications\nRéglages du portail\nMises à jour\n\nLes nouvelles versions viennent directement de votre serveur.\n\nVersion de l’application\n\nÀ jour\n\nVérifier les mises à jour\nMettre à jour le client\nVotre accès et votre historique sont conservés\nLa signature et le fichier sont vérifiés avant installation. La version précédente est conservée pour revenir en arrière si le démarrage échoue.",
+      "title": [
+        "Réglages · Mises à jour",
+        "Réglages",
+        "Mises à jour"
+      ]
+    },
+    "appareil-api-locale": {
+      "main": "Aller au contenu\nK\nKiara\nConversations\nProjets\nNotes\nMails\nRéunions\nActivité\nRéglages\nServeur Kiara\nRéglages · API locale\nModèle : Modèle de démonstration\nNotifications\n● Connecté au serveur IA ⌄\nRéglages\nMon accès personnel\nConnexion au serveur\nMises à jour\nAPI locale\nMémoire et rappels\nVocal\nDictée\nNotifications\nRéglages du portail\nAPI locale\n\nConnectez vos autres applications au modèle via ce client.\n\nAdresse API compatible OpenAI\nhttp://127.0.0.1/v1\nClé API de ce PC\nAfficher la clé\n\nGardez Accès serveur Kiara ouvert pour utiliser cette adresse. Le calcul est effectué sur le serveur.\n\nEmbeddings\n\nPour la recherche dans vos applications : même adresse API et même clé, modèle google/embeddinggemma-2, route /v1/embeddings, 768 dimensions. Les calculs sont effectués sur le serveur. Fournissez un texte ou un lot de 32 textes maximum (jusqu’à 8 192 jetons par texte).\n\nIntégrations\n\nAjoutez le modèle chargé aux applications installées sur ce PC. Leurs réglages sont conservés et une sauvegarde précède chaque modification.\n\nOpenCode 2\nDétection indisponible\nAjouter à OpenCode 2\nHermes\nDétection indisponible\nAjouter à Hermes\nCodex\nDétection indisponible\nAjouter à Codex\n\nKiara s’ajoute comme fournisseur optionnel. Les modèles et les réglages ChatGPT par défaut sont conservés.\n\nUtiliser Qwen dans Codex\n\nModèle à ajouter : Modèle de démonstration",
+      "title": [
+        "Réglages · API locale",
+        "Réglages",
+        "API locale"
+      ]
+    },
+    "appareil-memoire": {
+      "main": "Aller au contenu\nK\nKiara\nConversations\nProjets\nNotes\nMails\nRéunions\nActivité\nRéglages\nServeur Kiara\nRéglages · Mémoire et rappels\nModèle : Modèle de démonstration\nNotifications\n● Connecté au serveur IA ⌄\nRéglages\nMon accès personnel\nConnexion au serveur\nMises à jour\nAPI locale\nMémoire et rappels\nVocal\nDictée\nNotifications\nRéglages du portail\nMémoire et rappels\nEspace\nPersonnel\nRéaménagement de l’atelier\nActualiser\n\nCannot read properties of undefined (reading 'length')\n\nSouvenirs\nAjouter ou modifier un souvenir\nRappels et comptes rendus\n\nLes rappels restent disponibles à la reconnexion. Les alertes arrivent lorsque ce client est connecté.\n\nNouveau rappel\nBilan du projet\nFaire le point",
+      "title": [
+        "Réglages · Mémoire et rappels",
+        "Réglages",
+        "Mémoire et rappels"
+      ]
+    },
+    "connexion-web": {
+      "main": "Kiara\nClé d’accès Kiara  Se connecter",
+      "title": [
+        "Kiara"
+      ]
+    },
+    "correcteur": {
+      "main": "Aller au contenu\nK\nKiara\nConversations\nProjets\nNotes\nMails\nRéunions\nActivité\nRéglages\nServeur Kiara\nCorrecteur de français\nModèle : Modèle de démonstration\nNotifications\n● Connecté au serveur IA ⌄\nCorrecteur de français\n\nÉcrivez ou collez votre texte, puis choisissez le ton.\n\nVos textes restent sur votre serveur\nVotre texte\nCorriger\nTon professionnel\nTon amical\n\nOrthographe, grammaire et ponctuation, en conservant le sens de votre texte.\n\nVotre texte retravaillé\nCopier le texte\nReprendre ce texte\n\nLe résultat apparaîtra ici. Vous pourrez comparer les deux textes, le copier ou le reprendre.",
+      "title": [
+        "Correcteur de français",
+        "Correcteur de français"
+      ]
+    },
+    "studio": {
+      "main": "Aller au contenu\nK\nKiara\nConversations\nProjets\nNotes\nMails\nRéunions\nActivité\nRéglages\nServeur Kiara\nRechercher…\nÉtat du système\nServices accessibles\n←\nRevue de démonstration\n\n2026-11-18 · À préparer\n\nNotes\nNotes enrichies\nTranscription\nCompte rendu\nAssistant\n●\n0:00\nTerminer\nMicrophone du navigateur\nMicrophone par défaut\nDémarrer la réunion au microphone\nImporter un audio\nPartager aussi l’audio système\n\nAu démarrage, autorisez le microphone. Pour le son du PC, sélectionnez aussi la fenêtre et son audio.\n\nRechercher une note\n＋ Nouvelle note1 séance\nRevue de démonstration\n2026-11-18 · À préparer\nNotes personnelles\nTitre de la note\nÀ jour\nEnregistrer la note\nCopier\nParagraphe\nTitre 1\nTitre 2\nTitre 3\nB\nI\n+ Insérer / format\nMD",
+      "title": [
+        "Revue de démonstration",
+        "Notes personnelles"
+      ]
+    }
+  }
+}

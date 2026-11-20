@@ -54,6 +54,37 @@ def setup_chunk(db, status='pending'):
     return row['id'], item.id
 
 
+def test_personal_meeting_controls_follow_the_creator_of_each_session(stores):
+    from app.services import meeting_preferences, session_proactive
+    brain, _, project_id, _ = stores
+    scope = frozenset({project_id})
+    alpha = Operator('alpha', 'editor', scope)
+    beta = Operator('beta', 'editor', scope)
+    with brain() as db:
+        enabled(db, live_transcription_enabled=False, proactive_enabled=False, auto_enhancement_enabled=False)
+        values = {'live_transcription_enabled': True, 'proactive_enabled': True,
+                  'auto_enhancement_enabled': True, 'mode': 'local'}
+        meeting_preferences.save(db, alpha.id, values)
+        assert meeting_preferences.preferences(db, alpha.id) == values
+        assert meeting_preferences.preferences(db, beta.id)['mode'] == 'network'
+        assert sessions.live_transcription_enabled(db) is True
+        alpha_session = None
+        for operator, speech in [(alpha, True), (beta, False)]:
+            with operator_context(operator):
+                sid = create(db, project_id=project_id)['id']
+                chunk(db, sid)
+                session = db.get(MeetingSession, sid)
+                item = db.scalar(select(MeetingAudioChunk).where(MeetingAudioChunk.session_id == sid))
+                assert (item.speech_status == 'pending') is speech
+                assert sessions.serialize_session(db, session)['live_transcription_enabled'] is speech
+                assert session_proactive.question_progress(db, session)['enabled'] is speech
+                assert session_proactive.automatic_status(db, session)['enabled'] is speech
+                if speech:
+                    alpha_session = sid
+        statement = select(MeetingSession.id).where(meeting_preferences.enabled_for_session(db, 'proactive_enabled'))
+        assert list(db.scalars(statement)) == [alpha_session]
+
+
 @pytest.mark.parametrize('legacy', [{}, {'live_transcription_enabled': False},
                                   {'live_transcription_enabled': 'true'}, {'live_transcription_enabled': 1}])
 def test_general_enabled_and_legacy_values_do_not_opt_in(stores, legacy, monkeypatch):
@@ -360,13 +391,13 @@ def test_stale_disabled_tick_cannot_override_newer_enable(stores, monkeypatch):
     first = True
     nested_activation = False
     fresh_tick = threading.Event()
-    def old_snapshot_then_new_enable(db=None):
+    def old_snapshot_then_new_enable(db=None, *, operator_id=None):
         nonlocal first, nested_activation
         if threading.current_thread().name == 'live-speech' and first:
             first = False
             with brain() as changed:
                 enabled(changed, live_transcription_enabled=False)
-            observed = actual_enabled(db)
+            observed = actual_enabled(db, operator_id=operator_id)
             assert observed is False
             with brain() as changed:
                 enabled(changed)
@@ -376,7 +407,7 @@ def test_stale_disabled_tick_cannot_override_newer_enable(stores, monkeypatch):
             return observed  # The previous tick still holds its off observation.
         if threading.current_thread().name == 'live-speech' and not nested_activation:
             fresh_tick.set()
-        return actual_enabled(db)
+        return actual_enabled(db, operator_id=operator_id)
     monkeypatch.setattr(sessions, 'live_transcription_enabled', old_snapshot_then_new_enable)
     monkeypatch.setattr(live, 'runtime_status', lambda: {'installed': False})
     assert live.start_worker() is True

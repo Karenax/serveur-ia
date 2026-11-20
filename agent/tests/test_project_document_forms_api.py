@@ -9,6 +9,7 @@ from sqlalchemy import event
 from app.security import local_guard, SESSION_TOKEN
 from backend.app.db import get_db
 from backend.app.models import NetworkLink
+from backend.app.personal_document_models import PersonalDocumentSearchVersion
 from backend.app.routers import project_documents as http
 from backend.app.services.migration_guard import capture_baseline
 from backend.app.services import document_forms as forms
@@ -85,8 +86,10 @@ def test_project_policy_and_global_settings_administration(api, store, monkeypat
     assert client.put(root + '/forms/tdao', json={'expected_revision': 0}, headers={'X-Operator-Role': 'owner'}).status_code == write_code
     if scope:
         assert client.get(root.replace(ids[0], ids[1]) + '/forms/tdao').status_code == 404
-    for method, url, body in (('get', '/api/v1/document-settings', None),
-                            ('get', '/api/v1/document-settings/history', None),
+    preferences = client.get('/api/v1/document-settings')
+    assert preferences.status_code == 200 and preferences.json()['can_edit'] is False
+    assert len(preferences.json()['items']) == 8
+    for method, url, body in (('get', '/api/v1/document-settings/history', None),
                             ('put', '/api/v1/document-settings', {}),
                             ('post', '/api/v1/document-settings/restore', {})):
         assert getattr(client, method)(url, **({'json': body} if body is not None else {})).status_code == 403
@@ -151,6 +154,56 @@ def test_effective_rules_labels_order_and_inactive_search_use_saved_preferences(
     assert client.put('/api/v1/document-settings', json={'expected_revision': 1, 'items': items}).status_code == 200
     assert client.post(root + '/discover', json={'document_id': 'ce_request', 'link_id': ids[2]}).status_code == 409
     assert client.get(root + '/forms/ce_request').status_code == 200 and source.read_bytes() == original
+
+
+def test_personal_rules_drive_discovery_and_isolate_versions(api, store, monkeypatch, tmp_path):
+    install(store)
+    PersonalDocumentSearchVersion.__table__.create(store[0])
+    client, root, ids, _ = api
+    folder = tmp_path / 'authorized'
+    folder.mkdir()
+    raw = package(parts_for('ce_request'))
+    for name in ('Alpha.docx', 'Beta.docx'):
+        (folder / name).write_bytes(raw)
+    with store[1]() as db:
+        db.get(NetworkLink, ids[2]).chemin = str(folder)
+        db.commit()
+    monkeypatch.setenv('AGENT_DOCUMENT_ROOTS', json.dumps([str(folder)]))
+    monkeypatch.setenv('AGENT_OPERATOR_ROLE', 'reader')
+    monkeypatch.setenv('AGENT_OPERATOR_PROJECT_IDS', json.dumps([ids[0]]))
+    url = '/api/v1/document-settings/personal'
+    results = {}
+    for actor, name in [('alpha', 'Alpha'), ('beta', 'Beta')]:
+        monkeypatch.setenv('AGENT_OPERATOR_ID', actor)
+        state = client.get(url).json()
+        assert state['revision'] == 0 and state['can_edit'] is True
+        rule = next(row for row in state['items'] if row['document_id'] == 'ce_request')
+        rule.update(relative_paths=['.'], filename_patterns=[name], active=True)
+        saved = client.put(url, json={'expected_revision': 0, 'items': state['items']})
+        assert saved.status_code == 200, saved.text
+        results[actor] = saved.json()['version_id']
+        assert client.put(url, json={'expected_revision': 0, 'items': state['items']}).status_code == 409
+    for actor, name, other in [('alpha', 'Alpha', 'beta'), ('beta', 'Beta', 'alpha')]:
+        monkeypatch.setenv('AGENT_OPERATOR_ID', actor)
+        search = client.post(root + '/discover', json={'document_id': 'ce_request', 'link_id': ids[2]})
+        assert search.status_code == 200, search.text
+        assert search.json()['preferences_version_id'] == results[actor]
+        assert [item['filename'] for item in search.json()['candidates']] == [name + '.docx']
+        history = client.get(url + '/history').json()
+        assert [row['id'] for row in history['items']] == [results[actor]]
+        assert client.post(url + '/restore', json={'expected_revision': 1, 'version_id': results[other]}).status_code == 404
+        assert client.get('/api/v1/document-settings').json()['revision'] == 0
+
+
+def test_personal_criteria_can_be_saved_without_the_shared_document_editor(api, store):
+    PersonalDocumentSearchVersion.__table__.create(store[0])
+    client, _, _, _ = api
+    url = '/api/v1/document-settings/personal'
+    assert client.get('/api/v1/document-settings').json()['available'] is False
+    state = client.get(url).json()
+    assert state['available'] is True
+    saved = client.put(url, json={'expected_revision': 0, 'items': state['items']})
+    assert saved.status_code == 200 and saved.json()['revision'] == 1
 
 
 def test_origin_csrf_foreign_link_and_write_failure_rollback(api, store, monkeypatch):

@@ -99,7 +99,7 @@ function RichEditorSession({content,onChange,projectId,noteId,disabled=false,dra
   function closeMarkdown(apply:boolean){
     if(apply&&markdownPending){
       if(disabled||!markdownValid||!converted?.ok)return;
-      if(onChange(converted.value)===false){setStorageError('La note convertie n’a pas pu être conservée ; le brouillon Markdown reste disponible.');return;}
+      if(onChange({...converted.value,background:content.background})===false){setStorageError('La note convertie n’a pas pu être conservée ; le brouillon Markdown reste disponible.');return;}
     }
     if(markdownPending){
       try{localStorage.removeItem(markdownDraftKey(identity));}catch{setStorageError('Impossible de fermer le brouillon local ; sa saisie reste conservée.');return;}
@@ -112,11 +112,17 @@ function RichEditorSession({content,onChange,projectId,noteId,disabled=false,dra
     anchor.href=url;anchor.download='brouillon-note.md';anchor.click();window.setTimeout(()=>URL.revokeObjectURL(url),1000);
   }
   const root=useRef<HTMLDivElement>(null),savedRange=useRef<Range|null>(null),pendingFocus=useRef<EditorFocus|null>(null);
-  const latest=useRef(content),lastAccepted=useRef(JSON.stringify(content)),history=useRef<{undo:EditorSnapshot[];redo:EditorSnapshot[]}>({undo:[],redo:[]});
+  const toolbar=useRef<HTMLDivElement>(null),[toolbarWidth,setToolbarWidth]=useState(0);
+  useEffect(()=>{
+    const line=toolbar.current;if(!line||typeof ResizeObserver==='undefined')return;
+    const observer=new ResizeObserver(([box])=>setToolbarWidth(box.contentRect.width));
+    observer.observe(line);return()=>observer.disconnect();
+  },[markdownMode,disabled]);
+  const latest=useRef(content),lastAccepted=useRef(JSON.stringify(content.blocks)),history=useRef<{undo:EditorSnapshot[];redo:EditorSnapshot[]}>({undo:[],redo:[]});
   const typing=useRef<{id:string;time:number}|null>(null),[historyVersion,setHistoryVersion]=useState(0);
   useEffect(()=>{
     latest.current=content;
-    if(JSON.stringify(content)!==lastAccepted.current){history.current={undo:[],redo:[]};typing.current=null;setHistoryVersion(v=>v+1);lastAccepted.current=JSON.stringify(content);}
+    if(JSON.stringify(content.blocks)!==lastAccepted.current){history.current={undo:[],redo:[]};typing.current=null;setHistoryVersion(v=>v+1);lastAccepted.current=JSON.stringify(content.blocks);}
     const target=pendingFocus.current;if(!target)return;
     const editable=root.current?.querySelector<HTMLElement>(`[data-note-input="${target.id}"]`);if(!editable)return;
     pendingFocus.current=null;editable.focus();const range=document.createRange(),walker=document.createTreeWalker(editable,NodeFilter.SHOW_TEXT);
@@ -139,7 +145,7 @@ function RichEditorSession({content,onChange,projectId,noteId,disabled=false,dra
     const now=Date.now(),group=typingId&&typing.current?.id===typingId&&now-typing.current.time<750;
     if(!group){history.current.undo.push({content:latest.current,focus:currentFocus()});if(history.current.undo.length>100)history.current.undo.shift();}
     history.current.redo=[];typing.current=typingId?{id:typingId,time:now}:null;
-    latest.current=value;lastAccepted.current=JSON.stringify(value);setHistoryVersion(v=>v+1);return true;
+    latest.current=value;lastAccepted.current=JSON.stringify(value.blocks);setHistoryVersion(v=>v+1);return true;
   }
   const change=(index:number,block:NoteBlock,typingId?:string)=>commit({...latest.current,blocks:latest.current.blocks.map((b,i)=>i===index?block:b)},typingId);
   const focus=(id:string,offset=0)=>{pendingFocus.current={id,offset};};
@@ -150,8 +156,8 @@ function RichEditorSession({content,onChange,projectId,noteId,disabled=false,dra
   }
   function undo(redo=false){
     if(disabled)return;const from=redo?history.current.redo:history.current.undo,to=redo?history.current.undo:history.current.redo,snapshot=from[from.length-1];if(!snapshot)return;
-    const value=snapshot.content,previousFocus=currentFocus();if(onChange(value)===false)return;from.pop();to.push({content:latest.current,focus:previousFocus});
-    latest.current=value;lastAccepted.current=JSON.stringify(value);typing.current=null;savedRange.current=null;pendingFocus.current=snapshot.focus;
+    const value={...snapshot.content,background:latest.current.background},previousFocus=currentFocus();if(onChange(value)===false)return;from.pop();to.push({content:latest.current,focus:previousFocus});
+    latest.current=value;lastAccepted.current=JSON.stringify(value.blocks);typing.current=null;savedRange.current=null;pendingFocus.current=snapshot.focus;
     const restored=snapshot.focus?.id.split(':');setFocused(restored?Number(restored[1]):Math.min(focused,Math.max(0,value.blocks.length-1)));
     if(restored?.[0]==='l')setFocusedItem(Number(restored[2]));setHistoryVersion(v=>v+1);
   }
@@ -197,6 +203,11 @@ function RichEditorSession({content,onChange,projectId,noteId,disabled=false,dra
       }else if(items.length<500){items.splice(itemIndex,1,{...item,runs:part.before},{...item,runs:part.after,checked:false});focus(`l:${index}:${itemIndex+1}`);change(index,{...block,items});}
     }else if(event.key==='Tab'){
       event.preventDefault();items[itemIndex]={...item,indent:Math.max(0,Math.min(6,item.indent+(event.shiftKey?-1:1)))};change(index,{...block,items});
+    }else if((event.key==='Delete'||event.key==='Backspace')&&part.collapsed&&block.kind==='checklist'&&!length(item.runs)){
+      event.preventDefault();removeListItem(index,itemIndex);
+    }else if(event.key==='Delete'&&part.collapsed&&part.end&&itemIndex<items.length-1){
+      event.preventDefault();focus(`l:${index}:${itemIndex}`,length(item.runs));
+      items.splice(itemIndex,2,{...item,runs:[...item.runs,...items[itemIndex+1].runs]});change(index,{...block,items});
     }else if(event.key==='Backspace'&&part.collapsed&&part.start){
       event.preventDefault();
       if(item.indent){items[itemIndex]={...item,indent:item.indent-1};change(index,{...block,items});}
@@ -204,6 +215,22 @@ function RichEditorSession({content,onChange,projectId,noteId,disabled=false,dra
       else{const replacement:NoteBlock[]=[{type:'paragraph',align:'left',runs:item.runs}];if(items.length>1)replacement.push({...block,items:items.slice(1)});
         if(blocks.length-1+replacement.length>500)return;blocks.splice(index,1,...replacement);focus(`p:${index}`);commit({...latest.current,blocks});}
     }
+  }
+  function removeListItem(index:number,itemIndex:number){
+    const block=latest.current.blocks[index];if(block?.type!=='list'||!block.items[itemIndex])return;
+    const items=block.items.filter((_,row)=>row!==itemIndex);
+    if(!items.length&&latest.current.blocks.length>1){
+      const blocks=latest.current.blocks.filter((_,row)=>row!==index);
+      const next=Math.min(index,blocks.length-1),target=blocks[next];
+      setFocused(next);setFocusedItem(0);
+      if(target.type!=='image')focus(target.type==='list'?`l:${next}:0`:target.type==='table'?`t:${next}:0:0`:`p:${next}`);
+      commit({...latest.current,blocks});
+      return;
+    }
+    const next=Math.min(itemIndex,items.length-1);
+    setFocusedItem(Math.max(0,next));
+    focus(items.length?`l:${index}:${next}`:`p:${index}`);
+    change(index,items.length?{...block,items}:{type:'paragraph',align:'left',runs:[]});
   }
   function tableKey(event:KeyboardEvent<HTMLDivElement>,index:number,row:number,col:number){
     if(disabled||event.key!=='Tab')return;const block=latest.current.blocks[index];if(block?.type!=='table')return;
@@ -282,6 +309,20 @@ function RichEditorSession({content,onChange,projectId,noteId,disabled=false,dra
   }
   function move(delta:number){const blocks=[...latest.current.blocks],next=focused+delta;if(next<0||next>=blocks.length)return;
     [blocks[focused],blocks[next]]=[blocks[next],blocks[focused]];setFocused(next);commit({...latest.current,blocks});}
+  const table=()=>add({type:'table',header:true,rows:[[[],[],[]],[[],[],[]],[[],[],[]]]});
+  const paragraph=()=>add({type:'paragraph',align:'left',runs:[]});
+  const linkTool=()=>{savedRange.current=selection()??savedRange.current;setShowLink(value=>!value);};
+  const formatTools=[['Souligné','underline','U'],['Barré','strikeThrough','S'],['Code','code','<>'],['Sans mise en forme','removeFormat','Tx']] as const;
+  const toolsInBar=toolbarWidth>=755?formatTools.length:toolbarWidth>=525?2:0;
+  const insertsInBar=toolbarWidth>=525;
+  const fullToolbar=toolbarWidth>=820;
+  const alignment=b?.type==='paragraph'&&<select aria-label="Alignement du bloc" title="Alignement du bloc" value={b.align}
+    onChange={event=>change(focused,{...b,align:event.target.value as typeof b.align})}>
+    <option value="left">Gauche</option><option value="center">Centré</option><option value="right">Droite</option></select>;
+  function closeFormatMenu(menu:HTMLDetailsElement){
+    if(menu.contains(document.activeElement))menu.querySelector<HTMLElement>('summary')?.focus({preventScroll:true});
+    menu.open=false;
+  }
   const icon=(name:'bullet'|'ordered'|'checklist'|'undo'|'redo'|'plus')=><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     {name==='bullet'?<><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/><path d="M9 6h11M9 12h11M9 18h11"/></>:
       name==='ordered'?<><path d="M3 4h1v4M3 8h2M3 12c3-2 3 1 0 4h3M10 6h10M10 12h10M10 18h10"/></>:
@@ -309,26 +350,41 @@ function RichEditorSession({content,onChange,projectId,noteId,disabled=false,dra
   return <div className="note-rich-editor note-document-editor" ref={root} data-history-version={historyVersion}
     onKeyDown={event=>{if((event.ctrlKey||event.metaKey)&&!event.altKey&&['z','y'].includes(event.key.toLowerCase())){
       event.preventDefault();undo(event.key.toLowerCase()==='y'||event.shiftKey);}}}>
-    {!disabled&&<><div className="note-toolbar note-document-toolbar" role="toolbar" aria-label="Mise en forme de la note">
+    {!disabled&&<><div className="note-toolbar note-document-toolbar" ref={toolbar} role="toolbar" aria-label="Mise en forme de la note">
       <select className="note-style-select" aria-label="Style du bloc" value={b?.type==='heading'?`h${b.level}`:'paragraph'} disabled={!b||!('runs'in b)} onChange={event=>styleBlock(event.target.value)}>
         <option value="paragraph">Paragraphe</option><option value="h1">Titre 1</option><option value="h2">Titre 2</option><option value="h3">Titre 3</option></select>
       <span className="note-toolbar-divider" aria-hidden="true"/>
       <button type="button" className="note-tool" aria-label="Gras" title="Gras · Ctrl+B" onMouseDown={e=>e.preventDefault()} onClick={()=>format('bold')}><strong>B</strong></button>
       <button type="button" className="note-tool" aria-label="Italique" title="Italique · Ctrl+I" onMouseDown={e=>e.preventDefault()} onClick={()=>format('italic')}><em>I</em></button>
+      {formatTools.slice(0,toolsInBar).map(([label,command,glyph])=><button type="button" key={command} className="note-tool"
+        aria-label={label} title={label} onMouseDown={event=>event.preventDefault()} onClick={()=>format(command)}>{glyph}</button>)}
       <span className="note-toolbar-divider" aria-hidden="true"/>
       {(['bullet','ordered','checklist'] as const).map(kind=><button type="button" key={kind} className="note-tool" aria-label={{bullet:'Liste à puces',ordered:'Liste numérotée',checklist:'Liste à cocher'}[kind]}
         title={{bullet:'Liste à puces',ordered:'Liste numérotée',checklist:'Liste à cocher'}[kind]} aria-pressed={b?.type==='list'&&b.kind===kind} onMouseDown={e=>e.preventDefault()} onClick={()=>list(kind)}>{icon(kind)}</button>)}
-      <details className="note-format-menu"><summary aria-label="Insérer et formater" title="Insérer et formater" onMouseDown={()=>{savedRange.current=selection();}}>{icon('plus')}<span className="sr-only">+ Insérer / format</span></summary>
+      <input type="color" className="note-tool note-text-color" aria-label="Couleur du texte" title="Couleur du texte"
+        defaultValue="#203345" onPointerDown={()=>{savedRange.current=selection()??savedRange.current;}}
+        onFocus={()=>{savedRange.current=selection()??savedRange.current;}} onChange={event=>format('foreColor',event.target.value)}/>
+      {insertsInBar&&<>
+        <button type="button" className="note-tool" aria-label="Insérer un tableau" title="Insérer un tableau" disabled={content.blocks.length>=500}
+          onMouseDown={event=>event.preventDefault()} onClick={table}>▦</button>
+        <button type="button" className="note-tool" aria-label="Lien" title="Lien" onMouseDown={event=>event.preventDefault()} onClick={linkTool}>↗</button>
+      </>}
+      {fullToolbar&&<><button type="button" className="note-tool" aria-label="Insérer un paragraphe" title="Insérer un paragraphe"
+        disabled={content.blocks.length>=500} onMouseDown={event=>event.preventDefault()} onClick={paragraph}>¶</button>{alignment}</>}
+      <details data-dismiss-outside className="note-format-menu" onClick={event=>{
+        if((event.target as HTMLElement).closest('.note-format-popover button'))closeFormatMenu(event.currentTarget);
+      }} onChange={event=>closeFormatMenu(event.currentTarget)} onKeyDown={event=>{
+        if(event.key==='Escape'&&event.currentTarget.open){event.stopPropagation();closeFormatMenu(event.currentTarget);}
+      }}><summary aria-label="Insérer et formater" title="Insérer et formater" onMouseDown={()=>{savedRange.current=selection()??savedRange.current;}}>{icon('plus')}<span className="sr-only">+ Insérer / format</span></summary>
         <div className="note-format-popover">
-          <div className="note-menu-section"><span>Insérer</span><button type="button" disabled={content.blocks.length>=500} onClick={()=>add({type:'paragraph',align:'left',runs:[]})}>Paragraphe</button>
-            <button type="button" disabled={content.blocks.length>=500} onClick={()=>add({type:'table',header:true,rows:[[[],[],[]],[[],[],[]],[[],[],[]]]})}>Tableau</button></div>
-          <div className="note-menu-section"><span>Texte</span>{([['Souligné','underline'],['Barré','strikeThrough'],['Code','code'],['Sans mise en forme','removeFormat']] as const).map(([label,command])=>
+          <div className="note-menu-section"><span>Insérer</span><button type="button" disabled={content.blocks.length>=500} onClick={paragraph}>Paragraphe</button>
+            <button type="button" disabled={content.blocks.length>=500} onClick={table}>Tableau</button></div>
+          {(toolsInBar<formatTools.length||!insertsInBar||!fullToolbar&&alignment)&&<div className="note-menu-section"><span>Texte</span>{formatTools.slice(toolsInBar).map(([label,command])=>
             <button type="button" key={command} onMouseDown={e=>e.preventDefault()} onClick={()=>format(command)}>{label}</button>)}
-            <button type="button" onMouseDown={e=>{e.preventDefault();savedRange.current=selection();}} onClick={()=>setShowLink(v=>!v)}>Lien</button>
-            <label>Couleur<input type="color" aria-label="Couleur du texte" defaultValue="#203345" onMouseDown={()=>{savedRange.current=selection();}} onChange={e=>format('foreColor',e.target.value)}/></label>
-            {b?.type==='paragraph'&&<label>Alignement<select aria-label="Alignement du bloc" value={b.align} onChange={e=>change(focused,{...b,align:e.target.value as 'left'|'center'|'right'})}>
-              <option value="left">Gauche</option><option value="center">Centré</option><option value="right">Droite</option></select></label>}</div>
+            {!insertsInBar&&<button type="button" onMouseDown={e=>e.preventDefault()} onClick={linkTool}>Lien</button>}
+            {!fullToolbar&&alignment&&<label>Alignement{alignment}</label>}</div>}
           {b?.type==='list'&&<div className="note-menu-section"><span>Liste</span><button type="button" disabled={b.items.length>=500} onClick={()=>{focus(`l:${focused}:${b.items.length}`);change(focused,{...b,items:[...b.items,{runs:[],checked:false,indent:0}]});}}>Ajouter un élément</button>
+            <button type="button" onClick={()=>removeListItem(focused,focusedItem)}>Supprimer la ligne</button>
             <label>Retrait<select aria-label={`Retrait de l’élément ${focusedItem+1} du bloc ${focused+1}`} value={b.items[focusedItem]?.indent||0}
               onChange={e=>change(focused,{...b,items:b.items.map((item,n)=>n===focusedItem?{...item,indent:Number(e.target.value)}:item)})}>
               {Array.from({length:7},(_,n)=><option key={n} value={n}>{n}</option>)}</select></label></div>}
@@ -355,6 +411,7 @@ function RichEditorSession({content,onChange,projectId,noteId,disabled=false,dra
             onKeyDown={e=>paragraphKey(e,i)} onChange={runs=>change(i,{...block,runs},`p:${i}`)}/></div>}
         {block.type==='list'&&<ol className={`note-list ${block.kind}`}>{block.items.map((item,n)=><li key={n} style={{marginLeft:item.indent*20}}>
           {block.kind==='checklist'&&<input type="checkbox" aria-label={`Case ${n+1} du bloc ${i+1}`} disabled={disabled} checked={item.checked}
+            onKeyDown={event=>{if(!disabled&&(event.key==='Delete'||event.key==='Backspace')){event.preventDefault();removeListItem(i,n);}}}
             onFocus={()=>{setFocused(i);setFocusedItem(n);}} onChange={e=>change(i,{...block,items:block.items.map((it,j)=>j===n?{...it,checked:e.target.checked}:it)})}/>}
           <RunsInput runs={item.runs} inputId={`l:${i}:${n}`} disabled={disabled} label={`Élément ${n+1} du bloc ${i+1}`} onFocus={()=>{setFocused(i);setFocusedItem(n);}}
             onKeyDown={e=>listKey(e,i,n)} onChange={runs=>change(i,{...block,items:block.items.map((it,j)=>j===n?{...it,runs}:it)},`l:${i}:${n}`)}/>

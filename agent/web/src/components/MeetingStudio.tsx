@@ -375,6 +375,7 @@ export function MeetingStudio({sessionId, rows, capabilities, onClose, onChanged
   });
   if (!session) return <section className="meeting-studio"><button type="button" onClick={onClose}>Retour aux réunions</button>
     {error || sessionReadError ? <p role="alert">{error || sessionReadError}</p> : <p role="status">Ouverture de la séance…</p>}</section>;
+  const directTranscription = session.live_transcription_enabled ?? capabilities.transcription.enabled;
   const title = rows.find(row => row.id === session.project_id);
   const projectAssistant = session.project_id ? projectConversationHref(session.project_id) : null;
   const frozen = session.state === 'cancelled';
@@ -410,7 +411,8 @@ export function MeetingStudio({sessionId, rows, capabilities, onClose, onChanged
   return <section ref={studioRoot} data-focused-panel={layout==='assistant'&&(tab==='summary'||tab==='transcript')?'true':undefined} className={`meeting-studio${layout==='complete'?' meeting-studio-complete':''}`} aria-label={`Séance ${session.title}`} data-workspace-dirty={dirty || markdownDraft.pending ? 'true' : undefined}>
     <header className="meeting-studio-heading">
       <button type="button" className="meeting-studio-back" onClick={close} aria-label="Retour aux réunions">←</button>
-      <div className="meeting-studio-title"><h1 title={session.title}>{session.title}</h1><p>{session.date} · {sessionStateLabel(session)}</p></div>
+      <div className="meeting-studio-title"><h1 title={session.title}>{session.title}</h1><p><span>{title?.code||(session.project_id?"Projet associé":"À rattacher")}</span>
+        {" · "}<span>{session.date} · {sessionStateLabel(session)}</span></p></div>
       <nav className="meeting-view-actions" aria-label="Outils de la séance">
         <button type="button" aria-pressed={layout==='editor'} onClick={()=>setLayout('editor')}>Notes</button>
         <button type="button" aria-pressed={layout==='enhanced'||layout==='complete'} onClick={()=>setLayout(layout==='enhanced'?'editor':'enhanced')}>Notes enrichies</button>
@@ -427,7 +429,7 @@ export function MeetingStudio({sessionId, rows, capabilities, onClose, onChanged
       {session.kind==='note'&&session.state==='created'&&<button type="button" className="meeting-end-note" aria-label="Terminer la prise de notes"
         disabled={!!operation||dirty||markdownDraft.pending||captureBusy||nativeBusy||nativeRecoveryControls}
         onClick={transitions.finishNotes}>Terminer</button>}
-      <details ref={preparation} className="meeting-preparation" onKeyDown={event=>{if(event.key==='Escape'){event.preventDefault();event.stopPropagation();closePreparation();}}}>
+      <details data-dismiss-outside ref={preparation} className="meeting-preparation" onKeyDown={event=>{if(event.key==='Escape'){event.preventDefault();event.stopPropagation();closePreparation();}}}>
       <summary ref={preparationSummary} aria-label="Options de la réunion" title="Options de la réunion"><Glyph d={MORE} size={16}/></summary>
       <div className="meeting-studio-setup" role="region" aria-label="Commandes et état de la séance" tabIndex={0}>
       {navigation}
@@ -435,7 +437,7 @@ export function MeetingStudio({sessionId, rows, capabilities, onClose, onChanged
       <button type="button" className="meeting-preparation-close" onClick={closePreparation}>Fermer la préparation</button>
     <div className="meeting-studio-controls">
       <label>Disposition<select value={layout} onChange={event => setLayout(event.target.value as typeof layout)}>
-        <option value="editor">Notes · pleine page</option><option value="enhanced">Notes personnelles et enrichies</option><option value="assistant">Notes et assistant</option>
+        <option value="editor">Notes · pleine page</option><option value="enhanced">Notes de séance et enrichissements</option><option value="assistant">Notes et assistant</option>
         <option value="complete">Notes, enrichissement et assistant</option></select></label>
       {!session.project_id && <><label>Projet de la séance<select aria-label="Projet de la séance" value={project} onChange={event => setProject(event.target.value)}>
         <option value="">À choisir</option>{rows.map(row => <option key={row.id} value={row.id}>{row.code} — {row.title}</option>)}</select></label>
@@ -444,10 +446,10 @@ export function MeetingStudio({sessionId, rows, capabilities, onClose, onChanged
       <AsyncDownloadLink className="meeting-export" href={sessionExportUrl(sessionId)} activityLabel="Préparation de l’archive de la séance…" filename="seance-agent.zip">Exporter et récupérer la séance</AsyncDownloadLink>
     </div>
     <MeetingCalendarContext session={session} onChanged={accept}/>
-    <p className="meeting-capability" role="status">{capabilities.transcription.enabled === false ? 'Transcription en direct désactivée.'
+    <p className="meeting-capability" role="status">{directTranscription === false ? 'Transcription en direct désactivée.'
       : capabilities.transcription.live_ready ? 'Transcription en direct disponible.' : capabilities.transcription.live_operational
       ? 'Direct en essai, non qualifié. Relecture nécessaire.'
-      : capabilities.transcription.enabled === true && capabilities.transcription.installed === true
+      : directTranscription === true && capabilities.transcription.installed === true
       ? 'Direct activé en essai, non qualifié. Relecture nécessaire.' : 'Transcription en direct indisponible.'}
       {capabilities.transcription.batch_ready&&' Transcription de l’audio conservé disponible.'}
       {capabilities.transcription.detail&&` ${capabilities.transcription.detail}`}</p>
@@ -507,8 +509,8 @@ export function MeetingStudio({sessionId, rows, capabilities, onClose, onChanged
       </aside>}
     <div className={`meeting-studio-panes meeting-layout-${layout}`}>
       <div className="meeting-notes-stack" hidden={layout==='assistant'&&(tab==='summary'||tab==='transcript')}>
-      <section className="meeting-notes-pane" aria-label="Notes personnelles" tabIndex={0}>
-        <header className="meeting-document-heading"><h2 className="meeting-visually-hidden">Notes personnelles</h2>
+      <section className="meeting-notes-pane" aria-label="Notes de séance" tabIndex={0}>
+        <header className="meeting-document-heading"><h2 className="meeting-visually-hidden">Notes de séance</h2>
           <label className="meeting-note-title"><span className="meeting-visually-hidden">Titre de la note</span><input maxLength={255} value={noteTitle} readOnly={frozen} onChange={event => edit(content, event.target.value)} /></label>
           <span>{dirty ? 'Brouillon' : session.note_id ? `Version ${session.note_revision}` : 'À jour'}</span>
           <button className="meeting-save-note" type="button" disabled={!dirty || markdownDraft.pending || !noteTitle.trim() || !!operation || frozen || noteConflict || !validNoteContent(content)}
@@ -591,10 +593,10 @@ export function MeetingStudio({sessionId, rows, capabilities, onClose, onChanged
                 style={{width:'100%',maxWidth:'100%'}} onLoadedMetadata={event=>applyAudioSeek(event.currentTarget)} src={agentPath(sessionAudioUrl(sessionId, session.tracks.some(track => track.name === 'mic') ? 'mic' : 'system'))} />}
             {transcriptLive&&<div className="meeting-transcript-follow"><span>{transcriptFollow.following?transcriptFollowLabel:'Lecture des passages précédents'}</span>
               {!transcriptFollow.following&&<button type="button" onClick={transcriptFollow.returnToLive}>{directSuspended?'Voir les derniers passages':'Revenir au direct'}</button>}</div>}
-            <LiveTranscriptStatus session={session} enabled={capabilities.transcription.enabled}/>
+            <LiveTranscriptStatus session={session} enabled={directTranscription}/>
             {(session.transcription_admission?.recoverable_direct_chunks!==undefined
               ?session.transcription_admission.recoverable_direct_chunks>0:session.chunks?.some(chunk=>chunk.speech_status==='failed'||chunk.speech_status==='retained'))&&<button type="button"
-              disabled={!!operation||capabilities.transcription.enabled!==true||session.state==='cancelled'}
+              disabled={!!operation||directTranscription!==true||session.state==='cancelled'}
               onClick={transitions.retryTranscription}>Reprendre un lot de transcription</button>}
             {session.transcription_batch&&session.transcription_batch.state!=='idle'&&<div className="meeting-studio-notice" role="status" aria-label="État du traitement complet">
               <p>Traitement complet : {session.transcription_batch.completed_chunks} / {session.transcription_batch.selected_chunks} fragment(s) traités.

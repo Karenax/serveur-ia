@@ -5,11 +5,11 @@
   const personalPlaceholder = prompt.placeholder;
   const workspace = document.querySelector('[data-view="chat"]');
   const controls = wsElement('div', undefined, 'project-conversation-controls');
-  const toolbar = wsElement('div', undefined, 'project-conversation-switch');
+  const shellToolbar = workspace.querySelector('.conversation-toolbar');
   const region = wsElement('section', undefined, 'project-conversation-messages');
   region.setAttribute('aria-label', 'Conversation de projet');
   region.setAttribute('aria-live', 'polite');
-  const toggle = wsElement('button', 'Assistant de projet', 'secondary');
+  const toggle = $('project-conversation-toggle') || wsElement('button', 'Assistant de projet', 'secondary');
   const project = wsElement('select'), saved = wsElement('select');
   const temporary = wsElement('input'); temporary.type = 'checkbox'; temporary.checked = true;
   const includeEvidence = wsElement('input'); includeEvidence.type = 'checkbox'; includeEvidence.checked = true;
@@ -34,9 +34,13 @@
   recovery.append(prepareProject, retrySave, saveCopy, reopenSaved);
   controls.append(label('Projet ', project), newThread, label('Éphémère ', temporary),
     label('Historique de projet ', saved), options, status, recovery);
-  toolbar.append(toggle);
-  workspace.prepend(toolbar);
-  toolbar.after(controls);
+  if (shellToolbar) {
+    shellToolbar.after(controls);
+  } else {
+    const toolbar = wsElement('div', undefined, 'project-conversation-switch');
+    toolbar.append(toggle);
+    workspace.prepend(toolbar, controls);
+  }
   $('messages').after(region);
   let active = false, opening = false, pending = false, controller = null, thread = null;
   const fresh = ephemeral => ({ephemeral, id:null, revision:0, project:project.value, messages:[], draft:'', unsaved:false});
@@ -166,7 +170,8 @@
     controls.hidden = region.hidden = !active;
     toggle.setAttribute('aria-pressed', String(active));
     toggle.textContent = active ? 'Conversations personnelles' : 'Assistant de projet';
-    toggle.disabled = opening || pending || busy || (active && thread.unsaved);
+    const draftsPending = window.kiaraComposerDraftsReady?.() === false || !historyReady || historyBlocked;
+    toggle.disabled = (!active && !projectAssistantAvailable()) || draftsPending || opening || pending || busy || (active && thread.unsaved);
     if (!active) return;
     project.disabled = saved.disabled = temporary.disabled = includeEvidence.disabled = newThread.disabled = pending || thread.unsaved;
     retrySave.hidden = !thread.unsaved;
@@ -177,10 +182,10 @@
     prepareProject.hidden = !project.value.startsWith('erp:');
     prepareProject.disabled = pending || thread.unsaved;
     recovery.hidden = prepareProject.hidden && retrySave.hidden && saveCopy.hidden && reopenSaved.hidden;
-    $('send').disabled = pending || thread.unsaved || project.selectedIndex < 0 || !prepareProject.hidden;
+    $('send').disabled = draftsPending || pending || thread.unsaved || project.selectedIndex < 0 || !prepareProject.hidden;
     $('cancel').hidden = !controller;
     $('cancel').disabled = !controller;
-    prompt.readOnly = pending;
+    prompt.readOnly = draftsPending || pending;
   }
   const originalButtons = buttons;
   buttons = function() { originalButtons(); update(); };
@@ -245,15 +250,12 @@
   const projectChat = $('ws-project-chat');
   const openProjectChat = projectChat.onclick;
   projectChat.onclick = event => {
-    if (wsIsAgentProject(ws.project) && !toggle.hidden) {
+    if (wsIsAgentProject(ws.project) && projectAssistantAvailable()) {
       return wsTry(async () => { await wsFlush(); await open(ws.project); });
     }
     return openProjectChat.call(projectChat,event);
   };
-  const previousView = showView;
-  showView = function (name) {
-    if (name === 'chat' || leave()) return previousView(name);
-  };
+  onViewChange({before: name => name === 'chat' || leave()});
   for (const selector of ['#new', '#conversation-list', '#conversations', '#client-navigation', '.sidebar-settings']) {
     document.querySelector(selector)?.addEventListener('click', event => {
       if (!leave()) { event.preventDefault(); event.stopImmediatePropagation(); }
@@ -417,15 +419,19 @@
     requestedProject = projectFromHash();
     openRequestedProject();
   });
-  toggle.hidden = true;
+  if (!shellToolbar) toggle.hidden = true;
+  function projectAssistantAvailable() {
+    return ws.data?.project_catalogue?.state === 'ready';
+  }
   const previousDraw = wsDrawProjects;
   wsDrawProjects = function() {
     previousDraw();
-    toggle.hidden = ws.data?.project_catalogue?.state !== 'ready';
+    if (!shellToolbar) toggle.hidden = !projectAssistantAvailable();
+    update();
     openRequestedProject();
   };
   function openRequestedProject() {
-    if (requestedProject !== undefined && !active && !opening && !toggle.hidden && !conversationLocked()) {
+    if (requestedProject !== undefined && !active && !opening && projectAssistantAvailable() && !conversationLocked()) {
       const id = requestedProject;
       requestedProject = undefined;
       void openLinkedProject(id);

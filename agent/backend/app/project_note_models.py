@@ -4,6 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from .db import Base
 from .project_identity_models import now, uid
+from .project_note_schemas import NOTE_ATTACHMENT_BUDGET
 
 DIGEST = "length(sha256)=64 AND sha256 NOT GLOB '*[^0-9a-f]*'"
 
@@ -51,7 +52,7 @@ class NoteAttachment(Base):
     __table_args__ = (ForeignKeyConstraint(['project_id', 'note_id'], ['project_notes.project_id', 'project_notes.id'],
                                           deferrable=True, initially='DEFERRED'),
                      UniqueConstraint('storage_id'), UniqueConstraint('note_id', 'command_id'),
-                     CheckConstraint(DIGEST), CheckConstraint('size_bytes BETWEEN 1 AND 5242880'))
+                     CheckConstraint(DIGEST), CheckConstraint(f'size_bytes BETWEEN 1 AND {NOTE_ATTACHMENT_BUDGET}'))
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
     project_id: Mapped[str] = mapped_column(ForeignKey('projects.id'), index=True)
     note_id: Mapped[str] = mapped_column(String(36), index=True)

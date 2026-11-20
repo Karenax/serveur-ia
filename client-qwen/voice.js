@@ -1,3 +1,23 @@
+/* kiara-device:dictation:start */
+function dictationSettings(settingsStatus,act,locked,{embedded=false,android=false}={}){
+  const settings=document.createElement(embedded?'section':'details');
+  settings.className=embedded?'dictation-settings':'composer-options';settings.id='voice-dictation-settings';
+  const label=document.createElement('summary');label.textContent='Réglages de la dictée';
+  const description=document.createElement('p');description.textContent='Reconnaissance locale en français. Microphone fermé à la fin de la dictée. Aucun envoi automatique.';
+  const reinstall=document.createElement('button');reinstall.type='button';reinstall.className='secondary';reinstall.textContent='Installer / réparer';
+  const remove=document.createElement('button');remove.type='button';remove.className='secondary';remove.textContent='Désinstaller le modèle';
+  reinstall.onclick=()=>{if(locked())return;if(confirm('Télécharger et vérifier le modèle vocal local ?'))act('install');};
+  remove.onclick=()=>{if(locked())return;if(confirm('Supprimer le modèle vocal de cet appareil ?'+(!android?' Il sert à la dictée et à la conversation.':'')))act('remove');};
+  if(!embedded)settings.append(label);
+  settings.append(description,settingsStatus,reinstall,remove);
+  function render(value,busy){
+    const model=value.model||'Modèle français',size=value.model_bytes?'environ '+Math.ceil(value.model_bytes/1000000)+' Mo':'taille indiquée à l’installation';
+    description.textContent=model+' · français · '+size+'. Microphone fermé à la fin de la dictée. Aucun envoi automatique. Chaque dictée dure au maximum deux minutes.';
+    reinstall.disabled=busy;remove.disabled=busy||!value.installed;
+  }
+  return {settings,render};
+}
+/* kiara-device:dictation:end */
 /* Dictation only. Sending text remains the composer's explicit action. */
 (()=>{
   if(platformCapabilities.platform==='web')return;
@@ -9,6 +29,8 @@
   row.insertBefore(button,document.getElementById('send'));row.insertBefore(cancel,button.nextSibling);document.getElementById('composer').append(status);
   const phases=new Set(['installing','verifying','permission','loading','listening','finishing','cancelling']);
   let state={phase:'idle',installed:false},session='',draft='',dictating=false,polling=false,acting=false,closed=false;
+  const settingsStatus=wsElement('p',undefined,'muted');settingsStatus.setAttribute('role','status');
+  function announce(text){status.textContent=text;settingsStatus.textContent=text;}
   window.voiceBusy=false;
   async function transport(action){
     if(window.AndroidClient?.voiceStatus){const result=JSON.parse(action?AndroidClient.voiceAction(JSON.stringify(action)):AndroidClient.voiceStatus());if(result.error)throw new Error(result.error);return result;}
@@ -18,23 +40,39 @@
   function render(value){
     if(session&&value.session&&value.session!==session)return;
     state=value;const active=phases.has(value.phase),installing=['installing','verifying'].includes(value.phase);
-    const model=value.model||'Modèle français',size=value.model_bytes?'environ '+Math.ceil(value.model_bytes/1000000)+' Mo':'taille indiquée à l’installation';
-    description.textContent=model+' · français · '+size+'. Microphone fermé à la fin de la dictée. Aucun envoi automatique. Chaque dictée dure au maximum deux minutes.';
     if(dictating){
       if(value.phase==='cancelled'){prompt.value=draft;unlock();}
       else {if(typeof value.text==='string')prompt.value=draft+(draft&&value.text?'\n':'')+value.text;if(!active)unlock();}
       prompt.dispatchEvent(new Event('input',{bubbles:true}));
     }
     const amount=value.downloaded_bytes&&value.model_bytes?' '+Math.floor(100*value.downloaded_bytes/value.model_bytes)+' %':'';
-    status.textContent=(value.message||'Dictée locale · français')+amount+(value.phase==='listening'?' · '+(value.seconds||0)+' s · texte provisoire':'');
+    announce((value.message||(value.installed?'Modèle installé':'Modèle à installer'))+amount+(value.phase==='listening'?' · '+(value.seconds||0)+' s · texte provisoire':''));
     const actionLabel=value.phase==='listening'?'Terminer la dictée':installing?'Installation…':['loading','permission'].includes(value.phase)?'Chargement…':value.phase==='finishing'?'Finalisation…':value.installed?'Dicter':'Installer la dictée';
     button.setAttribute('aria-label',actionLabel);button.title=actionLabel+' · dictée locale en français';button.setAttribute('aria-pressed',String(value.phase==='listening'));
     const locked=typeof conversationLocked==='function'&&conversationLocked();
     button.disabled=acting||(active&&value.phase!=='listening')||(!active&&locked);
     cancel.hidden=!active;cancel.disabled=acting||value.phase==='cancelling';
+    dictation.render(value,acting||active);
   }
-  async function refresh(){if(polling||acting||closed)return;polling=true;try{render(await transport());}catch(e){status.textContent=e.message;/* Keep the composer locked until the native session's end is confirmed. */}finally{polling=false;}}
-  async function act(action){if(acting)return;acting=true;button.disabled=cancel.disabled=true;try{const value=await transport({action,...(['stop','cancel'].includes(action)?{session}: {})});if(action==='start'||action==='install')session=value.session||'';render(value);}catch(e){status.textContent=e.message;if(action==='start')unlock();}finally{acting=false;render(state);}}
+  async function refresh(){if(polling||acting||closed)return;polling=true;try{render(await transport());}catch(e){announce(e.message);/* Keep the composer locked until the native session's end is confirmed. */}finally{polling=false;}}
+  async function act(action){
+    if(acting)return;
+    acting=true;
+    button.disabled=cancel.disabled=true;
+    let failure='';
+    try{
+      const value=await transport({action,...(['stop','cancel'].includes(action)?{session}:{})});
+      if(action==='start'||action==='install')session=value.session||'';
+      render(value);
+    }catch(error){
+      failure=error.message;
+      if(action==='start')unlock();
+    }finally{
+      acting=false;
+      render(state);
+      if(failure)announce(failure);
+    }
+  }
   button.onclick=async()=>{
     if(state.phase==='listening'){await act('stop');return;}
     if(phases.has(state.phase)||acting||(typeof conversationLocked==='function'&&conversationLocked()))return;
@@ -42,14 +80,17 @@
     draft=prompt.value;dictating=true;window.voiceBusy=true;if(typeof buttons==='function')buttons();if(typeof drawLibrary==='function')drawLibrary();await act('start');
   };
   cancel.onclick=()=>act('cancel');
-  const settings=document.createElement('details');settings.className='composer-options';settings.id='voice-dictation-settings';
-  const label=document.createElement('summary');label.textContent='Réglages de la dictée';
-  const description=document.createElement('p');description.textContent='Reconnaissance locale en français. Microphone fermé à la fin de la dictée. Aucun envoi automatique.';
-  const reinstall=document.createElement('button');reinstall.type='button';reinstall.className='secondary';reinstall.textContent='Installer / réparer';
-  const remove=document.createElement('button');remove.type='button';remove.className='secondary';remove.textContent='Désinstaller le modèle';
-  reinstall.onclick=()=>{if(phases.has(state.phase)||acting)return;if(confirm('Télécharger et vérifier le modèle vocal local ?'))act('install');};
-  remove.onclick=()=>{if(phases.has(state.phase)||acting)return;if(confirm('Supprimer le modèle vocal de cet appareil ?'+(!window.AndroidClient?' Il sert à la dictée et à la conversation.':'')))act('remove');};
-  settings.append(label,description,reinstall,remove);(document.getElementById('composerOptionsMenu')||document.querySelector('.composer-bottom')).append(settings);
+  const dictation=dictationSettings(settingsStatus,act,()=>phases.has(state.phase)||acting,{android:!!window.AndroidClient});
+  const {settings}=dictation;
+  if(platformCapabilities.platform==='windows'){
+    const open=wsElement('a','Réglages de la dictée','secondary');
+    open.href='#reglages-dictee';
+    open.onclick=event=>uiOpenWorkspaceSetting(event,'dictee');
+    const host=document.getElementById('composerOptionsMenu')||document.querySelector('.composer-bottom');
+    host.append(open);
+    settings.classList.add('dictation-panel');
+  }
+  (document.getElementById('composerOptionsMenu')||document.querySelector('.composer-bottom')).append(settings);
   window.voiceFinishForClose=async()=>{if(!dictating)return;if(['listening','loading','permission'].includes(state.phase))await act('stop');const deadline=Date.now()+120000;while(phases.has(state.phase)){if(Date.now()>deadline)throw new Error('La dictée se termine encore. Réessayez de fermer après la finalisation.');await new Promise(r=>setTimeout(r,250));await refresh();}};
   document.addEventListener('visibilitychange',()=>{if(document.hidden&&dictating&&state.phase==='listening')act('stop');else if(!document.hidden)refresh();});
   window.addEventListener('pagehide',()=>{closed=true;if(phases.has(state.phase)&&session){if(window.AndroidClient?.voiceAction)AndroidClient.voiceAction(JSON.stringify({action:'cancel',session}));else fetch('/client/voice',{method:'POST',headers:{Authorization:'Bearer '+config.key,'Content-Type':'application/json'},body:JSON.stringify({action:'cancel',session}),keepalive:true}).catch(()=>{});}});

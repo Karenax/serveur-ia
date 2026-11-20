@@ -58,6 +58,21 @@ class LocalKeyPreservationTests(unittest.TestCase):
                 with self.assertRaises(ValueError):operation()
             self.assertEqual(self.path.read_bytes(),b'corrupt')
 
+    def test_preference_write_preserves_malformed_existing_drafts(self):
+        invalid = [[], {'conversation_drafts': 'invalide'},
+                   {'conversation_drafts': {'conversation': None}},
+                   {'corrector_text': None}, {'corrector_text': 'x' * 100001}]
+        for preferences in invalid:
+            for changes in ({'theme': 'dark'},
+                            {'theme': 'dark', 'corrector_text': 'nouvelle saisie', 'conversation_drafts': {}}):
+                with self.subTest(preferences_type=type(preferences).__name__, changes=changes):
+                    original = json.dumps({'preferences': preferences, 'future': 'conserver'}).encode()
+                    self.path.write_bytes(original)
+                    with patch.object(client, 'protect', side_effect=self.clear):
+                        with self.assertRaises(client.LocalSettingsUnreadable):
+                            client.save_preferences({}, changes)
+                    self.assertEqual(self.path.read_bytes(), original)
+
     @unittest.skipUnless(os.name == 'nt', 'Liaison Thunderbird Windows.')
     def test_thunderbird_does_not_package_or_update_unreadable_settings(self):
         import thunderbird_integration

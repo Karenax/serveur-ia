@@ -22,7 +22,7 @@ from .project_identity import _project
 from .project_note_binary import MAX_BYTES, IMAGE_TYPES, image, content_type
 from .project_note_binary import MAX_PIXELS as MAX_PIXELS, DOWNLOAD_TYPES as DOWNLOAD_TYPES
 
-MAX_TOTAL_BYTES = 25 * 1024 * 1024
+MAX_TOTAL_BYTES = MAX_BYTES
 
 
 def _command_id(value):
@@ -42,7 +42,7 @@ def _bounded_bytes(stream):
         chunks.append(chunk)
         total += len(chunk)
         if total > MAX_BYTES:
-            raise HTTPException(413, 'Pièce jointe de 5 Mio maximum requise')
+            raise HTTPException(413, 'Cette pièce jointe dépasse le quota total de la note (25 Mio)')
     if not total:
         raise HTTPException(422, 'La pièce jointe est vide')
     return b''.join(chunks)
@@ -153,7 +153,7 @@ def download(db, project_id, note_id, attachment_id, *, inline=False):
         with path.open('rb') as stream:
             before = os.fstat(stream.fileno())
             if not stat.S_ISREG(before.st_mode) or before.st_size > MAX_BYTES:
-                raise HTTPException(409, 'Pièce jointe régulière de 5 Mio maximum requise')
+                raise HTTPException(409, 'Fichier de pièce jointe non valide')
             data = stream.read(MAX_BYTES + 1)
             after = os.fstat(stream.fileno())
         if ((before.st_size, before.st_mtime_ns, before.st_ino) !=

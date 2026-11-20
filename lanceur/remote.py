@@ -18,7 +18,7 @@ import struct
 import threading
 import time
 from devices import Revocations, fields as device_fields
-from scheduler import Scheduler
+from scheduler import BackgroundBudgetReached, Scheduler
 from text_transform import CancellableResponse, TextTransforms, transform_request
 from voice_web import VoiceWeb, CAPABILITIES as VOICE_WEB_CAPABILITIES
 from voice_web_plan import plan as plan_voice_web
@@ -874,10 +874,16 @@ def serve_gateway(store, backend, port=GATEWAY_PORT, *, agent_web_origin=None, b
                     return self.respond(503,{'error':{'message':'Comptage du contexte indisponible.'}})
                 finally:counter.close()
             try:
-                item = scheduler.submit(self.identity,direct_request or self.headers.get('X-Qwen-Request') or None)
+                priority = self.headers.get('X-Kiara-Inference-Priority') if self.internal_agent else None
+                item = scheduler.submit(self.identity, direct_request or self.headers.get('X-Qwen-Request') or None,
+                                        background=priority in ('background', 'project-analysis'),
+                                        budgeted=priority == 'project-analysis')
                 if text_transform or voice_conversation:
                     with scheduler.condition:item['voice_conversation' if voice_conversation else 'text_transform']=True
                     if store.text_transforms.cancelled(self.identity,item['id']):scheduler.cancel(self.identity,item['id'])
+            except BackgroundBudgetReached as error:
+                return self.respond(429, {'error': {'code': 'background_budget', 'message': str(error),
+                                                    'retry_after_seconds': error.retry_after}})
             except ValueError as error:
                 return self.respond(429, {'error': {'message': str(error)}})
             connection = None

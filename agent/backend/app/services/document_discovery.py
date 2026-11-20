@@ -127,15 +127,24 @@ def _version(filename):
 
 def discover(db, project_id, *, link_id, document_id, rule=None, policy=None,
              limits=None, cancelled=None, on_progress=None):
+    _project(db, project_id)
+    rule = default_rule(document_id) if rule is None else rule
+    if not isinstance(rule, SearchRule) or rule.document_id != document_id:
+        raise HTTPException(422, 'Règle de découverte incompatible avec la trame')
+    return discover_many(db, project_id, link_id=link_id, rules=[rule], policy=policy,
+                         limits=limits, cancelled=cancelled, on_progress=on_progress)['items'][0]
+
+
+def discover_many(db, project_id, *, link_id, rules, output_names=None, policy=None,
+                  limits=None, cancelled=None, on_progress=None):
+    """Evaluate every active rule in one bounded enumeration of the project link."""
     _project(db, project_id)  # No path, configuration or rule probe before authorization.
     link = db.query(NetworkLink).filter_by(project_id=project_id, id=link_id).first()
     if link is None:
         raise HTTPException(404, 'Lien documentaire introuvable dans ce projet')
     original_link = link.chemin
-    rule = default_rule(document_id) if rule is None else rule
-    if not isinstance(rule, SearchRule) or rule.document_id != document_id:
-        raise HTTPException(422, 'Règle de découverte incompatible avec la trame')
-    spec = document_spec(document_id)
+    output_names = output_names or {}
+    formats = {rule.document_id: '.' + document_spec(rule.document_id)['format'].casefold() for rule in rules}
     limits = ScanLimits() if limits is None else limits
     if not isinstance(limits, ScanLimits):
         raise HTTPException(422, 'Limites de découverte serveur requises')
@@ -148,11 +157,14 @@ def discover(db, project_id, *, link_id, document_id, rule=None, policy=None,
     if not allowed:
         raise HTTPException(403, 'Lien du projet hors des racines documentaires autorisées')
     started = time.monotonic()
-    paths = [tuple(files._relative(value).split('/')) if value != '.' else () for value in rule.relative_paths]
+    paths = {rule.document_id: [tuple(files._relative(value).split('/')) if value != '.' else ()
+                                for value in rule.relative_paths] for rule in rules}
     counts = {'entries': 0, 'files': 0, 'directories': 0}
     skips = {key: 0 for key in ('reparse', 'unrelated_directory', 'excluded', 'input_directory',
                               'depth', 'oversized', 'empty', 'unsafe_name', 'wrong_format', 'name_or_folder')}
-    candidates, bounds, observations = [], set(), []
+    candidates = {rule.document_id: [] for rule in rules}
+    existing = {rule.document_id: [] for rule in rules}
+    bounds, observations = set(), []
     status = 'completed'
 
     def stop():
@@ -170,26 +182,38 @@ def discover(db, project_id, *, link_id, document_id, rule=None, policy=None,
     def notify():
         if on_progress:
             on_progress({'phase': 'discovery', 'examined': dict(counts), 'total': None,
-                         'candidates': len(candidates), 'elapsed_seconds': round(time.monotonic() - started, 2)})
+                         'candidates': sum(map(len, candidates.values())),
+                         'elapsed_seconds': round(time.monotonic() - started, 2)})
 
     def consider(path, metadata, root, *, direct=False):
         relative = '' if direct else path.relative_to(root).as_posix()
         folders = [*configured.parts, *path.relative_to(root).parts[:-1]] if not direct else []
+        searched = path.name if direct else root.name + '/' + relative
+        for rule in rules:
+            consider_rule(rule, path, metadata, relative, folders, searched, direct)
+
+    def consider_rule(rule, path, metadata, relative, folders, searched, direct):
+        document_id = rule.document_id
+        if path.suffix.casefold() != formats[document_id]:
+            skips['wrong_format'] += 1
+            return
+        if any(phrase(searched, value) for value in rule.excluded_tokens):
+            skips['excluded'] += 1
+            return
+        matched_paths = [] if direct else [rule.relative_paths[i] for i, expected in enumerate(paths[document_id])
+                                          if _progress(folders, expected) == len(expected)]
+        output_name = output_names.get(document_id)
+        if output_name and path.name.casefold() == output_name.casefold() and (direct or matched_paths):
+            existing[document_id].append({'filename': path.name, 'relative_path': relative})
+            if len(existing[document_id]) >= limits.candidates:
+                bounds.add('candidates')
+            return
         if metadata.st_size > MAX_SOURCE_BYTES:
             skips['oversized'] += 1
             return
         if not metadata.st_size:
             skips['empty'] += 1
             return
-        if path.suffix.casefold() != '.' + spec['format'].casefold():
-            skips['wrong_format'] += 1
-            return
-        searched = path.name if direct else root.name + '/' + relative
-        if any(phrase(searched, value) for value in rule.excluded_tokens):
-            skips['excluded'] += 1
-            return
-        matched_paths = [] if direct else [rule.relative_paths[i] for i, expected in enumerate(paths)
-                                          if _progress(folders, expected) == len(expected)]
         matched_names = [value for value in rule.filename_patterns if phrase(path.stem, value)]
         if (not direct and not matched_paths) or not matched_names:
             skips['name_or_folder'] += 1
@@ -197,12 +221,28 @@ def discover(db, project_id, *, link_id, document_id, rule=None, policy=None,
         version, origin = _version(path.name)
         score = (-(abs(version - rule.preferred_version)) if rule.preferred_version is not None and version is not None
                  else version if rule.preferred_version is None and version is not None else -1000)
-        candidates.append({'relative_path': relative, 'filename': path.name, 'size_bytes': metadata.st_size,
+        candidates[document_id].append({'relative_path': relative, 'filename': path.name, 'size_bytes': metadata.st_size,
             'modified_ns': metadata.st_mtime_ns, 'matched_paths': matched_paths, 'matched_patterns': matched_names,
             'version': version, 'version_origin': origin, 'rank': score, 'direct_file_link': direct,
             'requires_preview': True})
-        if len(candidates) >= limits.candidates:
+        if len(candidates[document_id]) >= limits.candidates:
             bounds.add('candidates')
+
+    def directory_status(root, relative):
+        name = relative.name
+        folders = [*configured.parts, *relative.parts]
+        searched = root.name + '/' + relative.as_posix()
+        available = [rule for rule in rules if not any(phrase(searched, value) for value in rule.excluded_tokens)]
+        if not available:
+            return 'excluded'
+        words = fold(name).split()
+        if ((any(word.startswith('donnee') for word in words) and any(word.startswith('entree') for word in words))
+                or phrase(name, 'data input')):
+            return 'input_directory'
+        if not any(not expected or _progress(folders, expected)
+                   for rule in available for expected in paths[rule.document_id]):
+            return 'unrelated_directory'
+        return None
 
     try:
         root = configured.resolve(strict=True)
@@ -242,16 +282,9 @@ def discover(db, project_id, *, link_id, document_id, rule=None, policy=None,
                                 skips['reparse'] += 1
                                 continue
                             if stat.S_ISDIR(observed_entry.st_mode):
-                                relative = path.relative_to(root)
-                                folders = [*configured.parts, *relative.parts]
-                                if any(phrase(root.name + '/' + relative.as_posix(), value) for value in rule.excluded_tokens):
-                                    skips['excluded'] += 1
-                                elif ((any(word.startswith('donnee') for word in fold(entry.name).split())
-                                       and any(word.startswith('entree') for word in fold(entry.name).split()))
-                                      or phrase(entry.name, 'data input')):
-                                    skips['input_directory'] += 1
-                                elif not any(not expected or _progress(folders, expected) for expected in paths):
-                                    skips['unrelated_directory'] += 1
+                                reason = directory_status(root, path.relative_to(root))
+                                if reason:
+                                    skips[reason] += 1
                                 elif depth >= limits.depth:
                                     skips['depth'] += 1
                                     bounds.add('depth')
@@ -303,12 +336,22 @@ def discover(db, project_id, *, link_id, document_id, rule=None, policy=None,
         raise HTTPException(409, 'Découverte indisponible : vérifier le lien et relancer') from exc
     if bounds and status != 'cancelled':
         status = 'limited'
-    candidates.sort(key=lambda item: (-item['rank'], item['relative_path'].casefold(), item['relative_path']))
-    tied = len(candidates) > 1 and candidates[0]['rank'] == candidates[1]['rank']
-    rule_data = asdict(rule)
-    return {'project_id': project_id, 'link_id': link_id, 'document_id': document_id,
-        'rule': rule_data, 'rule_sha256': hashlib.sha256(json.dumps(rule_data, sort_keys=True, ensure_ascii=False).encode()).hexdigest(),
+    result = {'project_id': project_id, 'link_id': link_id,
         'status': status, 'examined': counts, 'total': None, 'limits': asdict(limits), 'bounds': sorted(bounds),
-        'skipped': skips, 'candidates': candidates, 'ambiguous': tied or status != 'completed',
-        'recommended_path': candidates[0]['relative_path'] if candidates and not tied and status == 'completed' else None,
+        'skipped': skips,
         'elapsed_seconds': round(time.monotonic() - started, 2), 'read_only': True, 'requires_manual_choice': True}
+    items = []
+    for rule in rules:
+        matches = sorted(candidates[rule.document_id],
+                         key=lambda item: (-item['rank'], item['relative_path'].casefold(), item['relative_path']))
+        finals = sorted(existing[rule.document_id], key=lambda item: item['relative_path'].casefold())
+        tied = len(matches) > 1 and matches[0]['rank'] == matches[1]['rank']
+        rule_data = asdict(rule)
+        rule_sha = hashlib.sha256(json.dumps(rule_data, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+        item = {**result, 'document_id': rule.document_id, 'rule': rule_data, 'rule_sha256': rule_sha,
+                'candidates': matches, 'ambiguous': tied or status != 'completed',
+                'recommended_path': matches[0]['relative_path'] if matches and not tied and status == 'completed' else None}
+        if rule.document_id in output_names:
+            item['existing_files'] = finals
+        items.append(item)
+    return {**result, 'items': items}

@@ -58,6 +58,155 @@ def run():
     return service.process_next(idle_seconds=0)
 
 
+def make_due(project):
+    with Erp() as db:
+        db.get(ProjectKnowledgeAnalysis, project["id"]).next_due = service.now() - timedelta(seconds=1)
+        db.commit()
+
+
+def test_due_legacy_report_with_exact_inputs_is_reused(project, monkeypatch):
+    kid = knowledge(project)
+    monkeypatch.setattr(service, "analyse", lambda *args: answer(project, kid))
+    assert run()
+    with Erp() as db:
+        job = db.get(ProjectKnowledgeAnalysis, project["id"])
+        completed = job.completed_at
+        old = {key: value for key, value in job.report.items() if key != "_baseline"}
+        job.report = old
+        db.commit()
+    make_due(project)
+    monkeypatch.setattr(service, "analyse", lambda *args: pytest.fail("The inputs are identical"))
+    assert run()
+    with Erp() as db:
+        job = db.get(ProjectKnowledgeAnalysis, project["id"])
+        assert job.completed_at == completed and job.next_due > service.now()
+        assert job.report["_baseline"]["knowledge"].keys() == {kid}
+        assert {key: value for key, value in job.report.items() if key != "_baseline"} == old
+        assert "_baseline" not in service.describe(db, project["id"])["report"]
+
+
+def test_new_information_keeps_other_proof_and_sends_only_new_text(project, monkeypatch):
+    old = knowledge(project)
+    monkeypatch.setattr(service, "analyse", lambda *args: answer(project, old))
+    assert run()
+    new = knowledge(project, "Essai de contrôle prévu le lendemain.")
+    make_due(project)
+    calls = []
+
+    def analyse(cfg, passages, targets, dates):
+        calls.append(([row["id"] for row in passages], [row["id"] for row in targets], dates))
+        return {"findings": [], "dates": [], "highlights": []}
+
+    monkeypatch.setattr(service, "analyse", analyse)
+    assert run()
+    assert calls == [([new], [project["target"]], True)]
+    with Erp() as db:
+        job = db.get(ProjectKnowledgeAnalysis, project["id"])
+        assert job.report["findings"][0]["proofs"][0]["knowledge_id"] == old
+        assert job.report["knowledge_count"] == 2
+
+
+def test_legacy_full_rerun_switches_to_exactly_recovered_delta(project, monkeypatch):
+    original = knowledge(project, "Texte des justificatifs " * 700)
+    empty = {"findings": [], "dates": [], "highlights": []}
+    monkeypatch.setattr(service, "analyse", lambda *args: empty)
+    while run():
+        pass
+    new = knowledge(project, "Nouveau compte rendu de réception.")
+    make_due(project)
+    with Erp() as db:
+        job = db.get(ProjectKnowledgeAnalysis, project["id"])
+        job.report = {key: value for key, value in job.report.items() if key != "_baseline"}
+        from backend.app.routers.cdc import brain_ai_settings
+        job.snapshot = service.configured_snapshot(db, project["id"], brain_ai_settings())
+        job.working, job.cursor, job.status = empty, 1, "running"
+        assert len(service.pending_batches(job.snapshot)) > 2
+        db.commit()
+
+    def analyse(cfg, passages, targets, dates):
+        assert [row["id"] for row in passages] == [new]
+        return empty
+
+    monkeypatch.setattr(service, "analyse", analyse)
+    assert run()
+    with Erp() as db:
+        job = db.get(ProjectKnowledgeAnalysis, project["id"])
+        assert job.status == "completed" and job.report["_baseline"]["knowledge"].keys() == {original, new}
+
+
+def test_removed_proof_rechecks_only_affected_requirements(project, monkeypatch):
+    removed = knowledge(project)
+    retained = knowledge(project, "Réception de l’outillage prévue en atelier.")
+    with Erp() as db:
+        other = CdcItem(project_id=project["id"], kind="requirement", title="Transport", source_quote="Transport")
+        db.add(other)
+        db.commit()
+        other_id = other.id
+    monkeypatch.setattr(service, "analyse", lambda *args: answer(project, removed))
+    assert run()
+    make_due(project)
+    with Brain() as db:
+        db.get(KnowledgeItem, removed).status = "invalidated"
+        db.commit()
+
+    def analyse(cfg, passages, targets, dates):
+        assert [row["id"] for row in passages] == [retained]
+        assert [row["id"] for row in targets] == [project["target"]]
+        assert not dates
+        return {"findings": [], "dates": [], "highlights": []}
+
+    monkeypatch.setattr(service, "analyse", analyse)
+    assert run()
+    with Erp() as db:
+        job = db.get(ProjectKnowledgeAnalysis, project["id"])
+        assert {row["id"] for row in job.report["findings"]} == {project["target"], other_id}
+        assert all(not row["proofs"] for row in job.report["findings"])
+
+
+def test_budget_deferral_persists_lot_and_retry(project, monkeypatch):
+    knowledge(project, "Long texte " * 800)
+    calls = []
+
+    def analyse(cfg, passages, targets, dates):
+        calls.append(passages)
+        if len(calls) == 2:
+            raise llm_activity.Deferred("Quota", retry_after_seconds=120)
+        return {"findings": [], "dates": [], "highlights": []}
+
+    monkeypatch.setattr(service, "analyse", analyse)
+    assert run()
+    assert not run()
+    with Erp() as db:
+        job = db.get(ProjectKnowledgeAnalysis, project["id"])
+        assert job.status == "waiting_idle" and job.cursor == 1 and not job.error
+        assert job.retry_after > service.now() + timedelta(seconds=100)
+        job.retry_after = service.now() - timedelta(seconds=1)
+        db.commit()
+    assert run()
+    assert calls[1] == calls[2] and calls[0] != calls[1]
+
+
+def test_managed_gateway_budget_response_is_a_deferral(monkeypatch):
+    import io
+    from urllib.error import HTTPError
+    from app.services import ai_client
+
+    gateway = "http://127.0.0.1:8768"
+    monkeypatch.setenv("AGENT_KIARA_INFERENCE_URL", gateway)
+
+    def urlopen(request, timeout):
+        assert request.get_header("X-kiara-inference-priority") == "project-analysis"
+        body = b'{"error":{"code":"background_budget","retry_after_seconds":45}}'
+        raise HTTPError(request.full_url, 429, "Quota", {}, io.BytesIO(body))
+
+    monkeypatch.setattr(ai_client.urllib.request, "urlopen", urlopen)
+    with llm_activity.idle(0) as available:
+        assert available
+        with pytest.raises(llm_activity.Deferred) as caught:
+            ai_client._post_json(gateway + "/v1/chat/completions", {})
+    assert caught.value.retry_after_seconds == 45
+
+
 def test_completed_analysis_48h_and_canonical_data_unchanged(project, monkeypatch):
     kid = knowledge(project)
     monkeypatch.setattr(service, "analyse", lambda *args: answer(project, kid))

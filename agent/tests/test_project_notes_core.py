@@ -13,14 +13,17 @@ import pytest
 from sqlalchemy import create_engine, inspect, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.schema import CreateTable
 
 from app.db_support import backup_sqlite, configure_sqlite
 from backend.app.db import Base
 from backend.app.models import Project
 from backend.app.project_note_models import NOTE_TABLES, NoteVersion, ProjectNote, NoteAttachment
+from backend.app.personal_note_models import PersonalNote, PersonalNoteImage
 from backend.app.project_note_schemas import NoteContent, NoteCreate, NoteSave, NoteRestore, content_text
 from backend.app.services import project_notes as notes
 from backend.app.services.project_note_schema import install_note_schema, validate_note_schema, note_triggers
+from backend.app.services.project_note_schema_rules import SEQUENCE_TRIGGER, legacy_attachment_sql, legacy_sequence_sql
 from backend.app.services.project_operator import Operator, operator_context
 
 
@@ -98,6 +101,44 @@ def test_backup_before_ddl_exact_old_cells_second_install_neutral(store):
         assert before.execute('SELECT * FROM projects').fetchall() == after.execute('SELECT * FROM projects').fetchall()
         assert after.execute('PRAGMA integrity_check').fetchone()[0] == 'ok'
         assert not after.execute('PRAGMA foreign_key_check').fetchall()
+
+
+def test_attachment_upgrade_preserves_old_rows_and_accepts_more_than_five_mib(store, tmp_path, monkeypatch):
+    import io
+    from backend.app.services import project_note_files
+
+    engine, factory, ids, path = store
+    monkeypatch.setattr(project_note_files, 'APP_DIR', tmp_path)
+    with engine.begin() as db:
+        for table in (*NOTE_TABLES, PersonalNote.__table__, PersonalNoteImage.__table__):
+            db.exec_driver_sql(legacy_attachment_sql(str(CreateTable(table).compile(dialect=engine.dialect))))
+            for index in table.indexes:
+                index.create(db)
+        for name, trigger in note_triggers().items():
+            db.exec_driver_sql(legacy_sequence_sql(trigger) if name == SEQUENCE_TRIGGER else trigger)
+    response, _ = created(store)
+    note = response['note']
+    with factory() as db:
+        old = project_note_files.upload(db, ids[0], note['id'], command_id=command(), filename='ancien.txt', stream=io.BytesIO(b'original'))
+        db.commit()
+    captures = []
+    def backup():
+        captures.append(True)
+        backup_sqlite(path, path.with_suffix('.before.db'))
+    plan = install_note_schema(engine, backup=backup)
+    assert set(plan['upgrades']) == {'project_note_attachments', 'personal_note_images', SEQUENCE_TRIGGER}
+    assert captures == [True]
+    assert not validate_note_schema(engine).get('upgrades')
+    with factory() as db:
+        size = 6 * 1024 * 1024
+        result = project_note_files.upload(db, ids[0], note['id'], command_id=command(), filename='grand.txt', stream=io.BytesIO(b'x' * size))
+        assert result['attachment']['size_bytes'] == size
+        retained = project_note_files.download(db, ids[0], note['id'], old['attachment']['id'])
+        assert retained[0] == b'original'
+        db.commit()
+    with sqlite3.connect(path) as db:
+        assert db.execute('PRAGMA integrity_check').fetchone()[0] == 'ok'
+        assert not db.execute('PRAGMA foreign_key_check').fetchall()
 
 
 def test_backup_failure_and_incompatible_schema_precede_any_ddl(store):

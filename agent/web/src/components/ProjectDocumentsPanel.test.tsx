@@ -59,6 +59,27 @@ const discovered:DocumentDiscovery={project_id:'p1',link_id:'l1',document_id:'ce
 async function search(){fireEvent.click(screen.getByRole('button',{name:'Rechercher les trames dans ce lien'}));
   return screen.findByRole('region',{name:'Trames trouvées dans le lien projet'});}
 
+it('ouvre le fichier existant du dossier affaire et garde les corrections du formulaire',async()=>{
+  const existing='05 Études/04 Notice/AIRB26LTH0205-A-Notice.docm';
+  vi.mocked(documentApi.workspace).mockResolvedValue({...state,search_preferences:{available:true,revision:0,version_id:null,items:[]}});
+  vi.spyOn(documentApi,'draft').mockImplementation(async (_projectId,id)=>{
+    const overrides:Record<string,string>=id==='user_manual'?{description:'Description enregistrée'}:{};
+    return {available:true,revision:0,version_id:null,link_id:null,relative_path:'',selected_link:null,warnings:[],overrides};
+  });
+  vi.spyOn(documentApi,'discoverFolder').mockResolvedValue({
+    ...discovered,items:[{...discovered,document_id:'user_manual',candidates:[],recommended_path:null,
+      missing_fields:[],existing_files:[{filename:'AIRB26LTH0205-A-Notice.docm',relative_path:existing}]}],
+  });
+  render(<ProjectDocumentsPanel projectId="p1"/>);
+  await screen.findByText('Version enregistrée : 0');
+  fireEvent.click(screen.getByRole('button',{name:'Rechercher les documents'}));
+  const results=await screen.findByRole('region',{name:'Documents trouvés dans le dossier'});
+  fireEvent.click(within(results).getByRole('button',{name:/Partir du fichier existant/}));
+  await waitFor(()=>expect(screen.getByDisplayValue('Description enregistrée')).toBeTruthy());
+  expect(screen.getByDisplayValue(existing)).toBeTruthy();
+  expect(documentApi.discoverFolder).toHaveBeenCalledWith('p1','l1',expect.any(AbortSignal));
+});
+
 it('montre les correspondances sans choisir automatiquement et impose un nouvel aperçu après le choix',async()=>{
   render(<ProjectDocumentsPanel projectId="p1"/>);await inspect();confirm();fireEvent.click(screen.getByRole('button',{name:'Préparer la copie'}));
   await screen.findByRole('link',{name:/Télécharger AIRB26/});const results=await search();

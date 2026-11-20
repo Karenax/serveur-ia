@@ -14,6 +14,7 @@ export function FusionInsights({rows,active=true,initialTab='stats'}:{rows:Portf
   const [settings,setSettings]=useState<FusionSettings|null>(null),[draft,setDraft]=useState<Pick<FusionSettings,'enabled'|'live_transcription_enabled'|'live_speech_device'|'proactive_enabled'|'auto_enhancement_enabled'|'mode'|'onboarding_complete'>|null>(null);
   const [loading,setLoading]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState(''),[busy,setBusy]=useState(false),[tick,setTick]=useState(0);
   const brain=rows.find(row=>row.id===project)?.brain_project_id||undefined;
+  const canEdit=settings?.can_edit!==false;
   useEffect(()=>{
     if(!active)return;const controller=new AbortController();setLoading(true);setError('');
     void Promise.allSettled([fusionInsights.stats(brain,controller.signal),fusionInsights.settings(controller.signal)]).then(([value,result])=>{
@@ -25,7 +26,7 @@ export function FusionInsights({rows,active=true,initialTab='stats'}:{rows:Portf
     return()=>controller.abort();
   },[active,brain,tick]);
   const save=async(complete=false)=>{
-    if(!draft||busy)return;
+    if(!draft||!canEdit||busy)return;
     const capture=meetingCapture.getSnapshot();
     if(!draft.enabled&&(capture.pending>0||['starting','recording','paused','stopping','pending'].includes(capture.phase))){
       setNotice('');
@@ -84,8 +85,9 @@ export function FusionInsights({rows,active=true,initialTab='stats'}:{rows:Portf
         <li><h2>4. Répondre et enrichir les notes</h2><p>{settings.capabilities.assistant?.ready?'Assistance configurée ; validez une question réelle.':'La génération doit être vérifiée sur une question réelle.'}</p>
           <p>Les propositions conservent leurs sources ; leur acceptation enregistre une nouvelle version de note.</p></li>
       </ol>
-      <FusionReadiness active={active} refreshKey={tick}/>
-      <form className="fusion-settings-form" onSubmit={event=>{event.preventDefault();void save();}}>
+      {!canEdit&&<p role="status">Vous pouvez consulter les réglages communs des réunions. Le propriétaire de Kiara peut les modifier.</p>}
+      <form onSubmit={event=>{event.preventDefault();void save();}}>
+        <fieldset className="fusion-settings-form" disabled={!canEdit} aria-label="Réglages communs des réunions">
         <label className="fusion-check"><input type="checkbox" checked={draft.enabled} disabled={busy} onChange={event=>setDraft({...draft,enabled:event.target.checked})}/>Activer l’espace de séance</label>
         <label className="fusion-check"><input type="checkbox" checked={draft.live_transcription_enabled??false} disabled={busy} onChange={event=>setDraft({...draft,live_transcription_enabled:event.target.checked})}/>Autoriser la transcription directe en essai</label>
         <p className="fusion-meta">Ce réglage distinct autorise le traitement des fragments enregistrés. Il ne démarre pas le microphone. Le texte direct reste provisoire et doit être relu ; activer l’essai ne qualifie ni sa qualité ni sa latence.</p>
@@ -101,10 +103,15 @@ export function FusionInsights({rows,active=true,initialTab='stats'}:{rows:Portf
         <p className="fusion-meta">L’enrichissement attend au moins huit secondes de stabilité de la dernière note et des segments enregistrés. Vos modifications non enregistrées ne participent pas à l’analyse. Chaque ajout proposé attend votre acceptation.</p>
         <label>Exécution des nouveaux traitements<select value={draft.mode} disabled={busy} onChange={event=>setDraft({...draft,mode:event.target.value as FusionSettings['mode']})}>
           <option value="network">Serveur du réseau</option><option value="local">Entièrement sur ce PC</option></select></label>
-        <p className="fusion-meta">Le mode choisi conserve l’ancien fonds documentaire. Les états ci-dessus indiquent ce qui est disponible ; le mode local doit fonctionner sans réseau pour chaque moteur.</p>
-        <div><button type="submit" disabled={busy}>{busy?'Enregistrement…':'Enregistrer les réglages'}</button>
-          <button type="button" disabled={busy} onClick={()=>void save(true)}>{settings.onboarding_complete?'Préparation déjà enregistrée':'Terminer la préparation'}</button></div>
+        <p className="fusion-meta">Le mode choisi conserve l’ancien fonds documentaire. Le diagnostic indique ce qui est disponible ; le mode local doit fonctionner sans réseau pour chaque moteur.</p>
+        {canEdit&&<div><button type="submit" disabled={busy}>{busy?'Enregistrement…':'Enregistrer les réglages'}</button>
+          <button type="button" disabled={busy} onClick={()=>void save(true)}>{settings.onboarding_complete?'Préparation déjà enregistrée':'Terminer la préparation'}</button></div>}
+        </fieldset>
       </form>
+      {canEdit&&<details className="progressive-options">
+        <summary>Diagnostic des moteurs</summary>
+        <FusionReadiness active={active} refreshKey={tick}/>
+      </details>}
     </>}
     </div>
   </section>;

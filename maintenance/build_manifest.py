@@ -31,7 +31,8 @@ COMPONENT_DIRS={
 WEB_CONVERSATION_SOURCES = tuple('client-qwen/' + name for name in (
     'chat.html', 'workspace.html', 'ui.css', 'ui.js', 'attachments.js', 'corrector.js', 'selection.js',
     'thinking.js', 'voice.js', 'conversation.js', 'project-conversation.js', 'web_conversations.js',
-    'markdown.js', 'vendor/markdown-it.min.js',
+    'markdown.js', 'vendor/markdown-it.min.js', 'kiara-shell.html', 'notification-settings-panel.js',
+    'help.html', 'help.css', 'help.mjs', 'help.d.mts',
 ))
 SUFFIXES={'.py','.js','.cjs','.html','.css','.ps1','.cmd','.go','.mod','.sum','.java','.gradle','.xml','.toml','.properties','.cpp','.h','.cmake','.json','.rs','.nsh'}
 AGENT_SUFFIXES={'.ts','.tsx','.mjs','.svg','.md','.yml','.yaml','.in','.ico','.png','.po'}
@@ -63,7 +64,9 @@ def source_names(component, web_dist=None):
         path=ROOT/name
         if not name or not path.is_file():continue
         if component == 'server' and name == 'agent/scripts/agent_runtime.py':continue
-        is_windows_input = component == 'windows' and name in {'client-tauri/Cargo.lock', 'client-qwen/kiara-relay.spec'}
+        is_windows_input = component == 'windows' and name in {
+            'client-tauri/Cargo.lock', 'client-qwen/kiara-relay.spec', 'client-qwen/help.mjs',
+        }
         if not is_windows_input and path.suffix.lower() not in SUFFIXES and not (path.suffix=='.txt' and (path.name.startswith('requirements') or path.name=='product-version.txt')):
             if not (component=='server' and name.startswith('agent/') and path.suffix.lower() in AGENT_SUFFIXES):continue
         if path.name.startswith(('test_','preview_','verify_','validate_')) or any(part in {'tests','__pycache__','node_modules'} for part in path.parts):continue

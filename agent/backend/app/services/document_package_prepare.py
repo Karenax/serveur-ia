@@ -1,6 +1,6 @@
 """Prepare an independent OOXML copy in memory after a fresh preview.
 
-Only mapped text targets change. All other ZIP entry payloads, VBA code,
+Only mapped targets and affected calculation metadata change. VBA code,
 bookmarks, namespaces and unrelated XML bytes are retained. Never writes files.
 """
 import hashlib
@@ -10,7 +10,7 @@ from xml.parsers import expat
 from xml.sax.saxutils import escape
 import zipfile
 
-from .document_package_preview import MAX_ENTRY_BYTES, MAX_SOURCE_BYTES, MAX_TOTAL_BYTES, S, W, _Package, _coordinates, _xml, preview_package
+from .document_package_preview import CT, P, R, MAX_ENTRY_BYTES, MAX_SOURCE_BYTES, MAX_TOTAL_BYTES, S, W, _Package, _coordinates, _xml, preview_package
 
 
 def _tag_end(data, start):
@@ -197,17 +197,18 @@ def _spreadsheet(data, report):
 
 def _word(data, report):
     spans = _spans(data)
-    starts = {item['attrs'][W + '}name']: item for item in spans if item['name'] == W + '}bookmarkStart'}
+    starts = [item for item in spans if item['name'] == W + '}bookmarkStart']
     ends = {item['attrs'][W + '}id']: item for item in spans if item['name'] == W + '}bookmarkEnd'}
+    values = {target['target']: target['proposed_value'] for target in report['targets'] if target['available']}
     edits = []
-    for target in report['targets']:
-        if not target['available']:
-            continue  # Equivalent bookmark alias may be absent, never invent it.
-        start = starts[target['target']]
+    for start in starts:
+        name = start['attrs'][W + '}name']
+        if name not in values:
+            continue
         end = ends[start['attrs'][W + '}id']]
         texts = [item for item in spans if item['name'] == W + '}t'
                  and start['end'] <= item['start'] < item['end'] <= end['start']]
-        value = escape(target['proposed_value']).replace('\r', '&#13;').encode('utf-8')
+        value = escape(values[name]).replace('\r', '&#13;').encode('utf-8')
         if texts:
             for index, item in enumerate(texts):
                 content = value if index == 0 else b''
@@ -226,6 +227,35 @@ def _word(data, report):
     return _patch(data, edits)
 
 
+def _invalidate_calc_chain(package):
+    """Drop Excel's optional cached formula order when mapped formulas become text."""
+    rel_part, types_part = 'xl/_rels/workbook.xml.rels', '[Content_Types].xml'
+    rel_data = package.read(rel_part)
+    matches = [node for node in _spans(rel_data) if node['name'] == P + '}Relationship'
+               and node['attrs'].get('Type') == R + '/calcChain']
+    if not matches:
+        return {}
+    if len(matches) != 1:
+        raise ValueError('Chaîne de calcul Excel ambiguë')
+    relation = matches[0]
+    name = relation['attrs'].get('Target', '')
+    part = name.lstrip('/') if name.startswith('/') else 'xl/' + name
+    if (relation['attrs'].get('TargetMode') == 'External' or part not in package.names
+            or not part.startswith('xl/') or not part.endswith('.xml')
+            or '..' in part.split('/') or '\\' in part or part in {'xl/workbook.xml', rel_part}
+            or package.xml(part).tag != f'{{{S}}}calcChain'):
+        raise ValueError('Chaîne de calcul Excel invalide')
+    types_data = package.read(types_part)
+    types = [node for node in _spans(types_data) if node['name'] == CT + '}Override'
+             and node['attrs'].get('PartName') == '/' + part]
+    if (len(types) != 1 or types[0]['attrs'].get('ContentType')
+            != 'application/vnd.openxmlformats-officedocument.spreadsheetml.calcChain+xml'):
+        raise ValueError('Type de chaîne de calcul Excel invalide')
+    return {rel_part: _patch(rel_data, [(relation['start'], relation['end'], b'')]),
+            types_part: _patch(types_data, [(types[0]['start'], types[0]['end'], b'')]),
+            part: None}
+
+
 def prepare_package(source, document_id, values, *, expected_sha256):
     """Return new bytes, never overwrite input; expected hash binds to the preview."""
     if not isinstance(expected_sha256, str) or not re.fullmatch(r'[0-9a-f]{64}', expected_sha256):
@@ -239,12 +269,17 @@ def prepare_package(source, document_id, values, *, expected_sha256):
     try:
         old = package.read(report['part'])
         filled = (_spreadsheet if report['format'] in {'XLSX', 'XLSM'} else _word)(old, report)
+        changes = {report['part']: filled} if filled != old else {}
+        if any(target.get('replaces_placeholder') for target in report['targets']):
+            changes.update(_invalidate_calc_chain(package))
         output = BytesIO()
         total = 0
         with zipfile.ZipFile(output, 'w') as target:
             target.comment = package.archive.comment
             for entry in package.archive.infolist():
-                payload = filled if entry.filename == report['part'] else package.read(entry.filename)
+                payload = changes[entry.filename] if entry.filename in changes else package.read(entry.filename)
+                if payload is None:
+                    continue
                 total += len(payload)
                 if total > MAX_TOTAL_BYTES:
                     raise ValueError('Copie Office préparée trop volumineuse')
@@ -258,7 +293,7 @@ def prepare_package(source, document_id, values, *, expected_sha256):
                                              for item in verified['targets']):
             raise ValueError('Vérification des cibles préparées échouée')
         return result, {**report, 'output_sha256': hashlib.sha256(result).hexdigest(),
-                        'output_size_bytes': len(result), 'changed_parts': [report['part']] if filled != old else [],
+                        'output_size_bytes': len(result), 'changed_parts': list(changes),
                         'read_only': False, 'prepared_in_memory': True}
     finally:
         package.archive.close()

@@ -37,19 +37,24 @@ Installer les prérequis système (Ubuntu 24.04) :
 sudo apt install python3 python3-venv python3-tk gnome-keyring pulseaudio-utils gstreamer1.0-pulseaudio libegl1 libopengl0 libxcb-cursor0 libnss3 libasound2t64 libgtk-3-0 libwebkit2gtk-4.1-0
 ```
 
-Télécharger **l’archive complète Tauri** du client Linux. Le paquet de recette
-se nomme `Kiara-linux-amd64-4.0.9-tauri.tar.gz`.
+Télécharger **l’archive complète Tauri** du client Linux. Adapter le nom dans
+l’exemple à la version téléchargée.
 Le dossier `client-linux` du dépôt contient les sources de l’installateur :
 le copier seul ne permet pas d’installer l’application.
 
-Depuis le dossier contenant l’archive téléchargée, extraire le paquet dans un
-emplacement que vous conserverez, puis ouvrir son dossier :
+Depuis le dossier contenant l’archive téléchargée, créer un dossier séparé
+pour cette version puis l’installer. Si le dossier existe déjà, reprendre la
+commande depuis un autre dossier de destination pour éviter d’écraser une version.
 
 ```sh
-tar -xzf Kiara-linux-amd64-4.0.9-tauri.tar.gz
-cd Kiara-linux-amd64
-python3 installer.py
-./start-tauri.sh
+archive=Kiara-linux-amd64-4.0.12-tauri.tar.gz
+destination="$HOME/.local/opt/kiara/${archive%.tar.gz}"
+mkdir -p "$HOME/.local/opt/kiara" &&
+  mkdir "$destination" &&
+  tar -xzf "$archive" -C "$destination" &&
+  cd "$destination/Kiara-linux-amd64" &&
+  python3 installer.py &&
+  ./start-tauri.sh
 ```
 
 Le raccourci `./start.sh` ouvre aussi le client Tauri. Le profil, le trousseau
@@ -126,12 +131,12 @@ ce dossier **et le trousseau**. Une clé perdue n’est jamais remplacée quand 
 données chiffrées existent. Les conversations synchronisées restent sur le serveur ;
 l’import n’emporte pas les brouillons locaux du PC Windows.
 
-Pour une mise à jour, fermer Kiara, extraire le nouveau paquet dans un autre
-dossier puis relancer son installateur. Le raccourci pointera vers cette version ;
-les données personnelles sont conservées séparément. Conserver l’ancien dossier
-pour revenir à la version précédente. Pour désinstaller, supprimer le raccourci
-`~/.local/share/applications/kiara.desktop` et le dossier de l’application ;
-ne supprimer les données personnelles qu’après sauvegarde.
+Pour une mise à jour, fermer Kiara et suivre la procédure d’installation avec
+la nouvelle archive. Le raccourci est remplacé une fois l’installation réussie.
+Garder le dossier de données personnelles et le trousseau de la session pour
+retrouver les brouillons après la mise à jour.
+Pour désinstaller, supprimer le raccourci `${XDG_DATA_HOME:-~/.local/share}/applications/kiara.desktop`
+et le dossier de l’application. Sauvegarder les données personnelles avant de les supprimer.
 
 ## Construire et vérifier
 
@@ -140,6 +145,14 @@ Depuis la racine du dépôt, avec le Python de construction :
 ```powershell
 & '.\toolchain\build-python\Scripts\python.exe' maintenance/package_linux_client.py --tauri-binary '<binaire-Linux>' --tauri-version '<version>'
 ```
+
+Le binaire Tauri Linux doit être reconstruit depuis les sources avec la version demandée dans sa configuration Tauri. Le constructeur vérifie le marqueur de version intégré au binaire et refuse les anciens binaires sans ce marqueur ou dont la version diffère ; ce contrôle ne remplace pas une signature.
+
+`requirements.txt` décrit les dépendances directes. L'installateur utilise
+`requirements.lock` : versions directes et transitives fixées et empreintes
+SHA-256 des paquets binaires exigées par pip. Pour les mettre à jour, régénérer
+le verrou depuis les dépendances directes, puis contrôler les paquets et les
+installations pour Python 3.12 et 3.13, sur AMD64 et ARM64, avant publication.
 
 Le constructeur utilise le Go épinglé de `wireguard-toolchain.json`, vérifie les
 modules et compile le bridge pour Linux avec CGO désactivé. `--architecture arm64`

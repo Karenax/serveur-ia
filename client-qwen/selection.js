@@ -53,4 +53,4 @@ for(const event of ['selectionchange','select','keyup','mouseup','focusin'])docu
 document.addEventListener('mousedown',e=>{if(!selectionMenu.contains(e.target))selectionClose();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')selectionClose();if((e.ctrlKey||e.metaKey)&&!e.altKey&&!e.shiftKey&&e.key.toLowerCase()==='c'){const text=selectionRead();if(text){e.preventDefault();selectionWrite(text);}}});
 document.addEventListener('scroll',selectionClose,true);window.addEventListener('resize',selectionClose);
-const selectionOriginalShowView=showView;showView=function(name){selectionClose();selectionText='';selectionCopy.disabled=true;selectionCopy.hidden=true;selectionOriginalShowView(name);};
+onViewChange({before(){selectionClose();selectionText='';selectionCopy.disabled=true;selectionCopy.hidden=true;}});

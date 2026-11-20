@@ -12,7 +12,8 @@ CLIENT_MODULES = ('client','linux_support','linux_system_audio','fred_http','pro
                   'portal_migration_plan','portal_migration_job','portal_migration_windows','portal_migration_coordinator',
                   'portal_migration_state','relay_control_stream','draft_store','history_sync','history_migrations',
                   'chat_attachments','opencode_visibility','advanced_voice','max_installation','local_voice','conversation_service')
-CLIENT_ASSETS = ('chat.html','workspace.html','ui.css','ui.js','markdown.js','attachments.js','corrector.js',
+CLIENT_ASSETS = ('chat.html','kiara-shell.html','workspace.html','ui.css','ui.js','markdown.js','attachments.js','corrector.js',
+                 'help.html','help.css','help.mjs',
                  'selection.js','thinking.js','voice.js','conversation.js','project-conversation.js','linux_features.js',
                  'fred-icon.png','LICENSE.txt','THIRD-PARTY.txt','portal_origin_inventory.js','portal_origin_recovery.js',
                  'portal_origin_scan.html','portal_origin_scan.js','portal_origin_transfer.html','portal_origin_transfer.js',
@@ -21,7 +22,7 @@ CLIENT_ASSETS = ('chat.html','workspace.html','ui.css','ui.js','markdown.js','at
                  'portal_conflict_library.js','portal_conflict_library.css','portal_audio_conflict_archive.js',
                  'portal_audio_conflict_review.js','portal_audio_conflict_library.js','portal_origin_manifest.js')
 REQUIRED_FILES = frozenset({
-    'kiara', 'kiara-relay', 'start-tauri.sh', 'start.sh', 'installer.py', 'linux_launch.py', 'requirements.txt', 'README.md',
+    'kiara', 'kiara-relay', 'start-tauri.sh', 'start.sh', 'installer.py', 'linux_launch.py', 'requirements.txt', 'requirements.lock', 'README.md',
     'client/wireguard-bridge', 'client/screen_capture.py', 'client/recovery_init.js',
     'client/vendor/markdown-it.min.js', 'client/vendor/markdown-it-LICENSE.txt', 'client/vendor/README.txt',
     *(f'client/{name}.py' for name in CLIENT_MODULES), *(f'client/{name}' for name in CLIENT_ASSETS),
@@ -32,7 +33,7 @@ REQUIRED_FILES = frozenset({
       ('manifest.json','encoder.onnx','decoder.onnx','joiner.onnx','tokens.txt','keywords.txt',
        'KOTLIN-APACHE-2.0.txt','ONNXRUNTIME-MIT.txt','SHERPA-APACHE-2.0.txt')),
     *(f'shared/kiara_shared/{name}.py' for name in
-      ('__init__','agent_auth','agent_http','agent_workers','attachments','file_lock','history_store','http','http_download',
+      ('__init__','agent_auth','agent_http','agent_workers','attachments','conversation_shell','file_lock','history_store','http','http_download',
        'profiles','releases','request_ids','thunderbird','thunderbird_package','version','voice_packs','voice_runtime')),
 })
 

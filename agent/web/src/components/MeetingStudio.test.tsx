@@ -1035,7 +1035,7 @@ it('montre notes et enrichissement dans le même groupe gauche avec l’assistan
   const enhance=vi.spyOn(meetingSessions,'enhance'),ask=vi.spyOn(meetingSessions,'ask'),save=vi.spyOn(meetingSessions,'saveNote');
   setup();await screen.findByDisplayValue('Réserve : 55 mm à confirmer');
   fireEvent.change(screen.getByLabelText('Disposition'),{target:{value:'complete'}});
-  const notes=screen.getByRole('region',{name:'Notes personnelles'}),enriched=screen.getByRole('region',{name:'Notes enrichies'}),assistant=screen.getByRole('region',{name:'Assistant de la séance'});
+  const notes=screen.getByRole('region',{name:'Notes de séance'}),enriched=screen.getByRole('region',{name:'Notes enrichies'}),assistant=screen.getByRole('region',{name:'Assistant de la séance'});
   expect(notes.parentElement).toBe(enriched.parentElement);
   expect(notes.parentElement?.classList.contains('meeting-notes-stack')).toBe(true);
   expect(notes.parentElement?.parentElement).toBe(assistant.parentElement);
@@ -1150,7 +1150,7 @@ it('garde les commandes secondaires montées dans Préparation et les alertes vi
     expect(screen.getByRole('alert')).toBe(alert);expect(alert.closest('.meeting-preparation')).toBeNull();expect(alert.closest('[hidden]')).toBeNull();expect(screen.getByTestId('note-editor')).toBe(editor);
   }
   expect(commands.getAttribute('tabindex')).toBe('0');
-  expect(screen.getByRole('region',{name:'Notes personnelles'}).getAttribute('tabindex')).toBe('0');
+  expect(screen.getByRole('region',{name:'Notes de séance'}).getAttribute('tabindex')).toBe('0');
   expect(screen.getByRole('region',{name:'Notes enrichies'}).getAttribute('tabindex')).toBe('0');
   expect(screen.getByRole('tabpanel').getAttribute('tabindex')).toBe('0');
   expect(screen.getAllByTestId('note-editor')).toHaveLength(1);

@@ -16,10 +16,11 @@ import warnings
 
 from PIL import Image, UnidentifiedImageError
 
+from ..project_note_schemas import NOTE_ATTACHMENT_BUDGET
 from .project_note_conversion import convert_tiptap
 
 MAX_HTML_BYTES = DOCUMENT_IMPORT_BYTES
-MAX_IMAGE_BYTES = 5 * 1024 * 1024
+MAX_IMAGE_BYTES = NOTE_ATTACHMENT_BUDGET
 MAX_IMAGE_PIXELS = 16_000_000
 VOID = {'br', 'img', 'input'}
 LISTS = {'ul', 'ol'}

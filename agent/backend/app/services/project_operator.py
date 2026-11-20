@@ -71,8 +71,12 @@ def require_project_access(project_id: str, *, write=False) -> Operator:
     return operator
 
 
+def can_manage_references(operator: Operator) -> bool:
+    return operator.role == "owner" and operator.project_ids is None
+
+
 def require_reference_write() -> Operator:
     operator = current_operator()
-    if operator.role != "owner" or operator.project_ids is not None:
+    if not can_manage_references(operator):
         raise HTTPException(403, "Administration des référentiels réservée à l'opérateur propriétaire")
     return operator

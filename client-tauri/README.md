@@ -1,8 +1,7 @@
 # Client Windows Kiara 4
 
-La version publiée est **4.0.11**. Elle utilise le manifeste Ed25519 du canal
-Kiara et un installateur sans Authenticode. La version **4.0.10** reste disponible
-pour le retour arrière. [Bascule et preuves](../audits/2026-11-15-fusion-kiara/BASCULE.md#audit-des-réglages-de-kiara-4011)
+La version Windows publiée est indiquée par `DESKTOP_INSTALLER_VERSION` dans [le catalogue des versions](../lanceur/releases.py). Elle utilise le manifeste Ed25519 du canal
+Kiara et un installateur sans Authenticode. [Publication et preuves](../audits/2026-11-16-architecture-interface/AVANCEMENT.md#publication-windows-et-portail-4012)
 
 Dans le client classique 3.5.62, ouvrir **Mises à jour** et installer la
 3.5.63. Dans cette dernière, cliquer sur **Passer à Kiara 4**. Le client
@@ -104,9 +103,29 @@ dans le dépôt sur D: avec les paramètres par défaut.
   -TauriCli '.\toolchain\TauriCLI-2.12.2\cargo-tauri.exe'
 ```
 
-Pour construire le paquet de distribution en mode release, fournir `-Version`
-avec la version Windows et `-AgentCapture`. Le paquet utilise le nom **Kiara**
-et l’identifiant `fr.kiara.desktop`. Pour le signer, fournir `-SigningTool`
+Pour construire un candidat en mode release, fournir `-Version` et
+`-AgentCapture`. Le paquet utilise le nom **Kiara** et l’identifiant
+`fr.kiara.desktop`, comme le client installé. Exemple avec un relais et un
+composant WASAPI déjà compilés, depuis une copie de recette du dépôt :
+
+```powershell
+.\client-tauri\Build-Installer.ps1 `
+  -Version 4.0.12 `
+  -Relay (Join-Path $dist 'kiara-relay.exe') `
+  -AgentCapture (Join-Path $captureDist 'kiara-agent-capture.exe') `
+  -TauriCli (Join-Path $tools 'TauriCLI-2.12.2\cargo-tauri.exe') `
+  -ToolsRoot $tools -WorkRoot $work
+```
+
+`$dist` et `$captureDist` désignent les dossiers des deux exécutables, `$tools`
+le dossier `toolchain` du dépôt principal et `$work` un dossier de construction
+de recette sur D:. Pour tester la mise à jour
+de la 4.0.11 vers la 4.0.12, utiliser un environnement Windows isolé avec son
+propre compte et un profil fictif. Le contrôle des exécutables extraits avec DPAPI natif
+et les essais d’installateurs sous Wine sont consignés dans le
+[suivi de l’audit](../audits/2026-11-16-architecture-interface/AVANCEMENT.md).
+
+Pour signer le candidat avec Authenticode, fournir `-SigningTool`
 avec le chemin de l’outil de signature, `-SigningArguments` avec ses arguments
 et `-SignerThumbprint` avec l’empreinte du certificat de l’éditeur.
 Le script ajoute le chemin de chaque binaire en dernier argument. Configurer les

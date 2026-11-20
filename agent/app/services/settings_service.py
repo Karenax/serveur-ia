@@ -7,6 +7,8 @@ from ..config import settings
 from .ai_client import DEFAULTS as AI_DEFAULTS
 from .mail_ingest import DEFAULT_WATCH_DIR
 
+MEETING_PREFERENCES_PREFIX = 'meet:'
+
 DEFAULTS = {
     "ai": {**AI_DEFAULTS},
     "mail": {"source": "thunderbird", "thunderbird_folder_ids": None,
@@ -23,7 +25,7 @@ DEFAULTS = {
 def get_all(db: Session) -> dict:
     out = {k: dict(v) for k, v in DEFAULTS.items()}
     for row in db.query(AppSetting).all():
-        if row.key.startswith("thunderbird_"):
+        if row.key.startswith(("thunderbird_", MEETING_PREFERENCES_PREFIX)):
             continue
         out[row.key] = row.value
     out["ai"] = public_ai(get_section(db, 'ai') if os.environ.get('AGENT_KIARA_INFERENCE_URL') else out["ai"])

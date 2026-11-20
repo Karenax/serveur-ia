@@ -72,7 +72,7 @@ it('protège une fiche ouverte directement sur les réunions',async()=>{
   let check!:()=>boolean;
   const register=vi.fn((_id:string,probe:()=>boolean)=>{check=probe;return()=>{};});
   render(<ProjectWindow {...props} initialTab="reviews" registerCache={register}/>);
-  await screen.findByRole('tab',{name:'Réunions et audio'});
+  await screen.findByRole('tab',{name:'Comptes rendus et audio'});
   expect(check()).toBe(false);
 });
 
@@ -82,7 +82,7 @@ it('garde une fiche protégée après avoir quitté une rubrique métier',async(
   const view=render(<ProjectWindow {...props} initialTab="pilotage" registerCache={register}/>);
   await screen.findByText('Aucune tâche planifiée à traiter.');expect(check()).toBe(true);
   view.rerender(<ProjectWindow {...props} initialTab="reviews" registerCache={register}/>);
-  await screen.findByRole('tab',{name:'Réunions et audio'});expect(check()).toBe(false);
+  await screen.findByRole('tab',{name:'Comptes rendus et audio'});expect(check()).toBe(false);
   view.rerender(<ProjectWindow {...props} initialTab="pilotage" registerCache={register}/>);
   expect(check()).toBe(false);
 });
@@ -146,7 +146,7 @@ it('ne coupe pas le microphone si le projet disparaît temporairement du portefe
   Object.defineProperty(fakeNavigator,'mediaDevices',{value:{getUserMedia:vi.fn().mockResolvedValue({getTracks:()=>[{stop:release}]})}});
   vi.stubGlobal('navigator',fakeNavigator);vi.stubGlobal('MediaRecorder',FakeRecorder);
   const view=render(<ProjectWindow {...props} initialTab="reviews" active/>);
-  fireEvent.click(await screen.findByRole('tab',{name:'Réunions et audio'}));
+  fireEvent.click(await screen.findByRole('tab',{name:'Comptes rendus et audio'}));
   fireEvent.click(await screen.findByRole('button',{name:'Enregistrer au microphone'}));
   await screen.findByRole('button',{name:'Arrêter l’enregistrement'});
   view.rerender(<ProjectWindow {...props} row={undefined} initialTab="reviews" active/>);

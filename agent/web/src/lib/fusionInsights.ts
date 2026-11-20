@@ -6,7 +6,8 @@ export type FusionStats={sources:{total:number;by_type:Record<string,number>;ext
   assistant:{answers:number;stale:number;enhancements:number;p50_seconds:number|null;p95_seconds:number|null;tokens:number|null;token_complete_answers?:number;token_partial_answers?:number;token_unmeasured_answers?:number;token_total_answers?:number;useful_answers?:number|null;evaluated_answers?:number;unhelpful_answers?:number;measured_latency_samples?:number};
   engines:{speech:Record<string,unknown>;generation:GenerationReadiness};
   index:{text_passages:number|null;profiles:unknown[]|number;size_bytes:number};formulas:Record<string,string>};
-export type FusionSettings={enabled:boolean;live_transcription_enabled?:boolean;live_speech_device?:'cpu'|'cuda';speech_acceleration?:{selected:'cpu'|'cuda'|null;cuda_available:boolean;environment_override:boolean;detail:string;selection_starts_model:false};proactive_enabled:boolean;auto_enhancement_enabled?:boolean;mode:'network'|'local';onboarding_complete:boolean;capabilities:SessionCapabilities};
+export type MeetingPreferences={live_transcription_enabled:boolean;proactive_enabled:boolean;auto_enhancement_enabled:boolean;mode:'network'|'local'};
+export type FusionSettings={can_edit?:boolean;enabled:boolean;live_transcription_enabled?:boolean;live_speech_device?:'cpu'|'cuda';speech_acceleration?:{selected:'cpu'|'cuda'|null;cuda_available:boolean;environment_override:boolean;detail:string;selection_starts_model:false};proactive_enabled:boolean;auto_enhancement_enabled?:boolean;mode:'network'|'local';onboarding_complete:boolean;capabilities:SessionCapabilities};
 export type GenerationReadiness={placement:string;configured:boolean;model?:string;provider?:string;detail?:string;
   inventory?:{reachable:boolean;installed:boolean|null;loaded:boolean|null;announced?:boolean;checked_at:string;detail:string}|null;
   test?:{ok:boolean;reply_received:boolean;checked_at:string;detail:string;elapsed_seconds:number}|null};
@@ -14,6 +15,9 @@ export type FusionReadinessState={mode:'network'|'local';capture:{durable:boolea
   transcription:{batch:Record<string,unknown>;direct:Record<string,unknown>};embeddings:{network:{model?:string;detail:string}};
   generation:GenerationReadiness;resources:{available_ram_bytes:number|null;total_ram_bytes:number|null;free_disk_bytes:number|null};offline:{qualified:boolean;detail:string}};
 export const fusionInsights={
+  personal:(signal?:AbortSignal)=>request<MeetingPreferences>('/api/v1/workspace/fusion-settings/personal',{signal}),
+  savePersonal:(settings:MeetingPreferences)=>request<MeetingPreferences>('/api/v1/workspace/fusion-settings/personal',
+    {method:'PUT',body:JSON.stringify(settings)}),
   stats:(projectId?:string,signal?:AbortSignal)=>request<FusionStats>(`/api/v1/workspace/fusion-stats${projectId?`?project_id=${encodeURIComponent(projectId)}`:''}`,{signal}),
   settings:(signal?:AbortSignal)=>request<FusionSettings>('/api/v1/workspace/fusion-settings',{signal}),
   readiness:(signal?:AbortSignal)=>request<FusionReadinessState>('/api/v1/workspace/fusion-settings/readiness',{signal}),

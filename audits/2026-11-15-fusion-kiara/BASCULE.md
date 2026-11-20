@@ -1,5 +1,97 @@
 # Bascule de Kiara et retour arrière
 
+## Livraison Kiara 4.0.22
+
+Le 20 novembre 2026 à 11 h 20, la vérification en production a retrouvé les
+11 projets et le nouvel écran Documents sur le portail privé. Elle a confirmé
+la recherche groupée, les huit types actifs et la vue en lecture seule.
+Depuis un client 4.0.21, le canal HTTPS a proposé la 4.0.22. Le contrôle a
+vérifié la signature Ed25519 du manifeste et le téléchargement complet de
+l’installateur.
+
+Les preuves `production-verifiee.json` et `canal-client-verifie.json`, ainsi
+que les fichiers conservés pour le retour à la 4.0.21, se trouvent dans
+`D:\KRecette\publication-documents-422`.
+
+## Livraison Kiara 4.0.16
+
+Conversations adopte la navigation Kiara dès la réponse du portail privé
+ou du relais Windows authentifié. Les préférences d’apparence sont reprises
+dès le début du chargement et l’état des brouillons partage la ligne de
+l’historique sous le composeur.
+
+La recette a retardé l’historique et le catalogue en 720p, 1080p et 1440p.
+La largeur de la barre et la position du composeur visible sont restées
+stables en clair et en sombre. L’installateur a passé la recette WebView2
+et sa signature de manifeste a été vérifiée. Les preuves sont conservées
+sous D:\KRecette\conversations-416 avec la procédure de retour à la 4.0.15.
+
+## Livraison Kiara 4.0.15
+
+Le correctif serveur de la 4.0.15 permet à chaque compte d’enregistrer ses
+préférences de réunion et ses critères pour les huit trames documentaires.
+Les traitements suivent le créateur de la séance. Les recherches de trames
+et leur historique suivent le compte qui lance la recherche. Les critères
+communs servent de point de départ aux comptes sans version personnelle.
+Le propriétaire conserve les réglages des moteurs et les critères communs
+dans les sections d’administration. Les preuves du déploiement et les recettes
+sont dans D:\KRecette\preferences-personnelles-415.
+
+Le 18 novembre 2026, la navigation des réglages a été harmonisée sur le
+portail privé et sous Windows. Les 17 entrées Windows et les 14 entrées
+du portail conservent le menu à gauche. Les formulaires pris en charge
+apparaissent à droite. Les boutons Précédent et Suivant restaurent la
+rubrique sélectionnée.
+
+Les parcours ont été vérifiés avec des données fictives en 720p, 1080p
+et 1440p, avec l’installateur candidat pour WebView2. Le téléchargement
+signé, les deux accès HTTPS et les 11 projets ont été contrôlés en
+production. Le moteur d’inférence a conservé son processus.
+
+Les preuves et le script de retour à la 4.0.14 sont conservés sous
+D:\KRecette\publication-415. Le retour complet du portail comprend
+l’index compilé et la restauration du code du panneau côté serveur.
+
+## Livraison Kiara 4.0.14
+
+Le 18 novembre 2026, le canal Windows et le portail privé ont reçu la
+navigation principale de 216 px et l’ouverture directe des réglages de
+l’appareil et du compte. Le bouton de retour ramène à l’espace de travail.
+
+Le portail et l’installateur Windows ont passé la recette à 720p, 1080p et
+1440p. Le téléchargement signé, les deux accès HTTPS et le catalogue de
+11 projets ont été contrôlés après publication. Le moteur d’inférence a
+conservé son processus.
+
+Les preuves se trouvent dans D:\KRecette\publication-414. La commande
+`publier.ps1 -Retour` y rétablit le canal Windows et l’index du portail
+compilé de la 4.0.13. Les anciennes ressources de Conversations sont
+conservées dans le dossier `conversations-4.0.13`.
+
+## Livraison Kiara 4.0.13
+
+Le 18 novembre 2026 à 19 h 48, le canal Windows et le portail privé ont
+reçu les quatre lots de l’[audit de cohérence](../2026-11-18-coherence-interface/RAPPORT.md).
+Les nouveaux réglages, Notes et les accès aux parcours transversaux figurent
+dans le [guide Kiara](../../GUIDE-ASSISTANT-KIARA.md#retrouver-les-réglages).
+
+La recette a contrôlé les trois exécutables extraits de l’installateur,
+les panneaux de réglages dans WebView2 et le manifeste Ed25519 avec la clé
+du canal existant. L’empreinte SHA-256 de l’installateur téléchargé depuis
+le canal est 00187d85bfc12041b237abc77b5d92970d6d0d3098e9ee7db910cccb417225af. Les deux entrées HTTPS ont répondu 200
+avec le nouveau rendu de connexion. Le catalogue a conservé ses 11 projets
+et le processus d’inférence est resté actif.
+
+Les preuves et les scripts sont sous D:\KRecette\publication-413.
+En cas de retour, publier.ps1 -Retour rétablit le canal Windows et le
+portail compilé 4.0.12. Les ressources précédentes de Conversations sont
+conservées dans conversations-4.0.12. La réinstallation locale se fait
+séparément avec l’installateur de la version voulue, Kiara fermé.
+
+Le client Windows de Fred a été mis à niveau de la 4.0.8 à la 4.0.13.
+Le registre et les trois exécutables ont été contrôlés. Conversations et
+Réglages ont répondu 200 via le relais installé avec le bundle publié.
+
 ## Audit des réglages de Kiara 4.0.11
 
 La passe a comparé les réglages du client Serveur IA historique, la 4.0.10

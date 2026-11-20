@@ -28,7 +28,7 @@ it('réessaie les documents sans perdre les réglages voisins ni le formulaire r
   expect(await screen.findByText(/Le chargement de cette rubrique a échoué/)).toBeTruthy();
   fireEvent.click(screen.getByRole('button',{name:'Réessayer'}));
   fireEvent.change(await screen.findByLabelText('Réglage documentaire'),{target:{value:'Brouillon documentaire'}});
-  fireEvent.click(screen.getByRole('button',{name:'Général'}));
+  fireEvent.click(screen.getByRole('button',{name:'Assistant IA'}));
   expect((screen.getByLabelText('Réglage voisin') as HTMLInputElement).value).toBe('Brouillon général');
   fireEvent.click(screen.getByRole('button',{name:'Modèles de documents'}));
   expect((screen.getByLabelText('Réglage documentaire') as HTMLInputElement).value).toBe('Brouillon documentaire');

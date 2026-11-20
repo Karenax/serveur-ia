@@ -1666,6 +1666,7 @@ name = "kiara-tauri-prototype"
 version = "0.1.0"
 dependencies = [
  "gtk",
+ "serde_json",
  "tauri",
  "tauri-build",
 ]

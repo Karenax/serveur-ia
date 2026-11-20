@@ -49,22 +49,24 @@ def require_enabled(db):
         raise HTTPException(409, 'Les nouvelles séances sont désactivées dans les réglages.')
 
 
-def live_transcription_enabled(db=None):
+def live_transcription_enabled(db=None, *, operator_id=None):
     """Direct transcription needs its own explicit opt-in, including legacy data."""
     if db is None:
         from app.db import SessionLocal
         try:
             with SessionLocal() as session:
-                return live_transcription_enabled(session)
+                return live_transcription_enabled(session, operator_id=operator_id)
         except Exception:
             return False
-    from .settings_service import get_section
-    return feature_enabled(db) and get_section(db, 'foresight').get('live_transcription_enabled') is True
+    from . import meeting_preferences
+    key = 'live_transcription_enabled'
+    return feature_enabled(db) and (meeting_preferences.preferences(db, operator_id)[key]
+        if operator_id is not None else meeting_preferences.any_enabled(db, key))
 
 
-def require_live_transcription(db):
+def require_live_transcription(db, *, operator_id=None):
     require_enabled(db)
-    if not live_transcription_enabled(db):
+    if not live_transcription_enabled(db, operator_id=operator_id):
         raise HTTPException(409, 'La transcription directe est désactivée ; les fragments audio restent conservés.')
 
 
@@ -94,7 +96,7 @@ def capabilities(db):
                     'tracks': ['mic', 'system'], 'browser_permission_required': True,
                     'native_format': 'audio/ogg;codecs=opus', 'audio_bits_per_second': 32000},
         'transcription': {'batch_ready': status['ready'], 'session_batch_ready': session_batch_ready, 'live_ready': live_qualified,
-                          'enabled': live_transcription_enabled(db),
+                          'enabled': live_transcription_enabled(db, operator_id=current_operator().id),
                           **({'installed': live['installed']} if isinstance(live.get('installed'), bool) else {}),
                           'live_operational': live_operational, 'qualified_live_latency': bool(live.get('qualified_live_latency')),
                           'industrial_quality_qualified': bool(live.get('industrial_quality_qualified')), 'detail': live_detail},
@@ -285,6 +287,7 @@ def serialize_session(db, row, *, include_content=True, erp_factory=None):
         total_bytes=sum(chunk.size_bytes for chunk in chunks),
         duration_seconds=max((chunk.start_ms + chunk.duration_ms for chunk in chunks), default=0) / 1000,
         issues=issues,
+        live_transcription_enabled=live_transcription_enabled(db, operator_id=row.operator_id),
         transcript_provisional=(any(chunk.speech_status != 'completed' for chunk in chunks) or bool(db.scalar(
             select(LiveTranscriptSegment.id).where(LiveTranscriptSegment.session_id == row.id,
                 LiveTranscriptSegment.finalized.is_(False)).limit(1)))),
@@ -414,7 +417,7 @@ def retry_transcription(db, sid, body):
             command = _begin(db, row, 'retry-transcription', value)
             if command.status == 'completed':
                 return command.result  # Recovery of a validated receipt is not new inference.
-        require_live_transcription(db)
+        require_live_transcription(db, operator_id=row.operator_id)
         if row.state == 'cancelled':
             raise HTTPException(409, 'Une séance annulée ne peut pas reprendre sa transcription.')
         command = _begin(db, row, 'retry-transcription', value)
@@ -427,7 +430,7 @@ def retry_transcription(db, sid, body):
             db.expire_all()
             row = get_session(db, sid, write=True)
             command = db.get(MeetingSessionCommand, value['command_id'])
-            require_live_transcription(db)
+            require_live_transcription(db, operator_id=row.operator_id)
             if row.state == 'cancelled':
                 raise HTTPException(409, 'Une séance annulée ne peut pas reprendre sa transcription.')
             from .speech_admission import admit_retry

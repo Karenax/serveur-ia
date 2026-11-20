@@ -86,7 +86,7 @@ export function MeetingNotePublication({session,dirty,unfinished,onPublished}:{s
     const hasRetainedDraft=!!retainedSummary.overview.trim()||retainedSummary.decisions.length>0||retainedSummary.actions.length>0||retainedSummary.open_points.length>0||hasRetainedItem;
     return <section className="meeting-notes-publication"><h3>Compte rendu publié</h3>
       <p>La version relue des notes est conservée avec ses citations. Les actions peuvent être converties en tâches depuis le projet.</p>
-      <a className="button secondary" href={agentPath(`/app/projects/${encodeURIComponent(session.project_id!)}/reviews?meeting=${encodeURIComponent(session.published_meeting_id)}`)}>Ouvrir le compte rendu</a>
+      <a className="button secondary" href={agentPath(`/app/projets/${encodeURIComponent(session.project_id!)}/reunions?meeting=${encodeURIComponent(session.published_meeting_id)}`)}>Ouvrir le compte rendu</a>
       {session.project_id&&session.note_id&&session.published_note_version_id&&<><a href={agentPath(noteVersionUrl(session.project_id,session.note_id,session.published_note_version_id))} target="_blank" rel="noreferrer">Ouvrir la version des notes publiée</a>
         <NoteVersionPreview citation={{source_url:noteVersionUrl(session.project_id,session.note_id,session.published_note_version_id)}} label="Lire les notes publiées"/></>}
       {retained&&hasRetainedDraft&&<details>

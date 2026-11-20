@@ -26,7 +26,7 @@ it('ouvre directement la réunion publiée et ses actions en conservant la cible
   window.history.replaceState(null,'','/app/projects/p1/reviews?meeting=published-report');
   render(<ProjectWindow {...props}/>);
   await screen.findByText('Synthèse exacte du compte rendu ciblé');
-  expect(screen.getByRole('tab',{name:'Réunions et audio'}).getAttribute('aria-selected')).toBe('true');
+  expect(screen.getByRole('tab',{name:'Comptes rendus et audio'}).getAttribute('aria-selected')).toBe('true');
   expect(screen.getByRole('tab',{name:'Revue de lancement'}).getAttribute('aria-selected')).toBe('false');
   expect(screen.getByText('Vérifier le matériel')).toBeTruthy();expect(screen.getByText('2026-10-16')).toBeTruthy();
   expect(screen.queryByText('Ancienne synthèse fermée')).toBeNull();
@@ -36,7 +36,7 @@ it('ouvre directement la réunion publiée et ses actions en conservant la cible
 
 it('expose le même Studio depuis le projet sans modifier la revue héritée',async()=>{
   render(<ProjectWindow {...props}/>);
-  const link=await screen.findByRole('link',{name:'Ouvrir le Studio des réunions et notes'});
+  const link=await screen.findByRole('link',{name:'Ouvrir les séances du projet'});
   expect(link.getAttribute('href')).toBe('/app/meetings?project=p1');
   expect(screen.getByRole('tab',{name:'Revue de lancement'}).getAttribute('aria-selected')).toBe('true');
   expect(screen.getByLabelText('Revue de lancement héritée')).toBeTruthy();
@@ -46,7 +46,7 @@ it.each(['','?meeting=missing-report','?meeting=other-project-report'])('conserv
   window.history.replaceState(null,'','/app/projects/p1/reviews'+query);
   render(<ProjectWindow {...props}/>);
   expect((await screen.findByRole('tab',{name:'Revue de lancement'})).getAttribute('aria-selected')).toBe('true');
-  expect(screen.getByRole('tab',{name:'Réunions et audio'}).getAttribute('aria-selected')).toBe('false');
+  expect(screen.getByRole('tab',{name:'Comptes rendus et audio'}).getAttribute('aria-selected')).toBe('false');
   expect(screen.queryByText('Synthèse exacte du compte rendu ciblé')).toBeNull();
   expect(api.meetings).toHaveBeenCalledWith('p1');
   expect(api.meetings).not.toHaveBeenCalledWith('other-project');

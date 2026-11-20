@@ -7,6 +7,7 @@ import hashlib
 from io import BytesIO
 import zipfile
 
+from ..project_note_schemas import NOTE_ATTACHMENT_BUDGET
 from .project_note_source_preview import preview_source, MAX_IMPORT_BYTES, MAX_IMPORT_FILES, _path, _filename, OFFICE, LEGACY_TEXT
 from pathlib import PurePosixPath
 
@@ -72,8 +73,8 @@ def _inventory(value):
         if row['kind'] == 'attachment':
             attachments += 1
             attachment_bytes += row['size_bytes']
-            if (not 0 < row['size_bytes'] <= 5 * 1024 * 1024 or attachments > 20
-                    or attachment_bytes > 25 * 1024 * 1024):
+            if (not 0 < row['size_bytes'] <= NOTE_ATTACHMENT_BUDGET or attachments > 20
+                    or attachment_bytes > NOTE_ATTACHMENT_BUDGET):
                 raise ValueError('Inventaire de pièces dépassant les limites des notes')
         if name.casefold() in {key.casefold() for key in lookup}:
             raise ValueError('Fichiers source dupliqués ou ambigus')

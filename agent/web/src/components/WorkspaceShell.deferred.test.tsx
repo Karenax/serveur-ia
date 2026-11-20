@@ -31,6 +31,7 @@ it('réessaie les vues globales sans perdre le brouillon projet et réutilise le
   fireEvent.click(screen.getByRole('button', {name:'Réessayer'}));
   expect(await screen.findByText('Réunions retrouvées')).toBeTruthy();
   fireEvent.click(screen.getByRole('link', {name:'Activité'}));
+  fireEvent.click(screen.getByRole('button', {name:'Analyses'}));
   expect(await screen.findByText('Traitements retrouvés')).toBeTruthy();
   window.history.pushState(null,'','/app/projects/p1/cdc');
   fireEvent.popState(window);

@@ -125,7 +125,9 @@ def test_readiness_HTTP_routes_keep_global_owner_guard(configured, monkeypatch):
     from fastapi.testclient import TestClient
     from app.db import get_db
     from app.routers.fusion_insights import router
+    from app.security import local_guard
     app = FastAPI()
+    app.middleware('http')(local_guard)
     app.include_router(router)
     def database():
         with SessionLocal() as db:
@@ -134,15 +136,30 @@ def test_readiness_HTTP_routes_keep_global_owner_guard(configured, monkeypatch):
     monkeypatch.setattr(readiness, 'fetch', lambda *args:{'models':[{'key':'target','loaded_instances':[]}]})
     monkeypatch.setattr('app.services.ai_client.chat_text', lambda *args,**kwargs:'OK')
     monkeypatch.setattr('app.services.ai_routing.primary_succeeded', lambda *args:None)
-    with TestClient(app) as client:
-        root = '/api/v1/workspace/fusion-settings/readiness'
+    with TestClient(app, base_url='http://127.0.0.1') as client:
+        settings = '/api/v1/workspace/fusion-settings'
+        root = settings + '/readiness'
+        assert client.get(settings).json()['can_edit'] is True
         assert client.get(root).json()['generation']['test'] is None
         assert client.post(root+'/probe').json()['generation']['inventory']['loaded'] is False
         assert client.post(root+'/generation-test').json()['generation']['test']['reply_received']
-        monkeypatch.setenv('AGENT_OPERATOR_ROLE', 'editor')
-        assert client.get(root).status_code == 403
-        assert client.post(root+'/probe').status_code == 403
-        assert client.post(root+'/generation-test').status_code == 403
+        for role in ('reader', 'editor', 'owner'):
+            monkeypatch.setenv('AGENT_OPERATOR_ROLE', role)
+            monkeypatch.setenv('AGENT_OPERATOR_PROJECT_IDS', '[]')
+            response = client.get(settings)
+            assert response.status_code == 200 and response.json()['can_edit'] is False
+            assert client.put(settings, json={'enabled': False}).status_code == 403
+            monkeypatch.setenv('AGENT_OPERATOR_ID', role)
+            personal = settings + '/personal'
+            selection = client.get(personal).json()
+            assert selection['live_transcription_enabled'] is False
+            selection['live_transcription_enabled'] = True
+            assert client.put(personal, json=selection).json() == selection
+            assert client.get(personal).json() == selection
+            assert client.get(settings).json()['live_transcription_enabled'] is False
+            assert client.get(root).status_code == 403
+            assert client.post(root+'/probe').status_code == 403
+            assert client.post(root+'/generation-test').status_code == 403
 
 
 def test_timeout_or_onboarding_change_keeps_the_same_model_reply(configured, monkeypatch):

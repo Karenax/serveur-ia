@@ -12,7 +12,7 @@ from pathlib import PurePosixPath
 import re
 from uuid import UUID, uuid5
 
-from backend.app.project_note_schemas import NoteContent, content_text
+from backend.app.project_note_schemas import NOTE_ATTACHMENT_BUDGET, NoteContent, content_text
 from .project_note_conversion import convert_tiptap, _unique
 from .project_note_html import convert_html, html_plain_text
 
@@ -82,8 +82,8 @@ def _checked_files(files, *, external=False, legacy=False):
         if kind == 'attachment':
             attachments += 1
             attachment_bytes += len(value)
-            if not 0 < len(value) <= 5 * 1024 * 1024 or attachments > 20 or attachment_bytes > 25 * 1024 * 1024:
-                raise ValueError('Pièces source limitées à 5 Mio chacune, 20 pièces/25 Mio au total')
+            if not 0 < len(value) <= NOTE_ATTACHMENT_BUDGET or attachments > 20 or attachment_bytes > NOTE_ATTACHMENT_BUDGET:
+                raise ValueError('Pièces source limitées à 20 fichiers et 25 Mio au total')
         result.append({'relative_path': name, 'kind': kind, 'size_bytes': len(value),
                        'sha256': hashlib.sha256(value).hexdigest()})
     return result, total
@@ -228,6 +228,6 @@ def _asset_quota(inventory, versions):
     attachments = [item for item in inventory if item['kind'] == 'attachment']
     issues = []
     if (len(attachments) + len(embedded) > 20
-            or sum(item['size_bytes'] for item in attachments) + sum(item['size_bytes'] for item in embedded.values()) > 25 * 1024 * 1024):
+            or sum(item['size_bytes'] for item in attachments) + sum(item['size_bytes'] for item in embedded.values()) > NOTE_ATTACHMENT_BUDGET):
         issues.append({'path': 'images', 'message': 'Images historiques et pièces dépassant 20 éléments/25 Mio : aucun import partiel implicite'})
     return list(embedded.values()), issues

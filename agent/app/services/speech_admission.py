@@ -53,9 +53,9 @@ def _writer(db):
     db.expire_all()
 
 
-def _enabled(db):
+def _enabled(db, row=None):
     from .meeting_sessions import live_transcription_enabled
-    return live_transcription_enabled(db)
+    return live_transcription_enabled(db, operator_id=row.operator_id if row is not None else None)
 
 
 def _event(db, row, kind, data):
@@ -156,9 +156,13 @@ def _reconcile_locked(db, *, recover_running=False):
                                   'recovered_running_chunks': 0, 'reasons': defaultdict(int)})
     changed = retained = recovered = 0
     admitted = []
+    owner_enabled = {}
     for chunk, row in candidates:
+        if row.operator_id not in owner_enabled:
+            owner_enabled[row.operator_id] = _enabled(db, row)
         group = grouped[row.id]
-        reason = 'cancelled' if row.state == 'cancelled' else _reason(chunk)
+        reason = 'cancelled' if row.state == 'cancelled' else (
+            _reason(chunk) if owner_enabled[row.operator_id] else 'direct_disabled')
         if reason is None and (used_count >= MAX_CHUNKS or used_ms + budget_ms(chunk) > MAX_BUDGET_MS):
             reason = 'capacity'
         if reason:
@@ -200,7 +204,7 @@ def admit_new_chunk(db, row, chunk):
     """Decide before adding the chunk ORM object; durable file already exists."""
     _writer(db)
     reason = None
-    if not _enabled(db):
+    if not _enabled(db, row):
         reason = 'direct_disabled'
     elif row.state == 'cancelled':
         reason = 'cancelled'
@@ -234,7 +238,7 @@ def admit_retry(db, row, limit=None):
         raise ValueError(f'Lot de reprise STT entre 1 et {RETRY_LIMIT} fragments requis')
     _writer(db)
     from .meeting_sessions import require_live_transcription
-    require_live_transcription(db)
+    require_live_transcription(db, operator_id=row.operator_id)
     _reconcile_locked(db)
     count, duration = _usage(db)
     selected = []

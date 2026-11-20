@@ -5,6 +5,7 @@ must ensure a previous worker has stopped before explicit interruption recovery.
 """
 import hashlib
 import json
+from pathlib import PurePosixPath
 
 from fastapi import HTTPException
 from sqlalchemy import func, inspect, select, update
@@ -17,6 +18,7 @@ from ..project_identity_models import now, uid
 from . import document_forms, project_documents
 from .document_job_artifacts import read_artifact, write_artifact
 from .document_job_schema import validate_job_schema
+from .document_paths import _relative
 from .document_template_catalogue import catalogue
 from .project_identity import _project
 from .project_operator import current_operator
@@ -78,6 +80,20 @@ def _change(db, job, expected_revision, **values):
     db.refresh(job)
 
 
+def source_destination(item):
+    """Derive the suggested publication location from the approved source."""
+    if hashlib.sha256(item.snapshot.encode()).hexdigest() != item.sha256:
+        raise HTTPException(409, 'Aperçu de la copie modifié')
+    report = json.loads(item.snapshot)['preview']
+    source = report['source']
+    relative = _relative(source['relative_path'])
+    if not relative:
+        return None
+    parent = str(PurePosixPath(relative).parent)
+    return {'link_id': source['link_id'], 'relative_directory': '' if parent == '.' else parent,
+            'replace_existing': source['filename'].casefold() == report['output_filename'].casefold()}
+
+
 def detail(db, project_id, job_id):
     job = _job(db, project_id, job_id)
     items = _items(db, job)
@@ -97,7 +113,9 @@ def detail(db, project_id, job_id):
             'items': [{'id': i.id, 'document_id': i.document_id, 'position': i.position, 'status': i.status,
                        'last_attempt_id': i.last_attempt_id,
                        'artifact_id': receipts[i.last_attempt_id].artifact_id if i.last_attempt_id in receipts else None,
-                       'error': receipts[i.last_attempt_id].error if i.last_attempt_id in receipts else ''} for i in items]}
+                       'error': receipts[i.last_attempt_id].error if i.last_attempt_id in receipts else '',
+                       'publication_suggestion': source_destination(i) if i.status == 'succeeded' and not job.execution_blocked else None}
+                      for i in items]}
 
 
 def submit(db, project_id, command: DocumentBatchSubmit):

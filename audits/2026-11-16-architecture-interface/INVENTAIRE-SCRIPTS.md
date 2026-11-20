@@ -8,6 +8,8 @@ Une recherche en lecture seule sur cette machine a examiné 196 tâches planifi�
 
 Cette recherche ne couvre pas les autres machines, comptes, raccourcis hors des emplacements examinés, références indirectes ou chemins calculés. Quelques dépendances calculées vérifiées dans le code illustrent le risque : `Start-Interface-Qwen.ps1` construit ses chemins depuis `$PSScriptRoot`, notamment vers `lanceur\app.py` et le Python local ; `Start-Qwen.ps1` invoque `Start-Qwen-GPU.ps1` depuis ce même dossier ; `Start-Strata-P100.ps1` calcule le chemin de `Warmup-Strata-P100.ps1` et de plusieurs configurations avant de lancer des processus. Déplacer ces fichiers séparément casserait ces chemins. L’inventaire ci-dessous ne justifie donc pas de suppression automatique.
 
+Le 18 novembre, les quatre variantes `Comparer-Huihui*.ps1` ont été rangées dans [les archives Huihui P100](../../maintenance/legacy-huihui-p100/README.md). Le seul renvoi suivi relevé pour ces fichiers était l'ancien inventaire d'audit. Une vérification complémentaire n'a trouvé aucune tâche ou processus local qui les citait. Une copie isolée a validé la syntaxe PowerShell et les empreintes avant le déplacement. Ce résultat porte sur les quatre variantes nommées et sur les appelants accessibles.
+
 | Script | Fichiers suivis qui citent son nom complet (4 exemples au plus) |
 |---|---|
 | `Activer-Historique-IQ4.py` | `audits/2026-10-12/inventory.json`, `audits/2026-10-21/bandit.json` |

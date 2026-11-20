@@ -6,6 +6,9 @@ import re
 from pathlib import Path
 
 
+from kiara_shared.conversation_shell import chat_contextual_help, modern_chat, notification_settings
+
+
 SOURCE = Path(__file__).resolve().parent.parent / 'client-qwen'
 SCRIPTS = ('ui.js', 'attachments.js', 'corrector.js', 'selection.js', 'thinking.js',
            'voice.js', 'conversation.js', 'project-conversation.js')
@@ -18,9 +21,12 @@ ROUTES = {
 }
 
 
-def render(owner, prefix, nonce):
+def render(owner, prefix, nonce, *, settings_panel=False, notifications=False):
     def read(name):
         return (SOURCE / name).read_text(encoding='utf-8')
+
+    if notifications:
+        return notification_settings(read, nonce, prefix=prefix, web=True)
 
     def script(name):
         code = read(name).replace('</script', r'<\/script')
@@ -51,9 +57,15 @@ def render(owner, prefix, nonce):
           <form method="post" action="{prefix}/deconnexion"><button class="secondary">Se déconnecter</button></form>
         </div><div class="settings-card"><h3>Vos conversations</h3>
           <p>L’historique personnel est enregistré sur le serveur. Les brouillons enregistrés restent dans ce navigateur.</p>
+          <!-- shell:access-tools -->
         </div>
       </section>""", html=True)
     chat = chat.replace('Historique sur le serveur · copie locale chiffrée', 'Historique du serveur')
+    if settings_panel:
+        chat = chat.replace('<form method="post" action=', '<form target="_top" method="post" action=', 1)
+    chat = modern_chat(chat, read('kiara-shell.html'), settings_panel=settings_panel, web=True)
+    if not settings_panel:
+        chat = chat_contextual_help(chat, read)
     return (chat.replace('</head>', heading + '</head>')
             .replace('</body>', presentation + '</body>')
             .replace('__UI_CSS__', read('ui.css'))

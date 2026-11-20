@@ -2,6 +2,7 @@ import { agentFetch } from './agentRoutes';
 import { invalidateSession, request } from './http';
 import { withActivity } from './asyncActivity';
 import type { DocumentChoice, DocumentPage } from './projectDocuments';
+import type { PublicationChoice } from './projectDocumentPublications';
 
 export type BatchItem=DocumentChoice&{expected_source_sha256:string;expected_link_sha256:string;expected_values_sha256:string;
   expected_identity_revision:number;expected_planning_revision:number;expected_draft_revision:number};
@@ -12,7 +13,8 @@ export type DocumentWorker={state:string;enabled:boolean;running:boolean;can_sub
 export type DocumentJobSummary={id:string;project_id:string;status:JobStatus;revision:number;total:number;processed:number;
   progress:number;cancel_requested:boolean;execution_blocked:boolean;can_cancel:boolean;can_retry:boolean;created_at:string;updated_at:string};
 export type DocumentJob=DocumentJobSummary&{actor_id:string;items:{id:string;document_id:BatchItem['document_id'];position:number;
-  status:FileStatus;last_attempt_id:string|null;artifact_id:string|null;error:string}[]};
+  status:FileStatus;last_attempt_id:string|null;artifact_id:string|null;error:string;
+  publication_suggestion?:PublicationChoice|null}[]};
 export type DocumentJobs=DocumentPage<DocumentJobSummary>&{available:boolean;worker:DocumentWorker};
 export type DocumentEvent={id:string;revision:number;kind:string;actor_id:string;detail:Record<string,unknown>;created_at:string};
 export type DocumentAttempt={id:string;item_id:string;number:number;actor_id:string;created_at:string;finished_at:string|null;

@@ -6,12 +6,29 @@ import platform
 import shutil
 import subprocess
 import sys
+import tempfile
 import venv
 
 
 def desktop_quote(value):
     # Desktop Entry Exec has its own quoting rules (including field codes).
     return '"'+str(value).replace('\\','\\\\').replace('"','\\"').replace('`','\\`').replace('$','\\$').replace('%','%%')+'"'
+
+
+def write_shortcut(path: Path, entry: str) -> None:
+    # Keep the existing shortcut usable until the new contents are complete.
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', dir=path.parent,
+                                         prefix='.kiara-', suffix='.tmp', delete=False) as stream:
+            temporary = Path(stream.name)
+            stream.write(entry)
+            stream.flush()
+            os.fsync(stream.fileno())
+        temporary.replace(path)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
 
 
 def main():
@@ -40,8 +57,8 @@ def main():
     environment = root/'.venv'
     venv.EnvBuilder(with_pip=True).create(environment)
     try:
-        subprocess.run([str(environment/'bin/python'),'-m','pip','install','--only-binary=:all:',
-                        '-r',str(root/'requirements.txt')], check=True)
+        subprocess.run([str(environment/'bin/python'),'-m','pip','install','--require-hashes','--only-binary=:all:',
+                        '-r',str(root/'requirements.lock')], check=True)
     except subprocess.CalledProcessError:
         raise SystemExit('L’installation des dépendances a échoué. Consultez l’erreur pip ci-dessus, puis relancez python3 installer.py.') from None
     root.joinpath('start.sh').chmod(0o755)
@@ -56,7 +73,7 @@ def main():
     entry = ('[Desktop Entry]\nType=Application\nName=Kiara\nComment=Accès à votre assistant Kiara\n'
              'Exec='+desktop_quote(root/'start-tauri.sh')+'\nIcon='+str(root/'client/fred-icon.png')+
              '\nTerminal=false\nCategories=Office;Network;\nStartupNotify=true\n')
-    (shortcuts/'kiara.desktop').write_text(entry,encoding='utf-8')
+    write_shortcut(shortcuts/'kiara.desktop', entry)
     print('Kiara est installé. Ouvrez Kiara depuis le menu des applications.')
 
 

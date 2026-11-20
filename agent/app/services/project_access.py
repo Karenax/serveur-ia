@@ -184,11 +184,20 @@ def authorize(method, path, *, query=None, body=None):
         raise HTTPException(403, 'Seules les réponses Thunderbird sont accessibles sur ce poste')
     if operator.role == "owner" and operator.project_ids is None:
         return
+    if (method, path) in {
+        ("GET", "/api/v1/workspace/fusion-settings/personal"),
+        ("PUT", "/api/v1/workspace/fusion-settings/personal"),
+        ("GET", "/api/v1/document-settings/personal"),
+        ("PUT", "/api/v1/document-settings/personal"),
+        ("GET", "/api/v1/document-settings/personal/history"),
+        ("POST", "/api/v1/document-settings/personal/restore"),
+    }:
+        return  # These handlers always use the authenticated operator's own key.
     read_query = method == "POST" and (bool(re.fullmatch(r"/v1/projects/[^/]+/memory/recall", path))
                                       or bool(re.fullmatch(r"/api/v1/projects/[^/]+/planning/templates/[^/]+/preview", path))
                                       or bool(re.fullmatch(r"/api/v1/projects/[^/]+/deliverable-plan/selection/preview", path))
                                       or bool(re.fullmatch(r"/api/v1/projects/[^/]+/documents/preview", path))
-                                      or bool(re.fullmatch(r"/api/v1/projects/[^/]+/documents/discover", path))
+                                      or bool(re.fullmatch(r"/api/v1/projects/[^/]+/documents/discover(?:-folder)?", path))
                                       or bool(re.fullmatch(r"/api/v1/projects/[^/]+/documents/artifacts/[^/]+/publication-preview", path))
                                       or path in {"/v1/projects/chat", "/v1/projects/chat/stream", "/api/v1/brain/chat"})
     read_query = read_query or method == "POST" and bool(re.fullmatch(r"/api/v1/meeting-sessions/[^/]+/(?:ask|live-answers)", path))
@@ -203,6 +212,8 @@ def authorize(method, path, *, query=None, body=None):
         return
     if path in {'/internal/kiara/conversations', '/internal/kiara/memories', '/internal/kiara/transcriptions'} and method == 'GET':
         return
+    if method in SAFE_METHODS and path in {"/api/v1/document-settings", "/api/v1/workspace/fusion-settings"}:
+        return
     admin = any(path == prefix or path.startswith(prefix + "/") for prefix in ADMIN_PREFIXES)
     if admin:
         raise HTTPException(403, "Administration réservée à l'opérateur propriétaire sans restriction de projets")
@@ -210,8 +221,8 @@ def authorize(method, path, *, query=None, body=None):
         raise HTTPException(403, "Modification des liaisons Brain réservée à l'opérateur propriétaire")
     if operator.project_ids is None:
         return
-    if path == '/api/v1/notes/projects' and method in SAFE_METHODS:
-        return  # The catalogue query applies the operator's scope.
+    if path in {'/api/v1/notes/projects', '/api/v1/notes/all'} and method in SAFE_METHODS:
+        return  # Both queries apply the operator's project scope.
     if path == '/api/v1/notes/personal' or path.startswith('/api/v1/notes/personal/'):
         return  # The private notebook checks ownership on every note and image.
     if path == "/api/v1/meeting-sessions" and method == "POST":

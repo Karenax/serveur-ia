@@ -3,6 +3,7 @@ from pathlib import PurePosixPath
 
 from fastapi import HTTPException
 
+from ..project_note_schemas import NOTE_ATTACHMENT_BUDGET
 from .project_note_source_preview import MAX_IMPORT_BYTES, MAX_IMPORT_FILES, MAX_TEXT_BYTES, OFFICE, LEGACY_TEXT, _path, _filename
 
 
@@ -20,7 +21,7 @@ def acquire_uploads(uploads, paths):
                 maximum = MAX_IMPORT_BYTES if suffix in OFFICE | {'.html', '.htm'} else MAX_TEXT_BYTES
             else:
                 kind = _path(name)
-                maximum = 5 * 1024 * 1024 if kind == 'attachment' else MAX_IMPORT_BYTES if name.endswith('content.html') else MAX_TEXT_BYTES
+                maximum = NOTE_ATTACHMENT_BUDGET if kind == 'attachment' else MAX_IMPORT_BYTES if name.endswith('content.html') else MAX_TEXT_BYTES
             limits.append(maximum)
     except ValueError as exc:
         raise HTTPException(422, str(exc)) from exc

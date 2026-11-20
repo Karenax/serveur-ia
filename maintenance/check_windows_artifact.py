@@ -31,6 +31,7 @@ def check(artifact, result):
         raise ValueError('Frozen client is missing: ' + ', '.join(sorted(missing)))
     expected = {name: ROOT / 'client-qwen' / name for name in UI_ASSETS}
     if artifact.name == 'kiara-relay.exe':
+        expected.update({name: ROOT / 'client-qwen' / name for name in ('help.html', 'help.css', 'help.mjs')})
         expected.update({
             'thunderbird-agent/' + name: ROOT / 'agent/extensions/thunderbird-agent' / name
             for name in THUNDERBIRD_ASSETS

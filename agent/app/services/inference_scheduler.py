@@ -61,7 +61,7 @@ def engine_key(url: str, *, category: str = 'generation') -> str:
 def current_priority() -> int:
     # Idle callers retain their existing foreground/idle contract.
     from . import llm_activity
-    if _kind.get() == "manual" and llm_activity._background == threading.get_ident():
+    if _kind.get() == "manual" and llm_activity.owns_idle_slot():
         return PRIORITIES["background"]
     return PRIORITIES[_kind.get()]
 

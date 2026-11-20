@@ -10,7 +10,8 @@ from uuid import UUID, uuid4
 
 from app.services.deliverable_manifest import freeze
 from backend.app.project_note_import_schemas import NoteImportCapture
-from backend.app.project_note_schemas import NoteContent, NoteCreate, NoteSave, NoteRestore, ImageBlock, content_text
+from backend.app.project_note_schemas import (NOTE_ATTACHMENT_BUDGET, NoteContent, NoteCreate, NoteDelete,
+                                               NoteSave, NoteRestore, ImageBlock, content_text)
 
 PROJECT_TABLES = frozenset({'project_notes', 'project_note_versions', 'project_note_attachments', 'project_note_imports'})
 MAX_ROWS = 100000
@@ -106,7 +107,7 @@ def version_value(row):
     if not images <= set(value['attachment_ids']):
         raise ValueError('Image absente des pièces de la version')
     operation = value['operation']
-    if operation not in {'create', 'save', 'restore'} or (operation == 'create') != (value['revision'] == 1):
+    if operation not in {'create', 'save', 'restore', 'delete'} or (operation == 'create') != (value['revision'] == 1):
         raise ValueError('Opération de version incompatible')
     if operation == 'create':
         payload = NoteCreate(command_id=value['command_id'], title=value['title'], content=content)
@@ -114,6 +115,9 @@ def version_value(row):
     elif operation == 'save':
         payload = NoteSave(command_id=value['command_id'], title=value['title'], content=content,
                            expected_revision=value['revision'] - 1, attachment_ids=value['attachment_ids'])
+        target = value['note_id']
+    elif operation == 'delete':
+        payload = NoteDelete(command_id=value['command_id'], expected_revision=value['revision'] - 1)
         target = value['note_id']
     else:
         identity(value['restored_from'])
@@ -211,7 +215,7 @@ def validate(tables, section):
         if row['note_id'] not in heads or row['storage_id'] in seen_storage:
             raise ValueError('Pièce jointe orpheline ou stockage ambigu')
         seen_storage.add(row['storage_id'])
-        integer(row['size_bytes'], 5 * 1024 * 1024)
+        integer(row['size_bytes'], NOTE_ATTACHMENT_BUDGET)
         if (not isinstance(row['filename'], str) or not 1 <= len(row['filename']) <= 255
                 or any(ord(char) < 32 or char in '/\\' for char in row['filename'])
                 or not isinstance(row['content_type'], str) or not 1 <= len(row['content_type']) <= 120):
@@ -234,6 +238,8 @@ def validate(tables, section):
         sequence = by_note.setdefault(row['note_id'], [])
         if row['revision'] != len(sequence) + 1:
             raise ValueError('Séquence des versions incomplète')
+        if sequence and values[sequence[-1]['id']]['operation'] == 'delete':
+            raise ValueError('Une note supprimée ne peut pas recevoir de nouvelle version')
         sequence.append(row)
         bound_content, bound_assets = bound_value(row, value)
         for key in bound_assets:
@@ -279,7 +285,9 @@ def validate(tables, section):
             if (not target or target['note_id'] != row['note_id'] or any(target[key] != getattr(source, key)
                     for key in ('filename', 'content_type', 'size_bytes', 'sha256'))):
                 raise ValueError('Pièce source absente ou différente')
-        if row['source_kind'] == 'external_office' and heads[row['note_id']]['revision'] != 1:
+        head = heads[row['note_id']]
+        if row['source_kind'] == 'external_office' and not (head['revision'] == 1 or (
+                head['revision'] == 2 and values[head['current_version_id']]['operation'] == 'delete')):
             raise ValueError('Document Office externe modifié')
     return {'heads': heads, 'versions': versions, 'assets': assets, 'imports': imports, 'values': values, 'captures': captures}
 

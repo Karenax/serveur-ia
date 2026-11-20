@@ -7,6 +7,7 @@ import zipfile
 
 import pytest
 
+from backend.app.project_note_schemas import NOTE_ATTACHMENT_BUDGET
 from backend.app.services.project_note_source_bundle import prepare_bundle, verify_bundle
 from backend.app.services.project_note_source_preview import preview_source
 from tests.test_project_note_source_preview import sources
@@ -98,7 +99,7 @@ def test_forged_inventory_cannot_expand_source_limits():
     with pytest.raises(ValueError, match='2 Mo'):
         verify_bundle(data, inventory)
     inventory = deepcopy(manifest['files'])
-    next(row for row in inventory if row['kind'] == 'attachment')['size_bytes'] = 5 * 1024 * 1024 + 1
+    next(row for row in inventory if row['kind'] == 'attachment')['size_bytes'] = NOTE_ATTACHMENT_BUDGET + 1
     with pytest.raises(ValueError, match='limites'):
         verify_bundle(data, inventory)
 

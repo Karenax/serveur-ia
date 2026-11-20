@@ -19,9 +19,41 @@ _spec.loader.exec_module(_contract)
 MODULES, ASSETS = _contract.CLIENT_MODULES, _contract.CLIENT_ASSETS
 
 
+def validate_tauri_binary(path, architecture, tauri_version):
+    if not tauri_version or not re.fullmatch(r'\d{1,4}\.\d{1,4}\.\d{1,4}', tauri_version):
+        raise ValueError('Une version Tauri à trois nombres est nécessaire.')
+    path = Path(path).resolve(strict=True)
+    if not path.is_file():
+        raise ValueError('Binaire Tauri Linux ELF attendu.')
+    data = path.read_bytes()
+    if len(data) < 20 or data[:6] != b'\x7fELF\x02\x01' or int.from_bytes(data[18:20], 'little') != {'amd64':62, 'arm64':183}[architecture]:
+        raise ValueError('Binaire Tauri Linux ELF attendu.')
+    versions = re.findall(rb'KIARA_TAURI_VERSION=(\d{1,4}\.\d{1,4}\.\d{1,4})\x00', data)
+    if len(versions) != 1 or versions[0].decode('ascii') != tauri_version:
+        raise ValueError('Version du binaire Tauri absente, ambiguë ou différente : reconstruisez le binaire avec la version demandée.')
+    return path
+
+
+def validate_linux_requirements(directory):
+    """Refuse to package a lock that no longer matches the direct requirements."""
+    directory = Path(directory)
+    direct = [line.strip().lower() for line in (directory/'requirements.txt').read_text(encoding='utf-8').splitlines()
+              if line.strip() and not line.lstrip().startswith('#')]
+    text = (directory/'requirements.lock').read_text(encoding='utf-8').lower().replace('\\\n', ' ')
+    locked = [line.strip() for line in text.splitlines() if line.strip() and not line.lstrip().startswith('#')]
+    if not direct or any(not re.fullmatch(r'[a-z0-9_.-]+==[a-z0-9_.-]+', item) for item in direct):
+        raise ValueError('Dépendances Linux directes invalides.')
+    for item in direct:
+        matches = [entry for entry in locked if entry.startswith(item+' ')]
+        if len(matches) != 1 or not re.search(r'--hash=sha256:[0-9a-f]{64}(?:\s|$)', matches[0]):
+            raise ValueError('Verrou Linux incompatible avec les dépendances directes : '+item)
+
+
 def build(output, architecture, tauri_binary=None, tauri_version=None):
     if tauri_binary is None:
         raise ValueError('Le binaire Tauri Linux et sa version sont nécessaires pour construire le client.')
+    tauri_binary = validate_tauri_binary(tauri_binary, architecture, tauri_version)
+    validate_linux_requirements(ROOT/'client-linux')
     sys.path.insert(0,str(ROOT/'shared'))
     from kiara_shared.version import VERSION
     client = ROOT/'client-qwen'
@@ -38,15 +70,6 @@ def build(output, architecture, tauri_binary=None, tauri_version=None):
     subprocess.run([str(go),'mod','verify'],cwd=client/'wireguard-bridge',env=environment,check=True)
     output = Path(output).resolve()
     output.mkdir(parents=True,exist_ok=True)
-    tauri_binary = Path(tauri_binary).resolve(strict=True)
-    if not tauri_binary.is_file():
-        raise ValueError('Binaire Tauri Linux ELF attendu.')
-    with tauri_binary.open('rb') as stream:
-        header = stream.read(20)
-    if len(header) < 20 or header[:6] != b'\x7fELF\x02\x01' or int.from_bytes(header[18:20], 'little') != {'amd64':62, 'arm64':183}[architecture]:
-        raise ValueError('Binaire Tauri Linux ELF attendu.')
-    if not tauri_version or not re.fullmatch(r'\d{1,4}\.\d{1,4}\.\d{1,4}', tauri_version):
-        raise ValueError('Une version Tauri à trois nombres est nécessaire.')
     archive = output/f'Kiara-linux-{architecture}-{tauri_version}-tauri.tar.gz'
     with tempfile.TemporaryDirectory(prefix='kiara-linux-') as temporary:
         staging = Path(temporary)/f'Kiara-linux-{architecture}'
@@ -79,7 +102,7 @@ def build(output, architecture, tauri_binary=None, tauri_version=None):
                 shutil.copyfile(path,staging/'client/vendor'/path.name)
         for path in (ROOT/'shared/kiara_shared').glob('*.py'):
             shutil.copyfile(path,staging/'shared/kiara_shared'/path.name)
-        for name in ('start.sh','installer.py','linux_launch.py','requirements.txt','README.md'):
+        for name in ('start.sh','installer.py','linux_launch.py','requirements.txt','requirements.lock','README.md'):
             # Shell scripts must retain LF even when the checkout uses CRLF.
             content=(ROOT/'client-linux'/name).read_text(encoding='utf-8')
             (staging/name).write_text(content,encoding='utf-8',newline='\n')

@@ -27,7 +27,7 @@ def with_image(payload, attachment_id):
     blocks.insert(payload.insert_at, ImageBlock(type='image', attachment_id=attachment_id, caption=''))
     if payload.insert_at == len(blocks)-1 and len(blocks) < 500:
         blocks.append(Paragraph(type='paragraph'))
-    return NoteContent(blocks=blocks)
+    return NoteContent(background=payload.content.background, blocks=blocks)
 
 
 def attachment_command(command_id, index=0):

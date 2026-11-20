@@ -9,9 +9,12 @@ export type NoteBlock={type:'paragraph';runs:NoteRun[];align:'left'|'center'|'ri
   {type:'list';kind:'bullet'|'ordered'|'checklist';items:{runs:NoteRun[];checked:boolean;indent:number}[]}|
   {type:'table';header:boolean;rows:NoteRun[][][]}|
   {type:'image';attachment_id:string;caption:string};
-export type NoteContent={version:1;blocks:NoteBlock[]};
-export type NoteSummary={id:string;project_id:string;title:string;revision:number;version_id:string;updated_at:string;actor_id:string|null;excerpt:string};
-export type NoteDetail=Omit<NoteSummary,'excerpt'>&{content:NoteContent;attachment_ids:string[];read_only:boolean;source_kind:string|null};
+export const noteBackgrounds = {yellow:'Jaune',green:'Vert',blue:'Bleu',pink:'Rose'} as const;
+export type NoteBackground=keyof typeof noteBackgrounds;
+export const NOTE_ATTACHMENT_BUDGET=25*1024*1024;
+export type NoteContent={version:1;blocks:NoteBlock[];background?:NoteBackground};
+export type NoteSummary={id:string;project_id:string;title:string;revision:number;version_id:string;updated_at:string;actor_id:string|null;excerpt:string;background?:NoteBackground|null};
+export type NoteDetail=Omit<NoteSummary,'excerpt'|'background'>&{content:NoteContent;plain_text?:string;attachment_ids:string[];read_only:boolean;source_kind:string|null};
 export type NotePage<T>={items:T[];total:number;limit:number;offset:number};
 export type NotesList=NotePage<NoteSummary>&{available:boolean;can_edit?:boolean;operator_id?:string};
 export type NoteCreate={command_id:string;title:string;content:NoteContent};
@@ -25,12 +28,13 @@ export type NoteVersion=NoteHistory&{project_id:string;note_id:string;value:{tit
 export type NoteAttachment={id:string;project_id:string;note_id:string;filename:string;size_bytes:number;content_type:string;sha256:string};
 export class NoteHttpError extends Error { constructor(public status:number,message:string){super(message);} }
 export const personalNotesScope='personal';
+export const allNotesScope='all';
 const root=(projectId:string)=>projectId===personalNotesScope?'/api/v1/notes/personal':`/api/v1/projects/${encodeURIComponent(projectId)}/notes`;
 export const noteUrl=(projectId:string,noteId:string)=>`${root(projectId)}/${encodeURIComponent(noteId)}`;
 export type NotesProject={id:string;code:string;title:string;has_notes:boolean};
 
-export async function noteRequest<T>(url:string,init:RequestInit={},timeoutMs=60_000):Promise<T>{
-  const finish=['GET','HEAD'].includes((init.method||'GET').toUpperCase())?()=>{}:beginActivity('Enregistrement de la note…');
+export async function noteRequest<T>(url:string,{quiet=false,...init}:RequestInit&{quiet?:boolean}={},timeoutMs=60_000):Promise<T>{
+  const finish=quiet||['GET','HEAD'].includes((init.method||'GET').toUpperCase())?()=>{}:beginActivity('Enregistrement de la note…');
   const controller=new AbortController(),cancel=()=>controller.abort();
   init.signal?.addEventListener('abort',cancel,{once:true});if(init.signal?.aborted)cancel();
   const timer=window.setTimeout(cancel,timeoutMs);
@@ -49,10 +53,17 @@ const call=noteRequest;
 export const notesApi={
   catalogue:(signal?:AbortSignal)=>call<{projects:NotesProject[];can_edit:boolean}>('/api/v1/notes/projects',{signal}),
   list:(projectId:string,query='',offset=0,signal?:AbortSignal)=>call<NotesList>(`${root(projectId)}?query=${encodeURIComponent(query)}&offset=${offset}&limit=30`,{signal}),
+  all:(projects:string[],query='',offset=0,signal?:AbortSignal)=>{
+    const params=new URLSearchParams({query,offset:String(offset),limit:'30'});
+    for(const project of projects)params.append('projects',project);
+    return call<NotesList>(`/api/v1/notes/all?${params}`,{signal});
+  },
   read:(projectId:string,noteId:string,signal?:AbortSignal)=>call<NoteDetail>(noteUrl(projectId,noteId),{signal}),
+  remove:(projectId:string,noteId:string,payload:{command_id:string;expected_revision:number},signal?:AbortSignal)=>
+    call<{deleted:true}>(noteUrl(projectId,noteId),{method:'DELETE',body:JSON.stringify(payload),signal}),
   execute:(projectId:string,noteId:string,pending:NotePending,signal?:AbortSignal)=>call<NoteResult>(
     pending.kind==='create'?root(projectId):noteUrl(projectId,noteId)+(pending.kind==='restore'?'/restore':''),
-    {method:pending.kind==='save'?'PUT':'POST',body:JSON.stringify(pending.payload),signal}),
+    {method:pending.kind==='save'?'PUT':'POST',quiet:pending.kind==='save',body:JSON.stringify(pending.payload),signal}),
   history:(projectId:string,noteId:string,offset=0,signal?:AbortSignal)=>call<NotePage<NoteHistory>>(`${noteUrl(projectId,noteId)}/history?offset=${offset}&limit=20`,{signal}),
   version:(projectId:string,noteId:string,versionId:string,signal?:AbortSignal)=>call<NoteVersion>(`${noteUrl(projectId,noteId)}/versions/${encodeURIComponent(versionId)}`,{signal}),
   attachments:(projectId:string,noteId:string,signal?:AbortSignal)=>call<{items:NoteAttachment[]}>(`${noteUrl(projectId,noteId)}/attachments`,{signal}),
@@ -83,7 +94,8 @@ function validRuns(value:unknown,max=500):value is NoteRun[]{return Array.isArra
   (r.href===null||(typeof r.href==='string'&&r.href.length<=2048&&safeNoteLink(r.href)))&&
   (r.color===null||(typeof r.color==='string'&&/^#[0-9a-fA-F]{6}$/.test(r.color))));}
 export function validNoteContent(value:unknown):value is NoteContent{
-  if(!record(value)||!exact(value,['version','blocks'])||value.version!==1||!Array.isArray(value.blocks)||value.blocks.length>500)return false;
+  if(!record(value)||!exact(value,['version','blocks','background'])||value.version!==1||!Array.isArray(value.blocks)||value.blocks.length>500||
+    (value.background!==undefined&&(typeof value.background!=='string'||!Object.prototype.hasOwnProperty.call(noteBackgrounds,value.background))))return false;
   if(new TextEncoder().encode(JSON.stringify(value)).length>2_000_000)return false;
   return value.blocks.every(b=>{
     if(!record(b))return false;

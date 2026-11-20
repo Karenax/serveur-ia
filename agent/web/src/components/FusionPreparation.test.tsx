@@ -16,6 +16,16 @@ beforeEach(()=>{
   vi.spyOn(meetingCapture,'getSnapshot').mockReturnValue({sessionId:null,title:'',phase:'idle',tracks:[],seconds:0,totalBytes:0,savedBytes:0,pending:0,error:''});
 });
 afterEach(()=>{cleanup();vi.restoreAllMocks();});
+it('permet de consulter la préparation sans charger le diagnostic propriétaire',async()=>{
+  vi.mocked(fusionInsights.settings).mockResolvedValue({...settings,can_edit:false});
+  render(<FusionInsights rows={[]} initialTab="preparation"/>);
+  const control=await screen.findByLabelText('Autoriser la transcription directe en essai');
+  expect(control.matches(':disabled')).toBe(true);
+  expect(screen.queryByRole('button',{name:'Enregistrer les réglages'})).toBeNull();
+  expect(fusionInsights.readiness).not.toHaveBeenCalled();
+  expect(screen.getByRole('button',{name:'Actualiser'}).matches(':disabled')).toBe(false);
+});
+
 it('enregistre le calcul GPU sans activer la transcription ni ouvrir le microphone',async()=>{
   const existing:FusionSettings={...settings,live_speech_device:'cpu',speech_acceleration:{selected:'cpu',cuda_available:true,environment_override:false,detail:'GPU disponible en essai.',selection_starts_model:false}};
   vi.mocked(fusionInsights.settings).mockResolvedValue(existing);

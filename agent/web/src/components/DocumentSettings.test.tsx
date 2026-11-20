@@ -13,6 +13,17 @@ beforeEach(()=>{vi.spyOn(documentApi,'preferences').mockResolvedValue(structured
 afterEach(()=>{cleanup();vi.restoreAllMocks();});
 async function ready(){await screen.findByLabelText('Modifier les recherches des trames');await waitFor(()=>expect((screen.getAllByLabelText('Libellé')[0] as HTMLInputElement).disabled).toBe(false));}
 
+it('affiche les huit règles sans autoriser leur modification au lecteur',async()=>{
+  vi.mocked(documentApi.preferences).mockResolvedValue({...state,can_edit:false});
+  render(<DocumentSettings active onBusy={vi.fn()}/>);
+  const form=await screen.findByLabelText('Consulter les recherches des trames');
+  expect(screen.getAllByLabelText('Libellé')).toHaveLength(8);
+  expect(screen.getAllByLabelText('Libellé')[0].matches(':disabled')).toBe(true);
+  expect(screen.queryByRole('button',{name:'Historique des réglages'})).toBeNull();
+  fireEvent.submit(form);
+  expect(documentApi.savePreferences).not.toHaveBeenCalled();
+});
+
 it('enregistre les huit règles explicitement avec des listes normalisées et une révision',async()=>{
   render(<DocumentSettings active onBusy={vi.fn()}/>);await ready();expect(screen.getAllByLabelText('Libellé')).toHaveLength(8);
   fireEvent.change(screen.getAllByLabelText('Libellé')[0],{target:{value:'Ma trame'}});

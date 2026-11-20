@@ -4,7 +4,7 @@ from uuid import UUID
 
 from pydantic import Field, field_validator, model_validator
 
-from .project_note_schemas import Closed, Command
+from .project_note_schemas import NOTE_ATTACHMENT_BUDGET, Closed, Command
 
 DIGEST = r'^[0-9a-f]{64}$'
 
@@ -63,7 +63,7 @@ class ImportedAttachmentCapture(Closed):
     id: str = Field(pattern=r'^[0-9a-f-]{36}$')
     filename: str = Field(min_length=1, max_length=255)
     content_type: str = Field(min_length=1, max_length=120)
-    size_bytes: int = Field(strict=True, ge=1, le=5242880)
+    size_bytes: int = Field(strict=True, ge=1, le=NOTE_ATTACHMENT_BUDGET)
     sha256: str = Field(pattern=DIGEST)
     source_path: str | None = Field(default=None, max_length=1024)
 
@@ -110,7 +110,7 @@ class NoteImportCapture(Closed):
                 or len({item.note_version_id for item in self.versions}) != len(self.versions)
                 or len({item.source_key for item in self.versions}) != len(self.versions)
                 or len({item.id for item in self.attachments}) != len(self.attachments)
-                or sum(item.size_bytes for item in self.attachments) > 25 * 1024 * 1024):
+                or sum(item.size_bytes for item in self.attachments) > NOTE_ATTACHMENT_BUDGET):
             raise ValueError('Métadonnées source ou liaisons d’import incompatibles')
         if self.source_kind == 'external_office' and (self.attachments or len(self.versions) != 1):
             raise ValueError('Un document Office externe conserve une seule vue en consultation')

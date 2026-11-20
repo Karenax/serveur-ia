@@ -14,6 +14,7 @@ from fastapi import HTTPException
 
 from backend.app.models import NetworkLink
 from backend.app.project_note_import_schemas import SourceDescriptor
+from backend.app.project_note_schemas import NOTE_ATTACHMENT_BUDGET
 from backend.app.services import document_file_access as access
 from backend.app.services.document_discovery import _directory, _reparse
 from backend.app.services.project_identity import _project
@@ -115,10 +116,10 @@ class Selection:
                 or (kind == 'legacy_text' and path.suffix.casefold() not in {'.html', '.htm'})):
             maximum = MAX_TEXT_BYTES
         if kind == 'attachment':
-            maximum = 5 * 1024 * 1024
+            maximum = NOTE_ATTACHMENT_BUDGET
             self.attachment_count += 1
             self.attachment_bytes += metadata.st_size
-            if self.attachment_count > 20 or self.attachment_bytes > 25 * 1024 * 1024:
+            if self.attachment_count > 20 or self.attachment_bytes > NOTE_ATTACHMENT_BUDGET:
                 raise HTTPException(413, 'Toutes les pièces doivent tenir dans20éléments/25Mio')
         if not 0 <= metadata.st_size <= maximum or (kind in {'attachment', 'external'} and not metadata.st_size):
             raise HTTPException(413, 'Fichier source dépassant les limites de la note')

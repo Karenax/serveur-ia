@@ -36,6 +36,14 @@ class DesktopAuditCoverageTests(unittest.TestCase):
             self.assertIn('--desktop-audit', commands[0])
             self.assertIn(f'--{platform}-only', commands[0])
 
+    def test_portal_profiles_check_the_manifest_after_build(self):
+        checks = definitions(Path('D:/fixture'))
+        for name in ('desktop-portal', 'business-web'):
+            commands = checks[name]
+            build = next(i for i, command in enumerate(commands) if 'build' in command and '--manifest' in command)
+            budget = next(i for i, command in enumerate(commands) if any(str(part).endswith('web-initial-budget.mjs') for part in command))
+            self.assertLess(build, budget)
+
 
 if __name__ == '__main__':
     unittest.main()

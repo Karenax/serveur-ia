@@ -10,7 +10,6 @@ const uiPaths={notifications:'M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10
 function uiIcon(name){const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('fill','none');svg.setAttribute('stroke','currentColor');svg.setAttribute('stroke-width','1.7');svg.setAttribute('stroke-linecap','round');svg.setAttribute('stroke-linejoin','round');svg.setAttribute('aria-hidden','true');svg.classList.add('icon');for(const shape of (uiPaths[name]||uiPaths.general).split('|')){if(shape.startsWith('<')){svg.insertAdjacentHTML('beforeend',shape);continue;}const path=document.createElementNS(svg.namespaceURI,'path');path.setAttribute('d',shape);svg.append(path);}return svg;}
 const uiNavTitles={notifications:'Notifications',chat:'Conversations',projects:'Projets',settings:'Réglages'};
 const uiNavigationLabels=new WeakMap();
-let uiUnifiedStatusLabel=null;
 uiNavTitles.assistant='Mémoire et rappels';uiPaths.assistant='M4 4h7v16H4V4m9 0h7v16h-7V4M7 8h1m8 0h1M7 12h1m8 0h1';
 async function uiOpenProjectWorkspace(path){
   if(busy)throw new Error('Attendez la fin de la réponse.');
@@ -23,26 +22,68 @@ async function uiOpenProjectWorkspace(path){
     window.location.assign(config.web_prefix+(path||'/app'));
     return;
   }
-  const result=await api('/client/project-session',{});
+  let result;
+  try{result=await api('/client/project-session',{});}
+  catch(failure){failure.projectSessionUnavailable=true;throw failure;}
   await window.voiceFinishForClose?.();
   window.location.assign(path||result.url);
+}
+const uiNativeSettings=document.body.dataset.kiaraNativeSettings==='true';
+function uiNeedsDeviceRecovery(){
+  return !historyReady||historyBlocked||uiLastConnection.connection_required||(!connected&&!!uiLastConnection.checked_at);
+}
+async function uiOpenDeviceRecovery(section='connexion',prepared=false){
+  if(!prepared){
+    if(busy)throw new Error('Attendez la fin de la réponse.');
+    if(ws.projectDirty)throw new Error('Enregistrez les consignes du projet avant de continuer.');
+    window.uiCheckPendingEdits?.();
+    if(ws.dirty)await wsKeepDraft();
+    uiComposerSync();
+    if(uiDraftDirty||uiPreferencesPending||typeof correctorDirty!=='undefined'&&correctorDirty)await uiPersistPreferences();
+    if(historyReady&&!historyBlocked){save();await flushHistory();}
+  }
+  const session=await api('/client/device-session',{});
+  await window.voiceFinishForClose?.();
+  window.location.assign(session.url+'?section='+encodeURIComponent(section));
+}
+function uiOpenWorkspaceSetting(event, setting) {
+  if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey ||
+      document.body.dataset.kiaraUnifiedNavigation !== 'true') return;
+  event.preventDefault();
+  return wsTry(async()=>{
+    const local=uiNativeSettings&&['vocal','dictee','connexion','mises-a-jour','api-locale'].includes(setting);
+    if(local&&uiNeedsDeviceRecovery()){await uiOpenDeviceRecovery(setting);return;}
+    try{await uiOpenProjectWorkspace('/app/settings?settings='+encodeURIComponent(setting));}
+    catch(failure){
+      if(!local||!failure.projectSessionUnavailable)throw failure;
+      await uiOpenDeviceRecovery(setting,true);
+    }
+  });
 }
 if(platformCapabilities.platform!=='android'){
   const openPortfolio=$('ws-open-portfolio');
   openPortfolio.onclick=()=>wsTry(()=>uiOpenProjectWorkspace());
   const projectButton=document.querySelector('[data-view-button="projects"]');
-  const nav=document.querySelector('#client-navigation');
-  const notifications=nav.querySelector('[data-view-button="notifications"]');
-  let unifiedNavigation = false;
-  // Une fenêtre Windows ayant déjà affiché la barre Kiara doit la retrouver au boot,
-  // sans attendre la réponse réseau. Un contexte vierge reste en mode classique.
-  try {
-    unifiedNavigation = localStorage.getItem('fred-unified-navigation') === 'true' || document.body.dataset.kiaraUnifiedNavigation === 'true';
-  } catch {}
-  const brandTitle = document.querySelector('.brand strong');
+  const unifiedNavigation = document.body.dataset.kiaraUnifiedNavigation === 'true';
   const settingsButton = document.querySelector('[data-view-button="settings"]');
   const openLocalSettings = settingsButton.onclick;
-  settingsButton.onclick = () => unifiedNavigation ? wsTry(()=>uiOpenProjectWorkspace('/app/settings')) : openLocalSettings();
+  settingsButton.onclick = () => unifiedNavigation ? wsTry(async()=>{
+    if(uiNativeSettings&&uiNeedsDeviceRecovery()){
+      await uiOpenDeviceRecovery();
+      return;
+    }
+    try { await uiOpenProjectWorkspace('/app/settings'); }
+    catch (failure) {
+      if(uiNativeSettings){
+        if(!failure.projectSessionUnavailable)throw failure;
+        await uiOpenDeviceRecovery('connexion',true);
+        return;
+      }
+      if(platformCapabilities.platform!=='windows')throw failure;
+      openLocalSettings();
+      error(failure);
+    }
+  }) : openLocalSettings();
   const openLocalProjects = projectButton.onclick;
   projectButton.onclick = () => {
     if(unifiedNavigation || (ws.data?.project_catalogue?.interface==='projects-v1' && ws.data.project_catalogue.state==='ready')) {
@@ -50,70 +91,36 @@ if(platformCapabilities.platform!=='android'){
     }
     return openLocalProjects();
   };
-  const entries = [
-    ['Notes', '/app/notes', 'M6 3h12v18H6zM9 8h6M9 12h6M9 16h4'],
-    ['Mails', '/app/mails', 'M3 5h18v14H3zM3 5l9 7 9-7'],
-    ['Réunions', '/app/reunions', 'M4 10v4M8 5v14M12 8v8M16 3v18M20 9v6'],
-    ['Activité', '/app/activite', 'M3 12h4l3-6 4 12 3-6h4']
-  ];
-  let links = [];
-  let unifiedDomApplied = false;
-  const applyUnifiedDom = () => {
-    if (unifiedDomApplied) return;
-    unifiedDomApplied = true;
-    document.body.dataset.kiaraUnifiedNavigation = 'true';
-    brandTitle.textContent = 'Kiara';
-    const toolbar = wsElement('div', undefined, 'conversation-toolbar');
-    const history = wsElement('details', undefined, 'conversation-history-menu');
-    const summary = wsElement('summary', 'Historique');
-    history.append(summary, wsHistoryNavigation);
-    history.addEventListener('keydown', event => {
-      if (event.key === 'Escape' && history.open) { event.preventDefault(); event.stopPropagation(); history.open = false; summary.focus(); }
-    });
-    history.addEventListener('click', event => {
-      if (event.target.closest('.conversation-item')) {
-        history.open = false;
-        summary.focus();
-      }
-    });
-    document.addEventListener('click', event => { if (!history.contains(event.target)) history.open = false; });
-    toolbar.append($('new'), history);
-    document.querySelector('.chat-view').prepend(toolbar);
-    document.querySelector('[data-view="access"]').append(document.querySelector('.sidebar-bottom'));
-    const locationLabel = wsElement('span', platformCapabilities.platform === 'windows' ? 'Serveur Kiara' : 'Espace de travail', 'unified-sidebar-status');
-    uiUnifiedStatusLabel = locationLabel;
-    settingsButton.after(locationLabel);
-    links = entries.map(([label,path,icon]) => {
-      uiPaths[label] = icon;
-      const button = wsElement('button',null,'nav-button');
-      button.type = 'button';
-      button.append(uiIcon(label),wsElement('span',label,'nav-text'));
-      button.onclick = () => wsTry(() => uiOpenProjectWorkspace(path));
-      return button;
-    });
-    projectButton.after(...links);
-    if (platformCapabilities.platform === 'windows' && notifications.parentNode === nav) {
-      notifications.classList.add('notifications-shortcut');
-      $('connection').before(notifications);
-    }
+  const destinations={
+    notes:['/app/notes','M6 3h12v18H6zM9 8h6M9 12h6M9 16h4'],
+    mail:['/app/mail','M3 5h18v14H3zM3 5l9 7 9-7'],
+    meetings:['/app/meetings','M4 10v4M8 5v14M12 8v8M16 3v18M20 9v6'],
+    activity:['/app/activite','M3 12h4l3-6 4 12 3-6h4'],
   };
-  const enableUnifiedNavigation = () => {
-    unifiedNavigation = true;
-    try { localStorage.setItem('fred-unified-navigation', 'true'); } catch {}
-    applyUnifiedDom();
-  };
-  const drawProjects = wsDrawProjects;
-  wsDrawProjects = function(){
-    drawProjects();
-    const catalogue = ws.data?.project_catalogue;
-    // Dès que le catalogue annonce la navigation Kiara, même indisponible, on bascule.
-    if (catalogue?.navigation === 'kiara-v1') enableUnifiedNavigation();
-    openPortfolio.hidden = catalogue?.interface === 'projects-v1' && catalogue.state === 'ready';
-  };
-  if (unifiedNavigation) {
-    try { localStorage.setItem('fred-unified-navigation', 'true'); } catch {}
-    queueMicrotask(applyUnifiedDom);
+  for(const button of document.querySelectorAll('[data-workspace-link]')){
+    const name=button.dataset.workspaceLink,[path,icon]=destinations[name];
+    uiPaths[name]=icon;
+    const label=button.textContent;
+    button.title=label;
+    button.replaceChildren(uiIcon(name),wsElement('span',label,'nav-text'));
+    button.onclick=()=>wsTry(()=>uiOpenProjectWorkspace(path));
   }
+  const history=document.querySelector('.conversation-history-menu');
+  if(history){
+    const summary=history.querySelector('summary');
+    history.addEventListener('keydown',event=>{
+      if(event.key==='Escape'&&history.open){event.preventDefault();event.stopPropagation();history.open=false;summary.focus();}
+    });
+    history.addEventListener('click',event=>{
+      if(event.target.closest('.conversation-item')){history.open=false;summary.focus();}
+    });
+  }
+  const drawProjects=wsDrawProjects;
+  wsDrawProjects=function(){
+    drawProjects();
+    const catalogue=ws.data?.project_catalogue;
+    openPortfolio.hidden=catalogue?.interface==='projects-v1'&&catalogue.state==='ready';
+  };
 }
 if (platformCapabilities.platform !== 'windows' && location.hash === '#notifications') {
   void clientReady.then(() => showView('notifications'));
@@ -124,20 +131,19 @@ if (platformCapabilities.platform === 'windows' || platformCapabilities.platform
       showView('notifications');
       return;
     }
-    if (location.hash === '#reglages') { showView('settings'); return; }
-    if (location.hash !== '#apparence') return;
-    showView('settings');
-    $('ui-theme').focus();
+
   };
   window.addEventListener('hashchange', openChatDestination);
   void clientReady.then(openChatDestination);
 }
 function uiDecorateNavigation(){for(const button of document.querySelectorAll('[data-view-button]')){button.removeAttribute('aria-selected');if(button.classList.contains('active'))button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');}for(const b of document.querySelectorAll('.nav-button')){const name=b.dataset.viewButton;if(!uiNavTitles[name])continue;const unchangedSignature=JSON.stringify([name,uiNavTitles[name],b.dataset.unreadCount||0,b.dataset.unread==='true'||b.textContent.includes('résultats disponibles')]);if(uiNavigationLabels.get(b)===unchangedSignature&&b.querySelector('.nav-text'))continue;uiNavigationLabels.set(b,unchangedSignature);if(name==='notifications'){const count=Number(b.dataset.unreadCount||0);b.replaceChildren(uiIcon(name),wsElement('span',uiNavTitles[name],'nav-text'));if(count)b.append(wsElement('span',String(count),'fred-nav-count'));b.title='Notifications'+(count?' · '+count+' non lues':'');continue;}b.replaceChildren(uiIcon(name),wsElement('span',uiNavTitles[name],'nav-text'));b.title=uiNavTitles[name];}}
 $('new').prepend(uiIcon('new'));$('ui-sidebar-toggle').append(uiIcon('sidebar'));
-document.querySelector('.sidebar-settings').append(document.querySelector('[data-view-button="settings"]'));
-if(uiUnifiedStatusLabel)document.querySelector('.sidebar-settings').append(uiUnifiedStatusLabel);
+const settingsFooter=document.querySelector('.sidebar-settings');
+const settingsToggle=document.querySelector('[data-view-button="settings"]');
+if(!settingsFooter.contains(settingsToggle))settingsFooter.append(settingsToggle);
 $('workspace-heading').after($('undo-delete'));
-document.querySelector('[data-view="access"] .settings-card:last-child').append(document.querySelector('.sidebar-tools'));
+const historyTools=document.querySelector('.sidebar .sidebar-tools');
+if(historyTools)document.querySelector('[data-view="access"] .settings-card:last-child').append(historyTools);
 wsSettingsNav.classList.add('settings-subnav');
 const uiSidebar=document.querySelector('.sidebar'),uiMain=document.querySelector('.workspace');
 uiMain.id='fred-main';uiMain.setAttribute('role','main');uiMain.setAttribute('aria-labelledby','workspace-heading');uiMain.tabIndex=-1;$('messages').setAttribute('role','region');
@@ -153,7 +159,9 @@ uiSidebar.addEventListener('keydown',e=>{if(e.key!=='Tab'||!uiSidebarModal())ret
 uiSidebarClose.onclick=()=>uiCloseSidebar();$('ui-sidebar-toggle').onclick=uiToggleSidebar;document.querySelector('.sidebar-backdrop').onclick=()=>uiCloseSidebar();matchMedia('(max-width:850px)').addEventListener('change',()=>{const hiddenFocus=uiSidebar.contains(document.activeElement);document.body.classList.remove('sidebar-open');uiSyncSidebar();if(hiddenFocus&&uiSidebar.inert)$('ui-sidebar-toggle').focus();});uiSyncSidebar();
 const uiThemeCard=wsElement('div',undefined,'settings-card');uiThemeCard.append(wsElement('h3','Apparence'));const uiThemeRow=wsElement('div',undefined,'theme-row');const uiThemeLabel=wsElement('label','Thème de l’interface');uiThemeLabel.htmlFor='ui-theme';const uiThemeSelect=wsElement('select');uiThemeSelect.id='ui-theme';uiThemeSelect.append(new Option('Clair','light'),new Option('Sombre','dark'),new Option('Comme Windows','system'));uiThemeRow.append(uiThemeLabel,uiThemeSelect);uiThemeCard.append(uiThemeRow);document.querySelector('[data-view="access"]').prepend(uiThemeCard);
 if(platformCapabilities.platform==='web') uiThemeSelect.options[2].textContent='Comme le système';
-let uiTheme='light';try{uiTheme=localStorage.getItem('fred-theme')||'light';}catch{}if(!['light','dark','system'].includes(uiTheme))uiTheme='light';
+function uiStoredPreference(key){try{return localStorage.getItem(key);}catch{return null;}}
+const uiLocalTheme=uiStoredPreference('fred-theme')||uiStoredPreference('agent-ui-theme');
+let uiTheme=['light','dark','system'].includes(uiLocalTheme)?uiLocalTheme:'light';
 function uiSetTheme(value){uiTheme=value;uiThemeSelect.value=value;document.documentElement.dataset.theme=value==='system'?(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'):value;try{localStorage.setItem('fred-theme',value);}catch{}}
 uiSetTheme(uiTheme);uiThemeSelect.onchange=()=>uiSetTheme(uiThemeSelect.value);matchMedia('(prefers-color-scheme:dark)').addEventListener('change',()=>{if(uiTheme==='system')uiSetTheme('system');});
 
@@ -164,8 +172,8 @@ const uiFontSelect=uiReadingSetting('ui-font','Police des conversations',uiFonts
 const uiFontPreview=wsElement('p','Une réponse claire, agréable à lire.','reading-preview');uiThemeCard.append(uiFontPreview,wsElement('small','Les changements s’appliquent immédiatement aux conversations et au correcteur.'));
 const uiReadingStatus=wsElement('small');uiReadingStatus.id='ui-reading-status';uiReadingStatus.setAttribute('role','status');uiThemeCard.append(uiReadingStatus);
 function uiSetReading(font,size){font=Object.hasOwn(uiFonts,font)?font:'system';size=Object.hasOwn(uiReadingSizes,size)?size:'standard';uiFontSelect.value=font;uiSizeSelect.value=size;document.documentElement.style.setProperty('--reading-font',uiFonts[font].css);document.documentElement.style.setProperty('--reading-size',uiReadingSizes[size].css);uiReadingStatus.textContent='Appliqué : '+uiFonts[font].label+' · '+uiReadingSizes[size].label;try{localStorage.setItem('fred-reading-font',font);localStorage.setItem('fred-reading-size',size);}catch{}}
-let uiSavedFont='system',uiSavedSize='standard';try{uiSavedFont=localStorage.getItem('fred-reading-font')||uiSavedFont;uiSavedSize=localStorage.getItem('fred-reading-size')||uiSavedSize;}catch{}
-uiSetReading(uiSavedFont,uiSavedSize);
+const uiSavedFont=uiStoredPreference('fred-reading-font'),uiSavedSize=uiStoredPreference('fred-reading-size');
+uiSetReading(uiSavedFont||'system',uiSavedSize||'standard');
 for(const control of [uiFontSelect,uiSizeSelect]){
   control.addEventListener('input',()=>uiSetReading(uiFontSelect.value,uiSizeSelect.value));
   control.addEventListener('change',()=>{
@@ -177,7 +185,10 @@ for(const control of [uiFontSelect,uiSizeSelect]){
 }
 
 let uiPreferencesPending=0,uiPreferencesWrites=Promise.resolve(),uiPreferencesLoaded=false;
-let uiComposerId=currentId,uiComposerDrafts=Object.create(null),uiDraftsLoaded=false,uiDraftDirty=false,uiDraftVersion=0,uiDraftTimer=null;
+let uiComposerId=currentId,uiComposerDrafts=Object.create(null),uiDraftsLoaded=false,uiCorrectorDraftExists=false,uiDraftDirty=false,uiDraftVersion=0,uiDraftTimer=null;
+window.kiaraComposerDraftsReady=()=>uiDraftsLoaded;
+window.kiaraCorrectorDraftExists=()=>uiCorrectorDraftExists;
+buttons();
 const uiDraftChanges=new Map();
 function uiRemoveComposerDraft(id){uiComposerSync();const text=uiComposerDrafts[id]||'';if(uiComposerId===id)$('prompt').value='';uiComposerRemember(id,'');return text;}
 function uiRestoreComposerDraft(id,text){if(text)uiComposerRemember(id,text);}
@@ -201,7 +212,7 @@ window.kiaraPrepareClose=async()=>{
   await flushHistory();
   await api('/client/history/flush',{});
 };
-const uiDraftStatus=wsElement('span',undefined,'draft-status');uiDraftStatus.id='ui-draft-status';uiDraftStatus.setAttribute('role','status');uiDraftStatus.hidden=true;document.querySelector('.composer').append(uiDraftStatus);
+const uiDraftStatus=wsElement('span','Chargement des brouillons…','draft-status');uiDraftStatus.id='ui-draft-status';uiDraftStatus.setAttribute('role','status');document.querySelector(platformCapabilities.platform==='android'?'.composer':'.conversation-recovery').append(uiDraftStatus);
 const uiDraftRetry=wsElement('button','Réessayer l’enregistrement','secondary draft-retry');uiDraftRetry.id='ui-draft-retry';uiDraftRetry.type='button';uiDraftRetry.hidden=true;uiDraftStatus.after(uiDraftRetry);
 uiDraftRetry.onclick=async()=>{uiDraftRetry.disabled=true;try{await uiPersistPreferences();}catch(e){error(e);}finally{uiDraftRetry.disabled=false;}};
 function uiComposerRemember(id,text){
@@ -216,13 +227,25 @@ function uiComposerSync(){
   if(uiComposerId!==currentId){uiComposerId=currentId;$('prompt').value=uiComposerDrafts[currentId]||'';$('prompt').dispatchEvent(new Event('input',{bubbles:true}));uiDraftStatus.hidden=!$('prompt').value;uiDraftStatus.textContent=uiDraftDirty?'Brouillon à enregistrer sur cet appareil':'Brouillon conservé sur cet appareil';}
 }
 function uiLoadComposerDrafts(values){
-  if(uiDraftsLoaded)return;uiDraftsLoaded=true;
-  uiComposerDrafts=Object.assign(Object.create(null),values?.conversation_drafts||{});for(const [id,text] of uiDraftChanges){if(text)uiComposerDrafts[id]=text;else delete uiComposerDrafts[id];}
+  if(uiDraftsLoaded)return;
+  const drafts=values?.conversation_drafts===undefined?{}:values.conversation_drafts;
+  if(!values||typeof values!=='object'||Array.isArray(values)||!drafts||typeof drafts!=='object'||Array.isArray(drafts)
+      ||Object.values(drafts).some(text=>typeof text!=='string')
+      ||('corrector_text' in values&&typeof values.corrector_text!=='string')){
+    throw new Error('Brouillons locaux invalides. Les données restent conservées ; vérifiez-les avant de continuer.');
+  }
+  uiCorrectorDraftExists=Object.prototype.hasOwnProperty.call(values,'corrector_text');
+  if(typeof values.corrector_text==='string'&&$('corrector-text')&&!correctorDirty)$('corrector-text').value=values.corrector_text;
+  uiDraftsLoaded=true;
+  uiComposerDrafts=Object.assign(Object.create(null),drafts);for(const [id,text] of uiDraftChanges){if(text)uiComposerDrafts[id]=text;else delete uiComposerDrafts[id];}
+  uiDraftStatus.hidden=true;
   if(!$('prompt').value&&uiComposerDrafts[currentId]){$('prompt').value=uiComposerDrafts[currentId];uiDraftStatus.hidden=false;uiDraftStatus.textContent='Brouillon récupéré sur cet appareil';}
+  buttons();
+  window.historyBootstrapView?.();
 }
 $('prompt').addEventListener('input',()=>{if(!window.kiaraProjectConversation?.active)uiComposerRemember(uiComposerId,$('prompt').value);});
 async function uiPersistPreferences(){
-  if(!uiDraftsLoaded){const state=await api('/client/state');uiLoadComposerDrafts(state.preferences||{});}
+  if(!uiDraftsLoaded){const state=await api('/client/state');uiLoadComposerDrafts(state.preferences);}
   uiComposerSync();clearTimeout(uiDraftTimer);const draftVersion=uiDraftVersion;
   uiPreferencesLoaded=true;
   const values={theme:uiTheme,font:uiFontSelect.value,text_size:uiSizeSelect.value,...uiThinkingPreferences(),...window.conversationPreferences?.(),sidebar_collapsed:document.body.classList.contains('sidebar-collapsed'),corrector_text:$('corrector-text')?.value||'',conversation_drafts:Object.fromEntries(uiDraftChanges)};
@@ -231,12 +254,12 @@ async function uiPersistPreferences(){
   return uiPreferencesWrites;
 }
 function uiApplyPreferences(values){
-  if(values)uiLoadComposerDrafts(values);
+  if(!uiDraftsLoaded)uiLoadComposerDrafts(values);
   if(uiPreferencesLoaded||uiPreferencesPending||!values)return;
   uiPreferencesLoaded=true;
   window.conversationApplyPreferences?.(values);
-  if(values.theme)uiSetTheme(values.theme);
-  uiSetReading(values.font||uiFontSelect.value,values.text_size||uiSizeSelect.value);
+  if(values.theme&&!uiLocalTheme)uiSetTheme(values.theme);
+  uiSetReading(uiSavedFont||values.font||uiFontSelect.value,uiSavedSize||values.text_size||uiSizeSelect.value);
   if(!busy){uiThinkingLoad(values);}
   if(typeof values.corrector_text==='string'&&$('corrector-text')&&!correctorDirty&&document.activeElement!==$('corrector-text'))$('corrector-text').value=values.corrector_text;
   if(typeof values.sidebar_collapsed==='boolean'){
@@ -258,10 +281,23 @@ const uiSourceButton=wsElement('button','Sources','context-details');uiSourceBut
 let uiConversation=null;
 const uiRender=render;render=function(){uiComposerSync();uiRender();document.querySelector('.chat-view').classList.toggle('is-empty',!messages.length);if(uiConversation!==currentId){uiSourceButton.hidden=true;$('ws-side').hidden=true;uiConversation=currentId;}uiDecorateNavigation();};
 const uiDrawLibrary=drawLibrary;drawLibrary=function(){uiComposerSync();uiDrawLibrary();document.querySelector('.chat-view').classList.toggle('is-empty',!messages.length);};
-const uiShowView=showView;showView=function(name){const moveFocus=uiSidebarModal()||uiSidebar.contains(document.activeElement);uiShowView(name);uiDecorateNavigation();uiCloseSidebar(false);if(moveFocus){$('workspace-heading').tabIndex=-1;$('workspace-heading').focus();}/* kiara-slot:platform-expression-25 */if(name==='api')uiRefreshIntegrations();/* /kiara-slot:platform-expression-25 */};
+onViewChange({before(){return {moveFocus:uiSidebarModal()||uiSidebar.contains(document.activeElement)};},after(name,{moveFocus}){uiDecorateNavigation();uiCloseSidebar(false);if(moveFocus){$('workspace-heading').tabIndex=-1;$('workspace-heading').focus();}/* kiara-slot:platform-expression-25 */if(name==='api')uiRefreshIntegrations();/* /kiara-slot:platform-expression-25 */}});
 $('prompt').addEventListener('input',()=>{const field=$('prompt');field.style.height='auto';field.style.height=Math.min(180,Math.max(74,field.scrollHeight))+'px';});
 $('conversation-title').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('rename-conversation').click();e.target.blur();}});$('conversation-title').addEventListener('change',()=>$('rename-conversation').click());
-document.addEventListener('click',e=>{for(const menu of document.querySelectorAll('.menu[open]')){if(!menu.contains(e.target)||e.target.closest('.menu-body button'))menu.open=false;}});
+document.addEventListener('click',event=>{
+  if(!event.isTrusted)return;
+  const path=event.composedPath();
+  for(const menu of document.querySelectorAll('details[open]:is(.menu,.composer-options,.conversation-history-menu)')){
+    if(!path.includes(menu))menu.open=false;
+  }
+  const panel=$('connection-panel');
+  if(!panel.hidden&&!path.includes(panel)&&!path.includes($('connection')))uiCloseConnectionPanel(false);
+},true);
+document.addEventListener('click',event=>{
+  const action=event.target.closest?.('.menu-body button');
+  const menu=action?.closest('details.menu');
+  if(menu)menu.open=false;
+});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){for(const d of document.querySelectorAll('.menu[open],.composer-options[open]'))d.open=false;if(!$('connection-panel').hidden){$('connection-close').click();return;}uiCloseSidebar();$('ws-side').hidden=true;}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='b'&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)){e.preventDefault();uiToggleSidebar();}});
 
 function uiProjectTab(name){for(const pane of document.querySelectorAll('[data-project-pane]'))pane.hidden=pane.dataset.projectPane!==name;for(const b of document.querySelectorAll('[data-project-tab]')){const selected=b.dataset.projectTab===name;b.classList.toggle('active',selected);b.removeAttribute('aria-selected');if(selected)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');}}
@@ -335,8 +371,21 @@ function uiConnectionStatus(state=uiLastConnection){
   if(busy&&!agentApproval)$('queue-state').textContent=label;
 }
 $('connection').onclick=()=>{const panel=$('connection-panel');panel.hidden=!panel.hidden;$('connection').setAttribute('aria-expanded',String(!panel.hidden));uiConnectionStatus();if(!panel.hidden)$('connection-close').focus();};
-$('connection-close').onclick=()=>{const restore=$('connection-panel').contains(document.activeElement);$('connection-panel').hidden=true;$('connection').setAttribute('aria-expanded','false');if(restore)$('connection').focus();};
+function uiCloseConnectionPanel(restoreFocus=true){
+  const panel=$('connection-panel'),trigger=$('connection');
+  const restore=restoreFocus&&panel.contains(document.activeElement);
+  panel.hidden=true;
+  trigger.setAttribute('aria-expanded','false');
+  if(restore)trigger.focus();
+}
+$('connection-close').onclick=()=>uiCloseConnectionPanel();
 $('connection-retry').onclick=()=>{$('reconnect').click();};
+if(uiNativeSettings){
+  const recovery=wsElement('button','Réglages de connexion','secondary');
+  recovery.type='button';
+  recovery.onclick=()=>wsTry(()=>uiOpenDeviceRecovery());
+  $('connection-retry').after(recovery);
+}
 /* kiara-slot:desktop-connection-transfer-controls-32 */let uiWireGuardEndpoint='';
 function uiSetConnectionMode(https){
   $('connection-mode').value=https?'https':'wireguard';

@@ -5,7 +5,10 @@ from typing import Annotated, Literal
 from urllib.parse import urlsplit
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_serializer, model_validator
+
+NOTE_ATTACHMENT_BUDGET = 25 * 1024 * 1024
+NoteBackground = Literal['yellow', 'green', 'blue', 'pink']
 
 
 class Closed(BaseModel):
@@ -110,6 +113,14 @@ Block = Annotated[Paragraph | Heading | ListBlock | TableBlock | ImageBlock, Fie
 class NoteContent(Closed):
     version: Literal[1] = 1
     blocks: list[Block] = Field(default_factory=list, max_length=500)
+    background: NoteBackground | None = None
+
+    @model_serializer(mode='wrap')
+    def keep_uncolored_format(self, serialize):
+        value = serialize(self)
+        if self.background is None:
+            value.pop('background', None)
+        return value
 
     @field_validator('version', mode='before')
     @classmethod
@@ -160,8 +171,11 @@ class NoteSave(NoteCreate):
         return normalized
 
 
-class NoteRestore(Command):
+class NoteDelete(Command):
     expected_revision: int = Field(ge=1)
+
+
+class NoteRestore(NoteDelete):
     version_id: str = Field(pattern=r'^[0-9a-f-]{36}$')
 
     @field_validator('version_id')

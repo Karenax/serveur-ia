@@ -71,7 +71,7 @@
 }
 @media (min-width:851px) {
   .workspace-shell[data-kiara-navigation="true"] {
-    grid-template-columns:238px minmax(0,1fr);
+    grid-template-columns:216px minmax(0,1fr);
   }
   /* Même repli que client-qwen : 70px, icônes seules. */
   .workspace-shell[data-kiara-navigation="true"].workspace-sidebar-collapsed {

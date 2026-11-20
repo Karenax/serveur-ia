@@ -118,8 +118,8 @@ export function MeetingAudioPanel({projectId, onPublished, initialRecordingId, w
     if (!preserveTranscriptDraft) {setSegments(row.segments); setNames(row.speaker_names); setDirty(false);}
     if (!preserveSummaryDraft) {setSummary({...emptySummary(), ...row.summary}); setSummaryDirty(false);}
   }, []);
-  const reload = useCallback(async (quiet=false) => {
-    const rows = await (quiet?meetingAudio.list(projectId,true):meetingAudio.list(projectId));
+  const reload = useCallback(async () => {
+    const rows = await meetingAudio.list(projectId);
     if (alive.current && scope.current === currentScope) setList(initialRecordingId?rows.filter(row=>row.id===initialRecordingId):rows);
   }, [projectId,initialRecordingId,currentScope]);
   useEffect(() => {
@@ -137,6 +137,7 @@ export function MeetingAudioPanel({projectId, onPublished, initialRecordingId, w
   useEffect(() => {
     if (!viewActive || !active(record)) return;
     let disposed = false, polling = false, controller:AbortController|null=null;
+    let timer: number | undefined;
     const id = record!.id;
     const poll = async () => {
       if (polling || disposed || document.hidden) return;
@@ -144,16 +145,34 @@ export function MeetingAudioPanel({projectId, onPublished, initialRecordingId, w
       const request=new AbortController();controller=request;
       try {
         const row = await meetingAudio.get(projectId, id,request.signal,true);
-        if (!disposed && !request.signal.aborted) {accept(row,drafts.current.summaryDirty,drafts.current.dirty); if (!active(row)) await reload(true);}
+        if (!disposed && !request.signal.aborted) {
+          accept(row, drafts.current.summaryDirty, drafts.current.dirty);
+          // The final status already contains the fields shown in the list.
+          if (!active(row)) setList(entries => entries.map(entry => entry.id === row.id
+            ? {...entry, date: row.date, title: row.title, published_meeting_id: row.published_meeting_id}
+            : entry));
+        }
       } catch (e) {if (!disposed && !request.signal.aborted) setError(String((e as Error).message));}
       finally {if(controller===request){controller=null;polling=false;}}
     };
-    const visibility=()=>{if(document.hidden){controller?.abort();controller=null;polling=false;}else void poll();};
+    const stop = () => {
+      window.clearInterval(timer);
+      timer = undefined;
+      controller?.abort();
+      controller = null;
+      polling = false;
+    };
+    const visibility = () => {
+      if (document.hidden) stop();
+      else if (timer === undefined) {
+        void poll();
+        timer = window.setInterval(() => void poll(), 2000);
+      }
+    };
     document.addEventListener('visibilitychange',visibility);
-    const timer = window.setInterval(()=>void poll(),2000);
-    if(!document.hidden)void poll();
-    return () => {disposed = true; controller?.abort(); document.removeEventListener('visibilitychange',visibility); window.clearInterval(timer);};
-  }, [projectId, record?.id, record?.job_status, accept, reload, viewActive]);
+    visibility();
+    return () => {disposed = true; stop(); document.removeEventListener('visibilitychange',visibility);};
+  }, [projectId, record?.id, record?.job_status, accept, viewActive]);
 
   const execute = async (label: string, task: () => Promise<MeetingRecording>, preserveSummaryDraft=false) => {
     const finish=beginActivity(label);

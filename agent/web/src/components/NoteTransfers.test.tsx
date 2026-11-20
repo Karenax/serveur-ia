@@ -60,8 +60,8 @@ it('ne transmet rien si la commande de copie ne peut pas être conservée',async
   fireEvent.click(screen.getByRole('button',{name:'Joindre le fichier'}));await screen.findByText(/La commande ne peut pas être conservée/);expect(noteTransferApi.upload).not.toHaveBeenCalled();
 });
 it('refuse les grandes pièces avant toute lecture du contenu',async()=>{
-  const value=file();Object.defineProperty(value,'size',{value:5*1024*1024+1});const read=vi.spyOn(value,'arrayBuffer');renderUpload();chooseUpload(value);
-  fireEvent.click(screen.getByRole('button',{name:'Joindre le fichier'}));await screen.findByText(/5 Mio requise/);expect(read).not.toHaveBeenCalled();expect(noteTransferApi.upload).not.toHaveBeenCalled();
+  const value=file();Object.defineProperty(value,'size',{value:25*1024*1024+1});const read=vi.spyOn(value,'arrayBuffer');renderUpload();chooseUpload(value);
+  fireEvent.click(screen.getByRole('button',{name:'Joindre le fichier'}));await screen.findByText(/dépasse le quota total/);expect(read).not.toHaveBeenCalled();expect(noteTransferApi.upload).not.toHaveBeenCalled();
 });
 it('réserve l’ajout et les images aux éditeurs, rend une ancienne pièce réassociable',async()=>{
   vi.mocked(notesApi.attachments).mockResolvedValue({items:[{...asset,content_type:'image/png'}]});const attached=vi.fn(),image=vi.fn();

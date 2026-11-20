@@ -78,12 +78,13 @@ def agent_web_handler(store, origin, prefixes=('',)):
         def log_message(self, *args):
             pass
 
-        def send_content(self, code, data, content_type, *, cookie=None, location=None, nonce=None):
+        def send_content(self, code, data, content_type, *, cookie=None, location=None, nonce=None, settings_panel=False):
             self.send_response(code)
             self.send_header('Content-Type', content_type)
             self.send_header('Content-Length', str(len(data)))
             self.send_header('Cache-Control', 'no-store')
-            policy = "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+            ancestors = "'self'" if settings_panel else "'none'"
+            policy = f"default-src 'none'; frame-ancestors {ancestors}; base-uri 'none'; form-action 'self'"
             if nonce:
                 policy += f"; script-src 'nonce-{nonce}'; style-src 'nonce-{nonce}'; connect-src 'self'; img-src data: blob:"
             self.send_header('Content-Security-Policy', policy)
@@ -120,11 +121,22 @@ def agent_web_handler(store, origin, prefixes=('',)):
                            '<p>Installateur non signé. Au premier lancement, sélectionnez votre EXE personnel Kiara.</p>'
                            + content)
             status = f'<p role="alert">{html.escape(message)}</p>' if message else ''
+            nonce = secrets.token_urlsafe(24)
+            style = (
+                'html{color-scheme:light dark}body{margin:0;padding:32px;min-height:100vh;'
+                'box-sizing:border-box;display:grid;place-items:center;font:15px/1.5 "Segoe UI",system-ui,sans-serif}'
+                'main{width:min(100%,410px);padding:26px;box-sizing:border-box;border:1px solid GrayText;'
+                'border-radius:12px;background:Canvas;color:CanvasText}'
+                'h1{margin:0 0 20px;font-size:26px}form{display:grid;gap:9px} [role=alert]{font-weight:600}'
+                'input,button{font:inherit;padding:9px 12px;border:1px solid GrayText;border-radius:6px}'
+                'button{background:CanvasText;color:Canvas;justify-self:start;cursor:pointer}'
+                ':focus-visible{outline:2px solid Highlight;outline-offset:3px}'
+            )
             markup = ('<!doctype html><html lang="fr"><head><meta charset="utf-8">'
                       '<meta name="viewport" content="width=device-width,initial-scale=1">'
-                      '<title>Kiara</title></head><body><main><h1>Kiara</h1>'
-                      f'{status}{content}</main></body></html>')
-            self.send_content(code, markup.encode(), 'text/html; charset=utf-8')
+                      f'<title>Kiara</title><style nonce="{nonce}">{style}</style></head>'
+                      f'<body><main><h1>Kiara</h1>{status}{content}</main></body></html>')
+            self.send_content(code, markup.encode(), 'text/html; charset=utf-8', nonce=nonce)
 
         def download_installer(self, active):
             if not active():
@@ -237,17 +249,19 @@ def agent_web_handler(store, origin, prefixes=('',)):
             if path.startswith(THUNDERBIRD_PREFIX):
                 return self.respond(403, {'detail': 'Cette action est réservée au poste Thunderbird.'})
             browser_conversation = getattr(self, 'browser_conversation', None)
-            if browser_conversation and not parsed.query:
+            if browser_conversation and (not parsed.query or (path == '/app/device-settings' and parsed.query == 'section=notifications')):
                 from web_conversations import ROUTES, render
-                if self.command in ('GET', 'HEAD') and path == '/app/conversations':
+                if self.command in ('GET', 'HEAD') and path in ('/app/conversations', '/app/device-settings'):
                     if not store.agent_bridge or not store.agent_bridge.operator_for(identity):
                         return self.respond(403, {'detail': 'Accès Kiara refusé.'})
                     nonce = secrets.token_urlsafe(24)
                     try:
-                        page = render(identity, prefix, nonce)
+                        panel = path == '/app/device-settings'
+                        page = render(identity, prefix, nonce, settings_panel=panel,
+                                      notifications=parsed.query == 'section=notifications')
                     except (OSError, ValueError):
                         return self.respond(503, {'detail': 'Conversations est indisponible.'})
-                    return self.send_content(200, page, 'text/html; charset=utf-8', nonce=nonce)
+                    return self.send_content(200, page, 'text/html; charset=utf-8', nonce=nonce, settings_panel=panel)
                 if path in ROUTES.get(self.command, ()):
                     return browser_conversation(path, identity, active)
             return proxy(self, store, path, parsed.query, identity, active, browser=True, browser_prefix=prefix)

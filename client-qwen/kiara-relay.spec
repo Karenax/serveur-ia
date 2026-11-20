@@ -12,7 +12,9 @@ datas = [(str(client / directory), directory) for directory in ('voice', 'vendor
 datas += [(str(extension / name), 'thunderbird-agent') for name in (
     'manifest.json', 'core.js', 'background.js', 'options.html', 'options.js')]
 datas += [(str(client / name), '.') for name in (
-    'chat.html', 'workspace.html', 'ui.css', 'ui.js', 'voice.js', 'conversation.js', 'project-conversation.js',
+    'chat.html', 'kiara-shell.html', 'notification-settings-panel.js', 'device-settings.js', 'device-settings.css',
+    'help.html', 'help.css', 'help.mjs',
+    'workspace.html', 'ui.css', 'ui.js', 'voice.js', 'conversation.js', 'project-conversation.js',
     'attachments.js', 'selection.js', 'thinking.js', 'markdown.js', 'corrector.js', 'LICENSE.txt', 'THIRD-PARTY.txt',
     'portal_origin_inventory.js', 'portal_origin_recovery.js', 'portal_origin_scan.html', 'portal_origin_scan.js',
     'portal_origin_transfer.html', 'portal_origin_transfer.js', 'portal_origin_sender.js', 'portal_origin_sender_result.js',

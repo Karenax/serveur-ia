@@ -6,7 +6,7 @@ from uuid import uuid4
 
 import pytest
 
-from backend.app.project_note_schemas import NoteContent, content_text
+from backend.app.project_note_schemas import NOTE_ATTACHMENT_BUDGET, NoteContent, content_text
 from backend.app.services.project_note_source_preview import preview_source
 
 KEY = '20261007T101112123456Z'
@@ -142,7 +142,10 @@ def test_attachments_empty_oversized_and_complete_import_limits():
     with pytest.raises(ValueError, match='Pièces source'):
         preview_source({**sources(), 'attachments/empty.txt': b''}, planned_note_id=planned)
     with pytest.raises(ValueError, match='Pièces source'):
-        preview_source({**sources(), 'attachments/large.txt': b'x' * (5 * 1024 * 1024 + 1)}, planned_note_id=planned)
+        preview_source({**sources(), 'attachments/large.txt': b'x' * (NOTE_ATTACHMENT_BUDGET + 1)}, planned_note_id=planned)
+    accepted = preview_source({**sources(), 'attachments/large.txt': b'x' * (6 * 1024 * 1024)}, planned_note_id=planned)
+    assert any(file['relative_path'] == 'attachments/large.txt' and file['size_bytes'] == 6 * 1024 * 1024
+               for file in accepted['files'])
     with pytest.raises(ValueError, match='50 Mio'):
         preview_source({'large.doc': b'x' * (50 * 1024 * 1024 + 1)}, planned_note_id=planned)
     with pytest.raises(ValueError, match='200 fichiers'):

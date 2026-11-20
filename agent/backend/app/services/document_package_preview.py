@@ -29,6 +29,24 @@ W = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
 R = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships'
 P = 'http://schemas.openxmlformats.org/package/2006/relationships'
 CT = 'http://schemas.openxmlformats.org/package/2006/content-types'
+MC = 'http://schemas.openxmlformats.org/markup-compatibility/2006'
+
+# XPilot fills these identification cells directly. Allow only the formulas
+# observed on the supported forms, never a user-defined or financial formula.
+_TDAO_INPUTS = {'E6': 'C81', 'E8': 'C8', 'E10': 'C9', 'K6': 'C74',
+                'K8': 'C52', 'K10': 'C54', 'E15': 'C61'}
+
+
+def _template_formula(document_id, address, formula):
+    if formula is None or formula.attrib:
+        return False
+    if document_id == 'tdao' and address in _TDAO_INPUTS:
+        source = "'Extract SAGE'!" + _TDAO_INPUTS[address]
+        hint = "A remplir obligatoirement depuis extract sage ou directement dans la cellule" if address == 'E8' else ''
+        return formula.text == f'IF({source}="","{hint}",{source})'
+    return (document_id == 'tdsp' and address == 'L22'
+            and formula.text == 'IF(K22="Oui","Précisez la référence","-")')
+
 CONTENT_TYPES = {
     'DOCX': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml',
     'DOCM': 'application/vnd.ms-word.document.macroEnabled.main+xml',
@@ -152,6 +170,9 @@ def _sheet(package, spec):
     if not sheets:
         raise ValueError('Aucune feuille dans la trame Excel')
     expected = spec['sheet_name']
+    if (not expected and spec['id'] == 'manufacturing_specification'
+            and any(sheet.get('name') in {"Mode d'emploi", 'Cahier des Charges'} for sheet in sheets)):
+        expected = 'Cahier des Charges'
     candidates = [sheet for sheet in sheets if sheet.get('name') == expected] if expected else sheets[:1]
     if len(candidates) != 1:
         raise ValueError('Feuille attendue absente ou ambiguë : ' + str(expected))
@@ -202,6 +223,16 @@ def _coordinates(address):
     return column, row
 
 
+def _unlocked_styles(package):
+    if 'xl/styles.xml' not in package.names:
+        return set()
+    styles = package.xml('xl/styles.xml')
+    return {str(index) for index, style in enumerate(styles.findall(f'{{{S}}}cellXfs/{{{S}}}xf'))
+            if style.get('applyProtection') in {'1', 'true'}
+            and (protection := style.find(f'{{{S}}}protection')) is not None
+            and protection.get('locked') in {'0', 'false'}}
+
+
 def _spreadsheet(package, spec, values):
     part, name, xml = _sheet(package, spec)
     if xml.tag != f'{{{S}}}worksheet':
@@ -227,25 +258,46 @@ def _spreadsheet(package, spec, values):
         if start[0] > end[0] or start[1] > end[1]:
             raise ValueError('Plage de cellules fusionnées inversée')
         merged.append((start, end))
-    protected = xml.find(f'{{{S}}}sheetProtection') is not None
+    protection = xml.find(f'{{{S}}}sheetProtection')
+    protected = protection is not None and protection.get('sheet') not in {None, '0', 'false'}
+    unlocked_styles = _unlocked_styles(package) if protected else set()
     reports, blockers = [], []
-    if protected:
-        blockers.append('sheet_protected')
     for target, field in spec['cells']:
         matches = cells[target]
         if len(matches) > 1:
             raise ValueError('Cellule cible répétée : ' + target)
         cell = matches[0] if matches else None
-        formula = cell is not None and cell.find(f'{{{S}}}f') is not None
+        formula = cell.find(f'{{{S}}}f') if cell is not None else None
+        placeholder = _template_formula(spec['id'], target, formula)
+        locked = protected and (cell is None or cell.get('s', '0') not in unlocked_styles)
         coordinate = _coordinates(target)
         non_anchor = any(start[0] <= coordinate[0] <= end[0] and start[1] <= coordinate[1] <= end[1]
                          and coordinate != start for start, end in merged)
-        reasons = [code for condition, code in ((formula, 'formula'), (non_anchor, 'merged_non_anchor'),
-                                                 (protected, 'sheet_protected')) if condition]
+        reasons = [code for condition, code in ((formula is not None and not placeholder, 'formula'),
+                                                 (non_anchor, 'merged_non_anchor'),
+                                                 (locked, 'sheet_protected')) if condition]
+        if locked:
+            blockers.append('sheet_protected')
         reports.append({'kind': 'cell', 'target': target, 'field': field, 'present': cell is not None,
                         'available': not reasons, 'existing_value': _cell_text(cell, shared) if cell is not None else '',
-                        'proposed_value': values.get(field, ''), 'blockers': reasons})
+                        'proposed_value': values.get(field, ''), 'blockers': reasons,
+                        'replaces_placeholder': placeholder})
     return part, name, reports, blockers
+
+
+def _alternate_branch(node, parents):
+    while node in parents:
+        if node.tag in {f'{{{MC}}}Choice', f'{{{MC}}}Fallback'}:
+            parent = parents[node]
+            return node if parent.tag == f'{{{MC}}}AlternateContent' else None
+        node = parents[node]
+    return None
+
+
+def _parallel_bookmarks(entries, parents):
+    branches = [item['branch'] for item in entries]
+    return (len(entries) > 1 and None not in branches and len(set(branches)) == len(entries)
+            and len({parents[branch] for branch in branches}) == 1)
 
 
 def _word(package, spec, values):
@@ -266,7 +318,8 @@ def _word(package, spec, values):
             if len(used_ids) > 4096 or len(opened) >= 128:
                 raise ValueError('Trop de signets Word ou de signets simultanés')
             opened[identifier] = {'name': name, 'start': position, 'text': [], 'complex': False,
-                                  'parent': parents.get(node), 'has_text': False}
+                                  'parent': parents.get(node), 'has_text': False,
+                                  'branch': _alternate_branch(node, parents)}
         elif node.tag == f'{{{W}}}t':
             for bookmark in opened.values():
                 bookmark['text'].append(node.text or '')
@@ -279,11 +332,14 @@ def _word(package, spec, values):
             bookmark = opened.pop(identifier, None)
             if bookmark is None:
                 raise ValueError('Fin de signet Word sans début')
+            if bookmark['branch'] is not _alternate_branch(node, parents):
+                raise ValueError('Signet Word réparti entre deux variantes')
             found[bookmark['name']].append({**bookmark, 'end': position})
     if opened:
         raise ValueError('Signet Word non terminé')
-    selected = [(target, entries[0]) for target, _ in spec['bookmarks']
-                if len(entries := found[target]) == 1]
+    selected = [(target, entry) for target, _ in spec['bookmarks']
+                if len(entries := found[target]) == 1 or _parallel_bookmarks(entries, parents)
+                for entry in entries]
     overlap = set()
     for index, (left_target, left) in enumerate(selected):
         for right_target, right in selected[index + 1:]:
@@ -293,12 +349,14 @@ def _word(package, spec, values):
     for target, field in spec['bookmarks']:
         entries = found[target]
         reasons = [code for condition, code in ((not entries, 'bookmark_missing'),
-                    (len(entries) > 1, 'bookmark_ambiguous'), (target in overlap, 'bookmark_overlap'),
+                    (len(entries) > 1 and not _parallel_bookmarks(entries, parents), 'bookmark_ambiguous'),
+                    (target in overlap, 'bookmark_overlap'),
                     (any(item['complex'] for item in entries), 'bookmark_field'),
                     (any(not item['has_text'] and (item['parent'] is None or item['parent'].tag != f'{{{W}}}p')
                          for item in entries), 'bookmark_structure')) if condition]
         reports.append({'kind': 'bookmark', 'target': target, 'field': field, 'present': bool(entries),
-                        'available': not reasons, 'existing_value': ''.join(entries[0]['text']) if entries else '',
+                        'available': not reasons,
+                        'existing_value': ' / '.join(dict.fromkeys(''.join(item['text']) for item in entries)),
                         'proposed_value': values.get(field, ''), 'blockers': reasons})
     blockers = []
     if 'word/settings.xml' in package.names:

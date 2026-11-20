@@ -132,6 +132,26 @@ class RemoteTests(unittest.TestCase):
         headers = {'Authorization': 'Bearer ' + (token or self.access['token']), 'Content-Type': 'application/json','X-Qwen-Session':self.session}
         return urllib.request.urlopen(urllib.request.Request(self.url + path, json.dumps(body).encode() if body is not None else None, headers), timeout=5)
 
+    def test_project_budget_applies_only_to_authenticated_internal_analysis(self):
+        service_token = secrets.token_urlsafe(32)
+        self.store.agent_inference_token = service_token
+        self.store.scheduler.background_budget_seconds = 0
+        payload = json.dumps({'messages': [{'role': 'user', 'content': 'Test'}]}).encode()
+
+        def request(token):
+            return urllib.request.urlopen(urllib.request.Request(self.url + '/v1/chat/completions', payload, {
+                'Authorization': 'Bearer ' + token, 'X-Qwen-Session': self.session,
+                'Content-Type': 'application/json', 'X-Kiara-Inference-Priority': 'project-analysis',
+            }), timeout=5)
+
+        with self.assertRaises(urllib.error.HTTPError) as caught:
+            request(service_token)
+        with caught.exception as response:
+            self.assertEqual(response.code, 429)
+            self.assertEqual(json.load(response)['error']['code'], 'background_budget')
+        with request(self.access['token']) as response:
+            self.assertEqual(response.status, 200)
+
     def test_both_windows_update_routes_serve_the_same_signed_installer(self):
         import hashlib
         from kiara_shared.releases import DESKTOP_DOWNLOAD, DESKTOP_RELEASE

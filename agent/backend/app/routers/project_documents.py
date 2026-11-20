@@ -6,7 +6,7 @@ from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
 from ..db import get_db
-from ..project_document_schemas import DocumentDiscover, DocumentPrepare, DocumentPreview, DocumentId
+from ..project_document_schemas import DocumentDiscover, DocumentFolderDiscover, DocumentPrepare, DocumentPreview, DocumentId
 from ..project_document_form_schemas import DocumentDraftSave, DocumentFormRestore, DocumentSearchSave
 from ..services.document_discovery import discover as discover_templates
 from ..services.document_search_rules import SearchRule
@@ -50,6 +50,11 @@ def discover(project_id: str, payload: DocumentDiscover, db: Session = Depends(g
     return {**result, 'preferences_revision': preferences['revision'], 'preferences_version_id': preferences['version_id']}
 
 
+@router.post('/discover-folder')
+def discover_folder(project_id: str, payload: DocumentFolderDiscover, db: Session = Depends(get_db)):
+    return service.discover_folder(db, project_id, payload.link_id)
+
+
 @router.get('/forms/{document_id}')
 def form(project_id: str, document_id: DocumentId, db: Session = Depends(get_db)):
     return forms.draft(db, project_id, document_id)
@@ -90,6 +95,27 @@ def settings_history(offset: int = Query(0, ge=0, le=1000000), limit: int = Quer
 @settings_router.post('/restore')
 def restore_settings(payload: DocumentFormRestore, db: Session = Depends(get_db)):
     return _command(db, forms.restore_search_preferences, **payload.model_dump())
+
+
+@settings_router.get('/personal')
+def personal_settings(db: Session = Depends(get_db)):
+    return forms.personal_search_preferences(db)
+
+
+@settings_router.put('/personal')
+def save_personal_settings(payload: DocumentSearchSave, db: Session = Depends(get_db)):
+    return _command(db, forms.save_personal_search_preferences, **payload.model_dump())
+
+
+@settings_router.get('/personal/history')
+def personal_settings_history(offset: int = Query(0, ge=0, le=1_000_000), limit: int = Query(50, ge=1, le=200),
+                              db: Session = Depends(get_db)):
+    return forms.personal_search_history_page(db, offset=offset, limit=limit)
+
+
+@settings_router.post('/personal/restore')
+def restore_personal_settings(payload: DocumentFormRestore, db: Session = Depends(get_db)):
+    return _command(db, forms.restore_personal_search_preferences, **payload.model_dump())
 
 
 @router.post('/prepare-copy')

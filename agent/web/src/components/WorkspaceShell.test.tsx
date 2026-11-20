@@ -7,7 +7,7 @@ import { identityApi } from "../lib/projectIdentity";
 import { deliverableApi } from "../lib/projectDeliverables";
 import { documentApi, type DocumentPreferences } from "../lib/projectDocuments";
 import {fusionSources} from '../lib/fusionSources';
-import {fusionInsights, type FusionSettings, type FusionStats} from '../lib/fusionInsights';
+import {fusionInsights} from '../lib/fusionInsights';
 import {meetingWorkspaceHref,requestMeetingWorkspace} from '../lib/meetingWorkspace';
 import { WorkspaceShell, type ProjectWorkspaceProps, type ProjectCreateProps } from "./WorkspaceShell";
 import { CdcReviewPanel } from "./CdcReviewPanel";
@@ -156,11 +156,13 @@ function setup(ProjectPanel = ProjectDraft) {
     MailPanel={() => <section aria-label="Mails de test">Liste des mails</section>} CreatePanel={() => null} SagePanel={() => null} />);
 }
 
-it('ne suit Thunderbird que lorsque sa rubrique Connexions est visible',()=>{
-  window.history.replaceState(null,'','/app/imports');setup();
-  const panel=screen.getByTestId('thunderbird-activity');expect(panel.dataset.active).toBe('false');
-  fireEvent.click(screen.getByRole('button',{name:'Thunderbird'}));expect(panel.dataset.active).toBe('true');
-  fireEvent.click(screen.getByRole('link',{name:'Mails'}));expect(panel.dataset.active).toBe('false');
+it('renvoie l’ancienne rubrique Thunderbird vers les réglages de la liaison',async()=>{
+  window.history.replaceState(null,'','/app/imports?connection=thunderbird');setup();
+  expect(screen.queryByTestId('thunderbird-activity')).toBeNull();
+  fireEvent.click(screen.getByRole('button',{name:'Ouvrir les réglages Thunderbird'}));
+  expect(window.location.pathname+window.location.search).toBe('/app/settings?settings=mail');
+  expect(await screen.findByRole('heading',{name:'Mails et Thunderbird'})).toBeTruthy();
+  expect(screen.getByText('Installer ou mettre à jour la liaison Thunderbird')).toBeTruthy();
 });
 
 it("propose le retour aux conversations uniquement dans le client Kiara", () => {
@@ -186,9 +188,12 @@ it("reprend le thème des Conversations et renvoie vers son réglage sous Window
   try {
     const {container}=setup();
     expect(container.querySelector(".workspace-shell")?.getAttribute("data-workspace-theme")).toBe("dark");
-    expect(screen.getByRole("link",{name:"Thème de Kiara"}).getAttribute("href")).toBe("/chat#apparence");
-    expect(screen.getByRole("link",{name:"Mon accès"}).getAttribute("href")).toBe("/chat#reglages");
-    expect(screen.getByRole("link",{name:"Mises à jour"}).getAttribute("href")).toBe("/chat#reglages");
+    expect((screen.getByRole("combobox",{name:"Thème"}) as HTMLSelectElement).value).toBe("dark");
+    const settings = within(screen.getByRole("navigation",{name:"Réglages"}));
+    fireEvent.click(settings.getByRole("button",{name:"Mon accès"}));
+    expect(screen.getByRole("link",{name:"Ouvrir mon accès"}).getAttribute("href")).toBe("/chat#reglages");
+    fireEvent.click(settings.getByRole("button",{name:"Mises à jour"}));
+    expect(screen.getByRole("link",{name:"Ouvrir mises à jour"}).getAttribute("href")).toBe("/chat#reglages");
     expect(localStorage.getItem("agent-ui-theme")).toBe("light");
   } finally {
     delete document.body.dataset.kiaraDesktop;
@@ -196,18 +201,55 @@ it("reprend le thème des Conversations et renvoie vers son réglage sous Window
   }
 });
 
-it('affiche les réglages Windows et ouvre chaque destination prise en charge par le relais',()=>{
+it('garde le même menu pour chaque réglage Windows et réutilise le panneau du relais',()=>{
   window.history.replaceState(null,'','/app/settings');
-  Object.assign(document.body.dataset,{kiaraDesktop:'true',kiaraWindows:'true',kiaraDeviceSettings:'true'});
+  Object.assign(document.body.dataset,{kiaraDesktop:'true',kiaraWindows:'true',kiaraDeviceSettings:'true',kiaraInlineSettings:'true'});
   try {
     setup();
-    const device=within(screen.getByRole('group',{name:'Appareil Windows'}));
-    expect(device.getAllByRole('link').map(link=>link.getAttribute('href'))).toEqual([
-      '/chat#reglages','/chat#reglages-mises-a-jour','/chat#reglages-connexion','/chat#reglages-api-locale',
-      '/chat#reglages-memoire','/chat#reglages-vocal','/chat#reglages-dictee','/chat#reglages-notifications',
-    ]);
+    const menu=screen.getByRole('navigation',{name:'Réglages'});
+    const panels=['Notifications','Mon accès','Conversation vocale','Dictée','Mises à jour','Connexion au serveur','API locale et intégrations'];
+    let embedded: HTMLElement|undefined;
+    for(const button of within(menu).getAllByRole('button')){
+      const title=button.textContent!;
+      fireEvent.click(button);
+      expect(screen.getByRole('navigation',{name:'Réglages'})).toBe(menu);
+      expect(button.getAttribute('aria-pressed')).toBe('true');
+      if(panels.includes(title)){
+        const frame=within(screen.getByRole('main')).getByTitle(title);
+        expect(frame.getAttribute('src')).toBe('/device-settings');
+        embedded??=frame;
+        expect(frame).toBe(embedded);
+      }
+    }
   } finally {
-    for(const name of ['kiaraDesktop','kiaraWindows','kiaraDeviceSettings'])delete document.body.dataset[name];
+    for(const name of ['kiaraDesktop','kiaraWindows','kiaraDeviceSettings','kiaraInlineSettings'])delete document.body.dataset[name];
+  }
+});
+
+it('ouvre chaque réglage appareil à droite du même menu, à une URL dédiée',()=>{
+  window.history.replaceState(null,'','/app/settings');
+  const flags={kiaraDesktop:'true',kiaraWindows:'true',kiaraDeviceSettings:'true',kiaraInlineSettings:'true',kiaraNativeSettings:'true'};
+  Object.assign(document.body.dataset,flags);
+  try {
+    setup();
+    const menu=screen.getByRole('navigation',{name:'Réglages'});
+    const entries=[
+      ['Conversation vocale','vocal'], ['Dictée','dictee'], ['Connexion au serveur','connexion'],
+      ['Mises à jour','mises-a-jour'], ['API locale et intégrations','api-locale'],
+    ];
+    for(const [title,section] of entries){
+      const link=within(menu).getByRole('button',{name:title});
+      fireEvent.click(link);
+      const frame=screen.getByTitle(title);
+      expect(screen.getByRole('navigation',{name:'Réglages'})).toBe(menu);
+      expect(link.getAttribute('aria-pressed')).toBe('true');
+      expect(frame.getAttribute('src')).toBe('/device-settings?section='+section);
+      expect(frame.closest('[hidden]')).toBeNull();
+      expect(window.location.search).toBe('?settings='+section);
+    }
+    expect(screen.getByTitle('Conversation vocale').closest('[hidden]')).toBeTruthy();
+  } finally {
+    for(const name of Object.keys(flags))delete document.body.dataset[name];
   }
 });
 
@@ -242,10 +284,11 @@ it("ouvre directement la liste Projets à l’entrée du portail Windows", () =>
     ]);
     fireEvent.click(within(menu).getByRole("link",{name:"Activité"}));
     expect(screen.getByRole("heading",{name:"À traiter"})).toBeTruthy();
-    fireEvent.click(screen.getByRole("link",{name:"Kiara"}));
+    fireEvent.click(screen.getByRole("link",{name:"Kiara · Portefeuille des projets"}));
     expect(window.location.pathname).toBe("/app/projets");
-    fireEvent.click(screen.getByRole("button",{name:"Accès rapide aux rubriques"}));
-    expect(screen.queryByRole("button",{name:/^Accueil/})).toBeNull();
+    fireEvent.click(screen.getByRole("button",{name:"Accès rapide"}));
+    expect(screen.getByLabelText('Ouvrir une rubrique, un projet ou un élément')).toBeTruthy();
+    expect(within(screen.getByLabelText('Rubriques',{selector:'section'})).queryByRole("button",{name:/^Ouvrir la rubrique Accueil/})).toBeNull();
   } finally {
     delete document.body.dataset.kiaraDesktop;
     delete document.body.dataset.kiaraWindows;
@@ -330,7 +373,7 @@ it("indique l’import d’archive dès la lecture locale et jusqu’à la fin d
   const reload = vi.fn(() => reloading);
   const { container } = render(<WorkspaceShell rows={rows} reload={reload} ProjectPanel={ProjectDraft}
     MailPanel={() => null} CreatePanel={() => null} SagePanel={() => null} />);
-  fireEvent.click(screen.getByRole("button", { name: "Archives JSON" }));
+  fireEvent.click(screen.getByRole("button", { name: "Archives de projet" }));
   const input = container.querySelector('input[type="file"][accept="application/json,.json"]')!;
   fireEvent.change(input, { target: { files: [file] } });
   expect(getActivitySnapshot()?.labels).toContain("Importation d’une archive de projet…");
@@ -358,7 +401,7 @@ it("clôture le travail et conserve l’erreur existante quand la lecture de l�
   const reload = vi.fn().mockResolvedValue(undefined);
   const { container } = render(<WorkspaceShell rows={rows} reload={reload} ProjectPanel={ProjectDraft}
     MailPanel={() => null} CreatePanel={() => null} SagePanel={() => null} />);
-  fireEvent.click(screen.getByRole("button", { name: "Archives JSON" }));
+  fireEvent.click(screen.getByRole("button", { name: "Archives de projet" }));
   fireEvent.change(container.querySelector('input[type="file"][accept="application/json,.json"]')!, { target: { files: [file] } });
   expect(getActivitySnapshot()?.labels).toContain("Importation d’une archive de projet…");
   await act(async () => { failRead(new Error("Lecture locale interrompue")); });
@@ -460,44 +503,35 @@ it('ne monte les réglages qu’à leur ouverture et conserve leurs brouillons',
   expect(screen.queryByLabelText('Brouillon recherche de test')).toBeNull();
   expect(screen.queryByText('Maintenance de test')).toBeNull();
   fireEvent.change(general, {target:{value:'À conserver'}});
-  fireEvent.click(screen.getByRole('button',{name:'Mails'}));
+  fireEvent.click(screen.getByRole('button',{name:'Mails et Thunderbird'}));
   const mail = await screen.findByLabelText('Brouillon mails de test') as HTMLInputElement;
   fireEvent.change(mail, {target:{value:'Autre brouillon'}});
-  chooseSetting('Sauvegardes et maintenance');
+  chooseSetting('Sauvegarde du service Projets');
   await screen.findByText('Maintenance de test');
-  fireEvent.click(screen.getByRole('button',{name:'Général'}));
+  fireEvent.click(screen.getByRole('button',{name:'Assistant IA'}));
   expect((screen.getByLabelText('Brouillon général de test') as HTMLInputElement).value).toBe('À conserver');
-  fireEvent.click(screen.getByRole('button',{name:'Mails'}));
+  fireEvent.click(screen.getByRole('button',{name:'Mails et Thunderbird'}));
   expect((screen.getByLabelText('Brouillon mails de test') as HTMLInputElement).value).toBe('Autre brouillon');
   expect(screen.queryByLabelText('Brouillon recherche de test')).toBeNull();
 });
 
 it.each(['/app/settings?settings=preparation', '/app/preparation'])('conserve les réglages de réunion non enregistrés depuis %s', async (path) => {
   window.history.replaceState(null, '', path);
-  const settings: FusionSettings = {enabled:true, proactive_enabled:false, auto_enhancement_enabled:false,
-    mode:'network', onboarding_complete:false, capabilities:{enabled:true,
-      capture:{durable:true,max_upload_mb:50,max_duration_minutes:120,tracks:['mic'],browser_permission_required:true},
-      transcription:{batch_ready:true,live_ready:false,live_operational:true,detail:'Essai'},notes:{staging:true,erp_projection:true}}};
-  const stats: FusionStats = {sources:{total:0,by_type:{},extracted:0,indexed:0,current:0},
-    sessions:{total:0,by_state:{},duration_seconds:0,audio_bytes:0},
-    assistant:{answers:0,stale:0,enhancements:0,p50_seconds:null,p95_seconds:null,tokens:null},
-    engines:{speech:{},generation:{placement:'network',configured:false}},
-    index:{text_passages:0,profiles:[],size_bytes:0},formulas:{}};
-  vi.spyOn(fusionInsights,'readiness').mockReturnValue(new Promise(()=>{}));
-  vi.spyOn(fusionInsights,'settings').mockResolvedValue(settings);
-  vi.spyOn(fusionInsights,'stats').mockResolvedValue(stats);
+  vi.spyOn(fusionInsights,'personal').mockResolvedValue({live_transcription_enabled:false,
+    proactive_enabled:false,auto_enhancement_enabled:false,mode:'network'});
+  vi.spyOn(window,'confirm').mockReturnValue(true);
   setup();
-  const direct=await screen.findByLabelText('Autoriser la transcription directe en essai') as HTMLInputElement;
+  const direct=await screen.findByLabelText('Transcrire mes réunions en direct') as HTMLInputElement;
   fireEvent.click(direct);expect(direct.checked).toBe(true);
   fireEvent.click(screen.getByRole('link',{name:'Mails'}));
   fireEvent.click(screen.getByRole('link',{name:'Réglages'}));
-  expect((await screen.findByLabelText('Autoriser la transcription directe en essai') as HTMLInputElement).checked).toBe(true);
-  fireEvent.click(screen.getByRole('button',{name:'Apparence'}));
+  expect((await screen.findByLabelText('Transcrire mes réunions en direct') as HTMLInputElement).checked).toBe(true);
+  fireEvent.click(screen.getByRole('button',{name:'Apparence et lecture'}));
   chooseSetting('Réunions et transcription');
-  expect((await screen.findByLabelText('Autoriser la transcription directe en essai') as HTMLInputElement).checked).toBe(true);
+  expect((await screen.findByLabelText('Transcrire mes réunions en direct') as HTMLInputElement).checked).toBe(true);
   fireEvent.click(screen.getByRole('link',{name:'Mails'}));
   fireEvent.click(screen.getByRole('link',{name:'Réglages'}));
-  expect((await screen.findByLabelText('Autoriser la transcription directe en essai') as HTMLInputElement).checked).toBe(true);
+  expect((await screen.findByLabelText('Transcrire mes réunions en direct') as HTMLInputElement).checked).toBe(true);
 });
 
 it("ouvre les rubriques de la fiche en conservant le brouillon et l’URL",()=>{
@@ -524,8 +558,8 @@ it("conserve les réglages documentaires entre sous-rubriques et protège une sa
   await screen.findByLabelText('Modifier les recherches des trames',{}, {timeout:3000});
   await waitFor(()=>expect(screen.getByRole('button',{name:'Comparer avec les réglages enregistrés'}).matches(':disabled')).toBe(false));
   fireEvent.change(screen.getAllByLabelText('Libellé')[0],{target:{value:'Brouillon commun'}});
-  fireEvent.click(screen.getByRole('button',{name:'Apparence'}));expect(screen.getByRole('region',{name:'Réglages documentaires'})).toBeTruthy();
-  fireEvent.click(screen.getByRole('button',{name:'Apparence'}));expect(screen.queryByRole('region',{name:'Réglages documentaires'})).toBeNull();
+  fireEvent.click(screen.getByRole('button',{name:'Apparence et lecture'}));expect(screen.getByRole('region',{name:'Réglages documentaires'})).toBeTruthy();
+  fireEvent.click(screen.getByRole('button',{name:'Apparence et lecture'}));expect(screen.queryByRole('region',{name:'Réglages documentaires'})).toBeNull();
   chooseSetting("Modèles de documents");expect((screen.getAllByLabelText('Libellé')[0] as HTMLInputElement).value).toBe('Brouillon commun');
   expect(read).toHaveBeenCalledTimes(1);expect(confirm).toHaveBeenCalledTimes(2);
   fireEvent.click(screen.getByRole('button',{name:'Enregistrer les réglages'}));fireEvent.click(screen.getByRole('link',{name:'Mails'}));
@@ -540,7 +574,7 @@ it("charge le catalogue seulement à l’ouverture de Livrables et conserve le b
   setup();expect(types).not.toHaveBeenCalled();chooseSetting("Modèles de livrables");
   fireEvent.click(await screen.findByRole("button",{name:"Créer un type de livrable"},{timeout:3000}));
   fireEvent.change(screen.getByLabelText("Libellé du type de livrable"),{target:{value:"Brouillon conservé"}});
-  fireEvent.click(screen.getByRole("button",{name:"Apparence"}));chooseSetting("Modèles de livrables");
+  fireEvent.click(screen.getByRole("button",{name:"Apparence et lecture"}));chooseSetting("Modèles de livrables");
   expect((screen.getByLabelText("Libellé du type de livrable") as HTMLInputElement).value).toBe("Brouillon conservé");
 });
 
@@ -554,7 +588,7 @@ it("ouvre les référentiels depuis Réglages et charge leur liste à la demande
   await waitFor(()=>expect(references).toHaveBeenCalledWith("client",expect.objectContaining({offset:0})));
   fireEvent.click(screen.getByRole("button",{name:"Ajouter un client"}));
   fireEvent.change(screen.getByLabelText("Libellé"),{target:{value:"Brouillon conservé"}});
-  fireEvent.click(screen.getByRole("button",{name:"Apparence"}));
+  fireEvent.click(screen.getByRole("button",{name:"Apparence et lecture"}));
   fireEvent.click(screen.getByRole("button",{name:"Clients et équipe"}));
   expect((screen.getByLabelText("Libellé") as HTMLInputElement).value).toBe("Brouillon conservé");
 });
@@ -575,7 +609,7 @@ it("respecte le retour du navigateur après avoir quitté une rubrique projet", 
   expect(window.location.pathname).toBe("/app/mail");
   expect(screen.getByRole("region", {name: "Mails de test"})).toBeTruthy();
   window.history.back();
-  await waitFor(() => expect(window.location.pathname).toBe("/app/projects/erp-a/reviews"));
+  await waitFor(() => expect(window.location.pathname).toBe("/app/projets/erp-a/reunions"));
   await waitFor(() => expect(screen.getByRole("region", {name: "Projet erp-a"})).toBeTruthy());
   expect(screen.getByText("Rubrique projet : reviews")).toBeTruthy();
 });
@@ -710,26 +744,27 @@ it('rend visibles les statistiques et les réglages de transcription',async()=>{
   setup();
   expect(screen.queryByRole('link',{name:'Statistiques'})).toBeNull();
   fireEvent.click(screen.getByRole('link',{name:'Réglages'}));
-  expect(within(screen.getByRole('group',{name:'Projets'})).getByRole('button',{name:'Statistiques'})).toBeTruthy();
-  expect(within(screen.getByRole('group',{name:'Portail et serveur'})).getByRole('button',{name:'Réunions et transcription'})).toBeTruthy();
+  expect(within(screen.getByRole('group',{name:'Espace de travail'})).getByRole('button',{name:'Réunions et transcription'})).toBeTruthy();
+  fireEvent.click(screen.getByRole('link',{name:'Activité'}));
+  expect(screen.getByRole('button',{name:'Statistiques'})).toBeTruthy();
 });
 
 it('réserve les réglages aux paramètres et garde les connexions accessibles',()=>{
   vi.spyOn(fusionSources,'list').mockResolvedValue({items:[],total:0,offset:0,limit:25,has_next:false,labels:[]});
   setup();
   const sidebar=screen.getByRole('complementary',{name:'Menu principal'});
-  for(const label of ['Sources','Informations','Suivi des analyses','Connexions & imports']){
+  for(const label of ['Sources','Informations','Suivi des analyses','Connexions et imports']){
     expect(within(sidebar).queryByRole('link',{name:label})).toBeNull();
   }
   fireEvent.click(within(sidebar).getByRole('link',{name:'Réglages'}));
   const tabs=screen.getByRole('navigation',{name:'Réglages'});
   for(const label of ['Sources','Informations','Suivi des analyses'])expect(within(tabs).queryByRole('button',{name:label})).toBeNull();
-  fireEvent.click(within(tabs).getByRole('button',{name:'Connexions & imports'}));
+  fireEvent.click(within(tabs).getByRole('button',{name:'Connexions et imports'}));
   expect(window.location.pathname).toBe('/app/imports');
-  expect(within(screen.getByRole('navigation',{name:'Réglages'})).getByRole('button',{name:'Connexions & imports'}).getAttribute('aria-pressed')).toBe('true');
-  fireEvent.click(within(screen.getByRole('navigation',{name:'Réglages'})).getByRole('button',{name:'Général'}));
+  expect(within(screen.getByRole('navigation',{name:'Réglages'})).getByRole('button',{name:'Connexions et imports'}).getAttribute('aria-pressed')).toBe('true');
+  fireEvent.click(within(screen.getByRole('navigation',{name:'Réglages'})).getByRole('button',{name:'Assistant IA'}));
   expect(window.location.pathname).toBe('/app/settings');
-  expect(screen.getByRole('button',{name:'Général'}).getAttribute('aria-pressed')).toBe('true');
+  expect(screen.getByRole('button',{name:'Assistant IA'}).getAttribute('aria-pressed')).toBe('true');
 });
 
 it.each([['sources','Sources'],['knowledge','Connaissance globale de test'],['jobs','Traitements de test']])('conserve le lien direct vers %s hors des réglages', async(page,label)=>{
@@ -772,13 +807,13 @@ it('garde les favoris dans Projets sans modifier la barre de navigation',()=>{
   fireEvent.click(within(screen.getByText('Projets favoris').closest('details')!).getByRole('button',{name:/A-100.*Projet A-100/}));
   expect(window.location.pathname).toContain('/app/projets/erp-a');
 });
-it('ouvre les sources depuis les documents sans perdre le brouillon du projet',async()=>{
+it('ouvre la recherche depuis les documents sans perdre le brouillon du projet',async()=>{
   window.history.replaceState(null,'','/app/projets');setup();
   fireEvent.click(screen.getByRole('button',{name:'A-100 · Projet A-100'}));
   fireEvent.change(screen.getByRole('textbox',{name:'Brouillon erp-a'}),{target:{value:'Brouillon préservé'}});
   fireEvent.click(screen.getByRole('button',{name:'Documents du projet'}));
-  fireEvent.click(screen.getByRole('button',{name:'Sources de tous les projets'}));
-  expect(window.location.pathname).toBe('/app/sources');
+  fireEvent.click(screen.getByRole('button',{name:'Rechercher dans tous les projets'}));
+  expect(window.location.pathname).toBe('/app/search');
   fireEvent.click(screen.getByRole('link',{name:'Projets'}));
   fireEvent.click(screen.getByRole('button',{name:'A-100 · Projet A-100'}));
   expect((screen.getByRole('textbox',{name:'Brouillon erp-a'}) as HTMLInputElement).value).toBe('Brouillon préservé');
@@ -791,19 +826,24 @@ it('ouvre les informations depuis la recherche et les traitements depuis Activit
   expect(await screen.findByRole('region',{name:'Connaissance globale de test'})).toBeTruthy();
   fireEvent.click(screen.getByRole('link',{name:'Activité'}));
   expect(window.location.pathname).toBe('/app/activite');
+  fireEvent.click(screen.getByRole('button',{name:'Analyses'}));
+  expect(window.location.search).toBe('?view=analyses');
   expect(await screen.findByRole('region',{name:'Traitements de test'})).toBeTruthy();
 });
 it('protège aussi les modifications non enregistrées avant de quitter le portail web',()=>{
   document.body.dataset.kiaraWebConversations='true';
   window.history.replaceState(null,'','/kiara/app/settings');
   try {
-    setup();const dirty=document.createElement('div');dirty.dataset.workspaceDirty='true';document.body.append(dirty);
+    setup();
+    const settings=within(screen.getByRole('navigation',{name:'Réglages'}));
+    expect(settings.queryByRole('button',{name:'Mises à jour'})).toBeNull();
+    fireEvent.click(settings.getByRole('button',{name:'Mon accès'}));
+    expect(screen.getByTitle('Mon accès').getAttribute('src')).toBe('/kiara/app/device-settings');
+    const dirty=document.createElement('div');dirty.dataset.workspaceDirty='true';document.body.append(dirty);
     try {
-      const account=screen.getByRole('link',{name:'Mon accès'});
-      expect(screen.queryByRole('link',{name:'Mises à jour'})).toBeNull();
-      expect(screen.getByRole('link',{name:'Lecture des conversations'}).getAttribute('href')).toBe('/kiara/app/conversations#apparence');
-      expect(account.getAttribute('href')).toBe('/kiara/app/conversations#reglages');
-      expect(fireEvent.click(account)).toBe(false);
+      const notifications=screen.getByRole('link',{name:'Notifications'});
+      expect(notifications.getAttribute('href')).toBe('/kiara/app/conversations#notifications');
+      expect(fireEvent.click(notifications)).toBe(false);
       expect(screen.getByText('Enregistrez ou fermez la modification en cours avant de revenir à Conversations.')).toBeTruthy();
     } finally {dirty.remove();}
   } finally {delete document.body.dataset.kiaraWebConversations;}

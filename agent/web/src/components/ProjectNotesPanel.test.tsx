@@ -22,6 +22,32 @@ beforeEach(()=>{
 });
 afterEach(()=>{cleanup();vi.restoreAllMocks();localStorage.clear();});
 async function open(){fireEvent.click(await screen.findByRole('button',{name:/Réunion LED/}));return screen.findByLabelText('Titre de la note') as Promise<HTMLInputElement>;}
+it('enregistre la couleur de fond et garde le même éditeur pendant la sauvegarde',async()=>{
+  render(<ProjectNotesPanel projectId="p1"/>);
+  const title=await open();
+  fireEvent.click(screen.getByRole('button',{name:'Fond rose'}));
+  title.focus();
+  const editor=screen.getByRole('textbox',{name:'Texte du bloc 1'});
+  await screen.findByText('Enregistrée · version 3',{}, {timeout:3000});
+  expect(screen.getByLabelText('Titre de la note')).toBe(title);
+  expect(screen.getByRole('textbox',{name:'Texte du bloc 1'})).toBe(editor);
+  expect(document.activeElement).toBe(title);
+  expect(vi.mocked(notesApi.list)).toHaveBeenCalledTimes(1);
+  expect(screen.getByRole('button',{name:/Ouvrir la note Réunion LED/}).dataset.noteBackground).toBe('pink');
+});
+
+it('confirme la suppression avant de retirer la note sélectionnée',async()=>{
+  const confirmation=vi.spyOn(window,'confirm').mockReturnValueOnce(false).mockReturnValue(true);
+  const remove=vi.spyOn(notesApi,'remove').mockResolvedValue({deleted:true});
+  render(<ProjectNotesPanel projectId="p1"/>);await open();
+  const button=screen.getByRole('button',{name:'Supprimer la note'});
+  fireEvent.click(button);expect(remove).not.toHaveBeenCalled();
+  vi.mocked(notesApi.list).mockResolvedValue({available:true,can_edit:true,operator_id:'local',items:[],total:0,offset:0,limit:30});
+  fireEvent.click(button);
+  await waitFor(()=>expect(screen.queryByRole('button',{name:/Ouvrir la note Réunion LED/})).toBeNull());
+  expect(remove).toHaveBeenCalledWith('p1',id,expect.objectContaining({expected_revision:2}),expect.any(AbortSignal));
+  expect(confirmation).toHaveBeenCalledTimes(2);
+});
 it('bloque sauvegarde manuelle et automatique jusqu’à conversion Markdown valide',async()=>{
   render(<ProjectNotesPanel projectId="p1"/>);const title=await open();
   fireEvent.click(screen.getByRole('button',{name:'Éditer en Markdown'}));

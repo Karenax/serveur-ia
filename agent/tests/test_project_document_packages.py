@@ -211,6 +211,39 @@ def test_alternative_word_bookmark_missing_is_reported_without_erasing_another()
     assert preview.preview_package(result, 'ce_request', {'project_code': 'AIRB26LTH0205-A'})['targets'][0]['existing_value'] == 'AIRB26LTH0205-A'
 
 
+def test_word_fills_parallel_bookmarks_in_both_rendering_branches():
+    def bookmark(identifier, text):
+        return (f'<w:p><w:bookmarkStart w:id="{identifier}" w:name="Affaire"/>'
+                f'<w:r><w:t>{text}</w:t></w:r><w:bookmarkEnd w:id="{identifier}"/></w:p>')
+    body = (f'<mc:AlternateContent xmlns:mc="{preview.MC}" xmlns:wps="urn:test:wps">'
+            f'<mc:Choice Requires="wps">{bookmark(1, "Choice")}</mc:Choice>'
+            f'<mc:Fallback>{bookmark(2, "Fallback")}</mc:Fallback></mc:AlternateContent>')
+    result, _ = prepare(package(parts_for('ce_request', body=body)), 'ce_request', {'project_code': 'DEMO'})
+    with zipfile.ZipFile(BytesIO(result)) as archive:
+        xml = ET.fromstring(archive.read('word/document.xml'))
+        assert [node.text for node in xml.iter(f'{{{preview.W}}}t')] == ['DEMO', 'DEMO']
+
+
+def test_tdao_replaces_only_known_template_formula_and_invalidates_cached_order():
+    formula = '''IF('Extract SAGE'!C81="","",'Extract SAGE'!C81)'''
+    body = (f'<sheetData><row r="6"><c r="E6" t="str"><f>{formula}</f><v/></c>'
+            '<c r="T6"><f>SUM(A6:D6)</f><v>8</v></c></row></sheetData>')
+    parts = parts_for('tdao', body=body, extra={'xl/calcChain.xml': f'<calcChain xmlns="{preview.S}"><c r="E6" i="1"/></calcChain>'})
+    parts['xl/_rels/workbook.xml.rels'] = parts['xl/_rels/workbook.xml.rels'].replace('</Relationships>',
+        f'<Relationship Id="rId2" Type="{preview.R}/calcChain" Target="calcChain.xml"/></Relationships>')
+    parts['[Content_Types].xml'] = parts['[Content_Types].xml'].replace('</Types>',
+        '<Override PartName="/xl/calcChain.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.calcChain+xml"/></Types>')
+    content, _ = prepare(package(parts), 'tdao')
+    with zipfile.ZipFile(BytesIO(content)) as archive:
+        assert 'xl/calcChain.xml' not in archive.namelist()
+        assert b'SUM(A6:D6)' in archive.read('xl/worksheets/sheet1.xml')
+        assert b'Extract SAGE' not in archive.read('xl/worksheets/sheet1.xml')
+        assert archive.read('xl/vbaProject.bin') == parts['xl/vbaProject.bin']
+    parts['xl/worksheets/sheet1.xml'] = parts['xl/worksheets/sheet1.xml'].replace(formula, 'SUM(A1:A6)')
+    with pytest.raises(ValueError, match='bloquants'):
+        prepare(package(parts), 'tdao')
+
+
 @pytest.mark.parametrize('body,kind', [
     ('<w:p><w:r><w:t>no bookmark</w:t></w:r></w:p>', 'missing'),
     ('<w:p><w:bookmarkStart w:id="1" w:name="Affaire"/><w:bookmarkStart w:id="2" w:name="Affaire2"/>'

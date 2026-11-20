@@ -23,6 +23,7 @@ datés ; ils ne définissent pas la configuration de production.
 | `maintenance/2026-10-13-strata-0.1.43.1/` | Mise en service du moteur officiel, réglages, sauvegarde précédente et retour arrière |
 | `maintenance/2026-10-13-contexte/` | État des services et configurations recoupé lors de la mise à jour du contexte |
 | `maintenance/legacy-20261012/` | Anciens générateurs déplacés et neutralisés par le suffixe `.txt` |
+| [Comparatifs historiques Huihui P100](maintenance/legacy-huihui-p100/README.md) | Quatre scripts d’essai conservés avec le suffixe `.txt` |
 | `HISTORIQUE-PROJET-AVANT-AUDIT-20261012.md` | Ancien contexte complet ; décisions et chronologie conservées |
 
 Les preuves Hermes, voix, EG2 et des lots 0–4/6–8 restent des références de validation.

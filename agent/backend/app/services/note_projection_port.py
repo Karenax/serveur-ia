@@ -100,7 +100,7 @@ def current_head(metadata, factory):
         return db.execute(text('SELECT n.current_version_id,n.revision,v.sha256,l.brain_project_id '
             'FROM project_notes n JOIN project_note_versions v ON v.id=n.current_version_id '
             'LEFT JOIN brain_links l ON l.project_id=n.project_id '
-            'WHERE n.id=:nid AND n.project_id=:pid'),
+            "WHERE n.id=:nid AND n.project_id=:pid AND json_extract(v.snapshot,'$.operation')!='delete'"),
             {'nid': metadata.get('note_id'), 'pid': metadata.get('erp_project_id')}).first()
 
 

@@ -1,7 +1,7 @@
 # Reconstruire et vérifier Kiara
 
-La livraison de référence est Kiara 4.0.8 pour Windows et le portail privé.
-La 4.0.7 constitue le point de retour Windows. Les clients Android et Linux
+La livraison de référence Windows et du portail privé figure dans le
+[contexte de reprise](CONTEXTE-PROJET.md). Les clients Android et Linux
 gardent leur propre calendrier de qualification. Chaque construction produit
 `build-manifest.json` : empreintes des sources, empreinte du binaire, versions des
 paquets Python, Go, CMake, JDK, SDK/NDK Android et commit Hermes réellement utilisés.
@@ -59,7 +59,7 @@ autre poste ou avec une autre clé.
 
 Pour la livraison Windows, construire le client Tauri et le paquet serveur avec
 le portail compilé. Utiliser la validation de périmètre `windows` pour le
-manifeste de déploiement. La 4.0.11 publiée utilise le manifeste Ed25519 du canal
+manifeste de déploiement. La 4.0.13 publiée utilise le manifeste Ed25519 du canal
 avec un installateur sans Authenticode. Conserver l’installateur et le manifeste
 4.0.10 ainsi que l’index du portail conservé lors de la bascule.
 [Construction Windows](client-tauri/README.md)
@@ -169,9 +169,11 @@ Les captures UI restent dans ce répertoire et ne remplacent aucune preuve histo
 Pour la vérification ciblée Windows et Linux de l'audit, sans lancer Android ni
 les anciens tests Qt, utiliser `--desktop-audit` et fournir au besoin
 `--business-python` avec un environnement Python contenant les dépendances du
-service Projets. Ce profil comprend un test serveur isolé, les contrôles statiques
-et la compilation du portail, puis deux simulations Chromium de l'interface aux
-tailles de bureau de 720p à WQHD. Le champ `coverage` du rapport énumère les
+service Projets. Ce profil contrôle les droits d'accès et la restauration des
+notes sur des données de test. Il lance les tests ciblés de navigation et d'audio,
+les contrôles statiques, la compilation du portail et deux simulations Chromium
+aux tailles de bureau de 720p à WQHD. Choisir un chemin de sortie court sur D:
+pour les fichiers temporaires de restauration. Le champ `coverage` du rapport énumère les
 groupes non enregistrés ; la réussite concerne les seules commandes exécutées.
 Ces simulations ne remplacent pas les recettes Tauri natives Windows et Linux,
 ni la suite complète du service ou du portail.
@@ -286,20 +288,24 @@ Depuis le 23 octobre 2026, la voix serveur est Tiphaine (français de France). L
 
 Le [guide Linux](client-linux/README.md) décrit l’installation Ubuntu/Debian,
 l’import d’un accès personnel, le trousseau, la dictée et la conversation vocale.
-Construire une archive sans données privées avec :
+Compiler le binaire Tauri sous Linux avec la version voulue dans `tauri.conf.json`.
+Depuis la racine du dépôt, indiquer le chemin de ce binaire, la même version et
+un dossier de sortie sur D:. Exemple pour le candidat 4.0.12 :
 
 ```powershell
-& '.\toolchain\build-python\Scripts\python.exe' maintenance/package_linux_client.py
+& '.\toolchain\build-python\Scripts\python.exe' maintenance/package_linux_client.py `
+  --tauri-binary 'D:\Chemin\Vers\kiara' --tauri-version 4.0.12 `
+  --architecture amd64 --output 'D:\Kiara\construction-linux'
 ```
 
-Le moteur WireGuard est compilé nativement pour Linux avec le Go épinglé ;
-le paquet utilise les sources partagées du client et un environnement Python/Qt
-installé sur le poste Linux. Le manifeste Linux est indépendant des manifestes
-de publication Windows/Android/serveur. Ne pas l’ajouter à leur publication comme
-un livrable natif déjà validé : le premier lancement, le trousseau et les échanges
-avec un accès de test doivent encore être vérifiés sur une machine Linux.
-La révision Linux 2 produit une archive `*-vocal.tar.gz` avec le worker Python
-de reconnaissance et le modèle public du mot d’appel. Le microphone utilise
+Le constructeur compile le pont WireGuard pour Linux avec la version Go épinglée.
+L’archive `Kiara-linux-amd64-4.0.12-tauri.tar.gz` contient Tauri et le relais
+Python. L’installateur vérifie le manifeste, installe les dépendances en contrôlant
+leurs empreintes et crée le raccourci de la session. Le premier lancement et le
+retour avec Secret Service ont été exercés sous WSL isolé. La qualification sur
+une machine Linux avec un accès de test reste à faire avant publication.
+L’archive inclut le worker Python de reconnaissance et le modèle public du mot
+d’appel. Le microphone utilise
 `parec` (PipeWire/PulseAudio) ; installer `pulseaudio-utils`. Les modèles Low
 sont téléchargés et vérifiés par le client. Max utilise le serveur Kiara ; les
 compléments Windows ne sont pas exécutés sous Linux. L’écoute se suspend pendant

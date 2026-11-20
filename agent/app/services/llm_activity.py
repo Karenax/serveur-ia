@@ -15,6 +15,14 @@ _last_activity = time.monotonic()
 class Deferred(RuntimeError):
     """A foreground caller arrived between background requests."""
 
+    def __init__(self, message, *, retry_after_seconds=0):
+        super().__init__(message)
+        self.retry_after_seconds = retry_after_seconds
+
+
+def owns_idle_slot():
+    return _background == threading.get_ident()
+
 
 def acquire(*, timeout=None, cancel=None, count_as_interaction=True):
     global _active, _waiting, _automated_active, _automated_waiting

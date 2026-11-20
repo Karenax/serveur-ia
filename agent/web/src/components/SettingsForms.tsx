@@ -3,20 +3,39 @@ import { api } from "../lib/api";
 import { request } from "../lib/http";
 import {MemoryRecovery} from './MemoryRecovery';
 import "../progressive-options.css";
+function useSettingsChanges(form: object) {
+  const [saved, setSaved] = useState('');
+  const serialized = JSON.stringify(form);
+  const dirty = saved !== '' && saved !== serialized;
+  useEffect(() => {
+    if (!dirty) return;
+    const guard = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = '';
+    };
+    window.addEventListener('beforeunload', guard);
+    return () => window.removeEventListener('beforeunload', guard);
+  }, [dirty]);
+  return {dirty, markSaved: (value: object) => setSaved(JSON.stringify(value))};
+}
+
 export function AiSettingsForm() {
   const [form, setForm] = useState({ provider: "ollama", base_url: "", model: "", api_key: "", enabled: false,
     fallback_enabled: false, fallback_base_url: "http://127.0.0.1:1234", fallback_model: "google/gemma-4-e4b", fallback_autostart: true });
   const [msg, setMsg] = useState("");
   const [ready, setReady] = useState(false);
   const [testing, setTesting] = useState(false);
+  const {dirty, markSaved} = useSettingsChanges(form);
   const [saving, setSaving] = useState(false);
   useEffect(() => {
     api.brainAiSettings()
       .then((ai: any) => {
-        setForm({ provider: ai.provider || "ollama", base_url: ai.base_url || "",
+        const loaded = { provider: ai.provider || "ollama", base_url: ai.base_url || "",
                   model: ai.model || "", api_key: "", enabled: !!ai.enabled,
                   fallback_enabled: !!ai.fallback_enabled, fallback_base_url: ai.fallback_base_url || "http://127.0.0.1:1234",
-                  fallback_model: ai.fallback_model || "google/gemma-4-e4b", fallback_autostart: ai.fallback_autostart ?? true });
+                  fallback_model: ai.fallback_model || "google/gemma-4-e4b", fallback_autostart: ai.fallback_autostart ?? true };
+        setForm(loaded);
+        markSaved(loaded);
         setReady(true);
       })
       .catch((e: any) => setMsg(String(e.message || e)));
@@ -29,7 +48,9 @@ export function AiSettingsForm() {
       const body: any = { ...form };
       if (!body.api_key) delete body.api_key;
       await api.saveBrainAiSettings(body);
-      setForm({ ...form, api_key: "" });
+      const saved = { ...form, api_key: "" };
+      setForm(saved);
+      markSaved(saved);
       setMsg("Enregistré.");
     } catch (e: any) {
       setMsg(String(e.message || e));
@@ -51,7 +72,8 @@ export function AiSettingsForm() {
   };
   if (!ready && !msg) return <p><small>Chargement du réglage IA…</small></p>;
   return (
-    <div className="workspace-settings-form">
+    <div className="workspace-settings-form" data-settings-unsaved={dirty || undefined}>
+      {dirty && <p role="status">Modifications à enregistrer</p>}
       <p className="settings-overview">Choisissez le service qui rédige les réponses et les comptes rendus. Enregistrez les réglages avant de tester la connexion.</p>
       <label><input type="checkbox" checked={form.enabled} disabled={!ready || saving || testing}
         onChange={(e) => setForm({ ...form, enabled: e.target.checked })} /> Activer l’assistant IA</label>
@@ -122,14 +144,17 @@ export function MailSettingsForm({active=true}:{active?:boolean} = {}) {
   const [search,setSearch]=useState("");
   const [account,setAccount]=useState("");
   const [scanFolder,setScanFolder]=useState("");
+  const {dirty, markSaved} = useSettingsChanges(form);
   useEffect(()=>{
     let live=true;
     Promise.all([api.brainMailSettings(),request<any>("/v1/thunderbird/status")]).then(([m,value]:any[])=>{
       if(!live)return;
-      setForm({source:m.source||"thunderbird",folder:m.folder||"",auto_scan:m.auto_scan!==false,
+      const loaded = {source:m.source||"thunderbird",folder:m.folder||"",auto_scan:m.auto_scan!==false,
         scan_interval_minutes:Number(m.scan_interval_minutes)||5,
         auto_classification_threshold:m.auto_classification_threshold??.75,
-        thunderbird_folder_ids:m.thunderbird_folder_ids??value.sync?.folder_ids??(value.folders||[]).filter((f:any)=>/(?:^|\/)INBOX$/i.test(f.path)).map((f:any)=>f.id)});
+        thunderbird_folder_ids:m.thunderbird_folder_ids??value.sync?.folder_ids??(value.folders||[]).filter((f:any)=>/(?:^|\/)INBOX$/i.test(f.path)).map((f:any)=>f.id)};
+      setForm(loaded);
+      markSaved(loaded);
       setStatus(value);setReady(true);
     }).catch(e=>{if(live)setError(String(e.message||e));});
     return()=>{live=false;};
@@ -154,7 +179,8 @@ export function MailSettingsForm({active=true}:{active?:boolean} = {}) {
   const save=async()=>{
     if(!ready||busy)return;
     setBusy(true);setError("");setMsg("");
-    try {await api.saveBrainMailSettings(form);setMsg("Réglages enregistrés. La liaison adopte ce choix au prochain échange.");}
+    try {await api.saveBrainMailSettings(form);
+      markSaved(form);setMsg("Réglages enregistrés. La liaison adopte ce choix au prochain échange.");}
     catch(e:any){setError(String(e.message||e));}finally{setBusy(false);}
   };
   const synchronize=async()=>{
@@ -162,6 +188,7 @@ export function MailSettingsForm({active=true}:{active?:boolean} = {}) {
     setBusy(true);setError("");setMsg("");
     try {
       await api.saveBrainMailSettings(form);
+      markSaved(form);
       if(form.source==="thunderbird"){
         await request("/v1/thunderbird/sync",{method:"POST",body:JSON.stringify({folder_ids:form.thunderbird_folder_ids})});
         setMsg(status?.connected?"Synchronisation demandée dans Thunderbird.":"Demande enregistrée. Ouvrez Thunderbird pour lancer la synchronisation.");
@@ -189,7 +216,8 @@ export function MailSettingsForm({active=true}:{active?:boolean} = {}) {
   const validThreshold=Number.isFinite(form.auto_classification_threshold) && form.auto_classification_threshold>=.01 && form.auto_classification_threshold<=1;
   const folders=(status?.folders||[]).filter((f:any)=>(!account||f.account_id===account)&&`${f.path} ${f.name}`.toLocaleLowerCase().includes(search.toLocaleLowerCase()));
   const sync=status?.sync;
-  return <div className="workspace-settings-form mail-settings-form">
+  return <div className="workspace-settings-form mail-settings-form" data-settings-unsaved={dirty || undefined}>
+    {dirty && <p role="status">Modifications à enregistrer</p>}
     <label>Source des mails<select className="input" value={form.source} disabled={!ready||busy} onChange={e=>setForm({...form,source:e.target.value})}>
       <option value="thunderbird">Thunderbird</option><option value="folder">Dossier de fichiers EML</option>
     </select></label>
@@ -239,15 +267,23 @@ export function MemorySettingsForm({active=true}:{active?:boolean} = {}) {
     embedding_model: "text-embedding-embeddinggemma-2", embedding_endpoint: "http://192.9.110.115:1234",
     index_path: "", timeout_s: 120, batch_size: 8});
   const [state, setState] = useState<any>(null), [msg, setMsg] = useState(""), [busy, setBusy] = useState(false);
-  useEffect(() => {api.brainMemorySettings().then((m: any) => {setForm(f => ({...f, ...m.configured}));setState(m);})
+  const {dirty, markSaved} = useSettingsChanges(form);
+  useEffect(() => {api.brainMemorySettings().then((m: any) => {
+    const loaded = {...form, ...m.configured};
+    setForm(loaded);
+    markSaved(loaded);
+    setState(m);
+  })
     .catch((e: any) => setMsg(String(e.message || e)));}, []);
   const save = async () => {try {setBusy(true);await api.saveBrainMemorySettings(form);
+    markSaved(form);
     setState(await api.brainMemorySettings());setMsg("Réglages de recherche enregistrés. Si le modèle ou le serveur change, reconstruisez les index des projets.");}
     catch (e: any) {setMsg(String(e.message || e));} finally {setBusy(false);}};
   const probe = async () => {try {setBusy(true);setMsg("Test de la recherche : indexation, recherche et nettoyage…");
     const r: any = await api.brainMemoryTest();setMsg(r.status === "ok" ? `Recherche vérifiée : ${r.recall_hits} résultat(s), indexation ${r.remember_s}s, recherche ${r.recall_s}s.` : `Échec : ${r.error || r.status}`);}
     catch (e: any) {setMsg(String(e.message || e));} finally {setBusy(false);}};
-  return <div className="workspace-settings-form">
+  return <div className="workspace-settings-form" data-settings-unsaved={dirty || undefined}>
+    {dirty && <p role="status">Modifications à enregistrer</p>}
     <h3>Recherche dans les documents</h3>
     <p className="settings-overview">La recherche retrouve les passages utiles des sources du projet. L’assistant IA peut ensuite rédiger une réponse avec ses citations.</p>
     <p>{state?.active?.health?.passages!=null ? `${state.active.health.passages} passages disponibles pour la recherche` : "Nombre de passages non vérifié"}</p>

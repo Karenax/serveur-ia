@@ -3,6 +3,7 @@
 Write roots are separate from read roots. No directory or file is created by
 preview. Durable intent/receipt commands are integrated separately.
 """
+import json
 from pathlib import Path
 
 from fastapi import HTTPException
@@ -57,6 +58,11 @@ def preview(db, project_id, artifact_id, choice, *, storage_root, policy=None):
     filename = _name(artifact.filename)  # Always server-derived from the frozen copy.
     policy = configured_write_policy(project_id) if policy is None else policy
     root, directory, relative = _destination(db, project_id, choice, policy)
+    source_destination = jobs.source_destination(item)
+    updating_source = (source_destination is not None and source_destination['replace_existing']
+                       and source_destination['link_id'] == choice.link_id
+                       and source_destination['relative_directory'] == relative)
+    expected_source = json.loads(item.snapshot)['preview']['source_sha256'] if updating_source else None
     with AnchoredDirectory(root, directory) as opened:
         occupied = opened.exists(filename)
         existing = opened.describe(filename) if choice.replace_existing and occupied else None
@@ -82,5 +88,7 @@ def preview(db, project_id, artifact_id, choice, *, storage_root, policy=None):
         blockers.append('replacement_target_missing')
     if choice.replace_existing and not replacement_supported:
         blockers.append('replacement_not_supported')
+    if updating_source and (not occupied or (existing is not None and existing['sha256'] != expected_source)):
+        blockers.append('source_changed')
     return {**capture,'preview_sha256':jobs.frozen(capture)[1],'destination':str(directory / filename),
             'can_publish':not blockers,'blockers':blockers,'read_only':True,'network_published':False}

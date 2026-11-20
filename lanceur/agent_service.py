@@ -184,15 +184,24 @@ class AgentService:
                 finally:
                     if restart:
                         self.start()
-            with TemporaryDirectory(prefix='.agent-verification-', dir=target.parent) as folder:
-                pending = Path(folder) / 'archive'
+            # The archive is already encrypted. Create its temporary file in
+            # the destination itself so Windows inherits that directory's ACL
+            # instead of retaining the restrictive ACL of a temporary folder.
+            pending = target.parent / ('.agent-verification-' + secrets.token_hex(16) + '.tmp')
+            pending_created = False
+            try:
                 write_archive(snapshot, pending, password)
+                pending_created = True
                 check = stage / 'verified'
                 check.mkdir()
                 extract_archive(pending, check, password)
                 self._archive_tool('from pathlib import Path; import sys; from app.services.backup import verify_backup; '
                                    'verify_backup(Path(sys.argv[1]))', check)
                 pending.rename(target)
+                pending_created = False
+            finally:
+                if pending_created:
+                    pending.unlink(missing_ok=True)
         return target
 
     def restore_archive(self, source, parent, password):

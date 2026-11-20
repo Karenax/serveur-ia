@@ -1,11 +1,12 @@
 """Client IA local / API compatible OpenAI + Ollama, avec fallback heuristique."""
 import io
 import json
+import os
 import time
 import urllib.request
 import urllib.error
 from contextlib import nullcontext
-from .llm_activity import Deferred, foreground
+from .llm_activity import Deferred, foreground, owns_idle_slot
 from . import ai_routing
 from .inference_scheduler import DEFAULT_WAIT_SECONDS, PRIORITIES, current_priority, engine_key, lease, waiting_policy
 from .llm_usage import observe_request
@@ -30,16 +31,33 @@ class ModelUnloadedError(urllib.error.HTTPError):
 
 def _post_json(url: str, payload: dict, headers: dict | None = None, timeout: int = 60) -> dict:
     data = json.dumps(payload).encode("utf-8")
-    req = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json", **(headers or {})}, method="POST")
+    request_headers = {"Content-Type": "application/json", **(headers or {})}
+    background = current_priority() == PRIORITIES['background']
+    gateway = os.environ.get('AGENT_KIARA_INFERENCE_URL', '').rstrip('/')
+    project_analysis = bool(background and gateway and url == gateway + '/v1/chat/completions' and owns_idle_slot())
+    if background and gateway and url == gateway + '/v1/chat/completions':
+        request_headers['X-Kiara-Inference-Priority'] = 'project-analysis' if project_analysis else 'background'
+    req = urllib.request.Request(url, data=data, headers=request_headers, method="POST")
     delay, cancel = waiting_policy()
     deadline = time.monotonic() + delay if delay is not None else None
-    with foreground(timeout=delay, cancel=cancel, count_as_interaction=current_priority() != PRIORITIES['background']):
+    with foreground(timeout=delay, cancel=cancel, count_as_interaction=not background):
         remaining = max(0, deadline - time.monotonic()) if deadline is not None else DEFAULT_WAIT_SECONDS
         with lease(engine_key(url), timeout=min(DEFAULT_WAIT_SECONDS, remaining), cancel=cancel):
             try:
                 with urllib.request.urlopen(req, timeout=timeout) as resp:
                     return json.loads(resp.read().decode("utf-8", "replace"))
             except urllib.error.HTTPError as exc:
+                if exc.code == 429 and project_analysis:
+                    with exc:
+                        body = exc.read(4096)
+                    try:
+                        error = json.loads(body)['error']
+                        seconds = error['retry_after_seconds']
+                        if error['code'] == 'background_budget' and type(seconds) is int and 0 < seconds <= 3600:
+                            raise Deferred('Budget horaire des analyses de projet atteint.', retry_after_seconds=seconds) from exc
+                    except (KeyError, TypeError, ValueError):
+                        pass
+                    raise urllib.error.HTTPError(exc.url, exc.code, exc.msg, exc.headers, io.BytesIO(body)) from exc
                 if exc.code != 400:
                     raise
                 # Preserve the body for callers, including diagnostic wrappers

@@ -64,6 +64,12 @@ class RetentionSafetyTests(unittest.TestCase):
         del self.contents[self.main]
         self.assert_preserved()
 
+    def test_removed_local_projects_preserves_complete_secondary_pair(self):
+        self.agent.unlink()
+        del self.contents[self.agent]
+        self.assert_preserved()
+        self.assertIn('Nettoyage incomplet', self.manager.data['last_error'])
+
     def test_verified_pairs_are_still_removed_by_retention(self):
         self.assertEqual(self.manager.prune(), [self.old['id']])
         self.assertEqual(self.manager.data['catalog'], [self.new])

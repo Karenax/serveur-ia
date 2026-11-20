@@ -6,10 +6,10 @@ from pathlib import Path
 import re
 import sqlite3
 
-from backend.app.project_note_schemas import ImageBlock, NoteContent, content_text
+from backend.app.project_note_schemas import NOTE_ATTACHMENT_BUDGET, ImageBlock, NoteContent, content_text
 
 TABLES = {'personal_notes', 'personal_note_versions', 'personal_note_images'}
-MAX_IMAGE_BYTES = 5 * 1024 * 1024
+MAX_IMAGE_BYTES = NOTE_ATTACHMENT_BUDGET
 
 
 def validate(database):
@@ -41,6 +41,9 @@ def validate(database):
             if db.execute('''SELECT 1 FROM personal_note_images i
                 LEFT JOIN personal_notes n ON n.id=i.note_id WHERE n.id IS NULL LIMIT 1''').fetchone():
                 raise ValueError('Image de note personnelle orpheline')
+            if db.execute('''SELECT 1 FROM personal_note_images GROUP BY note_id
+                HAVING count(*)>20 OR sum(size_bytes)>? LIMIT 1''', (NOTE_ATTACHMENT_BUDGET,)).fetchone():
+                raise ValueError('Quota des images de note personnelle dépassé')
             for image_id, size, digest, actual_size in db.execute(
                     'SELECT id, size_bytes, sha256, length(data) FROM personal_note_images'):
                 if (type(size) is not int or not 1 <= size <= MAX_IMAGE_BYTES or actual_size != size

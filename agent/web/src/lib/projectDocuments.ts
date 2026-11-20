@@ -13,7 +13,7 @@ export type DocumentValues={project_id:string;identity_revision:number;planning_
 export type DocumentLink={id:string;code:string;label:string;path:string;order:number;missing?:boolean};
 export type DocumentSearchItem={document_id:DocumentId;label:string;format:DocumentTemplate['format'];
   relative_paths:string[];filename_patterns:string[];excluded_tokens:string[];preferred_version:number|null;active:boolean;order:number};
-export type DocumentPreferences={available:boolean;revision:number;version_id:string|null;items:DocumentSearchItem[]};
+export type DocumentPreferences={can_edit?:boolean;available:boolean;revision:number;version_id:string|null;items:DocumentSearchItem[]};
 export type DocumentFormChoice={link_id:string|null;relative_path:string;overrides:Record<string,string>};
 export type DocumentDraft=DocumentFormChoice&{available:boolean;revision:number;version_id:string|null;
   selected_link:DocumentLink|null;warnings:string[]};
@@ -33,8 +33,10 @@ export type DocumentDiscovery={project_id:string;link_id:string;document_id:Docu
   bounds:string[];skipped:Record<string,number>;candidates:DocumentCandidate[];ambiguous:boolean;
   recommended_path:string|null;elapsed_seconds:number;read_only:true;requires_manual_choice:true;
   preferences_revision?:number;preferences_version_id?:string|null};
+export type DocumentFolderDiscovery=Pick<DocumentDiscovery,'project_id'|'link_id'|'status'|'bounds'|'examined'>&{
+  items:(DocumentDiscovery&{existing_files:{filename:string;relative_path:string}[];missing_fields:string[]})[]};
 export type DocumentTarget={kind:'cell'|'bookmark';target:string;field:string;present:boolean;available:boolean;
-  existing_value:string;proposed_value:string;blockers:string[]};
+  existing_value:string;proposed_value:string;blockers:string[];replaces_placeholder?:boolean};
 export type DocumentPreview={document_id:DocumentId;format:string;source_sha256:string;link_sha256:string;values_sha256:string;size_bytes:number;
   source:{project_id:string;link_id:string;relative_path:string;filename:string;sha256:string};field_values:DocumentValues;
   part:string;sheet:string|null;targets:DocumentTarget[];missing_fields:string[];missing_targets:string[];blockers:string[];
@@ -43,6 +45,27 @@ export type DocumentPreview={document_id:DocumentId;format:string;source_sha256:
 export class DocumentHttpError extends Error {constructor(public status:number,message:string){super(message);}}
 const root=(id:string)=>`/api/v1/projects/${encodeURIComponent(id)}/documents`;
 const maxBytes=50*1024*1024;
+async function discover<T>(id:string,path:string,body:object,signal?:AbortSignal) {
+  const controller=new AbortController(),cancel=()=>controller.abort();let expired=false;
+  signal?.addEventListener('abort',cancel,{once:true});if(signal?.aborted)cancel();
+  const timeout=window.setTimeout(()=>{expired=true;cancel();},30_000);
+  try{
+    if(controller.signal.aborted)throw new DOMException('Recherche annulée','AbortError');
+    return await request<T>(root(id)+path,{method:'POST',signal:controller.signal,body:JSON.stringify(body)});
+  }catch(error){if(expired)throw new Error('Recherche trop longue. Vérifiez la disponibilité du dossier puis réessayez.');throw error;}
+  finally{window.clearTimeout(timeout);signal?.removeEventListener('abort',cancel);}
+}
+function searchPreferencesApi(path:string) {
+  return {
+    preferences:(signal?:AbortSignal)=>request<DocumentPreferences>(path,{signal}),
+    savePreferences:(revision:number,items:DocumentSearchItem[],signal?:AbortSignal)=>request<DocumentPreferences>(path,
+      {method:'PUT',body:JSON.stringify({expected_revision:revision,items}),signal}),
+    preferencesHistory:(offset=0,signal?:AbortSignal)=>request<DocumentPage<DocumentJournal>>(`${path}/history?offset=${offset}&limit=20`,{signal}),
+    restorePreferences:(revision:number,versionId:string,signal?:AbortSignal)=>request<DocumentPreferences>(path+'/restore',
+      {method:'POST',body:JSON.stringify({expected_revision:revision,version_id:versionId}),signal}),
+  };
+}
+export const sharedDocumentPreferences=searchPreferencesApi('/api/v1/document-settings');
 export const documentApi={
   draft:(id:string,doc:DocumentId,signal?:AbortSignal)=>request<DocumentDraft>(`${root(id)}/forms/${doc}`,{signal}),
   saveDraft:(id:string,doc:DocumentId,revision:number,choice:DocumentFormChoice,signal?:AbortSignal)=>request<DocumentDraft>(`${root(id)}/forms/${doc}`,
@@ -50,26 +73,14 @@ export const documentApi={
   draftHistory:(id:string,doc:DocumentId,offset=0,signal?:AbortSignal)=>request<DocumentPage<DocumentJournal>>(`${root(id)}/forms/${doc}/history?offset=${offset}&limit=20`,{signal}),
   restoreDraft:(id:string,doc:DocumentId,revision:number,versionId:string,signal?:AbortSignal)=>request<DocumentDraft>(`${root(id)}/forms/${doc}/restore`,
     {method:'POST',body:JSON.stringify({expected_revision:revision,version_id:versionId}),signal}),
-  preferences:(signal?:AbortSignal)=>request<DocumentPreferences>('/api/v1/document-settings',{signal}),
-  savePreferences:(revision:number,items:DocumentSearchItem[],signal?:AbortSignal)=>request<DocumentPreferences>('/api/v1/document-settings',
-    {method:'PUT',body:JSON.stringify({expected_revision:revision,items}),signal}),
-  preferencesHistory:(offset=0,signal?:AbortSignal)=>request<DocumentPage<DocumentJournal>>(`/api/v1/document-settings/history?offset=${offset}&limit=20`,{signal}),
-  restorePreferences:(revision:number,versionId:string,signal?:AbortSignal)=>request<DocumentPreferences>('/api/v1/document-settings/restore',
-    {method:'POST',body:JSON.stringify({expected_revision:revision,version_id:versionId}),signal}),
+  ...searchPreferencesApi('/api/v1/document-settings/personal'),
   workspace:(id:string,offset=0,signal?:AbortSignal)=>request<DocumentWorkspace>(`${root(id)}?offset=${offset}&limit=100`,{signal}),
   preview:(id:string,choice:DocumentChoice,signal?:AbortSignal)=>request<DocumentPreview>(root(id)+'/preview',
     {method:'POST',body:JSON.stringify(choice),signal}),
-  discover:async(id:string,documentId:DocumentId,linkId:string,signal?:AbortSignal)=>{
-    const controller=new AbortController(),cancel=()=>controller.abort();let expired=false;
-    signal?.addEventListener('abort',cancel,{once:true});if(signal?.aborted)cancel();
-    const timeout=window.setTimeout(()=>{expired=true;cancel();},30_000);
-    try{
-      if(controller.signal.aborted)throw new DOMException('Recherche annulée','AbortError');
-      return await request<DocumentDiscovery>(root(id)+'/discover',{method:'POST',signal:controller.signal,
-        body:JSON.stringify({document_id:documentId,link_id:linkId})});
-    }catch(error){if(expired)throw new Error('Recherche trop longue. Vérifiez la disponibilité du dossier puis réessayez.');throw error;}
-    finally{window.clearTimeout(timeout);signal?.removeEventListener('abort',cancel);}
-  },
+  discover:(id:string,documentId:DocumentId,linkId:string,signal?:AbortSignal)=>
+    discover<DocumentDiscovery>(id,'/discover',{document_id:documentId,link_id:linkId},signal),
+  discoverFolder:(id:string,linkId:string,signal?:AbortSignal)=>
+    discover<DocumentFolderDiscovery>(id,'/discover-folder',{link_id:linkId},signal),
   copy:async(id:string,choice:DocumentChoice,preview:DocumentPreview,signal?:AbortSignal)=>withActivity('Préparation et vérification du document…',async()=>{
     if(!preview.can_prepare||!preview.can_prepare_copy||!preview.output_filename)throw new Error('Aperçu complet et autorisation de préparation requis');
     if(preview.document_id!==choice.document_id||preview.source.project_id!==id||preview.source.link_id!==choice.link_id||

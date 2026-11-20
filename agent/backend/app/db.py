@@ -42,6 +42,7 @@ def init_db() -> None:
     from . import project_knowledge_models  # noqa: F401
     from . import note_evidence_models  # noqa: F401
     from . import personal_note_models  # noqa: F401
+    from . import personal_document_models  # noqa: F401
     from .services.project_identity_migration import install_identity_schema
     from .services.project_planning_migration import install_planning_schema
     from .services.project_deliverable_migration import install_deliverable_schema, validate_deliverable_schema

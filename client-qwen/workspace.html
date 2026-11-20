@@ -18,6 +18,78 @@
 <aside id="ws-side" class="ws-document-side" aria-label="Document et sources" hidden><button id="ws-side-close" class="secondary">Fermer ×</button><h3 id="ws-side-title"></h3><div id="ws-side-text" class="ws-result"></div></aside>
 </template>
 <script nonce="__NONCE__">
+/* notification-preferences:start */
+function notificationPreferencesForm() {
+  const form = document.createElement('form');
+  form.id = 'fred-inbox-preferences';
+  form.className = 'ws-card';
+  form.innerHTML = '<div id="fred-inbox-types"></div><label><input type="checkbox" id="fred-inbox-discreet" checked> Alertes discrètes</label><small class="muted">Le contenu privé des documents et conversations est masqué dans les alertes.</small><button class="secondary" type="submit">Enregistrer les préférences</button>';
+  return form;
+}
+
+function notificationPreferences(form, request, reload, protectChanges) {
+  const types = {
+    document_indexed: 'Document prêt pour la recherche',
+    transcription_ready: 'Transcription disponible',
+  };
+  const boxes = Object.entries(types).map(([key, label]) => {
+    const line = document.createElement('label');
+    const box = document.createElement('input');
+    box.type = 'checkbox';
+    box.dataset.notificationType = key;
+    box.checked = true;
+    line.append(box, ' '+label);
+    form.querySelector('#fred-inbox-types').append(line);
+    return box;
+  });
+  const discreet = form.querySelector('#fred-inbox-discreet');
+  const submit = form.querySelector('button[type="submit"]');
+  const status = document.createElement('p');
+  status.setAttribute('role','status');
+  form.append(status);
+  let current = null, dirty = false;
+
+  function apply(preferences) {
+    current = preferences;
+    if (!preferences || dirty) return;
+    for (const box of boxes) box.checked = preferences.types[box.dataset.notificationType] !== false;
+    discreet.checked = preferences.discreet !== false;
+  }
+
+  form.oninput = () => {dirty = true; status.textContent = 'Modifications à enregistrer';};
+  form.onsubmit = async event => {
+    event.preventDefault();
+    if (submit.disabled) return;
+    if (!current) {
+      status.textContent = 'Reconnectez-vous pour enregistrer vos préférences.';
+      return;
+    }
+    const selected = Object.fromEntries(boxes.map(box => [box.dataset.notificationType,box.checked]));
+    const fields = [...boxes,discreet,submit];
+    fields.forEach(field => field.disabled = true);
+    status.textContent = 'Enregistrement…';
+    try {
+      await request({action:'preferences',revision:current.revision,types:selected,discreet:discreet.checked});
+      dirty = false;
+      status.textContent = 'Préférences enregistrées.';
+      await reload();
+    } catch (failure) {
+      if (failure.status === 409) {
+        try { await reload(); } catch { /* Changes stay in the form. */ }
+      }
+      status.textContent = failure.status === 409
+        ? 'Les préférences ont changé. Vos choix sont conservés. Enregistrez-les de nouveau.'
+        : failure.message;
+    } finally {
+      fields.forEach(field => field.disabled = false);
+    }
+  };
+  if (protectChanges) window.addEventListener('beforeunload',event => {
+    if (dirty) {event.preventDefault();event.returnValue = '';}
+  });
+  return {apply};
+}
+/* notification-preferences:end */
 document.querySelector('.workspace').append($('ws-layout').content.cloneNode(true));
 const ws={data:null,project:null,document:null,dirty:false,conflict:false,timer:null,writes:Promise.resolve(),draftWrites:Promise.resolve(),polling:false,projectDirty:false};
 function wsElement(tag,value,klass){const n=document.createElement(tag);if(value!==undefined)n.textContent=value;if(klass)n.className=klass;return n;}
@@ -33,61 +105,178 @@ function workspaceShowSources(sources){$('ws-side-title').textContent='Passages 
 function wsOptions(select,rows,empty){const old=select.value;select.replaceChildren();if(empty)select.append(new Option(empty,''));for(const r of rows)select.append(new Option(r.title||r.name,r.id));if([...select.options].some(o=>o.value===old))select.value=old;}
 const pickers=wsElement('div',undefined,'ws-pickers');pickers.innerHTML='<label>Projet <select id="ws-chat-project" aria-label="Projet de la discussion"></select></label><label>Document <select id="ws-chat-document" aria-label="Document de référence"></select></label><button id="ws-publish" class="secondary">Enregistrer au projet</button><button id="ws-panel" class="secondary">Voir le document</button>';
 const pickerHost=document.getElementById('composerOptionsMenu');if(pickerHost)pickerHost.append(pickers);else document.querySelector('[data-view="chat"] .conversation-top').after(pickers);
-for(const [view,title] of [['projects','Projets']]){const b=wsElement('button',title,'nav-button');b.dataset.viewButton=view;b.onclick=()=>showView(view);document.querySelector('#client-navigation').insertBefore(b,document.querySelector('[data-view-button="access"]'));}
-const originalShowView=showView;showView=function(name){originalShowView(name);if(name==='projects'){$('workspace-heading').textContent='Projets';wsRefresh().catch(e=>error(e));}if(name!=='chat')$('ws-side').hidden=true;};
+const clientNavigation=$('client-navigation');
+const localSettingsTemplate=$('local-settings-navigation');
+function workspaceNavButton(view,title){
+  const existing=document.querySelector('[data-view-button="'+view+'"]');
+  if(existing){existing.onclick=()=>showView(view);return existing;}
+  const button=wsElement('button',title,'nav-button');
+  button.dataset.viewButton=view;
+  button.onclick=()=>showView(view);
+  clientNavigation.insertBefore(button,clientNavigation.querySelector('[data-view-button="access"]'));
+  return button;
+}
+workspaceNavButton('projects','Projets');
+onViewChange({after(name){if(name==='projects'){$('workspace-heading').textContent='Projets';wsRefresh().catch(e=>error(e));}if(name!=='chat')$('ws-side').hidden=true;}});
 const wsSettings=wsElement('section',undefined,'settings-view');wsSettings.dataset.view='settings';wsSettings.hidden=true;
 const wsSettingsNav=wsElement('nav',undefined,'ws-toolbar');wsSettingsNav.setAttribute('aria-label','Réglages du client');wsSettings.append(wsElement('h2','Réglages'),wsSettingsNav);
 const wsSettingsSections=[...platformCapabilities.settings];
-for(const name of platformCapabilities.settings){const b=document.querySelector('[data-view-button="'+name+'"]');b.className='secondary';wsSettingsNav.append(b);const pane=document.querySelector('[data-view="'+name+'"]');pane.style.padding='0';pane.style.overflow='visible';wsSettings.append(pane);}
-if(platformCapabilities.platform==='web'){
+const localNavigation=localSettingsTemplate?.content || clientNavigation;
+for(const name of platformCapabilities.settings){const b=localNavigation.querySelector('[data-view-button="'+name+'"]');b.className='secondary';wsSettingsNav.append(b);const pane=document.querySelector('[data-view="'+name+'"]');pane.style.padding='0';pane.style.overflow='visible';wsSettings.append(pane);}
+if(platformCapabilities.platform==='web'&&!localSettingsTemplate){
   for(const name of ['connection','updates','api'])document.querySelector(`[data-view-button="${name}"]`)?.remove();
 }
+localSettingsTemplate?.remove();
 document.querySelector('.workspace').append(wsSettings);
-const wsSettingsButton=wsElement('button','Réglages','nav-button');wsSettingsButton.dataset.viewButton='settings';document.querySelector('#client-navigation').append(wsSettingsButton);
-const wsShowViewOnce=showView;showView=function(name){const selected=name==='settings'?'access':name;wsShowViewOnce(selected);wsSettings.hidden=!wsSettingsSections.includes(selected);wsSettingsButton.classList.toggle('active',!wsSettings.hidden);if(!wsSettings.hidden)$('workspace-heading').textContent='Réglages · '+({access:'Mon accès',connection:'Connexion',updates:'Mises à jour',api:'API locale',assistant:'Mémoire et rappels'})[selected];};
+const wsSettingsButton=workspaceNavButton('settings','Réglages');
+onViewChange({after(selected){wsSettings.hidden=!wsSettingsSections.includes(selected);wsSettingsButton.classList.toggle('active',!wsSettings.hidden);if(!wsSettings.hidden)$('workspace-heading').textContent='Réglages · '+({access:'Mon accès',connection:'Connexion',updates:'Mises à jour',api:'API locale',assistant:'Mémoire et rappels'})[selected];}});
 wsSettingsButton.onclick=()=>showView('settings');
-if(platformCapabilities.platform==='windows'){
-  const views={'mises-a-jour':'updates','connexion':'connection','api-locale':'api','memoire':'assistant'};
+if(['windows','web'].includes(platformCapabilities.platform)){
+  const windows=platformCapabilities.platform==='windows';
+  const embedded=inlineDeviceSettings;
+  const views={'mises-a-jour':'updates','connexion':'connection','api-locale':'api','memoire':'assistant','acces':'access'};
+  const preferences={
+    apparence:['Apparence et lecture',()=>uiThemeCard],
+    notifications:['Notifications',()=>$('fred-inbox-preferences')],
+    ...(windows?{
+      vocal:['Conversation vocale',()=>$('voice-settings-dialog').querySelector('.voice-settings')],
+      dictee:['Dictée',()=>$('voice-dictation-settings')],
+    }:{}),
+  };
+  const pane=wsElement('section',undefined,'device-preferences');
+  pane.dataset.view='device-preferences';pane.hidden=true;wsSettings.append(pane);
+  wsSettingsSections.push('device-preferences');
+  wsSettings.classList.add('device-settings');
+  const heading=wsElement('h2');heading.tabIndex=-1;
+  let mounted=null,home=null,next=null,oldOpen=false,settingsFromHash=false;
+  function restorePreference(){
+    if(!mounted)return;
+    if(mounted instanceof HTMLDetailsElement)mounted.open=oldOpen;
+    home.insertBefore(mounted,next);
+    mounted=null;
+  }
+  function markDeviceSetting(section){
+    for(const button of wsSettingsNav.querySelectorAll('[data-setting]')){
+      if(button.dataset.setting===section)button.setAttribute('aria-current','page');
+      else button.removeAttribute('aria-current');
+    }
+  }
+  onViewChange({before(name){
+    if(name==='settings'){
+      wsSettingsNav.hidden=false;
+      wsSettings.classList.remove('device-setting-direct');
+    }
+    if(name!=='device-preferences')restorePreference();
+  },after(name){
+    if(name!=='device-preferences')markDeviceSetting(Object.keys(views).find(section=>views[section]===name));
+  }});
   function openDeviceSetting(section){
     if(Object.hasOwn(views,section)){
       const view=views[section];
       showView(view);
-      const pane=wsSettings.querySelector(`[data-view="${view}"]`);
-      const heading=pane?.hidden?null:pane?.querySelector('h2');
-      if(heading){heading.tabIndex=-1;heading.focus();}
-    }else if(section==='vocal'){
-      showView('voice');
-      const trigger=$('voice-settings-toggle');
-      if(trigger?.getClientRects().length)trigger.click();
-    }else if(section==='dictee'){
-      showView('chat');
-      const dictation=$('voice-dictation-settings');
-      if(dictation&&!dictation.closest('[data-view]').hidden){
-        $('ui-composer-options-menu').open=true;
-        dictation.open=true;dictation.querySelector('summary').focus();
-      }
-    }else if(section==='notifications'){
-      showView('notifications');
-      const preferences=$('fred-inbox-preferences').closest('details');
-      if(!preferences.closest('[data-view]').hidden){preferences.open=true;preferences.querySelector('summary').focus();}
+      const title=wsSettings.querySelector('[data-view="'+view+'"] h2');
+      if(title&&!embedded){title.tabIndex=-1;title.focus();}
+      return;
     }
+    if(!Object.hasOwn(preferences,section))return;
+    restorePreference();
+    const [title,getNode]=preferences[section];
+    const node=getNode();
+    if(!node)return;
+    showView('device-preferences');
+    mounted=node;home=node.parentNode;next=node.nextSibling;
+    if(node instanceof HTMLDetailsElement){oldOpen=node.open;node.open=true;}
+    heading.textContent=title;
+    pane.replaceChildren(heading,node);
+    $('workspace-heading').textContent='Réglages · '+title;
+    markDeviceSetting(section);
+    if(section==='notifications'){
+      const inbox=wsElement('a','Notifications reçues','secondary');
+      inbox.href=embedded?(windows?'/chat':config.web_prefix+'/app/conversations')+'#notifications':'#notifications';
+      if(embedded)inbox.target='_top';
+      heading.after(inbox);
+      void fredInboxLoad();
+    }
+    if(!embedded)heading.focus();
   }
-  const openDeviceHash=()=>{
-    if(location.hash.startsWith('#reglages-'))openDeviceSetting(location.hash.slice('#reglages-'.length));
-  };
-  window.addEventListener('hashchange',openDeviceHash);
-  window.addEventListener('DOMContentLoaded',()=>{
-    // L’accès à l’appareil reste local, même quand le portail est inaccessible.
-    wsSettingsButton.onclick=()=>showView('settings');
-    for(const [id,label] of [['vocal','Vocal'],['dictee','Dictée'],['notifications','Notifications']]){
-      const button=wsElement('button',label,'secondary');button.type='button';
-      button.onclick=event=>{event.stopPropagation();openDeviceSetting(id);};
-      wsSettingsNav.append(button);
+  const handleSettingsHash=()=>{
+    const hash=location.hash;
+    const section=hash.startsWith('#reglages-')?hash.slice('#reglages-'.length):
+      hash==='#apparence'?'apparence':hash==='#reglages'?'acces':null;
+    if(section){
+      settingsFromHash=true;
+      const direct=history.state?.localDeviceSettings!==true;
+      wsSettingsNav.hidden=direct;
+      wsSettings.classList.toggle('device-setting-direct',direct);
+      openDeviceSetting(section);
     }
-    const portal=wsButton('Réglages du portail',()=>uiOpenProjectWorkspace('/app/settings'));
-    wsSettingsNav.append(portal);
-    openDeviceHash();
+    else if(settingsFromHash){
+      settingsFromHash=false;
+      showView(hash==='#notifications'?'notifications':'chat');
+    }
+  };
+  window.addEventListener('hashchange',handleSettingsHash);
+  document.addEventListener('click',event=>{
+    if(settingsFromHash&&event.target.closest('[data-view-button="chat"],[data-view-button="notifications"]')){
+      settingsFromHash=false;
+      history.replaceState(null,'',location.pathname+location.search+(historyView==='notifications'?'#notifications':''));
+    }
+  });
+  window.addEventListener('DOMContentLoaded',()=>{
+    for(const button of wsSettingsNav.querySelectorAll('[data-view-button]')){
+      const section=Object.keys(views).find(id=>views[id]===button.dataset.viewButton);
+      if(!section)continue;
+      button.dataset.setting=section;
+      button.onclick=()=>selectLocalSetting(section);
+    }
+    for(const [id,[label]] of Object.entries(preferences)){
+      const button=wsButton(label,()=>selectLocalSetting(id));
+      button.dataset.setting=id;wsSettingsNav.append(button);
+    }
+    const groups=[
+      ['Mes préférences',['apparence','notifications','acces']],
+      ['Voix et dictée',['vocal','dictee']],
+      ['Cet appareil',['connexion','mises-a-jour','api-locale','memoire']],
+    ];
+    for(const [title,sections] of groups){
+      const buttons=sections.map(id=>wsSettingsNav.querySelector('[data-setting="'+id+'"]')).filter(Boolean);
+      if(!buttons.length)continue;
+      const group=wsElement('div',undefined,'device-settings-group');
+      group.append(wsElement('h3',title),...buttons);wsSettingsNav.append(group);
+    }
+    const back=wsElement('button','Réglages de l’espace de travail','secondary');
+    back.type='button';back.id='device-settings-back';
+    let returnPath='/app/settings';
+    if(document.referrer){
+      const referrer=new URL(document.referrer);
+      const path=windows?referrer.pathname:referrer.pathname.slice(config.web_prefix.length);
+      if(referrer.origin===location.origin&&/^\/app\//.test(path)&&path!=='/app/conversations'){
+        returnPath=path+referrer.search;
+        back.textContent=path==='/app/settings'?'Retour aux réglages':'Retour à l’espace de travail';
+      }
+    }
+    back.onclick=()=>wsTry(()=>uiOpenProjectWorkspace(returnPath));
+    wsSettings.prepend(back);
+    if(embedded)window.kiaraShowDeviceSetting=section=>{
+      if(!Object.hasOwn(views,section)&&!Object.hasOwn(preferences,section))return false;
+      openDeviceSetting(section);
+      if(section==='acces'){
+        for(const id of ['export-conversations','import-conversations'])$(id).disabled=!historyReady;
+        void loadConversationHistory().then(()=>{
+          for(const id of ['export-conversations','import-conversations'])$(id).disabled=!historyReady;
+        });
+      }
+      return !wsSettings.hidden;
+    };
+    handleSettingsHash();
   },{once:true});
+  function selectLocalSetting(section){
+    const hash='#reglages-'+section;
+    if(location.hash!==hash||history.state?.localDeviceSettings!==true){
+      history.pushState({localDeviceSettings:true},'',hash);
+    }
+    handleSettingsHash();
+  }
 }
 const originalDrawLibrary=drawLibrary;drawLibrary=function(){originalDrawLibrary();wsChatSelections();};
 const wsFillProjectOnce=wsFillProject;wsFillProject=function(){wsFillProjectOnce();ws.projectRevision=ws.data?.projects.find(p=>p.id===ws.project)?.revision;};
@@ -104,7 +293,7 @@ function wsIsAgentProject(id){
   return /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/.test(id);
 }
 function wsUsesUnifiedProjectPage(){
-  return platformCapabilities.platform==='windows'&&ws.data?.project_catalogue?.interface==='projects-v1';
+  return document.body.dataset.kiaraUnifiedNavigation==='true'|| ['windows','web'].includes(platformCapabilities.platform)&&ws.data?.project_catalogue?.interface==='projects-v1';
 }
 function wsProjectPage(id, section='overview'){
   const project=encodeURIComponent(id);
@@ -241,7 +430,7 @@ $('ws-refresh').onclick=()=>wsTry(()=>wsRefresh());
 async function wsPoll(){/* kiara-slot:platform-expression-24 */if((!connected&&platformCapabilities.platform!=='web')||busy||historySyncPending||conversationActionPending||wsDraggedConversation)/* /kiara-slot:platform-expression-24 */return;if(!ws.bootstrapDone){await wsBootstrap();return;}try{await wsRefresh();}catch(e){error('Actualisation indisponible : '+e.message);}}
 let wsBootstrapping=false;
 async function wsBootstrap(){if(wsBootstrapping||ws.bootstrapDone)return;wsBootstrapping=true;try{await clientReady;if(!connected&&platformCapabilities.platform!=='web')return;await wsRefresh();const r=await api('/client/draft');ws.bootstrapDone=true;if(r.draft){const d=r.draft;await wsSelectProject(d.project);await wsOpenDocument(d.id);$('ws-document-title').value=d.title;$('ws-document-text').value=d.text;ws.dirty=true;ws.conflict=ws.document.revision!==d.revision;ws.document.revision=d.revision;$('ws-document-status').classList.toggle('ws-warning',ws.conflict);$('ws-document-status').textContent='Brouillon local récupéré'+(ws.conflict?' : comparer avec le serveur avant enregistrement.':'.');showView('projects');}render();drawLibrary();}catch(e){error(e);}finally{wsBootstrapping=false;}}
-wsBootstrap();setInterval(wsPoll,5000);
+if(!inlineDeviceSettings){wsBootstrap();setInterval(wsPoll,5000);}
 // Conversation actions share one lock so a reply or history sync cannot change their target.
 function wsConversationRecord(id){
   const canonical=id.replaceAll('-',''),local=library.find(c=>c.id.replaceAll('-','')===canonical);
@@ -338,9 +527,13 @@ const wsConversationFill=wsFillProject;wsFillProject=function(){wsConversationFi
 $('ws-conversation-archived').onchange=wsDrawProjectConversations;
 
 // Keep both conversations and project destinations reachable in the sidebar.
-const wsHistoryNavigation=wsElement('div',undefined,'history-navigation'),wsSidebarProjects=wsElement('div');wsSidebarProjects.id='ws-sidebar-projects';
-const wsHistoryLabel=document.querySelector('.sidebar > .section-label');wsHistoryLabel.before(wsHistoryNavigation);
-wsHistoryNavigation.append(wsHistoryLabel,document.querySelector('.history-search'),$('conversation-list'),wsSidebarProjects);
+let wsSidebarProjects=$('ws-sidebar-projects');
+if(!wsSidebarProjects){
+  const navigation=wsElement('div',undefined,'history-navigation');
+  wsSidebarProjects=wsElement('div');wsSidebarProjects.id='ws-sidebar-projects';
+  const label=$('history-label');label.before(navigation);
+  navigation.append(label,document.querySelector('.history-search'),$('conversation-list'),wsSidebarProjects);
+}
 function wsDrawSidebarProjects(){
   wsSidebarProjects.hidden=historyView==='corrector';
   const open=new Set([...wsSidebarProjects.querySelectorAll('details[open]')].map(n=>n.dataset.projectDrop));
@@ -408,18 +601,32 @@ document.addEventListener('scroll',e=>{if(!wsConversationMenu.contains(e.target)
 drawLibrary();
 
 // Persistent server inbox; local state is disposable and authenticated again on every open.
-const fredInbox={items:new Map(),cursor:0,generation:null,agentScope:null,preferences:null,busy:false,dirty:false,loaded:false};
-const fredNotificationTypes={document_indexed:'Document prêt pour la recherche',transcription_ready:'Transcription disponible'};
+const fredInbox={items:new Map(),cursor:0,generation:null,agentScope:null,busy:false,loaded:false};
 const fredInboxPane=wsElement('section',undefined,'settings-view');fredInboxPane.dataset.view='notifications';fredInboxPane.hidden=true;
-fredInboxPane.innerHTML='<h2>Notifications</h2><p>Vos résultats et alertes sont conservés sur le serveur. Ils sont retrouvés à la reconnexion.</p><div class="ws-toolbar"><button type="button" class="secondary" id="fred-inbox-refresh">Actualiser</button><button type="button" class="secondary" id="fred-inbox-read-all">Tout marquer lu</button></div><p id="fred-inbox-status" role="status"></p><div id="fred-inbox-list"></div><details class="revision-details"><summary>Préférences de notification</summary><form id="fred-inbox-preferences" class="ws-card"><div id="fred-inbox-types"></div><label><input type="checkbox" id="fred-inbox-discreet" checked> Alertes discrètes</label><small class="muted">Le contenu privé des documents et conversations est masqué dans les alertes.</small><button class="secondary" type="submit">Enregistrer les préférences</button><p>Les alertes Android nécessitent votre autorisation. Une application complètement arrêtée récupère les événements à sa prochaine ouverture.</p></form></details>';
+fredInboxPane.innerHTML='<h2>Notifications</h2><p>Vos résultats et alertes sont conservés sur le serveur. Ils sont retrouvés à la reconnexion.</p><div class="ws-toolbar"><button type="button" class="secondary" id="fred-inbox-refresh">Actualiser</button><button type="button" class="secondary" id="fred-inbox-read-all">Tout marquer lu</button></div><p id="fred-inbox-status" role="status"></p><div id="fred-inbox-list"></div><details class="revision-details"><summary>Préférences de notification</summary></details>';
 document.querySelector('.workspace').append(fredInboxPane);
-const fredInboxNav=wsElement('button','Notifications','nav-button');fredInboxNav.dataset.viewButton='notifications';fredInboxNav.onclick=()=>showView('notifications');const fredInboxAnchor=document.querySelector('[data-view-button="access"]');$('client-navigation').insertBefore(fredInboxNav,fredInboxAnchor?.parentNode===$('client-navigation')?fredInboxAnchor:null);
-for(const [key,label] of Object.entries(fredNotificationTypes)){const line=wsElement('label');const box=wsElement('input');box.type='checkbox';box.dataset.notificationType=key;box.checked=true;line.append(box,document.createTextNode(' '+label));$('fred-inbox-types').append(line);}
+const fredInboxForm=notificationPreferencesForm();
+fredInboxPane.querySelector('details').append(fredInboxForm);
+const fredInboxPreferences=notificationPreferences(fredInboxForm,
+  payload=>api('/v1/notifications/action',payload),fredInboxLoad,['windows','web'].includes(platformCapabilities.platform));
+if(platformCapabilities.platform==='android'){
+  $('fred-inbox-preferences').append(wsElement('p','Autorisez les alertes dans Android. Kiara récupère les événements à sa prochaine ouverture.'));
+}else if(['windows','web'].includes(platformCapabilities.platform)){
+  const preferences=$('fred-inbox-preferences').closest('details');
+  // Keep a stable host for the preferences form and expose it only in Réglages.
+  preferences.hidden=true;
+  const settings=wsElement('a','Régler les notifications','secondary');
+  settings.href='#reglages-notifications';
+  settings.onclick=event=>uiOpenWorkspaceSetting(event,'notification-settings');
+  fredInboxPane.querySelector('.ws-toolbar').append(settings);
+}
+
+const fredInboxNav=workspaceNavButton('notifications','Notifications');
 function fredAndroidInbox(payload){if(typeof window.androidInboxChanged==='function')window.androidInboxChanged(payload);}
 let fredInboxDrawSignature='';
-function fredInboxDraw(){const signature=JSON.stringify([[...fredInbox.items.values()],fredInbox.preferences,fredInbox.dirty]);if(signature===fredInboxDrawSignature)return;fredInboxDrawSignature=signature;const rows=[...fredInbox.items.values()].sort((a,b)=>b.sequence-a.sequence);$('fred-inbox-list').replaceChildren();for(const item of rows){const card=wsElement('article',undefined,'ws-card fred-notification'+(item.read_at?'':' unread'));card.dataset.notificationId=item.id;card.append(wsElement('h3',item.title||'Notification'),wsElement('p',item.body||''),wsElement('small',new Date(item.created*1000).toLocaleString()+(item.read_at?' · Lu':' · Non lu'),'muted'));card.append(wsButton('Ouvrir',()=>window.fredOpenNotificationById(item.id)));if(!item.read_at)card.append(wsButton('Marquer lu',()=>fredInboxRead([item.id])));$('fred-inbox-list').append(card);}if(!rows.length)$('fred-inbox-list').append(wsElement('p','Aucune notification pour le moment.'));const unread=rows.filter(x=>!x.read_at).length;fredInboxNav.dataset.unreadCount=String(unread);if(typeof uiDecorateNavigation==='function')uiDecorateNavigation();else fredInboxNav.textContent='Notifications'+(unread?' · '+unread:'');if(fredInbox.preferences&&!fredInbox.dirty){for(const box of $('fred-inbox-types').querySelectorAll('input'))box.checked=fredInbox.preferences.types[box.dataset.notificationType]!==false;$('fred-inbox-discreet').checked=fredInbox.preferences.discreet!==false;}}
+function fredInboxDraw(){const signature=JSON.stringify([...fredInbox.items.values()]);if(signature===fredInboxDrawSignature)return;fredInboxDrawSignature=signature;const rows=[...fredInbox.items.values()].sort((a,b)=>b.sequence-a.sequence);$('fred-inbox-list').replaceChildren();for(const item of rows){const card=wsElement('article',undefined,'ws-card fred-notification'+(item.read_at?'':' unread'));card.dataset.notificationId=item.id;card.append(wsElement('h3',item.title||'Notification'),wsElement('p',item.body||''),wsElement('small',new Date(item.created*1000).toLocaleString()+(item.read_at?' · Lu':' · Non lu'),'muted'));card.append(wsButton('Ouvrir',()=>window.fredOpenNotificationById(item.id)));if(!item.read_at)card.append(wsButton('Marquer lu',()=>fredInboxRead([item.id])));$('fred-inbox-list').append(card);}if(!rows.length)$('fred-inbox-list').append(wsElement('p','Aucune notification pour le moment.'));const unread=rows.filter(x=>!x.read_at).length;fredInboxNav.dataset.unreadCount=String(unread);if(typeof uiDecorateNavigation==='function')uiDecorateNavigation();else fredInboxNav.textContent='Notifications'+(unread?' · '+unread:'');}
 async function fredInboxRead(ids){for(let i=0;i<ids.length;i+=100)await api('/v1/notifications/action',{action:'read',ids:ids.slice(i,i+100)});await fredInboxLoad();}
-async function fredInboxLoad(){if(fredInbox.busy)return;fredInbox.busy=true;try{let payload=await api('/v1/notifications/action',{action:'list',after:fredInbox.cursor,limit:100});if((fredInbox.generation&&fredInbox.generation!==payload.generation)||(fredInbox.agentScope!==null&&fredInbox.agentScope!==payload.agent_scope)){fredInbox.items.clear();fredInbox.cursor=0;fredInbox.loaded=false;fredAndroidInbox({reset:true,generation:payload.generation,items:[]});payload=await api('/v1/notifications/action',{action:'list',after:0,limit:100});}const newlyDelivered=[];for(let page=0;page<11;page++){if((fredInbox.generation&&fredInbox.generation!==payload.generation)||(fredInbox.agentScope!==null&&fredInbox.agentScope!==payload.agent_scope)){fredInbox.items.clear();fredInbox.cursor=0;fredInbox.loaded=false;newlyDelivered.length=0;fredAndroidInbox({reset:true,generation:payload.generation,items:[]});payload=await api('/v1/notifications/action',{action:'list',after:0,limit:100});}fredInbox.generation=payload.generation;fredInbox.agentScope=payload.agent_scope??null;fredInbox.preferences=payload.preferences;for(const item of payload.items||[]){if(!fredInbox.items.has(item.id))newlyDelivered.push(item.id);fredInbox.items.set(item.id,item);}if(Array.isArray(payload.retained_ids)){const retained=new Set(payload.retained_ids);for(const id of fredInbox.items.keys())if(!retained.has(id))fredInbox.items.delete(id);}const read=new Set(payload.read_ids||[]);for(const item of fredInbox.items.values()){if(read.has(item.id))item.read_at=item.read_at||Date.now()/1000;item.enabled=payload.preferences.types[item.type]!==false&&payload.subscription.enabled!==false;}fredInbox.cursor=payload.cursor;fredAndroidInbox({...payload,items:[...fredInbox.items.values()]});if(!payload.has_more)break;payload=await api('/v1/notifications/action',{action:'list',after:fredInbox.cursor,limit:100});}if(fredInbox.items.size>1000){const oldest=[...fredInbox.items.values()].sort((a,b)=>a.sequence-b.sequence);for(const item of oldest.slice(0,oldest.length-1000))fredInbox.items.delete(item.id);}fredInboxDraw();fredInbox.loaded=true;$('fred-inbox-status').textContent='Notifications synchronisées avec le serveur.';const retainedDelivered=newlyDelivered.filter(id=>fredInbox.items.has(id));for(let i=0;i<retainedDelivered.length;i+=100){try{await api('/v1/notifications/action',{action:'delivered',ids:retainedDelivered.slice(i,i+100)});}catch(e){if(e.status===401)throw e;/* A receipt may expire between list and acknowledgement. The authenticated inbox stays usable. */}}}catch(e){if(e.status===401||e.status===403){fredInbox.items.clear();fredInbox.cursor=0;fredInbox.loaded=false;fredInboxDraw();fredAndroidInbox({access_revoked:true,items:[]});}$('fred-inbox-status').textContent=e.status===404?'Le serveur ne propose pas encore les notifications.':('Actualisation indisponible : '+e.message);}finally{fredInbox.busy=false;}}
+async function fredInboxLoad(){if(fredInbox.busy)return;fredInbox.busy=true;try{let payload=await api('/v1/notifications/action',{action:'list',after:fredInbox.cursor,limit:100});if((fredInbox.generation&&fredInbox.generation!==payload.generation)||(fredInbox.agentScope!==null&&fredInbox.agentScope!==payload.agent_scope)){fredInbox.items.clear();fredInbox.cursor=0;fredInbox.loaded=false;fredAndroidInbox({reset:true,generation:payload.generation,items:[]});payload=await api('/v1/notifications/action',{action:'list',after:0,limit:100});}const newlyDelivered=[];for(let page=0;page<11;page++){if((fredInbox.generation&&fredInbox.generation!==payload.generation)||(fredInbox.agentScope!==null&&fredInbox.agentScope!==payload.agent_scope)){fredInbox.items.clear();fredInbox.cursor=0;fredInbox.loaded=false;newlyDelivered.length=0;fredAndroidInbox({reset:true,generation:payload.generation,items:[]});payload=await api('/v1/notifications/action',{action:'list',after:0,limit:100});}fredInbox.generation=payload.generation;fredInbox.agentScope=payload.agent_scope??null;fredInboxPreferences.apply(payload.preferences);for(const item of payload.items||[]){if(!fredInbox.items.has(item.id))newlyDelivered.push(item.id);fredInbox.items.set(item.id,item);}if(Array.isArray(payload.retained_ids)){const retained=new Set(payload.retained_ids);for(const id of fredInbox.items.keys())if(!retained.has(id))fredInbox.items.delete(id);}const read=new Set(payload.read_ids||[]);for(const item of fredInbox.items.values()){if(read.has(item.id))item.read_at=item.read_at||Date.now()/1000;item.enabled=payload.preferences.types[item.type]!==false&&payload.subscription.enabled!==false;}fredInbox.cursor=payload.cursor;fredAndroidInbox({...payload,items:[...fredInbox.items.values()]});if(!payload.has_more)break;payload=await api('/v1/notifications/action',{action:'list',after:fredInbox.cursor,limit:100});}if(fredInbox.items.size>1000){const oldest=[...fredInbox.items.values()].sort((a,b)=>a.sequence-b.sequence);for(const item of oldest.slice(0,oldest.length-1000))fredInbox.items.delete(item.id);}fredInboxDraw();fredInbox.loaded=true;$('fred-inbox-status').textContent='Notifications synchronisées avec le serveur.';const retainedDelivered=newlyDelivered.filter(id=>fredInbox.items.has(id));for(let i=0;i<retainedDelivered.length;i+=100){try{await api('/v1/notifications/action',{action:'delivered',ids:retainedDelivered.slice(i,i+100)});}catch(e){if(e.status===401)throw e;/* A receipt may expire between list and acknowledgement. The authenticated inbox stays usable. */}}}catch(e){if(e.status===401||e.status===403){fredInbox.items.clear();fredInbox.cursor=0;fredInbox.loaded=false;fredInboxPreferences.apply(null);fredInboxDraw();fredAndroidInbox({access_revoked:true,items:[]});}$('fred-inbox-status').textContent=e.status===404?'Le serveur ne propose pas encore les notifications.':('Actualisation indisponible : '+e.message);}finally{fredInbox.busy=false;}}
 window.fredOpenNotification=async target=>{
   if(target?.kind==='document'){await wsFlush();await wsSelectProject(target.project);await wsOpenDocument(target.id);showView('projects');}
   else if(target?.kind==='agent_project'&&wsIsAgentProject(target.project)){
@@ -428,11 +635,13 @@ window.fredOpenNotification=async target=>{
   }else{showView('notifications');await fredInboxLoad();}
 };
 window.fredOpenNotificationById=async id=>{try{const value=await api('/v1/notifications/action',{action:'get',id});await api('/v1/notifications/action',{action:'read',ids:[id]});const cached=fredInbox.items.get(id);if(cached)cached.read_at=Date.now()/1000;await window.fredOpenNotification(value.notification.target);await fredInboxLoad();}catch(e){showView('notifications');error(e);return false;}};
-const fredShowView=showView;showView=function(name){fredShowView(name);if(name==='notifications'){$('workspace-heading').textContent='Notifications';fredInboxLoad();}};
+onViewChange({after(name){if(name==='notifications'){$('workspace-heading').textContent='Notifications';fredInboxLoad();}}});
 $('fred-inbox-refresh').onclick=()=>fredInboxLoad();$('fred-inbox-read-all').onclick=()=>wsTry(()=>fredInboxRead([...fredInbox.items.values()].filter(x=>!x.read_at).map(x=>x.id)));
-$('fred-inbox-preferences').oninput=()=>fredInbox.dirty=true;
-$('fred-inbox-preferences').onsubmit=e=>{e.preventDefault();wsTry(async()=>{if(!fredInbox.preferences)throw new Error('Reconnectez-vous pour enregistrer vos préférences.');const types={};for(const box of $('fred-inbox-types').querySelectorAll('input'))types[box.dataset.notificationType]=box.checked;try{await api('/v1/notifications/action',{action:'preferences',revision:fredInbox.preferences.revision,types,discreet:$('fred-inbox-discreet').checked});fredInbox.dirty=false;await fredInboxLoad();}catch(e){if(e.status===409){await fredInboxLoad();throw new Error('Les préférences ont changé sur un autre client. Vos choix restent visibles ; cliquez de nouveau pour les enregistrer.');}throw e;}});};
-clientReady.then(()=>fredInboxLoad());setInterval(()=>{if(!document.hidden)fredInboxLoad();},15000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)fredInboxLoad();});
+if(!inlineDeviceSettings){
+  clientReady.then(()=>fredInboxLoad());
+  setInterval(()=>{if(!document.hidden)fredInboxLoad();},15000);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)fredInboxLoad();});
+}
 
 // Personal assistant controls share the same transactional service as chat and voice.
 const kiaraAssistant={data:null,project:null,pending:new Map(),busy:false};
@@ -471,10 +680,15 @@ if(platformCapabilities.platform==='windows'){
   assistantNav.className='secondary';
   wsSettingsNav.append(assistantNav);
   wsSettings.append(assistantPane);
+  const shortcut=wsElement('button','Mémoire et rappels','secondary');
+  shortcut.type='button';shortcut.onclick=()=>assistantNav.click();
+  (document.getElementById('composerOptionsMenu')||document.querySelector('.composer-bottom')).append(shortcut);
+}else if(platformCapabilities.platform==='web'){
+  assistantNav.className='secondary';
+  (document.getElementById('composerOptionsMenu')||document.querySelector('.composer-bottom')).append(assistantNav);
 }else $('client-navigation').insertBefore(assistantNav,document.querySelector('[data-view-button="notifications"]'));
 assistantNav.onclick=()=>showView('assistant');
-const assistantShowView=showView;
-showView=function(name){assistantShowView(name);if(name==='assistant'){if(platformCapabilities.platform!=='windows')$('workspace-heading').textContent='Mémoire et rappels';assistantTry(()=>assistantLoad());}};
+onViewChange({after(name){if(name==='assistant'){if(platformCapabilities.platform!=='windows')$('workspace-heading').textContent='Mémoire et rappels';assistantTry(()=>assistantLoad());}}});
 function assistantScope(){return $('assistant-project').value||null;}
 function assistantRequestKey(){return clientRequestId();}
 async function assistantCommand(operation,values={}){

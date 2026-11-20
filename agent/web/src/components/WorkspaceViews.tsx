@@ -1,4 +1,4 @@
-import { agentPath } from '../lib/agentRoutes';
+import { agentLocation, agentPath } from '../lib/agentRoutes';
 import {useQueryState} from '../hooks/useQueryState';
 import {MemoryRecovery} from './MemoryRecovery';
 import {AsyncDownloadLink} from './AsyncDownloadLink';
@@ -46,7 +46,7 @@ function ProjectFilter({rows, value, onChange, knowledge = false}: {rows: Portfo
   </label>;
 }
 
-function useWorkspacePage<T>(loader: (signal: AbortSignal,quiet?:boolean) => Promise<WorkspacePage<T>>, polling = false) {
+function useWorkspacePage<T>(loader: (signal: AbortSignal,quiet?:boolean) => Promise<WorkspacePage<T>>, {active=true, polling=false} = {}) {
   const [page, setPage] = useState<WorkspacePage<T>>({items: [], total: 0});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -54,9 +54,8 @@ function useWorkspacePage<T>(loader: (signal: AbortSignal,quiet?:boolean) => Pro
   const previousLoader = useRef<typeof loader | null>(null);
   const automaticRefresh = useRef(false);
   const currentRequest = useRef<AbortController | null>(null);
-  const wasPolling = useRef(polling);
   useEffect(() => {
-    if (polling && document.hidden) return;
+    if (!active || (polling && document.hidden)) return;
     const controller = new AbortController();
     currentRequest.current = controller;
     let live = true;
@@ -72,17 +71,27 @@ function useWorkspacePage<T>(loader: (signal: AbortSignal,quiet?:boolean) => Pro
       if (live && !controller.signal.aborted) setLoading(false);
     });
     return () => {live = false; controller.abort();if(currentRequest.current===controller)currentRequest.current=null;};
-  }, [loader, revision]);
+  }, [active, loader, polling, revision]);
   useEffect(() => {
-    const previous=wasPolling.current;wasPolling.current=polling;
-    if (!polling) {if(previous)currentRequest.current?.abort();return;}
+    if (!active || !polling) return;
+    let timer: number | undefined;
     const refresh=()=>{automaticRefresh.current=true;setRevision(value=>value+1);};
-    const visibility=()=>{if(document.hidden)currentRequest.current?.abort();else refresh();};
-    if (!previous && !document.hidden) refresh();
+    const stop = () => {
+      window.clearInterval(timer);
+      timer = undefined;
+      currentRequest.current?.abort();
+    };
+    const start = () => {
+      timer = window.setInterval(() => {if (!document.hidden && !currentRequest.current) refresh();}, 5000);
+    };
+    const visibility = () => {
+      if (document.hidden) stop();
+      else if (timer === undefined) {refresh(); start();}
+    };
+    if (!document.hidden) start();
     document.addEventListener('visibilitychange',visibility);
-    const timer = window.setInterval(() => {if (!document.hidden && !currentRequest.current)refresh();}, 5000);
-    return () => {window.clearInterval(timer);document.removeEventListener('visibilitychange',visibility);};
-  }, [polling]);
+    return () => {stop();document.removeEventListener('visibilitychange',visibility);};
+  }, [active, polling]);
   return {page, loading, error, reload: () => {automaticRefresh.current=false;setRevision(value => value + 1);}};
 }
 
@@ -104,7 +113,7 @@ function Pagination({offset, total, loading, setOffset}: {offset: number; total:
 
 export function GlobalMeetingsView({rows, onOpenProject, active=true,initialProjectId,creationRequest,studioNavigation,onStudioOpenChange}: WorkspaceViewProps&{
   initialProjectId?:string;creationRequest?:MeetingCreationRequest|null;studioNavigation?:ReactNode;onStudioOpenChange?:(open:boolean)=>void}) {
-  const [project, setProject] = useQueryState<string>("project",initialProjectId||"","/app/meetings");
+  const [project, setProject] = useQueryState<string>("project",initialProjectId||"",agentPath("/app/meetings"));
   const appliedRouteProject=useRef<string|null>(null);
   useEffect(()=>{
     const value=initialProjectId||'';
@@ -114,14 +123,14 @@ export function GlobalMeetingsView({rows, onOpenProject, active=true,initialProj
     appliedRouteProject.current=value;
     setProject(value);setOffset(0);setSessionOffset(0);setSelected(null);setStudio(null);
   },[active,initialProjectId]);
-  const [search, setSearch] = useQueryState<string>("q","","/app/meetings");
+  const [search, setSearch] = useQueryState<string>("q","",agentPath("/app/meetings"));
   const q = useDebouncedValue(search);
-  const [offset, setOffset] = useQueryState<number>("offset",0,"/app/meetings");
+  const [offset, setOffset] = useQueryState<number>("offset",0,agentPath("/app/meetings"));
   const [selected, setSelected] = useState<string | null>(null);
   const [capabilities, setCapabilities] = useState<SessionCapabilities | null>(null);
   const [sessions, setSessions] = useState<MeetingSession[]>([]);
   const [sessionTotal, setSessionTotal] = useState(0);
-  const [sessionOffset, setSessionOffset] = useQueryState<number>("sessions_offset",0,"/app/meetings");
+  const [sessionOffset, setSessionOffset] = useQueryState<number>("sessions_offset",0,agentPath("/app/meetings"));
   const [sessionError, setSessionError] = useState('');
   const [creationError,setCreationError] = useState('');
   const [studio, setStudio] = useState<string | null>(null);
@@ -189,6 +198,10 @@ export function GlobalMeetingsView({rows, onOpenProject, active=true,initialProj
     setActivationBusy(true);setCreationError('');
     try {
       const current = await fusionInsights.settings();
+      if(current.can_edit===false){
+        setCreationError('Demandez au propriétaire de Kiara d’activer les réunions pour cet espace.');
+        return;
+      }
       const saved = await fusionInsights.save({enabled:true,live_transcription_enabled:current.live_transcription_enabled??false,
         proactive_enabled:current.proactive_enabled,auto_enhancement_enabled:current.auto_enhancement_enabled??false,
         mode:current.mode,onboarding_complete:current.onboarding_complete});
@@ -198,7 +211,7 @@ export function GlobalMeetingsView({rows, onOpenProject, active=true,initialProj
     finally {setActivationBusy(false);}
   };
   const loader = useCallback((signal: AbortSignal,quiet=false) => quiet?workspaceApi.meetings({project_id: project || undefined, offset, limit: PAGE_SIZE, q},signal,true):workspaceApi.meetings({project_id: project || undefined, offset, limit: PAGE_SIZE, q}, signal), [project, offset, q]);
-  const state = useWorkspacePage(loader,active);
+  const state = useWorkspacePage(loader,{active,polling:true});
   const meeting = state.page.items.find(item => item.id === selected);
   const prepared=sessions.filter(session=>!state.page.items.some(item=>item.session_id===session.id));
   const closeStudio=()=>{setStudio(null);setSourceProof(null); setSessionTick(value => value + 1); state.reload();};
@@ -225,7 +238,7 @@ export function GlobalMeetingsView({rows, onOpenProject, active=true,initialProj
       {!capabilities?.enabled&&<div className="meeting-activation"><p>Les réunions sont désactivées sur ce PC. Activez l’espace de séance pour préparer l’audio et les notes.</p>
         <button type="button" disabled={activationBusy} onClick={()=>void activateMeetings()}>{activationBusy?'Activation…':'Activer les réunions'}</button>
         <p>Cette activation n’ouvre aucun microphone. Les réglages de transcription et d’assistance restent ceux que vous avez choisis.</p>
-        <a href={agentPath("/app/preparation")}>Voir tous les réglages des réunions</a></div>}
+        <a href={agentPath("/app/settings?settings=preparation")}>Voir tous les réglages des réunions</a></div>}
       <label>Titre de la séance<input maxLength={255} value={title} disabled={createBusy||activationBusy} onChange={event => {setTitle(event.target.value); createCommand.current = null;}} required /></label>
       <label>Projet de la nouvelle séance<select value={createProject} disabled={createBusy} onChange={event => {setCreateProject(event.target.value); createCommand.current = null;}}>
         <option value="">À rattacher après la réunion</option>{rows.map(row => <option key={row.id} value={row.id}>{row.code} — {row.title}</option>)}</select></label>
@@ -271,7 +284,7 @@ export function GlobalMeetingsView({rows, onOpenProject, active=true,initialProj
 }
 
 export function GlobalJobsView({rows, onOpenProject, active = true, embedded = false}: WorkspaceViewProps & {embedded?: boolean}) {
-  const path = agentPath(embedded ? "/app/activite" : "/app/jobs");
+  const path = agentPath(!embedded || agentLocation(window.location.pathname)==="/app/jobs" ? "/app/jobs" : "/app/activite");
   const Heading = embedded ? "h2" : "h1";
   const [project, setProject] = useQueryState<string>("project","",path);
   const [offset, setOffset] = useQueryState<number>("offset",0,path);
@@ -279,7 +292,7 @@ export function GlobalJobsView({rows, onOpenProject, active = true, embedded = f
   const [busy, setBusy] = useState("");
   const [error, setError] = useState("");
   const loader = useCallback((signal: AbortSignal,quiet=false) => quiet?workspaceApi.jobs({project_id: project || undefined, offset, limit: PAGE_SIZE},signal,true):workspaceApi.jobs({project_id: project || undefined, offset, limit: PAGE_SIZE}, signal), [project, offset]);
-  const state = useWorkspacePage(loader, active);
+  const state = useWorkspacePage(loader,{active,polling:true});
   const run = async (key: string, action: () => Promise<unknown>) => {
     setBusy(key); setError("");
     try {await action(); state.reload();} catch (cause) {setError(errorMessage(cause));} finally {setBusy("");}
@@ -360,7 +373,7 @@ function ProposalReview({item, onClose, onSaved}: {item: WorkspaceKnowledge; onC
   </>;
 }
 
-export function GlobalKnowledgeView({rows, onOpenProject}: WorkspaceViewProps) {
+export function GlobalKnowledgeView({rows, onOpenProject, active=true}: WorkspaceViewProps) {
   const knowledgePath = agentPath("/app/knowledge");
   const [knowledgeProject, setKnowledgeProject] = useQueryState<string>("knowledge_project","",knowledgePath);
   const [projectsOpen, setProjectsOpen] = useState(false);
@@ -398,7 +411,7 @@ export function GlobalKnowledgeView({rows, onOpenProject}: WorkspaceViewProps) {
     if (project && !knowledgeProject && !selectedProject?.brain_project_id) return Promise.reject(new Error("Ce projet n’est plus lié au moteur de connaissance. Ouvrez sa rubrique Informations pour vérifier la liaison."));
     return workspaceApi[mode]({project_id: knowledgeProject || selectedProject?.brain_project_id || undefined, offset, limit: PAGE_SIZE, q, status: mode === "proposals" ? "pending" : demoted ? "invalidated" : "validated", ...(mode === 'knowledge' && !demoted && reviewOnly ? {review_only: true} : {})}, signal);
   }, [mode, project, knowledgeProject, selectedProject?.brain_project_id, offset, q, demoted, reviewOnly]);
-  const state = useWorkspacePage(loader);
+  const state = useWorkspacePage(loader,{active});
   const change = async (item: WorkspaceKnowledge) => {
     if(!item.project_id)return;
     setChanging(item.id);setChangeError('');

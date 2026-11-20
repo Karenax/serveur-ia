@@ -30,7 +30,7 @@ class PackageIntegrityTests(unittest.TestCase):
     def test_missing_critical_manifest_entries_are_rejected_without_touching_files(self):
         with tempfile.TemporaryDirectory() as temporary:
             root=Path(temporary);files=self.make_package(root)
-            for name in ('kiara','kiara-relay','client/draft_store.py','client/portal_origin_state.py',
+            for name in ('kiara','kiara-relay','requirements.lock','client/draft_store.py','client/portal_origin_state.py',
                          'client/voice/conversation-worker/linux_audio.py','client/voice/wakeword/encoder.onnx',
                          'client/vendor/markdown-it.min.js'):
                 manifest={'format':1,'component':'linux','shell':'tauri','files':{k:v for k,v in files.items() if k!=name}}
@@ -72,6 +72,18 @@ class PackageIntegrityTests(unittest.TestCase):
 
 
 class TauriOnlyTests(unittest.TestCase):
+    def test_shortcut_keeps_previous_target_if_replacement_fails(self):
+        with tempfile.TemporaryDirectory() as directory:
+            shortcut = Path(directory) / 'kiara.desktop'
+            shortcut.write_text('Exec=previous', encoding='utf-8')
+            with patch.object(Path, 'replace', side_effect=PermissionError('fixture')):
+                with self.assertRaises(PermissionError):
+                    installer.write_shortcut(shortcut, 'Exec=candidate')
+            self.assertEqual(shortcut.read_text(encoding='utf-8'), 'Exec=previous')
+            self.assertEqual(list(shortcut.parent.iterdir()), [shortcut])
+            installer.write_shortcut(shortcut, 'Exec=candidate')
+            self.assertEqual(shortcut.read_text(encoding='utf-8'), 'Exec=candidate')
+
     def test_incomplete_or_old_package_is_rejected_before_installation(self):
         with tempfile.TemporaryDirectory() as temporary:
             root=Path(temporary);(root/'build-manifest.json').write_text(json.dumps({'architecture':'amd64'}),encoding='utf8')
@@ -87,6 +99,18 @@ class TauriOnlyTests(unittest.TestCase):
     def test_requirements_have_no_removed_desktop_engine(self):
         lines=(ROOT/'requirements.txt').read_text(encoding='utf8').lower().splitlines()
         self.assertFalse(any('pyside' in line or 'pywebview' in line or 'proxy_tools' in line for line in lines))
+
+    def test_lock_contains_the_exact_direct_dependencies_with_hashes(self):
+        requirements = [line.strip().lower() for line in (ROOT/'requirements.txt').read_text(encoding='utf8').splitlines()
+                        if line.strip() and not line.lstrip().startswith('#')]
+        lock = (ROOT/'requirements.lock').read_text(encoding='utf8').lower().replace('\\\n', ' ')
+        entries = [line.strip() for line in lock.splitlines() if line.strip() and not line.lstrip().startswith('#')]
+        for requirement in requirements:
+            matching = [line for line in entries if line.startswith(requirement+' ')]
+            self.assertEqual(len(matching), 1, requirement)
+            self.assertRegex(matching[0], r'--hash=sha256:[0-9a-f]{64}')
+        for line in entries:
+            self.assertRegex(line, r'^[a-z0-9_.-]+==[a-z0-9_.-]+\s+--hash=sha256:[0-9a-f]{64}')
 
     @unittest.skipUnless(sys.platform.startswith('linux'),'Shell Linux requis')
     def test_start_dispatches_only_to_tauri_or_headless_diagnostics(self):

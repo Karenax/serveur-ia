@@ -6,20 +6,24 @@ import { Pagination } from './IdentityPickers';
 import { message, useAlive } from './PlanningTasksPanel';
 
 type Props={projectId:string;jobId:string;revision:number;artifactId:string;label:string;active:boolean;canEdit:boolean;
-  executionBlocked:boolean;jobActive:boolean;disabled:boolean;onBusy:(value:boolean)=>void;onDirty:(value:boolean)=>void;onChanged:()=>void};
+  executionBlocked:boolean;jobActive:boolean;disabled:boolean;onBusy:(value:boolean)=>void;onDirty:(value:boolean)=>void;onChanged:()=>void;
+  suggestion?:PublicationChoice|null};
 const empty:PublicationChoice={link_id:'',relative_directory:'',replace_existing:false};
 export function DocumentPublicationPanel(props:Props){
   const {projectId,jobId,artifactId,revision,active,canEdit,executionBlocked,jobActive,disabled,onBusy,onDirty,onChanged}=props;
-  const [choice,setChoice]=useState<PublicationChoice>(empty),[preview,setPreview]=useState<PublicationPreview|null>(null),[reviewed,setReviewed]=useState(false);
+  const [choice,setChoice]=useState<PublicationChoice>(props.suggestion||empty),[preview,setPreview]=useState<PublicationPreview|null>(null),[reviewed,setReviewed]=useState(false);
   const [pending,setPending]=useState<PublicationCommand|null>(null),[localError,setLocalError]=useState('');
   const [links,setLinks]=useState<DocumentWorkspace['links']|null>(null),[linkOffset,setLinkOffset]=useState(0),[linkLabel,setLinkLabel]=useState('');
   const [history,setHistory]=useState<Publications|null>(null),[offset,setOffset]=useState(0),[tick,setTick]=useState(0);
   const [error,setError]=useState(''),[readError,setReadError]=useState(''),[notice,setNotice]=useState(''),[busy,setBusy]=useState(false);
   const [ack,setAck]=useState<string|null>(null);
+  const [linkToProject,setLinkToProject]=useState(!!props.suggestion);
   const action=useRef<AbortController|null>(null),alive=useAlive();
   const editable=canEdit&&!executionBlocked&&!jobActive;
   const locked=disabled||busy||!active;
-  const dirty=!!pending||!!localError||!!choice.link_id||!!choice.relative_directory||choice.replace_existing;
+  const suggested=props.suggestion||empty;
+  const dirty=!!pending||!!localError||!!preview||choice.link_id!==suggested.link_id||
+    choice.relative_directory!==suggested.relative_directory||choice.replace_existing!==suggested.replace_existing;
   useEffect(()=>{try{setPending(readPending(projectId,artifactId));}catch(e){setLocalError(message(e));}},[projectId,artifactId]);
   useEffect(()=>{onDirty(dirty);},[dirty,onDirty]);
   useEffect(()=>()=>{action.current?.abort();onBusy(false);onDirty(false);},[onBusy,onDirty]);
@@ -44,10 +48,10 @@ export function DocumentPublicationPanel(props:Props){
   },[projectId,jobId,artifactId,active,offset,tick,revision]);
   useEffect(()=>{if(!pending||!history)return;const known=history.items.find(row=>row.command_id===pending.command_id);
     if(known&&['succeeded','abandoned'].includes(known.state)){
-      try{localStorage.removeItem(pendingKey(projectId,artifactId));setPending(null);setChoice(empty);setPreview(null);setReviewed(false);}
+      try{localStorage.removeItem(pendingKey(projectId,artifactId));setPending(null);setChoice(suggested);setPreview(null);setReviewed(false);}
       catch(e){setLocalError(message(e));}
     }
-  },[pending,history,projectId,artifactId]);
+  },[pending,history,projectId,artifactId,suggested]);
   function change(value:PublicationChoice){setChoice(value);setPreview(null);setReviewed(false);setError('');setNotice('');}
   async function run(fn:(signal:AbortSignal)=>Promise<void>){if(action.current||locked||!editable)return;
     const controller=new AbortController();action.current=controller;setBusy(true);onBusy(true);setError('');setNotice('');
@@ -61,11 +65,12 @@ export function DocumentPublicationPanel(props:Props){
     localStorage.setItem(pendingKey(projectId,artifactId),JSON.stringify(command));setPending(command);
     const value=await publicationApi.publish(projectId,jobId,artifactId,command,signal);
     if(!current(signal))return;
-    if(value.state==='succeeded'){localStorage.removeItem(pendingKey(projectId,artifactId));setPending(null);setChoice(empty);setPreview(null);setReviewed(false);}
-    setNotice(value.state==='succeeded'?'Reçu de publication enregistré. Les sauvegardes éventuelles sont conservées.':'Relisez le reçu avant de poursuivre.');setOffset(0);
+    if(value.state==='succeeded'){localStorage.removeItem(pendingKey(projectId,artifactId));setPending(null);setChoice(suggested);setPreview(null);setReviewed(false);}
+    setNotice(value.state==='succeeded'?(command.link_to_project?'Fichier publié et ajouté aux liens du projet.':'Reçu de publication enregistré. Les sauvegardes éventuelles sont conservées.'):'Relisez le reçu avant de poursuivre.');setOffset(0);
   });}
   function start(){if(!preview||!reviewed||!preview.can_publish||!preview.publication_command_available||pending||localError)return;
-    void send({...choice,command_id:crypto.randomUUID(),expected_revision:preview.job_revision,expected_preview_sha256:preview.preview_sha256,reviewed:true});}
+    void send({...choice,command_id:crypto.randomUUID(),expected_revision:preview.job_revision,expected_preview_sha256:preview.preview_sha256,
+      reviewed:true,...(linkToProject?{link_to_project:true}:{})});}
   async function closeUncertain(row:PublicationRecord){if(!history||ack!==row.command_id||!row.can_abandon)return;
     const expected=history.job_revision;
     await run(async signal=>{const result=await publicationApi.abandon(projectId,jobId,artifactId,row.command_id,
@@ -99,6 +104,8 @@ export function DocumentPublicationPanel(props:Props){
       {preview.existing_receipt&&<p>Original à conserver : {(preview.existing_receipt.size_bytes/1024).toFixed(1)} Ko. Sa sauvegarde restera dans ce dossier.</p>}
       {preview.blockers.map(code=><p className="document-warning" key={code}>{publicationBlockerLabel(code)}</p>)}
       {!preview.publication_command_available&&<p className="document-warning">La publication n’est pas disponible sur cette version du serveur.</p>}
+      <label className="document-review"><input type="checkbox" checked={linkToProject} disabled={locked||!preview.can_publish}
+        onChange={e=>setLinkToProject(e.target.checked)}/>Ajouter ou actualiser le lien dans « Fichiers et dossiers »</label>
       <label className="document-review"><input type="checkbox" checked={reviewed} disabled={locked||!preview.can_publish} onChange={e=>setReviewed(e.target.checked)}/>
         J’ai relu la destination{choice.replace_existing?' et je confirme le remplacement avec sauvegarde de l’original':''}</label>
       <button type="button" className="button primary" disabled={locked||!reviewed||!preview.can_publish||!preview.publication_command_available} onClick={start}>

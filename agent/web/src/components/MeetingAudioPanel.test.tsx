@@ -57,6 +57,8 @@ it('suspend le suivi audio masqué et ignore la réponse tardive après reprise'
   expect(meetingAudio.get).toHaveBeenCalledTimes(3);
   await act(async()=>resolveOld({...running,title:'Réponse périmée'}));
   expect(screen.getByRole('heading',{name:'Traitement terminé',level:4})).toBeTruthy();
+  expect(screen.getByRole('button',{name:/2026-10-02 · Traitement terminé/})).toBeTruthy();
+  expect(meetingAudio.list).toHaveBeenCalledTimes(1);
   expect(screen.queryByText('Réponse périmée')).toBeNull();vi.useRealTimers();
 });
 

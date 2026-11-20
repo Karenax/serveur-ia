@@ -1,4 +1,4 @@
-import type {NotePaste} from './projectNotes';
+import {NOTE_ATTACHMENT_BUDGET, type NotePaste} from './projectNotes';
 
 export type PendingNoteImage={payload:NotePaste;file:File};
 
@@ -7,7 +7,8 @@ const imageExtensions:Record<string,string>={'image/png':'png','image/jpeg':'jpg
 export function prepareClipboardImage(file:File){
   const extension=imageExtensions[file.type];
   if(!extension)throw new Error('Collez une image PNG, JPEG ou WebP.');
-  if(!file.size||file.size>5*1024*1024)throw new Error('Choisissez une image de 5 Mio maximum.');
+  if(!file.size)throw new Error('L’image est vide.');
+  if(file.size>NOTE_ATTACHMENT_BUDGET)throw new Error('Cette image dépasse le quota total de la note (25 Mio).');
   return new File([file],`Image collée.${extension}`,{type:file.type});
 }
 

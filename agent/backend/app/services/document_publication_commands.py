@@ -5,15 +5,18 @@ promotion, success follows final verification. Unknown candidates are retained.
 No startup recovery, regeneration, implicit replacement or directory creation.
 """
 import json
+from pathlib import Path
 from uuid import uuid4
 
 from fastapi import HTTPException
-from sqlalchemy import select
+from sqlalchemy import func, select
 
+from ..models import NetworkLink, REQUIRED_NETWORK_LINKS
 from ..project_document_job_models import DocumentJobArtifact, DocumentJobItem, DocumentJobEvent
 from . import document_jobs as jobs, document_publications as destinations
 from . import document_publication_history as history
 from .document_publication_io import AnchoredDirectory
+from .document_template_catalogue import document_spec
 from .document_worker_lease import WorkerLease
 from .project_documents import _link_sha256
 from .project_identity import _project
@@ -79,7 +82,35 @@ def list_publications(db, project_id, job_id, *, offset=0, limit=30, artifact_id
             'items':[_result(job, row) for row in records[offset:offset + limit]]}
 
 
-def _append(db, project_id, job_id, kind, detail, *, expected_revision=None):
+def _attachment_link(db, project_id, capture):
+    if len(str(Path(capture['directory']) / capture['filename'])) > 1024:
+        raise HTTPException(422, 'Chemin trop long pour rattacher le fichier au projet')
+    spec = document_spec(capture['document_id'])
+    code, aliases = spec['link_code'], spec['link_aliases']
+    links = list(db.scalars(select(NetworkLink).where(
+        NetworkLink.project_id == project_id, func.lower(NetworkLink.code).in_([code, *aliases]))
+        .order_by(NetworkLink.ordre, NetworkLink.id)))
+    link = next((row for row in links if row.code.casefold() == code), links[0] if links else None)
+    if link is not None and link.id == capture['link_id']:
+        raise HTTPException(409, 'Choisissez un autre lien de dossier pour rattacher le fichier au projet')
+    return link
+
+
+def _attach_file(db, project_id, capture):
+    spec = document_spec(capture['document_id'])
+    code = spec['link_code']
+    link = _attachment_link(db, project_id, capture)
+    if link is None:
+        labels = dict(REQUIRED_NETWORK_LINKS)
+        link = NetworkLink(project_id=project_id, code=code, libelle=labels.get(code, spec['label']),
+                           ordre=spec['link_order'])
+        db.add(link)
+    else:
+        link.code = code
+    link.chemin = str(Path(capture['directory']) / capture['filename'])
+
+
+def _append(db, project_id, job_id, kind, detail, *, expected_revision=None, attach=None):
     job = jobs._job(db, project_id, job_id, write=True)
     _writable(job)
     jobs._change(db, job, job.revision if expected_revision is None else expected_revision)
@@ -87,6 +118,8 @@ def _append(db, project_id, job_id, kind, detail, *, expected_revision=None):
     db.flush()
     # Validate the entire publication chain before making this receipt durable.
     _records(db, job)
+    if attach is not None:
+        _attach_file(db, project_id, attach)
     db.commit()
     return jobs._job(db, project_id, job_id, write=True)
 
@@ -135,6 +168,8 @@ def _publish_locked(db, project_id, artifact_id, job_id, command, *, storage_roo
     _writable(job)
     records = _records(db, job)
     record = records.get(command.command_id)
+    if record is not None and record['preview']['version'] == 1 and command.link_to_project:
+        raise HTTPException(409, 'Ce reçu ne contient pas de rattachement ; conservez la commande d’origine')
     body = history.command_body(command,record['preview']['version']) if record else command.model_dump()
     if record is not None and (record['command'] != body or record['binding']['artifact_id'] != artifact_id):
         raise HTTPException(409, 'Cette commande de publication désigne une autre copie ou destination')
@@ -161,6 +196,8 @@ def _publish_locked(db, project_id, artifact_id, job_id, command, *, storage_roo
             or capture['directory'] != str(directory) or capture['relative_directory'] != relative
             or capture['filename'] != filename):
         raise HTTPException(409, 'Configuration ou lien de publication modifié : reprise refusée')
+    if command.link_to_project and (record is None or record['state'] != 'succeeded'):
+        _attachment_link(db, project_id, capture)
     with AnchoredDirectory(root, directory) as opened:
         if opened.identity != capture['directory_identity']:
             raise HTTPException(409, 'Identité du dossier de destination différente de la relecture')
@@ -200,7 +237,8 @@ def _publish_locked(db, project_id, artifact_id, job_id, command, *, storage_roo
             opened.promote(record['candidate'], filename, receipt)
         if record['state'] != 'succeeded':
             job = _append(db, project_id, job_id, 'publication_succeeded',
-                          {'command_id':command.command_id, 'receipt':receipt})
+                          {'command_id':command.command_id, 'receipt':receipt},
+                          attach=capture if command.link_to_project else None)
             record = _records(db, job)[command.command_id]
         return _result(job, record)
 

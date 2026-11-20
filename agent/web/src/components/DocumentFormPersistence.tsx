@@ -30,7 +30,7 @@ export function DocumentVersionHistory({active,tick,load,onRestore,canRestore,bu
 }
 
 type Props={projectId:string;documentId:DocumentId;
-  active:boolean;installed:boolean;canEdit:boolean;disabled:boolean;choice:DocumentFormChoice;onApply:(draft:DocumentDraft)=>void;
+  active:boolean;installed:boolean;canEdit:boolean;disabled:boolean;choice:DocumentFormChoice;onApply:(draft:DocumentDraft,initial?:boolean)=>void;
   onBusy:(busy:boolean)=>void;onDirty:(dirty:boolean)=>void;fieldLabels?:Record<string,string>};
 export function DocumentFormPersistence(props:Props){return <StoredDocumentForm key={`${props.projectId}/${props.documentId}`} {...props}/>;}
 function StoredDocumentForm({projectId,documentId,active,installed,canEdit,disabled,choice,onApply,onBusy,onDirty,fieldLabels={}}:Props) {
@@ -43,7 +43,7 @@ function StoredDocumentForm({projectId,documentId,active,installed,canEdit,disab
   useEffect(()=>{callbacks.current.onDirty(dirty);},[dirty]);
   useEffect(()=>{callbacks.current.onBusy(busy);return()=>callbacks.current.onBusy(false);},[busy]);
   useEffect(()=>{if(!active||!installed||initialized.current)return;const controller=new AbortController();action.current=controller;setBusy(true);setError('');
-    documentApi.draft(projectId,documentId,controller.signal).then(value=>{if(!controller.signal.aborted){initialized.current=true;setSaved(value);callbacks.current.onApply(value);}})
+    documentApi.draft(projectId,documentId,controller.signal).then(value=>{if(!controller.signal.aborted){initialized.current=true;setSaved(value);callbacks.current.onApply(value,true);}})
       .catch(e=>{if(!controller.signal.aborted)setError(message(e));}).finally(()=>{if(!controller.signal.aborted){setBusy(false);action.current=null;}});
     return()=>controller.abort();},[active,installed,projectId,documentId,retry]);
   useEffect(()=>{if(!active){action.current?.abort();setBusy(false);}},[active]);

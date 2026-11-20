@@ -14,7 +14,7 @@ from unittest.mock import patch
 
 from core import ROOT
 from remote import AccessStore, serve_gateway
-from scheduler import Scheduler
+from scheduler import BackgroundBudgetReached, Scheduler
 from gateway_responses import responses_request
 import test_remote
 from test_remote import client
@@ -192,6 +192,37 @@ class ResponsesTransportTests(unittest.TestCase):
 
 
 class ResponsesValidationTests(unittest.TestCase):
+    def test_interactive_calls_overtake_queued_background_in_fifo_order(self):
+        scheduler = Scheduler()
+        active = scheduler.submit('first', background=True)
+        scheduler.wait(active, lambda: True, lambda _: None)
+        background = scheduler.submit('scan', background=True)
+        first = scheduler.submit('conversation')
+        second = scheduler.submit('conversation-2')
+        self.assertEqual(scheduler.requests, [active, first, second, background])
+        scheduler.finish(active)
+        scheduler.wait(first, lambda: True, lambda _: None)
+        self.assertEqual(scheduler.position(background), 2)
+        self.assertEqual(scheduler.snapshot()['active'], 1)
+
+    def test_background_budget_counts_only_started_analyses_over_a_rolling_hour(self):
+        scheduler = Scheduler(background_budget_seconds=10)
+        with patch('scheduler.time.monotonic', return_value=100) as clock:
+            cancelled = scheduler.submit('unused', budgeted=True)
+            scheduler.cancel('unused')
+            scheduler.finish(cancelled)
+            active = scheduler.submit('analysis', budgeted=True)
+            scheduler.wait(active, lambda: True, lambda _: None)
+            clock.return_value = 114
+            scheduler.finish(active)
+            with self.assertRaises(BackgroundBudgetReached) as error:
+                scheduler.submit('analysis', budgeted=True)
+            self.assertEqual(error.exception.retry_after, 3591)
+            scheduler.submit('conversation')
+            scheduler.submit('milestones', background=True)
+            clock.return_value = 3705
+            scheduler.submit('analysis', budgeted=True)
+
     def test_remote_images_host_tools_and_private_parameters_are_rejected(self):
         for fields in [{'input': [{'role': 'user', 'content': [{'type': 'input_image', 'image_url': 'http://127.0.0.1/private'}]}]},
                        {'strata_mcp': True}, {'tools': [{'type': 'mcp', 'server_url': 'http://localhost'}]},

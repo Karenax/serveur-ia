@@ -27,6 +27,8 @@ def capture_keys(version):
 
 def command_body(command, version):
     body = command.model_dump()
+    if version == 1 and command.link_to_project:
+        raise ValueError('Rattachement absent de ce format de publication')
     if version == 1 and body.get('replace_existing') is False:
         body.pop('replace_existing')
     return body

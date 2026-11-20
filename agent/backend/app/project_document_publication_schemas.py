@@ -23,6 +23,8 @@ class DocumentPublicationCommand(DocumentPublicationPreview):
     expected_revision: StrictInt = Field(ge=1)
     expected_preview_sha256: str = Field(pattern=r'^[0-9a-f]{64}$')
     reviewed: Literal[True]
+    # Keep previously recorded commands byte-for-byte replayable.
+    link_to_project: StrictBool = Field(default=False, exclude_if=lambda value: not value)
 
     @field_validator('reviewed', mode='before')
     @classmethod

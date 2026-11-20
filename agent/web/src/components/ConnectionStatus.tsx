@@ -62,7 +62,7 @@ export function ConnectionStatus({onOpenJobs}:{onOpenJobs?:()=>void}) {
   const summary=state==='ok'&&mailAvailable&&mailState==='running'?'Traitement en cours':
     {ok:'Services accessibles',warning:mailState==='failed'?'Mails à reprendre':mailState==='offline'?'Mails déconnectés':'À vérifier',error:'Service indisponible',unknown:'État non vérifié',checking:'Vérification…',disabled:services.every(service=>service.state==='disabled')?'Services désactivés':'Service désactivé'}[state];
   const offline=status?.offline;
-  return <><details ref={popup} className={`workspace-connections system-status ${state}`}>
+  return <><details data-dismiss-outside ref={popup} className={`workspace-connections system-status ${state}`}>
     <summary><i aria-hidden="true"/><span>État du système</span><small>{summary}</small></summary>
     <div className="system-status-services" aria-label="Connexions des services">
     {offline?.decision==='wait'&&offline.outage_id&&<button type="button" onClick={()=>setChooseOffline(true)}>Choisir le mode hors ligne</button>}

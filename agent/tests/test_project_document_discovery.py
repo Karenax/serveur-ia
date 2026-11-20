@@ -7,7 +7,7 @@ import sys
 from fastapi import HTTPException
 import pytest
 
-from backend.app.models import NetworkLink
+from backend.app.models import NetworkLink, Project
 from backend.app.services import document_discovery as discovery
 from backend.app.services import document_file_access as files
 from backend.app.services.document_template_catalogue import catalogue, document_spec
@@ -296,3 +296,25 @@ def test_explicit_drive_mapping_discovery(store):
     with store[0]() as db:
         result = discovery.discover(db, store[1][0], link_id=store[2][0], document_id='ce_request', policy=policy)
     assert len(result['candidates']) == 1 and result['rule']['document_id'] == 'ce_request'
+
+
+def test_folder_discovery_finds_templates_and_existing_output_for_reader(api, monkeypatch):
+    client, root, factory, ids, source = api
+    folder = source.parent / '04 Qualité' / '06 CE'
+    folder.mkdir(parents=True)
+    template = folder / 'Fiche demande déclaration CE V10.docx'
+    template.write_bytes(source.read_bytes())
+    with factory() as db:
+        project_id = db.get(NetworkLink, ids['link']).project_id
+        project_code = db.get(Project, project_id).code
+    existing = folder / f'{project_code}-Demande de CE.docx'
+    existing.write_bytes(template.read_bytes())
+    monkeypatch.setenv('AGENT_OPERATOR_ROLE', 'reader')
+    response = client.post(root + '/discover-folder', json={'link_id': ids['link']})
+    assert response.status_code == 200, response.text
+    result = response.json()
+    assert result['status'] == 'completed' and len(result['items']) == 8
+    ce = next(row for row in result['items'] if row['document_id'] == 'ce_request')
+    assert ce['recommended_path'] == template.relative_to(source.parent).as_posix()
+    assert ce['existing_files'] == [{'filename': existing.name, 'relative_path': existing.relative_to(source.parent).as_posix()}]
+    assert client.post(root + '/discover-folder', json={'link_id': ids['other_link']}).status_code == 404

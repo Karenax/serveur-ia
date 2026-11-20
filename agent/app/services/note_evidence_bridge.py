@@ -161,7 +161,7 @@ def _apply(packet, erp_factory, brain_factory, *, reconcile=False):
             brain.flush()
         metadata = {**(source.source_metadata or {}), 'origin_kind': 'erp_note', 'erp_project_id': packet['project_id'], 'note_id': packet['note_id'],
             'note_version_id': packet['version_id'], 'note_revision': packet['revision'], 'note_sha256': packet['digest'],
-            'subject': value['title'], 'note_url': f"/app/projects/{packet['project_id']}/documents",
+            'subject': value['title'], 'note_url': f"/app/projets/{packet['project_id']}/documents",
             'evidence_state': 'assessed', 'truth_eligible': False, 'superseded': False}
         source.source_metadata = metadata
         artifacts = list(brain.scalars(select(SourceArtifact).where(SourceArtifact.source_id == source.id, SourceArtifact.kind == 'note_text')))
