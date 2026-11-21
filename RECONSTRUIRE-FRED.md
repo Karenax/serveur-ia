@@ -13,6 +13,16 @@ et compatibilités courantes.
 
 ## Préparer le poste
 
+Après mise à jour du client, fermer Kiara et ses intégrations pour renouveler
+une clé locale précédemment copiée dans OpenCode ou Hermes. Exécuter
+`kiara-relay.exe --renew-local-api-key` sous Windows, ou
+`./kiara-relay --renew-local-api-key` depuis le paquet Linux. La commande
+conserve les brouillons et renouvelle les identifiants des fournisseurs Kiara
+détectés. Les anciens fichiers de configuration peuvent être conservés, car
+leur clé est révoquée. Si la migration s’interrompt, relancer la même commande.
+Les autres clients de l’API locale devront utiliser la nouvelle clé affichée
+dans les réglages de Kiara.
+
 1. Extraire le dépôt sur Windows, avec Git, PowerShell 7 ou Windows PowerShell 5.1,
    Node.js ≥ 20 et Chrome. Sur le poste Fred, placer sur D: le dépôt, les outils,
    les caches, les fichiers temporaires et les résultats de recette. E: est
@@ -111,6 +121,9 @@ au chemin absolu du partage sur le serveur. Les variables JSON
 `AGENT_DOCUMENT_ROOTS`, `AGENT_DOCUMENT_WRITE_ROOTS` et
 `AGENT_DOCUMENT_DRIVE_MAPPINGS` priment sur le fichier. Sans racines
 configurées, le service désactive l’accès correspondant.
+L’aperçu d’un dossier affaire et son import depuis TDAO/TDSP utilisent
+`document_roots`. Le scan EML utilise le dossier enregistré dans les réglages
+Mails et ses sous-dossiers. Thunderbird conserve son circuit d’appairage.
 Le champ `document_project_root` désigne le répertoire privé des dossiers
 clients. Kiara crée un sous-dossier par projet lors de la création ou de
 l’import. La configuration autorise le projet à lire et publier dans son

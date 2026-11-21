@@ -5,7 +5,6 @@ import datetime as dt
 import hmac
 from http.server import BaseHTTPRequestHandler
 import json
-import os
 from pathlib import Path
 import secrets
 import shutil
@@ -13,10 +12,10 @@ import socket
 import subprocess
 import threading
 import time
-from urllib.parse import urlsplit, parse_qs
+from urllib.parse import urlsplit, parse_qs, quote
 import psutil
 from core import ROOT, HOME, BASE_PATH, PYTHON, HIDDEN, read_json, write_json, defaults_from_config, validate, build_config, health, matching_servers, process_identity, same_process, stop_processes, available_port, tail, arg
-from operations import Operations, VERSION as VERSION
+from operations import Operations
 from releases import DESKTOP_INSTALLER, status as release_status, repackage, rollback, windows_installer
 from remote import AccessStore, GATEWAY_PORT, serve_gateway
 from wireguard_access import WireGuardAccess,firewall
@@ -396,7 +395,8 @@ def serve(port=8765, controller=None):
                 self.send_header('Content-Length',str(len(raw)))
                 self.send_header('Cache-Control','no-store')
                 self.send_header('X-Content-Type-Options','nosniff')
-                self.send_header('Content-Disposition','attachment; filename="profil-'+identity+'.fred-android"')
+                filename = quote('profil-' + identity + '.fred-android', safe='')
+                self.send_header('Content-Disposition', f"attachment; filename*=UTF-8''{filename}")
                 self.end_headers();self.wfile.write(raw);return
             if path=='/api/workspace':
                 return self.respond(200,controller.remote.workspace.admin())

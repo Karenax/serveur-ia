@@ -5,14 +5,27 @@ import hashlib
 import time
 import sherpa_onnx
 
+WAKEWORD_FILES = frozenset({'tokens.txt', 'encoder.onnx', 'decoder.onnx', 'joiner.onnx', 'keywords.txt'})
+
 
 class WakeWordRecognizer:
     def __init__(self,models):
-        root=Path(models)
-        spec=json.loads((root/'manifest.json').read_text(encoding='utf-8'))
-        for entry in spec['files']:
-            with (root/entry['name']).open('rb') as stream:
-                if hashlib.file_digest(stream,'sha256').hexdigest()!=entry['sha256']:
+        root=Path(models).resolve(strict=True)
+        manifest = root / 'manifest.json'
+        if manifest.resolve(strict=True) != manifest:
+            raise ValueError('Emplacement de l’inventaire vocal invalide.')
+        spec=json.loads(manifest.read_text(encoding='utf-8'))
+        entries = spec.get('files') if isinstance(spec, dict) else None
+        if (not isinstance(entries, list) or len(entries) != len(WAKEWORD_FILES)
+                or any(not isinstance(entry, dict) or not isinstance(entry.get('name'), str) for entry in entries)
+                or {entry['name'] for entry in entries} != WAKEWORD_FILES):
+            raise ValueError('Inventaire du modèle d’activation vocale invalide. Réinstallez le client.')
+        for entry in entries:
+            path = root / entry['name']
+            if path.resolve(strict=True) != path or not path.is_file():
+                raise ValueError('Emplacement du modèle d’activation vocale invalide.')
+            with path.open('rb') as stream:
+                if hashlib.file_digest(stream,'sha256').hexdigest()!=entry.get('sha256'):
                     raise ValueError('Modèle d’activation vocale corrompu. Réinstallez le client.')
         self.spotter=sherpa_onnx.KeywordSpotter(tokens=str(root/'tokens.txt'),encoder=str(root/'encoder.onnx'),
             decoder=str(root/'decoder.onnx'),joiner=str(root/'joiner.onnx'),keywords_file=str(root/'keywords.txt'),

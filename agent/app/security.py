@@ -5,10 +5,11 @@ import threading
 from urllib.parse import urlsplit
 
 from fastapi.responses import JSONResponse
-from fastapi import HTTPException
+from fastapi import HTTPException, Request
 from .http_protection import body_budget
 
 SESSION_TOKEN = secrets.token_urlsafe(32)
+LOCAL_SESSION_COOKIE = 'kiara_project_session'
 _kiara_verifier = None
 _kiara_verifier_key = None
 _kiara_verifier_lock = threading.Lock()
@@ -121,19 +122,36 @@ async def _local_session_guard(request, call_next):
     if origin:
         parsed = urlsplit(origin)
         same = parsed.netloc == request.url.netloc and parsed.scheme == request.url.scheme
-        dev = origin in {"http://localhost:5174", "http://127.0.0.1:5174"}
+        dev = testing and origin in {"http://localhost:5174", "http://127.0.0.1:5174"}
         if not (same or dev):
             return JSONResponse({"detail": "Origine non autorisée"}, status_code=403)
-    if request.method not in {"GET", "HEAD", "OPTIONS"} and not testing:
-        provided = request.headers.get("x-agent-token", "")
-        if not secrets.compare_digest(provided, SESSION_TOKEN):
-            return JSONResponse({"detail": "Session locale absente ou expirée ; recharge la page"}, status_code=403)
+    public = request.method in {'GET', 'HEAD'} and (
+        path in {'/', '/app', '/health'} or path.startswith(('/app/', '/assets/')))
+    if not testing and not public:
+        cookie_valid = (request.method in {'GET', 'HEAD'} or origin == f'{request.url.scheme}://{request.url.netloc}') and secrets.compare_digest(
+            request.cookies.get(LOCAL_SESSION_COOKIE, '').encode(), SESSION_TOKEN.encode())
+        if not (_local_credential(request) or cookie_valid):
+            return JSONResponse({"detail": "Session Projets requise"}, status_code=403)
     return await call_next(request)
+
+
+def _local_credential(request):
+    expected = os.environ.get('AGENT_LOCAL_TOKEN', '')
+    provided = request.headers.get('x-agent-token', '')
+    return len(expected) >= 32 and secrets.compare_digest(provided.encode(), expected.encode())
+
+
+def start_local_session(request: Request):
+    if os.environ.get('AGENT_KIARA_KEY') or not _local_credential(request):
+        raise HTTPException(403, 'Ouverture de session Projets refusée')
+    response = JSONResponse(session(), headers={'Cache-Control': 'no-store'})
+    response.set_cookie(LOCAL_SESSION_COOKIE, SESSION_TOKEN, httponly=True, samesite='strict')
+    return response
 
 
 def session():
     from backend.app.services.project_operator import current_operator
     operator = current_operator()
-    return {"token": SESSION_TOKEN, "operator": {"id": operator.id, "role": operator.role,
+    return {"operator": {"id": operator.id, "role": operator.role,
             "can_edit": operator.role != "reader", "can_administer": operator.role == "owner" and operator.project_ids is None,
             "project_ids": sorted(operator.project_ids) if operator.project_ids is not None else None}}

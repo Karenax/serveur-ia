@@ -97,7 +97,9 @@ def definitions(output, business_python=None, npm_cli=None):
         'go':[[str(go),'test','-count=1','-v','.']],
         'go-security':[[str(go),'run','golang.org/x/vuln/cmd/govulncheck@v1.9.0','-json','.'],
                        [str(PYTHON),str(ROOT/'maintenance/summarize_go_security.py'),str(output/'go-security-1.txt'),'--output',str(output/'go-security.json')]],
-        'maintenance':[[str(PYTHON),'-m','unittest','discover','-s','maintenance/tests','-v']],
+        'maintenance':[[str(PYTHON),'-m','unittest','discover','-s','maintenance/tests','-v'],
+                       [business_python,'-m','unittest','discover','-s','maintenance','-v'],
+                       [str(PYTHON),'-m','unittest','discover','-s','maintenance/codex','-v']],
         'dependencies':[[str(PYTHON),'maintenance/check_dependencies.py','--output',str(output/'python-security.json')],
                         npm+['--prefix','client-qwen','audit','--json']],
     }
@@ -167,7 +169,10 @@ def main():
         results=[value for value in json.loads(previous.read_text(encoding='utf-8'))['results'] if value['check'] not in selected]
     for name in selected:
         if name=='server' and args.reuse_server_log:
-            from server_evidence import evidence
+            if __package__:
+                from .server_evidence import evidence
+            else:
+                from server_evidence import evidence
             results.append(evidence(args.reuse_server_log,args.server_recheck_logs))
             continue
         for number,command in enumerate(checks[name],1):

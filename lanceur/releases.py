@@ -46,7 +46,7 @@ def manifest(home=HOME):
     write_json(source.parent/'release.json',result)
     return result
 
-DESKTOP_INSTALLER_VERSION = '4.0.22'
+DESKTOP_INSTALLER_VERSION = '4.0.23'
 DESKTOP_INSTALLER = f'Kiara_{DESKTOP_INSTALLER_VERSION}_x64-setup.exe'
 
 
@@ -127,7 +127,6 @@ def status(home):
             _CACHE.clear();_CACHE[key]=digest(source)==release['sha256'] and stat.st_size==release['bytes']
         verified=_CACHE[key] and version(release['version']) <= version(VERSION)
     except (OSError,ValueError,KeyError,TypeError):pass
-    except Exception:pass
     return {'server_version':VERSION, 'release':release,
             'verified':verified,
             'clients':read_json(home/'versions-clients.json',{}),

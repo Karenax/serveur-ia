@@ -1,11 +1,12 @@
 # Contexte de reprise — serveur Kiara
 
-Mise à jour du 20 novembre 2026.
+Mise à jour du 21 novembre 2026.
 
-**Kiara 4.0.22** a été vérifiée en production le 20 novembre pour **Windows et
-le web privé**. Dans Documents, la recherche groupée couvre huit types actifs.
-La 4.0.21 est le point de retour documenté.
-[Bascule 4.0.22](audits/2026-11-15-fusion-kiara/BASCULE.md#livraison-kiara-4022)
+**Kiara 4.0.23** a été vérifiée en production le 21 novembre pour **Windows et
+le web privé**. La livraison protège la session du relais, confine les scans
+aux dossiers autorisés et pagine les résultats de Réunions et Activité.
+La 4.0.22 est le point de retour documenté.
+[Bascule 4.0.23](audits/2026-11-15-fusion-kiara/BASCULE.md#livraison-kiara-4023)
 Le lanceur Kiara supervise le service Projets et son catalogue de 11 projets.
 Conversations réunit le composeur, l’historique et l’assistant de projet, avec
 les brouillons et le mode éphémère. Projets propose la fiche à quatre rubriques

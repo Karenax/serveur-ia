@@ -17,8 +17,12 @@ from max_phonon import PhononVoice
 from max_gpu import gpu_candidates, select_gpu
 
 
-def emit(value):
-    print(json.dumps(value, ensure_ascii=False), flush=True)
+_output_lock = threading.Lock()
+
+
+def emit(value, stream=None):
+    with _output_lock:
+        print(json.dumps(value, ensure_ascii=False), file=stream, flush=True)
 
 
 def verify(configuration,engine=None):
@@ -41,7 +45,8 @@ def serve(configuration, engine, selection=None):
     verify(configuration,engine)
     with redirect_stdout(sys.stderr):
         loaded = WhisperRecognition(configuration['root'],selection or 'auto',configuration.get('native_device') if selection is None else None) if engine=='asr' else PhononVoice(configuration['root'])
-    inbox=CommandInbox(engine)
+    output = sys.stdout
+    inbox=CommandInbox(engine, reject=lambda frame: emit(frame, output))
     commands,stop,closed=inbox.commands,inbox.stop,inbox.closed
 
     inbox.start()

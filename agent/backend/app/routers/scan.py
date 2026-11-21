@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import os
 import re
+from contextlib import contextmanager
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -16,6 +17,7 @@ from sqlalchemy.orm import Session
 from ..db import get_db
 from ..models import CdcItem, NetworkLink, Project
 from ..services.client_directory import client_directory
+from ..services.document_file_access import _handle_path, _mapped, configured_policy, resolve_root
 
 router = APIRouter(prefix="/api/v1", tags=["scan"])
 
@@ -92,15 +94,20 @@ def find_docs(folder: Path) -> dict[str, str | None]:
     found: dict[str, str | None] = {"tdao": None, "tdsp": None}
     base_depth = len(folder.parts)
     for root, dirs, files in os.walk(folder):
-        dirs[:] = [d for d in dirs if not d.startswith(".") and not d.startswith("~")]
-        if len(Path(root).parts) - base_depth > 3:
+        directory = Path(root)
+        if not _canonical(directory):
             dirs[:] = []
             continue
+        dirs[:] = [d for d in dirs if not d.startswith((".", "~"))
+                   and len(directory.parts) - base_depth < 3 and _canonical(directory / d)]
         for filename in files:
             lowered = filename.lower()
             if Path(filename).suffix.lower() not in EXCEL_EXTS:
                 continue
-            full = str(Path(root) / filename)
+            file = directory / filename
+            if not _canonical(file) or not file.is_file():
+                continue
+            full = str(file)
             if "tdao" in lowered and found["tdao"] is None:
                 found["tdao"] = full
             elif "tdsp" in lowered and found["tdsp"] is None:
@@ -110,10 +117,43 @@ def find_docs(folder: Path) -> dict[str, str | None]:
     return found
 
 
+def _canonical(path):
+    try:
+        return path.resolve(strict=True) == path
+    except (OSError, RuntimeError):
+        return False
+
+
+def _scan_path(value, *, project_id=None):
+    policy = configured_policy(project_id)
+    if not policy.roots:
+        raise HTTPException(409, 'Renseignez les racines documentaires autorisées sur le serveur')
+    candidate = _mapped(value, policy)
+    roots = [Path(root) for root in policy.roots if candidate.is_relative_to(root)]
+    if not roots:
+        raise HTTPException(403, 'Chemin hors des racines documentaires autorisées')
+    try:
+        resolved = candidate.resolve(strict=True)
+        if any(resolved.is_relative_to(resolve_root(root, policy)) for root in roots):
+            return candidate, resolved
+    except (OSError, RuntimeError) as exc:
+        raise HTTPException(400, 'Dossier ou fichier indisponible') from exc
+    raise HTTPException(403, 'Chemin hors des racines documentaires autorisées')
+
+
+@contextmanager
 def _open(path: str):
     from openpyxl import load_workbook
 
-    return load_workbook(path, data_only=True, read_only=True)
+    expected = Path(path)
+    with expected.open('rb') as stream:
+        if _handle_path(stream) != expected:
+            raise HTTPException(403, 'Emplacement du classeur modifié')
+        workbook = load_workbook(stream, data_only=True, read_only=True)
+        try:
+            yield workbook
+        finally:
+            workbook.close()
 
 
 def read_identity(path: str, kind: str) -> dict[str, str]:
@@ -121,66 +161,48 @@ def read_identity(path: str, kind: str) -> dict[str, str]:
     cells = TDAO_CELLS if kind == "tdao" else TDSP_CELLS
     wanted = "page d'accueil" if kind == "tdsp" else "accueil"
     try:
-        workbook = _open(path)
+        with _open(path) as workbook:
+            sheet = next((ws for ws in workbook.worksheets if wanted in str(ws.title or '').lower()), None)
+            if sheet is None:
+                sheet = workbook.worksheets[0]
+            return {key: _as_text(sheet[cell].value) for key, cell in cells.items()}
+    except HTTPException:
+        raise
     except Exception:
         return {}
-    try:
-        sheet = None
-        for ws in workbook.worksheets:
-            if wanted in str(ws.title or "").lower():
-                sheet = ws
-                break
-        if sheet is None:
-            sheet = workbook.worksheets[0]
-        return {key: _as_text(sheet[cell].value) for key, cell in cells.items()}
-    except Exception:
-        return {}
-    finally:
-        workbook.close()
 
 
 def read_tdao_hours(path: str) -> dict[str, float]:
     """Lit les heures prévues TDAO, sans extraction financière."""
-    out: dict = {"budget_h": 0.0, "lines": {}}
+    lines: dict[str, float] = {}
     try:
-        workbook = _open(path)
+        with _open(path) as workbook:
+            for sheet in workbook.worksheets:
+                try:
+                    if _as_text(sheet["J135"].value) != "TOTAL HEURES PREVUES":
+                        continue
+                except Exception:
+                    continue
+                for cell, label in HOUR_CELLS:
+                    try:
+                        value = _as_number(sheet[cell].value)
+                    except Exception:
+                        continue
+                    if value:
+                        lines[label] = value
+                break
+    except HTTPException:
+        raise
     except Exception:
-        return out
-    try:
-        target = None
-        for ws in workbook.worksheets:
-            try:
-                if _as_text(ws["J135"].value) == "TOTAL HEURES PREVUES":
-                    target = ws
-                    break
-            except Exception:
-                continue
-        if target is None:
-            return out
-        total = 0.0
-        lines: dict[str, float] = {}
-        for cell, label in HOUR_CELLS:
-            try:
-                value = _as_number(target[cell].value)
-            except Exception:
-                value = 0.0
-            if value:
-                lines[label] = value
-                total += value
-        out["lines"] = lines
-        out["budget_h"] = total
-        return out
-    except Exception:
-        return out
-    finally:
-        workbook.close()
+        lines.clear()
+    return {"budget_h": sum(lines.values(), 0.0), "lines": lines}
 
 
 def scan_folder(folder: str) -> dict:
-    root = Path(folder)
+    configured, root = _scan_path(folder)
     if not root.exists() or not root.is_dir():
         raise HTTPException(400, f"Dossier introuvable ou inaccessible : {folder}")
-    code, title = parse_folder_name(root.name)
+    code, title = parse_folder_name(configured.name)
     docs = find_docs(root)
     identity: dict[str, str] = {}
     hours: dict[str, float] = {"budget_h": 0.0}
@@ -209,14 +231,14 @@ def scan_folder(folder: str) -> dict:
                 if not identity.get(key):
                     identity[key] = value
     return {
-        "folder": str(root),
+        "folder": str(configured),
         "code": folder_code or identity.get("project_code") or code,
         "title": title if folder_code else identity.get("description") or title,
         "client_name": identity.get("client_name", ""),
         "offer_number": identity.get("offer_number", ""),
         "trigram": identity.get("trigram", ""),
-        "tdao_file": docs["tdao"],
-        "tdsp_file": docs["tdsp"],
+        "tdao_file": str(configured / Path(docs["tdao"]).relative_to(root)) if docs["tdao"] else None,
+        "tdsp_file": str(configured / Path(docs["tdsp"]).relative_to(root)) if docs["tdsp"] else None,
         "warnings": warnings,
         "tdao_compatible": tdao_compatible,
         **hours,
@@ -233,16 +255,12 @@ class ImportRequest(BaseModel):
     title: str | None = None
 
 
-def seed_budget_lines(db: Session, project_id: str, tdao_file: str | None) -> int:
+def _seed_budget_values(db: Session, project_id: str, tdao_file: str | None, lines) -> int:
     """Crée les lignes de charge de travail depuis les heures TDAO.
 
     Idempotent : les lignes 'Budget TDAO – …' existantes ne sont pas dupliquées.
     """
-    if not tdao_file:
-        return 0
-    hours = read_tdao_hours(tdao_file)
-    lines = hours.get("lines", {})
-    if not lines:
+    if not tdao_file or not lines:
         return 0
     existing = {item.normalized_wording for item in db.query(CdcItem).filter_by(project_id=project_id).all()}
     created = 0
@@ -294,7 +312,7 @@ def import_project(payload: ImportRequest, db: Session = Depends(get_db)):
     for order, (link_code, libelle, chemin) in enumerate(links):
         db.add(NetworkLink(project_id=project.id, code=link_code, libelle=libelle,
                            chemin=chemin, ordre=order))
-    budget_lines = seed_budget_lines(db, project.id, preview["tdao_file"] if preview["tdao_compatible"] else None)
+    budget_lines = _seed_budget_values(db, project.id, preview["tdao_file"], preview.get("lines", {}))
     with client_directory(db, project.id):
         db.commit()
     db.refresh(project)
@@ -312,7 +330,8 @@ def budgets_from_tdao(project_id: str, db: Session = Depends(get_db)):
     link = db.query(NetworkLink).filter_by(project_id=project_id, code="dernier_tdao").first()
     if not link or not (link.chemin or "").strip():
         raise HTTPException(400, "Aucun lien 'dernier_tdao' renseigné (onglet Documents)")
-    created = seed_budget_lines(db, project_id, link.chemin.strip())
+    _, path = _scan_path(link.chemin.strip(), project_id=project_id)
+    created = _seed_budget_values(db, project_id, str(path), read_tdao_hours(str(path))["lines"])
     if not created:
         raise HTTPException(400, "Aucune ligne budgétaire trouvée dans le TDAO (ou déjà chargées)")
     db.commit()

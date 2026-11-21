@@ -2,10 +2,13 @@
 import json
 import unicodedata
 from datetime import datetime, timezone
+from heapq import merge
+from itertools import islice
+from sys import maxsize
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, ConfigDict, Field, field_validator
-from sqlalchemy import func, or_, update
+from sqlalchemy import func, or_, select, update
 from sqlalchemy.orm import Session, load_only
 
 from app.db import get_db
@@ -49,6 +52,47 @@ def _erp_scope(db, project_id):
         require_erp(project_id)
     if project_id and not db.get(ERPProject, project_id):
         raise HTTPException(404, "Projet introuvable")
+
+
+def _project_context(db, ids):
+    projects, links = {}, {}
+    ids = list({value for value in ids if value is not None})
+    for start in range(0, len(ids), 500):
+        rows = db.query(ERPProject, BrainLink).outerjoin(BrainLink, BrainLink.project_id == ERPProject.id).filter(
+            ERPProject.id.in_(ids[start:start + 500]))
+        for project, link in rows:
+            projects[project.id] = project
+            if link:
+                links[project.id] = link
+    return projects, links
+
+
+def _merged_page(streams, offset, limit):
+    ordered = merge(*streams, key=lambda item: (item[0], item[1]), reverse=True)
+    skipped = sum(1 for _ in islice(ordered, min(offset, maxsize)))
+    page = list(islice(ordered, limit))
+    return page, skipped + len(page) + sum(1 for _ in ordered)
+
+
+def _ordered_refs(query, model, kind):
+    rows = query.with_entities(model.created_at, model.id).order_by(model.created_at.desc(), model.id.desc())
+    return ((utc_iso(created), identity, kind) for created, identity in rows.yield_per(200))
+
+
+def _audio_meeting_refs(audio, reports, project_rows, term):
+    refs = audio.with_entities(MeetingRecording.created_at, MeetingRecording.id, MeetingRecording.erp_project_id,
+                              MeetingRecording.project_id, MeetingRecording.published_meeting_id, MeetingRecording.title)
+    refs = refs.order_by(MeetingRecording.created_at.desc(), MeetingRecording.id.desc())
+    rows = iter(refs.yield_per(200))
+    while batch := list(islice(rows, 200)):
+        published_ids = {row.published_meeting_id for row in batch if row.published_meeting_id}
+        published = {row.id for row in reports.with_entities(Meeting.id).filter(Meeting.id.in_(published_ids))} if published_ids else set()
+        for row in batch:
+            project = project_rows.get(row.erp_project_id)
+            if project is None or project.brain_project_id != row.project_id or row.published_meeting_id in published:
+                continue
+            if not term or term in _fold(' '.join((row.title, project.code, project.title, ''))):
+                yield utc_iso(row.created_at), row.id, 'audio'
 
 
 def _erp_contexts(erp, brain_ids):
@@ -180,51 +224,58 @@ def meetings(project_id: str | None = None, q: str = Query("", max_length=300),
              offset: int = Query(0, ge=0), limit: int = Query(50, ge=1, le=200),
              db: Session = Depends(get_db), erp: Session = Depends(get_erp_db)):
     _erp_scope(erp, project_id)
-    report_query = filter_erp(erp.query(Meeting), Meeting.project_id)
-    audio_query = db.query(MeetingRecording).options(load_only(
-        MeetingRecording.id, MeetingRecording.erp_project_id, MeetingRecording.project_id,
-        MeetingRecording.published_meeting_id, MeetingRecording.title, MeetingRecording.date,
-        MeetingRecording.created_at, MeetingRecording.job_status, MeetingRecording.stage,
-        MeetingRecording.progress, MeetingRecording.revision, MeetingRecording.reviewed_revision))
+    report_query = filter_erp(erp.query(Meeting).join(ERPProject, ERPProject.id == Meeting.project_id), Meeting.project_id)
+    audio_query = filter_erp(db.query(MeetingRecording), MeetingRecording.erp_project_id)
     if project_id:
         report_query = report_query.filter(Meeting.project_id == project_id)
         audio_query = audio_query.filter(MeetingRecording.erp_project_id == project_id)
-    reports = {row.id: row for row in report_query.all()}
-    recordings = filter_erp(audio_query, MeetingRecording.erp_project_id).all()
-    from sqlalchemy import inspect
-    from ..meeting_session_models import MeetingSession, MeetingSessionCommand
-    session_by_audio, session_by_report = {}, {}
-    if inspect(db.connection()).has_table('meeting_sessions'):
-        visible_sessions = filter_erp(db.query(MeetingSession), MeetingSession.project_id)
-        if project_id:
-            visible_sessions = visible_sessions.filter(MeetingSession.project_id == project_id)
-        allowed_sessions = {row.id: row for row in visible_sessions}
-        session_by_audio = {row.recording_id: row.id for row in allowed_sessions.values() if row.recording_id}
-        for command in db.query(MeetingSessionCommand).filter(MeetingSessionCommand.session_id.in_(allowed_sessions),
-                MeetingSessionCommand.kind == 'publish-notes', MeetingSessionCommand.status == 'completed'):
-            if command.result.get('meeting_id'):
-                session_by_report[command.result['meeting_id']] = command.session_id
-    audio_by_report = {row.published_meeting_id: row for row in recordings if row.published_meeting_id}
-    entries = [(row, audio_by_report.get(row.id)) for row in reports.values()]
-    entries.extend((None, row) for row in recordings if row.published_meeting_id not in reports)
+    linked_projects = filter_erp(erp.query(ERPProject.id, ERPProject.code, ERPProject.title, BrainLink.brain_project_id)
+                                .join(BrainLink, BrainLink.project_id == ERPProject.id), ERPProject.id)
+    if project_id:
+        linked_projects = linked_projects.filter(ERPProject.id == project_id)
+    project_rows = {row.id: row for row in linked_projects}
     term = _fold(q.strip())
-    items = []
+    matching_reports = report_query
+    if term:
+        searchable = Meeting.title + ' ' + ERPProject.code + ' ' + ERPProject.title + ' ' + Meeting.decisions
+        matching_reports = matching_reports.filter(func.agent_fold(searchable).contains(term, autoescape=True))
+    page, total = _merged_page((_ordered_refs(matching_reports, Meeting, 'report'),
+                                _audio_meeting_refs(audio_query, report_query, project_rows, term)), offset, limit)
+    report_ids = [identity for _, identity, kind in page if kind == 'report']
+    audio_ids = [identity for _, identity, kind in page if kind == 'audio']
+    reports = {row.id: row for row in report_query.filter(Meeting.id.in_(report_ids))} if report_ids else {}
+    audio_filter = MeetingRecording.id.in_(audio_ids)
+    if report_ids:
+        attached = audio_query.with_entities(MeetingRecording.id, func.row_number().over(
+            partition_by=MeetingRecording.published_meeting_id,
+            order_by=(MeetingRecording.created_at.desc(), MeetingRecording.id.desc())).label('position')).filter(
+                MeetingRecording.published_meeting_id.in_(report_ids)).subquery()
+        audio_filter = or_(audio_filter, MeetingRecording.id.in_(select(attached.c.id).where(attached.c.position == 1)))
+    recordings = audio_query.options(load_only(
+        MeetingRecording.id, MeetingRecording.erp_project_id, MeetingRecording.project_id,
+        MeetingRecording.published_meeting_id, MeetingRecording.title, MeetingRecording.date,
+        MeetingRecording.created_at, MeetingRecording.job_status, MeetingRecording.stage,
+        MeetingRecording.progress, MeetingRecording.revision, MeetingRecording.reviewed_revision)).filter(audio_filter).all() if page else []
+    audio_by_report = {row.published_meeting_id: row for row in recordings if row.published_meeting_id}
+    audio_by_id = {row.id: row for row in recordings}
+    entries = [(reports[identity], audio_by_report.get(identity)) if kind == 'report' else
+               (None, audio_by_id[identity]) for _, identity, kind in page
+               if identity in (reports if kind == 'report' else audio_by_id)]
+    selected = []
+    projects, links = _project_context(erp, (report.project_id if report else audio.erp_project_id for report, audio in entries))
     for report, audio in entries:
         pid = report.project_id if report else audio.erp_project_id
-        project = erp.get(ERPProject, pid)
-        if not project or (audio and (audio.erp_project_id != pid or
-            not (link := erp.get(BrainLink, pid)) or link.brain_project_id != audio.project_id)):
+        project, link = projects.get(pid), links.get(pid)
+        if project is None:
+            continue
+        if audio and (audio.erp_project_id != pid or not link or link.brain_project_id != audio.project_id):
             # An obsolete/mismatched recording mapping cannot imply project context.
             if not report:
                 continue
             audio = None
-        link = erp.get(BrainLink, pid)
         title = report.title if report else audio.title
-        if term and term not in _fold(" ".join((title, project.code, project.title, report.decisions if report else ""))):
-            continue
-        items.append({"id": report.id if report else audio.id, "meeting_id": report.id if report else None,
+        selected.append({"id": report.id if report else audio.id, "meeting_id": report.id if report else None,
                       "recording_id": audio.id if audio else None, "project_id": pid,
-                      "session_id": session_by_audio.get(audio.id) if audio else session_by_report.get(report.id),
                       "brain_project_id": link.brain_project_id if link else None,
                       "project_code": project.code, "project_title": project.title,
                       "title": title, "date": report.date if report else audio.date,
@@ -235,16 +286,45 @@ def meetings(project_id: str | None = None, q: str = Query("", max_length=300),
                       "recording": {"id": audio.id, "job_status": audio.job_status, "stage": audio.stage,
                                     "progress": audio.progress, "revision": audio.revision,
                                     "reviewed_revision": audio.reviewed_revision} if audio else None})
-    items.sort(key=lambda row: (row["created_at"], row["id"]), reverse=True)
-    total = len(items)
-    selected = items[offset:offset + limit]
     ids = [row["meeting_id"] for row in selected if row["meeting_id"]]
     actions = erp.query(MeetingAction).filter(MeetingAction.meeting_id.in_(ids)).all() if ids else []
+    session_by_audio, session_by_report = _meeting_sessions_for_page(db, selected, project_id)
     for item in selected:
+        item['session_id'] = (session_by_audio.get(item['recording_id']) if item['recording_id']
+                              else session_by_report.get(item['meeting_id']))
         item["actions"] = [{"id": action.id, "title": action.title, "owner": action.owner,
                             "due_date": action.due_date, "task_id": action.task_id}
                            for action in actions if action.meeting_id == item["meeting_id"] and action.project_id == item["project_id"]]
     return {"items": selected, "total": total}
+
+
+def _meeting_sessions_for_page(db, items, project_id):
+    from sqlalchemy import inspect
+    from ..meeting_session_models import MeetingSession, MeetingSessionCommand
+
+    if not items or not inspect(db.connection()).has_table('meeting_sessions'):
+        return {}, {}
+    audio_ids = [item['recording_id'] for item in items if item['recording_id']]
+    report_ids = [item['meeting_id'] for item in items if item['meeting_id'] and not item['recording_id']]
+    visible_sessions = filter_erp(db.query(MeetingSession), MeetingSession.project_id)
+    if project_id:
+        visible_sessions = visible_sessions.filter(MeetingSession.project_id == project_id)
+    recordings = visible_sessions.with_entities(MeetingSession.recording_id, MeetingSession.id).filter(
+        MeetingSession.recording_id.in_(audio_ids)) if audio_ids else ()
+    published_id = MeetingSessionCommand.result['meeting_id'].as_string()
+    reports = visible_sessions.join(MeetingSessionCommand, MeetingSessionCommand.session_id == MeetingSession.id).filter(
+        MeetingSessionCommand.kind == 'publish-notes', MeetingSessionCommand.status == 'completed',
+        published_id.in_(report_ids)).with_entities(published_id, MeetingSession.id) if report_ids else ()
+    return dict(list(recordings)), dict(list(reports))
+
+
+def _audio_job_refs(audio, projects):
+    rows = audio.with_entities(MeetingRecording.created_at, MeetingRecording.id,
+                              MeetingRecording.erp_project_id, MeetingRecording.project_id)
+    rows = rows.order_by(MeetingRecording.created_at.desc(), MeetingRecording.id.desc())
+    for created, identity, erp_id, brain_id in rows.yield_per(200):
+        if erp_id in projects and projects[erp_id] == brain_id:
+            yield utc_iso(created), identity, 'audio'
 
 
 @router.get("/jobs")
@@ -252,22 +332,57 @@ def jobs(project_id: str | None = None, status: str = "all", offset: int = Query
          db: Session = Depends(get_db), erp: Session = Depends(get_erp_db)):
     _erp_scope(erp, project_id)
     cdc = filter_erp(erp.query(CdcAnalysisJob), CdcAnalysisJob.project_id)
-    audio = db.query(MeetingRecording).filter(MeetingRecording.job_status != "idle").options(load_only(
-        MeetingRecording.id, MeetingRecording.erp_project_id, MeetingRecording.project_id, MeetingRecording.source_id,
-        MeetingRecording.title, MeetingRecording.job_kind, MeetingRecording.job_status, MeetingRecording.stage,
-        MeetingRecording.progress, MeetingRecording.processed_seconds, MeetingRecording.duration_seconds,
-        MeetingRecording.cancel_requested, MeetingRecording.error, MeetingRecording.created_at, MeetingRecording.updated_at))
+    audio = filter_erp(db.query(MeetingRecording).filter(MeetingRecording.job_status != 'idle'), MeetingRecording.erp_project_id)
     if project_id:
         cdc = cdc.filter(CdcAnalysisJob.project_id == project_id)
         audio = audio.filter(MeetingRecording.erp_project_id == project_id)
-    result = []
+    result = {}
     scans = filter_erp(erp.query(MilestoneScanJob), MilestoneScanJob.project_id)
     if project_id:
         scans = scans.filter_by(project_id=project_id)
-    for row in scans:
-        project = erp.get(ERPProject, row.project_id)
-        link = erp.get(BrainLink, row.project_id)
-        result.append({"id": row.id, "engine": "milestones", "kind": "dates", "title": "Recherche des dates de jalons",
+    mail = filter_brain(db.query(MailEnrichmentJob, Source, Project).join(Source, Source.id == MailEnrichmentJob.source_id)
+                        .outerjoin(Project, Project.id == MailEnrichmentJob.project_id).filter(
+                            Source.status == 'resolved', Source.project_id == MailEnrichmentJob.project_id),
+                        MailEnrichmentJob.project_id)
+    triage = db.query(TriageJob) if not project_id and erp_ids() is None else None
+    if status != 'all':
+        scans = scans.filter(MilestoneScanJob.status == status)
+        cdc = cdc.filter(CdcAnalysisJob.status == status)
+        audio = audio.filter(MeetingRecording.job_status == status)
+        mail = mail.filter(MailEnrichmentJob.status == status)
+        if triage is not None:
+            triage = triage.filter(TriageJob.status == status)
+    visible_links = filter_erp(erp.query(BrainLink.project_id, BrainLink.brain_project_id).join(
+        ERPProject, ERPProject.id == BrainLink.project_id), BrainLink.project_id)
+    if project_id:
+        visible_links = visible_links.filter(BrainLink.project_id == project_id)
+    project_links = dict(list(visible_links))
+    mail_links = {brain_id: erp_id for erp_id, brain_id in project_links.items()}
+    if project_id:
+        mail = mail.filter(MailEnrichmentJob.project_id.in_(mail_links))
+    page, total = _merged_page((
+        _ordered_refs(scans, MilestoneScanJob, 'milestones'), _ordered_refs(cdc, CdcAnalysisJob, 'cdc'),
+        _audio_job_refs(audio, project_links), _ordered_refs(triage, TriageJob, 'triage') if triage is not None else (),
+        _ordered_refs(mail, MailEnrichmentJob, 'mail')), offset, limit)
+    if not page:
+        return {'items': [], 'total': total}
+    ids = {kind: [] for kind in ('milestones', 'cdc', 'audio', 'triage', 'mail')}
+    for _, identity, kind in page:
+        ids[kind].append(identity)
+    audio_rows = audio.options(load_only(
+        MeetingRecording.id, MeetingRecording.erp_project_id, MeetingRecording.project_id, MeetingRecording.source_id,
+        MeetingRecording.title, MeetingRecording.job_kind, MeetingRecording.job_status, MeetingRecording.stage,
+        MeetingRecording.progress, MeetingRecording.processed_seconds, MeetingRecording.duration_seconds,
+        MeetingRecording.cancel_requested, MeetingRecording.error, MeetingRecording.created_at, MeetingRecording.updated_at
+    )).filter(MeetingRecording.id.in_(ids['audio'])).all() if ids['audio'] else []
+    mail_rows = mail.filter(MailEnrichmentJob.id.in_(ids['mail'])).all() if ids['mail'] else []
+    cross_database_ids = [row.erp_project_id for row in audio_rows]
+    cross_database_ids.extend(mail_links.get(row.project_id) for row, _, _ in mail_rows)
+    cross_projects, cross_links = _project_context(erp, cross_database_ids)
+    scans = scans.outerjoin(ERPProject, ERPProject.id == MilestoneScanJob.project_id).outerjoin(
+        BrainLink, BrainLink.project_id == MilestoneScanJob.project_id).add_entity(ERPProject).add_entity(BrainLink)
+    for row, project, link in scans.filter(MilestoneScanJob.id.in_(ids['milestones'])) if ids['milestones'] else ():
+        result['milestones', row.id] = {"id": row.id, "engine": "milestones", "kind": "dates", "title": "Recherche des dates de jalons",
                        "project_id": row.project_id, "brain_project_id": link.brain_project_id if link else None,
                        "project_code": project.code if project else "", "project_title": project.title if project else "",
                        "source_id": None, "status": row.status, "stage": "Recherche des dates",
@@ -275,12 +390,12 @@ def jobs(project_id: str | None = None, status: str = "all", offset: int = Query
                        "processed": row.processed, "total": row.total, "unit": "passages", "can_cancel": False,
                        "can_retry": row.status == "failed", "cancel_url": None,
                        "retry_url": f"/api/v1/projects/{row.project_id}/milestones/scan", "error": row.error,
-                       "created_at": utc_iso(row.created_at), "updated_at": utc_iso(row.updated_at)})
-    for row in cdc.all():
-        project = erp.get(ERPProject, row.project_id)
-        link = erp.get(BrainLink, row.project_id)
-        source = erp.get(CdcSource, row.source_id)
-        result.append({"id": row.id, "engine": "cdc", "kind": "analyse", "title": source.filename if source else "Analyse CDC",
+                       "created_at": utc_iso(row.created_at), "updated_at": utc_iso(row.updated_at)}
+    cdc = cdc.outerjoin(ERPProject, ERPProject.id == CdcAnalysisJob.project_id).outerjoin(
+        BrainLink, BrainLink.project_id == CdcAnalysisJob.project_id).outerjoin(
+        CdcSource, CdcSource.id == CdcAnalysisJob.source_id).add_entity(ERPProject).add_entity(BrainLink).add_columns(CdcSource.filename)
+    for row, project, link, filename in cdc.filter(CdcAnalysisJob.id.in_(ids['cdc'])) if ids['cdc'] else ():
+        result['cdc', row.id] = {"id": row.id, "engine": "cdc", "kind": "analyse", "title": filename or "Analyse CDC",
                        "project_id": row.project_id, "brain_project_id": link.brain_project_id if link else None,
                        "project_code": project.code if project else "", "project_title": project.title if project else "",
                        "source_id": row.source_id, "status": row.status, "stage": "analyse",
@@ -290,13 +405,13 @@ def jobs(project_id: str | None = None, status: str = "all", offset: int = Query
                        "can_retry": row.status in {"failed", "cancelled", "interrupted"},
                        "cancel_url": f"/api/v1/projects/{row.project_id}/cdc/jobs/{row.id}/cancel",
                        "retry_url": f"/api/v1/projects/{row.project_id}/cdc/jobs/{row.id}/retry",
-                       "error": row.error, "created_at": utc_iso(row.created_at), "updated_at": utc_iso(row.updated_at)})
-    for row in filter_erp(audio, MeetingRecording.erp_project_id).all():
-        project = erp.get(ERPProject, row.erp_project_id)
-        link = erp.get(BrainLink, row.erp_project_id)
+                       "error": row.error, "created_at": utc_iso(row.created_at), "updated_at": utc_iso(row.updated_at)}
+    for row in audio_rows:
+        project = cross_projects.get(row.erp_project_id)
+        link = cross_links.get(row.erp_project_id)
         if not project or not link or link.brain_project_id != row.project_id:
             continue
-        result.append({"id": row.id, "engine": "audio", "kind": row.job_kind, "title": row.title,
+        result['audio', row.id] = {"id": row.id, "engine": "audio", "kind": row.job_kind, "title": row.title,
                        "project_id": project.id, "brain_project_id": row.project_id,
                        "project_code": project.code, "project_title": project.title, "source_id": row.source_id,
                        "status": row.job_status, "stage": row.stage, "progress": row.progress,
@@ -305,26 +420,19 @@ def jobs(project_id: str | None = None, status: str = "all", offset: int = Query
                        "can_retry": row.job_status in {"failed", "cancelled", "interrupted"},
                        "cancel_url": f"/api/v1/projects/{project.id}/recordings/{row.id}/cancel",
                        "retry_url": f"/api/v1/projects/{project.id}/recordings/{row.id}/{'synthesize' if row.job_kind == 'synthesis' else 'transcribe'}",
-                       "error": row.error, "created_at": utc_iso(row.created_at), "updated_at": utc_iso(row.updated_at)})
-    if not project_id and erp_ids() is None:
-        for row in db.query(TriageJob).all():
-            result.append({**workspace_jobs.describe(row), "engine": "triage", "kind": "reanalyse" if row.force else "analyse",
+                       "error": row.error, "created_at": utc_iso(row.created_at), "updated_at": utc_iso(row.updated_at)}
+    if triage is not None and ids['triage']:
+        for row in triage.filter(TriageJob.id.in_(ids['triage'])):
+            result['triage', row.id] = {**workspace_jobs.describe(row), "engine": "triage", "kind": "reanalyse" if row.force else "analyse",
                            "title": "Tout ré-analyser" if row.force else "Analyser les nouveaux mails",
                            "project_id": None, "brain_project_id": None, "project_code": "", "project_title": "Tous les mails",
                            "source_id": None, "stage": "classement", "unit": "mails",
                            "cancel_url": f"/api/v1/workspace/triage-jobs/{row.id}/cancel",
-                           "retry_url": f"/api/v1/workspace/triage-jobs/{row.id}/retry"})
-    links = {link.brain_project_id: link.project_id for link in erp.query(BrainLink)}
-    for row in filter_brain(db.query(MailEnrichmentJob), MailEnrichmentJob.project_id):
-        erp_id = links.get(row.project_id)
-        if project_id and erp_id != project_id:
-            continue
-        source = db.get(Source, row.source_id)
-        if not source or source.status != "resolved" or source.project_id != row.project_id:
-            continue
-        project = erp.get(ERPProject, erp_id) if erp_id else None
-        brain = db.get(Project, row.project_id)
-        result.append({"id": row.id, "engine": "mail", "kind": "enrichment",
+                           "retry_url": f"/api/v1/workspace/triage-jobs/{row.id}/retry"}
+    for row, source, brain in mail_rows:
+        erp_id = mail_links.get(row.project_id)
+        project = cross_projects.get(erp_id)
+        result['mail', row.id] = {"id": row.id, "engine": "mail", "kind": "enrichment",
                        "title": (source.source_metadata or {}).get("subject") or "Connaissance du mail",
                        "project_id": erp_id, "brain_project_id": row.project_id,
                        "project_code": project.code if project else brain.code if brain else "",
@@ -336,11 +444,8 @@ def jobs(project_id: str | None = None, status: str = "all", offset: int = Query
                        "total": 2, "unit": "steps", "can_cancel": False,
                        "can_retry": row.status == "failed", "cancel_url": "",
                        "retry_url": f"/api/v1/workspace/mail-enrichments/{row.id}/retry",
-                       "error": row.error, "created_at": utc_iso(row.created_at), "updated_at": utc_iso(row.updated_at)})
-    if status != "all":
-        result = [row for row in result if row["status"] == status]
-    result.sort(key=lambda row: (row["created_at"], row["id"]), reverse=True)
-    return {"items": result[offset:offset + limit], "total": len(result)}
+                       "error": row.error, "created_at": utc_iso(row.created_at), "updated_at": utc_iso(row.updated_at)}
+    return {"items": [result[kind, identity] for _, identity, kind in page if (kind, identity) in result], "total": total}
 
 
 class TriageRequest(BaseModel):

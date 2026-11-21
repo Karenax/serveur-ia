@@ -157,7 +157,10 @@ def test_scan_and_import(tmp_path, monkeypatch):
     root.mkdir()
     monkeypatch.setenv("AGENT_DOCUMENT_PROJECT_ROOT", json.dumps(str(root)))
     c = TestClient(app)
-    folder = tmp_path / "00 - AIRB26LTx0000-A - Machine de test"
+    shared = tmp_path / "affaires"
+    shared.mkdir()
+    monkeypatch.setenv("AGENT_DOCUMENT_ROOTS", json.dumps([str(shared)]))
+    folder = shared / "00 - AIRB26LTx0000-A - Machine de test"
     folder.mkdir()
     _make_tdao(str(folder / "AIRB26LTx0000-A-TDAO-001-A.xlsm"))
     preview = c.post("/api/v1/projects/scan", json={"folder": str(folder)}).json()
@@ -178,8 +181,10 @@ def test_scan_and_import(tmp_path, monkeypatch):
     dup = c.post("/api/v1/projects/import", json={"folder": str(folder)})
     assert dup.status_code == 409
     # dossier inexistant -> 400
-    bad = c.post("/api/v1/projects/scan", json={"folder": str(tmp_path / "nope")})
+    bad = c.post("/api/v1/projects/scan", json={"folder": str(shared / "nope")})
     assert bad.status_code == 400
+    for route in ('scan', 'import'):
+        assert c.post(f'/api/v1/projects/{route}', json={'folder': str(tmp_path)}).status_code == 403
     # lignes budgétaires créées à l'import (J138=100, K138=24)
     items = c.get(f"/api/v1/projects/{created['id']}/cdc/items").json()
     by_title = {item["title"]: item for item in items}
@@ -189,7 +194,7 @@ def test_scan_and_import(tmp_path, monkeypatch):
     assert again.status_code == 400
 
 
-def test_scan_ignores_placeholders(tmp_path):
+def test_scan_ignores_placeholders(tmp_path, monkeypatch):
     from openpyxl import Workbook
 
     from backend.app.routers.scan import _clean_identity, parse_folder_name
@@ -199,6 +204,7 @@ def test_scan_ignores_placeholders(tmp_path):
     assert parse_folder_name("00 - AIRB26LTx0000-A - Machine de test") == ("AIRB26LTx0000-A", "Machine de test")
     # TDAO vierge : le code du dossier prime
     c = TestClient(app)
+    monkeypatch.setenv("AGENT_DOCUMENT_ROOTS", json.dumps([str(tmp_path)]))
     folder = tmp_path / "00 - AIRB26LTx0000-A - Vierge"
     folder.mkdir()
     wb = Workbook()
@@ -210,8 +216,9 @@ def test_scan_ignores_placeholders(tmp_path):
     assert preview["code"] == "AIRB26LTx0000-A"
 
 
-def test_scan_folder_identity_wins_over_old_tdao_and_tdsp(tmp_path):
+def test_scan_folder_identity_wins_over_old_tdao_and_tdsp(tmp_path, monkeypatch):
     from openpyxl import Workbook
+    monkeypatch.setenv("AGENT_DOCUMENT_ROOTS", json.dumps([str(tmp_path)]))
     folder = tmp_path / "AIRB26LTH0205-A - LED 2026"
     folder.mkdir()
     for kind, cell in (("TDAO", "E8"), ("TDSP", "E6")):
@@ -239,7 +246,8 @@ def test_scan_folder_identity_wins_over_old_tdao_and_tdsp(tmp_path):
     assert c.get(f"/api/v1/projects/{result['id']}/cdc/items").json() == []
 
 
-def test_scan_uses_document_identity_when_folder_has_no_project_code(tmp_path):
+def test_scan_uses_document_identity_when_folder_has_no_project_code(tmp_path, monkeypatch):
+    monkeypatch.setenv("AGENT_DOCUMENT_ROOTS", json.dumps([str(tmp_path)]))
     folder = tmp_path / "Sans référence"
     folder.mkdir()
     _make_tdao(str(folder / "document-TDAO.xlsm"))

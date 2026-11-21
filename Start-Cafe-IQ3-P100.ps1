@@ -2,7 +2,9 @@ param([switch]$MTP, [ValidateRange(512,262144)][int]$Context = 4096, [int]$Cache
       [ValidateRange(1,16)][int]$Parallel = 1,
       [ValidateRange(0,1)][double]$CpuFraction = 0,
       [ValidateRange(512,4096)][int]$ReserveMiB = 2048,
-      [ValidateRange(1,16)][int]$CpuThreads = 15)
+      [ValidateRange(1,16)][int]$CpuThreads = 15,
+      [string]$ModelsRoot = (Join-Path ([IO.Path]::GetPathRoot($PSScriptRoot)) 'modèle'),
+      [string]$ModelPath = (Join-Path ([IO.Path]::GetPathRoot($env:SystemRoot)) 'Temp\Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S-00001-of-00002.gguf'))
 $ErrorActionPreference = 'Stop'
 $root = $PSScriptRoot
 $exe = Join-Path $root 'cafe-build-p100\bin\llama-server.exe'
@@ -27,13 +29,13 @@ $env:GGML_CUDA_MOE_DIRECT_RESERVE_MB = "$ReserveMiB"
 $env:GGML_CUDA_MOE_DIRECT_STATS = '50'
 $env:GGML_CUDA_MOE_DIRECT_PROFILE = '0'
 Remove-Item Env:GGML_CUDA_ENABLE_UNIFIED_MEMORY -ErrorAction SilentlyContinue
-$model = 'C:\Temp\Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S-00001-of-00002.gguf'
+$model = $ModelPath
 $mode = if ($MTP) { 'mtp' } else { 'sans-mtp' }
 if ($CpuFraction -gt 0) { $mode = 'hybride-' + $mode }
 # Context is the total KV pool, divided between Parallel conversations.
 $argsList = @('-m', ('"' + $model + '"'), '--host', '127.0.0.1', '--port', '8080', '--alias', 'qwen3.8-flash-next-iq3-s', '-c', "$Context", '-np', "$Parallel", '--cont-batching', '-t', '4', '-tb', '4', '-b', '256', '-ub', '128', '-ngl', '99', '--fit', 'off', '--host-moe', '--no-pipeline-parallel', '--moe-cache', 'off', '--split-mode', 'layer', '--tensor-split', '1,1', '--load-mode', 'none', '--lazy-mode', 'off', '-ot', 'per_layer_token_embd=CPU', '--flash-attn', 'off', '--jinja', '--metrics', '-lv', '4')
 if ($MTP) {
- $draft = 'D:\modèle\qwen3.8FlashNext\mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf'
+ $draft = Join-Path $ModelsRoot 'qwen3.8FlashNext\mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf'
  $argsList += @('-md', ('"' + $draft + '"'), '--spec-type', 'draft-mtp', '--spec-draft-n-max', '2', '--spec-draft-ngl', '99')
 }
 $process = Start-Process -FilePath $exe -ArgumentList $argsList -WorkingDirectory (Split-Path $exe) -WindowStyle Hidden -RedirectStandardOutput (Join-Path $root "cafe-iq3-$mode.stdout.log") -RedirectStandardError (Join-Path $root "cafe-iq3-$mode.stderr.log") -PassThru

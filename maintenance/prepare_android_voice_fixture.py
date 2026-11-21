@@ -11,6 +11,7 @@ for i in range(len(samples)*2//3):
     left=int(position);fraction=position-left
     output.append(round(samples[left]*(1-fraction)+samples[min(left+1,len(samples)-1)]*fraction))
 path=root/'toolchain/android-tests/conversation.wav'
+path.parent.mkdir(parents=True, exist_ok=True)
 with wave.open(str(path),'wb') as target:
     target.setnchannels(1);target.setsampwidth(2);target.setframerate(16000);target.writeframes(output.tobytes())
 print(path)

@@ -212,7 +212,7 @@ function initializeApi(){
   dirtyChecks.push(()=>uiIntegrationPending);
   const load=setupStateLoader(async state=>{
     $('local-api').textContent=state.local_api;
-    key.value=config.key;
+    key.value=state.key||'';
     connected=state.connection.connected;
     const models=state.connection.models||[];
     if(JSON.stringify(models)!==model.dataset.models){
@@ -236,7 +236,8 @@ function setupStateLoader(apply,{repeat=false}={}){
     if(loading||ready&&!repeat)return;
     loading=true;
     try{
-      await apply(await api(config.section==='vocal'?'/client/device-state?section=vocal':'/client/device-state'));
+      const section=['api','vocal'].includes(config.section)?'?section='+config.section:'';
+      await apply(await api('/client/device-state'+section));
       ready=true;retry.hidden=true;
     }
     catch(failure){error(failure);retry.hidden=false;}

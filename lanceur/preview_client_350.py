@@ -66,7 +66,7 @@ try:
             except OSError:pass
             time.sleep(.3)
     threading.Thread(target=control,daemon=True).start()
-    print('Client de vérification isolé : http://127.0.0.1:8099/chat',flush=True)
+    print('Client de vérification isolé : '+server.chat_launch_url,flush=True)
     server.serve_forever()
 finally:
     if server:server.server_close()

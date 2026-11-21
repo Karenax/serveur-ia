@@ -120,8 +120,11 @@ class AdvancedVoiceTests(unittest.TestCase):
     def test_gpu_probe_rejects_bad_outputs_and_can_be_retried(self):
         _,cards=self.gpu_fixture()
         with patch('advanced_voice.subprocess.run') as run:
-            run.return_value.returncode=0;run.return_value.stdout=json.dumps({'devices':[{'id':'b'*24}],'recommended':'b'*24})
-            with self.assertRaises(ValueError):self.service.detect_devices()
+            run.return_value.returncode = 0
+            for output in (' \n ', '[]', json.dumps({'devices':[{'id':'b'*24}],'recommended':'b'*24})):
+                run.return_value.stdout = output
+                with self.assertRaises(ValueError):
+                    self.service.detect_devices()
             self.assertFalse(self.service.status()['gpu']['checked']);self.assertEqual(self.service.status()['gpu']['cards'],[])
             run.return_value.stdout=json.dumps({'devices':cards,'recommended':'b'*24})
             self.assertFalse(self.service.detect_devices()['gpu']['error'])

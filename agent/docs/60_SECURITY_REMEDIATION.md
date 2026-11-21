@@ -202,3 +202,13 @@ Ces contrôles ne qualifient pas un microphone, une inférence IA réelle, une
 restauration sur un autre compte Windows, un lecteur d'écran ni une conformité
 WCAG ou juridique. Les réglages IA HTTP sont conservés. Les sources et leurs
 empreintes finales permettront d'identifier exactement l'état livré localement.
+
+## Accès direct au service Projets
+
+Le lanceur Kiara transmet une identité signée au service Projets. Pour un
+lancement autonome sur loopback, définir `AGENT_LOCAL_TOKEN` avec une valeur
+aléatoire uniquement connue de l’opérateur (32 caractères minimum). Les routes
+métier, en lecture comme en écriture, exigent l’en-tête `X-Agent-Token` ou le
+cookie de session. `POST /api/v1/session` échange l’en-tête contre un cookie
+local `HttpOnly`, renouvelé après un redémarrage. `GET /api/v1/session` renvoie
+le périmètre de l’opérateur authentifié.

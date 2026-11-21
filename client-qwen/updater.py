@@ -126,11 +126,11 @@ class DesktopUpdate:
         self.installer = None
 
     def stage(self, remote):
-        _, installer = stage_desktop(remote, self.root)
+        release, installer = stage_desktop(remote, self.root)
         self.installer = installer
         try:
             remote.update_state = {'busy': True, 'message': 'Mise à jour vérifiée. Enregistrement avant redémarrage…'}
-            self.events.write(f'KIARA_RELAY_UPDATE {installer}\n'.encode('utf-8'))
+            self.events.write(f'KIARA_RELAY_UPDATE {release["sha256"]} {installer}\n'.encode('utf-8'))
             self.events.flush()
         except OSError:
             self.discard()

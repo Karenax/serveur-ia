@@ -8,11 +8,11 @@ L’[architecture courante](ARCHITECTURE-ACTUELLE.md) et le
 
 ## Suivi de Projets et de la fusion Windows
 
-Au 16 novembre 2026, Kiara 4.0.8 est en production pour Windows et le web privé.
-Le service Projets est supervisé par le lanceur. Les 11 projets ont été retrouvés
-après redémarrage. Le cycle d’installation 4.0.7 → 4.0.8 → 4.0.7 a passé sur le
-poste Windows. [Architecture et responsabilités](ARCHITECTURE-ACTUELLE.md#projets-et-conversations)
-[Publication et retour arrière](audits/2026-11-15-fusion-kiara/BASCULE.md)
+Le 21 novembre 2026, Kiara 4.0.23 a été vérifiée en production pour Windows et
+le web privé. La vérification a retrouvé les 11 projets du service supervisé
+par le lanceur. Le point de retour documenté est la 4.0.22.
+[Architecture et responsabilités](ARCHITECTURE-ACTUELLE.md#projets-et-conversations)
+[Publication et retour arrière](audits/2026-11-15-fusion-kiara/BASCULE.md#livraison-kiara-4023)
 
 - **Qualifications complémentaires.** Le second environnement Windows, la reprise de Voix Max et l’installation sans WebView2 préexistant restent à éprouver. La 4.0.8 a été publiée avec la signature Ed25519 du canal et sans Authenticode, sur décision de Fred.
 - **Réunions et accès.** Vérifier Réunions et WireGuard depuis un second poste et confirmer le périmètre d’un accès réduit au web privé.

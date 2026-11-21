@@ -88,7 +88,8 @@ class SafeInventoryTests(unittest.TestCase):
 
     def test_relay_uses_inventory_result_as_the_only_port(self):
         remote=SimpleNamespace(desktop_update=None,close=Mock())
-        server=SimpleNamespace(server_port=17844,serve_forever=Mock(),shutdown=Mock(),server_close=Mock())
+        server=SimpleNamespace(server_port=17844,chat_launch_url='http://127.0.0.1:17844/chat?launch='+'b'*64,
+                               serve_forever=Mock(),shutdown=Mock(),server_close=Mock())
         with ExitStack() as stack:
             settings,profile,guard=self.relay_context(stack)
             stack.enter_context(patch.object(client,'portal_recovery_fixed_port',return_value=None))

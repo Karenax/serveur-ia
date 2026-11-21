@@ -34,5 +34,16 @@ class WorkerProtocolTests(unittest.TestCase):
         self.assertEqual(len(inbox.cancelled),64)
         with self.assertRaises(ValueError):inbox.accept({'action':'speak','id':'a'*32})
 
+    def test_full_queue_refuses_only_the_new_command(self):
+        errors = []
+        inbox = CommandInbox('asr', io.StringIO(), reject=errors.append)
+        inbox.accept({'action':'transcribe','id':'a'*32})
+        inbox.accept({'action':'transcribe','id':'b'*32})
+        self.assertEqual(inbox.commands.get_nowait()['id'], 'a'*32)
+        self.assertEqual(errors[0]['id'], 'b'*32)
+        self.assertFalse(inbox.closed.is_set())
+        inbox.accept({'action':'transcribe','id':'c'*32})
+        self.assertEqual(inbox.commands.get_nowait()['id'], 'c'*32)
+
 
 if __name__=='__main__':unittest.main()

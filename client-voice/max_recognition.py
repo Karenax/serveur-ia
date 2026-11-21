@@ -23,6 +23,8 @@ class MaxRecognizer(Recognizer):
         self.ingress_key = None
         self.ingress_offset = 0
         self.ingress_id = None
+        self.decoding_id = None
+        self.decoding_final = False
         super().__init__(models, transcribe=self._progressive)
 
     def _progressive(self, audio):

@@ -1,4 +1,5 @@
 """Cross-module invariants identified by the September 2026 audit."""
+import os
 import uuid
 from unittest.mock import patch
 
@@ -246,13 +247,35 @@ def test_internal_bridge_remains_available_under_parallel_calls():
     assert all(r["reachable"] for r in results)
 
 
+def test_eml_scan_uses_only_the_configured_directory(tmp_path):
+    from app.services.settings_service import save_section
+
+    allowed = tmp_path / 'allowed'
+    folder = allowed / 'inbox'
+    folder.mkdir(parents=True)
+    separate = tmp_path / 'separate'
+    separate.mkdir()
+    with SessionLocal() as db:
+        save_section(db, 'mail', {'source': 'folder', 'folder': str(allowed)})
+    route = '/v1/ingest/scan'
+    assert c.post(route, json={'folder': str(separate)}).status_code == 403
+    result = c.post(route, json={'folder': str(folder)})
+    assert result.status_code == 200 and result.json()['scanned'] == 0
+
+
 def test_local_session_host_origin_and_executable_protection(monkeypatch, tmp_path):
     monkeypatch.delenv("AGENT_TESTING")
     local = TestClient(app, base_url="http://127.0.0.1:18001")
     assert local.get("/v1/settings", headers={"host": "evil.example"}).status_code == 400
     assert local.get("/api/v1/session", headers={"origin": "https://evil.example"}).status_code == 403
     assert local.post("/api/v1/open-path", json={"path": "bad.exe"}).status_code == 403
-    token = local.get("/api/v1/session").json()["token"]
+    assert local.get("/api/v1/session").status_code == 403
+    assert local.get("/v1/settings").status_code == 403
+    token = os.environ['AGENT_LOCAL_TOKEN']
+    opened = local.post('/api/v1/session', headers={'X-Agent-Token': token})
+    assert opened.status_code == 200 and 'token' not in opened.json()
+    assert 'HttpOnly' in opened.headers['Set-Cookie']
+    assert local.get('/api/v1/session').status_code == 200
     monkeypatch.setenv("AGENT_OPEN_ROOTS", str(tmp_path))
     program = tmp_path / "bad.exe"
     program.write_bytes(b"audit")

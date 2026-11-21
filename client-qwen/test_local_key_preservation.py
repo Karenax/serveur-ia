@@ -1,4 +1,5 @@
 """Local API key initialization must preserve existing fictional settings."""
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -115,5 +116,41 @@ class LocalKeyPreservationTests(unittest.TestCase):
     def test_new_profile_gets_a_key(self):
         with patch.object(client,'protect',side_effect=self.clear):key=client.local_key({})
         self.assertEqual(json.loads(self.path.read_bytes())['local_key'],key)
+
+    def test_rotation_resumes_without_rekeying_browsing_storage_or_other_providers(self):
+        integrations = client.app_integrations
+        old_key = 'local_' + 'a' * 40
+        initial = {'local_key': old_key, 'preferences': {'conversation_drafts': {'thread': 'Brouillon'}}}
+        self.path.write_text(json.dumps(initial), encoding='utf-8')
+        opencode = self.path.with_name('opencode.jsonc')
+        hermes = self.path.with_name('config.yaml')
+        opencode.write_text(f'{{"providers":{{"serveur-fred":{{"settings":{{"apiKey":"{old_key}"}}}},'
+                            f'"autre":{{"settings":{{"apiKey":"{old_key}"}}}}}}}}', encoding='utf-8')
+        hermes.write_text(f'providers:\n  serveur-fred:\n    api_key: {old_key}\n    default_model: fictif\n', encoding='utf-8')
+        apps = {name: {'config_path': path} for name, path in (('opencode', opencode), ('hermes', hermes))}
+        write = integrations.atomic
+
+        def failing_write(path, payload):
+            if path.name == hermes.name:
+                raise PermissionError('fixture')
+            return write(path, payload)
+
+        with patch.object(client, 'protect', side_effect=self.clear), patch.object(integrations, 'detect', return_value=apps):
+            with patch.object(integrations, 'atomic', side_effect=failing_write), self.assertRaises(PermissionError):
+                client.renew_local_key({})
+            pending = json.loads(self.path.read_bytes())
+            new_key = pending['local_key']
+            self.assertNotEqual(new_key, old_key)
+            self.assertEqual(pending['pending_integration_key_rotation'], old_key)
+            client.renew_local_key({})
+        settings = json.loads(self.path.read_bytes())
+        self.assertEqual(settings['local_key'], new_key)
+        self.assertEqual(settings['local_storage_id'], hashlib.sha256(old_key.encode()).hexdigest()[:20])
+        self.assertEqual(settings['preferences'], initial['preferences'])
+        self.assertNotIn('pending_integration_key_rotation', settings)
+        providers = integrations.jsonc(opencode.read_text(encoding='utf-8'))[0]['providers']
+        self.assertEqual(providers['serveur-fred']['settings']['apiKey'], integrations.integration_key(new_key, 'opencode'))
+        self.assertEqual(providers['autre']['settings']['apiKey'], old_key)
+        self.assertIn(integrations.integration_key(new_key, 'hermes'), hermes.read_text(encoding='utf-8'))
 
 if __name__=='__main__':unittest.main()

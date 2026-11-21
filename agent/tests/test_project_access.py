@@ -187,7 +187,7 @@ def test_session_exposes_trusted_role_without_allowing_change(context, monkeypat
     out = client.get("/api/v1/session").json()
     assert out["operator"] == {"id": "test-operator", "role": "reader", "can_edit": False, "can_administer": False,
                                 "project_ids": [context["pids"][0]]}
-    assert out["token"]
+    assert 'token' not in out
     assert client.get("/health").status_code == 200
     assert client.get("/app/projects").status_code == 200
 
@@ -509,8 +509,12 @@ def test_every_registered_write_route_is_denied_to_reader(context, monkeypatch):
                         "/api/v1/projects/{project_id}/planning/templates/{version_id}/preview",
                         "/api/v1/projects/{project_id}/documents/preview",
                         "/api/v1/projects/{project_id}/documents/discover",
+                        "/api/v1/projects/{project_id}/documents/discover-folder",
                         "/api/v1/projects/{project_id}/documents/artifacts/{artifact_id}/publication-preview",
-                        "/api/v1/projects/{project_id}/deliverable-plan/selection/preview"} or path.endswith("/memory/recall"):
+                        "/api/v1/projects/{project_id}/deliverable-plan/selection/preview",
+                        "/api/v1/workspace/fusion-settings/personal",
+                        "/api/v1/document-settings/personal",
+                        "/api/v1/document-settings/personal/restore"} or path.endswith("/memory/recall"):
                 continue
             concrete = re.sub(r"\{[^}]+\}", context["pids"][0], path)
             response = client.request(method, concrete, json={})

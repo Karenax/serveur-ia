@@ -39,7 +39,7 @@ _thread: threading.Thread | None = None
 def run_auto_scan_once() -> dict:
     """Reprend les classements éligibles, puis importe et analyse les nouveaux."""
     from ..db import SessionLocal
-    from ..services.mail_ingest import DEFAULT_WATCH_DIR, scan_folder
+    from ..services.mail_ingest import DEFAULT_WATCH_DIR, mail_scan_directory, scan_folder
     from ..services.memory_factory import get_memory_adapter
     from ..services.settings_service import get_section
     from ..services.triage import TRIAGE_LOCK, auto_classify_pending, triage_pending
@@ -69,7 +69,7 @@ def run_auto_scan_once() -> dict:
                           "status": "Synchronisation assurée par la liaison Thunderbird"}
         else:
             AUTO_SCAN_STATE.update(phase="scan")
-            scan_stats = scan_folder(folder, SessionLocal, mem, limit=500)
+            scan_stats = scan_folder(mail_scan_directory(folder, folder), SessionLocal, mem, limit=500)
         AUTO_SCAN_STATE.update(phase="analysis")
         db2 = SessionLocal()
         try:

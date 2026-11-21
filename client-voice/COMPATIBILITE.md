@@ -1,8 +1,8 @@
 # Compatibilité des moteurs vocaux
 
-Référence courante au 4 novembre 2026 : serveur/Windows Kiara 3.5.60,
-APK Android 1.0.25/code 26. Le pack Max publié reste inchangé lors de cette
-livraison Windows ; le worker Low embarqué est reconstruit avec le client.
+Référence du 21 novembre 2026. Kiara 4.0.23 pour Windows, canal classique 3.5.63
+et APK Android 1.0.26 (code 27). Le worker Low est reconstruit avec le client
+Windows et le complément Max suit son propre canal.
 
 | Famille | Usage actuel | Décision |
 |---|---|---|

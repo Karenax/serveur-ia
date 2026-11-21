@@ -1,4 +1,5 @@
-﻿$ErrorActionPreference = 'Stop'
+﻿param([string]$ModelsRoot = (Join-Path ([IO.Path]::GetPathRoot($PSScriptRoot)) 'modèle'))
+$ErrorActionPreference = 'Stop'
 $archive = Join-Path $PSScriptRoot 'comparatifs\2026-10-02-strata-q4-p100'
 $results = Import-Csv -LiteralPath (Join-Path $archive 'resultats-strata-mtp.csv')
 if ($results.Count -ne 2) { throw 'Les deux essais GPU complets sont requis avant archivage final.' }
@@ -31,7 +32,7 @@ if ($LASTEXITCODE) { throw 'Impossible de conserver les adaptations du code.' }
 $engine = Get-CimInstance Win32_Process -Filter "Name='strata.exe'" | Where-Object {
     $_.ExecutablePath -and [IO.Path]::GetFullPath($_.ExecutablePath) -eq (Join-Path $PSScriptRoot 'strata-build-p100\strata.exe')
 } | Select-Object -First 1
-$modelDirectory = 'D:\modèle\qwen3.8FlashNext'
+$modelDirectory = Join-Path $ModelsRoot 'qwen3.8FlashNext'
 $modelFiles = Get-ChildItem -LiteralPath $modelDirectory -File | Where-Object {
     $_.Name -like 'Qwen3.8-Flash-Next-UD-Q4_K_XL-*.gguf' -or $_.Name -eq 'mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf'
 } | ForEach-Object { [pscustomobject]@{path=$_.FullName;bytes=$_.Length;mtime_utc=$_.LastWriteTimeUtc.ToString('o')} }

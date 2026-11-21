@@ -1,6 +1,7 @@
 """Optional voice pack installation. No ML imports or downloads on application startup."""
 from __future__ import annotations
 import base64
+from contextlib import suppress
 import hashlib
 import json
 import os
@@ -9,16 +10,30 @@ import re
 import shutil
 import stat
 import subprocess
+import tempfile
 import threading
 import time
 import zipfile
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 from .http_download import HTTPSRedirect
+from .history_store import atomic
 import urllib.request
 
 PACK_FORMAT = 2
 LIMIT = 4 * 1024**3
+MODEL_URL = re.compile(r'https://huggingface\.co/([A-Za-z0-9_./-]+)/resolve/[a-f0-9]{40}/([A-Za-z0-9_.-]+)')
+
+
+def model_url_allowed(item):
+    url = item.get('url')
+    if not isinstance(url, str):
+        return False
+    match = MODEL_URL.fullmatch(url)
+    if match:
+        return all(part not in {'', '.', '..'} for part in (*match[1].split('/'), match[2]))
+    return (item.get('name') == 'asr/silero-vad.onnx'
+            and url == 'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/silero_vad.onnx')
 
 
 def max_home(default):
@@ -75,8 +90,7 @@ def verify_catalogue(value, pinned):
         if item is not value['runtime']:
             # Models are immutable, public files; runtime code comes only from
             # the authenticated Kiara endpoint and its pinned signing key.
-            if not (re.fullmatch(r'https://huggingface\.co/[A-Za-z0-9_./-]+/resolve/[a-f0-9]{40}/[A-Za-z0-9_.-]+', item.get('url', '')) or
-                    item.get('name') == 'asr/silero-vad.onnx' and item.get('url') == 'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/silero_vad.onnx'):
+            if not model_url_allowed(item):
                 raise ValueError('Source du modèle vocal invalide.')
     entries = value['runtime'].get('files', [])
     if not entries or len(entries) > 3000:
@@ -283,9 +297,7 @@ class MaxInstallation:
         probe.unlink()
         self.runtime.unload()
         self.location_file.parent.mkdir(parents=True, exist_ok=True)
-        temporary = self.location_file.with_suffix('.part')
-        temporary.write_text(json.dumps({'path':str(target)}, ensure_ascii=False), encoding='utf-8')
-        temporary.replace(self.location_file)
+        atomic(self.location_file, json.dumps({'path': str(target)}, ensure_ascii=False).encode())
         self.home = self.runtime.home = target
         self.catalogue = self.plan_id = self.storage_cache = None
         self.value = {'phase':'idle', 'downloaded_bytes':0,
@@ -378,28 +390,41 @@ class MaxInstallation:
 
     def _download(self, source, target, item, done):
         safe_directory(self.home, target.parent)
-        if target.is_symlink() or target.is_junction() or target.with_suffix(target.suffix+'.part').is_symlink():
+        if target.is_symlink() or target.is_junction():
             raise ValueError('Fichier du complément Max invalide.')
         target.parent.mkdir(parents=True, exist_ok=True)
+        legacy_partial = target.with_suffix(target.suffix + '.part')
+        with suppress(OSError):
+            legacy_partial.unlink(missing_ok=True)
+        for abandoned in target.parent.glob('.kiara-*.part'):
+            with suppress(OSError):
+                abandoned.unlink(missing_ok=True)
         if target.exists() and matches(target, item):
             return done + item['bytes']
-        part = target.with_suffix(target.suffix+'.part')
         total = 0
         digest = hashlib.sha256()
-        with source() as response, part.open('wb') as output:
-            while block := response.read(256*1024):
-                if self.cancelled.is_set():
-                    raise InterruptedError()
-                total += len(block)
-                if total > item['bytes']:
-                    raise ValueError('Le téléchargement Max dépasse la taille annoncée.')
-                output.write(block)
-                digest.update(block)
-                with self.lock:
-                    self.value['downloaded_bytes'] = done + total
-        if total != item['bytes'] or digest.hexdigest() != item['sha256']:
-            raise ValueError('Téléchargement Max incomplet ou altéré. Réessayez.')
-        part.replace(target)
+        part = None
+        try:
+            with tempfile.NamedTemporaryFile(dir=target.parent, prefix='.kiara-', suffix='.part', delete=False) as output:
+                part = Path(output.name)
+                with source() as response:
+                    while block := response.read(256*1024):
+                        if self.cancelled.is_set():
+                            raise InterruptedError()
+                        total += len(block)
+                        if total > item['bytes']:
+                            raise ValueError('Le téléchargement Max dépasse la taille annoncée.')
+                        output.write(block)
+                        digest.update(block)
+                        with self.lock:
+                            self.value['downloaded_bytes'] = done + total
+            if total != item['bytes'] or digest.hexdigest() != item['sha256']:
+                raise ValueError('Téléchargement Max incomplet ou altéré. Réessayez.')
+            part.replace(target)
+        finally:
+            if part is not None:
+                with suppress(OSError):
+                    part.unlink(missing_ok=True)
         return done + total
 
     def _extract(self, archive, target, entries):
@@ -426,15 +451,19 @@ class MaxInstallation:
         if part.is_symlink() or path.is_symlink():
             raise ValueError('Fichier du complément Max invalide.')
         part.unlink(missing_ok=True)
-        if cached.absolute().is_relative_to(self.home.absolute()):
-            try:
-                os.link(cached, part)
-            except OSError:
+        try:
+            if cached.absolute().is_relative_to(self.home.absolute()):
+                try:
+                    os.link(cached, part)
+                except OSError:
+                    shutil.copyfile(cached, part)
+            else:
+                # Low keeps its own independent cache and immutable files.
                 shutil.copyfile(cached, part)
-        else:
-            # Low keeps its own independent cache and immutable files.
-            shutil.copyfile(cached, part)
-        part.replace(path)
+            part.replace(path)
+        finally:
+            with suppress(OSError):
+                part.unlink(missing_ok=True)
 
     def _run(self, catalogue):
         try:
@@ -477,9 +506,7 @@ class MaxInstallation:
                 if self.cancelled.is_set():
                     raise InterruptedError()
                 self.runtime.unload()
-                temporary = self.home/'runtime.json.part'
-                temporary.write_text(json.dumps(configuration, ensure_ascii=False), encoding='utf-8')
-                temporary.replace(self.home/'runtime.json')
+                atomic(self.home/'runtime.json', json.dumps(configuration, ensure_ascii=False).encode())
                 with self.lock:
                     self.value.update(phase='testing', message='Vérification de la fluidité de Max…', downloaded_bytes=self.value['download_bytes'])
                 self.runtime.test()

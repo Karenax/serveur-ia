@@ -1,7 +1,7 @@
 # Serveur IA
 
 Référence courante : [architecture, versions et compatibilités](ARCHITECTURE-ACTUELLE.md).
-Au 16 novembre 2026, le téléchargement Windows courant est **Kiara 4.0.8**. Le portail privé et le client Windows donnent accès aux espaces Conversations et Projets de Kiara. La **4.0.7** est conservée pour le retour arrière, et la **3.5.63** pour la transition du client classique. [Bascule Windows et retour arrière](audits/2026-11-15-fusion-kiara/BASCULE.md)
+La livraison Windows et portail privé vérifiée le 21 novembre 2026 est **Kiara 4.0.23**. Elle donne accès à Conversations et Projets. La **4.0.22** est le point de retour documenté et la **3.5.63** reste la version de transition du client classique. [Bascule Windows et retour arrière](audits/2026-11-15-fusion-kiara/BASCULE.md#livraison-kiara-4023)
 La [publication Windows](maintenance/2026-11-04-connexion-client/README.md)
 efface le message temporaire de connexion dès que le catalogue est retrouvé.
 Les lots EG2 de 32 textes et la file de 16 demandes en attente sont conservés.

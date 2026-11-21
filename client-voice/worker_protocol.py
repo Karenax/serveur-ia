@@ -8,7 +8,7 @@ import threading
 
 
 class CommandInbox:
-    def __init__(self,engine,stream=None):
+    def __init__(self,engine,stream=None,*,reject=None):
         self.engine=engine
         if stream is None:
             sys.stdin.reconfigure(encoding='utf-8')
@@ -19,6 +19,7 @@ class CommandInbox:
         self.closed=threading.Event()
         self.guard=threading.Lock()
         self.current=None
+        self.reject=reject
 
     def accept(self,value):
         if not isinstance(value,dict):raise ValueError('Commande vocale invalide.')
@@ -31,7 +32,11 @@ class CommandInbox:
                 while len(self.cancelled)>64:self.cancelled.popitem(last=False)
                 if self.current==identity:self.stop.set()
         elif value.get('action')==('transcribe' if self.engine=='asr' else 'speak'):
-            self.commands.put_nowait(value)
+            try:
+                self.commands.put_nowait(value)
+            except queue.Full:
+                if self.reject is not None:
+                    self.reject({'id':identity,'error':'Le moteur Max traite déjà les commandes en attente.'})
         else:raise ValueError('Commande vocale invalide.')
 
     def read(self):
@@ -39,7 +44,7 @@ class CommandInbox:
             while line:=self.stream.readline(1300002):
                 if len(line)>1300000:raise ValueError('Commande vocale trop volumineuse.')
                 self.accept(json.loads(line))
-        except (OSError,ValueError,queue.Full):
+        except (OSError,ValueError):
             pass
         finally:
             self.closed.set();self.stop.set()

@@ -152,16 +152,29 @@ class ClientStorage:
                 if (incremental and pending is not None and identity not in pending and self.observed.get(identity)==token
                         and time.monotonic()-self.verified_at.get(identity,0)<300):
                     continue
-                self.directory(client['id'])
-                rows = {table: [dict(r) for r in db.execute('SELECT * FROM ' + table + ' WHERE owner=? ORDER BY rowid', (client['id'],))] for table in TABLES}
-                job_ids = {row['id'] for row in rows['jobs']}
-                settings = [dict(r) for r in db.execute('SELECT * FROM settings ORDER BY key')
-                    if r['key'] == 'history_reset_id' or r['key']=='assistant-memory:'+identity
-                    or r['key']=='command-journal-floor:'+identity
-                    or (r['key'].startswith('job_attempt:') and r['key'][12:] in job_ids)]
-                result.append({'client': metadata, 'rows': rows, 'settings': settings,
+                self.directory(identity)
+                result.append({'client': metadata, 'rows': {table: [] for table in TABLES},
                     'generation': epoch, 'profile': self.profile(client, saved), '_revision':token})
+            if result:
+                self.snapshot_rows(db, result)
             return result
+
+    @staticmethod
+    def snapshot_rows(db, snapshots):
+        by_owner = {snapshot['client']['id']: snapshot for snapshot in snapshots}
+        owners = list(by_owner)
+        for start in range(0, len(owners), 500):
+            batch = owners[start:start + 500]
+            placeholders = ','.join('?' for _ in batch)
+            for table in TABLES:
+                query = f'SELECT * FROM {table} WHERE owner IN ({placeholders}) ORDER BY rowid'
+                for row in db.execute(query, batch):
+                    by_owner[row['owner']]['rows'][table].append(dict(row))
+        settings = {row['key']: dict(row) for row in db.execute('SELECT * FROM settings')}
+        for identity, snapshot in by_owner.items():
+            keys = ['history_reset_id', 'assistant-memory:' + identity, 'command-journal-floor:' + identity]
+            keys.extend('job_attempt:' + row['id'] for row in snapshot['rows']['jobs'])
+            snapshot['settings'] = [settings[key].copy() for key in sorted(keys) if key in settings]
 
     @staticmethod
     def database(snapshot):

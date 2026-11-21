@@ -8,7 +8,7 @@ try:
     engine=Engine({'role':'server','wireguard':{'private_key':fixture.wireguard.vault()['private_key']},'listen_port':0,'upstream_port':fixture.gateway.server_port,'peers':fixture.wireguard.peers()})
     remote=client.Remote(fixture.profile,endpoint=f'127.0.0.1:{engine.port}')
     server=client.serve_local(remote,secrets.token_urlsafe(32),8099)
-    print('Aperçu de test isolé : http://127.0.0.1:8099/chat',flush=True)
+    print('Aperçu de test isolé : '+server.chat_launch_url,flush=True)
     server.serve_forever()
 finally:
     if server:server.server_close()

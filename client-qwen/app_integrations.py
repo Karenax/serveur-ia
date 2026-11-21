@@ -1,5 +1,7 @@
 """Add the running client's model to local OpenCode/Hermes configurations."""
 import copy
+import hashlib
+import hmac
 import json
 import os
 from pathlib import Path
@@ -18,6 +20,10 @@ from history_store import atomic
 PROVIDER='serveur-fred'
 LABEL='Serveur Kiara'
 MAX_CONFIG=2*1024*1024
+
+
+def integration_key(key, app):
+    return hmac.new(key.encode(), f'kiara-integration:{app}'.encode(), hashlib.sha256).hexdigest()
 
 
 def detect(home=None,environ=None,which=None):
@@ -277,6 +283,67 @@ def hermes_text(text,base_url,key,model,catalogue=None):
     expected={**value,section:providers}
     if check!=expected:raise ValueError('Configuration Hermes non vérifiée : modification annulée.')
     return updated
+
+
+def _rotate_opencode(text, previous, replacement):
+    value, _ = jsonc(text)
+    expected = copy.deepcopy(value)
+    for section, options in (('provider', 'options'), ('providers', 'settings')):
+        providers = expected.get(section)
+        entry = providers.get(PROVIDER) if isinstance(providers, dict) else None
+        settings = entry.get(options) if isinstance(entry, dict) else None
+        if isinstance(settings, dict) and settings.get('apiKey') in previous:
+            settings['apiKey'] = replacement
+            text = _json_set(text, [section, PROVIDER, options, 'apiKey'], replacement)
+    if jsonc(text)[0] != expected:
+        raise ValueError('Rotation de la configuration OpenCode non vérifiée.')
+    return text
+
+
+def _rotate_hermes(text, previous, replacement):
+    expected = yaml.load(text, Loader=UniqueLoader)
+    if not isinstance(expected, dict):
+        raise ValueError('Configuration Hermes illisible.')
+    for section, legacy in (('custom_providers', True), ('providers', False)):
+        providers = expected.get(section)
+        if legacy and isinstance(providers, list):
+            matches = [entry for entry in providers if isinstance(entry, dict) and entry.get('name') == PROVIDER]
+        elif not legacy and isinstance(providers, dict) and isinstance(providers.get(PROVIDER), dict):
+            matches = [providers[PROVIDER]]
+        else:
+            matches = []
+        if any(entry.get('api_key') in previous for entry in matches):
+            if len(matches) != 1:
+                raise ValueError('Fournisseur Serveur Kiara dupliqué.')
+            entry = matches[0]
+            entry['api_key'] = replacement
+            text = _yaml_provider(text, yaml.compose(text, Loader=UniqueLoader), section, entry, legacy, providers)
+    if yaml.load(text, Loader=UniqueLoader) != expected:
+        raise ValueError('Rotation de la configuration Hermes non vérifiée.')
+    return text
+
+
+def rotate_credentials(previous, replacement, apps=None):
+    apps = detect() if apps is None else apps
+    for app, rewrite in (('opencode', _rotate_opencode), ('hermes', _rotate_hermes)):
+        path = Path(apps[app]['config_path'])
+        if not path.is_file():
+            continue
+        path = path.resolve(strict=True)
+        with locked(path):
+            with path.open('rb') as stream:
+                raw = stream.read(MAX_CONFIG + 1)
+            if len(raw) > MAX_CONFIG:
+                raise ValueError('Configuration trop volumineuse.')
+            text = raw.decode('utf-8-sig')
+            if not text.strip():
+                continue
+            updated = rewrite(text, (previous, integration_key(previous, app)), integration_key(replacement, app))
+            if updated != text:
+                if path.read_bytes() != raw:
+                    raise ValueError('Configuration modifiée ailleurs. Réessayez.')
+                prefix = b'\xef\xbb\xbf' if raw.startswith(b'\xef\xbb\xbf') else b''
+                atomic(path, prefix + updated.encode('utf-8'))
 
 
 def install(app,base_url,key,model,apps=None,catalogue=None,remote=None):

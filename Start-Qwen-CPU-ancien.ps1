@@ -1,7 +1,8 @@
+param([string]$ModelsRoot = (Join-Path ([IO.Path]::GetPathRoot($PSScriptRoot)) 'modèle'))
 $ErrorActionPreference = 'Stop'
 $root = $PSScriptRoot
 $exe = Join-Path $root 'llama-cpu-b11344\llama-server.exe'
-$model = 'D:\modèle\qwen3.8FlashNext\Qwen3.8-Flash-Next-UD-Q4_K_XL-00001-of-00004.gguf'
+$model = Join-Path $ModelsRoot 'qwen3.8FlashNext\Qwen3.8-Flash-Next-UD-Q4_K_XL-00001-of-00004.gguf'
 if (Test-Path (Join-Path $root 'qwen.pid')) {
  $savedPid = [int](Get-Content (Join-Path $root 'qwen.pid'))
  $existing = Get-Process -Id $savedPid -ErrorAction SilentlyContinue

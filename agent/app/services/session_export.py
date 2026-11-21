@@ -3,7 +3,8 @@ import hashlib
 import json
 from copy import deepcopy
 from pathlib import Path
-from uuid import uuid4
+import time
+from uuid import UUID, uuid4
 import zipfile
 
 from fastapi import HTTPException
@@ -227,6 +228,28 @@ def _revalidate(db, sid, operator, bindings, retained):
             raise HTTPException(404, 'Un événement est désormais hors du périmètre autorisé')
 
 
+def discard_export(path):
+    try:
+        path.unlink(missing_ok=True)
+    except OSError:
+        pass
+
+
+def _prune_exports(folder):
+    cutoff = time.time() - 86400
+    for candidate in folder.glob('*.zip'):
+        stem = candidate.stem
+        if len(stem) != 73 or stem[36] != '-':
+            continue
+        try:
+            UUID(stem[:36])
+            UUID(stem[37:])
+            if not candidate.is_symlink() and candidate.is_file() and candidate.stat().st_mtime < cutoff:
+                discard_export(candidate)
+        except (OSError, ValueError):
+            continue
+
+
 def export(db, sid):
     operator = _operator_identity()
     row = _fresh_session(db, sid, operator)
@@ -243,6 +266,7 @@ def export(db, sid):
                             .order_by(MeetingAudioChunk.track, MeetingAudioChunk.sequence)))
     folder = sessions._root().parent / 'session-exports'
     folder.mkdir(parents=True, exist_ok=True)
+    _prune_exports(folder)
     path = folder / f'{sid}-{uuid4()}.zip'
     with zipfile.ZipFile(path, 'w', compression=zipfile.ZIP_STORED, allowZip64=True) as archive:
         for chunk in chunks:

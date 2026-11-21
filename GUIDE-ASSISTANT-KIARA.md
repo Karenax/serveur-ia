@@ -1,6 +1,6 @@
 # Utiliser l’assistant Kiara
 
-Pour Windows et le web privé, ce guide prend **Kiara 4.0.8** comme référence.
+Pour Windows et le web privé, ce guide prend **Kiara 4.0.23** comme référence.
 Les indications Android ci-dessous concernent les versions antérieures à la
 qualification finale de l’interface commune. Une mise à jour Android s’installe
 par-dessus l’application existante pour conserver le profil et les conversations.
@@ -13,7 +13,7 @@ d’interface sont dans les sources Android, en attente d’un nouvel APK.
 
 ## Ouvrir Projets et Conversations dans Kiara
 
-Télécharger **Kiara 4.0.8 pour Windows** depuis la console serveur. Le code de
+Télécharger **Kiara pour Windows** depuis la console serveur. Le code de
 connexion est disponible dans **Clients & accès**. Ouvrir **Projets** pour voir
 le portefeuille autorisé et la fiche à quatre rubriques. Utiliser **Conversations**
 pour retrouver l’historique, reprendre un brouillon ou choisir un projet avant

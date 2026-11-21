@@ -1,6 +1,7 @@
 """Rebuildable, bounded semantic index. Canonical sources always authorize retrieval."""
 from array import array
 import hashlib
+from heapq import heappush, heappushpop
 import http.client
 import json
 import math
@@ -20,6 +21,15 @@ MAX_OWNER_ROWS = 4000
 MAX_CACHE_BYTES = 64 * 1024 * 1024
 MODEL_VERSION = 'embeddinggemma-2-text-f32-768-search-v1'
 MIN_SCORE = .72
+RANK_CANDIDATES = 80
+
+
+def _rank_hit(heap, score, item):
+    hit = score, item['id'], item
+    if len(heap) < RANK_CANDIDATES:
+        heappush(heap, hit)
+    else:
+        heappushpop(heap, hit)
 
 
 def passages(value):
@@ -114,21 +124,19 @@ class Knowledge:
                 append(record(m['owner'], '', 'personal_memory', m['id'], 'Souvenir personnel confirmé', m['text'], str(m['updated'])))
             for c in db.execute('SELECT c.*,d.title,d.revision FROM chunks c JOIN documents d ON d.id=c.document AND d.owner=c.owner AND d.project=c.project JOIN projects p ON p.id=c.project AND p.owner=c.owner WHERE p.archived=0 ORDER BY d.updated DESC,c.id'):
                 append(record(c['owner'], c['project'], 'document', c['document'], c['title'], c['text'], c['revision'], c['id'], c['page']))
+            active_projects = {(row['owner'], row['id']) for row in db.execute('SELECT owner,id FROM projects WHERE archived=0')}
+            exclusions = {(row['owner'], row['conversation']) for row in db.execute('SELECT owner,conversation FROM knowledge_exclusions')}
             saved = {r['id']: dict(r) for r in db.execute('SELECT * FROM conversations')}
             for c in sorted(saved.values(), key=lambda c: c['updated'], reverse=True):
-                p = db.execute('SELECT archived FROM projects WHERE id=? AND owner=?', (c['project'], c['owner'])).fetchone()
-                if c['archived'] or not p or p[0]: continue
+                if c['archived'] or (c['owner'], c['project']) not in active_projects: continue
                 for item in conversation_records(c['owner'], c['project'], c['id'], c['title'], json.loads(c['messages']), c['revision']): append(item)
             for h in db.execute('SELECT * FROM client_histories ORDER BY updated DESC'):
                 history = json.loads(h['history'])
-                exclusions={r[0] for r in db.execute('SELECT conversation FROM knowledge_exclusions WHERE owner=?',(h['owner'],))}
                 for c in history['conversations']:
-                    if c.get('archived') or c['id'] in saved or c['id'] in exclusions: continue
+                    if c.get('archived') or c['id'] in saved or (h['owner'], c['id']) in exclusions: continue
                     scope = c.get('project_id') or ''
-                    if scope:
-                        p = db.execute('SELECT archived FROM projects WHERE id=? AND owner=?', (scope, h['owner'])).fetchone()
-                        # An orphan project never becomes a personal conversation.
-                        if not p or p[0]: continue
+                    # An orphan project never becomes a personal conversation.
+                    if scope and (h['owner'], scope) not in active_projects: continue
                     revision = h['revision']
                     for item in conversation_records(h['owner'], scope, c['id'], c['title'], c['messages'], revision): append(item)
         self.limited = limited
@@ -220,12 +228,22 @@ class Knowledge:
 
     def retrieve(self, db, owner, scope, query, document=None, kinds=None, limit=6,exclude_conversation=None):
         if self.workspace.maintenance: return []
-        with self.db() as cache:
-            rows = cache.execute('SELECT data,vector FROM entries WHERE owner=? AND scope=?', (owner, scope or '')).fetchall()
+        kinds = tuple(kinds or ())
+        filters = ['owner=?', 'scope=?']
+        values = [owner, scope or '']
+        if document:
+            filters.append("kind='document' AND object=?")
+            values.append(document)
+        if kinds:
+            filters.append('kind IN (' + ','.join('?' for _ in kinds) + ')')
+            values.extend(kinds)
         if exclude_conversation:
-            canonical=exclude_conversation.replace('-','')
-            rows=[row for row in rows if not ((item:=json.loads(row['data']))['kind']=='conversation' and item['object'].replace('-','')==canonical)]
-        if not rows:return []
+            filters.append("NOT (kind='conversation' AND replace(object, '-', '')=?)")
+            values.append(exclude_conversation.replace('-', ''))
+        where = ' FROM entries WHERE ' + ' AND '.join(filters)
+        with self.db() as cache:
+            if not cache.execute('SELECT 1' + where + ' LIMIT 1', values).fetchone():
+                return []
         vector = None
         if self.engine.state == 'pret':
             try: vector = self.engine.encode([query[:2000]], mode='query')[0]
@@ -233,27 +251,28 @@ class Knowledge:
         from workspace import search_words
         from assistant_commands import suppression_rules,suppressed
         forgotten=suppression_rules(db,owner,scope)
-        words = search_words(query); lexical = []; dense = []; eligible = {};memo={}
-        for row in rows:
-            item = json.loads(row['data'])
-            if document and (item['kind'] != 'document' or item['object'] != document): continue
-            if kinds and item['kind'] not in kinds: continue
-            # Filter scope and authorization before ranking, not after a global top-k.
-            fresh = self.resolve(db, item,memo)
-            if not fresh: continue
-            if fresh['kind']=='conversation' and suppressed(fresh['text'],forgotten):continue
-            eligible[item['id']] = fresh
-            normalized = ''.join(c for c in unicodedata.normalize('NFD', (item['title'] + ' ' + item['text']).casefold()) if unicodedata.category(c) != 'Mn')
-            coverage = sum(bool(re.search(r'(?<!\w)' + re.escape(w) + r'(?!\w)', normalized)) for w in words)
-            if coverage: lexical.append((coverage, item['id']))
-            if vector is not None and row['vector']:
-                values = array('f'); values.frombytes(row['vector'])
-                if len(values) != len(vector) or any(not math.isfinite(v) for v in values): continue
-                score = sum(a * b for a, b in zip(vector, values))
-                if score >= MIN_SCORE: dense.append((score, item['id']))
-        ranks = {}
+        words = search_words(query); lexical = []; dense = []; memo = {}
+        with self.db() as cache:
+            for row in cache.execute('SELECT data,vector' + where, values):
+                item = json.loads(row['data'])
+                if document and (item['kind'] != 'document' or item['object'] != document): continue
+                if kinds and item['kind'] not in kinds: continue
+                # Check the canonical source before retaining a candidate.
+                fresh = self.resolve(db, item, memo)
+                if not fresh or (fresh['kind']=='conversation' and suppressed(fresh['text'], forgotten)): continue
+                normalized = ''.join(c for c in unicodedata.normalize('NFD', (item['title'] + ' ' + item['text']).casefold()) if unicodedata.category(c) != 'Mn')
+                coverage = sum(bool(re.search(r'(?<!\w)' + re.escape(w) + r'(?!\w)', normalized)) for w in words)
+                if coverage: _rank_hit(lexical, coverage, fresh)
+                if vector is not None and row['vector']:
+                    components = array('f'); components.frombytes(row['vector'])
+                    if len(components) != len(vector) or any(not math.isfinite(v) for v in components): continue
+                    score = sum(a * b for a, b in zip(vector, components))
+                    if score >= MIN_SCORE: _rank_hit(dense, score, fresh)
+        ranks, eligible = {}, {}
         for ranking in (sorted(lexical, reverse=True), sorted(dense, reverse=True)):
-            for index, (_, id) in enumerate(ranking[:80]): ranks[id] = ranks.get(id, 0) + 1 / (60 + index + 1)
+            for index, (_, identity, item) in enumerate(ranking):
+                eligible[identity] = item
+                ranks[identity] = ranks.get(identity, 0) + 1 / (60 + index + 1)
         return [eligible[id] for id in sorted(ranks, key=lambda id: (-ranks[id], id))[:limit]]
 
     def reference(self, item):

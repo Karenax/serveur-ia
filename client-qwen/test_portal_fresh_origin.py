@@ -25,7 +25,8 @@ class FreshOriginTests(unittest.TestCase):
         self.profile={'url':'https://fiction.example','token':'fiction'}
         self.guard=Mock()
         self.remote=SimpleNamespace(desktop_update=None,close=Mock())
-        self.server=SimpleNamespace(server_port=17842,serve_forever=Mock(),shutdown=Mock(),server_close=Mock())
+        self.server=SimpleNamespace(server_port=17842,chat_launch_url='http://127.0.0.1:17842/chat?launch='+'b'*64,
+                                    serve_forever=Mock(),shutdown=Mock(),server_close=Mock())
 
     def test_unknown_or_existing_state_is_not_fresh(self):
         for linux in (False,True):

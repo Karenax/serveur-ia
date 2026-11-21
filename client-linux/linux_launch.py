@@ -61,6 +61,7 @@ def verify_files(root):
         with path.open('rb') as stream:
             if hashlib.file_digest(stream,'sha256').hexdigest() != digest:
                 raise ValueError('Paquet Linux incomplet ou altéré : '+name)
+    return manifest
 
 
 def main():
@@ -79,7 +80,7 @@ def main():
         from linux_audio import audio_self_test
         print(json.dumps(audio_self_test()))
         return
-    if not ({'--relay-stdio','--self-test','--sync-agent-capture'} & set(sys.argv[1:])):
+    if not ({'--relay-stdio','--self-test','--sync-agent-capture','--renew-local-api-key'} & set(sys.argv[1:])):
         raise SystemExit('Ouvrez Kiara avec ./start-tauri.sh.')
     import client
     client.main()

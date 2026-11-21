@@ -12,6 +12,10 @@ os.environ["PB_MEMORY_ENGINE"] = "fake"
 
 os.environ["AGENT_TESTING"] = "1"
 
+from app.security import SESSION_TOKEN
+
+os.environ["AGENT_LOCAL_TOKEN"] = SESSION_TOKEN
+
 
 @pytest.fixture(scope="session", autouse=True)
 def initialize_test_databases():

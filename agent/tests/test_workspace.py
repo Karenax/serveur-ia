@@ -99,9 +99,12 @@ def test_meetings_merge_published_audio_and_preserve_explicit_scope(context):
                                      stage="published", job_status="completed")
         stale = MeetingRecording(project_id=bids[1], erp_project_id=pids[0], source_id=sid,
                                  filename="incoherent.wav", title="Contexte incorrect")
-        db.add_all([recording, stale])
+        draft = MeetingRecording(project_id=bids[0], erp_project_id=pids[0], source_id=sid,
+                                 filename='brouillon.wav', title='Séance à terminer')
+        db.add_all([recording, stale, draft])
         db.commit()
         recording_id = recording.id
+        draft_id = draft.id
     result = client.get(PREFIX + "/meetings", params={"project_id": pids[0], "q": "diametre"}).json()
     assert result["total"] == 1
     item = result["items"][0]
@@ -110,6 +113,11 @@ def test_meetings_merge_published_audio_and_preserve_explicit_scope(context):
     assert [action["title"] for action in item["actions"]] == ["Préparer le plan"]
     assert client.get(PREFIX + "/meetings", params={"project_id": pids[1]}).json()["total"] == 1
     assert client.get(PREFIX + "/meetings", params={"project_id": bids[0]}).status_code == 404
+    for offset, identity in enumerate((draft_id, rid)):
+        page = client.get(PREFIX + '/meetings', params={'project_id': pids[0], 'offset': offset, 'limit': 1}).json()
+        assert page['total'] == 2 and [item['id'] for item in page['items']] == [identity]
+    beyond = client.get(PREFIX + '/meetings', params={'project_id': pids[0], 'offset': 10**22}).json()
+    assert beyond == {'items': [], 'total': 2}
 
 
 def test_proposals_pagination_search_and_project_attach_separation(context):
@@ -178,6 +186,8 @@ def test_jobs_keep_global_mail_jobs_out_of_project_scope(context):
     assert any(row["progress"] == 47.5 for row in result["items"])
     running = client.get(PREFIX + "/jobs", params={"project_id": pids[0], "status": "running", "offset": 0, "limit": 1}).json()
     assert running["total"] == 1 and running["items"][0]["engine"] == "audio"
+    second = client.get(PREFIX + '/jobs', params={'project_id': pids[0], 'offset': 1, 'limit': 1}).json()
+    assert second == {'items': result['items'][1:], 'total': 2}
     global_jobs = client.get(PREFIX + "/jobs").json()["items"]
     assert any(row["id"] == job["id"] and row["project_id"] is None for row in global_jobs)
     assert any(row["engine"] == "cdc" and row["project_id"] == pids[0] for row in global_jobs)

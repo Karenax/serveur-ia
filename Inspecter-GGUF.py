@@ -1,6 +1,10 @@
+import argparse
 import struct,json
 from pathlib import Path
-base=Path(r'D:\modèle\huihui-ai\Huihui-Qwen3.8-27B-abliterated-GGUF')
+parser = argparse.ArgumentParser()
+default = Path(Path(__file__).resolve().anchor) / 'modèle' / 'huihui-ai' / 'Huihui-Qwen3.8-27B-abliterated-GGUF'
+parser.add_argument('directory', type=Path, nargs='?', default=default)
+base = parser.parse_args().directory
 for p in base.glob('*.gguf'):
  if p.name.startswith('mmproj'):continue
  f=p.open('rb'); magic,ver,nt,nk=struct.unpack('<4sIQQ',f.read(24))

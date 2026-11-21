@@ -1,5 +1,31 @@
 # Bascule de Kiara et retour arrière
 
+## Livraison Kiara 4.0.23
+
+Le 21 novembre 2026 à 09 h 28, Kiara 4.0.23 a été vérifiée en production sur le
+canal Windows et le portail privé. Le lanceur a retrouvé les 11 projets et
+Strata a conservé le même processus. Les deux entrées HTTPS ont répondu.
+Le portail authentifié a servi le nouveau bundle et les métadonnées de session
+sans jeton. Les pages Réunions et Activité et la recherche groupée en lecture
+seule dans Documents ont répondu.
+
+Le relais extrait du candidat a été vérifié avec un profil isolé. L’hôte Tauri
+extrait a passé la recette WebView2 en 720p, 1080p et 1440p. Le téléchargement
+HTTPS complet de l’installateur a correspondu au manifeste Ed25519 depuis un
+client 4.0.21. L’installateur suit le canal Windows sans Authenticode. Le
+complément Max téléchargeable `vocal-rt-153a134e7cc7496f` a également passé la
+vérification de signature et de téléchargement complet en HTTPS.
+Le serveur utilise la même révision de Max. Les poids existants ont été
+vérifiés et réutilisés. La sonde native a retrouvé deux cartes Vulkan et le
+service a confirmé sa disponibilité après activation.
+
+Les preuves, l’index du portail 4.0.22, les sources serveur du point de retour
+et le complément Max précédent sont conservés sous
+`D:\KRecette\publication-audit-423`. Le retour 4.0.22 rétablit ces fichiers, puis
+redémarre le lanceur en préservant le moteur. L’installateur 4.0.22 reste dans
+le catalogue des versions. `runtime-max-avant.json` conserve le pointeur Max
+du serveur avant activation.
+
 ## Livraison Kiara 4.0.22
 
 Le 20 novembre 2026 à 11 h 20, la vérification en production a retrouvé les

@@ -1,4 +1,4 @@
-"""Pin installed runtime packages and public distribution hashes; verify without network."""
+"""Create runtime locks from installed packages and PyPI hashes, or check them offline."""
 import argparse
 import concurrent.futures
 import hashlib

@@ -184,6 +184,8 @@ def authorize(method, path, *, query=None, body=None):
         raise HTTPException(403, 'Seules les réponses Thunderbird sont accessibles sur ce poste')
     if operator.role == "owner" and operator.project_ids is None:
         return
+    if (method, path) == ('POST', '/api/v1/session'):
+        return  # Only the standalone handler can exchange its configured credential.
     if (method, path) in {
         ("GET", "/api/v1/workspace/fusion-settings/personal"),
         ("PUT", "/api/v1/workspace/fusion-settings/personal"),

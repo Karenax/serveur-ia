@@ -1,13 +1,13 @@
 # Kiara — architecture et versions actuelles
 
-Référence du 20 novembre 2026. Kiara 4.0.22 est le client Windows publié avec le portail privé unifié. Le canal de transition du client classique utilise la 3.5.63. Les qualifications Linux et Android suivent un calendrier distinct.
+Référence du 21 novembre 2026. Kiara 4.0.23 est le client Windows publié avec le portail privé unifié. Le canal de transition du client classique utilise la 3.5.63. Les qualifications Linux et Android suivent un calendrier distinct.
 
 ## Versions et responsabilités
 
 | Composant | Version ou contrat | Rôle |
 |---|---|---|
 | Lanceur et client Windows de transition | 3.5.63 | Services Kiara et passage vers Kiara 4 |
-| Client Windows Kiara 4 | 4.0.22 | Application Tauri, téléchargements et mises à jour Windows. |
+| Client Windows Kiara 4 | 4.0.23 | Application Tauri, téléchargements et mises à jour Windows. |
 | Linux | 3.5.62, dernière référence documentée | Client Linux historique |
 | Android | 1.0.26, code 27 | Enveloppe Java/WebView et interface partagée |
 | Contrat de conversation | 4 | Conversations, outils et approbations existants |
@@ -48,13 +48,13 @@ documentent ce choix et le rôle de la P2200 pour l’encodage des images.
 - **Notes.** Le portail réunit les notes privées de l’opérateur et les notes des projets actifs auxquels il a accès. L’éditeur riche permet le collage direct d’images. Les pièces jointes et l’historique des notes de projet relèvent de l’ERP, qui conserve également les versions et images des notes personnelles. [Guide d’utilisation](GUIDE-ASSISTANT-KIARA.md#prendre-des-notes-dans-kiara)
 - **Vocal.** La conversation vocale et la dictée sont disponibles dans le composeur Windows. Le web privé indique où ouvrir le client Windows pour utiliser le microphone.
 - **Réglages.** Le menu reste visible pendant que la rubrique sélectionnée s’affiche à droite. Le client Windows et le portail servent les formulaires du compte et de l’appareil via un panneau authentifié limité à la même origine. Les mises à jour utilisent le relais du client et le canal signé. [Recette des réglages](audits/2026-11-15-fusion-kiara/BASCULE.md#livraison-kiara-4015)
-- **Distribution.** La console sert la 4.0.22 avec son manifeste Ed25519 et son installateur sans Authenticode. Les clients classiques utilisent la 3.5.63.
+- **Distribution.** La console sert la 4.0.23 avec son manifeste Ed25519 et son installateur sans Authenticode. Les clients classiques utilisent la 3.5.63.
 
 Le [plan global](PLAN-GLOBAL-SERVEUR-FRED.md) reprend les vérifications qui restent à faire et le report des imports Sage.
 
 ## Organisation du code
 
-Le serveur reste un monolithe modulaire, avec des processus séparés pour les moteurs. `lanceur/app.py` pilote la console et `remote.py` la passerelle. Workspace garde la transaction et le contrôle d’accès ; les opérations sont réparties dans `workspace_project.py`, `workspace_document.py`, `workspace_conversation.py`, `workspace_job.py`, `workspace_memory.py` et `workspace_knowledge.py`.
+Le serveur reste un monolithe modulaire, avec des processus séparés pour les moteurs. `lanceur/app.py` pilote la console et `remote.py` la passerelle. Workspace garde la transaction et le contrôle d’accès. Les opérations sont réparties dans `workspace_project.py`, `workspace_document.py`, `workspace_conversation.py`, `workspace_memory.py` et `workspace_knowledge.py`. Le service Projets gère ses traitements dans `agent/app/services/workspace_jobs.py`.
 
 `memory_service.py` porte les règles de mémoire des deux protocoles. `assistant_commands.py` orchestre les commandes ; `assistant_repository.py` fournit les primitives de stockage et `command_journal.py` leur idempotence. Les adaptateurs historiques n’inventent pas de révision pour un brouillon.
 

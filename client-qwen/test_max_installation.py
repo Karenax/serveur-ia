@@ -104,7 +104,8 @@ class MaxInstallationTests(unittest.TestCase):
         self.assertFalse(self.install.runtime.maintenance)
         old = self.install.home
         previous_pointer = self.install.location_file.read_bytes()
-        with patch('tkinter.Tk'), patch('tkinter.filedialog.askdirectory', return_value=str(self.root/'denied')), patch.object(Path,'replace',side_effect=PermissionError()):
+        with patch('tkinter.Tk'), patch('tkinter.filedialog.askdirectory', return_value=str(self.root/'denied')), \
+                patch('kiara_shared.history_store.os.replace', side_effect=PermissionError()):
             self.install.choose_folder();self.install.thread.join(5)
         self.assertEqual(self.install.home, old)
         self.assertEqual(self.install.location_file.read_bytes(), previous_pointer)
@@ -263,6 +264,7 @@ class MaxInstallationTests(unittest.TestCase):
             self.install.install(plan['plan']);self.install.thread.join(5)
         self.assertEqual(self.install.status()['phase'],'cancelled')
         self.assertFalse((self.install.home/'runtime.json').exists())
+        self.assertFalse(list(self.install.home.rglob('*.part')))
         self.install.install(plan['plan']);self.install.thread.join(5)
         self.assertEqual(self.install.status()['phase'],'ready',self.install.status())
 

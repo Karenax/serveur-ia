@@ -1,7 +1,7 @@
 # Client Windows Kiara 4
 
 La version Windows publiée est indiquée par `DESKTOP_INSTALLER_VERSION` dans [le catalogue des versions](../lanceur/releases.py). Elle utilise le manifeste Ed25519 du canal
-Kiara et un installateur sans Authenticode. [Publication et preuves](../audits/2026-11-16-architecture-interface/AVANCEMENT.md#publication-windows-et-portail-4012)
+Kiara et un installateur sans Authenticode. [Publication et preuves](../audits/2026-11-15-fusion-kiara/BASCULE.md#livraison-kiara-4023)
 
 Dans le client classique 3.5.62, ouvrir **Mises à jour** et installer la
 3.5.63. Dans cette dernière, cliquer sur **Passer à Kiara 4**. Le client

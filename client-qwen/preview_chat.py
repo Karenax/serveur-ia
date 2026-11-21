@@ -24,7 +24,7 @@ class MockRemote:
 
 if __name__ == '__main__':
     server = serve_local(MockRemote(), 'local_visual_test_only', 8090)
-    print('Aperçu simulé : http://127.0.0.1:8090/chat', flush=True)
+    print('Aperçu simulé : '+server.chat_launch_url, flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

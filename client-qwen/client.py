@@ -451,6 +451,13 @@ def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
     from history_sync import HistorySync
     drafts=DraftStore(settings_path(remote.profile),protect)
     histories=HistorySync(remote,settings_path(remote.profile).with_suffix('.history.dpapi'),protect)
+    chat_launch = secrets.token_hex(32)
+    chat_cookie = secrets.token_urlsafe(32)
+    chat_launch_lock = threading.Lock()
+    integration_keys = {app: app_integrations.integration_key(key, app) for app in ('opencode', 'hermes')}
+    storage_id = getattr(remote, 'local_storage_id', None)
+    if not isinstance(storage_id, str) or not re.fullmatch('[0-9a-f]{20}', storage_id):
+        storage_id = hashlib.sha256(key.encode()).hexdigest()[:20]
     agent_cookie = secrets.token_urlsafe(32)
     device_cookie = secrets.token_urlsafe(32)
     helper = Path(sys.executable).with_name('kiara-agent-capture.exe')
@@ -476,12 +483,16 @@ def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
             self.end_headers()
             self.wfile.write(data)
 
-        def authorized(self):
+        def authorized(self, *integrations):
             if not self.local_request():
                 self.reply(403, {'error': {'message': 'Utiliser une application API locale avec la clé affichée.'}})
                 return False
             actual = self.headers.get('Authorization', '')
-            if not hmac.compare_digest(actual, 'Bearer ' + key):
+            if not (hmac.compare_digest(actual.encode(), ('Bearer ' + key).encode())
+                    or any(hmac.compare_digest(actual.encode(), ('Bearer ' + integration_keys[app]).encode())
+                           for app in integrations)
+                    or (self.local_session('kiara_chat', chat_cookie) and (
+                        self.command == 'GET' or self.headers.get('Origin') == 'http://' + self.headers['Host']))):
                 self.reply(401, {'error': {'message': 'Clé API locale requise ; elle est affichée dans '+APP_NAME+'.'}})
                 return False
             return True
@@ -507,12 +518,30 @@ def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
                 cookie = SimpleCookie()
                 cookie.load(self.headers.get('Cookie', ''))
                 value = cookie.get(name)
-                return bool(value and hmac.compare_digest(value.value, expected))
+                return bool(value and hmac.compare_digest(value.value.encode(), expected.encode()))
             except CookieError:
                 return False
 
         def agent_authorized(self):
             return self.local_session('kiara_agent', agent_cookie)
+
+        def start_chat(self, candidate):
+            nonlocal chat_launch
+            if not self.local_request() or self.headers.get('Host') != f'127.0.0.1:{self.server.server_port}':
+                return self.reply(403, {'detail': 'Ouverture de Kiara refusée.'})
+            with chat_launch_lock:
+                accepted = bool(chat_launch and hmac.compare_digest(candidate, chat_launch))
+                if accepted:
+                    chat_launch = None
+            if not accepted:
+                return self.reply(403, {'detail': 'Ouvrez Kiara depuis son application.'})
+            self.send_response(303)
+            self.send_header('Location', '/chat')
+            self.send_header('Set-Cookie', f'kiara_chat={chat_cookie}; Path=/; HttpOnly; SameSite=Strict')
+            self.send_header('Referrer-Policy', 'no-referrer')
+            self.send_header('Cache-Control', 'no-store')
+            self.send_header('Content-Length', '0')
+            self.end_headers()
 
         def agent_proxy(self):
             bridge = self.path.startswith(THUNDERBIRD_PREFIX)
@@ -744,14 +773,14 @@ def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
             if not self.local_request():
                 return self.reply(403, {'error': {'message': 'Le chat est accessible sur localhost uniquement.'}})
             nonce = secrets.token_urlsafe(24)
-            config = json.dumps({'key':key, 'model':remote.model, 'version':remote.version, 'storage':hashlib.sha256(key.encode()).hexdigest()[:20], 'platform':'linux' if sys.platform.startswith('linux') else 'windows'}, ensure_ascii=False).replace('<', '\\u003c')
+            config = json.dumps({'model':remote.model, 'version':remote.version, 'storage':storage_id, 'platform':'linux' if sys.platform.startswith('linux') else 'windows'}, ensure_ascii=False).replace('<', '\\u003c')
             template = Path(getattr(sys, '_MEIPASS', Path(__file__).parent)) / 'chat.html'
             def read_asset(name):
                 return (template.parent / name).read_text(encoding='utf-8')
             if section:
-                content = device_settings(read_asset, nonce, section, key=key, recovery=recovery)
+                content = device_settings(read_asset, nonce, section, key='', recovery=recovery)
             elif notifications:
-                content = notification_settings(read_asset, nonce, key=key)
+                content = notification_settings(read_asset, nonce)
             else:
                 scripts=('ui.js','attachments.js','corrector.js','selection.js','thinking.js','voice.js','conversation.js','project-conversation.js')+ (('linux_features.js',) if sys.platform.startswith('linux') else ()) + ('portal_conflict_archive.js','portal_conflict_review.js','portal_conflict_library.js','portal_origin_recovery.js','portal_audio_conflict_archive.js','portal_audio_conflict_library.js')
                 presentation = ''.join('<script nonce="__NONCE__">'+(template.parent/name).read_text(encoding='utf-8')+'</script>' for name in scripts)
@@ -771,6 +800,7 @@ def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
             self.send_header('Content-Type', 'text/html; charset=utf-8')
             self.send_header('Content-Length', str(len(content)))
             self.send_header('Cache-Control', 'no-store')
+            self.send_header('Referrer-Policy', 'no-referrer')
             self.send_header('X-Content-Type-Options', 'nosniff')
             ancestors = "'self'" if settings_panel else "'none'"
             self.send_header('Content-Security-Policy', f"default-src 'none'; script-src 'nonce-{nonce}'; style-src 'nonce-{nonce}'; connect-src 'self'; img-src data:; media-src blob:; frame-ancestors {ancestors}; base-uri 'none'; form-action 'self'")
@@ -784,7 +814,7 @@ def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
                 if not self.authorized():return
                 return self.reply(200,{'pc':advanced.status(),'server':max_server_status(),'installation':max_installation.status()})
             if self.path=='/hermes/v1/models':
-                if not self.authorized():return
+                if not self.authorized('hermes'):return
                 state=remote.check()
                 if not state['connected']:return self.reply(503,{'error':{'message':state['error']}})
                 return self.reply(200,hermes_catalogue.catalogue(remote.models_catalogue)[0])
@@ -794,7 +824,12 @@ def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
             if self.path == '/client/conversation':
                 if not self.authorized():return
                 return self.reply(200,conversation.status())
+            launch = re.fullmatch(r'/chat\?launch=([0-9a-f]{64})', self.path)
+            if launch:
+                return self.start_chat(launch[1])
             if self.path in ('/', '/chat'):
+                if not self.local_session('kiara_chat', chat_cookie):
+                    return self.reply(403, {'detail': 'Ouvrez Kiara depuis son application.'})
                 try:
                     return self.chat()
                 except (OSError, ValueError):
@@ -818,7 +853,7 @@ def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
                     return self.chat(not recovery, notifications, section=None if notifications else section, recovery=recovery)
                 except (OSError, ValueError):
                     return self.reply(503, {'error': {'message': 'Impossible de charger les réglages de Kiara.'}})
-            if self.path in ('/client/device-state', '/client/device-state?section=vocal'):
+            if self.path in ('/client/device-state', '/client/device-state?section=vocal', '/client/device-state?section=api'):
                 if not self.authorized():
                     return
                 if not managed or sys.platform != 'win32':
@@ -834,7 +869,8 @@ def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
                 return self.reply(200, {'endpoint': remote.endpoint, 'internet_endpoint': remote.profile['wireguard']['endpoint'],
                                         'connection': remote.state(), 'update': remote.update_state,
                                         'local_api': f'http://127.0.0.1:{self.server.server_port}/v1',
-                                        'voice_preferences': voice_preferences, 'voice_preferences_error': failure})
+                                        'voice_preferences': voice_preferences, 'voice_preferences_error': failure,
+                                        **({'key': key} if self.path.endswith('?section=api') else {})})
             if self.path == '/client/voice':
                 if not self.authorized():return
                 return self.reply(200,voice.status())
@@ -862,7 +898,8 @@ def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
                 except (OSError,ValueError):return self.reply(500,{'error':{'message':'Brouillon local illisible : le fichier est conservé.'}})
             if self.path not in ('/v1/models', '/v1/status','/v1/workspace','/v1/notifications','/v1/voice/status','/v1/agent/state'):
                 return self.reply(404, {'error': {'message': 'Route non disponible.'}})
-            if not self.authorized():
+            integrations = ('opencode', 'hermes') if self.path == '/v1/models' else ()
+            if not self.authorized(*integrations):
                 return
             if self.path=='/v1/models':
                 state=remote.check()
@@ -898,7 +935,8 @@ def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
             if hermes_request:self.path='/v1/chat/completions'
             if self.path not in ('/client/wakeword','/client/capture') and self.path not in ('/v1/embeddings','/v1/chat/completions','/v1/responses','/v1/context', '/v1/cancel','/v1/workspace/action','/v1/notifications/action','/v1/agent/action','/v1/voice/speech','/v1/voice/cancel','/client/conversation','/client/draft','/client/endpoint','/client/preferences','/client/update/check','/client/update/apply','/client/update/kiara4','/client/history','/client/history/sync','/client/history/restore-ack','/client/history/flush','/client/history/recover','/client/integrations/apply','/client/voice','/client/voice/max/test','/client/voice/max/transcribe','/client/voice/max/speech','/client/voice/max/cancel','/client/voice/max/plan','/client/voice/max/install','/client/voice/max/install-cancel','/client/voice/max/detect','/client/voice/max/remove','/client/voice/max/open-folder','/client/voice/max/choose-folder','/client/voice/max/devices','/client/voice/max/gpu'):
                 return self.reply(404, {'error': {'message': 'Route non disponible.'}})
-            if not self.authorized():
+            integrations = ('hermes',) if hermes_request else ('opencode', 'hermes') if self.path in ('/v1/chat/completions', '/v1/responses') else ()
+            if not self.authorized(*integrations):
                 return
             try:
                 maximum = 10*1024*1024 if self.path.startswith('/client/history') or self.path in ('/v1/chat/completions','/v1/responses','/v1/context') else 8*1024*1024 if self.path=='/v1/workspace/action' else 2*1024*1024
@@ -1018,7 +1056,9 @@ def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
                         if not state['connected']:raise ValueError('Connectez le client au serveur et chargez un modèle avant de l’ajouter.')
                         model=values.get('model') or state['model']
                         if model not in state['models']:raise ValueError('Ce modèle n’est plus disponible sur le serveur. Actualisez la liste.')
-                        result=app_integrations.install(values.get('app'),f'http://127.0.0.1:{self.server.server_port}/v1',key,model,catalogue=copy.deepcopy(remote.models_catalogue),remote=remote)
+                        app = values.get('app')
+                        integration_key = integration_keys.get(app, key) if isinstance(app, str) else key
+                        result=app_integrations.install(app,f'http://127.0.0.1:{self.server.server_port}/v1',integration_key,model,catalogue=copy.deepcopy(remote.models_catalogue),remote=remote)
                     elif self.path=='/client/endpoint':
                         endpoint=values.get('endpoint') or None
                         if endpoint:endpoint=parse_connection_settings(endpoint)
@@ -1154,6 +1194,7 @@ def serve_local(remote, key, port=LOCAL_API_PORT, *, managed=False):
                         remote.active_requests-=1
                         if inference:remote.active_inference_requests-=1
     server = LocalHTTPServer(('127.0.0.1', port), Handler)
+    server.chat_launch_url = f'http://127.0.0.1:{server.server_port}/chat?launch={chat_launch}'
     server.voice = voice
     server.conversation = conversation
     server.wakeword = wakeword
@@ -1357,6 +1398,45 @@ def _local_key(profile):
     history_store.atomic(path, protect(json.dumps(data)))
     return key
 
+
+def renew_local_key(profile):
+    from file_lock import locked
+
+    path = settings_path(profile)
+    with locked(path):
+        current = _local_key(profile)
+        data = read_settings_for_update(profile)
+        previous = data.get('pending_integration_key_rotation')
+        if previous is None:
+            previous = current
+            current = 'local_' + secrets.token_urlsafe(32)
+            data.setdefault('local_storage_id', hashlib.sha256(previous.encode()).hexdigest()[:20])
+            data.update(local_key=current, pending_integration_key_rotation=previous)
+            history_store.atomic(path, protect(json.dumps(data)))
+        if not isinstance(previous, str) or len(previous) < 32 or previous == current:
+            raise LocalSettingsUnreadable('Rotation de clé locale illisible.')
+        app_integrations.rotate_credentials(previous, current)
+        del data['pending_integration_key_rotation']
+        history_store.atomic(path, protect(json.dumps(data)))
+
+
+def renew_local_profile_key():
+    if sys.platform.startswith('linux'):
+        from linux_support import lock_desktop_profile
+        profile = read_profile()
+        guard = lock_desktop_profile(profile)
+    else:
+        from windows_profile_guard import lock_desktop_profile
+        try:
+            profile = read_relay_profile()
+        except FileNotFoundError:
+            profile = read_profile()
+        guard = lock_desktop_profile(settings_path(profile))
+    try:
+        renew_local_key(profile)
+    finally:
+        guard.close()
+
 def _prepare_close_linux(window, timeout=90):
     """Await the page's save barrier without eval, which Kiara's CSP forbids."""
     identifier = secrets.token_hex(16)
@@ -1468,6 +1548,7 @@ def open_local_relay(profile, *, managed=False, required_port=None):
             if type(required_port) is not int or not LOCAL_API_PORT <= required_port <= last_port:
                 raise LocalOriginIncompatible('Le port local enregistré est incompatible avec cet accès.')
         key = local_key(profile)
+        remote.local_storage_id = read_settings_for_update(profile).get('local_storage_id')
         if required_port is not None:
             try:
                 return remote, serve_local(remote, key, required_port, managed=managed)
@@ -1685,7 +1766,7 @@ def relay_stdio(executable=None, version=VERSION):
         if imported:
             history_store.atomic(profile_path, protect(json.dumps(profile, ensure_ascii=False)))
         worker.start()
-        print(f'KIARA_RELAY_READY http://127.0.0.1:{server.server_port}/chat {settings_path(profile).stem}', flush=True)
+        print(f'KIARA_RELAY_READY {server.chat_launch_url} {settings_path(profile).stem}', flush=True)
         # Tauri owns the write end. EOF also shuts down the relay if Tauri crashes.
         if remote.desktop_update:
             remote.desktop_update.wait(remote)
@@ -1706,6 +1787,14 @@ def relay_stdio(executable=None, version=VERSION):
 
 
 def main():
+    if sys.argv[1:] == ['--renew-local-api-key']:
+        try:
+            renew_local_profile_key()
+        except (OSError, ValueError, app_integrations.yaml.YAMLError) as error:
+            print(f'Rotation interrompue ({type(error).__name__}). Fermez Kiara ou vérifiez les configurations, puis relancez la commande.', file=sys.stderr)
+            raise SystemExit(1) from None
+        print('Clé API locale renouvelée. Rouvrez Kiara et les intégrations.')
+        return
     if len(sys.argv) == 4 and sys.argv[1] == '--sync-agent-capture':
         from agent_capture import upload_journal
         try:
@@ -1807,7 +1896,7 @@ def main():
             profile_guard=lock_desktop_profile(settings_path(profile))
         remote,server=open_local_relay(profile)
         threading.Thread(target=server.serve_forever,daemon=True).start()
-        window=webview.create_window(APP_NAME+' · '+VERSION,f'http://127.0.0.1:{server.server_port}/chat',background_color='#ffffff',text_select=True,**window_geometry())
+        window=webview.create_window(APP_NAME+' · '+VERSION,server.chat_launch_url,background_color='#ffffff',text_select=True,**window_geometry())
         remote.window=window
         remote.close_guard = install_close_guard(window)
         if '--update-ack' in sys.argv:

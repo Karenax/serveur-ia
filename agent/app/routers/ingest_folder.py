@@ -1,10 +1,10 @@
 """Router scan dossier mails."""
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from pathlib import Path
 from sqlalchemy.orm import Session
 from ..db import get_db, SessionLocal
-from ..services.mail_ingest import scan_folder, DEFAULT_WATCH_DIR
+from ..services.mail_ingest import scan_folder, mail_scan_directory, DEFAULT_WATCH_DIR
 from ..services.memory_factory import get_memory_adapter
 
 router = APIRouter(prefix="/v1/ingest", tags=["ingest"])
@@ -40,7 +40,15 @@ def scan(req: ScanRequest, db: Session = Depends(get_db)):
             folders = (status(db).get("sync") or {}).get("folder_ids", [])
         result = sync(SyncRequest(folder_ids=folders), db)
         return {**result, "source": "thunderbird", "scanned": 0, "imported": 0, "duplicates": 0}
-    folder = req.folder or get_section(db, "mail").get("folder") or DEFAULT_WATCH_DIR
+    allowed = config.get("folder") or DEFAULT_WATCH_DIR
+    try:
+        folder = mail_scan_directory(req.folder or allowed, allowed)
+    except PermissionError as exc:
+        raise HTTPException(403, "Le dossier est hors de l’emplacement EML configuré") from exc
+    except ValueError as exc:
+        raise HTTPException(400, "Un chemin de dossier EML absolu est requis") from exc
+    except (OSError, RuntimeError) as exc:
+        raise HTTPException(400, "Impossible d’accéder au dossier EML") from exc
     stats = scan_folder(folder, SessionLocal, get_memory_adapter(SessionLocal), req.candidate_project_id, req.limit)
     return stats
 

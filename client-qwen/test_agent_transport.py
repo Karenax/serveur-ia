@@ -1,6 +1,8 @@
 """The local Agent interface uses the authenticated client transport."""
 
 import base64
+import hashlib
+import hmac
 import http.client
 import urllib.error
 import io
@@ -73,6 +75,15 @@ class AgentTransportTests(unittest.TestCase):
         connection.close()
         return result
 
+    def chat_session(self):
+        launch = client.urlsplit(self.server.chat_launch_url)
+        status, headers, _ = self.call('GET', launch.path + '?' + launch.query)
+        self.assertEqual(status, 303)
+        self.assertEqual(headers['Location'], '/chat')
+        self.assertEqual(headers['Referrer-Policy'], 'no-referrer')
+        self.assertIn('HttpOnly; SameSite=Strict', headers['Set-Cookie'])
+        return {'Cookie': headers['Set-Cookie'].split(';', 1)[0]}
+
     @unittest.skipUnless(sys.platform.startswith('linux'), 'Boucle audio réservée au relais Linux')
     def test_linux_system_audio_requires_local_cookie_and_same_origin(self):
         from linux_system_audio import LinuxSystemAudio
@@ -109,7 +120,7 @@ class AgentTransportTests(unittest.TestCase):
         self.assertEqual(status, 200)
         cookie = headers['Set-Cookie'].split(';', 1)[0]
         self.assertIn('HttpOnly', headers['Set-Cookie'])
-        status, _, chat = self.call('GET', '/chat')
+        status, _, chat = self.call('GET', '/chat', headers=self.chat_session())
         self.assertEqual(status, 200)
         self.assertEqual(b'<body data-kiara-unified-navigation="true"' in chat, sys.platform == 'win32' or sys.platform.startswith('linux'))
         self.assertIn(b'class="conversation-toolbar"', chat)
@@ -250,9 +261,23 @@ class AgentTransportTests(unittest.TestCase):
             self.assertEqual(saved['conversation_drafts'], original['preferences']['conversation_drafts'])
 
     def test_chat_contains_read_only_local_recovery_library_under_its_csp(self):
-        status, headers, body = self.call('GET', '/chat')
+        self.assertEqual(self.call('GET', '/')[0], 403)
+        self.assertEqual(self.call('GET', '/chat')[0], 403)
+        session = self.chat_session()
+        launch = client.urlsplit(self.server.chat_launch_url)
+        self.assertEqual(self.call('GET', launch.path + '?' + launch.query)[0], 403)
+        status, headers, body = self.call('GET', '/chat', headers=session)
         self.assertEqual(status, 200)
         page = body.decode('utf-8')
+        self.assertNotIn('local-key', page)
+        self.assertEqual(self.call('GET', '/client/history', headers=session)[0], 200)
+        integration = hmac.new(b'local-key', b'kiara-integration:opencode', hashlib.sha256).hexdigest()
+        self.assertEqual(self.call('GET', '/client/history', headers={'Authorization': 'Bearer ' + integration})[0], 401)
+        if sys.platform == 'win32':
+            address = f'http://127.0.0.1:{self.port}'
+            post_headers = {**session, 'Content-Type': 'application/json'}
+            self.assertEqual(self.call('POST', '/client/device-session', '{}', post_headers)[0], 401)
+            self.assertEqual(self.call('POST', '/client/device-session', '{}', {**post_headers, 'Origin': address})[0], 200)
         self.assertIn('kiaraPortalConflictArchive', page)
         self.assertIn('kiaraPortalConflictReview', page)
         self.assertIn('kiara-conflict-dialog', page)

@@ -93,7 +93,8 @@ class WindowsProfileGuardTests(unittest.TestCase):
     def test_relay_announces_and_releases_guard_after_server_closes(self):
         profile={'url':'https://example.test','token':'fiction'}
         guard=Mock();remote=SimpleNamespace(desktop_update=None,close=Mock())
-        server=SimpleNamespace(server_port=48001,serve_forever=Mock(),shutdown=Mock(),server_close=Mock())
+        server=SimpleNamespace(server_port=48001,chat_launch_url='http://127.0.0.1:48001/chat?launch='+'b'*64,
+                               serve_forever=Mock(),shutdown=Mock(),server_close=Mock())
         stdin=SimpleNamespace(buffer=io.BytesIO(b''))
         with patch.object(client,'read_relay_profile',return_value=profile), \
              patch.object(client,'settings_path',return_value=self.target), \
@@ -141,7 +142,8 @@ class WindowsProfileGuardTests(unittest.TestCase):
     def test_opt_in_recovery_passes_verified_origin_to_relay(self):
         profile={'url':'https://example.test','token':'fiction'}
         guard=Mock();control=Mock();remote=SimpleNamespace(desktop_update=None,close=Mock())
-        server=SimpleNamespace(server_port=17844,serve_forever=Mock(),shutdown=Mock(),server_close=Mock())
+        server=SimpleNamespace(server_port=17844,chat_launch_url='http://127.0.0.1:17844/chat?launch='+'b'*64,
+                               serve_forever=Mock(),shutdown=Mock(),server_close=Mock())
         with patch.object(client,'read_relay_profile',return_value=profile), \
              patch.object(client,'settings_path',return_value=self.target), \
              patch.object(client.sys,'stdin',SimpleNamespace(buffer=io.BytesIO())), \

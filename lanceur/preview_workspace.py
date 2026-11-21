@@ -39,7 +39,7 @@ try:
     server=client.serve_local(remote,secrets.token_urlsafe(32),8099)
     controller=Controller(fixture.temporary.name,include_legacy=False);controller.remote=fixture.store;controller.wireguard=fixture.wireguard
     console=serve(8875,controller);threading.Thread(target=console.serve_forever,daemon=True).start()
-    print('Aperçus isolés : client 8099/chat ; console 8875/#spaces',flush=True)
+    print(f'Aperçus isolés : client {server.chat_launch_url} ; console http://127.0.0.1:8875/#spaces',flush=True)
     server.serve_forever()
 finally:
     if server:server.server_close()

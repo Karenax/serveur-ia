@@ -3,6 +3,7 @@ import hashlib
 import json
 import os
 import re
+import shutil
 from pathlib import Path
 import tempfile
 import threading
@@ -12,6 +13,9 @@ from .attachments import validate_message
 
 LOCK = threading.RLock()
 HISTORY_RESET_ID = '20261006-remove-assistants'
+HISTORY_BYTES = 9 * 1024 * 1024
+# Fernet base64 expands the plaintext by one third. DPAPI also adds metadata.
+ENCRYPTED_HISTORY_BYTES = 13 * 1024 * 1024
 
 
 def is_agent_project_id(value):
@@ -64,17 +68,21 @@ def validate(value):
                 raise HistoryError('État du message invalide.')
     if value.get('currentId') not in ids:
         raise HistoryError('Conversation sélectionnée introuvable.')
-    if len(json.dumps(value, ensure_ascii=False).encode()) > 9 * 1024 * 1024:
+    if len(json.dumps(value, ensure_ascii=False).encode()) > HISTORY_BYTES:
         raise HistoryError('Historique limité à 9 Mo. Exporter puis supprimer des conversations.')
     return value
 
 def atomic(path, raw):
+    _atomic_write(path, lambda stream: stream.write(raw))
+
+
+def _atomic_write(path, write):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     fd, name = tempfile.mkstemp(dir=path.parent, suffix='.tmp')
     try:
         with os.fdopen(fd, 'wb') as stream:
-            stream.write(raw)
+            write(stream)
             stream.flush()
             os.fsync(stream.fileno())
         os.replace(name, path)
@@ -83,9 +91,17 @@ def atomic(path, raw):
 
 def read(path, protect):
     with LOCK, locked(path):
-        try: raw = Path(path).read_bytes()
+        try:
+            with Path(path).open('rb') as stream:
+                raw = stream.read(ENCRYPTED_HISTORY_BYTES + 1)
         except FileNotFoundError: return {'history': None, 'revision': ''}
-        try: value = validate(json.loads(protect(raw, decrypt=True)))
+        try:
+            if len(raw) > ENCRYPTED_HISTORY_BYTES:
+                raise ValueError('Historique chiffré trop volumineux')
+            plain = protect(raw, decrypt=True)
+            if len(plain) > HISTORY_BYTES:
+                raise ValueError('Historique déchiffré trop volumineux')
+            value = validate(json.loads(plain))
         except (OSError, ValueError, TypeError) as error:
             raise HistoryError('Historique illisible : le fichier original est conservé. Exportez vos conversations avant toute récupération.') from error
         return {'history': value, 'revision': hashlib.sha256(raw).hexdigest()}
@@ -105,9 +121,10 @@ def recover(path,protect,value):
         try:read(path,protect)
         except HistoryError:pass
         else:raise HistoryError('L’historique est lisible. Rechargez le client pour éviter de l’écraser.')
-        path=Path(path);original=path.read_bytes();validate(value)
+        path=Path(path)
+        raw=protect(json.dumps(validate(value),ensure_ascii=False).encode())
         backup=path.with_name(path.stem+'.unreadable-'+secrets.token_hex(6)+'.dpapi')
-        atomic(backup,original)
-        raw=protect(json.dumps(value,ensure_ascii=False).encode())
+        with path.open('rb') as original:
+            _atomic_write(backup, lambda output: shutil.copyfileobj(original, output, 1024 * 1024))
         atomic(path,raw)
         return {'saved':True,'revision':hashlib.sha256(raw).hexdigest(),'backup':backup.name}

@@ -14,7 +14,7 @@ from pathlib import Path
 from .config import settings
 from sqlalchemy.orm import Session
 from .db import init_db, get_db
-from .security import local_guard, session
+from .security import local_guard, session, start_local_session
 from .models import Project
 from .routers.sources import router as sources_router, project_router as project_sources_router
 from .routers.ingest_folder import router as ingest_router
@@ -156,6 +156,7 @@ app.middleware("http")(local_guard)
 from .http_protection import HTTPProtection  # noqa: E402
 app.add_middleware(HTTPProtection)
 app.get("/api/v1/session")(session)
+app.post("/api/v1/session")(start_local_session)
 
 
 app.include_router(sources_router)

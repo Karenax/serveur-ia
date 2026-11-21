@@ -61,7 +61,11 @@ fn relay_ready(line: &str) -> Result<(Url, String), &'static str> {
     if identity.len() != 20 || !identity.bytes().all(|byte| byte.is_ascii_hexdigit()) {
         return Err("Identifiant de profil Kiara invalide");
     }
-    Ok((local_url(url)?, identity.to_owned()))
+    let url = local_url(url)?;
+    if url.query().is_none() {
+        return Err("Session de démarrage Kiara absente ou invalide");
+    }
+    Ok((url, identity.to_owned()))
 }
 
 fn start_relay(profile: Option<&Path>, version: &str) -> Result<Option<RelayStart>, &'static str> {
@@ -129,11 +133,19 @@ fn local_url(value: &str) -> Result<Url, &'static str> {
         || url.password().is_some()
         || !matches!(url.port(), Some(1024..=65535))
         || url.path() != "/chat"
-        || url.query().is_some()
+        || url.query().is_some_and(|query| !query.strip_prefix("launch=").is_some_and(|token| {
+            token.len() == 64 && token.bytes().all(|byte| byte.is_ascii_hexdigit() && !byte.is_ascii_uppercase())
+        }))
         || url.fragment().is_some()
     {
         return Err("Adresse locale invalide");
     }
+    Ok(url)
+}
+
+fn diagnostic_url(value: &str) -> Result<Url, &'static str> {
+    let url = local_url(value)?;
+    if url.query().is_some() { return Err("Adresse de diagnostic invalide"); }
     Ok(url)
 }
 
@@ -288,9 +300,13 @@ fn relay_reply(input: &RelayInput, reply: u8) {
 }
 
 #[cfg(windows)]
-fn update_installer(line: &str) -> Option<&Path> {
+fn update_installer(line: &str) -> Option<(&Path, &str)> {
     let value = line.strip_suffix('\n')?.trim_end_matches('\r');
-    let path = Path::new(value.strip_prefix("KIARA_RELAY_UPDATE ")?);
+    let (digest, path) = value.strip_prefix("KIARA_RELAY_UPDATE ")?.split_once(' ')?;
+    if digest.len() != 64 || !digest.bytes().all(|byte| byte.is_ascii_hexdigit() && !byte.is_ascii_uppercase()) {
+        return None;
+    }
+    let path = Path::new(path);
     let release = path.file_name()?.to_str()?.strip_prefix("Kiara_4.")?.strip_suffix("_x64-setup.exe")?;
     let (minor, patch) = release.split_once('.')?;
     if !path.is_absolute() || [minor, patch].iter().any(|part| {
@@ -298,7 +314,32 @@ fn update_installer(line: &str) -> Option<&Path> {
     }) {
         return None;
     }
-    Some(path)
+    Some((path, digest))
+}
+
+#[cfg(windows)]
+fn verified_installer(root: &Path, installer: &Path, expected: &str) -> Option<(PathBuf, std::fs::File)> {
+    use sha2::{Digest, Sha256};
+    use std::{fs::OpenOptions, os::windows::fs::OpenOptionsExt};
+
+    let stage = installer.parent()?;
+    let stage_name = stage.file_name()?.to_str()?;
+    if stage.parent()? != root || !stage_name.starts_with("kiara-update-") {
+        return None;
+    }
+    let canonical_root = root.parent()?.canonicalize().ok()?.join(root.file_name()?);
+    let canonical_stage = canonical_root.join(stage_name);
+    let canonical_installer = canonical_stage.join(installer.file_name()?);
+    if stage.canonicalize().ok()? != canonical_stage || installer.canonicalize().ok()? != canonical_installer {
+        return None;
+    }
+    // Keep the verified file open without write or delete sharing until CreateProcess succeeds.
+    let mut file = OpenOptions::new().read(true).share_mode(1).open(&canonical_installer).ok()?;
+    if !file.metadata().ok()?.is_file() { return None; }
+    let mut digest = Sha256::new();
+    std::io::copy(&mut file, &mut digest).ok()?;
+    if format!("{:x}", digest.finalize()) != expected { return None; }
+    Some((canonical_installer, file))
 }
 
 #[cfg(windows)]
@@ -306,7 +347,7 @@ fn watch_updates(window: &WebviewWindow, pending: Arc<AtomicBool>, input: RelayI
     let window = window.clone();
     thread::spawn(move || {
         for event in events {
-            let Some(installer) = update_installer(&event) else { continue; };
+            let Some((installer, digest)) = update_installer(&event) else { continue; };
             if pending.swap(true, Ordering::AcqRel) {
                 relay_reply(&input, b'c');
                 continue;
@@ -316,10 +357,17 @@ fn watch_updates(window: &WebviewWindow, pending: Arc<AtomicBool>, input: RelayI
                 pending.store(false, Ordering::Release);
                 continue;
             }
+            let verified = std::env::var_os("LOCALAPPDATA")
+                .map(PathBuf::from).map(|base| base.join("QwenClient").join("desktop-updates"))
+                .and_then(|root| verified_installer(&root, installer, digest));
+            let Some((installer, verified_file)) = verified else {
+                relay_reply(&input, b'c');
+                pending.store(false, Ordering::Release);
+                continue;
+            };
             let handle = window.clone();
             let input_for_window = input.clone();
             let pending_for_window = pending.clone();
-            let installer = installer.to_owned();
             if window.run_on_main_thread(move || {
                 // The installer waits for this process and its relay to finish closing.
                 let started = Command::new(&installer)
@@ -327,6 +375,7 @@ fn watch_updates(window: &WebviewWindow, pending: Arc<AtomicBool>, input: RelayI
                     .arg(format!("/KIARA-WAIT={}", std::process::id()))
                     .stdin(Stdio::null()).stdout(Stdio::null()).stderr(Stdio::null())
                     .spawn().is_ok();
+                drop(verified_file);
                 relay_reply(&input_for_window, if started { b'u' } else { b'c' });
                 if started {
                     let _ = handle.destroy();
@@ -627,9 +676,9 @@ fn main() {
     let mut updates = None;
     let mut profile_directory = None;
     let (url, hidden) = match args.as_slice() {
-        [_, flag, value] if flag == "--local-url" => (local_url(&value.to_string_lossy()), false),
+        [_, flag, value] if flag == "--local-url" => (diagnostic_url(&value.to_string_lossy()), false),
         [_, flag, value, hidden] if flag == "--local-url" && hidden == "--hidden" => {
-            (local_url(&value.to_string_lossy()), true)
+            (diagnostic_url(&value.to_string_lossy()), true)
         }
         arguments => {
             let (profile, hidden) = match arguments {
@@ -736,9 +785,33 @@ mod tests {
     #[test]
     #[cfg(windows)]
     fn only_accepts_a_windows_installer_from_the_relay() {
-        assert!(update_installer("KIARA_RELAY_UPDATE C:\\Usér Files\\Kiara_4.0.2_x64-setup.exe\r\n").is_some());
-        assert!(update_installer("KIARA_RELAY_UPDATE C:\\Kiara_3.5.63_x64-setup.exe\n").is_none());
-        assert!(update_installer("KIARA_RELAY_UPDATE Kiara_4.0.2_x64-setup.exe\n").is_none());
+        let sha = "a".repeat(64);
+        assert!(update_installer(&format!("KIARA_RELAY_UPDATE {sha} C:\\Usér Files\\Kiara_4.0.2_x64-setup.exe\r\n")).is_some());
+        assert!(update_installer(&format!("KIARA_RELAY_UPDATE {sha} C:\\Kiara_3.5.63_x64-setup.exe\n")).is_none());
+        assert!(update_installer(&format!("KIARA_RELAY_UPDATE {sha} Kiara_4.0.2_x64-setup.exe\n")).is_none());
+        assert!(update_installer("KIARA_RELAY_UPDATE C:\\Kiara_4.0.2_x64-setup.exe\n").is_none());
+    }
+
+    #[test]
+    #[cfg(windows)]
+    fn staged_installer_requires_the_expected_directory_and_digest() {
+        use sha2::{Digest, Sha256};
+        use std::{fs, time::{SystemTime, UNIX_EPOCH}};
+
+        let identity = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
+        let root = std::env::temp_dir().join(format!("kiara-update-test-{identity}"));
+        let stage = root.join("kiara-update-fixture");
+        fs::create_dir_all(&stage).unwrap();
+        let installer = stage.join("Kiara_4.0.22_x64-setup.exe");
+        let bytes = b"isolated installer fixture";
+        fs::write(&installer, bytes).unwrap();
+        let digest = format!("{:x}", Sha256::digest(bytes));
+        assert!(super::verified_installer(&root, &installer, &digest).is_some());
+        assert!(super::verified_installer(&root, &installer, &"0".repeat(64)).is_none());
+        assert!(super::verified_installer(&root.join("other"), &installer, &digest).is_none());
+        fs::remove_file(installer).unwrap();
+        fs::remove_dir(stage).unwrap();
+        fs::remove_dir(root).unwrap();
     }
 
     #[test]
@@ -752,10 +825,12 @@ mod tests {
 
     #[test]
     fn relay_supplies_a_local_origin_and_safe_profile_directory_key() {
-        let (url, key) = relay_ready("KIARA_RELAY_READY http://127.0.0.1:45678/chat 0123456789abcdef0123").unwrap();
+        let ready = format!("KIARA_RELAY_READY http://127.0.0.1:45678/chat?launch={} 0123456789abcdef0123", "a".repeat(64));
+        let (url, key) = relay_ready(&ready).unwrap();
         assert_eq!(url.port(), Some(45678));
         assert_eq!(key, "0123456789abcdef0123");
-        assert_eq!(relay_ready("KIARA_RELAY_READY http://127.0.0.1:45678/chat 0123456789abcdef0123\r\n").unwrap().1, key);
+        assert_eq!(relay_ready(&format!("{ready}\r\n")).unwrap().1, key);
+        assert!(relay_ready("KIARA_RELAY_READY http://127.0.0.1:45678/chat 0123456789abcdef0123").is_err());
         assert!(relay_ready("KIARA_RELAY_READY http://127.0.0.1:45678/chat ../another-profile").is_err());
         assert!(relay_ready("KIARA_RELAY_ORIGIN_BUSY\n").unwrap_err().contains("occupé"));
         assert!(relay_ready("KIARA_RELAY_ORIGIN_MULTIPLE\n").unwrap_err().contains("conservées"));

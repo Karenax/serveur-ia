@@ -64,7 +64,8 @@ class LinuxSupportTests(unittest.TestCase):
         (Path(self.directory.name) / 'profile.enc').write_bytes(b'profil fictif')
         (Path(self.directory.name) / ('a'*20+'.enc')).write_bytes(b'reglages fictifs existants')
         remote = SimpleNamespace(desktop_update=None, close=Mock())
-        server = SimpleNamespace(server_port=48001, serve_forever=Mock(), shutdown=Mock(), server_close=Mock())
+        server = SimpleNamespace(server_port=48001, chat_launch_url='http://127.0.0.1:48001/chat?launch='+'b'*64,
+                                 serve_forever=Mock(), shutdown=Mock(), server_close=Mock())
         stdin = SimpleNamespace(buffer=io.BytesIO(b''))
         guard = Mock()
         with patch.object(client.sys, 'platform', 'linux'), \
@@ -84,7 +85,7 @@ class LinuxSupportTests(unittest.TestCase):
         self.assertFalse(remote.managed_relay)
         self.assertIsNone(remote.desktop_update)
         self.assertEqual(printed.call_args_list, [unittest.mock.call('KIARA_RELAY_PROFILE_LOCKED', flush=True),
-                         unittest.mock.call('KIARA_RELAY_READY http://127.0.0.1:48001/chat '+('a'*20), flush=True)])
+                         unittest.mock.call(f'KIARA_RELAY_READY {server.chat_launch_url} '+('a'*20), flush=True)])
         remote.close.assert_called_once()
         server.server_close.assert_called_once()
         guard.close.assert_called_once()
@@ -131,7 +132,8 @@ class LinuxSupportTests(unittest.TestCase):
         (Path(self.directory.name) / 'profile.enc').write_bytes(b'profil fictif')
         guard = Mock()
         remote = SimpleNamespace(desktop_update=None, close=Mock())
-        server = SimpleNamespace(server_port=17844, serve_forever=Mock(), shutdown=Mock(), server_close=Mock())
+        server = SimpleNamespace(server_port=17844, chat_launch_url='http://127.0.0.1:17844/chat?launch='+'b'*64,
+                                 serve_forever=Mock(), shutdown=Mock(), server_close=Mock())
         stdin = SimpleNamespace(buffer=io.BytesIO(b''))
         with patch.object(client.sys, 'platform', 'linux'), \
              patch.object(client.sys, 'stdin', stdin), \
@@ -198,7 +200,8 @@ class LinuxSupportTests(unittest.TestCase):
         (Path(self.directory.name) / 'profile.enc').write_bytes(b'profil fictif')
         guard=Mock();control=Mock()
         remote=SimpleNamespace(desktop_update=None,close=Mock())
-        server=SimpleNamespace(server_port=17844,serve_forever=Mock(),shutdown=Mock(),server_close=Mock())
+        server=SimpleNamespace(server_port=17844,chat_launch_url='http://127.0.0.1:17844/chat?launch='+'b'*64,
+                               serve_forever=Mock(),shutdown=Mock(),server_close=Mock())
         with patch.object(client.sys,'platform','linux'), \
              patch.object(client.sys,'stdin',SimpleNamespace(buffer=io.BytesIO())), \
              patch.dict(os.environ,{'KIARA_TEST_RECOVERY':'1'}), \
@@ -305,7 +308,8 @@ class LinuxSupportTests(unittest.TestCase):
             thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
             url=f'http://127.0.0.1:{server.server_port}'
             try:
-                with urllib.request.urlopen(url+'/chat') as response:
+                browser=urllib.request.build_opener(urllib.request.HTTPCookieProcessor())
+                with browser.open(server.chat_launch_url) as response:
                     html=response.read().decode()
                     self.assertIn("button.id='voice-start'",html)
                     self.assertIn("button.id='conversation-start'",html)

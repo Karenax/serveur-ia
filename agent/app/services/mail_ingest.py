@@ -153,13 +153,27 @@ async def ingest_eml_bytes(db: Session, raw: bytes, mem, candidate_project_id: s
 DEFAULT_WATCH_DIR = str(Path.home() / "Downloads" / "Infomaniak-IA")
 
 
-def scan_folder(folder: str, db_factory, mem, candidate_project_id: str | None = None,
+def mail_scan_directory(folder, allowed):
+    from backend.app.services.document_file_access import _absolute
+
+    requested, root = Path(_absolute(folder)), Path(_absolute(allowed))
+    if not requested.is_relative_to(root):
+        raise PermissionError('Dossier EML hors périmètre')
+    canonical_root = root.resolve()
+    resolved = requested.resolve()
+    if not resolved.is_relative_to(canonical_root):
+        raise PermissionError('Dossier EML hors périmètre')
+    return resolved
+
+
+def scan_folder(folder: str | Path, db_factory, mem, candidate_project_id: str | None = None,
                 limit: int = 500) -> dict:
     """Scan synchrone d'un dossier *.eml (appelé depuis endpoint)."""
     import asyncio
-    from pathlib import Path
-    p = Path(folder)
-    if not p.exists():
+    from backend.app.services.document_file_access import _handle_path
+
+    p = folder if isinstance(folder, Path) else Path(folder).resolve()
+    if not p.is_dir():
         return {"error": f"Dossier introuvable: {folder}", "scanned": 0}
     files = sorted(p.glob("*.eml"))
     stats = {"folder": str(p), "scanned": 0, "imported": 0, "duplicates": 0,
@@ -168,14 +182,18 @@ def scan_folder(folder: str, db_factory, mem, candidate_project_id: str | None =
         if stats["imported"] + len(stats["errors"]) >= limit:
             break
         stats["scanned"] += 1
-        if f.stat().st_size > DOCUMENT_IMPORT_BYTES:
-            stats["errors"].append(f"{f.name}: fichier trop volumineux")
-            continue
-        db = db_factory()
         try:
-            raw = f.read_bytes()
-            res = asyncio.run(ingest_eml_bytes(db, raw, mem, candidate_project_id,
-                                               origin="folder-scan", origin_path=str(f)))
+            if f.resolve(strict=True) != f or not f.is_file():
+                raise ValueError('Fichier EML redirigé ou non régulier')
+            with f.open('rb') as stream:
+                if _handle_path(stream) != f:
+                    raise ValueError('Emplacement du fichier EML modifié')
+                raw = stream.read(DOCUMENT_IMPORT_BYTES + 1)
+            if len(raw) > DOCUMENT_IMPORT_BYTES:
+                raise ValueError('fichier trop volumineux')
+            with db_factory() as db:
+                res = asyncio.run(ingest_eml_bytes(db, raw, mem, candidate_project_id,
+                                                   origin="folder-scan", origin_path=str(f)))
             if res["status"] == "duplicate":
                 stats["duplicates"] += 1
             else:
@@ -186,6 +204,4 @@ def scan_folder(folder: str, db_factory, mem, candidate_project_id: str | None =
                     stats["pending"] += 1
         except Exception as e:
             stats["errors"].append(f"{f.name}: {e}")
-        finally:
-            db.close()
     return stats

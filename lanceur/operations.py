@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import secrets
 import socket
+import subprocess
 import threading
 import time
 from cryptography.fernet import Fernet, InvalidToken
@@ -193,7 +194,9 @@ class Operations:
     def startup(self, enabled):
         if not isinstance(enabled, bool): raise ValueError('Activation invalide.')
         import winreg
-        command = 'powershell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File "'+str(ROOT/'Start-Interface-Qwen.ps1')+'" -SansNavigateur'
+        command = subprocess.list2cmdline(['powershell.exe', '-NoProfile', '-WindowStyle', 'Hidden',
+                                          '-ExecutionPolicy', 'Bypass', '-File', str(ROOT/'Start-Interface-Qwen.ps1'),
+                                          '-SansNavigateur'])
         with winreg.CreateKey(winreg.HKEY_CURRENT_USER, r'Software\Microsoft\Windows\CurrentVersion\Run') as key:
             if enabled: winreg.SetValueEx(key, 'QwenServer', 0, winreg.REG_SZ, command)
             else:

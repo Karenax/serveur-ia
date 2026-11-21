@@ -18,8 +18,12 @@ os.environ['TRANSFORMERS_OFFLINE'] = '1'
 os.environ['TOKENIZERS_PARALLELISM'] = 'false'
 
 
-def emit(value):
-    print(json.dumps(value, ensure_ascii=False), flush=True)
+_output_lock = threading.Lock()
+
+
+def emit(value, stream=None):
+    with _output_lock:
+        print(json.dumps(value, ensure_ascii=False), file=stream, flush=True)
 
 
 def load_engine(configuration, engine):
@@ -102,7 +106,8 @@ from worker_protocol import CommandInbox
 
 
 def serve(configuration, engine):
-    inbox=CommandInbox(engine)
+    protocol_output = sys.stdout
+    inbox=CommandInbox(engine, reject=lambda frame: emit(frame, protocol_output))
     commands,stop,closed=inbox.commands,inbox.stop,inbox.closed
     with redirect_stdout(sys.stderr):
         loaded = load_engine(configuration, engine)

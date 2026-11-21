@@ -252,10 +252,11 @@ class RemoteTests(unittest.TestCase):
         threading.Thread(target=local.serve_forever, daemon=True).start()
         try:
             self.assertTrue(remote.check()['connected'])
-            with urllib.request.urlopen(f'http://127.0.0.1:{local.server_port}/chat', timeout=5) as page:
+            browser = urllib.request.build_opener(urllib.request.HTTPCookieProcessor())
+            with browser.open(local.chat_launch_url, timeout=5) as page:
                 html = page.read().decode()
                 self.assertIn('Accès serveur Kiara', html)
-                self.assertIn(key, html)
+                self.assertNotIn(key, html)
                 self.assertNotIn(self.access['token'], html)
                 self.assertIn("frame-ancestors 'none'", page.headers['Content-Security-Policy'])
             address = f'http://127.0.0.1:{local.server_port}/v1/chat/completions'

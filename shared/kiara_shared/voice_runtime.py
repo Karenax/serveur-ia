@@ -83,7 +83,10 @@ class AdvancedVoice:
     def paths(self):
         configuration = self.configuration()
         if configuration.get('format') == 2:
-            root = Path(configuration.get('root', ''))
+            try:
+                root = self.native_root(configuration)
+            except (OSError, RuntimeError, ValueError):
+                return ()
             native='kiara-asr.dll' if configuration.get('catalogue',{}).get('runtime_api',0)>=6 else 'qwen.dll'
             return (root/'max-worker.exe', root/'native'/native, self.home/'runtime.json', root/'max-worker.exe')
         return (self.home/'python/Scripts/python.exe', self.home/'worker.py', self.home/'runtime.json',
@@ -111,12 +114,23 @@ class AdvancedVoice:
         return {**inventory,'selection':self.gpu_selection(),'scanning':self.probing,
                 'supported':installed and configuration.get('format')==2 and configuration.get('catalogue',{}).get('runtime_api',0)>=4}
 
+    def native_root(self, configuration):
+        value = configuration.get('root')
+        manifest = configuration.get('manifest')
+        if not isinstance(value, str) or not Path(value).is_absolute() or not isinstance(manifest, dict) or not manifest:
+            raise ValueError('Configuration du complément Max incomplète. Réinstallez-le depuis Vocal.')
+        root = Path(value)
+        if not root.resolve().is_relative_to(self.home.resolve()):
+            raise ValueError('Dossier du complément Max invalide.')
+        return root
+
     def native_command(self,engine=None):
         """Same integrity boundary for discovery and inference; probing skips model weights."""
-        configuration=self.configuration();root=Path(configuration['root']).resolve()
-        if not root.is_relative_to(self.home.resolve()):raise ValueError('Dossier du complément Max invalide.')
+        configuration=self.configuration()
+        configured_root = self.native_root(configuration)
+        root = configured_root.resolve()
         from .voice_packs import matches,relative_path,safe_directory
-        safe_directory(self.home,Path(configuration['root']))
+        safe_directory(self.home,configured_root)
         models={item['name'] for item in configuration.get('catalogue',{}).get('models',[])}
         for name,expected in configuration['manifest'].items():
             if engine is None and (name in models or name.startswith(('asr/','tts/'))):continue
@@ -138,8 +152,10 @@ class AdvancedVoice:
         try:
             result=subprocess.run(self.native_command(),stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,
                 text=True,encoding='utf-8',timeout=25,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
-            if result.returncode or not result.stdout or len(result.stdout)>65536:raise ValueError('Détection des cartes impossible. Vérifiez le pilote graphique et réessayez.')
-            value=json.loads(result.stdout.strip().splitlines()[-1])
+            output = result.stdout.strip() if result.stdout else ''
+            if result.returncode or not output or len(result.stdout)>65536:raise ValueError('Détection des cartes impossible. Vérifiez le pilote graphique et réessayez.')
+            value=json.loads(output.splitlines()[-1])
+            if not isinstance(value, dict):raise ValueError('Liste des cartes graphiques invalide.')
             if value.get('error'):raise ValueError(str(value['error'])[:400])
             cards=value.get('devices')
             if not isinstance(cards,list) or len(cards)>32:raise ValueError('Liste des cartes graphiques invalide.')
@@ -199,7 +215,8 @@ class AdvancedVoice:
     def status(self):
         with self.lock:
             self.leases={key:until for key,until in self.leases.items() if until>time.monotonic()}
-        installed = all(path.is_file() for path in self.paths())
+        paths = self.paths()
+        installed = bool(paths) and all(path.is_file() for path in paths)
         with self.lock:
             try:
                 report = json.loads((self.home/'benchmark.json').read_text(encoding='utf-8'))
@@ -496,18 +513,37 @@ class AdvancedVoice:
         for process in processes:
             if process.poll() is None:
                 with self.write_lock:
-                    if process.stdin and not process.stdin.closed:process.stdin.close()
+                    try:
+                        if process.stdin and not process.stdin.closed:
+                            process.stdin.close()
+                    except OSError:
+                        pass
                 try:process.wait(timeout=3)
                 except subprocess.TimeoutExpired:
-                    if os.name=='nt':
-                        subprocess.run(['taskkill','/PID',str(process.pid),'/T','/F'],
-                            stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,timeout=5,
-                            creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
-                    else:process.terminate()
-                    process.wait(timeout=5)
+                    self.stop_process(process)
+            if process.poll() is None:
+                with self.lock:
+                    self.error = 'Le moteur Max n’a pas confirmé son arrêt.'
+                continue
             for pipe in (process.stdin, process.stdout):
                 if pipe:
                     pipe.close()
+
+    @staticmethod
+    def stop_process(process):
+        if os.name == 'nt':
+            try:
+                subprocess.run(['taskkill', '/PID', str(process.pid), '/T', '/F'],
+                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=5,
+                    creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
+            except (OSError, subprocess.TimeoutExpired):
+                pass
+        try:
+            if process.poll() is None:
+                process.kill()
+            process.wait(timeout=5)
+        except (OSError, subprocess.TimeoutExpired):
+            pass
 
     def begin_maintenance(self):
         self.status()

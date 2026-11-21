@@ -72,6 +72,30 @@ class PackageIntegrityTests(unittest.TestCase):
 
 
 class TauriOnlyTests(unittest.TestCase):
+    def test_shortcut_escapes_entry_values_and_exec_arguments(self):
+        self.assertEqual(installer.desktop_string('a\nb\\c'), r'a\nb\\c')
+        self.assertEqual(installer.desktop_quote('a b%$\\c'), r'"a b%%\\$\\\\c"')
+
+    @unittest.skipUnless(sys.platform.startswith('linux'), 'Installation Linux requise')
+    def test_chmod_only_marks_the_verified_package_file(self):
+        import hashlib
+        import stat
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            binary = root/'kiara'
+            binary.write_bytes(b'fixture')
+            binary.chmod(0o600)
+            expected = hashlib.sha256(b'fixture').hexdigest()
+            with self.assertRaises(ValueError):
+                installer.mark_executable(root, 'kiara', '0' * 64)
+            self.assertEqual(stat.S_IMODE(binary.stat().st_mode), 0o600)
+            installer.mark_executable(root, 'kiara', expected)
+            (root/'alias').symlink_to(binary)
+            with self.assertRaises(OSError):
+                installer.mark_executable(root, 'alias', expected)
+            self.assertEqual(stat.S_IMODE(binary.stat().st_mode), 0o755)
+
     def test_shortcut_keeps_previous_target_if_replacement_fails(self):
         with tempfile.TemporaryDirectory() as directory:
             shortcut = Path(directory) / 'kiara.desktop'

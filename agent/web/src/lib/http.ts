@@ -10,7 +10,8 @@ export async function token(): Promise<string> {
   session ??= agentFetch("/api/v1/session", { credentials: "same-origin" })
     .then(async response => {
       if (!response.ok) throw new Error("Session locale indisponible");
-      return (await response.json()).token as string;
+      const {token} = await response.json();
+      return typeof token === 'string' ? token : '';
     }).catch(error => { session = undefined; throw error; });
   return session;
 }
